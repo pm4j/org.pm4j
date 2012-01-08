@@ -1,0 +1,68 @@
+<project name="pm4j-facelets" basedir="." default="all" >
+
+	<property name="dir.src" location="main/java"/>
+	<property name="repository.dir" location="C:/Temp/repo"/>
+	<property name="dir.classes" location="target/classes"/>
+	<property name="dir.dist" location="target/dist"/>
+
+	<!-- ========== Compile Target ========== -->
+	<target name="compile">
+		<mkdir dir="${dir.classes}"/>
+		<javac srcdir="${dir.src}" destdir="${dir.classes}" includes="org/**" debug="true" fork="true"
+			   target="1.5" >
+			<classpath>
+				<fileset file="${repository.dir}/commons-lang/jars/commons-lang-2.4.jar" />
+				<fileset file="${repository.dir}/commons-logging/jars/commons-logging-1.1.1.jar" />
+				<fileset file="${repository.dir}/junit/jars/junit-4.10.jar" />
+				<fileset file="${repository.dir}/log4j/jars/log4j-1.2.15.jar" />
+				<fileset file="../pm4j-core/target/dist/pm4j-core.jar" />
+
+				<fileset file="${repository.dir}/myfaces/jars/myfaces-api-1.2.10.jar" />
+				<fileset file="${repository.dir}/javax.servlet/jars/servletapi-2.4.jar" />
+				<fileset file="${repository.dir}/commons-io/jars/commons-io-1.4.jar" />
+<!--
+				<fileset file="${repository.dir}/myfaces/jars/myfaces-impl-1.2.10.jar" />
+				-->
+			</classpath>
+		</javac>
+		<copy todir="${dir.classes}">
+    		<fileset dir="${dir.src}">
+      			<exclude name="**/*.java"/>
+    		</fileset>
+  		</copy>
+	</target>
+
+	<!-- ========== Create Jar Target ========== -->
+	<target name="jar" depends="compile">
+		<mkdir dir="${dir.dist}"/>
+		<delete file="${dir.dist}/${ant.project.name}.jar"/>
+		<jar destfile="${dir.dist}/${ant.project.name}.jar">
+	 	 	 <fileset dir="${dir.classes}">
+	 	 	     <include name="**/*.class" />
+	 	 	 	 <include name="**/*.properties" />
+	 	 	 	 <include name="**/*.x*ml" />
+	 	 	 </fileset>
+		</jar>
+	</target>
+
+	<target name="src-jar">
+		<delete file="${dir.dist}/${ant.project.name}-src.jar"/>
+		<jar destfile="${dir.dist}/${ant.project.name}-src.jar">
+	 	 	 <fileset dir="${dir.src}">
+	 	 	     <include name="**/*.java" />
+	 	 	 	 <include name="**/*.properties" />
+	 	 	 </fileset>
+		</jar>
+	</target>
+
+	<!-- ========== Clean Target ========== -->
+	<target name="clean">
+		<delete includeEmptyDirs="true">
+			<fileset dir="${dir.classes}" includes="**/*"/>
+		</delete>
+	</target>
+
+	<!-- ========== All Target ========== -->
+    <target name="all" depends="clean,jar,src-jar" />
+
+</project>

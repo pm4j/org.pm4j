@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="test"/>
+	<classpathentry kind="src" path="sample/java"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
+		<accessrules>
+			<accessrule kind="nonaccessible" pattern="javax/swing/**"/>
+			<accessrule kind="nonaccessible" pattern="java/awt/**"/>
+		</accessrules>
+	</classpathentry>
+	<classpathentry kind="var" path="ECLIPSE_HOME/plugins/org.eclipse.core.commands_3.6.0.I20110111-0800.jar" sourcepath="/ECLIPSE_HOME/plugins/org.eclipse.core.commands.source_3.6.0.I20100512-1500.jar"/>
+	<classpathentry kind="var" path="ECLIPSE_HOME/plugins/org.eclipse.core.runtime_3.7.0.v20110110.jar" sourcepath="/ECLIPSE_HOME/plugins/org.eclipse.core.runtime.source_3.6.0.v20100505.jar"/>
+	<classpathentry kind="var" path="ECLIPSE_HOME/plugins/org.eclipse.equinox.common_3.6.0.v20110523.jar" sourcepath="/ECLIPSE_HOME/plugins/org.eclipse.equinox.common.source_3.6.0.v20100503.jar"/>
+	<classpathentry kind="var" path="ECLIPSE_HOME/plugins/org.eclipse.jface_3.7.0.I20110522-1430.jar" sourcepath="/ECLIPSE_HOME/plugins/org.eclipse.jface.source_3.6.1.M20100825-0800.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.eclipse.swt"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/pm4j-core"/>
+	<classpathentry kind="output" path="build/classes"/>
+</classpath>

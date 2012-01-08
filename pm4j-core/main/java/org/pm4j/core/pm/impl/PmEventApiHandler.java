@@ -1,0 +1,130 @@
+package org.pm4j.core.pm.impl;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.pm4j.core.pm.PmEvent;
+import org.pm4j.core.pm.PmEventListener;
+import org.pm4j.core.pm.PmObject;
+import org.pm4j.core.pm.api.PmEventApi;
+import org.pm4j.core.pm.impl.PmObjectBase.PmInitState;
+
+public class PmEventApiHandler {
+
+  private static final Log LOG = LogFactory.getLog(PmEventApiHandler.class);
+
+  ThreadLocal<Object> threadEventSource = new ThreadLocal<Object>();
+
+  public Object setThreadEventSource(Object src) {
+    threadEventSource.set(src);
+    return src;
+  }
+
+  public Object getThreadEventSource() {
+    return threadEventSource.get();
+  }
+
+  public void addPmEventListener(PmObject pm, int eventMask, PmEventListener listener) {
+    PmObjectBase pmImpl = (PmObjectBase)pm;
+    if (pmImpl.pmEventTable == null)
+      pmImpl.pmEventTable = new PmEventTable(false);
+
+    pmImpl.pmEventTable.addListener(eventMask, listener);
+
+    if (LOG.isTraceEnabled())
+      LOG.trace("Added PM-event listener '" + listener + "' for '" + PmUtil.getPmLogString(pmImpl) + "'.");
+  }
+
+  public void addWeakPmEventListener(PmObject pm, int eventMask, PmEventListener listener) {
+    PmObjectBase pmImpl = (PmObjectBase)pm;
+    if (pmImpl.pmWeakEventTable == null)
+      pmImpl.pmWeakEventTable = new PmEventTable(true);
+
+    pmImpl.pmWeakEventTable.addListener(eventMask, listener);
+
+    if (LOG.isTraceEnabled())
+      LOG.trace("Added weak PM-event listener '" + listener + "' for '" + PmUtil.getPmLogString(pmImpl) + "'.");
+  }
+
+  /**
+   * Removes the listener reference.
+   *
+   * @param listener
+   *          The listener to unregister.
+   */
+  public void removePmEventListener(PmObject pm, PmEventListener listener) {
+    PmObjectBase pmImpl = (PmObjectBase)pm;
+
+    if (pmImpl.pmEventTable != null) {
+      pmImpl.pmEventTable.removeListener(listener);
+      if (pmImpl.pmEventTable.size() == 0) {
+        pmImpl.pmEventTable = null;
+      }
+    }
+    if (pmImpl.pmWeakEventTable != null) {
+      pmImpl.pmWeakEventTable.removeListener(listener);
+      if (pmImpl.pmWeakEventTable.size() == 0) {
+        pmImpl.pmWeakEventTable = null;
+      }
+    }
+  }
+
+  public void removePmEventListener(PmObject pm, int eventMask, PmEventListener listener) {
+    PmObjectBase pmImpl = (PmObjectBase)pm;
+
+    if (pmImpl.pmEventTable != null) {
+      pmImpl.pmEventTable.removeListener(eventMask, listener);
+      if (pmImpl.pmEventTable.size() == 0) {
+        pmImpl.pmEventTable = null;
+      }
+    }
+    if (pmImpl.pmWeakEventTable != null) {
+      pmImpl.pmWeakEventTable.removeListener(eventMask, listener);
+      if (pmImpl.pmWeakEventTable.size() == 0) {
+        pmImpl.pmWeakEventTable = null;
+      }
+    }
+  }
+
+  public void firePmEvent(PmObject pm, PmEvent event) {
+    PmObjectBase pmImpl = (PmObjectBase)pm;
+
+    dispatchToOnEventMethodCalls(pmImpl, event, event.changeKind);
+
+    // TODO olaf: add option and state change.
+    // Or: check if that callback interface is really a good idea for the PM itself.
+    //     Possibly its better to add listeners manually...
+    //     We should check, how the rich client bindings work to get a good choice here.
+
+    if (pmImpl.pmEventTable != null && pmImpl.pmEventTable.size() > 0) {
+      pmImpl.pmEventTable.fireEvent(event);
+    }
+    if (pmImpl.pmWeakEventTable != null && pmImpl.pmWeakEventTable.size() > 0) {
+      pmImpl.pmWeakEventTable.fireEvent(event);
+    }
+  }
+
+  public void firePmEventIfInitialized(PmObject pm, int eventMask) {
+    PmObjectBase pmImpl = (PmObjectBase)pm;
+    if (pmImpl.pmInitState == PmInitState.INITIALIZED) {
+      PmEventApi.firePmEvent(pmImpl, eventMask);
+    }
+  }
+
+  /**
+   * Calls the related on...() methods. The set of methods to call is determined
+   * by the given <code>eventMask</code> parameter.
+   *
+   * @param event The event to propagate.
+   * @param eventMask Defines the set of on-methods to be called.
+   */
+  protected void dispatchToOnEventMethodCalls(PmObjectBase pmImpl, PmEvent event, int eventMask) {
+    // XXX olaf: the onPmXXX methods are really convenient to use, but
+    //           this construction costs some performance...
+    //           Is this really an issue?
+    //           Idea for better performing and convenient call back structure wanted!
+    if ((eventMask & PmEvent.VALUE_CHANGE) != 0) {
+      pmImpl.onPmValueChange(event);
+    }
+  }
+
+}

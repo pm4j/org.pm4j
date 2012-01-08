@@ -1,0 +1,42 @@
+Targets
+- application framework
+ - menu structure
+ - remote pm (dto surrogate)
+- swing
+ 
+- sample application
+ - petshop
+ - solar mirror configuration and control
+ - string resource editor
+ 
+
+Remoting
+ Purpose
+  - simplify the conversion of server objects to client objects.
+ Approaches
+  - provide a separate transfer model
+  - use the pm on server side and use a functional subset to support the remote task.
+ Remoting mechanism:
+  - Associate remote root PMs to named server PMs
+  - Configure for each sub-PM and PM aspect if it should be loaded with the parent.    
+ DTO
+  a) explicite dto fields (contra: serialization + memory footprint)
+  b) explicite PM interface, internally a generic value map
+  
+ Serialization:
+ - Add an enum (or class?) defining a serialization strategy.
+ - Configure default in PmDefaults
+ - Add an annotation, defining the serialization strategy.
+ - implement specific handling for List, PmList, PmRef, PmTable, PmTree
+ - add visibility and editability to dto
+  
+
+ - remote client uses the configurable caching mechanisms.
+ - there is a pm communication channel abstraction
+ - each server pm needs to be managed on the server
+   . named objects + path navigation
+ - client sessions need to be managed
+   . server state is optional
+ 
+ 
+ + named object transfer: Usage scenarion -> impl. 

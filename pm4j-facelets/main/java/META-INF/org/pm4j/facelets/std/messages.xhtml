@@ -1,0 +1,13 @@
+<ui:composition
+    xmlns="http://pm4j.org/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+>
+<div class="pm_msg_div" xmlns="http://www.w3.org/1999/xhtml">
+  <ui:repeat value="#{registerPmMessagesForCleanup(pm.pmConversation)}" var="msg">
+    <p xmlns="http://www.w3.org/1999/xhtml">
+        <h:outputText styleClass="#{styleClassForPmMsg(pmViewMapper, msg)}" value="#{msg.title}" escape="false" />
+    </p>
+  </ui:repeat>
+</div>
+</ui:composition>

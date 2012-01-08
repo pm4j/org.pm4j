@@ -1,0 +1,16 @@
+<ui:composition 
+	xmlns="http://pm4j.org/facelets"
+    xmlns:c="http://java.sun.com/jstl/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+><h:outputText 
+    id="#{pm.pmRelativeName}"
+	value="#{pm.valueAsString}"
+	rendered="#{(rendered ne 'false') and pm.pmVisible}"
+	styleClass="#{styleClassForPm(pmViewMapper, pm, styleClass)}"
+	title="#{pm.pmTooltip}"
+	escape="#{condVal(escape ne null, escape, 'true')}"
+	><ui:insert 
+/></h:outputText
+></ui:composition>
+

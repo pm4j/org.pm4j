@@ -1,0 +1,18 @@
+- Menüs:
+   - File
+      Exit
+
+- Popup Menüs:
+   - Expand / Collapse
+   - Open (für .java & .text)
+  für Verzeichnisse:
+   - Create File
+   - Create Dir
+   - rename
+   
+- Statuszeile
+   Info über das je letzte Kommando
+   
+- File Detailseite
+   Handentwurf
+   Änderbarkeit des Zeitstempels (File.setLastModified)      

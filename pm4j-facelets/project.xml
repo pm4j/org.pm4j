@@ -1,0 +1,130 @@
+<?xml version="1.0"?>
+<!-- =================================================================
+	$Log: project.xml,v $
+	Revision 1.9  2010-11-11 14:42:11  benny
+	* (myfaces): 1.2.9.
+	* (tomahawk12): 1.1.10.
+
+	Revision 1.8  2010-06-02 09:16:28  benny
+	* (jxpath): Remove unused.
+
+	Revision 1.7  2010-05-31 08:58:48  benny
+	* (junit): Load in root classloader to avoid confusion.
+
+	Revision 1.6  2010-01-13 13:51:20  benny
+	Version updates, review Olaf:
+	* (junit): 4.1.
+
+	Revision 1.5  2009-10-13 10:09:43  benny
+	* (commons-io): Add.
+
+	Revision 1.4  2009-03-03 11:33:14  olaf
+	Bugfix: servlet api in maven build ergaenzt
+
+	Revision 1.3  2009-01-07 16:03:54  olaf
+	Umstellung auf jsf 1.2
+
+	Revision 1.2  2008-05-28 10:11:52  olaf
+	Weiterimplementierung Umstellung auf PM
+
+	Revision 1.1  2008-05-27 10:03:57  olaf
+	Initiales Checkin fuer Preasentationsmodell Umstellung
+	  Review: Carl
+
+================================================================== -->
+<project>
+	<pomVersion>3</pomVersion>
+
+	<name>dpa Plattform, myui-facelets</name>
+	<groupId>dpaplattform</groupId>
+	<artifactId>myui-facelets</artifactId>
+	<currentVersion>0.0</currentVersion>
+
+	<dependencies>
+		<!--  DPAPLATTFORM DEPENDENCIES -->
+		<dependency>
+			<groupId>dpaplattform</groupId>
+			<artifactId>myui-core</artifactId>
+			<version>0.0</version>
+		</dependency>
+
+		<!-- EXTERNAL DEPENDENCIES -->
+		<dependency>
+		  <groupId>javax.servlet</groupId>
+		  <artifactId>servlet-api</artifactId>
+		  <version>2.4</version>
+		</dependency>
+
+		<dependency>
+		  <groupId>myfaces</groupId>
+		  <artifactId>myfaces-api</artifactId>
+		  <version>1.2.9</version>
+		</dependency>
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.1</version>
+            <properties>
+                <classloader>root</classloader>
+            </properties>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-logging</groupId>
+			<artifactId>commons-logging</artifactId>
+			<version>1.1.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>2.4</version>
+		</dependency>
+
+        <dependency>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+            <version>1.8.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>1.4</version>
+        </dependency>
+
+	</dependencies>
+
+	<build>
+		<nagEmailAddress>asman@mecom.de</nagEmailAddress>
+
+		<sourceDirectory>main/java</sourceDirectory>
+		<resources>
+			<resource>
+				<directory>main/java</directory>
+				<includes>
+					<include>**/*.xml</include>
+					<include>**/*.xhtml</include>
+					<include>**/*.properties</include>
+				</includes>
+			</resource>
+		</resources>
+
+		<unitTestSourceDirectory>test/java</unitTestSourceDirectory>
+		<unitTest>
+			<includes>
+				<include>**/*Test.java</include>
+			</includes>
+			<resources>
+				<resource>
+					<directory>test/java</directory>
+					<includes>
+						<include>**/*.properties</include>
+					</includes>
+				</resource>
+			</resources>
+		</unitTest>
+	</build>
+
+</project>

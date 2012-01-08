@@ -1,0 +1,13 @@
+**/*~
+**/build/**
+**/target/**
+.metadata/*
+**/CVS
+**/CVS/**
+**/.hg/*
+**/.hgignore
+**/.svn/**
+Servers/*
+org.eclipse.swt/*
+pm4j-facelets-demo/*
+RemoteSystemsTempFiles/*

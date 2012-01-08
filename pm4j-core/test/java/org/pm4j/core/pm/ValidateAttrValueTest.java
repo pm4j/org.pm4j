@@ -1,0 +1,79 @@
+package org.pm4j.core.pm;
+
+import junit.framework.TestCase;
+
+import org.pm4j.core.pm.annotation.PmAttrCfg;
+import org.pm4j.core.pm.annotation.PmAttrIntegerCfg;
+import org.pm4j.core.pm.annotation.PmCommandCfg;
+import org.pm4j.core.pm.api.PmMessageUtil;
+import org.pm4j.core.pm.impl.PmAttrIntegerImpl;
+import org.pm4j.core.pm.impl.PmCommandImpl;
+import org.pm4j.core.pm.impl.PmElementImpl;
+import org.pm4j.core.pm.impl.PmConversationImpl;
+import org.pm4j.core.pm.impl.PmUtil;
+
+public class ValidateAttrValueTest extends TestCase {
+
+  public static class MyPmClass extends PmConversationImpl {
+    public static class NestedPm extends PmElementImpl {
+      public NestedPm(PmObject pmParent) { super(pmParent); }
+
+      @PmAttrIntegerCfg(maxValue=10)
+      public final PmAttrInteger j = new PmAttrIntegerImpl(this);
+    }
+
+    @PmAttrCfg(required=true)
+    public final PmAttrInteger i = new PmAttrIntegerImpl(this);
+
+    public final NestedPm nestedPm = new NestedPm(this);
+
+    @PmCommandCfg(requiresValidValues=true)
+    public final PmCommand cmdWithValidation = new PmCommandImpl(this);
+  }
+
+  public void testValidation() {
+    MyPmClass o = new MyPmClass();
+
+    o.i.setValueAsString("1");
+    o.cmdWithValidation.doIt();
+    assertTrue(PmUtil.hasValidAttributes(o));
+    assertEquals(0, PmMessageUtil.getPmErrors(o).size());
+
+    o.i.setValueAsString("abc");
+    o.cmdWithValidation.doIt();
+    assertEquals("abc", o.i.getValueAsString());
+    assertFalse(PmUtil.hasValidAttributes(o));
+    assertEquals(1, PmMessageUtil.getPmErrors(o).size());
+    PmMessageUtil.clearPmMessages(o);
+
+    o.i.setValueAsString("");
+    o.cmdWithValidation.doIt();
+    assertEquals(null, o.i.getValueAsString());
+    assertEquals(1, PmMessageUtil.getPmErrors(o).size());
+    PmMessageUtil.clearPmMessages(o);
+
+    o.i.setValueAsString("12");
+    o.cmdWithValidation.doIt();
+    assertEquals("12", o.i.getValueAsString());
+    assertTrue(PmUtil.hasValidAttributes(o));
+    assertEquals(0, PmMessageUtil.getPmErrors(o).size());
+  }
+
+  public void testValidateAttrOfNestedElement() {
+    MyPmClass o = new MyPmClass();
+
+    o.i.setValue(123);
+    o.nestedPm.j.setValue(11);
+    o.cmdWithValidation.doIt();
+
+    assertEquals(new Integer(11), o.nestedPm.j.getValue());
+    assertFalse(o.nestedPm.j.isPmValid());
+    assertTrue(o.i.isPmValid());
+
+    o.clearPmInvalidValues();
+
+    // FIXME olaf: this fails sometimes because unresolved timing issues.
+    assertTrue(o.nestedPm.j.isPmValid());
+    assertEquals(new Integer(11), o.nestedPm.j.getValue());
+  }
+}

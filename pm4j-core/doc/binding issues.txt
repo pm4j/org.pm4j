@@ -1,0 +1,7 @@
+1. Do we really need two binder class hierarchies? 
+   The factory hierarchy and the embedded Binder hierarchy too?
+
+ Yes. To get a clear separation of configuration and runtime objects.
+
+2. Shouldn't be the makeView method part of the Binder?
+ This way the Binder may hold reference of some internal view artefacts..

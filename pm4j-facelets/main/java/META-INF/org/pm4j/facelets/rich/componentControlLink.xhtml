@@ -1,0 +1,16 @@
+<ui:composition 
+  xmlns="http://pm4j.org/facelets/rich"
+  xmlns:ui="http://java.sun.com/jsf/facelets"
+  xmlns:h="http://java.sun.com/jsf/html"
+  xmlns:rich="http://richfaces.org/rich"
+
+  ><h:outputLink value="#" 
+                 id="#{pm.pmRelativeName}"
+    ><outputTitle xmlns="http://pm4j.org/facelets"
+    /><rich:componentControl 
+                for="#{for}" 
+                attachTo="#{pm.pmRelativeName}"
+                operation="#{operation ne null ? operation : 'show'}"
+                event="#{event ne null ? event : 'onclick'}" 
+    /></h:outputLink
+></ui:composition>

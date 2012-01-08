@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="main/java"/>
+	<classpathentry kind="src" output="build/test-classes" path="test/java"/>
+	<classpathentry exported="true" kind="lib" path="/pm4j-libs-temp-solution/lib/javax.servlet/jars/servlet-api-2.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="/pm4j-libs-temp-solution/lib/myfaces/jars/myfaces-api-1.2.10.jar" sourcepath="/MAVEN_REPO/myfaces/src/myfaces-api-1.2.10-sources.jar"/>
+	<classpathentry exported="true" kind="lib" path="/pm4j-libs-temp-solution/lib/myfaces/jars/myfaces-impl-1.2.10.jar"/>
+	<classpathentry kind="lib" path="/pm4j-libs-temp-solution/lib/commons-io/jars/commons-io-1.4.jar" sourcepath="MAVEN_REPO/commons-io/src/commons-io-1.4-sources.jar"/>
+	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/pm4j-core"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6">
+		<attributes>
+			<attribute name="owner.project.facets" value="java"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="output" path="build/classes"/>
+</classpath>

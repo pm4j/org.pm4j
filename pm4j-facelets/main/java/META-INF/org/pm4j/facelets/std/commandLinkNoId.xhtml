@@ -1,0 +1,19 @@
+<ui:composition 
+    xmlns="http://pm4j.org/facelets"
+    xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+
+><h:commandLink
+    type="#{type}"
+	rendered="#{(rendered ne 'false') and pm.pmVisible}"
+	disabled="#{not pm.pmEnabled}"
+	action="#{pm.doItReturnString}"
+	title="#{condVal(pmTooltip ne null, pmTooltip, pm.pmTooltip)}"
+	styleClass="#{styleClassForPm(pmViewMapper, pm, styleClass)}" 
+	><h:outputText 
+		value ="#{condVal(pmTitle ne null, pmTitle, pm.pmTitle)}" 
+		escape="#{condVal(escape ne null, escape, 'true')}"
+	/><ui:insert 
+/></h:commandLink
+></ui:composition>
+
