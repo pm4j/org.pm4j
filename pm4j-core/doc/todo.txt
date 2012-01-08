@@ -39,4 +39,4 @@ Remoting
    . server state is optional
  
  
- + named object transfer: Usage scenarion -> impl. 
+ + named object transfer: Usage scenario -> impl. 

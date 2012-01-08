@@ -1,0 +1,14 @@
+Setup pm4j projects for eclipse 
+
+1. download pm4j:
+ git clone https://pm4j@github.com/pm4j/org.pm4j.git
+ this creates a directory 'pm4j.org'
+ 
+2. start eclipse 
+ setup or use an eclipse workspace
+ import the pm4j projects
+ 
+3. setup an OS specific SWT library project
+ create an project 'org.eclipse.swt'
+ add the classpath library ECLIPSE_HOME/plugins/org.eclipse.swt.<your_os>...jar
+ mark the library as exported
