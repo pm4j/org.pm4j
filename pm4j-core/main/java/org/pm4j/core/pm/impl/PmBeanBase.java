@@ -69,6 +69,16 @@ public abstract class PmBeanBase<T_BEAN>
     return pmBean;
   }
 
+  @Override
+  public T_BEAN findPmBean() {
+    if (pmBean == null) {
+      zz_ensurePmInitialization();
+      pmBean = findPmBeanImpl();
+      checkBeanClass(pmBean);
+    }
+    return pmBean;
+  }
+
   /**
    * Looks up for the bean behind this PM.
    * <p>
