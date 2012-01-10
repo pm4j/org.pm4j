@@ -1048,7 +1048,9 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
           ? ((PmBean)getPmParent()).getPmBeanClass()
           : null;
 
-    zz_readBeanValidationRestrictions(beanClass, myMetaData);
+    PmAttrCfg fieldAnnotation = findAnnotation(PmAttrCfg.class);
+
+    zz_readBeanValidationRestrictions(beanClass, fieldAnnotation, myMetaData);
 
     // read the option configuration first from the getOptionValues()
     // method. If not found there: From the attribute- and class declaration.
@@ -1080,7 +1082,6 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
           new PmConverterOptionBased(optionCfg != null ? optionCfg.id() : ""));
     }
 
-    PmAttrCfg fieldAnnotation = findAnnotation(PmAttrCfg.class);
 
     boolean useReflection = true;
     if (fieldAnnotation != null) {
@@ -1173,13 +1174,23 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
 
   }
 
-  private void zz_readBeanValidationRestrictions(Class<?> beanClass, MetaData myMetaData) {
-    if (zz_validatorFactory != null &&
-        beanClass != null) {
-      BeanDescriptor beanDescriptor = zz_validatorFactory.getValidator().getConstraintsForClass(beanClass);
+  private void zz_readBeanValidationRestrictions(Class<?> beanClass, PmAttrCfg fieldAnnotation, MetaData myMetaData) {
+    if (zz_validatorFactory == null)
+      return;
+
+    Class<?> srcClass = fieldAnnotation.beanInfoClass() != Void.class
+          ? fieldAnnotation.beanInfoClass()
+          : beanClass;
+
+    if (srcClass != null) {
+      BeanDescriptor beanDescriptor = zz_validatorFactory.getValidator().getConstraintsForClass(srcClass);
 
       if (beanDescriptor != null) {
-        PropertyDescriptor propertyDescriptor = beanDescriptor.getConstraintsForProperty(myMetaData.getName());
+        String propName = StringUtils.isNotBlank(fieldAnnotation.beanInfoField())
+            ? fieldAnnotation.beanInfoField()
+            : myMetaData.getName();
+
+        PropertyDescriptor propertyDescriptor = beanDescriptor.getConstraintsForProperty(propName);
 
         if (propertyDescriptor != null) {
           for (ConstraintDescriptor<?> cd : propertyDescriptor.getConstraintDescriptors()) {

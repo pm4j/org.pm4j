@@ -50,6 +50,32 @@ public @interface PmAttrCfg {
   String defaultValue() default "";
 
   /**
+   * Supports usage of JSR-303 bean validation annotations of a related bean class.
+   * <p>
+   * If the attribute is simply bound to a corresponding bean attribute having the
+   * same name, the JSR-303 annotations of the bound field are considered automatically
+   * for the attribute.<br>
+   * But if the field is somehow bound to a field of a different bean class (e.g. by value expression
+   * or getBackingValue implementation), the framework can't access these definitions.<br>
+   * This annotation may be used to provides a reference to a class that defines JSR-303 restrictions.<br>
+   * The annotation attribute {@link #beanInfoField()} allows to specify the field with the JSR-303 restriction definition.
+   * The {@link #beanInfoField()} definition is not required if the field has the same name as this attribute.
+   *
+   * @return The class that provides the related JSR-303 validation restrictions.
+   */
+  Class<?> beanInfoClass() default Void.class;
+
+  /**
+   * Allows to specify the name of the field to read JSR-303 validation information from.<br>
+   * It is not required to define this if the PM attribute and the related field have the same name.
+   * <p>
+   * See also: {@link #beanInfoClass()}.
+   *
+   * @return The name of the related bean field to read JSR-303 information from.
+   */
+  String beanInfoField() default "";
+
+  /**
    * May be specified alternatively to {@link #defaultValue()}.
    * <p>
    * Denotes a path expression that points to the default value.
@@ -67,7 +93,7 @@ public @interface PmAttrCfg {
    * @return Key of a format definition used for string conversions.
    */
   String formatResKey() default "";
-  
+
   /**
    * Defines value change detection on string level.<br>
    * If set to <code>true</code> a difference between the current string representation
@@ -75,8 +101,8 @@ public @interface PmAttrCfg {
    * This will usually only be done on the native value representation.
    * <p>
    * The main reason for this option are formatted date fields....
-   * 
-   *  is checked if an entered value should be compared against 
+   *
+   *  is checked if an entered value should be compared against
    * @return
    */
   boolean checkValueChangeOnStringInput() default false;
@@ -84,15 +110,6 @@ public @interface PmAttrCfg {
   /**
    * @return The data access kind definition.
    */
-  // TODO olaf: accessKind specification is a pure framework support
-  // task delegated to the programmer.<br>
-  // It might be useful to get that information by user attribute class
-  // inspection: Just check if the framework method 'getBackingAttrValue'
-  // is overridden or not...<br>
-  // Is some magic, but releases the programmer from the task to provide
-  // redundant framework hints...<br>
-  // Most programmers had problems to understand (or simply forgot) that
-  // accessKind hint!
   AttrAccessKind accessKind() default AttrAccessKind.DEFAULT;
 
   enum AttrAccessKind {
@@ -123,6 +140,7 @@ public @interface PmAttrCfg {
      * Is only useful for attributes that return a unique value with their
      * implementation of {@link PmAttr#getPmLongName()}.
      */
+    @Deprecated
     SESSIONPROPERTY
 }
 
