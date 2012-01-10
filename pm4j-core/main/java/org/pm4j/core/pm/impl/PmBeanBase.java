@@ -6,6 +6,7 @@ import org.apache.commons.lang.StringUtils;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmEvent;
+import org.pm4j.core.pm.PmEventListener;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmBeanCfg;
 import org.pm4j.core.pm.api.PmCacheApi;
@@ -222,6 +223,49 @@ public abstract class PmBeanBase<T_BEAN>
       throw new PmRuntimeException(this, "Class '" + bean.getClass()
           + "' is not assignable to '" + getOwnMetaData().beanClass + "'.");
     }
+  }
+
+  /**
+   * A special {@link PmBeanBase} class that provides access to the bean that is handled by the embedding
+   * {@link PmBeanBase} instance.
+   *
+   * @param <T_BEAN> Type of the backing bean.
+   */
+  public static class Nested<T_BEAN> extends PmBeanBase<T_BEAN> {
+
+    public Nested(PmObject parentPm) {
+      super(parentPm, null);
+    }
+
+    /** A reference that binds the listener life cycle to this instance. */
+    private PmEventListener pmEmbeddingBeanPmValueChangeListener;
+
+    @Override
+    protected void onPmInit() {
+      super.onPmInit();
+
+      pmEmbeddingBeanPmValueChangeListener = new PmEventListener() {
+        @Override
+        public void handleEvent(PmEvent event) {
+          setPmBean(null);
+        }
+      };
+
+      PmBeanBase<T_BEAN> embeddingBeanPm = getEmbeddingBeanPm();
+      PmEventApi.addWeakPmEventListener(embeddingBeanPm, PmEvent.VALUE_CHANGE, pmEmbeddingBeanPmValueChangeListener);
+    }
+
+    @Override
+    protected T_BEAN findPmBeanImpl() {
+      T_BEAN bean = getEmbeddingBeanPm().findPmBean();
+      return bean;
+    }
+
+    @SuppressWarnings("unchecked")
+    private PmBeanBase<T_BEAN> getEmbeddingBeanPm() {
+      return PmUtil.getPmParentOfType(this, PmBeanBase.class);
+    }
+
   }
 
   // ======== meta data ======== //
