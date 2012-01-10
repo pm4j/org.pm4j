@@ -96,6 +96,16 @@ public abstract class PmElementBase
   }
 
   /**
+   * An element is disabled in cascade with its parent.
+   */
+  @Override
+  protected boolean isPmEnabledImpl() {
+    return super.isPmEnabledImpl() &&
+        (getPmParent() == null ||
+         getPmParent().isPmEnabled());
+  }
+
+  /**
    * Defines if the attribute validation should be executed on each attribute value set
    * operation. - That's that default setting.
    * <p>
