@@ -5,7 +5,7 @@
 	<classpathentry kind="src" output="build/test-classes" path="test/java"/>
 	<classpathentry exported="true" kind="lib" path="/pm4j-libs-temp-solution/lib/javax.validation/jars/validation-api-1.0.0.GA.jar"/>
 	<classpathentry exported="true" kind="lib" path="/pm4j-libs-temp-solution/lib/junit/jars/junit-4.6.jar"/>
-	<classpathentry exported="true" kind="lib" path="/pm4j-libs-temp-solution/lib/commons-lang/jars/commons-lang-2.4.jar" sourcepath="MAVEN_REPO/commons-lang/src/commons-lang-2.4-sources.jar"/>
+	<classpathentry exported="true" kind="lib" path="/pm4j-libs-temp-solution/lib/commons-lang/jars/commons-lang-2.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="/pm4j-libs-temp-solution/lib/commons-logging/jars/commons-logging-1.1.1.jar" sourcepath="MAVEN_REPO/commons-logging/src/commons-logging-1.1.1-sources.jar"/>
 	<classpathentry exported="true" kind="lib" path="/pm4j-libs-temp-solution/lib/log4j/jars/log4j-1.2.16.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6">

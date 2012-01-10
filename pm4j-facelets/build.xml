@@ -57,7 +57,7 @@
 
 	<!-- ========== Clean Target ========== -->
 	<target name="clean">
-		<delete includeEmptyDirs="true">
+		<delete includeEmptyDirs="true" quiet="true">
 			<fileset dir="${dir.classes}" includes="**/*"/>
 		</delete>
 	</target>
