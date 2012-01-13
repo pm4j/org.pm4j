@@ -8,6 +8,14 @@ import org.pm4j.core.pm.PmAttrDate;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.impl.converter.PmConverterDate;
 
+/**
+ * Base class for PM attributes the externally provide a {@link java.util.Date}.<br>
+ * Sub classes may bind it to other date representations (e.g. joda data, Long, ...).
+ *
+ * @author OBOEDE
+ *
+ * @param <T_BACKING_DATE> The backing value type this attribute is bound to.
+ */
 public class PmAttrDateBase<T_BACKING_DATE> extends PmAttrBase<Date, T_BACKING_DATE> implements PmAttrDate {
 
   public PmAttrDateBase(PmObject pmParent) {
