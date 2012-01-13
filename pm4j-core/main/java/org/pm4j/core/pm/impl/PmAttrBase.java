@@ -262,6 +262,25 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
         : super.compareTo(otherPm);
   }
 
+  /**
+   * Checks if two instances represent the same value.
+   * <p>
+   * Sub classes may override this method to provide their specific equals-conditions.
+   * <p>
+   * This correct implementation of this method is important for the changed state handling.
+   *
+   * @see #isPmValueChanged()
+   * @see #onPmValueChange(PmEvent)
+   * @see PmEvent#VALUE_CHANGE
+   *
+   * @param v1 A value. May be <code>null</code>.
+   * @param v2 Another value. May be <code>null</code>.
+   * @return <code>true</code> if both parameters represent the same value.
+   */
+  protected boolean equalValues(T_PM_VALUE v1, T_PM_VALUE v2) {
+    return ObjectUtils.equals(v1, v2);
+  }
+
   // ======== Attribute value access ======== //
 
   // TODO: Gegenwärtig liefert nur getValueAsString den 'invalidValue'.
@@ -466,7 +485,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
 
       T_PM_VALUE newPmValue = value.getPmValue();
       T_PM_VALUE currentValue = getUncachedValidValue();
-      boolean valueChanged = !ObjectUtils.equals(currentValue, newPmValue);
+      boolean pmValueChanged = ! equalValues(currentValue, newPmValue);
 
       // Ensure that primitive types will not be set to null.
       if ((newPmValue == null) && getOwnMetaData().primitiveType) {
@@ -474,7 +493,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
         return false;
       }
 
-      if (valueChanged && isPmReadonly()) {
+      if (pmValueChanged && isPmReadonly()) {
         PmMessageUtil.makeMsg(this, Severity.ERROR, PmConstants.MSGKEY_VALIDATION_READONLY);
         return false;
       }
@@ -494,7 +513,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
 
       // Check both values for null-value because they might be different but
       // may both represent a null-value.
-      if (valueChanged &&
+      if (pmValueChanged &&
           (!(isEmptyValue(newPmValue) && isEmptyValue(currentValue)))
          ) {
         try {
@@ -1011,7 +1030,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
       zz_validatorFactory = Validation.buildDefaultValidatorFactory();
     }
     catch (ValidationException e) {
-      LOG.debug("No JSR-303 bean validation configuration found.");
+      LOG.info("No JSR-303 bean validation configuration found:" + e.getMessage());
     }
   }
 
@@ -1178,7 +1197,8 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     if (zz_validatorFactory == null)
       return;
 
-    Class<?> srcClass = fieldAnnotation.beanInfoClass() != Void.class
+    Class<?> srcClass = ((fieldAnnotation != null) &&
+                         (fieldAnnotation.beanInfoClass() != Void.class))
           ? fieldAnnotation.beanInfoClass()
           : beanClass;
 
@@ -1186,7 +1206,8 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
       BeanDescriptor beanDescriptor = zz_validatorFactory.getValidator().getConstraintsForClass(srcClass);
 
       if (beanDescriptor != null) {
-        String propName = StringUtils.isNotBlank(fieldAnnotation.beanInfoField())
+        String propName = ((fieldAnnotation != null) &&
+                           (StringUtils.isNotBlank(fieldAnnotation.beanInfoField())))
             ? fieldAnnotation.beanInfoField()
             : myMetaData.getName();
 
