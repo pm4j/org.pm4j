@@ -70,16 +70,6 @@ public abstract class PmBeanBase<T_BEAN>
     return pmBean;
   }
 
-  @Override
-  public T_BEAN findPmBean() {
-    if (pmBean == null) {
-      zz_ensurePmInitialization();
-      pmBean = findPmBeanImpl();
-      checkBeanClass(pmBean);
-    }
-    return pmBean;
-  }
-
   /**
    * Looks up for the bean behind this PM.
    * <p>
@@ -119,10 +109,6 @@ public abstract class PmBeanBase<T_BEAN>
       } catch (Exception e) {
         throw new PmRuntimeException(this, "Unable to execute the autoCreateBean action specified in @PmCommandCfg.");
       }
-    }
-
-    if (bean == null) {
-      throw new PmRuntimeException(this, "Missing bean reference! PM class: " + getClass().getName());
     }
 
     return bean;
@@ -257,8 +243,8 @@ public abstract class PmBeanBase<T_BEAN>
 
     @Override
     protected T_BEAN findPmBeanImpl() {
-      T_BEAN bean = getEmbeddingBeanPm().findPmBean();
-      return bean;
+      PmBeanBase<T_BEAN> embeddingBeanPm = getEmbeddingBeanPm();
+      return embeddingBeanPm.getPmBean();
     }
 
     @SuppressWarnings("unchecked")
