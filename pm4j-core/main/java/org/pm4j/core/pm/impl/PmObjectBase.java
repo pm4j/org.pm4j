@@ -875,9 +875,8 @@ public abstract class PmObjectBase implements PmObject {
   protected void zz_ensurePmInitialization() {
     if (pmInitState != PmInitState.INITIALIZED) {
       if (pmInitState == PmInitState.BEFORE_ON_PM_INIT) {
-        // XXX olaf: is that reaction ok?
-        LOG.warn("Pm interface usage within an 'onPmInit()' method implementation may result in unexpected results. " +
-            "Please check if it is really necessary. Was obsserved for PM: " + PmUtil.getPmLogString(this));
+        if (LOG.isDebugEnabled())
+          LOG.debug("Pm interface usage within an 'onPmInit()' in PM: " + PmUtil.getPmLogString(this));
       }
       else {
         ensurePmMetaDataInitialization();
