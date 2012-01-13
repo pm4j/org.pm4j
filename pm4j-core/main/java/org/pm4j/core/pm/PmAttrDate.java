@@ -26,7 +26,4 @@ public interface PmAttrDate extends PmAttr<Date> {
    */
   String getOutputFormat();
 
-  int getMaxLen();
-
-  int getMinLen();
 }
