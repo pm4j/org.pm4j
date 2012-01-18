@@ -857,7 +857,7 @@ public abstract class PmObjectBase implements PmObject {
         m.invoke(this, value);
       } catch (Exception ex) {
         throw new PmRuntimeException(this, "Can't initialize field '" + m.getName() + "' in class '"
-            + getClass().getName() + "'.", ex);
+            + getClass().getName() + "' with value '" + value + "'.", ex);
       }
     }
   }
