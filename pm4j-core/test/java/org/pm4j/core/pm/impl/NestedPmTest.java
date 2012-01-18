@@ -29,11 +29,11 @@ public class NestedPmTest extends TestCase {
 
     assertEquals("childElem", pm.childElem.getPmName());
     assertEquals("childElem", pm.childElem.getPmRelativeName());
-    assertEquals("rootPm_childElem", pm.childElem.getPmAbsoluteName());
+    assertEquals("org.pm4j.core.pm.impl.NestedPmTest$RootPm_childElem", pm.childElem.getPmAbsoluteName());
 
     assertEquals("cmdInChildElem", pm.childElem.cmdInChildElem.getPmName());
     assertEquals("childElem_cmdInChildElem", pm.childElem.cmdInChildElem.getPmRelativeName());
-    assertEquals("rootPm_childElem_cmdInChildElem", PmUtil.getPmAbsoluteName(pm.childElem.cmdInChildElem));
+    assertEquals("org.pm4j.core.pm.impl.NestedPmTest$RootPm_childElem_cmdInChildElem", PmUtil.getPmAbsoluteName(pm.childElem.cmdInChildElem));
 
     assertEquals("nestedPmTest.RootPm", pm.getPmResKey());
     assertEquals("nestedPmTest.RootPm.childElem", pm.childElem.getPmResKey());
@@ -44,10 +44,10 @@ public class NestedPmTest extends TestCase {
     RootPm pm2 = new RootPm();
 
     assertEquals("childElem", pm2.childElem.getPmName());
-    assertEquals("rootPm_childElem", pm2.childElem.getPmAbsoluteName());
+    assertEquals("org.pm4j.core.pm.impl.NestedPmTest$RootPm_childElem", pm2.childElem.getPmAbsoluteName());
 
     assertEquals("cmdInChildElem", pm2.childElem.cmdInChildElem.getPmName());
-    assertEquals("rootPm_childElem_cmdInChildElem", PmUtil.getPmAbsoluteName(pm2.childElem.cmdInChildElem));
+    assertEquals("org.pm4j.core.pm.impl.NestedPmTest$RootPm_childElem_cmdInChildElem", PmUtil.getPmAbsoluteName(pm2.childElem.cmdInChildElem));
   }
 
 }

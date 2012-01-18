@@ -61,35 +61,6 @@ public final class PmUtil {
   }
 
   /**
-   * Generates a string that represents the PM hierarchy of the given PM.
-   * <p>
-   * The first item is the given PM itself.<br>
-   * The last item is the session of the PM.
-   *
-   * @param pm
-   *          The PM to analyze.
-   * @param withSessionHierarchy
-   *          If <code>true</code> PM's till the root session will be returned.<br>
-   *          If <code>false</code> PM's till the session that manages the given
-   *          PM will returned.
-   * @param delimiter
-   *          The delimiter between path name parts.
-   * @return The session hierarchy.
-   */
-  public static String getPmHierarchyString(PmObject pm, boolean withSessionHierarchy, char delimiter) {
-    StringBuilder sb = new StringBuilder(50);
-    List<PmObject> pmHierarchy = getPmHierarchy(pm, withSessionHierarchy);
-    for (int i=pmHierarchy.size()-1; i>=0; --i) {
-      if (sb.length() > 0) {
-        sb.append(delimiter);
-      }
-      sb.append(pmHierarchy.get(i).getPmName());
-    }
-
-    return sb.toString();
-  }
-
-  /**
    * Provides the root of the session hierarchy for the given PM.
    *
    * @param pm

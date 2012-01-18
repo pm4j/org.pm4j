@@ -695,14 +695,14 @@ public abstract class PmObjectBase implements PmObject {
    *          The name of this presentation model. Is often used to find
    *          annotations attached to a field or getter.
    */
-  private void zz_initMetaData(PmObject parentPm, String name, boolean isPmField, boolean isSubPm) {
+  private void zz_initMetaData(PmObjectBase parentPm, String name, boolean isPmField, boolean isSubPm) {
     if (pmMetaData == null) {
-      String key = (parentPm != null)
-              ? ((PmObjectBase)parentPm).getPmAbsoluteName() + MetaData.NAME_PATH_DELIMITER +
-                (name != null
-                    ? name
-                    : getClass().getName())
-              : getClass().getName();
+      String lastKeyPart = (name != null)
+                            ? name
+                            : getClass().getName();
+      String key = (pmParent != null)
+                            ? pmParent.getPmAbsoluteName() + PmObjectBase.MetaData.NAME_PATH_DELIMITER + lastKeyPart
+                            : lastKeyPart;
 
       setPmMetaData(pmKeyToMetaDataMap.get(key));
       if (pmMetaData == null) {
@@ -729,8 +729,7 @@ public abstract class PmObjectBase implements PmObject {
                   "PM class: " + getClass().getCanonicalName());
             }
 
-            // MMZ, Jan 18, 2012: TODO: use same algorithm as for variable 'key'
-            pmMetaData.absoluteName = PmUtil.getPmHierarchyString(this, true, MetaData.NAME_PATH_DELIMITER);
+            pmMetaData.absoluteName = key;
 
             // Perform the subclass specific meta data initialization after having defined names.
             initMetaData(pmMetaData);
@@ -1640,7 +1639,6 @@ final class PmObjectUtil {
         throw e;
       }
     }
-
   }
 }
 
