@@ -8,7 +8,7 @@
 	<!-- ========== Compile Target ========== -->
 	<target name="compile">
 		<mkdir dir="${dir.classes}"/>
-		<javac srcdir="${dir.src}" destdir="${dir.classes}" includes="org/**" debug="true" fork="true"
+		<javac srcdir="${dir.src}" destdir="${dir.classes}" includes="org/**" debug="true" debuglevel="lines,vars,source" fork="true"
 			   target="1.5" >
 			<classpath>
 				<fileset file="${repository.dir}/commons-lang/jars/commons-lang-2.4.jar" />
@@ -20,9 +20,6 @@
 				<fileset file="${repository.dir}/myfaces/jars/myfaces-api-1.2.10.jar" />
 				<fileset file="${repository.dir}/javax.servlet/jars/servletapi-2.4.jar" />
 				<fileset file="${repository.dir}/commons-io/jars/commons-io-1.4.jar" />
-<!--
-				<fileset file="${repository.dir}/myfaces/jars/myfaces-impl-1.2.10.jar" />
-				-->
 			</classpath>
 		</javac>
 		<copy todir="${dir.classes}">

@@ -1,15 +1,14 @@
 <project name="pm4j-core" basedir="." default="all" >
 
 	<property name="dir.src" location="main/java"/>
-	<property name="repository.dir" location="C:/Temp/repo"/>
+	<property name="repository.dir" location="../pm4j-libs-temp-solution/lib" />
 	<property name="dir.classes" location="target/classes"/>
 	<property name="dir.dist" location="target/dist"/>
 
 	<!-- ========== Compile Target ========== -->
 	<target name="compile">
 		<mkdir dir="${dir.classes}"/>
-		<javac srcdir="${dir.src}" destdir="${dir.classes}" includes="org/**" debug="true" fork="true"
-			   target="1.5" >
+		<javac srcdir="${dir.src}" destdir="${dir.classes}" includes="org/**" debug="true" debuglevel="lines,vars,source" fork="true">
 			<classpath>
 				<fileset file="${repository.dir}/commons-lang/jars/commons-lang-2.4.jar" />
 				<fileset file="${repository.dir}/commons-logging/jars/commons-logging-1.1.1.jar" />
