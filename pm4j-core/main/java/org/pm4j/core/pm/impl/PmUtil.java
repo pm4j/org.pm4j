@@ -44,7 +44,8 @@ public final class PmUtil {
   public static List<PmObject> getPmHierarchy(PmObject pm, boolean withSessionHierarchy) {
     List<PmObject> list = new ArrayList<PmObject>();
     PmConversation pmConversation = pm.getPmConversation();
-    for (PmObject p = pm; true; p=p.getPmParent()) {
+    PmObject p = pm;
+    do {
       if (!withSessionHierarchy) {
         // Terminate when the session of the item is reached.
         if (p == pmConversation) {
@@ -53,14 +54,8 @@ public final class PmUtil {
       }
 
       list.add(p);
-
-      if (withSessionHierarchy) {
-        // Terminate when the root session is reached.
-        if (p.getPmConversation() == p) {
-          break;
-        }
-      }
-    }
+      p = p.getPmParent();
+    } while (p != null);
 
     return list;
   }

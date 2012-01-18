@@ -729,6 +729,7 @@ public abstract class PmObjectBase implements PmObject {
                   "PM class: " + getClass().getCanonicalName());
             }
 
+            // MMZ, Jan 18, 2012: TODO: use same algorithm as for variable 'key'
             pmMetaData.absoluteName = PmUtil.getPmHierarchyString(this, true, MetaData.NAME_PATH_DELIMITER);
 
             // Perform the subclass specific meta data initialization after having defined names.
