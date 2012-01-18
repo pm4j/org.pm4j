@@ -13,7 +13,7 @@ public class AbstractEventProvidingObjectTest extends TestCase {
     PmConversation instance = new PmConversationImpl();
     RecordingTestListener changeListerner = new RecordingTestListener();
 
-    PmEventApi.addPmEventListener(instance, changeListerner);
+    PmEventApi.addPmEventListener(instance, PmEvent.ALL, changeListerner);
     assertEquals(0, changeListerner.getEvents().size());
 
     PmEventApi.firePmEvent(instance, PmEvent.ALL);

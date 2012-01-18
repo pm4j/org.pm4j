@@ -10,26 +10,23 @@ public class PmEventApi {
   private static final PmEventApiHandler apiHandler = new PmEventApiHandler();
 
   /**
-   * The provided <tt>listener</tt> will receive {@link PmEvent}
-   * events whenever something happens that affects the given item.
+   * The provided <tt>listener</tt> will receive {@link PmEvent} events whenever
+   * something happens that affects the given item.
    * <p>
    * This call generates only a weak reference to the listener. The calling code
    * has to ensure the intended live time of the listener.
    *
+   * @param pm
+   *          The PM to observe
+   * @param eventMask
+   *          A bit-mask that defines the kind of observed events. See the event
+   *          kind constants in {@link PmEvent}.
    * @param listener
    *          The listener that wants to get informed whenever the title
    *          changes.
    */
-  public static void addPmEventListener(PmObject pm, PmEventListener listener) {
-    apiHandler.addPmEventListener(pm, PmEvent.ALL, listener);
-  }
-
   public static void addPmEventListener(PmObject pm, int eventMask, PmEventListener listener) {
     apiHandler.addPmEventListener(pm, eventMask, listener);
-  }
-
-  public static void addWeakPmEventListener(PmObject pm, PmEventListener listener) {
-    apiHandler.addWeakPmEventListener(pm, PmEvent.ALL, listener);
   }
 
   public static void addWeakPmEventListener(PmObject pm, int eventMask, PmEventListener listener) {

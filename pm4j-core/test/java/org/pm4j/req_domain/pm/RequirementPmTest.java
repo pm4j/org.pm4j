@@ -36,7 +36,7 @@ public class RequirementPmTest extends TestCase {
 
     PmEventApi.addPmEventListener(nameAttr, PmEvent.VALUE_CHANGE, valueChangeListener);
     PmEventApi.addPmEventListener(nameAttr, PmEvent.VALUE_CHANGED_STATE_CHANGE, changedStateChangeListener);
-    PmEventApi.addPmEventListener(nameAttr, allEventsListener);
+    PmEventApi.addPmEventListener(nameAttr, PmEvent.ALL, allEventsListener);
 
     assertEquals(false, nameAttr.isPmValueChanged());
 

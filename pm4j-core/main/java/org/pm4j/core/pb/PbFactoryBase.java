@@ -103,7 +103,7 @@ public abstract class PbFactoryBase<VIEW, PARENT_VIEW_CTXT, PM extends PmObject>
       ((Binding)binding).view = view;
 
       // TODO: check!
-      PmEventApi.addWeakPmEventListener(pm, binding.getPmEventListener());
+      PmEventApi.addWeakPmEventListener(pm, PmEvent.ALL, binding.getPmEventListener());
 
       setBinding(view, binding);
 
@@ -283,7 +283,7 @@ public abstract class PbFactoryBase<VIEW, PARENT_VIEW_CTXT, PM extends PmObject>
         pmListenerArray = Arrays.copyOf(pmListenerArray, oldLen+1);
         pmListenerArray[oldLen] = listener;
       }
-      PmEventApi.addWeakPmEventListener(pm, listener);
+      PmEventApi.addWeakPmEventListener(pm, PmEvent.ALL, listener);
     }
 
     @Override
