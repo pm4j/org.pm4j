@@ -67,7 +67,7 @@ public class PbMatcherMapped extends PbMatcher {
       return null;
     }
 
-    String pmName = PmUtil.getPmAbsoluteName(pm);
+    String pmName = PmUtil.getAbsoluteName(pm);
     PbFactory<?> b = binderCache.find(pmName);
 
     // Check if the PM has a subclass of a mapped class or interface.

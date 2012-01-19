@@ -82,7 +82,7 @@ public class PmAttrPmRefImpl<T_REFED_PM extends PmBean<?>, T_BEAN>
   @SuppressWarnings("unchecked")
   @Override
   public int compareTo(PmObject otherPm) {
-    if (getPmAbsoluteName().equals(PmUtil.getPmAbsoluteName(otherPm))) {
+    if (PmUtil.getAbsoluteName(this).equals(PmUtil.getAbsoluteName(otherPm))) {
       T_REFED_PM lhs = getValue();
       T_REFED_PM rhs = ((PmAttrPmRef<T_REFED_PM>)otherPm).getValue();
       if (lhs != null) {

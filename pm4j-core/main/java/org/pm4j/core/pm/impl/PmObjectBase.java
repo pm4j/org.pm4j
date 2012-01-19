@@ -536,19 +536,6 @@ public abstract class PmObjectBase implements PmObject {
   }
 
   /**
-   * A name that includes the names of all elements and sessions within the
-   * complete context hierarchy of the PM.
-   * <p>
-   * Example: The name attribute of a user presentation model may have the long
-   * name 'userSession.userPm.name'.
-   *
-   * @return The canonical name.
-   */
-  public final String getPmAbsoluteName() {
-    return getPmMetaDataWithoutPmInitCall().absoluteName;
-  }
-
-  /**
    * @return The conversation implementation interface. It allows to use the
    *         internal feature set (not declared in the {@link PmConversation}
    *         interface).
@@ -701,7 +688,7 @@ public abstract class PmObjectBase implements PmObject {
                             ? name
                             : getClass().getName();
       String key = (pmParent != null)
-                            ? pmParent.getPmAbsoluteName() + PmObjectBase.MetaData.NAME_PATH_DELIMITER + lastKeyPart
+                            ? PmUtil.getAbsoluteName(pmParent) + PmObjectBase.MetaData.NAME_PATH_DELIMITER + lastKeyPart
                             : lastKeyPart;
 
       setPmMetaData(pmKeyToMetaDataMap.get(key));
@@ -1122,9 +1109,8 @@ public abstract class PmObjectBase implements PmObject {
     private BeanAttrAccessor[] childFieldColumnAccessorArray = {};
     private Map<String, BeanAttrAccessor> nameToChildAccessorMap = Collections.emptyMap();
 
-    public String getName() {
-      return name;
-    }
+    public String getName() { return name; }
+    /* package */ String getAbsoluteName() { return absoluteName; }
 
     @SuppressWarnings("rawtypes")
     public PmTitleProvider getPmTitleProvider() {
@@ -1145,13 +1131,8 @@ public abstract class PmObjectBase implements PmObject {
       this.pmElementFactory = pmElementFactory;
     }
 
-    public boolean isReadOnly() {
-      return readOnly;
-    }
-
-    public void setReadOnly(boolean readOnly) {
-      this.readOnly = readOnly;
-    }
+    public boolean isReadOnly() { return readOnly; }
+    public void setReadOnly(boolean readOnly) { this.readOnly = readOnly; }
   }
 
   // ======== Annotation support ======== //
@@ -1493,7 +1474,7 @@ public abstract class PmObjectBase implements PmObject {
     public static final NameBuilder INSTANCE = new NameBuilderAbsoluteName();
     @Override
     public String makeName(PmObjectBase pm) {
-      return pm.getPmAbsoluteName();
+      return PmUtil.getAbsoluteName(pm);
     }
   }
 

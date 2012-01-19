@@ -26,7 +26,7 @@ public abstract class PmAttrNumBase<T extends Number> extends PmAttrBase<T, T> i
   @SuppressWarnings("unchecked")
   @Override
   public int compareTo(PmObject otherPm) {
-    return getPmAbsoluteName().equals(PmUtil.getPmAbsoluteName(otherPm))
+    return PmUtil.getAbsoluteName(this).equals(PmUtil.getAbsoluteName(otherPm))
       ? CompareUtil.compare(
               (Comparable<T>)getValue(),
               (Comparable<T>)((PmAttrNumber<T>)otherPm).getValue())

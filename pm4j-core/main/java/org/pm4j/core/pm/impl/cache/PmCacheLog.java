@@ -31,7 +31,7 @@ public final class PmCacheLog {
   }
 
   private final void doLog(PmObject pm, String cacheItem, Map<String, Long> counterMap, String mapKind) {
-    String key = PmUtil.getPmAbsoluteName(pm) + "-" + cacheItem;
+    String key = PmUtil.getAbsoluteName(pm) + "-" + cacheItem;
     Long count = counterMap.get(key);
     count = (count == null) ? 1L : ++count;
 

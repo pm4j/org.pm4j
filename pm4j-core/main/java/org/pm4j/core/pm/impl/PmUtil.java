@@ -178,7 +178,7 @@ public final class PmUtil {
         return false;
       }
     }
-    // all attribues are valid
+    // all attributes are valid
     return true;
   }
 
@@ -266,8 +266,8 @@ public final class PmUtil {
    *
    * @return The canonical name.
    */
-  public static String getPmAbsoluteName(PmObject pm) {
-    return ((PmObjectBase)pm).getPmAbsoluteName();
+  public static String getAbsoluteName(PmObject pm) {
+    return ((PmObjectBase)pm).getPmMetaDataWithoutPmInitCall().getAbsoluteName();
   }
 
   /**

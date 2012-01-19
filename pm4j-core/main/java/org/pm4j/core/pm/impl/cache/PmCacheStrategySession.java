@@ -39,7 +39,7 @@ public class PmCacheStrategySession extends PmCacheStrategyBase<PmObject> {
    * @return A unique key
    */
   private String getCacheIdentity(PmObject pm) {
-    return cacheVarKeyPfx + PmUtil.getPmAbsoluteName(pm)
+    return cacheVarKeyPfx + PmUtil.getAbsoluteName(pm)
         + Integer.toHexString(System.identityHashCode(pm));
   }
 }

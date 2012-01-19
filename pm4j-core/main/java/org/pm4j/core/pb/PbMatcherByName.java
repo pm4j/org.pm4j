@@ -32,7 +32,7 @@ public class PbMatcherByName extends PbMatcher {
 
   @Override
   public PbFactory<?> findPbFactory(PmObject pm) {
-    return nameSet.contains(PmUtil.getPmAbsoluteName(pm))
+    return nameSet.contains(PmUtil.getAbsoluteName(pm))
             ? builder
             : null;
   }

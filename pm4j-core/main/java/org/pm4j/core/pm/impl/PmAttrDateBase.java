@@ -61,7 +61,7 @@ public class PmAttrDateBase<T_BACKING_DATE> extends PmAttrBase<Date, T_BACKING_D
 
   @Override
   public int compareTo(PmObject otherPm) {
-    return getPmAbsoluteName().equals(PmUtil.getPmAbsoluteName(otherPm))
+    return PmUtil.getAbsoluteName(this).equals(PmUtil.getAbsoluteName(otherPm))
               ? CompareUtil.compare(getValue(), ((PmAttrDate)otherPm).getValue())
               : super.compareTo(otherPm);
   }

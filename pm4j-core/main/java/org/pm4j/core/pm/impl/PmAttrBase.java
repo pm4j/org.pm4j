@@ -257,7 +257,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
    */
   @Override
   public int compareTo(PmObject otherPm) {
-    return getPmAbsoluteName().equals(PmUtil.getPmAbsoluteName(otherPm))
+    return PmUtil.getAbsoluteName(this).equals(PmUtil.getAbsoluteName(otherPm))
         ? CompareUtil.compare(getValueLocalized(), ((PmAttr<?>)otherPm).getValueLocalized(), getPmConversation().getPmLocale())
         : super.compareTo(otherPm);
   }
@@ -1380,12 +1380,12 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
 
     @Override
     public Object getValue(PmAttrBase<?, ?> attr) {
-      return attr.getPmConversation().getPmNamedObject(PmUtil.getPmAbsoluteName(attr));
+      return attr.getPmConversation().getPmNamedObject(PmUtil.getAbsoluteName(attr));
     }
 
     @Override
     public void setValue(PmAttrBase<?, ?> attr, Object value) {
-      attr.getPmConversation().setPmNamedObject(PmUtil.getPmAbsoluteName(attr), value);
+      attr.getPmConversation().setPmNamedObject(PmUtil.getAbsoluteName(attr), value);
     }
   }
 
