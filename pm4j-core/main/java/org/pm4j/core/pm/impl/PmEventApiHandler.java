@@ -12,15 +12,34 @@ public class PmEventApiHandler {
 
   private static final Log LOG = LogFactory.getLog(PmEventApiHandler.class);
 
-  ThreadLocal<Object> threadEventSource = new ThreadLocal<Object>();
+  /**
+   * A handler that can hold a reference to an event source within the current thread.<br>
+   * May be useful for rich client applications that need to be aware about even source objects
+   * to prevent event loops.
+   * <p>
+   * <b>Attention</b>: In case of environments with re-used threads it needs to be ensured that
+   * the {@link #setThreadEventSource(Object)} gets called with a <code>null</code> parameter.
+   */
+  static class WithThreadLocalEventSource extends PmEventApiHandler {
+
+    private ThreadLocal<Object> threadEventSource = new ThreadLocal<Object>();
+
+    public Object setThreadEventSource(Object src) {
+      threadEventSource.set(src);
+      return src;
+    }
+
+    public Object getThreadEventSource() {
+      return threadEventSource.get();
+    }
+  }
 
   public Object setThreadEventSource(Object src) {
-    threadEventSource.set(src);
     return src;
   }
 
   public Object getThreadEventSource() {
-    return threadEventSource.get();
+    return null;
   }
 
   public void addPmEventListener(PmObject pm, int eventMask, PmEventListener listener) {

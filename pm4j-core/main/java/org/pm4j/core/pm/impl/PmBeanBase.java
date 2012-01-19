@@ -121,7 +121,7 @@ public abstract class PmBeanBase<T_BEAN>
    * @param bean The new bean behind this PM.
    */
   public void setPmBean(T_BEAN bean) {
-    PmEventApi.ensureThreadEventSource(this);
+    Object eventSource = PmEventApi.ensureThreadEventSource(this);
 
     if (bean != pmBean) {
       pmBean = null;
@@ -147,7 +147,7 @@ public abstract class PmBeanBase<T_BEAN>
       // This is not done if the bean gets set within the initialization phase.
       // Otherwise we get the risk if initialization race conditions.
       if (pmInitState == PmInitState.INITIALIZED) {
-        new PmVisitorFireEvent(new PmEvent(PmEventApi.getThreadEventSource(), this, PmEvent.ALL_CHANGE_EVENTS))
+        new PmVisitorFireEvent(new PmEvent(eventSource, this, PmEvent.ALL_CHANGE_EVENTS))
               .visit(this);
       }
     }

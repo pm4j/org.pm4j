@@ -42,7 +42,9 @@ import org.pm4j.core.pm.pageable.PmPagerImpl;
  *
  * @author olaf boede
  */
-public class PmTableImpl<T_ROW_ELEMENT_PM extends PmElement> extends PmDataInputBase implements PmTable<T_ROW_ELEMENT_PM> {
+public class PmTableImpl<T_ROW_ELEMENT_PM extends PmElement> 
+        extends PmDataInputBase 
+        implements PmTable<T_ROW_ELEMENT_PM> {
 
   /** The content this table is based on. */
   private PageableCollection<T_ROW_ELEMENT_PM> pageableCollection;
@@ -299,7 +301,7 @@ public class PmTableImpl<T_ROW_ELEMENT_PM extends PmElement> extends PmDataInput
   /**
    * @return A pager that may be used to navigate through the table.
    */
-  public PmPagerImpl<T_ROW_ELEMENT_PM> getPager() {
+  public PmPager<T_ROW_ELEMENT_PM> getPager() {
     return pager;
   }
 
