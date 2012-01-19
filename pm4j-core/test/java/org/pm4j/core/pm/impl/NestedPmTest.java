@@ -15,12 +15,20 @@ public class NestedPmTest extends TestCase {
     public ChildPm(PmObject pmParent) {
       super(pmParent);
     }
-    public final PmCommand cmdInChildElem = new PmCommandImpl(this) {
-      @Override
-      protected void doItImpl() throws Exception {
-        super.doItImpl();
-      }
-    };
+
+    public final PmConversationImplChild pmConversationChildElem = new PmConversationImplChild(this);
+
+    public final PmCommand               cmdInChildElem          = new PmCommandImpl(this);
+
+  }
+
+  public static class PmConversationImplChild extends PmConversationImpl {
+
+    public final PmCommand cmdInPmConversationChildElem = new PmCommandImpl(this);
+    public PmConversationImplChild(PmObject pmParent) {
+      super(pmParent);
+    }
+
   }
 
   public void testAccessNestedPm() {
@@ -30,6 +38,9 @@ public class NestedPmTest extends TestCase {
     assertEquals("childElem", pm.childElem.getPmName());
     assertEquals("childElem", pm.childElem.getPmRelativeName());
     assertEquals("org.pm4j.core.pm.impl.NestedPmTest$RootPm_childElem", PmUtil.getAbsoluteName(pm.childElem));
+    assertEquals(
+        "org.pm4j.core.pm.impl.NestedPmTest$RootPm_childElem_pmConversationChildElem_cmdInPmConversationChildElem",
+        PmUtil.getAbsoluteName(pm.childElem.pmConversationChildElem.cmdInPmConversationChildElem));
 
     assertEquals("cmdInChildElem", pm.childElem.cmdInChildElem.getPmName());
     assertEquals("childElem_cmdInChildElem", pm.childElem.cmdInChildElem.getPmRelativeName());
