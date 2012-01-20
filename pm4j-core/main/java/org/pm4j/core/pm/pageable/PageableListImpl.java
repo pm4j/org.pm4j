@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -25,7 +25,7 @@ public class PageableListImpl<T_ITEM> implements PageableCollection<T_ITEM> {
   private int                pageSize;
   private int                currentPageIdx;
   private boolean            multiSelect;
-  private Set<T_ITEM>        selectedItems = new HashSet<T_ITEM>();
+  private Set<T_ITEM>        selectedItems = new LinkedHashSet<T_ITEM>();
   private Comparator<?>      currentSortComparator;
   private Filter<T_ITEM>     currentFilter;
 

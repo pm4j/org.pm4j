@@ -18,7 +18,7 @@ public class NestedPmTest extends TestCase {
 
     public final PmConversationImplChild pmConversationChildElem = new PmConversationImplChild(this);
 
-    public final PmCommand               cmdInChildElem          = new PmCommandImpl(this);
+    public final PmCommand cmdInChildElem = new PmCommandImpl(this);
 
   }
 
