@@ -719,7 +719,12 @@ public abstract class PmObjectBase implements PmObject {
             pmMetaData.absoluteName = key;
 
             // Perform the subclass specific meta data initialization after having defined names.
-            initMetaData(pmMetaData);
+            try {
+              initMetaData(pmMetaData);
+            }
+            catch (RuntimeException e) {
+              throw new PmRuntimeException(this, e);
+            }
             pmKeyToMetaDataMap.put(key, pmMetaData);
 
 
@@ -1577,8 +1582,8 @@ class PmEventTable {
     if (size() > 0) {
       boolean hasListeners = (pmEventListeners.size() > 0);
 
-      if (log.isDebugEnabled())
-        log.debug("fireChange[" + event.changeKind + "] for event source   : " + event.getNonPmSource() +
+      if (log.isTraceEnabled())
+        log.trace("fireChange[" + event.changeKind + "] for event source   : " + event.getNonPmSource() +
             (hasListeners ? "\n\teventListeners: " + pmEventListeners : ""));
 
       if (hasListeners) {
