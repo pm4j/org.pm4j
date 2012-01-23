@@ -76,4 +76,14 @@ public interface PmPager<T_ITEM> {
    */
   PmAttrBoolean getAllOnPageSelected();
 
+  /**
+   * @return A command that allows to select all items on the current page.
+   */
+  PmCommand getCmdSelectAllOnPage();
+
+  /**
+   * @return A command that allows to de-select all items on the current page.
+   */
+  PmCommand getCmdDeSelectAllOnPage();
+
 }

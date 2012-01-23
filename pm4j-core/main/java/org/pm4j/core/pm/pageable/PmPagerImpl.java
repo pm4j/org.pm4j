@@ -8,6 +8,7 @@ import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.annotation.PmAttrCfg.AttrAccessKind;
 import org.pm4j.core.pm.annotation.PmBeanCfg;
+import org.pm4j.core.pm.annotation.PmCommandCfg;
 import org.pm4j.core.pm.annotation.PmTitleCfg;
 import org.pm4j.core.pm.impl.PmAttrBooleanImpl;
 import org.pm4j.core.pm.impl.PmAttrIntegerImpl;
@@ -138,6 +139,15 @@ public class PmPagerImpl<T_ITEM>
           return getPmBean().isMultiSelect();
       }
 
+      /**
+       * Is only enabled if the pager is enabled.
+       */
+      @Override
+      protected boolean isPmEnabledImpl() {
+        return super.isPmEnabledImpl() &&
+               getPmParent().isPmEnabled();
+      };
+
       @Override
       protected Boolean getBackingValueImpl() {
           return PageableCollectionUtil.isAllOnPageSelected(getPmBean());
@@ -149,6 +159,30 @@ public class PmPagerImpl<T_ITEM>
               PageableCollectionUtil.setAllOnPageSelected(getPmBean(), value.booleanValue());
           }
       }
+  };
+
+  @PmCommandCfg(requiresValidValues=false)
+  public final PmCommand cmdSelectAllOnPage = new PmCommandImpl(this) {
+    @Override
+    protected void doItImpl() {
+      PageableCollectionUtil.setAllOnPageSelected(getPmBean(), Boolean.TRUE);
+    }
+    @Override
+    protected boolean isPmEnabledImpl() {
+      return allOnPageSelected.isPmEnabled();
+    }
+  };
+
+  @PmCommandCfg(requiresValidValues=false)
+  public final PmCommand cmdDeSelectAllOnPage = new PmCommandImpl(this) {
+    @Override
+    protected void doItImpl() {
+      PageableCollectionUtil.setAllOnPageSelected(getPmBean(), Boolean.FALSE);
+    }
+    @Override
+    protected boolean isPmEnabledImpl() {
+      return allOnPageSelected.isPmEnabled();
+    }
   };
 
   @Override
@@ -249,5 +283,8 @@ public class PmPagerImpl<T_ITEM>
   public PmAttrInteger getCurrentPageIdx() { return currentPageIdx; }
   @Override
   public PmAttrBoolean getAllOnPageSelected() { return allOnPageSelected; }
+
+  public PmCommand getCmdSelectAllOnPage() { return cmdSelectAllOnPage; }
+  public PmCommand getCmdDeSelectAllOnPage() { return cmdDeSelectAllOnPage; }
 
 }
