@@ -41,6 +41,11 @@ public interface PmTable<T_ROW_OBJ> extends PmObject, PmDataInput {
   int getRowNum();
 
   /**
+   * @return <code>true</code> if the table supports the selection of multiple rows.
+   */
+  boolean isMultiSelect();
+
+  /**
    * PM for table with a pager.
    *
    * @param <T_ROW_OBJ> The type used for row objects.

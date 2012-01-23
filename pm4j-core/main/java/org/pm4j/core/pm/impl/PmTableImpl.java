@@ -42,8 +42,9 @@ import org.pm4j.core.pm.pageable.PmPagerImpl;
  *
  * @author olaf boede
  */
-public class PmTableImpl<T_ROW_ELEMENT_PM extends PmElement> 
-        extends PmDataInputBase 
+public class PmTableImpl
+        <T_ROW_ELEMENT_PM extends PmElement>
+        extends PmDataInputBase
         implements PmTable<T_ROW_ELEMENT_PM> {
 
   /** The content this table is based on. */
@@ -105,6 +106,9 @@ public class PmTableImpl<T_ROW_ELEMENT_PM extends PmElement>
           : new PageableListImpl<T_ROW_ELEMENT_PM>(Collections.EMPTY_LIST, 10, false);
           PmEventApi.firePmEventIfInitialized(this, PmEvent.VALUE_CHANGE);
     }
+    else {
+      pageableCollection = pageable;
+    }
   }
 
   @Override
@@ -139,6 +143,11 @@ public class PmTableImpl<T_ROW_ELEMENT_PM extends PmElement>
   public int getRowNum() {
     zz_ensurePmInitialization();
     return pageableCollection.getNumOfItems();
+  }
+
+  @Override
+  public boolean isMultiSelect() {
+    return pageableCollection.isMultiSelect();
   }
 
   // -- row sort order support --

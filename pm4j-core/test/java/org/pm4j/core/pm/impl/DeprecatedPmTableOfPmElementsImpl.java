@@ -272,4 +272,10 @@ public class DeprecatedPmTableOfPmElementsImpl<T_ROW_ELEMENT_PM extends PmElemen
     PmEventApi.firePmEvent(this, PmEvent.VALUE_CHANGE);
   }
 
+  @Override
+  public boolean isMultiSelect() {
+    // TODO Auto-generated method stub
+    return false;
+  }
+
 }
