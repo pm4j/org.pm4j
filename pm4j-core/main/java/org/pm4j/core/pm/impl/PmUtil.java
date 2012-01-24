@@ -276,7 +276,12 @@ public final class PmUtil {
    * @return A 'toString' like output.
    */
   public static String getPmLogString(PmObject pm) {
-    return pm.getPmConversation().getPmDefaults().getLogStringBuilder().makeName((PmObjectBase)pm);
+    if (pm.getPmConversation() != null) {
+      return pm.getPmConversation().getPmDefaults().getLogStringBuilder().makeName((PmObjectBase)pm);
+    }
+    else {
+      return getAbsoluteName(pm);
+    }
   }
 
 
