@@ -1433,7 +1433,11 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
 
     @SuppressWarnings("unchecked")
     private final Object getPmParentElementBean(PmAttrBase<?, ?> attr) {
-      return ((PmBean<Object>)attr.getPmParentElement()).getPmBean();
+      Object bean = ((PmBean<Object>)attr.getPmParentElement()).getPmBean();
+      if (bean == null) {
+        throw new PmRuntimeException(attr, "Unable to access an attribute value for a backing pmBean that is 'null'.");
+      }
+      return bean;
     }
 
   }
