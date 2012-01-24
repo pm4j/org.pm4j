@@ -146,6 +146,28 @@ public class PmPagerImpl<T_ITEM>
     }
   };
 
+  @PmCommandCfg(requiresValidValues=false)
+  public final PmCommand cmdSelectAll = new PmCommandImpl(this) {
+    @Override
+    protected void doItImpl() {
+      PageableCollection<T_ITEM> coll = getPmBean();
+      for (T_ITEM i : coll.getItemsOnPage()) {
+          coll.select(i);
+      }
+    }
+  };
+
+  @PmCommandCfg(requiresValidValues=false)
+  public final PmCommand cmdDeSelectAll = new PmCommandImpl(this) {
+    @Override
+    protected void doItImpl() {
+      PageableCollection<T_ITEM> coll = getPmBean();
+      for (T_ITEM i : coll.getItemsOnPage()) {
+          coll.select(i);
+      }
+    }
+  };
+
   @Override
   public int getPageSize() {
     return pageSize;
@@ -246,5 +268,9 @@ public class PmPagerImpl<T_ITEM>
   public PmCommand getCmdSelectAllOnPage() { return cmdSelectAllOnPage; }
   @Override
   public PmCommand getCmdDeSelectAllOnPage() { return cmdDeSelectAllOnPage; }
+  @Override
+  public PmCommand getCmdSelectAll() { return cmdSelectAll; }
+  @Override
+  public PmCommand getCmdDeSelectAll() { return cmdDeSelectAll; }
 
 }

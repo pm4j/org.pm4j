@@ -75,4 +75,14 @@ public interface PmPager<T_ITEM> {
    */
   PmCommand getCmdDeSelectAllOnPage();
 
+  /**
+   * @return A command that allows to select all items across all pages.
+   */
+  PmCommand getCmdSelectAll();
+
+  /**
+   * @return A command that allows to de-select all items.
+   */
+  PmCommand getCmdDeSelectAll();
+
 }
