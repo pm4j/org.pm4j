@@ -1,6 +1,5 @@
 package org.pm4j.core.pm.pageable;
 
-import org.pm4j.core.pm.PmAttrBoolean;
 import org.pm4j.core.pm.PmAttrInteger;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmLabel;
@@ -65,16 +64,6 @@ public interface PmPager<T_ITEM> {
    * @return The total number of pages.
    */
   int getNumOfPages();
-
-  /**
-   * Provides an attribute that may be used to select/de-select all items on the current page.
-   * <p>
-   * The {@link PmPager} implementation should make sure that this attribute is only visible if
-   * multi item selection is supported for the related pageable object.
-   *
-   * @return The attribute.
-   */
-  PmAttrBoolean getAllOnPageSelected();
 
   /**
    * @return A command that allows to select all items on the current page.

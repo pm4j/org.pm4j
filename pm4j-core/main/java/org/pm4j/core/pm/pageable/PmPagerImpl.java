@@ -5,8 +5,6 @@ import org.pm4j.core.pm.PmAttrInteger;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmLabel;
 import org.pm4j.core.pm.PmObject;
-import org.pm4j.core.pm.annotation.PmAttrCfg;
-import org.pm4j.core.pm.annotation.PmAttrCfg.AttrAccessKind;
 import org.pm4j.core.pm.annotation.PmBeanCfg;
 import org.pm4j.core.pm.annotation.PmCommandCfg;
 import org.pm4j.core.pm.annotation.PmTitleCfg;
@@ -132,44 +130,11 @@ public class PmPagerImpl<T_ITEM>
       }
   };
 
-  @PmAttrCfg(accessKind = AttrAccessKind.OVERRIDE)
-  public final PmAttrBoolean allOnPageSelected = new PmAttrBooleanImpl(this) {
-      @Override
-      protected boolean isPmVisibleImpl() {
-          return getPmBean().isMultiSelect();
-      }
-
-      /**
-       * Is only enabled if the pager is enabled.
-       */
-      @Override
-      protected boolean isPmEnabledImpl() {
-        return super.isPmEnabledImpl() &&
-               getPmParent().isPmEnabled();
-      };
-
-      @Override
-      protected Boolean getBackingValueImpl() {
-          return PageableCollectionUtil.isAllOnPageSelected(getPmBean());
-      }
-
-      @Override
-      protected void setBackingValueImpl(Boolean value) {
-          if (value != null) {
-              PageableCollectionUtil.setAllOnPageSelected(getPmBean(), value.booleanValue());
-          }
-      }
-  };
-
   @PmCommandCfg(requiresValidValues=false)
   public final PmCommand cmdSelectAllOnPage = new PmCommandImpl(this) {
     @Override
     protected void doItImpl() {
       PageableCollectionUtil.setAllOnPageSelected(getPmBean(), Boolean.TRUE);
-    }
-    @Override
-    protected boolean isPmEnabledImpl() {
-      return allOnPageSelected.isPmEnabled();
     }
   };
 
@@ -178,10 +143,6 @@ public class PmPagerImpl<T_ITEM>
     @Override
     protected void doItImpl() {
       PageableCollectionUtil.setAllOnPageSelected(getPmBean(), Boolean.FALSE);
-    }
-    @Override
-    protected boolean isPmEnabledImpl() {
-      return allOnPageSelected.isPmEnabled();
     }
   };
 
@@ -282,9 +243,8 @@ public class PmPagerImpl<T_ITEM>
   @Override
   public PmAttrInteger getCurrentPageIdx() { return currentPageIdx; }
   @Override
-  public PmAttrBoolean getAllOnPageSelected() { return allOnPageSelected; }
-
   public PmCommand getCmdSelectAllOnPage() { return cmdSelectAllOnPage; }
+  @Override
   public PmCommand getCmdDeSelectAllOnPage() { return cmdDeSelectAllOnPage; }
 
 }
