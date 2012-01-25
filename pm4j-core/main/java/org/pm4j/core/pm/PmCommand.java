@@ -112,12 +112,6 @@ public interface PmCommand extends PmObject {
   NaviLink getNaviLink();
 
   /**
-   * @return For value change commands: The UI control that invoked this command.
-   *         For others: the command instance itself.
-   */
-  Object getEventSource();
-
-  /**
    * @return <code>true</code> when the command should fail when there are invalid
    *         values within the current session.
    */

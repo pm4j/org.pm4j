@@ -41,18 +41,12 @@ public class PmTabChangeCommand extends PmCommandImpl {
   protected void doItImpl() {
     tabSet.getPmToTabSetViewConnector()._switchToTab(toTab);
     executed = true;
+    // Only successfully executed tab switches need to be undone.
+    setUndoCommand(new PmTabChangeCommand(tabSet, toTab, fromTab));
   }
 
   protected boolean isExecuted() {
     return executed;
-  }
-
-  /** Only successfully executed tab switches need to be undone. */
-  @Override
-  public PmCommand getUndoCommand() {
-    return executed
-        ? new PmTabChangeCommand(tabSet, toTab, fromTab)
-        : null;
   }
 
 }

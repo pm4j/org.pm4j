@@ -67,9 +67,6 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
   /** The command logic commandDecorators to execute. */
   private Collection<PmCommandDecorator> commandDecorators = Collections.emptyList();
 
-  /** An optional link to the instance that caused the command execution. */
-  private Object eventSource;
-
   /**
    * Constructor for fix commands that have an associated field in the parent
    * PM.
@@ -199,7 +196,7 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
    * @param changeCommandHistory
    * @return
    */
-  public PmCommand doIt(boolean changeCommandHistory) {
+  public final PmCommand doIt(boolean changeCommandHistory) {
     PmCommandImpl cmd = zz_doCloneAndRegisterEventSource();
 
     if (cmd.beforeDo()) {
@@ -221,7 +218,7 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
     return cmd;
   }
 
-  public String doItReturnString() {
+  public final String doItReturnString() {
     PmCommandImpl cmd = zz_doCloneAndRegisterEventSource();
     NaviLink link = null;
 
@@ -245,12 +242,12 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
     return execNavigateTo(link);
   }
 
-  public void doItReturnVoid() {
+  public final void doItReturnVoid() {
     doIt();
   }
 
   @Override
-  public PmCommand getUndoCommand() {
+  public final PmCommand getUndoCommand() {
     return undoCommand;
   }
 
@@ -275,7 +272,7 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
    *
    * @param naviLink The target to navigate to after command execution.
    */
-  protected void navigateTo(NaviLink naviLink) {
+  protected final void navigateTo(NaviLink naviLink) {
     this.naviLink = naviLink;
   }
 
@@ -410,11 +407,6 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
   }
 
   @Override
-  public Object getEventSource() {
-    return this;
-  }
-
-  @Override
   public boolean isRequiresValidValues() {
     return getOwnMetaData().requiresValidValues;
   }
@@ -466,12 +458,6 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
     zz_ensurePmInitialization();
 
     PmCommandImpl clone = clone();
-    Object evSrc = PmEventApi.getThreadEventSource();
-    if (evSrc == null) {
-      evSrc = PmEventApi.setThreadEventSource(clone);
-    }
-    clone.eventSource = evSrc;
-
     return clone;
   }
 

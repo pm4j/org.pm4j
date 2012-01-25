@@ -289,7 +289,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   // den nicht validierten Inhalt liefern. (spätestens für Rich-GUIs).
   @SuppressWarnings("unchecked")
   @Override
-  public T_PM_VALUE getValue() {
+  public final T_PM_VALUE getValue() {
     MetaData md = getOwnMetaData();
     Object ov = md.cacheStrategyForValue.getCachedValue(this);
 
@@ -329,7 +329,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   public final void setValue(T_PM_VALUE value) {
     if (!isPmReadonly()) {
       SetValueContainer<T_PM_VALUE> vc = SetValueContainer.makeWithPmValue(this, value);
-      PmValueChangeCommand cmd = new PmValueChangeCommand(null, this, vc.getPmValue());
+      PmValueChangeCommand cmd = new PmValueChangeCommand(this, vc.getPmValue());
       if (setValueImpl(vc)) {
         getPmConversation().getPmCommandHistory().commandDone(cmd);
       }
@@ -397,7 +397,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   @Override
   public final void setValueAsString(String text) {
     SetValueContainer<T_PM_VALUE> vc = new SetValueContainer<T_PM_VALUE>(this, text);
-    PmValueChangeCommand cmd = new PmValueChangeCommand(null, this, vc.getPmValue());
+    PmValueChangeCommand cmd = new PmValueChangeCommand(this, vc.getPmValue());
     if (zz_validateAndSetValueAsString(vc)) {
       getPmConversation().getPmCommandHistory().commandDone(cmd);
     }
@@ -881,7 +881,6 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   // ======== Buffered data input support ======== //
 
   public boolean isBufferedPmValueMode() {
-
     return getPmParentElement().isBufferedPmValueMode();
   }
 
@@ -911,13 +910,13 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   }
 
   @SuppressWarnings("unchecked")
-  public T_BEAN_VALUE getBackingValue() {
+  public final T_BEAN_VALUE getBackingValue() {
     return (bufferedValue != UNKNOWN_VALUE_INDICATOR)
          ? (T_BEAN_VALUE)bufferedValue
          : getBackingValueImpl();
   }
 
-  public void setBackingValue(T_BEAN_VALUE value) {
+  public final void setBackingValue(T_BEAN_VALUE value) {
     if (isBufferedPmValueMode()) {
       bufferedValue = value;
     }
@@ -1057,7 +1056,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
               : OptionSetDefNoOption.INSTANCE;
   }
 
-  @SuppressWarnings({ "unchecked", "rawtypes" })
+  @SuppressWarnings({ "unchecked", "rawtypes", "deprecation" })
   @Override
   protected void initMetaData(PmObjectBase.MetaData metaData) {
     super.initMetaData(metaData);

@@ -1418,7 +1418,7 @@ class PmEventTable {
       boolean hasListeners = (pmEventListeners.size() > 0);
 
       if (log.isTraceEnabled())
-        log.trace("fireChange[" + event.changeKind + "] for event source   : " + event.getNonPmSource() +
+        log.trace("fireChange[" + event.changeKind + "] for event source   : " + PmEventApi.getThreadEventSource() +
             (hasListeners ? "\n\teventListeners: " + pmEventListeners : ""));
 
       if (hasListeners) {

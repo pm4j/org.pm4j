@@ -13,15 +13,11 @@ import org.pm4j.core.pm.impl.PmCommandImpl;
 @PmTitleCfg(resKey="pmValueChangeCommand")
 public final class PmValueChangeCommand extends PmCommandImpl {
 
-  /** The UI control that caused the command execution. */
-  private final Object eventSource;
-
   private final Object newValue;
 
-  public PmValueChangeCommand(Object eventSource, PmAttrBase<?,?> changedPmAttr, Object newValue) {
+  public PmValueChangeCommand(PmAttrBase<?,?> changedPmAttr, Object newValue) {
     super(changedPmAttr);
     this.newValue = newValue;
-    this.eventSource = eventSource;
     setUndoCommand(new PmValueChangeCommand(this, changedPmAttr.getUncachedValidValue()));
   }
 
@@ -35,7 +31,6 @@ public final class PmValueChangeCommand extends PmCommandImpl {
     super(doCommand.getPmParent());
 
     this.newValue = oldValue;
-    this.eventSource = doCommand.getEventSource();
     setUndoCommand(doCommand);
   }
 
@@ -53,10 +48,4 @@ public final class PmValueChangeCommand extends PmCommandImpl {
     return super.isPmEnabledImpl() && getPmParent().isPmEnabled();
   }
 
-  @Override
-  public Object getEventSource() {
-    return eventSource != null
-              ? eventSource
-              : this;
-  }
 }

@@ -71,18 +71,6 @@ public class PmEvent extends EventObject {
   }
 
   /**
-   * @return The external source of the event. E.g. a UI-Control.<br>
-   *         May be <code>null</code> if it was not provided by the code that
-   *         caused this event.
-   */
-  public Object getNonPmSource() {
-    Object src = super.getSource();
-    return src instanceof PmCommand
-              ? ((PmCommand)src).getEventSource()
-              : src;
-  }
-
-  /**
    * @return A bit mask for the change kind.
    */
   public final int getChangeKind() {

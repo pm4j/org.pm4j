@@ -26,14 +26,6 @@ public class PmListAddItemCommand extends PmCommandImpl implements PmCommand {
 //    setUndoCommand(undoCommand)
   }
 
-//  @SuppressWarnings("unchecked")
-//  PmListAddItemCommand(PmListRemoveItemCommand doCmd, PmAttrPmList<?> pmListAttr, Collection<?> addedItems) {
-//    super(pmListAttr, PmListAddItemCommand.class.getName(), null, CmdLiveTime.TEMPORARY);
-//    this.addedItems = (Collection<PmElement>)addedItems;
-//
-//    setUndoCommand(doCmd);
-//  }
-
   public PmListAddItemCommand(PmAttrPmList<?> presentationModel, Object addedItem) {
     // FIXME olaf: mark it as a temporary command!
     this(presentationModel, ListUtil.itemToList(addedItem));
@@ -44,7 +36,7 @@ public class PmListAddItemCommand extends PmCommandImpl implements PmCommand {
     @SuppressWarnings("unchecked")
     PmAttrPmList<PmElement> pmListAttr = (PmAttrPmList<PmElement>) getPmParent();
 
-    PmValueChangeCommand undoCommand = new PmValueChangeCommand(this, (PmAttrBase<?,?>)pmListAttr, pmListAttr.getValue());
+    PmValueChangeCommand undoCommand = new PmValueChangeCommand((PmAttrBase<?,?>)pmListAttr, pmListAttr.getValue());
     undoCommand.setUndoCommand(this);
     this.setUndoCommand(undoCommand);
 
