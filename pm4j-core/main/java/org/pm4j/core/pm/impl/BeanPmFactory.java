@@ -15,7 +15,6 @@ import org.apache.commons.logging.LogFactory;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmObject;
-import org.pm4j.core.pm.annotation.AnnotationUtil;
 import org.pm4j.core.pm.annotation.PmBeanCfg;
 
 /**

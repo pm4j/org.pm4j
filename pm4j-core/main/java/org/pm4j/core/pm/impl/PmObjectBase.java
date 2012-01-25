@@ -39,7 +39,6 @@ import org.pm4j.core.pm.PmMessage.Severity;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmTableCol;
 import org.pm4j.core.pm.PmVisitor;
-import org.pm4j.core.pm.annotation.AnnotationUtil;
 import org.pm4j.core.pm.annotation.PmCacheCfg;
 import org.pm4j.core.pm.annotation.PmCacheCfg.CacheMode;
 import org.pm4j.core.pm.annotation.PmFactoryCfg;
@@ -478,7 +477,7 @@ public abstract class PmObjectBase implements PmObject {
   /**
    * @return Registers a new bean in the bean PM cache.
    */
-  protected void registerInPmBeanCache(PmBean<?> pmBean) {
+  /* package */ void registerInPmBeanCache(PmBean<?> pmBean) {
     BeanPmFactory f = getOwnPmElementFactory();
     if ((f != null) && f.canMakePmFor(pmBean.getPmBean())) {
       if (pmBeanFactoryCache == null) {
@@ -770,7 +769,7 @@ public abstract class PmObjectBase implements PmObject {
   /**
    * Initializes this PM runtime instance.
    */
-  protected void zz_ensurePmInitialization() {
+  /* package */ void zz_ensurePmInitialization() {
     if (pmInitState != PmInitState.INITIALIZED) {
       if (pmInitState == PmInitState.BEFORE_ON_PM_INIT) {
         if (LOG.isDebugEnabled())
@@ -815,7 +814,7 @@ public abstract class PmObjectBase implements PmObject {
   @SuppressWarnings("rawtypes")
   protected void initMetaData(MetaData metaData) {
     // -- Language resource configuration --
-    PmTitleCfg annotation = findAnnotation(PmTitleCfg.class);
+    PmTitleCfg annotation = AnnotationUtil.findAnnotation(this, PmTitleCfg.class);
     if (annotation != null) {
       metaData.resKey = StringUtils.defaultIfEmpty(annotation.resKey(), null);
       metaData.resKeyBase = StringUtils.defaultIfEmpty(annotation.resKeyBase(), null);
@@ -886,7 +885,7 @@ public abstract class PmObjectBase implements PmObject {
     }
 
     // -- Bean Factory --
-    PmFactoryCfg factoryAnnotation = findAnnotation(PmFactoryCfg.class);
+    PmFactoryCfg factoryAnnotation = AnnotationUtil.findAnnotation(this, PmFactoryCfg.class);
     if (factoryAnnotation != null) {
       if (factoryAnnotation.beanPmClasses().length > 0) {
         metaData.pmElementFactory = new BeanPmFactory(factoryAnnotation.beanPmClasses());
@@ -966,7 +965,7 @@ public abstract class PmObjectBase implements PmObject {
     private String compositeChildName;
     private String relativeName;
     private String absoluteName;
-    private boolean isPmField;
+    boolean isPmField;
     private boolean isSubPm;
 
     @SuppressWarnings("rawtypes")
@@ -1049,76 +1048,6 @@ public abstract class PmObjectBase implements PmObject {
   // ======== Annotation support ======== //
 
   /**
-   * @param <T>
-   *          The annotation type.
-   * @param annotationClass
-   *          The annotation class to find.
-   * @return The annotation instance.
-   * @throws PmRuntimeException
-   *           if the annotation was not found.
-   */
-  protected <T extends Annotation> T getAnnotation(Class<T> annotationClass) {
-    T foundAnnotation = findAnnotation(annotationClass);
-    if (foundAnnotation == null) {
-      throw new PmRuntimeException(this, "Missing annotation " + annotationClass);
-    }
-    return foundAnnotation;
-  }
-
-  /**
-   * Just finds an annotation for this class.
-   * <p>
-   * Subclasses provide different implementations e.g. to find annotations that
-   * are attached to a matching field declaration of the parent model.
-   *
-   * @param <T>
-   *          The annotation type.
-   * @param annotationClass
-   *          The annotation class to find.
-   * @return The annotation instance of <code>null</code> when not found.
-   */
-  protected <T extends Annotation> T findAnnotation(Class<T> annotationClass) {
-    return getPmMetaDataWithoutPmInitCall().isPmField
-              ? findAnnotation(annotationClass, getPmParent().getClass())
-              : AnnotationUtil.findAnnotationInClassTree(getClass(), annotationClass);
-  }
-
-  /**
-   * Provides an annotation that is defined for this presentation model class or
-   * the field of the parent presentation model class.
-   *
-   * @param <T>
-   *          The annotation type.
-   * @param annotationClass
-   *          The annotation class to find.
-   * @param parentClass
-   *          The class the contains this presentation model. E.g. the element
-   *          PM class for an attribute PM class.
-   * @return The annotation instance of <code>null</code> when not found.
-   */
-  protected <T extends Annotation> T findAnnotation(Class<T> annotationClass, Class<?> parentClass) {
-    assert parentClass != null;
-
-    T foundAnnotation = null;
-
-    // find it in the field declaration
-    try {
-      Field field = parentClass.getField(getPmName());
-      foundAnnotation = field.getAnnotation(annotationClass);
-    } catch (NoSuchFieldException e) {
-      // may be OK, because the attribute may use something like getters or
-      // xPath.
-    }
-
-    // next try if necessary: find it in the attribute presentation model class
-    if (foundAnnotation == null) {
-      foundAnnotation = AnnotationUtil.findAnnotationInClassTree(getClass(), annotationClass);
-    }
-
-    return foundAnnotation;
-  }
-
-  /**
    * Searches an annotation within the attribute-element-session hierarchy. Adds
    * all found annotations to the given collection. Adds nothing when no
    * annotation was found in the hierarchy.
@@ -1132,7 +1061,7 @@ public abstract class PmObjectBase implements PmObject {
    *          at the last position.
    */
   protected <T extends Annotation> void findAnnotationsInPmHierarchy(Class<T> annotationClass, Collection<T> foundAnnotations) {
-    T cfg = findAnnotation(annotationClass);
+    T cfg = AnnotationUtil.findAnnotation(this, annotationClass);
     if (cfg != null) {
       foundAnnotations.add(cfg);
     }

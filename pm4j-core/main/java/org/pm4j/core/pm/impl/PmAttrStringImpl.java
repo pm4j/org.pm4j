@@ -87,7 +87,7 @@ public class PmAttrStringImpl extends PmAttrBase<String, String> implements PmAt
     super.initMetaData(metaData);
     MetaData myMetaData = (MetaData) metaData;
 
-    PmAttrStringCfg annotation = findAnnotation(PmAttrStringCfg.class);
+    PmAttrStringCfg annotation = AnnotationUtil.findAnnotation(this, PmAttrStringCfg.class);
     if (annotation != null) {
       if (annotation.maxLen() != PmAttrStringCfg.DEFAULT_MAXLEN) {
         myMetaData.maxLen = annotation.maxLen();

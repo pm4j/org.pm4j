@@ -54,7 +54,7 @@ public class PmAttrIntegerImpl extends PmAttrNumBase<Integer> implements PmAttrI
     MetaData myMetaData = (MetaData) metaData;
     myMetaData.setConverterDefault(PmConverterInteger.INSTANCE);
 
-    PmAttrIntegerCfg annotation = findAnnotation(PmAttrIntegerCfg.class);
+    PmAttrIntegerCfg annotation = AnnotationUtil.findAnnotation(this, PmAttrIntegerCfg.class);
     if (annotation != null) {
       int maxValue = myMetaData.maxValue = annotation.maxValue();
       int minValue = myMetaData.minValue = annotation.minValue();

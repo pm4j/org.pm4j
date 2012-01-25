@@ -635,7 +635,7 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
 
     MetaData myMetaData = (MetaData) metaData;
 
-    PmCommandCfg annotation = findAnnotation(PmCommandCfg.class, getPmParent().getClass());
+    PmCommandCfg annotation = AnnotationUtil.findAnnotation(this, PmCommandCfg.class, getPmParent().getClass());
     if (annotation != null) {
       myMetaData.requiresValidValues = annotation.requiresValidValues();
       myMetaData.cmdKind = annotation.cmdKind();

@@ -197,7 +197,7 @@ public abstract class PmElementBase
   @Override
   protected <T extends Annotation> void findAnnotationsInPmHierarchy(Class<T> annotationClass, Collection<T> foundAnnotations) {
     if (getPmConversation().getPmDefaults().isElementsInheritAnnotationsOnlyFromSession()) {
-      T cfg = findAnnotation(annotationClass);
+      T cfg = AnnotationUtil.findAnnotation(this, annotationClass);
       if (cfg != null) {
         foundAnnotations.add(cfg);
       }

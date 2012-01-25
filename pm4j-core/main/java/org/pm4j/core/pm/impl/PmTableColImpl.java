@@ -212,7 +212,7 @@ public class PmTableColImpl extends PmObjectBase implements PmTableCol {
 
     // myMetaData.setConverterDefault(PmConverterLong.INSTANCE);
 
-    PmTableColCfg annotation = findAnnotation(PmTableColCfg.class);
+    PmTableColCfg annotation = AnnotationUtil.findAnnotation(this, PmTableColCfg.class);
     if (annotation != null) {
       myMetaData.colSizeSpec = new ColSizeSpec(
           annotation.prefSize(), annotation.minSize(), annotation.maxSize());
@@ -225,7 +225,7 @@ public class PmTableColImpl extends PmObjectBase implements PmTableCol {
     }
 
     if (myMetaData.sortable == PmBoolean.UNDEFINED) {
-      PmTableCfg tableCfg = ((PmObjectBase)getPmParent()).findAnnotation(PmTableCfg.class);
+      PmTableCfg tableCfg = AnnotationUtil.findAnnotation((PmObjectBase)getPmParent(), PmTableCfg.class);
       myMetaData.sortable = (tableCfg != null &&
                              tableCfg.sortable() == PmBoolean.TRUE)
                                ? PmBoolean.TRUE

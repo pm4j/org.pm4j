@@ -54,7 +54,7 @@ public class PmAttrLongImpl extends PmAttrNumBase<Long> implements PmAttrLong {
 
     myMetaData.setConverterDefault(PmConverterLong.INSTANCE);
 
-    PmAttrLongCfg annotation = findAnnotation(PmAttrLongCfg.class);
+    PmAttrLongCfg annotation = AnnotationUtil.findAnnotation(this, PmAttrLongCfg.class);
     if (annotation != null) {
       long maxValue = myMetaData.maxValue = annotation.maxValue();
       long minValue = myMetaData.minValue = annotation.minValue();

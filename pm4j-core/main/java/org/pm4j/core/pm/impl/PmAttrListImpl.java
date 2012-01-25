@@ -143,7 +143,7 @@ public class PmAttrListImpl<T> extends PmAttrBase<List<T>, Collection<T>> implem
     super.initMetaData(metaData);
     MetaData myMetaData = (MetaData) metaData;
 
-    PmAttrListCfg annotation = findAnnotation(PmAttrListCfg.class);
+    PmAttrListCfg annotation = AnnotationUtil.findAnnotation(this, PmAttrListCfg.class);
     if (annotation != null) {
       if (annotation.itemConverter() != Void.class) {
         myMetaData.itemConverter = ClassUtil.newInstance(annotation.itemConverter());

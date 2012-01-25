@@ -64,7 +64,7 @@ public class PmAttrDoubleImpl extends PmAttrNumBase<Double> implements PmAttrDou
     super.initMetaData(metaData);
     MetaData myMetaData = (MetaData) metaData;
 
-    PmAttrDoubleCfg annotation = findAnnotation(PmAttrDoubleCfg.class);
+    PmAttrDoubleCfg annotation = AnnotationUtil.findAnnotation(this, PmAttrDoubleCfg.class);
     if (annotation != null) {
       double maxValue = myMetaData.maxValue = annotation.maxValue();
       double minValue = myMetaData.minValue = annotation.minValue();

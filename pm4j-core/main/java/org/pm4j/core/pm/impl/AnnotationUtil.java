@@ -1,10 +1,12 @@
-package org.pm4j.core.pm.annotation;
+package org.pm4j.core.pm.impl;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Collection;
 
 import org.pm4j.common.exception.CheckedExceptionWrapper;
+import org.pm4j.core.pm.annotation.PmCacheCfg;
 import org.pm4j.core.pm.annotation.PmCacheCfg.CacheMode;
 
 public class AnnotationUtil {
@@ -19,7 +21,7 @@ public class AnnotationUtil {
    * @param <A>
    *          The annotation type.
    * @param classToAnalyze
-   *          In this class or one of its super classes the annontation will be
+   *          In this class or one of its super classes the annotation will be
    *          searched.
    * @param annotationClass
    *          The runtime class of the annotation.
@@ -40,6 +42,61 @@ public class AnnotationUtil {
 
     return a;
   }
+
+  /**
+   * Just finds an annotation for this class.
+   * <p>
+   * Subclasses provide different implementations e.g. to find annotations that
+   * are attached to a matching field declaration of the parent model.
+   *
+   * @param <T>
+   *          The annotation type.
+   * @param annotationClass
+   *          The annotation class to find.
+   * @return The annotation instance of <code>null</code> when not found.
+   */
+  public static <T extends Annotation> T findAnnotation(PmObjectBase pm, Class<T> annotationClass) {
+    return pm.getPmMetaDataWithoutPmInitCall().isPmField
+              ? findAnnotation(pm, annotationClass, pm.getPmParent().getClass())
+              : findAnnotationInClassTree(pm.getClass(), annotationClass);
+  }
+
+  /**
+   * Provides an annotation that is defined for this presentation model class or
+   * the field of the parent presentation model class.
+   *
+   * @param <T>
+   *          The annotation type.
+   * @param annotationClass
+   *          The annotation class to find.
+   * @param parentClass
+   *          The class the contains this presentation model. E.g. the element
+   *          PM class for an attribute PM class.
+   * @return The annotation instance of <code>null</code> when not found.
+   */
+  public static <T extends Annotation> T findAnnotation(PmObjectBase pm, Class<T> annotationClass, Class<?> parentClass) {
+    assert parentClass != null;
+
+    T foundAnnotation = null;
+
+    // find it in the field declaration
+    try {
+      Field field = parentClass.getField(pm.getPmName());
+      foundAnnotation = field.getAnnotation(annotationClass);
+    } catch (NoSuchFieldException e) {
+      // may be OK, because the attribute may use something like getters or
+      // xPath.
+    }
+
+    // next try if necessary: find it in the attribute presentation model class
+    if (foundAnnotation == null) {
+      foundAnnotation = findAnnotationInClassTree(pm.getClass(), annotationClass);
+    }
+
+    return foundAnnotation;
+  }
+
+
 
   /**
    * Searches for the first {@link CacheMode} property with the given

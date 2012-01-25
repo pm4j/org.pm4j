@@ -266,7 +266,7 @@ public abstract class PmBeanBase<T_BEAN>
     super.initMetaData(metaData);
     MetaData myMetaData = (MetaData) metaData;
 
-    PmBeanCfg annotation = findAnnotation(PmBeanCfg.class);
+    PmBeanCfg annotation = AnnotationUtil.findAnnotation(this, PmBeanCfg.class);
 
     if (annotation != null) {
       myMetaData.beanClass = annotation.beanClass();

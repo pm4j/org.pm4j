@@ -263,7 +263,7 @@ public class PmAttrPmListImpl<T_ITEM_PM extends PmBean<T_BEAN>, T_BEAN> extends 
     super.initMetaData(metaData);
     MetaData myMetaData = (MetaData) metaData;
 
-    PmAttrPmListCfg annotation = findAnnotation(PmAttrPmListCfg.class);
+    PmAttrPmListCfg annotation = AnnotationUtil.findAnnotation(this, PmAttrPmListCfg.class);
     Class<?> itemConverterClass = Void.class;
     if (annotation != null) {
       myMetaData.touchItems = annotation.touchItems();

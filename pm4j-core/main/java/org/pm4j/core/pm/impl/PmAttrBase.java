@@ -1068,7 +1068,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
           ? ((PmBean)getPmParent()).getPmBeanClass()
           : null;
 
-    PmAttrCfg fieldAnnotation = findAnnotation(PmAttrCfg.class);
+    PmAttrCfg fieldAnnotation = AnnotationUtil.findAnnotation(this, PmAttrCfg.class);
 
     zz_readBeanValidationRestrictions(beanClass, fieldAnnotation, myMetaData);
 
@@ -1091,7 +1091,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     }
 
     if (optionCfg == null) {
-      optionCfg = findAnnotation(PmOptionCfg.class);
+      optionCfg = AnnotationUtil.findAnnotation(this, PmOptionCfg.class);
     }
 
     myMetaData.optionSetDef = (PmOptionSetDef)
