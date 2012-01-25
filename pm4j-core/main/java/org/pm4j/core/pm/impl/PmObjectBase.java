@@ -1618,12 +1618,7 @@ final class PmObjectUtil {
       throw e;
     }
     else {
-      if (pm.isMetaDataInitialized()) {
-        throw new PmRuntimeException(pm, e);
-      }
-      else {
-        throw e;
-      }
+      throw new PmRuntimeException(pm, e);
     }
   }
 }
