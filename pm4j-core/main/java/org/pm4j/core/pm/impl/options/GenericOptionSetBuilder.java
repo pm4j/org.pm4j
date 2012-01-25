@@ -11,6 +11,7 @@ import org.pm4j.core.pm.PmOption;
 import org.pm4j.core.pm.PmOptionSet;
 import org.pm4j.core.pm.annotation.PmOptionCfg;
 import org.pm4j.core.pm.annotation.PmOptionCfg.NullOption;
+import org.pm4j.core.pm.api.PmLocalizeApi;
 import org.pm4j.core.pm.impl.PmAttrBase;
 import org.pm4j.core.pm.impl.pathresolver.ExpressionPathResolver;
 import org.pm4j.core.pm.impl.pathresolver.PathComparatorFactory;
@@ -113,9 +114,9 @@ class GenericOptionSetBuilder {
         if (nullOptionTitleResKey != null) {
           title = PmOptionCfg.NULL_OPTION_DEFAULT_RESKEY.equals(nullOptionTitleResKey)
               // default key must not exist.
-              ? forAttr.findLocalization(nullOptionTitleResKey)
+              ? PmLocalizeApi.findLocalization(forAttr, nullOptionTitleResKey)
               // user-defined key should exist. -> debug-title and a log message will appear.
-              : forAttr.localize(nullOptionTitleResKey);
+              : PmLocalizeApi.localize(forAttr, nullOptionTitleResKey);
         }
 
         List<PmOption> l = new ArrayList<PmOption>(list.size()+1);

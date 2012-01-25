@@ -1,11 +1,12 @@
 package org.pm4j.core.sample.admin.user;
 
+import static org.pm4j.core.pm.api.PmLocalizeApi.localize;
+
 import org.pm4j.core.pm.PmAttrDate;
 import org.pm4j.core.pm.PmAttrEnum;
 import org.pm4j.core.pm.PmAttrPmList;
 import org.pm4j.core.pm.PmAttrString;
 import org.pm4j.core.pm.PmCommand;
-import org.pm4j.core.pm.PmElement;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.annotation.PmAttrStringCfg;
@@ -24,8 +25,8 @@ import org.pm4j.core.pm.impl.PmUtil;
 import org.pm4j.core.pm.impl.commands.PmCommandNaviBack;
 import org.pm4j.core.sample.admin.user.service.Address;
 import org.pm4j.core.sample.admin.user.service.User;
-import org.pm4j.core.sample.admin.user.service.UserService;
 import org.pm4j.core.sample.admin.user.service.User.Gender;
+import org.pm4j.core.sample.admin.user.service.UserService;
 
 /**
  * PM for the User edit page.
@@ -106,8 +107,8 @@ public class UserEditPm extends PmBeanBase<User> {
   protected String getPmTitleImpl() {
     User user = getPmBean();
     return user.getId() != null
-             ? localize("userEditPm", user.getName())
-             : localize("userEditPm_newUser");
+             ? localize(this, "userEditPm", user.getName())
+             : localize(this, "userEditPm_newUser");
   }
 
   // -- Getter --

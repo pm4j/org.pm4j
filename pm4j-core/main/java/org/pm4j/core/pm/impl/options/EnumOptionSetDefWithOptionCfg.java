@@ -12,6 +12,7 @@ import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmOption;
 import org.pm4j.core.pm.PmOptionSet;
 import org.pm4j.core.pm.annotation.PmOptionCfg;
+import org.pm4j.core.pm.api.PmLocalizeApi;
 import org.pm4j.core.pm.impl.PmAttrEnumImpl;
 import org.pm4j.core.pm.impl.ResKeyUtil;
 
@@ -100,14 +101,14 @@ public class EnumOptionSetDefWithOptionCfg extends OptionSetDefBase<PmAttrEnumIm
   @Override
   public String getNullOptionTitle(PmAttrEnumImpl<?> forAttr) {
     if (PmOptionCfg.NULL_OPTION_DEFAULT_RESKEY.equals(nullOptionTitleResKey)) {
-      String title = forAttr.findLocalization(ResKeyUtil.shortResKeyForClass(enumClass) + NULL_OPTION_RESKEY_POSTFIX);
+      String title = PmLocalizeApi.findLocalization(forAttr, ResKeyUtil.shortResKeyForClass(enumClass) + NULL_OPTION_RESKEY_POSTFIX);
 
       return title != null
                 ? title
-                : forAttr.findLocalization(PmOptionCfg.NULL_OPTION_DEFAULT_RESKEY);
+                : PmLocalizeApi.findLocalization(forAttr, PmOptionCfg.NULL_OPTION_DEFAULT_RESKEY);
     }
     else {
-      return forAttr.localize(nullOptionTitleResKey);
+      return PmLocalizeApi.localize(forAttr, nullOptionTitleResKey);
     }
   }
 

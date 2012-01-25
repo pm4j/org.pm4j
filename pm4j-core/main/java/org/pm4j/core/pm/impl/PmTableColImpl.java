@@ -14,6 +14,7 @@ import org.pm4j.core.pm.PmVisitor;
 import org.pm4j.core.pm.annotation.PmBoolean;
 import org.pm4j.core.pm.annotation.PmTableCfg;
 import org.pm4j.core.pm.annotation.PmTableColCfg;
+import org.pm4j.core.pm.api.PmLocalizeApi;
 import org.pm4j.core.pm.pageable.PageableCollection;
 import org.pm4j.core.util.table.ColSizeSpec;
 
@@ -125,9 +126,9 @@ public class PmTableColImpl extends PmObjectBase implements PmTableCol {
         default: throw new PmRuntimeException(this, "Unknown enum value: " + sortAttr.getValue());
       }
 
-      return localize(isPmEnabled()
-            ? path
-            : path + "Disabled");
+      return PmLocalizeApi.localize(this, isPmEnabled()
+                                          ? path
+                                          : path + "Disabled");
     }
 
     @Override

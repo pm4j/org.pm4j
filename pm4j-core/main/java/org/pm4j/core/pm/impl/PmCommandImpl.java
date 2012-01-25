@@ -24,6 +24,7 @@ import org.pm4j.core.pm.PmVisitor;
 import org.pm4j.core.pm.annotation.PmCommandCfg;
 import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.api.PmEventApi;
+import org.pm4j.core.pm.api.PmLocalizeApi;
 import org.pm4j.core.pm.api.PmMessageUtil;
 import org.pm4j.navi.NaviHistory;
 import org.pm4j.navi.NaviLink;
@@ -352,7 +353,7 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
       }
     }
 
-    String msgTemplate = findLocalization(key);
+    String msgTemplate = PmLocalizeApi.findLocalization(this, key);
     if (msgTemplate != null) {
       // Does only pass the PM title when it is really used in the message.
       // This prevents a lot of unnecessary warnings.

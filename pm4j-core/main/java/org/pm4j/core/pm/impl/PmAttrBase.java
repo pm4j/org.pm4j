@@ -47,6 +47,7 @@ import org.pm4j.core.pm.annotation.PmOptionCfg.NullOption;
 import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmExpressionApi;
+import org.pm4j.core.pm.api.PmLocalizeApi;
 import org.pm4j.core.pm.api.PmMessageUtil;
 import org.pm4j.core.pm.impl.cache.PmCacheStrategy;
 import org.pm4j.core.pm.impl.cache.PmCacheStrategyBase;
@@ -955,18 +956,18 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
 
     // 1. fix resource key definition
     if (key != null) {
-      format = localize(key);
+      format = PmLocalizeApi.localize(this, key);
     }
     // 2. no fix key: try to find a postfix based definition
     else {
       key = getPmResKey() + PmConstants.RESKEY_POSTFIX_FORMAT;
-      format = findLocalization(key);
+      format = PmLocalizeApi.findLocalization(this, key);
 
       // 3. Try a default key (if defined for this attribute)
       if (format == null) {
         key = getFormatDefaultResKey();
         if (key != null) {
-          format = findLocalization(key);
+          format = PmLocalizeApi.findLocalization(this, key);
         }
       }
     }

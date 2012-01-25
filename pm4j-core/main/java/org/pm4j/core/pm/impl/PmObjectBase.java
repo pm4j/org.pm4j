@@ -21,7 +21,6 @@ import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.pm4j.common.util.collection.ArrayUtil;
 import org.pm4j.common.util.collection.MapUtil;
 import org.pm4j.core.exception.PmConverterException;
 import org.pm4j.core.exception.PmRuntimeException;
@@ -182,99 +181,6 @@ public abstract class PmObjectBase implements PmObject {
   public void setPmTitle(String titleString) {
     PmEventApi.ensureThreadEventSource(this);
     getPmTitleDef().setTitle(this, titleString);
-  }
-
-  /**
-   * Provides a localization based on a key and option resource string arguments.
-   * <p>
-   * The result of that operation strongly depends on the kind of title provider used.
-   *
-   * @param key A resource key.
-   * @param resStringArgs Optional resource string arguments.
-   * @return The localized string or <code>null</code> when no localization is available.
-   */
-  public String findLocalization(String key, Object... resStringArgs) {
-    return getPmTitleDef().findLocalization(this, key, resStringArgs);
-  }
-
-  /**
-   * Provides a localization based on a key and option resource string arguments.
-   * <p>
-   * The result of that operation strongly depends on the kind of title provider used.
-   *
-   * @param key A resource key.
-   * @param resStringArgs Optional resource string arguments.
-   * @return The localized string.
-   * @throws PmRuntimeException when no localization for the given key was found.
-   */
-  public String localize(String key, Object... resStringArgs) {
-    return getPmTitleDef().getLocalization(this, key, resStringArgs);
-  }
-
-  /**
-   * Provides a localization based on a key and option resource string
-   * arguments.
-   * <p>
-   * Examples:
-   * <ul>
-   * <li>localizeOneOrMany("myKey", 1) - provides the string for the resource
-   * key 'myKey_one'</li>
-   * <li>localizeOneOrMany("myKey", 2) - provides the string for the resource
-   * key 'myKey_many'</li>
-   * <li>localizeOneOrMany("myKey", 0) - provides the string for the resource
-   * key 'myKey_none'</li>
-   * </ul>
-   *
-   * @param keybase
-   *          A resource key base that will be concatenated with 'one' or
-   *          'many'.
-   * @param number
-   *          depending on the number the postfix '_one', '_many' or '_none'
-   *          will be added to keybase
-   * @param resArgs
-   *          The arguments for the resource string.
-   * @return The localized string.
-   */
-  public String localizeOneOrMany(String keybase, int number, Object... resArgs) {
-    String key = keybase + (number > 1 ? "_many" : (number == 1 ? "_one" : "_none"));
-
-    Object[] resArgsWithNumber = ArrayUtil.copyOf(resArgs, resArgs.length+1, 1);
-    resArgsWithNumber[0] = number;
-
-    return localize(key, resArgsWithNumber);
-  }
-
-  /**
-   * Calls {@link #localizeOneOrMany(String, int, Object...)} with the resource
-   * key provided by {@link #getPmResKey()}.
-   */
-  public String localizeOneOrMany(int number, Object... resArgs) {
-    return localizeOneOrMany(getPmResKey(), number, resArgs);
-  }
-
-  /**
-   * Provides a localization based on a key and option resource string arguments.
-   * <p>
-   * Used localization key: {@link #getPmResKeyBase()}+key.<br>
-   *
-   * @param key A resource key.
-   * @param resStringArgs Optional resource string arguments.
-   * @return The localized string.
-   * @throws PmRuntimeException if no localization for the given key was found.
-   */
-  protected String findLocalizationWithPfx(String key, Object... resStringArgs) {
-    return findLocalization(getPmResKeyBase() + key, resStringArgs);
-  }
-
-  /**
-   * Provides a localization based on a key and option resource string arguments.
-   *
-   * @param key A resource key with
-   * @param resStringArgs Optional resource string arguments.
-   * @return The localized string or <code>null</code> when no localization is available.
-   */
-  protected String localizeWithPfx(String key, Object... resStringArgs) {
-    return localize(getPmResKeyBase() + key, resStringArgs);
   }
 
   @Override

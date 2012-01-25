@@ -6,6 +6,7 @@ import org.apache.commons.lang.time.FastDateFormat;
 import org.pm4j.common.util.CompareUtil;
 import org.pm4j.core.pm.PmAttrDate;
 import org.pm4j.core.pm.PmObject;
+import org.pm4j.core.pm.api.PmLocalizeApi;
 import org.pm4j.core.pm.impl.converter.PmConverterDate;
 
 /**
@@ -54,7 +55,7 @@ public class PmAttrDateBase<T_BACKING_DATE> extends PmAttrBase<Date, T_BACKING_D
     @Override
     protected String getPmTooltipImpl() {
       String fmt = getOutputFormat();
-      return localize(RESKEY_DATEATTR_FORMAT_TOOLTIP,
+      return PmLocalizeApi.localize(this, RESKEY_DATEATTR_FORMAT_TOOLTIP,
                       fmt, FastDateFormat.getInstance(fmt).format(new Date()));
     }
   }

@@ -8,6 +8,7 @@ import org.pm4j.core.pm.PmAttrEnum;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmOptionCfg;
 import org.pm4j.core.pm.annotation.PmOptionCfg.NullOption;
+import org.pm4j.core.pm.api.PmLocalizeApi;
 import org.pm4j.core.pm.impl.options.EnumOptionSetDef;
 import org.pm4j.core.pm.impl.options.EnumOptionSetDefWithOptionCfg;
 import org.pm4j.core.pm.impl.options.PmOptionImpl;
@@ -56,7 +57,7 @@ public class PmAttrEnumImpl<T_ENUM extends Enum<T_ENUM>> extends PmAttrBase<T_EN
 
   protected String getTitleForEnumValue(Enum<?> value) {
     return value != null
-            ? localize(resKeyForEnumValue(value))
+            ? PmLocalizeApi.localize(this, resKeyForEnumValue(value))
             : getOwnMetaData().getOptionSetDef().getNullOptionTitle(this);
   }
 

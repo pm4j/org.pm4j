@@ -11,6 +11,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.pm4j.core.pm.PmObject;
+import org.pm4j.core.pm.api.PmLocalizeApi;
 import org.pm4j.core.pm.impl.PmObjectBase;
 
 /**
@@ -55,7 +56,7 @@ public final class TagFn {
           + "\nPlease check if the 'pm' attribute is set for your ui tag.";
     }
 
-    return ctxt.localize(resKey, resStringArgs);
+    return PmLocalizeApi.localize(ctxt, resKey, resStringArgs);
   }
 
   /**

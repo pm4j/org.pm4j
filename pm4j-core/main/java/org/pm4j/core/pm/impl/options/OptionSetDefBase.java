@@ -16,6 +16,7 @@ import org.pm4j.core.pm.PmOption;
 import org.pm4j.core.pm.PmOptionSet;
 import org.pm4j.core.pm.annotation.PmOptionCfg;
 import org.pm4j.core.pm.annotation.PmOptionCfg.NullOption;
+import org.pm4j.core.pm.api.PmLocalizeApi;
 import org.pm4j.core.pm.impl.PmAttrBase;
 import org.pm4j.core.pm.impl.PmUtil;
 import org.pm4j.core.pm.impl.pathresolver.ExpressionPathResolver;
@@ -102,9 +103,9 @@ public abstract class OptionSetDefBase<T_ATTR extends PmAttrBase<?,?>> implement
   public String getNullOptionTitle(T_ATTR forAttr) {
     return PmOptionCfg.NULL_OPTION_DEFAULT_RESKEY.equals(nullOptionTitleResKey)
               // default key must not exist.
-              ? forAttr.findLocalization(nullOptionTitleResKey)
+              ? PmLocalizeApi.findLocalization(forAttr, nullOptionTitleResKey)
               // user-defined key should exist. -> debug-title and a log message will appear.
-              : forAttr.localize(nullOptionTitleResKey);
+              : PmLocalizeApi.localize(forAttr, nullOptionTitleResKey);
   }
 
   /**

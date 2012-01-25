@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.pm4j.core.pm.PmCommand;
+import org.pm4j.core.pm.api.PmLocalizeApi;
 import org.pm4j.core.pm.impl.PmCommandImpl;
 import org.pm4j.core.pm.impl.PmElementImpl;
 import org.pm4j.core.pm.impl.PmLabelImpl;
-import org.pm4j.core.pm.impl.PmObjectBase;
 
 /**
  * A standard confirmation dialog PM.<br>
@@ -48,7 +48,7 @@ public class PmConfirmDialog extends PmElementImpl {
 
   @Override
   protected String getPmTitleImpl() {
-    return localize(getLocalOrStandardDlgResKey(""), getNameOfThingToConfirm());
+    return PmLocalizeApi.localize(this, getLocalOrStandardDlgResKey(""), getNameOfThingToConfirm());
   }
 
   /**
@@ -62,7 +62,7 @@ public class PmConfirmDialog extends PmElementImpl {
       return (s != null)
             ? s
 			// TODO: Konstante!
-            : localize(getLocalOrStandardDlgResKey("_dialogMessage"), getNameOfThingToConfirm());
+            : PmLocalizeApi.localize(this, getLocalOrStandardDlgResKey("_dialogMessage"), getNameOfThingToConfirm());
     };
   };
 
@@ -128,7 +128,7 @@ public class PmConfirmDialog extends PmElementImpl {
   protected String getLocalOrStandardDlgResKey(String postfix) {
     // 1. command res key + "_confirmDialog" + postfix
     String dlgResKey = cmdToConfim.getPmResKeyBase() + "_confirmDialog" + postfix;
-    if (((PmObjectBase)cmdToConfim).findLocalization(dlgResKey) != null) {
+    if (PmLocalizeApi.findLocalization(cmdToConfim, dlgResKey) != null) {
       return dlgResKey;
     }
 
@@ -136,7 +136,7 @@ public class PmConfirmDialog extends PmElementImpl {
     String resKeyBase = getDialogResKeyBase();
     if (resKeyBase != null) {
       dlgResKey = resKeyBase + postfix;
-      if (findLocalization(dlgResKey) != null) {
+      if (PmLocalizeApi.findLocalization(this, dlgResKey) != null) {
         return dlgResKey;
       }
     }

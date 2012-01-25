@@ -8,6 +8,7 @@ import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmBeanCfg;
 import org.pm4j.core.pm.annotation.PmCommandCfg;
 import org.pm4j.core.pm.annotation.PmTitleCfg;
+import org.pm4j.core.pm.api.PmLocalizeApi;
 import org.pm4j.core.pm.impl.PmAttrBooleanImpl;
 import org.pm4j.core.pm.impl.PmAttrIntegerImpl;
 import org.pm4j.core.pm.impl.PmBeanBase;
@@ -98,7 +99,7 @@ public class PmPagerImpl<T_ITEM>
     @Override
     protected String getPmTitleImpl() {
         PageableCollection<T_ITEM> ps = getPmBean();
-        return localize(getPmResKey(),
+        return PmLocalizeApi.localize(this, getPmResKey(),
                 PageableCollectionUtil.getIdxOfFirstItemOnPage(ps),
                 PageableCollectionUtil.getIdxOfLastItemOnPage(ps),
                 ps.getNumOfItems());

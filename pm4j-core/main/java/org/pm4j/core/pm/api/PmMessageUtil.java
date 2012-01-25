@@ -76,7 +76,7 @@ public class PmMessageUtil {
    *          Optional message arguments.
    */
   public static void makeOptionalInfoMsg(PmObject pm, String key, Object... msgArgs) {
-    String msgString = ((PmObjectBase)pm).findLocalization(key);
+    String msgString = PmLocalizeApi.findLocalization(pm, key);
     if (msgString != null) {
       PmMessageUtil.makeMsg(pm, Severity.INFO, key, msgArgs);
     }
@@ -99,7 +99,7 @@ public class PmMessageUtil {
   public static PmResourceData makeRequiredWarning(PmAttr<?> pm) {
     PmAttrBase<?, ?> pmImpl = (PmAttrBase<?, ?>)pm;
     String msgKey = pmImpl.getPmResKeyBase() + PmConstants.RESKEY_POSTFIX_REQUIRED_MSG;
-    String customMsg = pmImpl.findLocalization(msgKey);
+    String customMsg = PmLocalizeApi.findLocalization(pmImpl, msgKey);
 
     if (customMsg == null) {
       msgKey = (pmImpl.getOptionSet().getOptions().size() == 0)
