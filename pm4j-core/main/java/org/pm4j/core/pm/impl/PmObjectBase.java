@@ -1346,7 +1346,7 @@ public abstract class PmObjectBase implements PmObject {
     }
   }
 
-}
+} // end of PmObjectBase
 
 
 /**
@@ -1432,7 +1432,7 @@ class PmEventTable {
     }
   }
 
-}
+} // end of PmEventTable
 
 /**
  * Core internal utility for common internal tasks.
