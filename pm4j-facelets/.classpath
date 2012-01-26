@@ -7,10 +7,6 @@
 	<classpathentry exported="true" kind="lib" path="/pm4j-libs-temp-solution/lib/myfaces/jars/myfaces-impl-1.2.10.jar"/>
 	<classpathentry kind="lib" path="/pm4j-libs-temp-solution/lib/commons-io/jars/commons-io-1.4.jar" sourcepath="MAVEN_REPO/commons-io/src/commons-io-1.4-sources.jar"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/pm4j-core"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6">
-		<attributes>
-			<attribute name="owner.project.facets" value="java"/>
-		</attributes>
-	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
