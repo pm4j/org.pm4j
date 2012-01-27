@@ -92,6 +92,13 @@ public class PmAttrEnumImpl<T_ENUM extends Enum<T_ENUM>> extends PmAttrBase<T_EN
     return 30;
   }
 
+  /**
+   * @return The represented enum class.
+   */
+  protected Class<T_ENUM> getEnumClass() {
+    return enumClass;
+  }
+
   // ======== meta data ======== //
 
   @Override
