@@ -23,15 +23,18 @@ public interface PmAttr<T> extends PmObject, PmDataInput {
   T getValue();
 
   /**
-   * Setter without explicit event source.
-   *
    * @param value
    *          The new value.
    */
   void setValue(T value);
 
   /**
-   * Sets the value with a string without explicit event source.
+   * @return The string for the current value.
+   */
+  String getValueAsString();
+
+  /**
+   * Sets the value with a string value.
    *
    * @param text
    *          The new value as string.
@@ -39,9 +42,20 @@ public interface PmAttr<T> extends PmObject, PmDataInput {
   void setValueAsString(String text);
 
   /**
-   * @return The string for the current value.
+   * Provides the PM for the attribute value options the user may choose from.
+   * <p>
+   * Attributes that represent enums or references to other objects usually
+   * provide an option set.
+   * <p>
+   * Most PM view components use the string value of the provided option IDs to
+   * set the value of the attribute using {@link #setValueAsString(String)}.<br>
+   * (For multiple value attribute types the PM view components usually use the
+   * 'setListValueAsString' method signatures to set the selected option values.)
+   *
+   * @return The attribute options.<br>
+   *         In case of no options an empty option set.
    */
-  String getValueAsString();
+  PmOptionSet getOptionSet();
 
   /**
    * Some attribute types, such as enums, may provide localized values.
@@ -65,6 +79,12 @@ public interface PmAttr<T> extends PmObject, PmDataInput {
    * @return The minimal string representation length.
    */
   int getMinLen();
+
+  /**
+   * @return <code>true</code> if the attribute value needs to be set to a value
+   *         that is not <code>null</code>.
+   */
+  boolean isRequired();
 
   /**
    * Reset the value to <code>null</code> or the optional default value definition.
@@ -109,33 +129,6 @@ public interface PmAttr<T> extends PmObject, PmDataInput {
    *        <code>false</code> marks the attribute as unchanged.
    */
   void setPmValueChanged(boolean newChangedState);
-
-  /**
-   * Provides the PM for the attribute value options the user may choose from.
-   * <p>
-   * Attributes that represent enums or references to other objects usually
-   * provide an option set.
-   * <p>
-   * Most PM view components use the string value of the provided option IDs to
-   * set the value of the attribute using {@link #setValueAsString(String)}.<br>
-   * (For multiple value attribute types the PM view components usually use the
-   * 'setListValueAsString' method signatures to set the selected option values.)
-   *
-   * @return The attribute options.<br>
-   *         In case of no options an empty option set.
-   */
-  PmOptionSet getOptionSet();
-
-  /**
-   * @return <code>true</code> if the attribute value needs to be set to a value
-   *         that is not <code>null</code>.
-   */
-  boolean isRequired();
-
-  /**
-   * @return <code>true</code> if the attribute value may not be changed.
-   */
-  boolean isPmReadonly();
 
   /**
    * Returns a localized format string for attribute values provided as strings.<br>

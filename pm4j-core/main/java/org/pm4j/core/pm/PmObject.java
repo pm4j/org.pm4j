@@ -103,6 +103,12 @@ public interface PmObject extends Comparable<PmObject> {
   boolean isPmVisible();
 
   /**
+   * The visibility state is usually defined by some UI logic code of the
+   * implementing class.
+   * <p>
+   * In some cases it is useful to control the visibility of an UI element by
+   * calling this setter.
+   *
    * @param visible
    *          The new local visibility state. If set to <code>null</code>,
    *          the visibility provided by <code>isPmVisibleImpl()</code>
