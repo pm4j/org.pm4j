@@ -12,3 +12,4 @@ Servers/*
 org.eclipse.swt/*
 pm4j-facelets-demo/*
 RemoteSystemsTempFiles/*
+web/httpdocs/pm4j-core/docs/current
