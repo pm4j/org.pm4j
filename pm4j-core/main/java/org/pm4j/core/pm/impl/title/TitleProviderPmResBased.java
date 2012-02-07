@@ -1,7 +1,12 @@
 package org.pm4j.core.pm.impl.title;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.Locale;
+import java.util.Map;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.pm4j.common.util.resource.ClassPathResourceStringUtil;
@@ -157,10 +162,55 @@ public class TitleProviderPmResBased<T extends PmObjectBase> implements PmTitleP
    * @return
    */
   private String makeMissingResourceWarning(T item, String key, Object... resStringArgs) {
-    return "String resource for key '" + key + "' and locale '"
-            + getLocale(item) + "' not found. \n"
-            + " Context classes=" + item.getPmResLoaderCtxtClasses()
-            + " Context object=" + PmUtil.getPmLogString(item);
+    StringBuilder sb = new StringBuilder(200);
+    sb.append("String resource for key '")
+      .append(key)
+      .append("' and locale '")
+      .append(getLocale(item))
+      .append("' not found. \n")
+      .append("The following resouce folders (and their parent directories) have been considered:\n");
+
+    for (Map.Entry<String, Class<?>> e : findRelevantResLoaderCtxtClasses(item.getPmResLoaderCtxtClasses()).entrySet()) {
+      sb.append(" ").append(e.getKey()).append("\n");
+    }
+
+    sb.append(" PM context:").append(PmUtil.getPmLogString(item));
+
+    return sb.toString();
+  }
+
+  private static Map<String, Class<?>> findRelevantResLoaderCtxtClasses(Collection<Class<?>> ctxtClasses) {
+    Map<String, Class<?>> urlToClassMap = new LinkedHashMap<String, Class<?>>();
+
+    for (Class<?> c : ctxtClasses) {
+      while (c.getEnclosingClass() != null) {
+        c = c.getEnclosingClass();
+      }
+
+      String classFilePath = "/" + c.getCanonicalName().replaceAll("\\.", "/") + ".class";
+      String classFileUrl = ObjectUtils.toString(c.getResource(classFilePath));
+      int classPostfixLength = c.getSimpleName().length() + ".class".length() + 1;
+
+      String packageUrl = classFileUrl.substring(0, classFileUrl.length() - classPostfixLength);
+
+      boolean isSubUrlOfOtherUrl = false;
+      for (String url : new ArrayList<String>(urlToClassMap.keySet())) {
+        if (url.startsWith(packageUrl)) {
+          isSubUrlOfOtherUrl = true;
+        }
+        else {
+          if (packageUrl.startsWith(url)) {
+            urlToClassMap.remove(url);
+          }
+        }
+      }
+
+      if (! isSubUrlOfOtherUrl) {
+        urlToClassMap.put(packageUrl, c);
+      }
+    }
+
+    return urlToClassMap;
   }
 
 }
