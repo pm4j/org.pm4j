@@ -170,12 +170,12 @@ public abstract class PmElementBase
   }
 
   /**
-   * The default implementation returns <code>true</code> if there is at least a single child.
+   * The default implementation returns <code>true</code> if there is no child.
    * Otherwise <code>false</code>.
    */
   @Override
   public boolean isPmTreeLeaf() {
-    return getPmChildNodes().size() > 0;
+    return getPmChildNodes().isEmpty();
   }
 
   /**
