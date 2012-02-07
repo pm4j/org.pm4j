@@ -38,20 +38,6 @@ public class PmFactoryApi {
     return apiHandler.<T>findPmForBean(pmCtxt, bean);
   }
 
-
-
-  /**
-   * Searches an existing presentation model for a bean that equals the
-   * given bean instance.
-   *
-   * @param bean The bean to find a similar presentation model for.
-   * @return The presentation model for an 'equal' bean or <code>null</code>.
-   */
-  public static <T extends PmBean<?>> T findPmForEqualBean(PmObject pmCtxt, Object bean) {
-    return apiHandler.<T>findPmForEqualBean(pmCtxt, bean);
-  }
-
-
   /**
    * Convenience method that calls {@link #getPmForBean(Object)} for each item
    * within the given list.

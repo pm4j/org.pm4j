@@ -76,7 +76,6 @@ public class PmFactoryApiHandler {
     PmObjectBase pmCtxtImpl = (PmObjectBase)pmCtxt;
     T pmBean = null;
 
-
     if (pmCtxtImpl.pmBeanFactoryCache != null) {
       synchronized(pmCtxt) {
         pmBean = pmCtxtImpl.pmBeanFactoryCache.<T>findByBean(bean);
@@ -109,32 +108,33 @@ public class PmFactoryApiHandler {
    * @param bean The bean to find a similar presentation model for.
    * @return The presentation model for an 'equal' bean or <code>null</code>.
    */
-  public <T extends PmBean<?>> T findPmForEqualBean(PmObject pmCtxt, Object bean) {
-    PmObjectBase pmCtxtImpl = (PmObjectBase)pmCtxt;
-    T pmBean = null;
-
-    if (pmCtxtImpl.pmBeanFactoryCache != null) {
-      synchronized(pmCtxtImpl) {
-        pmBean = pmCtxtImpl.pmBeanFactoryCache.<T>findPmForEqualBean(bean);
-      }
-    }
-
-    if (pmBean == null) {
-      BeanPmFactory factory = pmCtxtImpl.getOwnPmElementFactory();
-
-      // check in hierarchy only when the own factory (and cache) does not
-      // manage objects of the given type.
-      if (factory == null ||
-          ! factory.canMakePmFor(bean)) {
-        PmObject pmParent = pmCtxtImpl.getPmParent();
-        if (pmParent != null) {
-          pmBean = this.<T>findPmForEqualBean(pmParent, bean);
-        }
-      }
-    }
-
-    return pmBean;
-  }
+  // TODO olaf: Check with first project context how to get rid of this...
+//  public <T extends PmBean<?>> T findPmForEqualBean(PmObject pmCtxt, Object bean) {
+//    PmObjectBase pmCtxtImpl = (PmObjectBase)pmCtxt;
+//    T pmBean = null;
+//
+//    if (pmCtxtImpl.pmBeanFactoryCache != null) {
+//      synchronized(pmCtxtImpl) {
+//        pmBean = pmCtxtImpl.pmBeanFactoryCache.<T>findPmForEqualBean(bean);
+//      }
+//    }
+//
+//    if (pmBean == null) {
+//      BeanPmFactory factory = pmCtxtImpl.getOwnPmElementFactory();
+//
+//      // check in hierarchy only when the own factory (and cache) does not
+//      // manage objects of the given type.
+//      if (factory == null ||
+//          ! factory.canMakePmFor(bean)) {
+//        PmObject pmParent = pmCtxtImpl.getPmParent();
+//        if (pmParent != null) {
+//          pmBean = this.<T>findPmForEqualBean(pmParent, bean);
+//        }
+//      }
+//    }
+//
+//    return pmBean;
+//  }
 
 
   /**
