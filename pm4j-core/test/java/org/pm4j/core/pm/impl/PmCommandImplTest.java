@@ -7,7 +7,6 @@ import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmAttrEnum;
 import org.pm4j.core.pm.PmAttrString;
 import org.pm4j.core.pm.PmCommand;
-import org.pm4j.core.pm.PmMessage.Severity;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.api.PmMessageUtil;
 import org.pm4j.navi.NaviLink;

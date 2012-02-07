@@ -1,5 +1,7 @@
 package org.pm4j.demo.basic;
 
+import static org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO.CLEAR;
+
 import java.util.Locale;
 
 import org.pm4j.core.pm.PmAttrBoolean;
@@ -51,13 +53,13 @@ public class BasicDemoElementPm extends PmElementImpl {
     }
   };
 
-  @PmCommandCfg(requiresValidValues=false)
+  @PmCommandCfg(beforeDo=CLEAR)
   public final PmCommand         cmdBack = new PmCommandNaviBack(this);
 
-  @PmCommandCfg(requiresValidValues=false)
+  @PmCommandCfg(beforeDo=CLEAR)
   public final PmCommand         cmdCancel = new PmCommandImpl(this);
 
-  @PmCommandCfg(requiresValidValues=false)
+  @PmCommandCfg(beforeDo=CLEAR)
   public final PmCommand         cmdSwitchLanguage = new PmCommandImpl(this) {
     @Override
     protected void doItImpl() {

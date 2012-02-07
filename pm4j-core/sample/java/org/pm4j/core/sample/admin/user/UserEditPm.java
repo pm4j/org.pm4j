@@ -1,5 +1,6 @@
 package org.pm4j.core.sample.admin.user;
 
+import static org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO.CLEAR;
 import static org.pm4j.core.pm.api.PmLocalizeApi.localize;
 
 import org.pm4j.core.pm.PmAttrDate;
@@ -65,7 +66,7 @@ public class UserEditPm extends PmBeanBase<User> {
     }
   };
 
-  @PmCommandCfg(requiresValidValues=false)
+  @PmCommandCfg(beforeDo=CLEAR)
   @PmTitleCfg(resKey="cmd.cancel")
   public final PmCommand cmdCancel = new PmCommandNaviBack(this);
 

@@ -1,5 +1,7 @@
 package org.pm4j.testdomains.user;
 
+import static org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO.CLEAR;
+
 import org.pm4j.core.pm.PmAttrEnum;
 import org.pm4j.core.pm.PmAttrList;
 import org.pm4j.core.pm.PmAttrPmRef;
@@ -11,8 +13,8 @@ import org.pm4j.core.pm.annotation.PmAttrStringCfg;
 import org.pm4j.core.pm.annotation.PmBeanCfg;
 import org.pm4j.core.pm.annotation.PmCommandCfg;
 import org.pm4j.core.pm.annotation.PmOptionCfg;
-import org.pm4j.core.pm.annotation.PmTitleCfg;
 import org.pm4j.core.pm.annotation.PmOptionCfg.NullOption;
+import org.pm4j.core.pm.annotation.PmTitleCfg;
 import org.pm4j.core.pm.impl.PmAttrEnumImpl;
 import org.pm4j.core.pm.impl.PmAttrListImpl;
 import org.pm4j.core.pm.impl.PmAttrPmRefImpl;
@@ -64,13 +66,14 @@ public class UserPm extends PmBeanBase<User> implements PmBean<User> {
 
   public final PmCommand cmdEdit = new PmCommandImpl(this);
 
+  //@PmCommandCfg(beforeDo=BEFORE_DO.VALIDATE)
   public final PmCommand cmdCommitChanges = new PmCommandImpl(this) {
     @Override protected void doItImpl() {
       commitBufferedPmChanges();
     }
   };
 
-  @PmCommandCfg(requiresValidValues=false)
+  @PmCommandCfg(beforeDo=CLEAR)
   public final PmCommand cmdClear = new PmCommandImpl(this) {
     @Override protected void doItImpl() {
       resetPmValues();

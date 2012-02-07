@@ -1,5 +1,7 @@
 package org.pm4j.core.sample.album;
 
+import static org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO.CLEAR;
+
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmEvent;
@@ -8,8 +10,8 @@ import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmCommandCfg;
 import org.pm4j.core.pm.annotation.PmInject;
 import org.pm4j.core.pm.annotation.PmOptionCfg;
-import org.pm4j.core.pm.annotation.PmTitleCfg;
 import org.pm4j.core.pm.annotation.PmOptionCfg.NullOption;
+import org.pm4j.core.pm.annotation.PmTitleCfg;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.impl.PmAttrImpl;
 import org.pm4j.core.pm.impl.PmCommandImpl;
@@ -62,7 +64,7 @@ public class AlbumFormPm extends PmElementImpl {
    * Clears the edited album.<br>
    * Asks the user for confirmation if the currently edited album is changed.
    */
-  @PmCommandCfg(requiresValidValues=false)
+  @PmCommandCfg(beforeDo=CLEAR)
   public final PmCommand cmdCancel = new PmConfirmedCommand(this) {
 
     protected boolean isPmEnabledImpl() {

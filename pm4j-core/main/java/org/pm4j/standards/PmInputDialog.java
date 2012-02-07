@@ -1,5 +1,7 @@
 package org.pm4j.standards;
 
+import static org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO.CLEAR;
+
 import org.pm4j.core.pm.PmAttrString;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmObject;
@@ -46,7 +48,7 @@ public class PmInputDialog extends PmElementImpl {
     }
   };
 
-  @PmCommandCfg(requiresValidValues=false)
+  @PmCommandCfg(beforeDo=CLEAR)
   public final PmCommand cmdCancel = new PmCommandImpl(this) {
     @Override
     protected void doItImpl() throws Exception {

@@ -9,6 +9,8 @@ import org.pm4j.core.pm.PmElement;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.annotation.PmAttrIntegerCfg;
+import org.pm4j.core.pm.annotation.PmCommandCfg;
+import org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO;
 import org.pm4j.core.pm.api.PmMessageUtil;
 import org.pm4j.core.pm.impl.PmAttrIntegerImpl;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
@@ -69,6 +71,7 @@ public class PmRemoteChannelInVmTest extends TestCase {
     @PmAttrIntegerCfg(maxValue=10)
     public final PmAttrInteger i1 = new PmAttrIntegerImpl(this);
 
+    @PmCommandCfg(beforeDo=BEFORE_DO.VALIDATE) //
     public final PmCommand cmdSave = new PmCommandImpl(this) {
       protected void doItImpl() throws Exception {
         System.out.println("cmdSave was called on server pm.\n"+

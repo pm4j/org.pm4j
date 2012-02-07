@@ -15,6 +15,8 @@ import org.pm4j.core.exception.PmUserMessageException;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmCommandDecorator;
 import org.pm4j.core.pm.PmConstants;
+import org.pm4j.core.pm.PmDataInput;
+import org.pm4j.core.pm.PmDefaults;
 import org.pm4j.core.pm.PmElement;
 import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmMessage;
@@ -22,6 +24,7 @@ import org.pm4j.core.pm.PmMessage.Severity;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmVisitor;
 import org.pm4j.core.pm.annotation.PmCommandCfg;
+import org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO;
 import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmLocalizeApi;
@@ -408,7 +411,7 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
 
   @Override
   public boolean isRequiresValidValues() {
-    return getOwnMetaData().requiresValidValues;
+    return getOwnMetaData().beforeDo == BEFORE_DO.VALIDATE;
   }
 
   // -- internal helper --
@@ -469,7 +472,7 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
    * triggers the validation of the parent element.
    */
   protected void validate() {
-    PmElement parentElement = PmUtil.getPmParentOfType(this, PmElement.class);
+    PmDataInput parentElement = PmUtil.getPmParentOfType(this, PmDataInput.class);
     parentElement.pmValidate();
   }
 
@@ -487,36 +490,37 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
    * @return <code>true</code> if the {@link #doItImpl()} logic should be executed.
    */
   protected boolean beforeDo() {
-    PmConversationImpl conversationPm = getPmConversationImpl();
-    boolean requiresValidValues = isRequiresValidValues();
-
-    if (requiresValidValues) {
-        validate();
-    }
-
-    if (! conversationPm.isPmValid()) {
-      if (requiresValidValues) {
-        if (LOG.isDebugEnabled()) {
-          StringBuilder sb = new StringBuilder();
-          sb.append("Command '" + PmUtil.getPmLogString(this) + "' not executed because of validation errors:");
-          for (PmMessage m : PmMessageUtil.getPmErrors(conversationPm)) {
-            sb.append("\n\t").append(m.getTitle());
-          }
-          LOG.debug(sb.toString());
-        }
-        return false;
-      }
-      else {
-        // clear the unused error messages and validation failures.
-        conversationPm.clearPmMessages(null, Severity.ERROR);
-      }
-    }
-
     if (!isPmEnabled()) {
       LOG.warn("The command '" + PmUtil.getPmLogString(this)+ "' is not enabled.");
       return false;
     }
 
+    switch (getOwnMetaData().beforeDo) {
+      case VALIDATE:
+        validate();
+        List<PmMessage> errors = PmMessageUtil.getPmErrors(getPmConversation());
+        if (! errors.isEmpty()) {
+          if (LOG.isDebugEnabled()) {
+            StringBuilder sb = new StringBuilder(160);
+            sb.append("Command '").append(PmUtil.getPmLogString(this)).append("' not executed because of validation errors:");
+            for (PmMessage m : errors) {
+              sb.append("\n\t").append(m.getTitle());
+            }
+            LOG.debug(sb.toString());
+          }
+          return false;
+        }
+        break;
+      case CLEAR:
+        PmMessageUtil.clearPmMessages(getPmConversation());
+        break;
+      case DO_NOTHING:
+        break;
+      default:
+        throw new PmRuntimeException(this, "Can't handle 'beforeDo' definition: " + getOwnMetaData().beforeDo);
+    }
+
+    // XXX olaf: move to the calling methods?
     for (PmCommandDecorator d : commandDecorators) {
       if (! d.beforeDo(this)) {
         return false;
@@ -623,12 +627,23 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
 
     PmCommandCfg annotation = AnnotationUtil.findAnnotation(this, PmCommandCfg.class, getPmParent().getClass());
     if (annotation != null) {
-      myMetaData.requiresValidValues = annotation.requiresValidValues();
+      myMetaData.beforeDo = annotation.beforeDo();
+
+      // TODO olaf: remove asap.
+      if (myMetaData.beforeDo == BEFORE_DO.DEFAULT &&
+          annotation.requiresValidValues() == false) {
+        myMetaData.beforeDo = BEFORE_DO.CLEAR;
+      }
+
       myMetaData.cmdKind = annotation.cmdKind();
       myMetaData.hideWhenNotEnabled = annotation.hideWhenNotEnabled();
       if (annotation.clearCaches().length > 0) {
         myMetaData.clearCachesSet = new TreeSet<PmCacheApi.CacheKind>(Arrays.asList(annotation.clearCaches()));
       }
+    }
+
+    if (myMetaData.beforeDo == BEFORE_DO.DEFAULT) {
+      myMetaData.beforeDo = PmDefaults.getInstance().getBeforeDoCommandDefault();
     }
   }
 
@@ -637,7 +652,7 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
    * E.g. for all 'myapp.User.cmdSave' attributes.
    */
   protected static class MetaData extends PmObjectBase.MetaData {
-    private boolean requiresValidValues = true;
+    private PmCommandCfg.BEFORE_DO beforeDo = BEFORE_DO.DEFAULT;
     private CmdKind cmdKind = CmdKind.COMMAND;
     private Set<PmCacheApi.CacheKind> clearCachesSet = Collections.emptySet();
     /**

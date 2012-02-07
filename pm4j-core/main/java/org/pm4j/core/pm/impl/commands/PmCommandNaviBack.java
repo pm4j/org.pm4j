@@ -1,5 +1,7 @@
 package org.pm4j.core.pm.impl.commands;
 
+import static org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO.CLEAR;
+
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmCommandCfg;
 import org.pm4j.core.pm.impl.PmCommandImpl;
@@ -14,7 +16,7 @@ import org.pm4j.navi.NaviLink;
  * <p>
  * In some cases there might be no previous page. (E.g. in case of an application
  * session that was started by a bookmark.)
- * In this case it navigates back to the (optionally configrured) start link.
+ * In this case it navigates back to the (optionally configured) start link.
  * <p>
  * If both are not available, the command will be disabled.
  * <p>
@@ -22,7 +24,7 @@ import org.pm4j.navi.NaviLink;
  *
  * @author olaf boede
  */
-@PmCommandCfg(requiresValidValues=false)
+@PmCommandCfg(beforeDo=CLEAR)
 public class PmCommandNaviBack extends PmCommandImpl {
 
   private NaviLink[] linksToSkip;

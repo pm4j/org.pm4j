@@ -1,5 +1,6 @@
 package org.pm4j.core.pm;
 
+import static org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO.VALIDATE;
 import junit.framework.TestCase;
 
 import org.pm4j.core.pm.annotation.PmAttrCfg;
@@ -8,8 +9,8 @@ import org.pm4j.core.pm.annotation.PmCommandCfg;
 import org.pm4j.core.pm.api.PmMessageUtil;
 import org.pm4j.core.pm.impl.PmAttrIntegerImpl;
 import org.pm4j.core.pm.impl.PmCommandImpl;
-import org.pm4j.core.pm.impl.PmElementImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
+import org.pm4j.core.pm.impl.PmElementImpl;
 import org.pm4j.core.pm.impl.PmUtil;
 
 public class ValidateAttrValueTest extends TestCase {
@@ -27,7 +28,7 @@ public class ValidateAttrValueTest extends TestCase {
 
     public final NestedPm nestedPm = new NestedPm(this);
 
-    @PmCommandCfg(requiresValidValues=true)
+    @PmCommandCfg(beforeDo=VALIDATE)
     public final PmCommand cmdWithValidation = new PmCommandImpl(this);
   }
 

@@ -1,5 +1,7 @@
 package org.pm4j.core.pm.pageable;
 
+import static org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO.DO_NOTHING;
+
 import org.pm4j.core.pm.PmAttrBoolean;
 import org.pm4j.core.pm.PmAttrInteger;
 import org.pm4j.core.pm.PmCommand;
@@ -131,7 +133,7 @@ public class PmPagerImpl<T_ITEM>
       }
   };
 
-  @PmCommandCfg(requiresValidValues=false)
+  @PmCommandCfg(beforeDo=DO_NOTHING)
   public final PmCommand cmdSelectAllOnPage = new PmCommandImpl(this) {
     @Override
     protected void doItImpl() {
@@ -139,7 +141,7 @@ public class PmPagerImpl<T_ITEM>
     }
   };
 
-  @PmCommandCfg(requiresValidValues=false)
+  @PmCommandCfg(beforeDo=DO_NOTHING)
   public final PmCommand cmdDeSelectAllOnPage = new PmCommandImpl(this) {
     @Override
     protected void doItImpl() {
@@ -147,7 +149,7 @@ public class PmPagerImpl<T_ITEM>
     }
   };
 
-  @PmCommandCfg(requiresValidValues=false)
+  @PmCommandCfg(beforeDo=DO_NOTHING)
   public final PmCommand cmdSelectAll = new PmCommandImpl(this) {
     @Override
     protected void doItImpl() {
@@ -158,7 +160,7 @@ public class PmPagerImpl<T_ITEM>
     }
   };
 
-  @PmCommandCfg(requiresValidValues=false)
+  @PmCommandCfg(beforeDo=DO_NOTHING)
   public final PmCommand cmdDeSelectAll = new PmCommandImpl(this) {
     @Override
     protected void doItImpl() {
