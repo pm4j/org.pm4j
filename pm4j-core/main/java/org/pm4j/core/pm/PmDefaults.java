@@ -1,5 +1,7 @@
 package org.pm4j.core.pm;
 
+import org.pm4j.core.pm.annotation.PmCommandCfg;
+import org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO;
 import org.pm4j.core.pm.annotation.PmOptionCfg;
 import org.pm4j.core.pm.impl.PmObjectBase.NameBuilder;
 import org.pm4j.core.pm.impl.PmObjectBase.NameBuilderAbsoluteName;
@@ -48,6 +50,12 @@ public class PmDefaults {
   private NameBuilder logStringBuilder = NameBuilderAbsoluteName.INSTANCE;
 
   private PmOptionCfg.NullOption enumNullOptionDefault = PmOptionCfg.NullOption.NO;
+
+  /**
+   * Defines the default {@link PmCommandCfg#beforeDo()} setting for commands
+   * that do not define this attribute explicitly.
+   */
+  private PmCommandCfg.BEFORE_DO beforeDoCommandDefault = BEFORE_DO.VALIDATE;
 
   /**
    * The event mask to be fired on validation state changes.<br>
@@ -150,6 +158,14 @@ public class PmDefaults {
   @Deprecated
   public void setElementsInheritAnnotationsOnlyFromSession(boolean elementsInheritAnnotationsOnlyFromSession) {
     this.elementsInheritAnnotationsOnlyFromSession = elementsInheritAnnotationsOnlyFromSession;
+  }
+
+  public PmCommandCfg.BEFORE_DO getBeforeDoCommandDefault() {
+    return beforeDoCommandDefault;
+  }
+
+  public void setBeforeDoCommandDefault(PmCommandCfg.BEFORE_DO beforeDoCommandDefault) {
+    this.beforeDoCommandDefault = beforeDoCommandDefault;
   }
 
 }
