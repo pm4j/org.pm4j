@@ -53,6 +53,17 @@
 		</delete>
 	</target>
 
+	<target name="javadoc" description="generate the javadoc subset to be placed online.">
+		<javadoc destdir="${dir.dist}/javadoc">
+		  <packageset dir="${dir.src}" defaultexcludes="yes">
+			  <include name="org/pm4j/core/pm/**"/>
+			  <exclude name="org/pm4j/core/pm/expr/**"/>
+			</packageset>
+
+		</javadoc>
+	</target>
+
+
 	<!-- ========== All Target ========== -->
     <target name="all" depends="clean,jar,src-jar">
     </target>
