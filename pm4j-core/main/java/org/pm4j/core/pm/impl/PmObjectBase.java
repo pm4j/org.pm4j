@@ -222,6 +222,18 @@ public abstract class PmObjectBase implements PmObject {
   }
 
   @Override
+  public void setPmVisible(Boolean visible) {
+    PmEventApi.ensureThreadEventSource(this);
+    boolean changed = !ObjectUtils.equals(pmVisible, visible);
+    pmVisible = visible;
+    // Does not fire change events if called within the initialization phase.
+    if (changed &&
+        pmInitState == PmInitState.INITIALIZED) {
+      PmEventApi.firePmEvent(this, PmEvent.VISIBILITY_CHANGE);
+    }
+  }
+
+  @Override
   public final boolean isPmEnabled() {
     PmCacheStrategy strategy = getPmMetaData().cacheStrategyForEnablement;
     Object e = strategy.getCachedValue(this);
@@ -237,18 +249,6 @@ public abstract class PmObjectBase implements PmObject {
 
   protected boolean isPmEnabledImpl() {
     return pmEnabled;
-  }
-
-  @Override
-  public void setPmVisible(Boolean visible) {
-    PmEventApi.ensureThreadEventSource(this);
-    boolean changed = !ObjectUtils.equals(pmVisible, visible);
-    pmVisible = visible;
-    // Does not fire change events if called within the initialization phase.
-    if (changed &&
-        pmInitState == PmInitState.INITIALIZED) {
-      PmEventApi.firePmEvent(this, PmEvent.VISIBILITY_CHANGE);
-    }
   }
 
   @Override
@@ -779,6 +779,11 @@ public abstract class PmObjectBase implements PmObject {
         ensurePmMetaDataInitialization();
 
         synchronized(this) {
+          // ensure strict top-down initialization of the PM tree.
+          if (pmParent != null) {
+            pmParent.zz_ensurePmInitialization();
+          }
+
           if (pmInitState.ordinal() < PmInitState.BEFORE_ON_PM_INIT.ordinal()) {
             initPmResourceAnnotatedFields();
             pmInitState = PmInitState.BEFORE_ON_PM_INIT;
