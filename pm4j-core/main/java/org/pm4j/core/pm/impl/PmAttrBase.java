@@ -3,6 +3,7 @@ package org.pm4j.core.pm.impl;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -10,6 +11,7 @@ import java.util.Set;
 
 import javax.validation.Validation;
 import javax.validation.ValidationException;
+import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import javax.validation.constraints.NotNull;
 import javax.validation.metadata.BeanDescriptor;
@@ -823,8 +825,9 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
         return false;
       } catch (PmConverterException e) {
         PmResourceData resData = e.getResourceData();
-        // TODO olaf: processing of converter message is not yet implemented.
-        zz_setAndPropagateInvalidValue(vc, resData.msgKey, getPmShortTitle());
+        Object[] args = Arrays.copyOf(resData.msgArgs, resData.msgArgs.length+1);
+        args[resData.msgArgs.length] = getPmShortTitle();
+        zz_setAndPropagateInvalidValue(vc, resData.msgKey, args);
         if (LOG.isDebugEnabled()) {
           LOG.debug("String to value conversion failed in attribute '" + PmUtil.getPmLogString(this) +
               "'. String value: '" + stringValue +
@@ -1023,14 +1026,16 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   // ======== meta data ======== //
 
   /** The optional JSR-303 bean validator to be considered. */
-  private static ValidatorFactory zz_validatorFactory;
+  private static Validator zz_validator = zz_getValidator();
 
-  {
+  private static Validator zz_getValidator() {
     try {
-      zz_validatorFactory = Validation.buildDefaultValidatorFactory();
+      ValidatorFactory f = Validation.buildDefaultValidatorFactory();
+      return f.getValidator();
     }
     catch (ValidationException e) {
-      LOG.info("No JSR-303 bean validation configuration found:" + e.getMessage());
+      LOG.info("No JSR-303 bean validation configuration found: " + e.getMessage());
+      return null;
     }
   }
 
@@ -1194,7 +1199,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   }
 
   private void zz_readBeanValidationRestrictions(Class<?> beanClass, PmAttrCfg fieldAnnotation, MetaData myMetaData) {
-    if (zz_validatorFactory == null)
+    if (zz_validator == null)
       return;
 
     Class<?> srcClass = ((fieldAnnotation != null) &&
@@ -1203,7 +1208,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
           : beanClass;
 
     if (srcClass != null) {
-      BeanDescriptor beanDescriptor = zz_validatorFactory.getValidator().getConstraintsForClass(srcClass);
+      BeanDescriptor beanDescriptor = zz_validator.getConstraintsForClass(srcClass);
 
       if (beanDescriptor != null) {
         String propName = ((fieldAnnotation != null) &&
@@ -1423,22 +1428,21 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
 
     @Override
     public Object getValue(PmAttrBase<?, ?> attr) {
-      return attr.getOwnMetaData().beanAttrAccessor.<Object>getBeanAttrValue(getPmParentElementBean(attr));
+      @SuppressWarnings("unchecked")
+      Object bean = ((PmBean<Object>)attr.getPmParentElement()).getPmBean();
+      return bean != null
+              ? attr.getOwnMetaData().beanAttrAccessor.<Object>getBeanAttrValue(bean)
+              : null;
     }
 
     @Override
     public void setValue(PmAttrBase<?, ?> attr, Object value) {
-      attr.getOwnMetaData().beanAttrAccessor.setBeanAttrValue(getPmParentElementBean(attr), value);
-    }
-
-    @SuppressWarnings("unchecked")
-    private final Object getPmParentElementBean(PmAttrBase<?, ?> attr) {
+      @SuppressWarnings("unchecked")
       Object bean = ((PmBean<Object>)attr.getPmParentElement()).getPmBean();
       if (bean == null) {
         throw new PmRuntimeException(attr, "Unable to access an attribute value for a backing pmBean that is 'null'.");
       }
-      return bean;
+      attr.getOwnMetaData().beanAttrAccessor.setBeanAttrValue(bean, value);
     }
-
   }
 }
