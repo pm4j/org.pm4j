@@ -1,15 +1,10 @@
 package org.pm4j.jsf;
 
-import java.util.Map;
-
-import javax.faces.application.FacesMessage;
-import javax.faces.application.FacesMessage.Severity;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.pm4j.core.pm.PmMessage;
 import org.pm4j.core.pm.PmTabSet;
 import org.pm4j.core.pm.impl.connector.PmTabSetConnector;
 import org.pm4j.core.pm.impl.connector.PmTabSetConnectorDefaultImpl;
@@ -19,7 +14,6 @@ import org.pm4j.jsf.util.JsfUtil;
 import org.pm4j.jsf.util.NaviJsfUtil;
 import org.pm4j.jsf.util.PmJsfUtil;
 import org.pm4j.navi.NaviHistory;
-import org.pm4j.navi.NaviLink;
 import org.pm4j.navi.impl.NaviLinkImpl;
 import org.pm4j.web.UrlInfo;
 
@@ -58,7 +52,7 @@ public class PmConnectorForJsf implements PmToViewTechnologyConnector {
       }
       else {
         boolean withVersion = ! naviLink.isExternalLink();
-        String url = relUrlForNaviLink(naviLink, withVersion);
+        String url = PmJsfUtil.relUrlForNaviLink(naviLink, withVersion);
         NaviJsfUtil.redirect(url);
       }
     }
@@ -131,27 +125,6 @@ public class PmConnectorForJsf implements PmToViewTechnologyConnector {
   @Override
   public PmTabSetConnector createTabSetConnector(PmTabSet pmTabSet) {
     return new PmTabSetConnectorDefaultImpl();
-  }
-
-  /**
-   * Generates a relative URL for a given navigation link.
-   * It does not contain the mapped servlet name.
-   *
-   * @param naviLink
-   *          The link.
-   * @param withVersion
-   *          Defines if the navigation version should be part of the URI. Links
-   *          without version are useful for external link generation.
-   * @return The application internal URL for the link.
-   */
-  public String relUrlForNaviLink(NaviLink naviLink, boolean withVersion) {
-    String uiParam = null;
-    if (naviLink instanceof NaviLinkImpl) {
-      Map<String, Object> uiParams = ((NaviLinkImpl)naviLink).getParams();
-      uiParam = PmJsfUtil.URL_PARAM_CODER.mapToParamValue(uiParams);
-    }
-    String url = NaviJsfUtil.makeUrl(new UrlInfo(naviLink.getPath(), naviLink.getPosOnPage()), uiParam, withVersion);
-    return url;
   }
 
   // -- getter setter --

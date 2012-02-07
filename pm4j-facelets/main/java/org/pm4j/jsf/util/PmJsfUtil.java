@@ -20,15 +20,15 @@ import org.pm4j.core.pm.PmOption;
 import org.pm4j.core.pm.PmOptionSet;
 import org.pm4j.core.pm.api.PmExpressionApi;
 import org.pm4j.core.pm.impl.PmAttrBase;
-import org.pm4j.core.pm.impl.PmConversationImpl;
 import org.pm4j.jsf.Pm4jJsfConstants;
-import org.pm4j.jsf.PmConnectorForJsf;
 import org.pm4j.jsf.PmMessageCleanupListener;
 import org.pm4j.jsf.UrlParamCoder;
 import org.pm4j.jsf.impl.UrlParamCoderJson;
 import org.pm4j.navi.NaviHistory;
 import org.pm4j.navi.NaviLink;
+import org.pm4j.navi.impl.NaviLinkImpl;
 import org.pm4j.navi.impl.NaviRuntimeException;
+import org.pm4j.web.UrlInfo;
 
 /**
  * Some convenience functions for JSF Api used in combination with presentation
@@ -174,15 +174,33 @@ public class PmJsfUtil {
   // TODO: The PM is not really needed here. A signature without PM could be moved to NaviJsfUtil.
   public static String uriForNaviLink(PmObject pm, NaviLink naviLink) {
     if (naviLink != null) {
-      PmConversationImpl pmConversation = (PmConversationImpl) pm.getPmConversation();
-      PmConnectorForJsf naviHandler = (PmConnectorForJsf) pmConversation.getViewConnector();
-
       boolean withVersion = ! naviLink.isExternalLink();
-      return JsfUtil.relUrlWithServletName(naviHandler.relUrlForNaviLink(naviLink, withVersion));
+      return JsfUtil.relUrlWithServletName(relUrlForNaviLink(naviLink, withVersion));
     }
     else {
       return null;
     }
+  }
+
+  /**
+   * Generates a relative URL for a given navigation link.
+   * It does not contain the mapped servlet name.
+   *
+   * @param naviLink
+   *          The link.
+   * @param withVersion
+   *          Defines if the navigation version should be part of the URI. Links
+   *          without version are useful for external link generation.
+   * @return The application internal URL for the link.
+   */
+  public static String relUrlForNaviLink(NaviLink naviLink, boolean withVersion) {
+    String uiParam = null;
+    if (naviLink instanceof NaviLinkImpl) {
+      Map<String, Object> uiParams = ((NaviLinkImpl)naviLink).getParams();
+      uiParam = PmJsfUtil.URL_PARAM_CODER.mapToParamValue(uiParams);
+    }
+    String url = NaviJsfUtil.makeUrl(new UrlInfo(naviLink.getPath(), naviLink.getPosOnPage()), uiParam, withVersion);
+    return url;
   }
 
   /**
@@ -222,9 +240,7 @@ public class PmJsfUtil {
   // TODO: The PM is not really needed here. A signature without PM could be moved to NaviJsfUtil.
   public static String uriForNaviLinkWithoutVersion(PmObject pm, NaviLink naviLink) {
     if (naviLink != null) {
-      PmConversationImpl pmConversation = (PmConversationImpl) pm.getPmConversation();
-      PmConnectorForJsf viewConnector = (PmConnectorForJsf) pmConversation.getViewConnector();
-      return JsfUtil.relUrlWithServletName(viewConnector.relUrlForNaviLink(naviLink, false));
+      return JsfUtil.relUrlWithServletName(relUrlForNaviLink(naviLink, false));
     }
     else {
       return null;

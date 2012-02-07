@@ -6,6 +6,7 @@ import java.util.TreeMap;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
+import org.pm4j.core.exception.PmRuntimeException;
 
 /**
  * A simple URL structure information object.
@@ -49,7 +50,9 @@ public class UrlInfo {
    *          within the urlString parameter.
    */
   public UrlInfo(String urlString, String fragment) {
-    assert urlString != null;
+    if (urlString == null) {
+      throw new PmRuntimeException("Can't handle a 'null' as urlString.");
+    }
 
     String paramString = null;
     int questMarkPos = urlString.indexOf('?');
