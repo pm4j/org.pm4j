@@ -13,8 +13,6 @@
 	styleClass="#{pv:styleClassForPm(pmViewMapper, pm, styleClass)}"
 	title="#{pm.pmTooltip}"
 	maxlength="#{pm.maxLen}"
-    immediate="true"
-    size="#{pv:condVal(size ne null, size, '')}"
     ><ui:insert
  /><debugInput
  /></ice:inputText
