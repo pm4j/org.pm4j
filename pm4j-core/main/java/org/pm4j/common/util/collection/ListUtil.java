@@ -2,16 +2,9 @@ package org.pm4j.common.util.collection;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 public final class ListUtil {
-
-  public static <T> List<T> itemToList(T addedItem) {
-    List<T> addedItems = new ArrayList<T>(1);
-    addedItems.add(addedItem);
-    return addedItems;
-  }
 
   public static <T> T listToItemOrNull(List<T> list) {
     if (list == null) {
@@ -33,15 +26,6 @@ public final class ListUtil {
       list.addAll(coll);
     }
     return list;
-  }
-
-  public static <T> List<T> shallowCopy(Collection<T> srcSet) {
-    if (srcSet != null && srcSet.size() > 0) {
-      return new ArrayList<T>(srcSet);
-    }
-    else {
-      return Collections.emptyList();
-    }
   }
 
   /**

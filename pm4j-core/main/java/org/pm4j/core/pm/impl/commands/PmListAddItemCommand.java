@@ -1,8 +1,8 @@
 package org.pm4j.core.pm.impl.commands;
 
+import java.util.Arrays;
 import java.util.Collection;
 
-import org.pm4j.common.util.collection.ListUtil;
 import org.pm4j.core.pm.PmAttrPmList;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmElement;
@@ -28,7 +28,7 @@ public class PmListAddItemCommand extends PmCommandImpl implements PmCommand {
 
   public PmListAddItemCommand(PmAttrPmList<?> presentationModel, Object addedItem) {
     // FIXME olaf: mark it as a temporary command!
-    this(presentationModel, ListUtil.itemToList(addedItem));
+    this(presentationModel, Arrays.asList(addedItem));
   }
 
   @Override

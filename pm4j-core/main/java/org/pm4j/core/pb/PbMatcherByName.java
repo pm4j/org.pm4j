@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.pm4j.common.util.collection.ListUtil;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.impl.PmUtil;
 
@@ -21,7 +20,7 @@ public class PbMatcherByName extends PbMatcher {
   public PbMatcherByName(String name, PbFactory<?> builder) {
     assert builder != null;
     this.builder = builder;
-    this.nameSet = new HashSet<String>(ListUtil.itemToList(name));
+    this.nameSet = new HashSet<String>(Arrays.asList(name));
   }
 
   public PbMatcherByName(PbFactory<?> builder, String... names) {

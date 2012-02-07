@@ -1,9 +1,9 @@
 package org.pm4j.core.pm.impl.commands;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import org.pm4j.common.util.collection.ListUtil;
 import org.pm4j.core.pm.PmAttrPmList;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmElement;
@@ -26,7 +26,7 @@ public class PmListRemoveItemCommand extends PmCommandImpl implements PmCommand 
   }
 
   public PmListRemoveItemCommand(PmAttrPmList<?> presentationModel, PmElement removedItem) {
-    this(presentationModel, ListUtil.itemToList(removedItem));
+    this(presentationModel, Arrays.asList(removedItem));
   }
 
   @Override
