@@ -2,7 +2,6 @@ package org.pm4j.core.pm.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -97,13 +96,12 @@ public class PmTableImpl
    * @param pageable The new data set to present.
    * @return <code>true</code> if the data set was new.
    */
-  @SuppressWarnings("unchecked")
   public void setPageableCollection(PageableCollection<T_ROW_ELEMENT_PM> pageable) {
     if (pageableCollection == null ||
         pageable != pageableCollection) {
       this.pageableCollection = (pageable != null)
           ? pageable
-          : new PageableListImpl<T_ROW_ELEMENT_PM>(Collections.EMPTY_LIST, 10, false);
+          : new PageableListImpl<T_ROW_ELEMENT_PM>(10, false);
           PmEventApi.firePmEventIfInitialized(this, PmEvent.VALUE_CHANGE);
     }
     else {

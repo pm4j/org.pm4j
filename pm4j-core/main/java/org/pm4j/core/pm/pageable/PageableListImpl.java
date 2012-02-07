@@ -44,6 +44,16 @@ public class PageableListImpl<T_ITEM> implements PageableCollection<T_ITEM> {
     onUpdateCollection();
   }
 
+  /**
+   * Creates an empty collection.
+   * @param pageSize The page size.
+   * @param multiSelect The multi selection behavior definition.
+   */
+  public PageableListImpl(int pageSize, boolean multiSelect) {
+    this(new ArrayList<T_ITEM>(), pageSize, multiSelect);
+  }
+
+
   @Override
   public List<T_ITEM> getItemsOnPage() {
     if (objects.isEmpty()) {
