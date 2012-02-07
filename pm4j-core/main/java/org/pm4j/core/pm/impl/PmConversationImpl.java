@@ -443,12 +443,6 @@ public class PmConversationImpl extends PmElementBase implements PmConversation 
     return !getPmMessages(null, Severity.ERROR).isEmpty();
   }
 
-  @Override
-  public boolean isPmValid() {
-    // TODO Auto-generated method stub
-    return super.isPmValid();
-  }
-
   public Object getPmNamedObject(Object key) {
     Object obj = pmNamedObjects.get(key);
     return obj == null &&
