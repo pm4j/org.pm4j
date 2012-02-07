@@ -195,17 +195,9 @@ public class PmAttrPmListImpl<T_ITEM_PM extends PmBean<T_BEAN>, T_BEAN> extends 
           .getPmListForBeans(this,
                              beanList,
                              !md.provideInvisibleItems);
-
-    for (T_ITEM_PM itemPm : pmValues) {
-      if (md.touchItems) {
-        PmVisitorTouchAll.DEFAULT_INSTANCE.visit(itemPm);
-      }
-      onGetListItem(itemPm);
-    }
     return pmValues;
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public Collection<T_BEAN> convertPmValueToBackingValue(List<T_ITEM_PM> rawPmAttrValue) {
     List<T_ITEM_PM> pmAttrValue = rawPmAttrValue;
@@ -236,20 +228,6 @@ public class PmAttrPmListImpl<T_ITEM_PM extends PmBean<T_BEAN>, T_BEAN> extends 
     }
   }
 
-  /**
-   * This method will be called whenever an PM list item gets returned by this attribute
-   * the first time.
-   * <p>
-   * It allows some specific postprocessing (e.g. setting some transient information) on
-   * the list item.
-   *
-   * @param item The list item to present.
-   * @return The 'finalized' list item.
-   */
-  protected void onGetListItem(T_ITEM_PM item) {
-    // nothing will be done in the default implementation.
-  }
-
   // ======== meta data ======== //
 
   @Override
@@ -266,7 +244,6 @@ public class PmAttrPmListImpl<T_ITEM_PM extends PmBean<T_BEAN>, T_BEAN> extends 
     PmAttrPmListCfg annotation = AnnotationUtil.findAnnotation(this, PmAttrPmListCfg.class);
     Class<?> itemConverterClass = Void.class;
     if (annotation != null) {
-      myMetaData.touchItems = annotation.touchItems();
       itemConverterClass = annotation.itemConverter();
       myMetaData.provideInvisibleItems = annotation.provideInvisibleItems();
     }
@@ -285,7 +262,6 @@ public class PmAttrPmListImpl<T_ITEM_PM extends PmBean<T_BEAN>, T_BEAN> extends 
   }
 
   protected static class MetaData extends PmAttrBase.MetaData {
-    private boolean touchItems = false;
     private Converter<?> itemConverter;
     private boolean provideInvisibleItems = false;
 

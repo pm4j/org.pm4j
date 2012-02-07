@@ -41,17 +41,4 @@ public @interface PmAttrPmListCfg {
    */
   boolean provideInvisibleItems() default false;
 
-  /**
-   * Lazy load scenario support:<br>
-   * Defines whether the {@link PmElement#pmTouchAll()} method should be called
-   * for each loaded item.
-   * <p>
-   * Please take care: The lazy load initialization may take some time to run.
-   * Use this setting only when required.<br>
-   * You may customize the PM specific lazy load initialization by overriding
-   * {@link PmElement#pmTouchAll()}.
-   *
-   * @return <code>true</code> for lazy load support.
-   */
-  boolean touchItems() default false;
 }
