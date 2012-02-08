@@ -1,7 +1,6 @@
 package org.pm4j.core.pm.impl;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 
@@ -48,8 +47,6 @@ public class PmTableImpl
 
   /** The content this table is based on. */
   private PageableCollection<T_ROW_ELEMENT_PM> pageableCollection;
-
-  private List<PmTableCol> columns = null;
 
   /** Container for the sort specification and the sorted items. */
   private SortOrderSelection sortOrderSelection;
@@ -111,8 +108,7 @@ public class PmTableImpl
 
   @Override
   public List<PmTableCol> getColumns() {
-    zz_ensurePmInitialization();
-    return columns;
+    return zz_getPmColumns();
   }
 
   @Override
@@ -151,29 +147,31 @@ public class PmTableImpl
   // -- row sort order support --
 
   class SortOrderSelection implements PmEventListener {
-    /** The column to sort the rows by. */
-    PmTableCol sortCol = null;
-
-    public SortOrderSelection(Collection<PmTableCol> columns) {
-      for (PmTableCol c : columns) {
-        PmAttrEnum<PmSortOrder> a = c.getSortOrderAttr();
-
-        // Whenever a the sort order attribute of a column changes, the sorted row
-        // set needs to be updated.
-        PmEventApi.addPmEventListener(a, PmEvent.VALUE_CHANGE, this);
-
-        // Identify the initial sort order (if there is one).
-        if (a.getValue() != PmSortOrder.NEUTRAL) {
-          sortCol = c;
-        }
-      }
-    }
+// FIXME olaf: Check sort attribute event listener initialization.
+//             Currently there is a conflict with the too simple single phase initialization.
+//    /** The column to sort the rows by. */
+//    PmTableCol sortCol = null;
+//
+//    public SortOrderSelection(Collection<PmTableCol> columns) {
+//      for (PmTableCol c : columns) {
+//        PmAttrEnum<PmSortOrder> a = c.getSortOrderAttr();
+//
+//        // Whenever a the sort order attribute of a column changes, the sorted row
+//        // set needs to be updated.
+//        PmEventApi.addPmEventListener(a, PmEvent.VALUE_CHANGE, this);
+//
+//        // Identify the initial sort order (if there is one).
+//        if (a.getValue() != PmSortOrder.NEUTRAL) {
+//          sortCol = c;
+//        }
+//      }
+//    }
 
     @Override
     public void handleEvent(PmEvent event) {
       @SuppressWarnings("unchecked")
       PmAttrEnum<PmSortOrder> a = (PmAttrEnum<PmSortOrder>)event.pm;
-      sortCol = a.getValue() != PmSortOrder.NEUTRAL
+      PmTableCol sortCol = a.getValue() != PmSortOrder.NEUTRAL
                   ? (PmTableCol) a.getPmParent()
                   : null;
 
@@ -249,17 +247,19 @@ public class PmTableImpl
   @Override
   protected void onPmInit() {
     super.onPmInit();
-    if (columns == null) {
-      columns = zz_getPmColumns();
 
-      // Initial column position setup.
-      for (int i=0; i<columns.size(); ++i) {
-        PmTableCol c = columns.get(i);
-        c.getColPosAttr().setValue(i);
-      }
+// FIXME olaf: find a way to do this without breaking the top-down initialization.
+//    if (columns == null) {
+//      columns = zz_getPmColumns();
+//
+//      // Initial column position setup.
+//      for (int i=0; i<columns.size(); ++i) {
+//        PmTableCol c = columns.get(i);
+//        c.getColPosAttr().setValue(i);
+//      }
+//    }
 
-      sortOrderSelection = new SortOrderSelection(columns);
-    }
+      sortOrderSelection = new SortOrderSelection();
   }
 
   private static PmObject zz_getPmRowCellForColumn(PmElement rowElement, PmTableCol column) {
