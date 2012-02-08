@@ -344,7 +344,15 @@ public class BeanAttrAccessorImpl implements BeanAttrAccessor {
 
   /** Encapsulates the best-match algorithm used here. */
   private Method findPublicMethod(Class<?> beanClass, String methodName, Class<?>... argClasses) {
-    return SunReflectionUtils.findPublicMethod(beanClass, methodName, argClasses);
+    try {
+      return beanClass.getMethod(methodName, argClasses);
+    }
+    catch (NoSuchMethodException e) {
+      return null;
+    }
+    catch (SecurityException e) {
+      throw new ReflectionException(makeErrMsg("Security manager problem: " + e.getMessage()), e);
+    }
   }
 
 }

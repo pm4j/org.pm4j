@@ -91,51 +91,6 @@ public class ClassUtil {
   }
 
   /**
-   * Creates an instance of the given class using a matching constructor that
-   * accepts the given argument. If such constructor does not exist, the default
-   * constructor will be used.
-   *
-   * @param <T>
-   *          The instance fieldClass that the calling code expects.
-   * @param forClass
-   *          The class to get an instance for.
-   * @param args
-   *          The arguments to pass to the constructor.
-   * @return The created instance.
-   * @throws IllegalStateException
-   *           when the given class has no public default constructor.
-   */
-  @SuppressWarnings("unchecked")
-  public static <T> T newInstanceWithOptionalArg(Class<?> forClass, Object... args) {
-    Object result = null;
-
-    try {
-      Class<?>[] argClasses = new Class[args.length];
-      for (int i = 0; i < args.length; ++i) {
-        if (args[i] != null) {
-          argClasses[i] = args[i].getClass();
-        }
-      }
-
-      Constructor< ? > ctor = SunReflectionUtils.getConstructor(forClass, argClasses);
-
-      if (ctor != null) {
-        result = ctor.newInstance(args);
-      }
-      else {
-        // no constructor for the given argument found.
-        // try the default one:
-        result = newInstance(forClass);
-      }
-    }
-    catch (Exception e) {
-      CheckedExceptionWrapper.throwAsRuntimeException(e);
-    }
-
-    return (T) result;
-  }
-
-  /**
    * Checks if there is a public default constructor defined for the given
    * class.
    *
