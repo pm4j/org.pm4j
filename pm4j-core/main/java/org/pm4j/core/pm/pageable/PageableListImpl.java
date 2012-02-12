@@ -22,7 +22,7 @@ public class PageableListImpl<T_ITEM> implements PageableCollection<T_ITEM> {
   private Collection<T_ITEM> originalObjects;
   private List<T_ITEM>       objectsInOriginalSortOrder;
   private List<T_ITEM>       objects;
-  private int                pageSize;
+  private int                pageSize = 10;
   private int                currentPageIdx;
   private boolean            multiSelect;
   private Set<T_ITEM>        selectedItems = new LinkedHashSet<T_ITEM>();
@@ -35,11 +35,9 @@ public class PageableListImpl<T_ITEM> implements PageableCollection<T_ITEM> {
    * @param pageSize
    *          The page size to use.
    */
-  public PageableListImpl(Collection<T_ITEM> objects, int pageSize, boolean multiSelect) {
+  public PageableListImpl(Collection<T_ITEM> objects) {
     this.originalObjects = objects;
-    this.pageSize = pageSize;
     this.currentPageIdx = 1;
-    this.multiSelect = multiSelect;
 
     onUpdateCollection();
   }
@@ -50,7 +48,7 @@ public class PageableListImpl<T_ITEM> implements PageableCollection<T_ITEM> {
    * @param multiSelect The multi selection behavior definition.
    */
   public PageableListImpl(int pageSize, boolean multiSelect) {
-    this(new ArrayList<T_ITEM>(), pageSize, multiSelect);
+    this(new ArrayList<T_ITEM>());
   }
 
 

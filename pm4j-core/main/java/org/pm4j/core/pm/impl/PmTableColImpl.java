@@ -19,7 +19,7 @@ import org.pm4j.core.pm.pageable.PageableCollection;
 import org.pm4j.core.util.table.ColSizeSpec;
 
 /**
- * Implements the table column PM behaviour.
+ * Implements the table column PM behavior.
  *
  * @author olaf boede
  */
@@ -143,34 +143,6 @@ public class PmTableColImpl extends PmObjectBase implements PmTableCol {
     }
   }
 
-  /**
-   * Default sort order PM attribute class.
-   * <p>
-   * May be extended or replaced by domain specific implementations.
-   */
-  public class SortOrderAttr extends PmAttrEnumImpl<PmSortOrder> {
-    public SortOrderAttr(PmObject pmParent) {
-      super(pmParent, PmSortOrder.class);
-    }
-
-    @Override
-    protected PmSortOrder getDefaultValueImpl() {
-      return PmSortOrder.NEUTRAL;
-    }
-
-    @Override
-    protected boolean isPmEnabledImpl() {
-      return  (getOwnMetaData().sortable != PmBoolean.FALSE) &&
-              (getPmTable().getRowNum() > 1);
-    }
-
-    @Override
-    protected boolean isPmVisibleImpl() {
-      return isPmEnabledImpl();
-    }
-
-  }
-
   @Override
   public void accept(PmVisitor visitor) {
     visitor.visit(this);
@@ -240,6 +212,35 @@ public class PmTableColImpl extends PmObjectBase implements PmTableCol {
 
   private final MetaData getOwnMetaData() {
     return (MetaData) getPmMetaData();
+  }
+
+
+  /**
+   * Default sort order PM attribute class.
+   * <p>
+   * May be extended or replaced by domain specific implementations.
+   */
+  public class SortOrderAttr extends PmAttrEnumImpl<PmSortOrder> {
+    public SortOrderAttr(PmObject pmParent) {
+      super(pmParent, PmSortOrder.class);
+    }
+
+    @Override
+    protected PmSortOrder getDefaultValueImpl() {
+      return PmSortOrder.NEUTRAL;
+    }
+
+    @Override
+    protected boolean isPmEnabledImpl() {
+      return  (getOwnMetaData().sortable != PmBoolean.FALSE) &&
+              (getPmTable().getTotalNumOfRows() > 1); // TODO olaf: The set of visible rows would be better...
+    }
+
+    @Override
+    protected boolean isPmVisibleImpl() {
+      return isPmEnabledImpl();
+    }
+
   }
 
 }

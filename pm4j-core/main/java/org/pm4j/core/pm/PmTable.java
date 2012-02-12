@@ -6,13 +6,28 @@ import org.pm4j.core.pm.pageable.PmPager;
 
 /**
  * PM for tables.<br>
- * A table provides columns (@see {@link #getColumns()}) and rows (see {@link #getRowNum()}).
+ * A table provides columns (@see {@link #getColumns()}) and rows (see {@link #getTotalNumOfRows()}).
  *
  * @author OBOEDE
  *
  * @param <T_ROW_OBJ> The type used for row objects.
  */
 public interface PmTable<T_ROW_OBJ> extends PmObject, PmDataInput {
+
+  /**
+   * The set of supported row selection modes.
+   */
+  public static enum RowSelectMode {
+    /** Only a single row may be selected. */
+    SINGLE,
+    /** More than one row may be selected. */
+    MULTI,
+    /** No row can be marked as selected. */
+    NO_SELECTION,
+    /** This value defines no specific mode. The default should be applied. */
+    DEFAULT
+  }
+
 
   /**
    * @return The set of columns.
@@ -36,13 +51,25 @@ public interface PmTable<T_ROW_OBJ> extends PmObject, PmDataInput {
   List<PmTableGenericRow<T_ROW_OBJ>> getGenericRows();
 
   /**
-   * @return The total number of rows to display within this table.
+   * @return The number of rows per table page.
    */
-  int getRowNum();
+  int getNumOfPageRows();
+
+  /**
+   * @return The total size of the un-filtered row set.
+   */
+  int getTotalNumOfRows();
+
+  /**
+   * @return The row selection mode for this table.
+   */
+  RowSelectMode getRowSelectMode();
 
   /**
    * @return <code>true</code> if the table supports the selection of multiple rows.
+   * @deprecated Please use {@link #getRowSelectMode()}
    */
+  @Deprecated
   boolean isMultiSelect();
 
   /**

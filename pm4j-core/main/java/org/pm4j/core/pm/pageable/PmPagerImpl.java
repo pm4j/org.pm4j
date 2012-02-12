@@ -201,7 +201,7 @@ public class PmPagerImpl<T_ITEM>
   /** Provides an initial empty backing bean if there is none. */
   @Override
   protected PageableCollection<T_ITEM> getPmBeanImpl() {
-      return new PageableListImpl<T_ITEM>(null, 1, false);
+      return new PageableListImpl<T_ITEM>(null);
   }
 
   /**

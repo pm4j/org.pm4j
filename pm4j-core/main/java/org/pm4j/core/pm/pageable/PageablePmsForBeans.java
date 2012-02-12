@@ -32,10 +32,9 @@ public class PageablePmsForBeans<T_PM extends PmBean<T_BEAN>, T_BEAN> implements
     this.beans = beanItems;
   }
 
-  public PageablePmsForBeans(PmObject pmCtxt, Collection<T_BEAN> beans, int pageSize, boolean multiSelect) {
-    this(pmCtxt, new PageableListImpl<T_BEAN>(beans, pageSize, multiSelect));
+  public PageablePmsForBeans(PmObject pmCtxt, Collection<T_BEAN> beans) {
+	    this(pmCtxt, new PageableListImpl<T_BEAN>(beans));
   }
-
 
   @SuppressWarnings("unchecked")
   @Override

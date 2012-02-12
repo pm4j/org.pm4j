@@ -1,5 +1,7 @@
 package org.pm4j.core.pm.impl;
 
+import static org.pm4j.core.pm.impl.PmObjectBase.PmInitState.INITIALIZED;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -18,6 +20,7 @@ import org.pm4j.core.pm.PmTableGenericRow;
 import org.pm4j.core.pm.PmTableRow;
 import org.pm4j.core.pm.PmVisitor;
 import org.pm4j.core.pm.api.PmEventApi;
+import org.pm4j.core.pm.impl.converter.PmConverterShort;
 import org.pm4j.core.pm.pageable.PageableCollection;
 import org.pm4j.core.pm.pageable.PageableListImpl;
 import org.pm4j.core.pm.pageable.PmPager;
@@ -51,6 +54,13 @@ public class PmTableImpl
   /** Container for the sort specification and the sorted items. */
   private SortOrderSelection sortOrderSelection;
 
+  /**
+   * Defines the row-selection behavior.
+   */
+  private RowSelectMode rowSelectMode;
+
+
+
   /** A pager that may be used to navigate through the table. */
   public final PmPagerImpl<T_ROW_ELEMENT_PM> pager = new PmPagerImpl<T_ROW_ELEMENT_PM>(this) {
     @Override
@@ -58,7 +68,7 @@ public class PmTableImpl
       PmEventApi.addPmEventListener(PmTableImpl.this, PmEvent.VALUE_CHANGE, new PmEventListener() {
         @Override
         public void handleEvent(PmEvent event) {
-          setPmBean(pageableCollection);
+          setPmBean(getPageableCollection());
         }
       });
     }
@@ -84,7 +94,9 @@ public class PmTableImpl
    */
   public PmTableImpl(PmObject pmParent, PageableCollection<T_ROW_ELEMENT_PM> pageableItems) {
     super(pmParent);
-    setPageableCollection(pageableItems);
+    if (pageableItems != null) {
+      setPageableCollection(pageableItems);
+    }
   }
 
   /**
@@ -94,16 +106,20 @@ public class PmTableImpl
    * @return <code>true</code> if the data set was new.
    */
   public void setPageableCollection(PageableCollection<T_ROW_ELEMENT_PM> pageable) {
-    if (pageableCollection == null ||
-        pageable != pageableCollection) {
-      this.pageableCollection = (pageable != null)
-          ? pageable
-          : new PageableListImpl<T_ROW_ELEMENT_PM>(10, false);
-          PmEventApi.firePmEventIfInitialized(this, PmEvent.VALUE_CHANGE);
+    if (pageable != null) {
+      pageableCollection = pageable;
+
+      // XXX olaf: Risk of side effects to other users referencing the given collection.
+      //           Find a better solution...
+      //           Generates potentially an initialization problem if called in constructor
+      pageableCollection.setMultiSelect(isMultiSelect());
+      pageableCollection.setPageSize(getNumOfPageRows());
     }
     else {
-      pageableCollection = pageable;
+      pageableCollection = new PageableListImpl<T_ROW_ELEMENT_PM>(getNumOfPageRows(), isMultiSelect());
     }
+
+    PmEventApi.firePmEventIfInitialized(this, PmEvent.VALUE_CHANGE);
   }
 
   @Override
@@ -129,19 +145,34 @@ public class PmTableImpl
 
   @Override
   public List<T_ROW_ELEMENT_PM> getRows() {
-    zz_ensurePmInitialization();
-    return pageableCollection.getItemsOnPage();
+    return getPageableCollection().getItemsOnPage();
   }
 
   @Override
-  public int getRowNum() {
-    zz_ensurePmInitialization();
-    return pageableCollection.getNumOfItems();
+  public int getTotalNumOfRows() {
+    return getPageableCollection().getNumOfItems();
+  }
+
+  public RowSelectMode getRowSelectMode() {
+    return rowSelectMode != null
+              ? rowSelectMode
+              : getOwnMetaDataWithoutPmInitCall().rowSelectMode;
+  }
+
+  // XXX olaf: Really required to have that?
+  public void setRowSelectMode(RowSelectMode rowSelectMode) {
+    this.rowSelectMode = rowSelectMode;
+    getPageableCollection().setMultiSelect(isMultiSelect());
+  }
+
+  @Override
+  public int getNumOfPageRows() {
+    return getOwnMetaDataWithoutPmInitCall().numOfPageRows;
   }
 
   @Override
   public boolean isMultiSelect() {
-    return pageableCollection.isMultiSelect();
+    return getRowSelectMode() == RowSelectMode.MULTI;
   }
 
   // -- row sort order support --
@@ -193,7 +224,7 @@ public class PmTableImpl
           if (order != null && order != PmSortOrder.NEUTRAL) {
             comparator = new RowPmComparator<T_ROW_ELEMENT_PM>(sortCol);
             // sort the PM items.
-            pageableCollection.sortItems(comparator);
+            getPageableCollection().sortItems(comparator);
             PmEventApi.firePmEvent(PmTableImpl.this, PmEvent.VALUE_CHANGE);
             return;
           }
@@ -207,7 +238,7 @@ public class PmTableImpl
       }
 
       // sort based on a backing items related comparator.
-      pageableCollection.sortBackingItems(comparator);
+      getPageableCollection().sortBackingItems(comparator);
       PmEventApi.firePmEvent(PmTableImpl.this, PmEvent.VALUE_CHANGE);
     }
   }
@@ -280,8 +311,9 @@ public class PmTableImpl
     // FIXME olaf: a quick hack. Does not work for rows on the next page!
     //             Debug and fix base class implementation!
     boolean changed = super.isPmValueChanged();
-    if (!changed) {
-      for (T_ROW_ELEMENT_PM r : getRows()) {
+    if ((!changed) &&
+        (pmInitState == INITIALIZED)) {
+      for (T_ROW_ELEMENT_PM r : getPageableCollection().getItemsOnPage()) {
         if (! (r instanceof PmElement)) {
           return false; // can't evaluate this for tables containing simple beans.
         }
@@ -295,6 +327,44 @@ public class PmTableImpl
   }
 
 
+  // -- metadata handling --
+
+  @Override
+  protected PmObjectBase.MetaData makeMetaData() {
+    return new MetaData();
+  }
+
+  @Override
+  protected void initMetaData(PmObjectBase.MetaData metaData) {
+    super.initMetaData(metaData);
+    MetaData myMetaData = (MetaData) metaData;
+    myMetaData.setConverterDefault(PmConverterShort.INSTANCE);
+
+// TODO olaf: Not yet implemented.
+//    PmTableCfg annotation = AnnotationUtil.findAnnotation(this, PmTableCfg.class);
+//    if (annotation != null) {
+//      if (annotation.rowSelectMode() != RowSelectMode.DEFAULT) {
+//        myMetaData.rowSelectMode = annotation.rowSelectMode();
+//      }
+//      if (annotation.numOfPageRows() > 0) {
+//        myMetaData.numOfPageRows = annotation.numOfPageRows();
+//      }
+//    }
+  }
+
+  protected static class MetaData extends PmAttrBase.MetaData {
+    private RowSelectMode rowSelectMode = RowSelectMode.SINGLE;
+    private int numOfPageRows = 10;
+  }
+
+  private final MetaData getOwnMetaData() {
+    return (MetaData) getPmMetaData();
+  }
+
+  private final MetaData getOwnMetaDataWithoutPmInitCall() {
+    return (MetaData) getPmMetaDataWithoutPmInitCall();
+  }
+
 
   // -- getter / setter --
 
@@ -302,6 +372,12 @@ public class PmTableImpl
    * @return The container that handles the table data to display.
    */
   public PageableCollection<T_ROW_ELEMENT_PM> getPageableCollection() {
+    if (pageableCollection == null) {
+      zz_ensurePmInitialization();
+      if (pageableCollection == null) {
+        pageableCollection = new PageableListImpl<T_ROW_ELEMENT_PM>(getNumOfPageRows(), isMultiSelect());
+      }
+    }
     return pageableCollection;
   }
 
