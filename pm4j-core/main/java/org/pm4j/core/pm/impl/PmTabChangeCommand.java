@@ -1,8 +1,10 @@
 package org.pm4j.core.pm.impl;
 
-import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmElement;
+import org.pm4j.core.pm.annotation.PmCommandCfg;
+import org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO;
 
+@PmCommandCfg(beforeDo=BEFORE_DO.DO_NOTHING)
 public class PmTabChangeCommand extends PmCommandImpl {
 
   private final PmTabSetImpl tabSet;

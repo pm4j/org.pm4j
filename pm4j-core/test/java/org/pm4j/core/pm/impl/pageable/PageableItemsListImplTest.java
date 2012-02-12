@@ -19,7 +19,8 @@ public class PageableItemsListImplTest {
 
   @Test
   public void testPageNavigation() {
-    PageableListImpl<MyBean> items = new PageableListImpl<MyBean>(TEST_ITEM_LIST, 2, true);
+    PageableListImpl<MyBean> items = new PageableListImpl<MyBean>(TEST_ITEM_LIST);
+    items.setPageSize(2);
 
     assertEquals("5 items should occupy 3 pages.", 3, PageableCollectionUtil.getNumOfPages(items));
     assertEquals("Last item of first page should have the index 2.", 2, PageableCollectionUtil.getIdxOfLastItemOnPage(items));
