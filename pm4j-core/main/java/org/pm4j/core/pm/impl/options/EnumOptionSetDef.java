@@ -3,10 +3,8 @@ package org.pm4j.core.pm.impl.options;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import org.pm4j.common.util.collection.IterableUtil;
-import org.pm4j.common.util.resource.ClassPathResourceStringUtil;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmOption;
 import org.pm4j.core.pm.PmOptionSet;
@@ -90,11 +88,10 @@ public class EnumOptionSetDef implements PmOptionSetDef<PmAttrEnumImpl<?>> {
       options.add(new PmOptionImpl("", getNullOptionTitle(forAttr), null));
     }
 
-    List<Class<?>> resCtxtClasses = forAttr.getPmResLoaderCtxtClasses();
-    Locale locale = forAttr.getPmConversation().getPmLocale();
     String resKeyPfx = ResKeyUtil.shortResKeyForClass(enumClass) + ".";
     for (Enum<?> e : values) {
-      options.add(makeEnumOption(e, resKeyPfx, resCtxtClasses, locale));
+      String resKey = resKeyPfx + e.name();
+      options.add(new PmOptionImpl(e.name(), PmLocalizeApi.localize(forAttr, resKey), e));
     }
     return new PmOptionSetImpl(options);
   }
@@ -112,12 +109,5 @@ public class EnumOptionSetDef implements PmOptionSetDef<PmAttrEnumImpl<?>> {
               ? title
               : "";
   }
-
-  private PmOptionImpl makeEnumOption(Enum<?> value, String resKeyPfx, List<Class<?>> resCtxtClasses, Locale locale) {
-    String resKey = resKeyPfx + value.name();
-    String title = ClassPathResourceStringUtil.getString(locale, resCtxtClasses, resKey);
-    return new PmOptionImpl(value.name(), title, value);
-  }
-
 }
 

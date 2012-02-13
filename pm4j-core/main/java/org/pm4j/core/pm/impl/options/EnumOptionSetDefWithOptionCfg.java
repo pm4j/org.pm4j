@@ -4,10 +4,8 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 
 import org.apache.commons.lang.StringUtils;
-import org.pm4j.common.util.resource.ClassPathResourceStringUtil;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmOption;
 import org.pm4j.core.pm.PmOptionSet;
@@ -89,10 +87,8 @@ public class EnumOptionSetDefWithOptionCfg extends OptionSetDefBase<PmAttrEnumIm
         options.add(new PmOptionImpl("", getNullOptionTitle(forAttr), null));
       }
 
-      List<Class<?>> resCtxtClasses = forAttr.getPmResLoaderCtxtClasses();
-      Locale locale = forAttr.getPmConversation().getPmLocale();
       for (Enum<?> e : values) {
-        options.add(makeEnumOption(e, resCtxtClasses, locale));
+        options.add(makeOption(forAttr, e));
       }
       return new PmOptionSetImpl(options);
     }
@@ -119,13 +115,10 @@ public class EnumOptionSetDefWithOptionCfg extends OptionSetDefBase<PmAttrEnumIm
 
   @Override
   protected PmOption makeOption(PmAttrEnumImpl<?> forAttr, Object o) {
-    return makeEnumOption((Enum<?>)o, forAttr.getPmResLoaderCtxtClasses(), forAttr.getPmConversation().getPmLocale());
-  }
-
-  private PmOptionImpl makeEnumOption(Enum<?> value, List<Class<?>> resCtxtClasses, Locale locale) {
-    String resKey = resKeyPfx + value.name();
-    String title = ClassPathResourceStringUtil.getString(locale, resCtxtClasses, resKey);
-    return new PmOptionImpl(value.name(), title, value);
+    Enum<?> e = (Enum<?>)o;
+    String resKey = resKeyPfx + e.name();
+    String title = PmLocalizeApi.localize(forAttr, resKey);
+    return new PmOptionImpl(e.name(), title, e);
   }
 
 }

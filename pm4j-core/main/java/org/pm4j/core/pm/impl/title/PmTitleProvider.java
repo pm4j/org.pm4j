@@ -1,6 +1,5 @@
 package org.pm4j.core.pm.impl.title;
 
-import java.util.Locale;
 
 
 
@@ -14,29 +13,6 @@ import java.util.Locale;
  * @author olaf boede
  */
 public interface PmTitleProvider<T> {
-
-  /**
-   * Provides a localization based on a key and option resource string arguments.
-   * <p>
-   * The result of that operation strongly depends on the kind of titleprovider used.
-   *
-   * @param key A resource key.
-   * @param resStringArgs Optinal resource string arguments.
-   * @return The localized string.
-   */
-  String findLocalization(T item, String key, Object... resStringArgs);
-  String getLocalization(T item, String key, Object... resStringArgs);
-
-  /**
-   * Works as {@link #findLocalization(Object, String, Object...)}, but only for a specific
-   * language.
-   *
-   * @param key A resource key.
-   * @param locale The locale to use.
-   * @param resStringArgs Optinal resource string arguments.
-   * @return The localized string.
-   */
-  String findLocalization(T item, Locale locale, String key, Object... resStringArgs);
 
   /**
    * @param item

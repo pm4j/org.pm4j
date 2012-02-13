@@ -5,6 +5,7 @@ import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.impl.PmLocalizeApiHandler;
 import org.pm4j.core.pm.impl.PmObjectBase;
+import org.pm4j.core.pm.impl.title.ResourceStringProvider;
 
 public class PmLocalizeApi {
 
@@ -103,5 +104,11 @@ public class PmLocalizeApi {
     return localize(pm, ((PmObjectBase)pm).getPmResKeyBase() + key, resStringArgs);
   }
 
+  /**
+   * @param resourceStringProvider The algorithm that provides resource strings for given resource keys.
+   */
+  public static void setResourceStringProvider(ResourceStringProvider resourceStringProvider) {
+    apiHandler.setResourceStringProvider(resourceStringProvider);
+  }
 
 }

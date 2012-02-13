@@ -6,6 +6,7 @@ import org.pm4j.common.util.resource.ClassPathResourceFinder;
 import org.pm4j.core.pm.PmAttrBoolean;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmOptionSet;
+import org.pm4j.core.pm.api.PmLocalizeApi;
 import org.pm4j.core.pm.impl.converter.PmConverterBoolean;
 import org.pm4j.core.pm.impl.options.PmOptionImpl;
 import org.pm4j.core.pm.impl.options.PmOptionSetImpl;
@@ -52,7 +53,7 @@ public class PmAttrBooleanImpl extends PmAttrBase<Boolean, Boolean> implements P
   // -- Helper --
 
   private String titleForNameAndValueKey(Object value, Locale locale) {
-    return ClassPathResourceFinder.instance().getString(getClass(), ResKeyUtil.classNameAndValue(value), locale);
+    return PmLocalizeApi.localize(this, ResKeyUtil.classNameAndValue(value), locale);
   }
 
   // ======== meta data ======== //

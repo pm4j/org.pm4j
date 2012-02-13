@@ -5,10 +5,9 @@ import java.util.List;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
-import org.pm4j.common.util.resource.ClassPathResourceStringUtil;
 import org.pm4j.core.exception.PmResourceData;
 import org.pm4j.core.exception.PmRuntimeException;
-import org.pm4j.core.pm.impl.PmObjectBase;
+import org.pm4j.core.pm.api.PmLocalizeApi;
 
 /**
  * A string resource based presentation model message.
@@ -177,13 +176,12 @@ public class PmMessage {
 
   protected String localize(String resKey, Object... resStringArgs) {
     Object[] args = getArgsWithSubMessages(resStringArgs);
-    PmObjectBase pm = (PmObjectBase)resourceData.pm;
-    return ClassPathResourceStringUtil.getString(pm.getPmConversation().getPmLocale(), pm.getPmResLoaderCtxtClasses(), resKey, args);
-}
+    return PmLocalizeApi.localize(resourceData.pm, resKey, args);
+  }
+
   protected String localizeOptional(String resKey, Object... resStringArgs) {
     Object[] args = getArgsWithSubMessages(resStringArgs);
-    PmObjectBase pm = (PmObjectBase)resourceData.pm;
-    return ClassPathResourceStringUtil.findString(pm.getPmConversation().getPmLocale(), pm.getPmResLoaderCtxtClasses(), resKey, args);
+    return PmLocalizeApi.findLocalization(resourceData.pm, resKey, args);
   }
 
   private Object[] getArgsWithSubMessages(Object... resStringArgs) {

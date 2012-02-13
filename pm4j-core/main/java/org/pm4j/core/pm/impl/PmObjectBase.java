@@ -184,7 +184,9 @@ public abstract class PmObjectBase implements PmObject {
 
   @Override
   public PmConversation getPmConversation() {
-    return pmParent.getPmConversation();
+    return (pmParent != null)
+              ? pmParent.getPmConversation()
+              : null;
   }
 
   @Override

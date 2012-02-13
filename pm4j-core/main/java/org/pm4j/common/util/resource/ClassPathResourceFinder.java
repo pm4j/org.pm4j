@@ -1,9 +1,7 @@
 package org.pm4j.common.util.resource;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
-import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
@@ -14,7 +12,7 @@ import org.apache.commons.logging.LogFactory;
 import org.pm4j.core.exception.PmRuntimeException;
 
 /**
- * TODOC:
+ * Finds a resource string in packages related to a given class.
  */
 public class ClassPathResourceFinder {
 
@@ -26,13 +24,6 @@ public class ClassPathResourceFinder {
 
   /** Defines the way how language resources are found by the {@link ResourceBundle}. */
   private ResourceBundle.Control resBundleStrategy = ResourceBundle.Control.getNoFallbackControl(ResourceBundle.Control.FORMAT_DEFAULT);
-
-  /**
-   * A map of caches for each resource scope (package).
-   * That structure is required since the same key may be bound to different
-   * values within different scope.
-   */
-  private Map<Object, ResStringCache> pkgToResStringCacheMap = new HashMap<Object, ResStringCache>();
 
   private static final ClassPathResourceFinder INSTANCE = new ClassPathResourceFinder();
 
@@ -58,9 +49,9 @@ public class ClassPathResourceFinder {
 
   /**
    * Finds a value for the given key and locale.
-   * The forClass parameter is used to identify a localization scope.
+   * The <code>forClass</code> parameter is used to identify a localization scope.
    * A resource is searched within the archive and package of the given class.
-   * If it is not found there if will be searched in the parent packages till
+   * If it is not found there it will be searched within the parent packages till
    * the root package is reached.
    * <p>
    * To ensure a good performance, a cache ensures that the resource file search
@@ -74,49 +65,24 @@ public class ClassPathResourceFinder {
   public String findString(Class<?> forClass, String key, Locale locale) {
     assert key != null;
 
-    ResStringCache resStringCache = getPkgResStringCache(forClass);
-    ResStringCache.Entry cacheEntry = resStringCache.find(key, locale);
+    String result = null;
+    String pkgName = ClassUtils.getPackageName(forClass);
+    String relPkgDir = pkgName.replace('.', '/');
 
-    if (cacheEntry != null) {
-      return cacheEntry.getValue();
-    }
-    else {
-      String result = null;
-      String pkgName = ClassUtils.getPackageName(forClass);
-      String relPkgDir = pkgName.replace('.', '/');
+    Iterator<String> i = new CutStringTailIterator(relPkgDir, "/");
 
-      Iterator<String> i = new CutStringTailIterator(relPkgDir, "/");
+    while (i.hasNext() && (result == null)) {
+      String pkgDir = i.next();
 
-      while (i.hasNext() && (result == null)) {
-        String pkgDir = i.next();
-
-        result = findResStringInPgk(pkgDir, locale, key);
-      }
-
-      // finally try the root package
-      if (result == null) {
-        result = findResStringInPgk("", locale, key);
-      }
-
-      // remember the result in the cache:
-      resStringCache.put(key, locale, result);
-      return result;
-    }
-  }
-
-  private ResStringCache getPkgResStringCache(Class<?> forClass) {
-    Object cacheScopeKey = forClass.getPackage();
-    if (cacheScopeKey == null) {
-      log.warn("No package reference for class " + forClass);
-      cacheScopeKey = ClassUtils.getPackageName(forClass);
+      result = findResStringInPgk(pkgDir, locale, key);
     }
 
-    ResStringCache cache = pkgToResStringCacheMap.get(cacheScopeKey);
-    if (cache == null) {
-      cache = new ResStringCache();
-      pkgToResStringCacheMap.put(cacheScopeKey, cache);
+    // finally try the root package
+    if (result == null) {
+      result = findResStringInPgk("", locale, key);
     }
-    return cache;
+
+    return result;
   }
 
   private String findResStringInPgk(String pkgDir, Locale locale, String key) {

@@ -86,7 +86,7 @@ public class DeprecatedPmTableOfPmElementsImpl<T_ROW_ELEMENT_PM extends PmElemen
   }
 
   @Override
-  public int getRowNum() {
+  public int getTotalNumOfRows() {
     return getRowsImpl().size();
   }
 
@@ -276,6 +276,18 @@ public class DeprecatedPmTableOfPmElementsImpl<T_ROW_ELEMENT_PM extends PmElemen
   public boolean isMultiSelect() {
     // TODO Auto-generated method stub
     return false;
+  }
+
+  @Override
+  public org.pm4j.core.pm.PmTable.RowSelectMode getRowSelectMode() {
+    // TODO Auto-generated method stub
+    return RowSelectMode.SINGLE;
+  }
+
+  @Override
+  public int getNumOfPageRows() {
+    // TODO Auto-generated method stub
+    return 10;
   }
 
 }
