@@ -214,11 +214,18 @@ public abstract class PmBeanBase<T_BEAN>
   /**
    * A special {@link PmBeanBase} class that provides access to the bean that is handled by the embedding
    * {@link PmBeanBase} instance.
+   * <p>
+   * If this class is not used in such an embedded context, it acts just like its base class {@link PmBeanBase}.
    *
    * @param <T_BEAN> Type of the backing bean.
    */
   public static class Nested<T_BEAN> extends PmBeanBase<T_BEAN> {
 
+    /**
+     * Creates the PM bound to a <code>null</code>-pmBean .
+     * 
+     * @param parentPm The parent context PM.
+     */
     public Nested(PmObject parentPm) {
       super(parentPm, null);
     }
@@ -237,19 +244,23 @@ public abstract class PmBeanBase<T_BEAN>
         }
       };
 
-      PmBeanBase<T_BEAN> embeddingBeanPm = getEmbeddingBeanPm();
-      PmEventApi.addWeakPmEventListener(embeddingBeanPm, PmEvent.VALUE_CHANGE, pmEmbeddingBeanPmValueChangeListener);
+      PmBeanBase<T_BEAN> embeddingBeanPm = findEmbeddingBeanPm();
+      if (embeddingBeanPm != null) {
+        PmEventApi.addWeakPmEventListener(embeddingBeanPm, PmEvent.VALUE_CHANGE, pmEmbeddingBeanPmValueChangeListener);
+      }
     }
 
     @Override
     protected T_BEAN findPmBeanImpl() {
-      PmBeanBase<T_BEAN> embeddingBeanPm = getEmbeddingBeanPm();
-      return embeddingBeanPm.getPmBean();
+      PmBeanBase<T_BEAN> embeddingBeanPm = findEmbeddingBeanPm();
+      return embeddingBeanPm != null
+                ? embeddingBeanPm.getPmBean()
+                : super.findPmBeanImpl();
     }
 
     @SuppressWarnings("unchecked")
-    private PmBeanBase<T_BEAN> getEmbeddingBeanPm() {
-      return PmUtil.getPmParentOfType(this, PmBeanBase.class);
+    private PmBeanBase<T_BEAN> findEmbeddingBeanPm() {
+      return PmUtil.findPmParentOfType(this, PmBeanBase.class);
     }
 
   }
