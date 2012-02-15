@@ -35,7 +35,7 @@ public class PmLocalizeApi {
    * @throws PmRuntimeException when no localization for the given key was found.
    */
   public static String localize(PmObject pm, String key, Object... resStringArgs) {
-    return apiHandler.findLocalization((PmObjectBase)pm, key, resStringArgs);
+    return apiHandler.localize((PmObjectBase)pm, key, resStringArgs);
   }
 
   /**
