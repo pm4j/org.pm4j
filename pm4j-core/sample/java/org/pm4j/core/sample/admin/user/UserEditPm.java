@@ -10,7 +10,6 @@ import org.pm4j.core.pm.PmAttrString;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
-import org.pm4j.core.pm.annotation.PmAttrStringCfg;
 import org.pm4j.core.pm.annotation.PmBeanCfg;
 import org.pm4j.core.pm.annotation.PmCommandCfg;
 import org.pm4j.core.pm.annotation.PmFactoryCfg;
@@ -47,7 +46,7 @@ public class UserEditPm extends PmBeanBase<User> {
     super(pmParent, user);
   }
 
-  @PmAttrCfg(required=true) @PmAttrStringCfg(maxLen=5)
+  @PmAttrCfg(required=true, maxLen=5)
   public final PmAttrString       name     = new PmAttrStringImpl(this);
 
   @PmAttrCfg(required=true)

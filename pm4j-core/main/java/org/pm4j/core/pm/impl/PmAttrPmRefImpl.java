@@ -127,4 +127,13 @@ public class PmAttrPmRefImpl<T_REFED_PM extends PmBean<?>, T_BEAN>
     //           is named 'id'.
     myMetaData.setConverterDefault(new PmConverterOptionBased("id"));
   }
+
+  protected static class MetaData extends PmAttrBase.MetaData {
+    @Override
+    protected int getMaxLenDefault() {
+      // XXX olaf: check for a real restriction...
+      return 100;
+    }
+  }
+
 }

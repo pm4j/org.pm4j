@@ -137,11 +137,6 @@ public class PmAttrPmListImpl<T_ITEM_PM extends PmBean<T_BEAN>, T_BEAN> extends 
     return NullOption.NO;
   }
 
-  @Override
-  public int getMaxLen() {
-    // XXX olaf: check for a real restriction...
-    return Short.MAX_VALUE;
-  }
 
   // ======== PmTreeNode implementation ======== //
 
@@ -267,6 +262,12 @@ public class PmAttrPmListImpl<T_ITEM_PM extends PmBean<T_BEAN>, T_BEAN> extends 
 
     @Override public Converter<?> getItemConverter()                   {    return itemConverter;    }
     @Override public void setItemConverter(Converter<?> itemConverter) {    this.itemConverter = itemConverter;    }
+
+    @Override
+    protected int getMaxLenDefault() {
+      // XXX olaf: check for a real restriction...
+      return Short.MAX_VALUE;
+    }
   }
 
   private final MetaData getOwnMetaData() {

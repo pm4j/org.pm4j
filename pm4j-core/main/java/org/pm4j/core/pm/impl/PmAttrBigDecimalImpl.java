@@ -15,7 +15,7 @@ public class PmAttrBigDecimalImpl extends PmAttrNumBase<BigDecimal> implements P
   // ======== Interface implementation ======== //
 
   public BigDecimal getMax() {
-    return new BigDecimal(Double.MAX_VALUE);
+    return new BigDecimal(getOwnMetaDataWithoutPmInitCall().getMaxValue());
   }
 
   public BigDecimal getMin() {
@@ -70,14 +70,17 @@ public class PmAttrBigDecimalImpl extends PmAttrNumBase<BigDecimal> implements P
 */
   }
 
-/*
-  protected static class MetaData extends PmAttrBase.MetaData {
-    private BigDecimal maxValue = null;
-    private BigDecimal minValue = null;
+  protected static class MetaData extends PmAttrNumBase.MetaData {
+    @Override
+    protected double getMaxValue() {
+      // TODO olaf: not yet configurable
+      return Double.MAX_VALUE;
+    }
+//    private BigDecimal maxValue = null;
+//    private BigDecimal minValue = null;
   }
 
-  private final MetaData getOwnMetaData() {
-    return (MetaData) getPmMetaData();
+  private final MetaData getOwnMetaDataWithoutPmInitCall() {
+    return (MetaData) getPmMetaDataWithoutPmInitCall();
   }
-*/
 }

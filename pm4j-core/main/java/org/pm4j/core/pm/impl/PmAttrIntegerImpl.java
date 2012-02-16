@@ -65,9 +65,14 @@ public class PmAttrIntegerImpl extends PmAttrNumBase<Integer> implements PmAttrI
     }
   }
 
-  protected static class MetaData extends PmAttrBase.MetaData {
+  protected static class MetaData extends PmAttrNumBase.MetaData {
     private int maxValue = Integer.MAX_VALUE;
     private int minValue = Integer.MIN_VALUE;
+
+    @Override
+    protected double getMaxValue() {
+      return maxValue;
+    }
   }
 
   private final MetaData getOwnMetaData() {

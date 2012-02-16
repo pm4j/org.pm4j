@@ -5,7 +5,7 @@ import org.pm4j.core.pm.PmAspect;
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmAttrString;
 import org.pm4j.core.pm.PmCommand;
-import org.pm4j.core.pm.annotation.PmAttrStringCfg;
+import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.annotation.PmInject;
 import org.pm4j.core.pm.annotation.PmOptionCfg;
 import org.pm4j.core.pm.impl.PmAttrImpl;
@@ -23,10 +23,10 @@ public class LoginSrvPm extends PmElementImpl {
   @PmOptionCfg(values="#adminService.departments", id="id", title="name")
   public final PmAttr<Department> department = new PmAttrImpl<Department>(this);
 
-  @PmAttrStringCfg(minLen=3)
+  @PmAttrCfg(minLen=3)
   public final PmAttrString userName = new PmAttrStringImpl(this);
 
-  @PmAttrStringCfg(minLen=6)
+  @PmAttrCfg(minLen=6)
   public final PmAttrString pwd = new PmAttrStringImpl(this);
 
   public final PmAttr<LoginState> loginState = new PmAttrImpl<LoginState>(this);

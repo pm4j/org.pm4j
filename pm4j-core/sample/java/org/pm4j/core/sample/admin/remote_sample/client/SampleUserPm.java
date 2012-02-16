@@ -5,7 +5,6 @@ import org.pm4j.core.pm.PmAttrLong;
 import org.pm4j.core.pm.PmAttrString;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
-import org.pm4j.core.pm.annotation.PmAttrStringCfg;
 import org.pm4j.core.pm.impl.PmAttrEnumImpl;
 import org.pm4j.core.pm.impl.PmAttrLongImpl;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
@@ -24,7 +23,7 @@ public class SampleUserPm extends PmElementImpl {
 
   @PmAttrCfg(readOnly=true)
   public PmAttrLong id = new PmAttrLongImpl(this);
-  @PmAttrStringCfg(minLen=3, maxLen=20)
+  @PmAttrCfg(minLen=3, maxLen=20)
   public PmAttrString loginName = new PmAttrStringImpl(this);
   public PmAttrString firstName = new PmAttrStringImpl(this);
   public PmAttrString lastName = new PmAttrStringImpl(this);

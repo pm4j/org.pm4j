@@ -18,11 +18,6 @@ public abstract class PmAttrNumBase<T extends Number> extends PmAttrBase<T, T> i
 
   // ======== Interface implementation ======== //
 
-  public int getMaxLen() {
-    // TODO olaf: cache that info in meta data
-    return new Double(Math.ceil(Math.log10(getMax().longValue()))).intValue();
-  }
-
   @SuppressWarnings("unchecked")
   @Override
   public int compareTo(PmObject otherPm) {
@@ -47,6 +42,29 @@ public abstract class PmAttrNumBase<T extends Number> extends PmAttrBase<T, T> i
     return (StringUtils.isBlank(formatString))
         ? NumberFormat.getNumberInstance(locale)
         : new DecimalFormat(formatString, new DecimalFormatSymbols(locale));
+  }
+
+  /**
+   * The default implementation calculates the number of digits required for
+   * the maximal value as provided by {@link #getMax()}.
+   */
+  protected int getMaxLenDefault() {
+    return new Double(Math.ceil(Math.log10(getMax().longValue()))).intValue();
+  }
+
+  protected abstract static class MetaData extends PmAttrBase.MetaData {
+    /**
+     * @return The configured maximum value limit.
+     */
+    protected abstract double getMaxValue();
+
+    /**
+     * The default implementation calculates the number of digits required for
+     * the maximal value as provided by {@link #getMaxValue()}.
+     */
+    protected int getMaxLenDefault() {
+      return new Double(Math.ceil(Math.log10(getMaxValue()))).intValue();
+    }
   }
 
 }

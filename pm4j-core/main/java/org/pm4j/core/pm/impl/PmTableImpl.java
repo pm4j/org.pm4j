@@ -20,7 +20,6 @@ import org.pm4j.core.pm.PmTableGenericRow;
 import org.pm4j.core.pm.PmTableRow;
 import org.pm4j.core.pm.PmVisitor;
 import org.pm4j.core.pm.api.PmEventApi;
-import org.pm4j.core.pm.impl.converter.PmConverterShort;
 import org.pm4j.core.pm.pageable.PageableCollection;
 import org.pm4j.core.pm.pageable.PageableListImpl;
 import org.pm4j.core.pm.pageable.PmPager;
@@ -334,11 +333,10 @@ public class PmTableImpl
     return new MetaData();
   }
 
-  @Override
-  protected void initMetaData(PmObjectBase.MetaData metaData) {
-    super.initMetaData(metaData);
-    MetaData myMetaData = (MetaData) metaData;
-    myMetaData.setConverterDefault(PmConverterShort.INSTANCE);
+//  @Override
+//  protected void initMetaData(PmObjectBase.MetaData metaData) {
+//    super.initMetaData(metaData);
+//    MetaData myMetaData = (MetaData) metaData;
 
 // TODO olaf: Not yet implemented.
 //    PmTableCfg annotation = AnnotationUtil.findAnnotation(this, PmTableCfg.class);
@@ -350,15 +348,11 @@ public class PmTableImpl
 //        myMetaData.numOfPageRows = annotation.numOfPageRows();
 //      }
 //    }
-  }
+//  }
 
-  protected static class MetaData extends PmAttrBase.MetaData {
+  protected static class MetaData extends PmObjectBase.MetaData {
     private RowSelectMode rowSelectMode = RowSelectMode.SINGLE;
     private int numOfPageRows = 10;
-  }
-
-  private final MetaData getOwnMetaData() {
-    return (MetaData) getPmMetaData();
   }
 
   private final MetaData getOwnMetaDataWithoutPmInitCall() {

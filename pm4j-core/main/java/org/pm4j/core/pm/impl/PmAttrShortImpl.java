@@ -22,11 +22,11 @@ public class PmAttrShortImpl extends PmAttrNumBase<Short> implements PmAttrShort
   // ======== Interface implementation ======== //
 
   public Short getMax() {
-    return getOwnMetaData().maxValue;
+    return getOwnMetaDataWithoutPmInitCall().maxValue;
   }
 
   public Short getMin() {
-    return getOwnMetaData().minValue;
+    return getOwnMetaDataWithoutPmInitCall().minValue;
   }
 
   // ======== Value handling ======== //
@@ -70,13 +70,18 @@ public class PmAttrShortImpl extends PmAttrNumBase<Short> implements PmAttrShort
     }
   }
 
-  protected static class MetaData extends PmAttrBase.MetaData {
+  protected static class MetaData extends PmAttrNumBase.MetaData {
     private short maxValue = Short.MAX_VALUE;
     private short minValue = Short.MIN_VALUE;
+
+    @Override
+    protected double getMaxValue() {
+      return maxValue;
+    }
   }
 
-  private final MetaData getOwnMetaData() {
-    return (MetaData) getPmMetaData();
+  private final MetaData getOwnMetaDataWithoutPmInitCall() {
+    return (MetaData) getPmMetaDataWithoutPmInitCall();
   }
 
 }

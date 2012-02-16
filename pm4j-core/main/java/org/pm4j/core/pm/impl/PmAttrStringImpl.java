@@ -1,10 +1,6 @@
 package org.pm4j.core.pm.impl;
 
-import javax.validation.constraints.Size;
-import javax.validation.metadata.ConstraintDescriptor;
-
 import org.apache.commons.lang.StringUtils;
-import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.exception.PmValidationException;
 import org.pm4j.core.pm.PmAttrString;
 import org.pm4j.core.pm.PmConstants;
@@ -19,16 +15,6 @@ public class PmAttrStringImpl extends PmAttrBase<String, String> implements PmAt
   }
 
   // ======== Interface implementation ======== //
-
-  @Override
-  public int getMaxLen() {
-    return getOwnMetaData().maxLen;
-  }
-
-  @Override
-  public int getMinLen() {
-    return getOwnMetaData().minLen;
-  }
 
   @Override
   public boolean isMultiLine() {
@@ -89,25 +75,8 @@ public class PmAttrStringImpl extends PmAttrBase<String, String> implements PmAt
 
     PmAttrStringCfg annotation = AnnotationUtil.findAnnotation(this, PmAttrStringCfg.class);
     if (annotation != null) {
-      if (annotation.maxLen() != PmAttrStringCfg.DEFAULT_MAXLEN) {
-        myMetaData.maxLen = annotation.maxLen();
-      }
-      if (annotation.minLen() != 0) {
-        myMetaData.minLen = annotation.minLen();
-      }
-
       myMetaData.multiLine = annotation.multiLine();
       myMetaData.trim = annotation.trim();
-
-      if (myMetaData.minLen > myMetaData.maxLen) {
-        throw new PmRuntimeException(this, "minLen(" + myMetaData.minLen +
-                                           ") > maxLen(" + myMetaData.maxLen + ")");
-      }
-
-      // FIXME olaf: What about the case of an optional field with a min-length in case of entered data?
-      if (myMetaData.minLen > 0) {
-        myMetaData.setRequired(true);
-      }
     }
 
     myMetaData.setConverterDefault(myMetaData.trim
@@ -115,28 +84,14 @@ public class PmAttrStringImpl extends PmAttrBase<String, String> implements PmAt
           : PmConverterString.INSTANCE);
   }
 
-  @Override
-  protected void initMetaDataBeanConstraint(ConstraintDescriptor<?> cd) {
-    super.initMetaDataBeanConstraint(cd);
-
-    if (cd.getAnnotation() instanceof Size) {
-      MetaData metaData = getOwnMetaData();
-      Size annotation = (Size)cd.getAnnotation();
-
-      if (annotation.min() > 0) {
-        metaData.minLen = annotation.min();
-      }
-      if (annotation.max() < Integer.MAX_VALUE) {
-        metaData.maxLen = annotation.max();
-      }
-    }
-  }
-
   protected static class MetaData extends PmAttrBase.MetaData {
-    private int maxLen = PmAttrStringCfg.DEFAULT_MAXLEN;
-    private int minLen = 0;
     private boolean multiLine = false;
     private boolean trim = true;
+
+    @Override
+    protected int getMaxLenDefault() {
+      return PmAttrStringCfg.DEFAULT_MAXLEN;
+    }
   }
 
   private final MetaData getOwnMetaData() {

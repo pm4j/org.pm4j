@@ -77,9 +77,14 @@ public class PmAttrDoubleImpl extends PmAttrNumBase<Double> implements PmAttrDou
     myMetaData.setConverterDefault(PmConverterDouble.INSTANCE);
   }
 
-  protected static class MetaData extends PmAttrBase.MetaData {
+  protected static class MetaData extends PmAttrNumBase.MetaData {
     private double maxValue = Double.MAX_VALUE;
     private double minValue = -Double.MAX_VALUE;
+
+    @Override
+    protected double getMaxValue() {
+      return maxValue;
+    }
   }
 
   private final MetaData getOwnMetaData() {

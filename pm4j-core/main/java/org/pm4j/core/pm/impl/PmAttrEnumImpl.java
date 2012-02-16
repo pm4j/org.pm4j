@@ -58,7 +58,7 @@ public class PmAttrEnumImpl<T_ENUM extends Enum<T_ENUM>> extends PmAttrBase<T_EN
   protected String getTitleForEnumValue(Enum<?> value) {
     return value != null
             ? PmLocalizeApi.localize(this, resKeyForEnumValue(value))
-            : getOwnMetaData().getOptionSetDef().getNullOptionTitle(this);
+            : getOwnMetaDataWithoutPmInitCall().getOptionSetDef().getNullOptionTitle(this);
   }
 
   /**
@@ -86,12 +86,6 @@ public class PmAttrEnumImpl<T_ENUM extends Enum<T_ENUM>> extends PmAttrBase<T_EN
     return os;
   }
 
-  @Override
-  public int getMaxLen() {
-    // XXX olaf: check how to get a real language specific output without performance issues.
-    return 30;
-  }
-
   /**
    * @return The represented enum class.
    */
@@ -108,8 +102,21 @@ public class PmAttrEnumImpl<T_ENUM extends Enum<T_ENUM>> extends PmAttrBase<T_EN
               : new EnumOptionSetDefWithOptionCfg(enumClass, cfg, getOptionValuesMethod);
   }
 
-  private PmAttrBase.MetaData getOwnMetaData() {
-    return (PmAttrBase.MetaData) getPmMetaData();
+  @Override
+  protected PmObjectBase.MetaData makeMetaData() {
+    return new MetaData();
+  }
+
+  protected static class MetaData extends PmAttrBase.MetaData {
+    @Override
+    protected int getMaxLenDefault() {
+      // XXX olaf: check how to get a real language specific output without performance issues.
+      return 30;
+    }
+  }
+
+  private MetaData getOwnMetaDataWithoutPmInitCall() {
+    return (MetaData) getPmMetaDataWithoutPmInitCall();
   }
 
   // ======== converter ======== //

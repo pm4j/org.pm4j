@@ -2,7 +2,6 @@ package org.pm4j.core.pm.impl;
 
 import java.util.Locale;
 
-import org.pm4j.common.util.resource.ClassPathResourceFinder;
 import org.pm4j.core.pm.PmAttrBoolean;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmOptionSet;
@@ -44,12 +43,6 @@ public class PmAttrBooleanImpl extends PmAttrBase<Boolean, Boolean> implements P
     return pmOptionSetBean;
   }
 
-  @Override
-  public int getMaxLen() {
-    // XXX olaf: check how to get a real language specific output without performance issues.
-    return 10;
-  }
-
   // -- Helper --
 
   private String titleForNameAndValueKey(Object value, Locale locale) {
@@ -59,10 +52,23 @@ public class PmAttrBooleanImpl extends PmAttrBase<Boolean, Boolean> implements P
   // ======== meta data ======== //
 
   @Override
+  protected PmObjectBase.MetaData makeMetaData() {
+    return new MetaData();
+  }
+
+  @Override
   protected void initMetaData(PmObjectBase.MetaData metaData) {
     super.initMetaData(metaData);
 
     ((MetaData) metaData).setConverterDefault(PmConverterBoolean.INSTANCE);
+  }
+
+  protected static class MetaData extends PmAttrBase.MetaData {
+    @Override
+    protected int getMaxLenDefault() {
+      // XXX olaf: check how to get a real language specific output without performance issues.
+      return 10;
+    }
   }
 
 }

@@ -44,6 +44,16 @@ public @interface PmAttrCfg {
   boolean readOnly() default false;
 
   /**
+   * @return maximal string length.
+   */
+  int maxLen() default -1;
+
+  /**
+   * @return minimal string length.
+   */
+  int minLen() default 0;
+
+  /**
    * @return The default to be assigned to the attribute when the value of the attribute
    *         is <code>null</code>.
    */

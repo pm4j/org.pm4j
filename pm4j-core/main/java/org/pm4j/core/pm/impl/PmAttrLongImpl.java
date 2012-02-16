@@ -65,9 +65,14 @@ public class PmAttrLongImpl extends PmAttrNumBase<Long> implements PmAttrLong {
     }
   }
 
-  protected static class MetaData extends PmAttrBase.MetaData {
+  protected static class MetaData extends PmAttrNumBase.MetaData {
     private long maxValue = Long.MAX_VALUE;
     private long minValue = Long.MIN_VALUE;
+
+    @Override
+    protected double getMaxValue() {
+      return maxValue;
+    }
   }
 
   private final MetaData getOwnMetaData() {

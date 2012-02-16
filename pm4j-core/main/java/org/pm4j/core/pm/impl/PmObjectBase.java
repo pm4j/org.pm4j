@@ -229,9 +229,8 @@ public abstract class PmObjectBase implements PmObject {
     boolean changed = !ObjectUtils.equals(pmVisible, visible);
     pmVisible = visible;
     // Does not fire change events if called within the initialization phase.
-    if (changed &&
-        pmInitState == PmInitState.INITIALIZED) {
-      PmEventApi.firePmEvent(this, PmEvent.VISIBILITY_CHANGE);
+    if (changed) {
+      PmEventApi.firePmEventIfInitialized(this, PmEvent.VISIBILITY_CHANGE);
     }
   }
 
@@ -259,9 +258,8 @@ public abstract class PmObjectBase implements PmObject {
     boolean changed = !ObjectUtils.equals(pmEnabled, enabled);
     pmEnabled = enabled;
     // Does not fire change events if called within the initialization phase.
-    if (changed &&
-        pmInitState == PmInitState.INITIALIZED) {
-      PmEventApi.firePmEvent(this, PmEvent.ENABLEMENT_CHANGE);
+    if (changed) {
+      PmEventApi.firePmEventIfInitialized(this, PmEvent.ENABLEMENT_CHANGE);
     }
   }
 
@@ -810,8 +808,6 @@ public abstract class PmObjectBase implements PmObject {
    * Subclasses that provide more specific meta data should override this
    * method to provide their meta data information container.
    *
-   * @param attrName
-   *          The name of the attribute. Unique within the parent element scope.
    * @return A static data container for this presentation model.
    */
   protected MetaData makeMetaData() {

@@ -9,11 +9,13 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.ValidationException;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.ConstraintDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
@@ -41,7 +43,6 @@ import org.pm4j.core.pm.PmOptionSet;
 import org.pm4j.core.pm.PmVisitor;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.annotation.PmAttrCfg.AttrAccessKind;
-import org.pm4j.core.pm.annotation.PmAttrStringCfg;
 import org.pm4j.core.pm.annotation.PmCacheCfg;
 import org.pm4j.core.pm.annotation.PmCacheCfg.CacheMode;
 import org.pm4j.core.pm.annotation.PmOptionCfg;
@@ -60,6 +61,7 @@ import org.pm4j.core.pm.impl.converter.PmConverterOptionBased;
 import org.pm4j.core.pm.impl.options.GenericOptionSetDef;
 import org.pm4j.core.pm.impl.options.OptionSetDefNoOption;
 import org.pm4j.core.pm.impl.options.PmOptionSetDef;
+import org.pm4j.core.pm.impl.pathresolver.PassThroughPathResolver;
 import org.pm4j.core.pm.impl.pathresolver.PathResolver;
 import org.pm4j.core.pm.impl.pathresolver.PmExpressionPathResolver;
 import org.pm4j.core.util.reflection.BeanAttrAccessor;
@@ -303,15 +305,19 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
       try {
         T_PM_VALUE v = null;
 
-        if (isInvalidValue()) {
-          if (!dataContainer.invalidValue.isPmValueSet()) {
-            throw new PmRuntimeException(this,
-                "Unable to get a value that was not convertible to the presentation model type.\n" +
-                "Hint: Use getValueAsString when the value was set by getValueAsString.");
-          }
+        if (isInvalidValue() &&
+            dataContainer.invalidValue.isPmValueSet()) {
+// The exception on getting an unconverted value made a lot of trouble.
+// It seems to be a better idea to return the current value in this case.
+//          if (!dataContainer.invalidValue.isPmValueSet()) {
+//            throw new PmRuntimeException(this,
+//                "Unable to get a value that was not convertible to the presentation model type.\n" +
+//                "Hint: Use getValueAsString when the value was set by getValueAsString.");
+//          }
           v = dataContainer.invalidValue.getPmValue();
         }
         else {
+          // In case of converter problems: Return the current value.
           v = getValueImpl();
         }
 
@@ -388,12 +394,12 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
    */
   @Override
   public int getMinLen() {
-    return 0;
+    return getOwnMetaDataWithoutPmInitCall().minLen;
   }
 
   @Override
   public int getMaxLen() {
-      return PmAttrStringCfg.DEFAULT_MAXLEN;
+    return getOwnMetaDataWithoutPmInitCall().getMaxLen();
   }
 
   @Override
@@ -758,17 +764,37 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
    * @param value The value to validate.
    */
   protected void validate(T_PM_VALUE value) throws PmValidationException {
-    if (isRequired() && isEmptyValue(value)) {
+    if (isRequired() &&
+        isEmptyValue(value)) {
       throw new PmValidationException(PmMessageUtil.makeRequiredWarning(this));
+    }
+  }
+
+  void performJsr303Validations() {
+    if (zz_getValidator() != null) {
+      Object validationBean = getOwnMetaData().valueAccessStrategy.getPropertyContainingBean(this);
+      if (validationBean != null &&
+          getOwnMetaData().validationFieldName != null) {
+        Set<ConstraintViolation<Object>> violations = zz_getValidator().validateProperty(validationBean, getOwnMetaData().validationFieldName);
+        for (ConstraintViolation<Object> v : violations) {
+          // FIXME olaf: add handling for translated strings.
+          //             what is the result of:
+          System.out.println("v.getMessageTemplate: '" + v.getMessageTemplate() + "'  message: " + v.getMessage());
+          PmValidationMessage msg = new PmValidationMessage(this, v.getMessage());
+          getPmConversationImpl().addPmMessage(msg);
+        }
+      }
     }
   }
 
   @Override
   public void pmValidate() {
-    if (isPmVisible() && !isPmReadonly()) {
+    if (isPmVisible() &&
+        !isPmReadonly()) {
       boolean wasValid = isPmValid();
       try {
         validate(getValue());
+        performJsr303Validations();
       }
       catch (PmValidationException e) {
         PmResourceData exResData = e.getResourceData();
@@ -1039,21 +1065,6 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     }
   }
 
-  /**
-   * Gets called when the meta data instance for this presentation model
-   * is not yet available (first call within the VM live time).
-   * <p>
-   * Subclasses that provide more specific meta data should override this method
-   * to provide their meta data information container.
-   *
-   * @param attrName The name of the attribute. Unique within the parent element scope.
-   * @return A meta data container for this presentation model.
-   */
-  @Override
-  protected PmObjectBase.MetaData makeMetaData() {
-    return new MetaData();
-  }
-
   // XXX olaf: really required? May be solved by overriding initMetaData too.
   protected PmOptionSetDef<?> makeOptionSetDef(PmOptionCfg cfg, Method getOptionValuesMethod) {
     return cfg != null
@@ -1123,10 +1134,23 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
       }
       myMetaData.defaultPath = StringUtils.defaultIfEmpty(fieldAnnotation.defaultPath(), null);
 
+      myMetaData.maxLen = fieldAnnotation.maxLen();
+      myMetaData.minLen = fieldAnnotation.minLen();
+      if (myMetaData.maxLen != -1 &&
+          myMetaData.minLen > myMetaData.maxLen) {
+        throw new PmRuntimeException(this, "minLen(" + myMetaData.minLen +
+                                           ") > maxLen(" + myMetaData.maxLen + ")");
+      }
+
       switch (myMetaData.accessKind) {
         case DEFAULT:
           if (StringUtils.isNotBlank(fieldAnnotation.valuePath())) {
             myMetaData.valuePathResolver = PmExpressionPathResolver.parse(fieldAnnotation.valuePath(), true);
+            int lastDotPos = fieldAnnotation.valuePath().lastIndexOf('.');
+            if (lastDotPos > 0) {
+              String parentPath = fieldAnnotation.valuePath().substring(0, lastDotPos);
+              myMetaData.valueContainingObjPathResolver = PmExpressionPathResolver.parse(parentPath, true);
+            }
             useReflection = false;
             myMetaData.valueAccessStrategy = ValueAccessByExpression.INSTANCE;
           }
@@ -1211,14 +1235,17 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
       BeanDescriptor beanDescriptor = zz_validator.getConstraintsForClass(srcClass);
 
       if (beanDescriptor != null) {
-        String propName = ((fieldAnnotation != null) &&
-                           (StringUtils.isNotBlank(fieldAnnotation.beanInfoField())))
-            ? fieldAnnotation.beanInfoField()
-            : myMetaData.getName();
+        myMetaData.validationFieldName = (fieldAnnotation != null) &&
+            (StringUtils.isNotBlank(fieldAnnotation.beanInfoField()))
+           ? fieldAnnotation.beanInfoField()
+           : myMetaData.getName();
 
-        PropertyDescriptor propertyDescriptor = beanDescriptor.getConstraintsForProperty(propName);
-
-        if (propertyDescriptor != null) {
+        PropertyDescriptor propertyDescriptor = beanDescriptor.getConstraintsForProperty(myMetaData.validationFieldName);
+        if (propertyDescriptor == null ||
+            propertyDescriptor.getConstraintDescriptors().isEmpty()) {
+          myMetaData.validationFieldName = null;
+        }
+        else {
           for (ConstraintDescriptor<?> cd : propertyDescriptor.getConstraintDescriptors()) {
             initMetaDataBeanConstraint(cd);
           }
@@ -1235,8 +1262,19 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
    * @param cd The {@link ConstraintDescriptor} to consider for this attribute.
    */
   protected void initMetaDataBeanConstraint(ConstraintDescriptor<?> cd) {
+    MetaData metaData = getOwnMetaDataWithoutPmInitCall();
     if (cd.getAnnotation() instanceof NotNull) {
-      getOwnMetaData().required = true;
+      metaData.required = true;
+    }
+    else if (cd.getAnnotation() instanceof Size) {
+      Size annotation = (Size)cd.getAnnotation();
+
+      if (annotation.min() > 0) {
+        metaData.minLen = annotation.min();
+      }
+      if (annotation.max() < Integer.MAX_VALUE) {
+        metaData.maxLen = annotation.max();
+      }
     }
   }
 
@@ -1244,7 +1282,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
    * Shared meta data for all attributes of the same kind.
    * E.g. for all 'myapp.User.name' attributes.
    */
-  protected static class MetaData extends PmObjectBase.MetaData {
+  protected abstract static class MetaData extends PmObjectBase.MetaData {
     static final Object                     NOT_INITIALIZED         = "NOT_INITIALIZED";
 
     private BeanAttrAccessor                beanAttrAccessor;
@@ -1252,8 +1290,8 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     private boolean                         hideWhenEmpty;
     private boolean                         required;
     private boolean                         primitiveType;
-    // private PmValueStrategy pmValueStrategy;
     private PathResolver                    valuePathResolver;
+    private PathResolver                    valueContainingObjPathResolver = PassThroughPathResolver.INSTANCE;
     private PmAttrCfg.AttrAccessKind        accessKind              = PmAttrCfg.AttrAccessKind.DEFAULT;
     private String                          formatResKey;
     private String                          defaultValueString;
@@ -1264,6 +1302,11 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     private PmCacheStrategy                 cacheStrategyForValue   = PmCacheStrategyNoCache.INSTANCE;
     private Converter<?>                    converter;
     private BackingValueAccessStrategy      valueAccessStrategy     = ValueAccessLocal.INSTANCE;
+    /** Name of the field configured for JSR 303-validation.<br>
+     * Is <code>null</code> if there is nothing to validate this way. */
+    private String                          validationFieldName;
+    private int                             maxLen                  = -1;
+    private int                             minLen                  = 0;
 
     /** @return The statically defined option set algorithm. */
     public PmOptionSetDef<PmAttr<?>> getOptionSetDef() { return optionSetDef; }
@@ -1302,10 +1345,30 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
 
     public boolean isRequired() { return required; }
     public void setRequired(boolean required) { this.required = required; }
+    public int getMinLen() { return minLen; }
+
+    public int getMaxLen() {
+      if (maxLen == -1) {
+        maxLen = getMaxLenDefault();
+      }
+      return maxLen;
+    }
+
+    /**
+     * Provides the attribute type specific default max length.
+     *
+     * @return The maximal number of characters default.
+     */
+    protected abstract int getMaxLenDefault();
+
   }
 
   private final MetaData getOwnMetaData() {
     return (MetaData) getPmMetaData();
+  }
+
+  private final MetaData getOwnMetaDataWithoutPmInitCall() {
+    return (MetaData) getPmMetaDataWithoutPmInitCall();
   }
 
   // ====== Cache strategies ====== //
@@ -1360,8 +1423,9 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   // ====== Backing value access strategies ====== //
 
   interface BackingValueAccessStrategy {
-     Object getValue(PmAttrBase<?, ?> attr);
-     void setValue(PmAttrBase<?, ?> attr, Object value);
+    Object getValue(PmAttrBase<?, ?> attr);
+    void setValue(PmAttrBase<?, ?> attr, Object value);
+    Object getPropertyContainingBean(PmAttrBase<?, ?> attr);
   }
 
   static class ValueAccessLocal implements BackingValueAccessStrategy {
@@ -1378,6 +1442,11 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     public void setValue(PmAttrBase<?, ?> attr, Object value) {
       attr.zz_getDataContainer().localValue = value;
     }
+
+    @Override
+    public Object getPropertyContainingBean(PmAttrBase<?, ?> attr) {
+      return null;
+    }
   }
 
   static class ValueAccessSessionProperty implements BackingValueAccessStrategy {
@@ -1391,6 +1460,11 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     @Override
     public void setValue(PmAttrBase<?, ?> attr, Object value) {
       attr.getPmConversation().setPmNamedObject(PmUtil.getAbsoluteName(attr), value);
+    }
+
+    @Override
+    public Object getPropertyContainingBean(PmAttrBase<?, ?> attr) {
+      return null;
     }
   }
 
@@ -1407,6 +1481,11 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     public void setValue(PmAttrBase<?, ?> attr, Object value) {
       throw new PmRuntimeException(attr, "setBackingValueImpl() method is not implemented.");
     }
+
+    @Override
+    public Object getPropertyContainingBean(PmAttrBase<?, ?> attr) {
+      return null;
+    }
   }
 
   static class ValueAccessByExpression implements BackingValueAccessStrategy {
@@ -1420,6 +1499,11 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     @Override
     public void setValue(PmAttrBase<?, ?> attr, Object value) {
       attr.getOwnMetaData().valuePathResolver.setValue(attr.getPmParent(), value);
+    }
+
+    @Override
+    public Object getPropertyContainingBean(PmAttrBase<?, ?> attr) {
+      return attr.getOwnMetaData().valueContainingObjPathResolver.getValue(attr.getPmParent());
     }
   }
 
@@ -1443,6 +1527,12 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
         throw new PmRuntimeException(attr, "Unable to access an attribute value for a backing pmBean that is 'null'.");
       }
       attr.getOwnMetaData().beanAttrAccessor.setBeanAttrValue(bean, value);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public Object getPropertyContainingBean(PmAttrBase<?, ?> attr) {
+      return ((PmBean<Object>)attr.getPmParentElement()).getPmBean();
     }
   }
 }

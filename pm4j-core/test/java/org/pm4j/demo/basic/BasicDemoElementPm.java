@@ -15,7 +15,6 @@ import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
-import org.pm4j.core.pm.annotation.PmAttrStringCfg;
 import org.pm4j.core.pm.annotation.PmCommandCfg;
 import org.pm4j.core.pm.impl.PmAttrBooleanImpl;
 import org.pm4j.core.pm.impl.PmAttrDateImpl;
@@ -30,9 +29,9 @@ import org.pm4j.core.pm.impl.commands.PmCommandNaviBack;
 
 public class BasicDemoElementPm extends PmElementImpl {
 
-  @PmAttrStringCfg(maxLen=10) @PmAttrCfg(required=true)
+  @PmAttrCfg(required=true, maxLen=10)
   public final PmAttrString      textFieldShort = new PmAttrStringImpl(this);
-  @PmAttrStringCfg(maxLen=1000)
+  @PmAttrCfg(maxLen=1000)
   public final PmAttrString      textFieldLong = new PmAttrStringImpl(this);
   @PmAttrCfg(required=true)
   public final PmAttrInteger     intField = new PmAttrIntegerImpl(this);

@@ -8,6 +8,7 @@ import org.pm4j.core.exception.PmUserMessageException;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmMessage;
 import org.pm4j.core.pm.PmMessage.Severity;
+import org.pm4j.core.pm.api.PmMessageUtil;
 import org.pm4j.navi.NaviLink;
 import org.pm4j.navi.NaviRuleLink;
 
@@ -46,8 +47,7 @@ public class PmExceptionHandlerImpl implements PmExceptionHandler {
       PmResourceData resData = ((PmUserMessageException)throwable).getResourceData();
       if (resData != null) {
         PmConversationImpl sessionCtxt = (PmConversationImpl) failedCommand.getPmConversation();
-        PmMessage message = new PmMessage(failedCommand, Severity.ERROR, resData.msgKey, resData.msgArgs);
-        sessionCtxt.addPmMessage(message);
+        PmMessage message = PmMessageUtil.makeMsg(failedCommand, Severity.ERROR, resData.msgKey, resData.msgArgs);
 
         if (LOG.isInfoEnabled()) {
           LOG.info("Exception with resource key '" + resData.msgKey +

@@ -205,7 +205,7 @@ public class PmTableColImpl extends PmObjectBase implements PmTableCol {
     }
   }
 
-  protected static class MetaData extends PmAttrBase.MetaData {
+  protected static class MetaData extends PmObjectBase.MetaData {
     private ColSizeSpec colSizeSpec = null;
     private PmBoolean sortable = PmBoolean.UNDEFINED;
   }

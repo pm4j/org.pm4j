@@ -9,7 +9,6 @@ import org.pm4j.core.pm.PmAttrString;
 import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
-import org.pm4j.core.pm.annotation.PmAttrStringCfg;
 import org.pm4j.core.pm.annotation.PmBeanCfg;
 import org.pm4j.core.pm.annotation.PmCommandCfg;
 import org.pm4j.core.pm.annotation.PmOptionCfg;
@@ -28,8 +27,7 @@ public class UserPm extends PmBeanBase<User> implements PmBean<User> {
 
   // ------- Attributes ------- //
 
-  @PmAttrCfg(required=true)
-  @PmAttrStringCfg(minLen=2, maxLen=10)
+  @PmAttrCfg(required=true, minLen=2, maxLen=10)
   public final PmAttrString     name = new PmAttrStringImpl(this);
 
   /**
@@ -53,7 +51,7 @@ public class UserPm extends PmBeanBase<User> implements PmBean<User> {
     }
   };
 
-  @PmAttrStringCfg(maxLen=1000)
+  @PmAttrCfg(maxLen=1000)
   public final PmAttrString     description = new PmAttrStringImpl(this);
 
   /**

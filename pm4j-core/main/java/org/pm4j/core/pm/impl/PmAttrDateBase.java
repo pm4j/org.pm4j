@@ -35,6 +35,7 @@ public class PmAttrDateBase<T_BACKING_DATE> extends PmAttrBase<Date, T_BACKING_D
     return RESKEY_DEFAULT_FORMAT_PATTERN;
   }
 
+  @Override
   public String getOutputFormat() {
     // TODO: missing support for alternate converter configuration objects.
     return PmConverterDate.INSTANCE.getOutputFormat(this);
@@ -70,10 +71,27 @@ public class PmAttrDateBase<T_BACKING_DATE> extends PmAttrBase<Date, T_BACKING_D
   // ======== meta data ======== //
 
   @Override
+  protected PmObjectBase.MetaData makeMetaData() {
+    return new MetaData();
+  }
+
+  @Override
   protected void initMetaData(PmObjectBase.MetaData metaData) {
     super.initMetaData(metaData);
 
     ((MetaData) metaData).setConverterDefault(PmConverterDate.INSTANCE);
   }
+
+  protected static class MetaData extends PmAttrBase.MetaData {
+    /**
+     * The default max length is the length of the date format pattern.
+     */
+    @Override
+    protected int getMaxLenDefault() {
+      // XXX olaf: just a fix default.
+      return 20;
+    }
+  }
+
 
 }

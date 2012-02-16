@@ -125,12 +125,6 @@ public class PmAttrListImpl<T> extends PmAttrBase<List<T>, Collection<T>> implem
     return NullOption.NO;
   }
 
-  @Override
-  public int getMaxLen() {
-    // XXX olaf: check for a real restriction...
-    return Short.MAX_VALUE;
-  }
-
   // ======== meta data ======== //
 
   @Override
@@ -157,7 +151,13 @@ public class PmAttrListImpl<T> extends PmAttrBase<List<T>, Collection<T>> implem
 
     @Override public Converter<?> getItemConverter()                   {  return itemConverter;   }
     @Override public void setItemConverter(Converter<?> itemConverter) {  this.itemConverter = itemConverter;    }
-  }
+
+    @Override
+    protected int getMaxLenDefault() {
+      // XXX olaf: check for a real restriction...
+      return Short.MAX_VALUE;
+    }
+}
 
   private final MetaData getOwnMetaData() {
     return (MetaData) getPmMetaData();

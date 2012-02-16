@@ -6,7 +6,7 @@ import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmAttrString;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmEvent;
-import org.pm4j.core.pm.annotation.PmAttrStringCfg;
+import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.annotation.PmCommandCfg;
 import org.pm4j.core.pm.impl.PmAttrImpl;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
@@ -18,10 +18,10 @@ import org.pm4j.core.sample.admin.remote_sample.shared.LoginState;
 @PmClientCfg(serverPm="#loginSrvPm")
 public class LoginPm extends PmElementImpl {
 
-  @PmAttrStringCfg(minLen=3)
+  @PmAttrCfg(minLen=3)
   public final PmAttrString userName = new PmAttrStringImpl(this);
 
-  @PmAttrStringCfg(minLen=6)
+  @PmAttrCfg(minLen=6)
   public final PmAttrString pwd = new PmAttrStringImpl(this);
 
   public final PmCommand cmdLogin = new PmCommandImpl(this);
