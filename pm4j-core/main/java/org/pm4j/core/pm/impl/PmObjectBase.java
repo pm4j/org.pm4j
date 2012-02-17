@@ -810,9 +810,7 @@ public abstract class PmObjectBase implements PmObject {
    *
    * @return A static data container for this presentation model.
    */
-  protected MetaData makeMetaData() {
-    return new MetaData();
-  }
+  protected abstract MetaData makeMetaData();
 
   @SuppressWarnings("rawtypes")
   protected void initMetaData(MetaData metaData) {

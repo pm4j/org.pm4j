@@ -1072,6 +1072,12 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
               : OptionSetDefNoOption.INSTANCE;
   }
 
+  /**
+   * It's abstract because specific attribute types have to create their specific meta data.
+   */
+  @Override
+  protected abstract PmObjectBase.MetaData makeMetaData();
+
   @SuppressWarnings({ "unchecked", "rawtypes", "deprecation" })
   @Override
   protected void initMetaData(PmObjectBase.MetaData metaData) {

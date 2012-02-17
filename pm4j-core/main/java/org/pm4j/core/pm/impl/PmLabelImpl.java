@@ -31,4 +31,8 @@ public class PmLabelImpl extends PmObjectBase implements PmLabel {
     visitor.visit(this);
   }
 
+  @Override
+  protected MetaData makeMetaData() {
+    return new MetaData();
+  }
 }

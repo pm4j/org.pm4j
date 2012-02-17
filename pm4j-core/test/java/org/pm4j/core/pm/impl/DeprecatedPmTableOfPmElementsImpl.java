@@ -290,4 +290,9 @@ public class DeprecatedPmTableOfPmElementsImpl<T_ROW_ELEMENT_PM extends PmElemen
     return 10;
   }
 
+  @Override
+  protected MetaData makeMetaData() {
+    return new MetaData();
+  }
+
 }

@@ -192,6 +192,11 @@ public abstract class PmElementBase
 
   // ======== meta data ======== //
 
+  @Override
+  protected MetaData makeMetaData() {
+    return new MetaData();
+  }
+
   // XXX olaf: a workaround that keeps the old annotation logic of the first
   //           pm4j project unchanged.
   @Override
