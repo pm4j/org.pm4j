@@ -1116,6 +1116,11 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
       myMetaData.setItemConverter(
           new PmConverterOptionBased(optionCfg != null ? optionCfg.id() : ""));
     }
+    // TODO olaf: implement a simplified and more consistent option implementation...
+    if (optionCfg != null) {
+      myMetaData.nullOption = optionCfg.nullOption();
+    }
+
 
 
     boolean useReflection = true;
@@ -1287,6 +1292,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
 
     private BeanAttrAccessor                beanAttrAccessor;
     private PmOptionSetDef<PmAttr<?>>       optionSetDef            = OptionSetDefNoOption.INSTANCE;
+    private PmOptionCfg.NullOption          nullOption              = NullOption.DEFAULT;
     private boolean                         hideWhenEmpty;
     private boolean                         required;
     private boolean                         primitiveType;
@@ -1310,6 +1316,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
 
     /** @return The statically defined option set algorithm. */
     public PmOptionSetDef<PmAttr<?>> getOptionSetDef() { return optionSetDef; }
+    public PmOptionCfg.NullOption getNullOption() { return nullOption; }
 
     public String getFormatResKey() { return formatResKey; }
     public void setFormatResKey(String formatResKey) { this.formatResKey = formatResKey; }

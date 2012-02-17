@@ -49,7 +49,8 @@ public class PmDefaults {
    */
   private NameBuilder logStringBuilder = NameBuilderAbsoluteName.INSTANCE;
 
-  private PmOptionCfg.NullOption enumNullOptionDefault = PmOptionCfg.NullOption.NO;
+  // TODO olaf: I suspect that we don't need a special option configuration only for enums. Deprecate/Delete?
+  private PmOptionCfg.NullOption enumNullOptionDefault = PmOptionCfg.NullOption.FOR_OPTIONAL_ATTR;
 
   /**
    * Defines the default {@link PmCommandCfg#beforeDo()} setting for commands

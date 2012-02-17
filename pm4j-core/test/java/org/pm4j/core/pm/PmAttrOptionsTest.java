@@ -135,11 +135,11 @@ public class PmAttrOptionsTest extends TestCase {
   }
 
   public void testEnumOptionsWithoutAdditionalSpec() {
-    assertEqualOptions("[One, Two, Three]", testPm.enumAttrWithoutAdditionlSpec);
+    assertEqualOptions("[No selection, One, Two, Three]", testPm.enumAttrWithoutAdditionlSpec);
   }
 
   public void testEnumOptionsSubset() {
-    assertEqualOptions("[Three, One]", testPm.enumAttrSubSet);
+    assertEqualOptions("[No selection, Three, One]", testPm.enumAttrSubSet);
   }
 
   public void testEnumOptionsSubsetWithNullOption() {
