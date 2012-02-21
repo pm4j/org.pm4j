@@ -126,7 +126,10 @@ public class PageableListImpl<T_ITEM> implements PageableCollection<T_ITEM> {
     if (!multiSelect) {
       selectedItems.clear();
     }
-    selectedItems.add(item);
+
+    if (item != null) {
+      selectedItems.add(item);
+    }
   }
 
   @Override

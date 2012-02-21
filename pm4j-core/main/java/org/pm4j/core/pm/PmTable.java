@@ -43,6 +43,12 @@ public interface PmTable<T_ROW_OBJ> extends PmObject, PmDataInput {
   List<T_ROW_OBJ> getRows();
 
   /**
+   * @return The set of rows that contains changed data.
+   */
+  List<T_ROW_OBJ> getRowsWithChanges();
+
+
+  /**
    * Provides a row representation that may be used by generic a renderer.
    *
    * @return The set of rows as provides by {@link #getRows()}.<br>

@@ -295,4 +295,10 @@ public class DeprecatedPmTableOfPmElementsImpl<T_ROW_ELEMENT_PM extends PmElemen
     return new MetaData();
   }
 
+  @Override
+  public List<T_ROW_ELEMENT_PM> getRowsWithChanges() {
+    // TODO Auto-generated method stub
+    return Collections.emptyList();
+  }
+
 }

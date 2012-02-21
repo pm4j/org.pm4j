@@ -148,6 +148,21 @@ public class PmTableImpl
   }
 
   @Override
+  public List<T_ROW_ELEMENT_PM> getRowsWithChanges() {
+    // TODO olaf: Add a changed row-set to get more efficient.
+    // FIXME olaf: provides only the items of the current page!
+    List<T_ROW_ELEMENT_PM> allItems = getPageableCollection().getItemsOnPage();
+    List<T_ROW_ELEMENT_PM> changedItems = new ArrayList<T_ROW_ELEMENT_PM>();
+    for (T_ROW_ELEMENT_PM row : allItems) {
+      if (! row.isPmReadonly() &&
+          row.isPmValueChanged()) {
+        changedItems.add(row);
+      }
+    }
+    return changedItems;
+  }
+
+  @Override
   public int getTotalNumOfRows() {
     return getPageableCollection().getNumOfItems();
   }

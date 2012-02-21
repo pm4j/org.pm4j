@@ -97,17 +97,23 @@ public class PageablePmsForBeans<T_PM extends PmBean<T_BEAN>, T_BEAN> implements
 
   @Override
   public boolean isSelected(T_PM item) {
-    return beans.isSelected(item.getPmBean());
+    return item != null
+            ? beans.isSelected(item.getPmBean())
+            : null;
   }
 
   @Override
   public void select(T_PM item) {
-    beans.select(item.getPmBean());
+    beans.select(item != null
+            ? item.getPmBean()
+            : null);
   }
 
   @Override
   public void deSelect(T_PM item) {
-    beans.deSelect(item.getPmBean());
+    beans.deSelect(item != null
+        ? item.getPmBean()
+        : null);
   }
 
   @Override
