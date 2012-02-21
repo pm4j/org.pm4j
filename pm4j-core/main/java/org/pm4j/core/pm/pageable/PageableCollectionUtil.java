@@ -1,6 +1,7 @@
 package org.pm4j.core.pm.pageable;
 
 import java.awt.print.Pageable;
+import java.util.List;
 
 /**
  * Some common algorithms that should not be implemented redundantly for each
@@ -161,10 +162,16 @@ public final class PageableCollectionUtil {
   /**
    * @param pageable
    *          The set to handle.
-   * @return <code>true</code> if all items on the current page are selected.
+   * @return <code>true</code> if all items on the current page are selected.<p>
+   *         For an empty page always <code>false</code>.
    */
   public static <T> boolean isAllOnPageSelected(PageableCollection<T> pageable) {
-    for (T i : pageable.getItemsOnPage()) {
+    List<T> itemsOnPage = pageable.getItemsOnPage();
+    if (itemsOnPage.isEmpty()) {
+      return false;
+    }
+
+    for (T i : itemsOnPage) {
       if (!pageable.isSelected(i)) {
         return false;
       }
