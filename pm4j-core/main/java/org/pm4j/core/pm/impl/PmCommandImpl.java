@@ -12,9 +12,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.exception.PmUserMessageException;
+import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmCommandDecorator;
 import org.pm4j.core.pm.PmConstants;
+import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.PmDataInput;
 import org.pm4j.core.pm.PmDefaults;
 import org.pm4j.core.pm.PmElement;
@@ -497,7 +499,23 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
 
     switch (getOwnMetaData().beforeDo) {
       case VALIDATE:
+        // identify existing validation errors. If one exists, the command should not be executed.
+        List<PmMessage> oldNotAttributeRelatedMessages = new ArrayList<PmMessage>();
+        PmConversationImpl converation = getPmConversationImpl();
+        for (PmMessage m : converation.getPmMessages()) {
+          if (!(m.getPm() instanceof PmAttr)) {
+            oldNotAttributeRelatedMessages.add(m);
+          }
+        }
+
         validate();
+
+        // all old non-attribute related messages can be cleared.
+        // the old attribute related messages not. They contain the string conversion problems to report.
+        for (PmMessage m : oldNotAttributeRelatedMessages) {
+          converation.clearPmMessage(m);
+        }
+
         List<PmMessage> errors = PmMessageUtil.getPmErrors(getPmConversation());
         if (! errors.isEmpty()) {
           if (LOG.isDebugEnabled()) {
