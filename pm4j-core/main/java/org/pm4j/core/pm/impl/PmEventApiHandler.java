@@ -109,6 +109,10 @@ public class PmEventApiHandler {
 
     dispatchToOnEventMethodCalls(pmImpl, event, event.changeKind);
 
+    if (LOG.isTraceEnabled()) {
+      LOG.trace("PMEvent: " + event.changeKind + " fired for: " + pm.getPmRelativeName());
+    }
+
     // TODO olaf: add option and state change.
     // Or: check if that callback interface is really a good idea for the PM itself.
     //     Possibly its better to add listeners manually...
