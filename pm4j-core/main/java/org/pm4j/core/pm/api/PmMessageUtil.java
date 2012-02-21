@@ -1,7 +1,9 @@
 package org.pm4j.core.pm.api;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.TreeSet;
 
 import org.pm4j.common.util.collection.ArrayUtil;
 import org.pm4j.core.exception.PmResourceData;
@@ -110,7 +112,6 @@ public class PmMessageUtil {
     return new PmResourceData(pm, msgKey, pm.getPmShortTitle());
   }
 
-
   public static List<PmMessage> getPmMessages(PmObject pm) {
     return pm.getPmConversation().getPmMessages(pm, null);
   }
@@ -137,6 +138,26 @@ public class PmMessageUtil {
    */
   public static List<PmMessage> getPmInfos(PmObject pm) {
     return pm.getPmConversation().getPmMessages(pm, Severity.INFO);
+  }
+
+  /**
+   * @param pm
+   *          The PM to get the most severe message for.
+   * @return The most severe message for the given PM or <code>null</code> if
+   *         there is no message for the given PM.
+   */
+  public static PmMessage findMostSevereMessage(PmObject pm) {
+    TreeSet<PmMessage> messages = new TreeSet<PmMessage>(new Comparator<PmMessage>() {
+      @Override
+      public int compare(PmMessage o1, PmMessage o2) {
+        return - o1.getSeverity().compareTo(o2.getSeverity());
+      }
+    });
+    messages.addAll(getPmMessages(pm));
+
+    return messages.isEmpty()
+            ? null
+            : messages.iterator().next();
   }
 
 

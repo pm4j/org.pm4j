@@ -155,6 +155,15 @@ public class PmMessage {
   }
 
   /**
+   * Defines a message causing exception.
+   *
+   * @param cause The exception that caused this message.
+   */
+  public void setCause(Throwable cause) {
+    this.cause = cause;
+  }
+
+  /**
    * @return An optional exception that caused this message.
    */
   public Throwable getCause() {
@@ -214,7 +223,7 @@ public class PmMessage {
     }
 
     /**
-     * Conctructor for message lists with item termination string.
+     * Constructor for message lists with item termination string.
      *
      * @param termStringKey Key of a string termination character sequence to be placed between the items.
      * @param parentMessage Parent of this list. Used to get context information (language etc.)
