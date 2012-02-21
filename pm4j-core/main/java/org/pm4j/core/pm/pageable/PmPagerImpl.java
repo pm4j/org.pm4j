@@ -2,6 +2,7 @@ package org.pm4j.core.pm.pageable;
 
 import static org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO.DO_NOTHING;
 
+import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmAttrBoolean;
 import org.pm4j.core.pm.PmAttrInteger;
 import org.pm4j.core.pm.PmCommand;
@@ -25,10 +26,23 @@ public class PmPagerImpl<T_ITEM>
           extends PmBeanBase<PageableCollection<T_ITEM>>
           implements PmPager<T_ITEM> {
 
-  // TODO olaf: move to meta data
+  /**
+   * The set of standard pager visibility conditions.
+   */
+  public enum PagerVisibility {
+    /** The pager will always be displayed. */
+    ALWAYS,
+    /** The pager will be displayed only if there is at least a second page to navigate to. */
+    WHEN_SECOND_PAGE_EXISTS,
+    /** The pager will be displayed only if the table has at least a single row. */
+    WHEN_TABLE_IS_NOT_EMPTY
+  }
+
+  // TODO olaf: move to meta data or use the related pageable collection.
   private int pageSize = 10; // local member, should be initialized by meta data
-  // another option: onlyVisibleForMoreThanOnePage
-  private boolean visibleForEmptyCollection = false;
+
+  /** The pager visibility condition. */
+  private PagerVisibility pagerVisibility = PagerVisibility.ALWAYS;
 
   /**
    * The changed state of this element does usually not indicate a real data
@@ -45,8 +59,12 @@ public class PmPagerImpl<T_ITEM>
 
   @Override
   protected boolean isPmVisibleImpl() {
-    return visibleForEmptyCollection ||
-           (getPmBean().getNumOfItems() > 0);
+    switch (pagerVisibility) {
+      case ALWAYS: return true;
+      case WHEN_SECOND_PAGE_EXISTS: return getPmBean().getNumOfItems() > getPageSize();
+      case WHEN_TABLE_IS_NOT_EMPTY: return getPmBean().getNumOfItems() > 0;
+      default: throw new PmRuntimeException(this, "Unknown enum value: " + pagerVisibility);
+    }
   }
 
   public final PmCommand cmdFirst = new PmCommandImpl(this) {
@@ -276,4 +294,10 @@ public class PmPagerImpl<T_ITEM>
   @Override
   public PmCommand getCmdDeSelectAll() { return cmdDeSelectAll; }
 
+  /**
+   * @param pagerVisibility The pager visibility rule to use.
+   */
+  public void setPagerVisibility(PagerVisibility pagerVisibility) {
+    this.pagerVisibility = pagerVisibility;
+  }
 }
