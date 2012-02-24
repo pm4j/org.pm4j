@@ -16,7 +16,6 @@ import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmCommandDecorator;
 import org.pm4j.core.pm.PmConstants;
-import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.PmDataInput;
 import org.pm4j.core.pm.PmDefaults;
 import org.pm4j.core.pm.PmElement;
