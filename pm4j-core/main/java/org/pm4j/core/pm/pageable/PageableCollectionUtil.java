@@ -44,6 +44,17 @@ public final class PageableCollectionUtil {
   }
 
   /**
+   *
+   * @param pageable The {@link PageableCollection} to evaluate.
+   * @param itemPos The position to get the page number for. Starts with <i>One</i>.
+   * @return The page number for the given item position. <i>One</i> for the first page.
+   */
+  public static int getPageForItemPos(PageableCollection<?> pageable, int itemPos) {
+    int pageSize = pageable.getPageSize();
+    return ((itemPos-1) / pageSize) + 1;
+  }
+
+  /**
    * @param pageable
    *          The set to get the result for.
    * @return The number of available pages.

@@ -88,7 +88,7 @@ public interface PmTable<T_ROW_OBJ> extends PmObject, PmDataInput {
     /**
      * @return The pager used for the table.
      */
-    PmPager<T_ROW_ELEMENT> getPager();
+    PmPager getPager();
   }
 
 }

@@ -8,10 +8,8 @@ import org.pm4j.core.pm.PmLabel;
  * PM for a control that allows to switch between pages.
  *
  * @author olaf boede
- *
- * @param <T_ITEM>
  */
-public interface PmPager<T_ITEM> {
+public interface PmPager {
 
   /**
    * @return A command that navigates to the first page.

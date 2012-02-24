@@ -20,11 +20,18 @@ import org.pm4j.core.pm.impl.PmLabelImpl;
 import org.pm4j.core.pm.impl.PmUtil;
 import org.pm4j.core.pm.impl.SetValueContainer;
 
+/**
+ * Implementation for some standard pager functionality.
+ *
+ * @author olaf boede
+ *
+ * @param <T_ITEM>
+ */
 @PmTitleCfg(resKeyBase = "pmPager")
 @PmBeanCfg(beanClass=PageableCollection.class)
 public class PmPagerImpl<T_ITEM>
           extends PmBeanBase<PageableCollection<T_ITEM>>
-          implements PmPager<T_ITEM> {
+          implements PmPager {
 
   /**
    * The set of standard pager visibility conditions.
@@ -67,6 +74,7 @@ public class PmPagerImpl<T_ITEM>
     }
   }
 
+  @PmCommandCfg(beforeDo=DO_NOTHING)
   public final PmCommand cmdFirst = new PmCommandImpl(this) {
     @Override
     protected boolean isPmEnabledImpl() {
@@ -79,6 +87,7 @@ public class PmPagerImpl<T_ITEM>
     }
   };
 
+  @PmCommandCfg(beforeDo=DO_NOTHING)
   public final PmCommand cmdPrev = new PmCommandImpl(this) {
     @Override
     protected boolean isPmEnabledImpl() {
@@ -91,6 +100,7 @@ public class PmPagerImpl<T_ITEM>
     }
   };
 
+  @PmCommandCfg(beforeDo=DO_NOTHING)
   public final PmCommand cmdNext = new PmCommandImpl(this) {
     @Override
     protected boolean isPmEnabledImpl() {
@@ -103,6 +113,7 @@ public class PmPagerImpl<T_ITEM>
     }
   };
 
+  @PmCommandCfg(beforeDo=DO_NOTHING)
   public final PmCommand cmdLast = new PmCommandImpl(this) {
       @Override
       protected boolean isPmEnabledImpl() {
