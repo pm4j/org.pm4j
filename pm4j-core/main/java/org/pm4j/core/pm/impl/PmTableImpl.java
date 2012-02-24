@@ -189,6 +189,20 @@ public class PmTableImpl
     return getRowSelectMode() == RowSelectMode.MULTI;
   }
 
+  @Override
+  public boolean isPmReadonlyImpl() {
+    if (super.isPmReadonlyImpl()) {
+      return true;
+    }
+    else {
+      PmObject ctxt = getPmParent();
+      return (ctxt != null &&
+              ctxt.isPmReadonly()) ||
+             !isPmEnabled();
+    }
+  }
+
+
   // -- row sort order support --
 
   class SortOrderSelection implements PmEventListener {
@@ -393,7 +407,7 @@ public class PmTableImpl
   /**
    * @return A pager that may be used to navigate through the table.
    */
-  public PmPager<T_ROW_ELEMENT_PM> getPager() {
+  public PmPager getPager() {
     return pager;
   }
 

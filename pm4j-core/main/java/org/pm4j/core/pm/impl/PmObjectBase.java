@@ -277,8 +277,20 @@ public abstract class PmObjectBase implements PmObject {
     }
   }
 
+  /**
+   * Please override {@link #isPmReadonlyImpl()} to provide your specific logic.
+   */
   @Override
-  public boolean isPmReadonly() {
+  public final boolean isPmReadonly() {
+    return isPmReadonlyImpl();
+  }
+
+  /**
+   * Sub classes may implement their specific read-only definition here.
+   *
+   * @return <code>true</code> if the PM is in read-only state.
+   */
+  protected boolean isPmReadonlyImpl() {
     return getPmMetaData().readOnly;
   }
 
@@ -320,6 +332,21 @@ public abstract class PmObjectBase implements PmObject {
    * @param event The fired event.
    */
   protected void onPmValueChange(PmEvent event) {
+  }
+
+  /**
+   * Gets called whenever the state of a child was changed.
+   * <p>
+   * This method can be used to observe changes within a part of the PM tree.
+   *
+   * @param child
+   *          The affected child of this PM. This PM must not be the changed
+   *          one. The change may be related to a sub-PM of this child. Please
+   *          check {@link PmEvent#pm} to get the changed PM.
+   * @param event
+   *          The change event that caused this call.
+   */
+  protected void onPmChildStateChange(PmObject child, PmEvent event) {
   }
 
   /**

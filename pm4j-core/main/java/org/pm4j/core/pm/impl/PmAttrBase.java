@@ -202,8 +202,8 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   }
 
   @Override
-  public boolean isPmReadonly() {
-    return super.isPmReadonly() ||
+  protected boolean isPmReadonlyImpl() {
+    return super.isPmReadonlyImpl() ||
            getPmParentElement().isPmReadonly();
   }
 
@@ -525,21 +525,16 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
       if (pmValueChanged &&
           (!(isEmptyValue(newPmValue) && isEmptyValue(currentValue)))
          ) {
-        try {
-          // TODO olaf: a quick hack to hide password data. Should be done more general for other field names too.
-          if (LOG.isDebugEnabled() && !ObjectUtils.equals(getPmName(), "password")) {
-            LOG.debug("Changing PM value of '" + PmUtil.getPmLogString(this) + "' from '" + currentValue + "' to '" + newPmValue + "'.");
-          }
+        // TODO olaf: a quick hack to hide password data. Should be done more general for other field names too.
+        if (LOG.isDebugEnabled() && !ObjectUtils.equals(getPmName(), "password")) {
+          LOG.debug("Changing PM value of '" + PmUtil.getPmLogString(this) + "' from '" + currentValue + "' to '" + newPmValue + "'.");
+        }
 
-          T_BEAN_VALUE beanAttrValue = (newPmValue != null)
-                          ? convertPmValueToBackingValue(newPmValue)
-                          : null;
-          setBackingValue(beanAttrValue);
-          getOwnMetaData().cacheStrategyForValue.setAndReturnCachedValue(this, newPmValue);
-        }
-        catch (Exception e) {
-          throw PmRuntimeException.asPmRuntimeException(this, e);
-        }
+        T_BEAN_VALUE beanAttrValue = (newPmValue != null)
+                        ? convertPmValueToBackingValue(newPmValue)
+                        : null;
+        setBackingValue(beanAttrValue);
+        getOwnMetaData().cacheStrategyForValue.setAndReturnCachedValue(this, newPmValue);
 
         // From now on the value should be handled as intentionally modified.
         // That means that the default value shouldn't be returned, even if the

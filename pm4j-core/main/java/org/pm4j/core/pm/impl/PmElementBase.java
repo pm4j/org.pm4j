@@ -87,12 +87,16 @@ public abstract class PmElementBase
   }
 
   @Override
-  public boolean isPmReadonly() {
-    PmObject ctxt = getPmParent();
-    return getPmMetaData().isReadOnly() ||
-           (ctxt != null &&
-            ctxt.isPmReadonly()) ||
-           !isPmEnabled();
+  public boolean isPmReadonlyImpl() {
+    if (super.isPmReadonlyImpl()) {
+      return true;
+    }
+    else {
+      PmObject ctxt = getPmParent();
+      return (ctxt != null &&
+              ctxt.isPmReadonly()) ||
+             !isPmEnabled();
+    }
   }
 
   /**
