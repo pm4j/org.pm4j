@@ -41,4 +41,8 @@ public class PmConstants {
   public static final String MSGKEY_VALIDATION_VALUE_TOO_HIGH                = "pmAttr_validationValueTooHigh";
   public static final String MSGKEY_VALIDATION_READONLY                      = "pmAttr_validationReadonly";
 
+  /**
+   * A resource key for cached exceptions. The first Parameter of the resource is used to transfer the exception message.
+   */
+  public static final String MSGKEY_EXCEPTION                                = "pmException";
 }
