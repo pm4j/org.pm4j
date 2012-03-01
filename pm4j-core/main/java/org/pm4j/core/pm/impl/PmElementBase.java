@@ -87,7 +87,7 @@ public abstract class PmElementBase
   }
 
   @Override
-  public boolean isPmReadonlyImpl() {
+  protected boolean isPmReadonlyImpl() {
     if (super.isPmReadonlyImpl()) {
       return true;
     }
