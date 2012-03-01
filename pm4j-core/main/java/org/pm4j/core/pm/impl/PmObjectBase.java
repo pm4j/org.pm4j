@@ -108,7 +108,10 @@ public abstract class PmObjectBase implements PmObject {
    */
   /* package */ BeanPmCache pmBeanFactoryCache;
 
-  /** Logger for cache usage statistics. */
+  /** A container for application/user specific additional information. */
+  private Map<String, Object> pmProperties = Collections.emptyMap();
+
+ /** Logger for cache usage statistics. */
   protected static final PmCacheLog pmCacheLog = new PmCacheLog();
 
 
@@ -266,15 +269,7 @@ public abstract class PmObjectBase implements PmObject {
   @Override
   public boolean isPmValid() {
     List<PmMessage> msgList = getPmConversationImpl().getPmMessages(this, Severity.ERROR);
-    if (!msgList.isEmpty()) {
-      if (LOG.isTraceEnabled())
-        LOG.trace(msgList);
-
-      return false;
-    }
-    else {
-      return true;
-    }
+    return msgList.isEmpty();
   }
 
   /**
@@ -1143,6 +1138,19 @@ public abstract class PmObjectBase implements PmObject {
     if (!isPmEnabled()) {
       styleClassSet.add(STYLE_CLASS_DISABLED);
     }
+  }
+
+  @Override
+  public Object getPmProperty(String propName) {
+    return pmProperties.get(propName);
+  }
+
+  @Override
+  public void setPmProperty(String propName, Object value) {
+    if (pmProperties.isEmpty()) {
+      pmProperties = new HashMap<String, Object>();
+    }
+    pmProperties.put(propName, value);
   }
 
   // ====== Cache strategies ====== //
