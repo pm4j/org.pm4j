@@ -345,7 +345,21 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
    * (e.g. by the doItImpl() method).
    */
   protected void makeOptionalSuccessMsg() {
+    // First try to find a success message for the resource key base.
+    // This key is usually very specific for the individual command. E.g. 'myElement.myCmd'.
     String key = getPmResKeyBase() + PmConstants.SUCCESS_MSG_KEY_POSTFIX;
+    String msgTemplate = PmLocalizeApi.findLocalization(this, key);
+    if (msgTemplate == null) {
+      // If the specific resource base did not provide a message,
+      // an assigned resource (E.g. 'common.cmdSave') key might provide a success message:
+      key = getPmResKey() + PmConstants.SUCCESS_MSG_KEY_POSTFIX;
+      msgTemplate = PmLocalizeApi.findLocalization(this, key);
+    }
+
+    // no success message string found.
+    if (msgTemplate == null) {
+      return;
+    }
 
     // prevent message duplication:
     for (PmMessage m : PmMessageUtil.getPmInfos(this)) {
@@ -354,18 +368,16 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
       }
     }
 
-    String msgTemplate = PmLocalizeApi.findLocalization(this, key);
-    if (msgTemplate != null) {
-      // Does only pass the PM title when it is really used in the message.
-      // This prevents a lot of unnecessary warnings.
-      if (msgTemplate.indexOf("{0}") != -1) {
-        PmMessageUtil.makeMsg(this, Severity.INFO, key, getPmParent().getPmTitle());
-      }
-      else {
-        PmMessageUtil.makeMsg(this, Severity.INFO, key);
-      }
+    // Does only pass the PM title when it is really used in the message.
+    // This prevents a lot of unnecessary warnings.
+    if (msgTemplate.indexOf("{0}") != -1) {
+      PmMessageUtil.makeMsg(this, Severity.INFO, key, getPmParent().getPmTitle());
+    }
+    else {
+      PmMessageUtil.makeMsg(this, Severity.INFO, key);
     }
   }
+
 
   @Override
   public CmdKind getCmdKind() {
