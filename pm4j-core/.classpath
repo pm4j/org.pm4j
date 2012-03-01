@@ -9,5 +9,8 @@
 	<classpathentry exported="true" kind="lib" path="/pm4j-libs-temp-solution/lib/commons-logging/jars/commons-logging-1.1.1.jar" sourcepath="MAVEN_REPO/commons-logging/src/commons-logging-1.1.1-sources.jar"/>
 	<classpathentry exported="true" kind="lib" path="/pm4j-libs-temp-solution/lib/log4j/jars/log4j-1.2.16.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="/pm4j-libs-temp-solution/lib/hibernate-validator-4.1.0.Final.jar"/>
+	<classpathentry kind="lib" path="/pm4j-libs-temp-solution/lib/slf4j-api-1.6.1.jar"/>
+	<classpathentry kind="lib" path="/pm4j-libs-temp-solution/lib/slf4j-log4j12-1.6.1.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
