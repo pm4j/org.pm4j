@@ -26,15 +26,48 @@ public class PmAttrBigDecimalTest {
     assertEquals("The assigned value should also appear as string.", assignedValue.toString(), myPm.bigAttr.getValueAsString());
   }
 
+  @Test
   public void testMaxLen() {
     MyPm myPm = new MyPm();
 
     assertEquals(6, myPm.bigAttr.getMaxLen());
   }
 
+  @Test
+  public void testDefaultStringFormat() {
+    MyPm myPm = new MyPm();
+
+    assertEquals("An un-set value provides a null.", null, myPm.bigAttr.getValueAsString());
+    myPm.bigAttr.setValueAsString("0");
+
+    assertEquals("Default format for zero.", "0", myPm.bigAttr.getValueAsString());
+
+    myPm.bigAttr.setValueAsString("0.123");
+    assertEquals("0.123", myPm.bigAttr.getValueAsString());
+
+  }
+
+  @Test
+  public void testFormatted() {
+    MyPm myPm = new MyPm();
+
+    assertEquals("An un-set value provides a null.", null, myPm.bigFormatted.getValueAsString());
+    myPm.bigFormatted.setValueAsString("0");
+
+    assertEquals("Default format for zero.", "0", myPm.bigFormatted.getValueAsString());
+
+    myPm.bigFormatted.setValueAsString("0.123");
+    assertEquals("0.123", myPm.bigFormatted.getValueAsString());
+
+  }
+
+
+
   static class MyPm extends PmConversationImpl {
     @PmAttrCfg(maxLen=6)
     public final PmAttrBigDecimal bigAttr = new PmAttrBigDecimalImpl(this);
+    @PmAttrCfg(formatResKey="")
+    public final PmAttrBigDecimal bigFormatted = new PmAttrBigDecimalImpl(this);
   }
 
 }
