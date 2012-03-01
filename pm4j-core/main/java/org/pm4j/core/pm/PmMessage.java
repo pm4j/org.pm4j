@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.pm4j.core.exception.PmResourceData;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.api.PmLocalizeApi;
@@ -13,6 +15,8 @@ import org.pm4j.core.pm.api.PmLocalizeApi;
  * A string resource based presentation model message.
  */
 public class PmMessage {
+
+  private static final Log LOG = LogFactory.getLog(PmMessage.class);
 
   public enum Severity {
     /** Normal user feedback. */
@@ -56,7 +60,7 @@ public class PmMessage {
    * @param msgArgs
    *          Arguments for the resource string.
    */
-  public PmMessage(PmObject pm, Severity severity, String msgKey, Object... msgArgs) {
+  public PmMessage(final PmObject pm, Severity severity, String msgKey, Object... msgArgs) {
     assert pm != null;
     assert severity != null;
     assert StringUtils.isNotBlank(msgKey);
@@ -66,7 +70,7 @@ public class PmMessage {
     int argCount = msgArgs != null ? msgArgs.length : 0;
 
     // A copy of the provide arguments with the related PM as an additional default argument.
-    Object [] newMsgArgs = new Object[argCount+1];
+    Object [] newMsgArgs = new Object[argCount + 1];
     for (int i=0; i<msgArgs.length; ++i) {
       Object arg = msgArgs[i];
 
@@ -83,7 +87,24 @@ public class PmMessage {
 
       newMsgArgs[i] = arg;
     }
-    newMsgArgs[argCount] = pm.getPmTitle();
+
+    // The title gets provided by a proxy to prevent problems with PM initialization states.
+    // It also prevents unnecessary getPmTitle() calls if the title is not relevant for the
+    // resource string.
+    newMsgArgs[argCount] = new Object() {
+      @Override
+      public String toString() {
+        try {
+          return pm.getPmTitle();
+        }
+        catch (RuntimeException e) {
+          // a fall back if the title is not accessible:
+          LOG.info("Unable to resolve a title parameter for a message. Related PM: " + pm.getPmRelativeName());
+          return pm.getPmRelativeName();
+        }
+      }
+    };
+
     this.resourceData = new PmResourceData(pm, msgKey, newMsgArgs);
   }
 

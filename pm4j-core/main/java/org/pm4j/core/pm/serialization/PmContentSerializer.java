@@ -137,7 +137,8 @@ public class PmContentSerializer {
     SerializationUtils.serialize(msg.getPm().getPmName(), os);
     SerializationUtils.serialize(msg.getSeverity(), os);
     SerializationUtils.serialize(msg.getMsgKey(), os);
-    SerializationUtils.serialize(msg.getMsgArgs(), os);
+    // FIXME olaf: this does not yet work.
+//    SerializationUtils.serialize(msg.getMsgArgs(), os);
   }
 
   private void deserializePmMessage(PmObject pmCtxt, InputStream is) throws IOException, ClassNotFoundException {
@@ -145,7 +146,9 @@ public class PmContentSerializer {
       String pmPath = (String)new ObjectInputStream(is).readObject();
       Severity severity = (Severity)new ObjectInputStream(is).readObject();
       String msgKey = (String)new ObjectInputStream(is).readObject();
-      Object[] args = (Object[])new ObjectInputStream(is).readObject();
+      // FIXME olaf: this does not yet work.
+//      Object[] args = (Object[])new ObjectInputStream(is).readObject();
+      Object[] args = {};
 
       // TODO: path resolution is not yet implemented
       PmObject msgPm = PmUtil.findChildPm(pmCtxt, pmPath);

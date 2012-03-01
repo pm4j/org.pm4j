@@ -7,6 +7,7 @@ import java.util.TreeSet;
 
 import org.pm4j.common.util.collection.ArrayUtil;
 import org.pm4j.core.exception.PmResourceData;
+import org.pm4j.core.exception.PmUserMessageException;
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmConstants;
 import org.pm4j.core.pm.PmMessage;
@@ -20,7 +21,7 @@ import org.pm4j.core.pm.impl.PmUtil;
 public class PmMessageUtil {
 
   /**
-   * Generates a message and propagates it to the PM session.
+   * Generates a message and propagates it to the PM conversation.
    *
    * @param severity
    *          Message severity.
@@ -32,6 +33,34 @@ public class PmMessageUtil {
    */
   public static PmMessage makeMsg(PmObject pm, Severity severity, String key, Object... resArgs) {
     PmMessage msg = new PmMessage(pm, severity, key, resArgs);
+    pm.getPmConversation().addPmMessage(msg);
+    return msg;
+  }
+
+  /**
+   * Generates a standard exception message and propagates it to the PM conversation.
+   *
+   * @param pm The exception related PM.
+   * @param severity
+   *          Message severity.
+   * @param key
+   *          The message resource key.
+   * @param resArgs
+   *          The arguments for the resource string.
+   * @return The generated message.
+   */
+  public static PmMessage makeExceptionMsg(PmObject pm, Severity severity, Throwable e) {
+    PmMessage msg = null;
+    if (e instanceof PmUserMessageException) {
+      // XXX olaf: internalize handling of not internationalized strings: use a standard resource that just provides the message.
+      PmResourceData rd = ((PmUserMessageException) e).getResourceData();
+      msg = (rd != null)
+          ? new PmMessage(pm, severity, rd.msgKey, rd.msgArgs)
+          : new PmMessage(pm, severity, e, PmConstants.MSGKEY_EXCEPTION, e.getMessage());
+    }
+    else {
+      msg = new PmMessage(pm, severity, e, PmConstants.MSGKEY_EXCEPTION, e.getMessage());
+    }
     pm.getPmConversation().addPmMessage(msg);
     return msg;
   }
