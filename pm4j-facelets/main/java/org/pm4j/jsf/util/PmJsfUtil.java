@@ -18,7 +18,6 @@ import org.pm4j.core.pm.PmMessage;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmOption;
 import org.pm4j.core.pm.PmOptionSet;
-import org.pm4j.core.pm.api.PmExpressionApi;
 import org.pm4j.core.pm.impl.PmAttrBase;
 import org.pm4j.jsf.Pm4jJsfConstants;
 import org.pm4j.jsf.PmMessageCleanupListener;
@@ -27,7 +26,6 @@ import org.pm4j.jsf.impl.UrlParamCoderJson;
 import org.pm4j.navi.NaviHistory;
 import org.pm4j.navi.NaviLink;
 import org.pm4j.navi.impl.NaviLinkImpl;
-import org.pm4j.navi.impl.NaviRuntimeException;
 import org.pm4j.web.UrlInfo;
 
 /**
@@ -88,55 +86,14 @@ public class PmJsfUtil {
   }
 
   /**
-   * Provides a PM property value.
+   * Provides an application specific named PM property. See {@link PmObject#getPmProperty(String)}.
    *
-   * @param pm
-   *          The PM context object to get the property from.
-   * @param key
-   *          The property key.
-   * @return The found value or <code>null</code>.
+   * @param pm The PM to get the property for.
+   * @param propName Name of the property.
+   * @return The found property. May be <code>null</code> if the property is not defined.
    */
-  public static Object findPmProperty(PmObject pm, String key) {
-    return PmExpressionApi.findByExpression(pm, key);
-  }
-
-  /**
-   * Provides a PM property value.
-   *
-   * @param pm
-   *          The PM context object to get the property from.
-   * @param key
-   *          The property key.
-   * @return The found value.
-   * @throws PmRuntimeException
-   *           when no value exists for the given key.
-   */
-  public static Object getPmProperty(PmObject pm, String key) {
-    return PmExpressionApi.getByExpression(pm, key);
-  }
-
-  /**
-   * Sets a session context property value.
-   *
-   * @param pmConversation
-   *          The session context that stores the parameter value.
-   * @param key
-   *          Name of the property to set.
-   * @param value
-   *          The new property value.
-   * @return The value of the session context property.
-   */
-  public static Object setPmProperty(PmConversation pmConversation, String key, Object value) {
-    if (pmConversation == null) {
-      throw new NaviRuntimeException("Parameter 'pmConversation' should not be null.");
-    }
-    if (StringUtils.isBlank(key)) {
-      throw new NaviRuntimeException("Parameter 'key' should not be empty or null.");
-    }
-
-    pmConversation.setPmNamedObject(key, value);
-
-    return value;
+  public static Object getProperty(PmObject pm, String propName) {
+    return pm.getPmProperty(propName);
   }
 
   /**

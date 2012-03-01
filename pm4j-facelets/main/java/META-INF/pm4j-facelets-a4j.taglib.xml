@@ -58,22 +58,6 @@
     </function>
 
     <function>
-        <function-name>getPmProperty</function-name>
-        <function-class>org.pm4j.jsf.util.PmJsfUtil</function-class>
-        <function-signature>java.lang.Object getPmProperty(org.pm4j.core.pm.PmObject, java.lang.String)</function-signature>
-    </function>
-    <function>
-        <function-name>findPmProperty</function-name>
-        <function-class>org.pm4j.jsf.util.PmJsfUtil</function-class>
-        <function-signature>java.lang.Object findPmProperty(org.pm4j.core.pm.PmObject, java.lang.String)</function-signature>
-    </function>
-    <function>
-        <function-name>setPmProperty</function-name>
-        <function-class>org.pm4j.jsf.util.PmJsfUtil</function-class>
-        <function-signature>java.lang.Object setPmProperty(org.pm4j.core.pm.PmConversation, java.lang.String, java.lang.Object)</function-signature>
-    </function>
-
-    <function>
         <function-name>styleClassForPm</function-name>
         <function-class>org.pm4j.web.PmViewUtil</function-class>
         <function-signature>java.lang.String styleClassForPm(org.pm4j.web.PmViewMapper, org.pm4j.core.pm.PmObject, java.lang.String)</function-signature>
@@ -88,16 +72,6 @@
         <function-name>text</function-name>
         <function-class>org.pm4j.jsf.TagFn</function-class>
         <function-signature>java.lang.String localizeWithFixArgSet(org.pm4j.core.pm.impl.PmObjectBase, java.lang.String)</function-signature>
-    </function>
-    <function>
-        <function-name>text1</function-name>
-        <function-class>org.pm4j.jsf.TagFn</function-class>
-        <function-signature>java.lang.String localizeWithFixArgSet(org.pm4j.core.pm.impl.PmObjectBase, java.lang.String, java.lang.Object)</function-signature>
-    </function>
-    <function>
-        <function-name>text2</function-name>
-        <function-class>org.pm4j.jsf.TagFn</function-class>
-        <function-signature>java.lang.String localizeWithFixArgSet(org.pm4j.core.pm.impl.PmObjectBase, java.lang.String, java.lang.Object, java.lang.Object)</function-signature>
     </function>
     <function>
         <function-name>text3</function-name>

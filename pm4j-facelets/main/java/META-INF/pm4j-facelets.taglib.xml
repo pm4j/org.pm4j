@@ -53,12 +53,6 @@
 
 	<!-- Localization support tags -->
 	<tag><tag-name>text</tag-name><source>org/pm4j/facelets/std/text.xhtml</source></tag>
-	<tag><tag-name>text1</tag-name><source>org/pm4j/facelets/std/text1.xhtml</source></tag>
-	<tag><tag-name>text2</tag-name><source>org/pm4j/facelets/std/text2.xhtml</source></tag>
-	<tag><tag-name>textInP</tag-name><source>org/pm4j/facelets/std/textInP.xhtml</source></tag>
-
-	<!-- Convenience composite tags -->
-	<tag><tag-name>tr</tag-name><source>org/pm4j/facelets/std/tr.xhtml</source></tag>
 
     <!-- Message tags -->
     <tag><tag-name>messages</tag-name><source>org/pm4j/facelets/std/messages.xhtml</source></tag>
@@ -125,21 +119,11 @@
 		<function-class>org.pm4j.jsf.util.PmJsfUtil</function-class>
 		<function-signature>javax.faces.model.SelectItem[] makeSelectItems(org.pm4j.core.pm.PmAttr)</function-signature>
 	</function>
-
 	<function>
-		<function-name>getPmProperty</function-name>
+		<!-- Provides a user defined property by name. See: PmObject.getPmProperty(). -->
+		<function-name>property</function-name>
 		<function-class>org.pm4j.jsf.util.PmJsfUtil</function-class>
-		<function-signature>java.lang.Object getPmProperty(org.pm4j.core.pm.PmObject, java.lang.String)</function-signature>
-	</function>
-	<function>
-		<function-name>findPmProperty</function-name>
-		<function-class>org.pm4j.jsf.util.PmJsfUtil</function-class>
-		<function-signature>java.lang.Object findPmProperty(org.pm4j.core.pm.PmObject, java.lang.String)</function-signature>
-	</function>
-	<function>
-	    <function-name>setPmProperty</function-name>
-	    <function-class>org.pm4j.jsf.util.PmJsfUtil</function-class>
-	    <function-signature>java.lang.Object setPmProperty(org.pm4j.core.pm.PmConversation, java.lang.String, java.lang.Object)</function-signature>
+		<function-signature>java.lang.Object getProperty(org.pm4j.core.pm.PmObject, java.lang.String)</function-signature>
 	</function>
 
 	<function>
@@ -158,21 +142,6 @@
 		<function-signature>java.util.List filterPmList(java.util.List, java.lang.String, java.lang.String)</function-signature>
 	</function>
 
-	<function>
-		<function-name>text</function-name>
-		<function-class>org.pm4j.jsf.TagFn</function-class>
-		<function-signature>java.lang.String localizeWithFixArgSet(org.pm4j.core.pm.impl.PmObjectBase, java.lang.String)</function-signature>
-	</function>
-	<function>
-		<function-name>text1</function-name>
-		<function-class>org.pm4j.jsf.TagFn</function-class>
-		<function-signature>java.lang.String localizeWithFixArgSet(org.pm4j.core.pm.impl.PmObjectBase, java.lang.String, java.lang.Object)</function-signature>
-	</function>
-	<function>
-		<function-name>text2</function-name>
-		<function-class>org.pm4j.jsf.TagFn</function-class>
-		<function-signature>java.lang.String localizeWithFixArgSet(org.pm4j.core.pm.impl.PmObjectBase, java.lang.String, java.lang.Object, java.lang.Object)</function-signature>
-	</function>
 	<function>
 		<function-name>text3</function-name>
 		<function-class>org.pm4j.jsf.TagFn</function-class>
