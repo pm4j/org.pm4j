@@ -8,6 +8,7 @@ import org.pm4j.core.exception.PmUserMessageException;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmMessage;
 import org.pm4j.core.pm.PmMessage.Severity;
+import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.api.PmMessageUtil;
 import org.pm4j.navi.NaviLink;
 import org.pm4j.navi.NaviRuleLink;
@@ -26,44 +27,36 @@ public class PmExceptionHandlerImpl implements PmExceptionHandler {
   public PmExceptionHandlerImpl() {
   }
 
-  /**
-   * Will be called whenever the execution of a command failed with an
-   * exception.
-   *
-   * @param failedCommand
-   *          The command.
-   * @param throwable
-   *          The exception thrown during command execution.
-   * @param inNaviContext
-   *          Indicates if the returned navigation string may be considered by
-   *          the framework in the current exception situation.
-   *
-   * @return A navigation string or <code>null</code> for no special
-   *         navigation.
+
+  /* (non-Javadoc)
+   * @see org.pm4j.core.pm.impl.PmExceptionHandler#onException(org.pm4j.core.pm.PmObject, java.lang.Throwable, boolean)
    */
-  public NaviLink onException(PmCommand failedCommand, Throwable throwable,
+  public NaviLink onException(PmObject pmObject, Throwable throwable,
       boolean inNaviContext) {
-    if (throwable instanceof PmUserMessageException) {
-      PmResourceData resData = ((PmUserMessageException)throwable).getResourceData();
-      if (resData != null) {
-        PmConversationImpl sessionCtxt = (PmConversationImpl) failedCommand.getPmConversation();
-        PmMessage message = PmMessageUtil.makeMsg(failedCommand, Severity.ERROR, resData.msgKey, resData.msgArgs);
+    if(pmObject instanceof PmCommand) {
+      if (throwable instanceof PmUserMessageException) {
+        PmResourceData resData = ((PmUserMessageException)throwable).getResourceData();
+        if (resData != null) {
+          PmMessage message = PmMessageUtil.makeMsg(pmObject, Severity.ERROR, resData.msgKey, resData.msgArgs);
 
-        if (LOG.isInfoEnabled()) {
-          LOG.info("Exception with resource key '" + resData.msgKey +
-                    "' was used to create the user error message '" + message.getTitle() + "'.", throwable);
+          if (LOG.isInfoEnabled()) {
+            LOG.info("Exception with resource key '" + resData.msgKey +
+                      "' was used to create the user error message '" + message.getTitle() + "'.", throwable);
+          }
+
+          // no navigation
+          return null;
         }
-
-        // no navigation
-        return null;
       }
-    }
 
-    // No exception with human readable message:
-    String ruleString = onNonPmException(failedCommand, throwable, inNaviContext);
-    return ruleString != null
-              ? new NaviRuleLink(ruleString)
-              : null;
+      // No exception with human readable message:
+      String ruleString = onNonPmException((PmCommand) pmObject, throwable, inNaviContext);
+      return ruleString != null
+                ? new NaviRuleLink(ruleString)
+                : null;
+    }
+    // default: rethrow exception 
+    throw new PmRuntimeException(pmObject, throwable);
   }
 
   /**

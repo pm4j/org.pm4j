@@ -552,8 +552,9 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     }
     catch (RuntimeException e) {
       PmRuntimeException pmex = new PmRuntimeException(this, "Unable to set value: " + value, e);
-      LOG.error("setValue failed", pmex);
-      throw pmex;
+      // handle exception
+      getPmConversationImpl().getPmExceptionHandler().onException(this, pmex, false);
+      return false;
     }
   }
 
