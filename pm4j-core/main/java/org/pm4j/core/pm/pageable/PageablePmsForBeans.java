@@ -78,16 +78,21 @@ public class PageablePmsForBeans<T_PM extends PmBean<T_BEAN>, T_BEAN> implements
 
   @SuppressWarnings("unchecked")
   @Override
-  public void filterItems(Filter<?> filter) {
-    beans.filterItems(filter != null
+  public void setItemFilter(Filter<?> filter) {
+    beans.setItemFilter(filter != null
         ? new BeanFilterBasedOnPmFilter<T_PM, T_BEAN>(
               (Filter<T_PM>)filter)
         : null);
   }
 
   @Override
-  public void filterBackingItems(Filter<?> filter) {
-    this.beans.filterItems(filter);
+  public void setBackingItemFilter(Filter<?> filter) {
+    this.beans.setItemFilter(filter);
+  }
+
+  @Override
+  public Filter<?> getBackingItemFilter() {
+    return beans.getBackingItemFilter();
   }
 
   @Override

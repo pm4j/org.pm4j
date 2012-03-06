@@ -3,6 +3,8 @@ package org.pm4j.core.pm.impl;
 import static org.pm4j.core.pm.impl.PmObjectBase.PmInitState.INITIALIZED;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -21,6 +23,7 @@ import org.pm4j.core.pm.PmTableRow;
 import org.pm4j.core.pm.PmVisitor;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.pageable.PageableCollection;
+import org.pm4j.core.pm.pageable.PageableCollection.Filter;
 import org.pm4j.core.pm.pageable.PageableListImpl;
 import org.pm4j.core.pm.pageable.PmPager;
 import org.pm4j.core.pm.pageable.PmPagerImpl;
@@ -94,7 +97,7 @@ public class PmTableImpl
   public PmTableImpl(PmObject pmParent, PageableCollection<T_ROW_ELEMENT_PM> pageableItems) {
     super(pmParent);
     if (pageableItems != null) {
-      setPageableCollection(pageableItems);
+      setPageableCollection(pageableItems, false);
     }
   }
 
@@ -102,9 +105,17 @@ public class PmTableImpl
    * Sets an empty {@link #pageableCollection} if the given parameter is <code>null</code>.
    *
    * @param pageable The new data set to present.
+   * @param preseveSettings Defines if the currently selected items and filter definition should be preserved.
    * @return <code>true</code> if the data set was new.
    */
-  public void setPageableCollection(PageableCollection<T_ROW_ELEMENT_PM> pageable) {
+  public void setPageableCollection(PageableCollection<T_ROW_ELEMENT_PM> pageable, boolean preseveSettings) {
+    Collection<T_ROW_ELEMENT_PM> selectedItems = Collections.emptyList();
+    Filter<?> filter = null;
+    if (pageableCollection != null && preseveSettings) {
+      selectedItems = pageableCollection.getSelectedItems();
+      filter = pageableCollection.getBackingItemFilter();
+    }
+
     if (pageable != null) {
       pageableCollection = pageable;
 
@@ -116,6 +127,14 @@ public class PmTableImpl
     }
     else {
       pageableCollection = new PageableListImpl<T_ROW_ELEMENT_PM>(getNumOfPageRows(), isMultiSelect());
+    }
+
+    // re-apply the settings to preserve
+    if (preseveSettings) {
+      for (T_ROW_ELEMENT_PM r : selectedItems) {
+        pageableCollection.select(r);
+      }
+      pageableCollection.setBackingItemFilter(filter);
     }
 
     PmEventApi.firePmEventIfInitialized(this, PmEvent.VALUE_CHANGE);
@@ -176,7 +195,9 @@ public class PmTableImpl
   // XXX olaf: Really required to have that?
   public void setRowSelectMode(RowSelectMode rowSelectMode) {
     this.rowSelectMode = rowSelectMode;
-    getPageableCollection().setMultiSelect(isMultiSelect());
+    if (pageableCollection != null) {
+      getPageableCollection().setMultiSelect(rowSelectMode == RowSelectMode.MULTI);
+    }
   }
 
   @Override
@@ -184,6 +205,7 @@ public class PmTableImpl
     return getOwnMetaDataWithoutPmInitCall().numOfPageRows;
   }
 
+  // XXX olaf: should disappear. getRowSelectMode should be enough.
   @Override
   public boolean isMultiSelect() {
     return getRowSelectMode() == RowSelectMode.MULTI;

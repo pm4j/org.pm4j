@@ -14,6 +14,53 @@ import org.pm4j.core.pm.impl.options.PmOptionSetUtil;
 
 public class PmAttrOptionsTest extends TestCase {
 
+  // -- Tests --
+
+  public void testUsePmMethodToGetOptionset() {
+    assertEqualOptions("[---, 1:a, 2:b]", testPm.item);
+    testPm.item.setValueAsString("1");
+    assertEquals("1:a", testPm.item.getValue().toString());
+  }
+
+  public void testSortOptionsByExpression() {
+    assertEqualOptions("[---, 2:b, 1:a]", testPm.itemWithOptsSortedByNameDesc);
+  }
+
+  public void testUseNamedObjectToGetOptionset() {
+    assertEqualOptions("[---, 1:a, 2:b]", testPm.itemWithNamedObjectOptions);
+    testPm.itemWithNamedObjectOptions.setValueAsString("1");
+    assertEquals("1:a", testPm.itemWithNamedObjectOptions.getValue().toString());
+  }
+
+  public void testNullOptionTitle() {
+    assertEqualOptions("[Please select, a, b]", testPm.itemWithTitledNullOption);
+  }
+
+  public void testEnumOptionsWithNullOptionTitleResource() {
+    assertEqualOptions("[No selection, One, Two, Three]", testPm.enumAttrWithNullResKey);
+  }
+
+  public void testEnumOptionsWithDefaultNullOptionTitleResource() {
+    assertEqualOptions("[---, One, Two]", testPm.enumAttrWithoutNullResKey);
+  }
+
+  public void testEnumOptionsWithoutAdditionalSpec() {
+    assertEqualOptions("[No selection, One, Two, Three]", testPm.enumAttrWithoutAdditionlSpec);
+  }
+
+  public void testEnumOptionsSubset() {
+    assertEqualOptions("[No selection, Three, One]", testPm.enumAttrSubSet);
+  }
+
+  public void testEnumOptionsSubsetWithNullOption() {
+    assertEqualOptions("[No selection, Three, One]", testPm.enumAttrSubSetWithNullOption);
+  }
+
+
+  private void assertEqualOptions(String optionsString, PmAttr<?> attr) {
+    assertEquals(optionsString, PmOptionSetUtil.getOptionTitles(attr.getOptionSet()).toString());
+  }
+
   // -- Domain structure --
 
   public static class Item {
@@ -102,53 +149,6 @@ public class PmAttrOptionsTest extends TestCase {
   @Override
   protected void setUp() throws Exception {
     testPm = new TestPm();
-  }
-
-  // -- Tests --
-
-  public void testUsePmMethodToGetOptionset() {
-    assertEqualOptions("[---, 1:a, 2:b]", testPm.item);
-    testPm.item.setValueAsString("1");
-    assertEquals("1:a", testPm.item.getValue().toString());
-  }
-
-  public void testSortOptionsByExpression() {
-    assertEqualOptions("[---, 2:b, 1:a]", testPm.itemWithOptsSortedByNameDesc);
-  }
-
-  public void testUseNamedObjectToGetOptionset() {
-    assertEqualOptions("[---, 1:a, 2:b]", testPm.itemWithNamedObjectOptions);
-    testPm.itemWithNamedObjectOptions.setValueAsString("1");
-    assertEquals("1:a", testPm.itemWithNamedObjectOptions.getValue().toString());
-  }
-
-  public void testNullOptionTitle() {
-    assertEqualOptions("[Please select, a, b]", testPm.itemWithTitledNullOption);
-  }
-
-  public void testEnumOptionsWithNullOptionTitleResource() {
-    assertEqualOptions("[No selection, One, Two, Three]", testPm.enumAttrWithNullResKey);
-  }
-
-  public void testEnumOptionsWithDefaultNullOptionTitleResource() {
-    assertEqualOptions("[---, One, Two]", testPm.enumAttrWithoutNullResKey);
-  }
-
-  public void testEnumOptionsWithoutAdditionalSpec() {
-    assertEqualOptions("[No selection, One, Two, Three]", testPm.enumAttrWithoutAdditionlSpec);
-  }
-
-  public void testEnumOptionsSubset() {
-    assertEqualOptions("[No selection, Three, One]", testPm.enumAttrSubSet);
-  }
-
-  public void testEnumOptionsSubsetWithNullOption() {
-    assertEqualOptions("[No selection, Three, One]", testPm.enumAttrSubSetWithNullOption);
-  }
-
-
-  private void assertEqualOptions(String optionsString, PmAttr<?> attr) {
-    assertEquals(optionsString, PmOptionSetUtil.getOptionTitles(attr.getOptionSet()).toString());
   }
 
 }

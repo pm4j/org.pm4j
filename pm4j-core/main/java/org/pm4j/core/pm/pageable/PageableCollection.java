@@ -83,7 +83,7 @@ public interface PageableCollection<T_ITEM> {
    *          The item filter to use.<br>
    *          May be <code>null</code> to switch filtering off.
    */
-  void filterItems(Filter<?> filter);
+  void setItemFilter(Filter<?> filter);
 
   /**
    * Provides a filter that will be applied to the items of the backing
@@ -96,7 +96,12 @@ public interface PageableCollection<T_ITEM> {
    *          The item filter to use.<br>
    *          May be <code>null</code> to switch filtering off.
    */
-  void filterBackingItems(Filter<?> filter);
+  void setBackingItemFilter(Filter<?> filter);
+  
+  /**
+   * @return The current filter definition for the backing collection.
+   */
+  Filter<?> getBackingItemFilter();
 
   /**
    * @return The total number of object within this set.

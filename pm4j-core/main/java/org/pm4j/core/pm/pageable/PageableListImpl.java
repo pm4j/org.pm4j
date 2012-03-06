@@ -106,14 +106,19 @@ public class PageableListImpl<T_ITEM> implements PageableCollection<T_ITEM> {
 
   @SuppressWarnings("unchecked")
   @Override
-  public void filterItems(Filter<?> filter) {
+  public void setItemFilter(Filter<?> filter) {
     currentFilter = (Filter<T_ITEM>)filter;
     _applyFilterAndSortOrder();
   }
 
   @Override
-  public void filterBackingItems(Filter<?> filter) {
-    filterItems(filter);
+  public void setBackingItemFilter(Filter<?> filter) {
+    setItemFilter(filter);
+  }
+
+  @Override
+  public Filter<?> getBackingItemFilter() {
+    return currentFilter;
   }
 
   @Override
