@@ -1,13 +1,13 @@
-<project name="pm4j-core" basedir="." default="all" >
+<project name="pm4j-core" basedir="." default="all">
 
-	<property name="dir.src" location="main/java"/>
+	<property name="dir.src" location="main/java" />
 	<property name="repository.dir" location="../pm4j-libs-temp-solution/lib" />
-	<property name="dir.classes" location="target/classes"/>
-	<property name="dir.dist" location="target/dist"/>
+	<property name="dir.classes" location="target/classes" />
+	<property name="dir.dist" location="target/dist" />
 
 	<!-- ========== Compile Target ========== -->
 	<target name="compile">
-		<mkdir dir="${dir.classes}"/>
+		<mkdir dir="${dir.classes}" />
 		<javac srcdir="${dir.src}" destdir="${dir.classes}" includes="org/**" debug="true" debuglevel="lines,vars,source" fork="true">
 			<classpath>
 				<fileset file="${repository.dir}/commons-lang/jars/commons-lang-2.4.jar" />
@@ -18,46 +18,60 @@
 			</classpath>
 		</javac>
 		<copy todir="${dir.classes}">
-    		<fileset dir="${dir.src}">
-      			<exclude name="**/*.java"/>
-    		</fileset>
-  		</copy>
+			<fileset dir="${dir.src}">
+				<exclude name="**/*.java" />
+			</fileset>
+		</copy>
 	</target>
 
 	<!-- ========== Create Jar Target ========== -->
 	<target name="jar" depends="compile">
-		<delete file="${dir.dist}/${ant.project.name}.jar"/>
+		<delete file="${dir.dist}/${ant.project.name}.jar" />
+		<!-- Does not fail on error. This works only, if git.exe is included in your OSs PATH variable -->
+		<exec executable="git.exe" outputproperty="head.sha1">
+			<arg value="rev-parse" />
+			<arg value="HEAD" />
+		</exec>
+		
+		<echo>Including HEAD SHA1 ${head.sha1}</echo>
+
 		<jar destfile="${dir.dist}/${ant.project.name}.jar">
-	 	 	 <fileset dir="${dir.classes}">
-	 	 	     <include name="**/*.class" />
-	 	 	 	 <include name="**/*.properties" />
-	 	 	 	 <include name="**/*.xml" />
-	 	 	 </fileset>
+			<fileset dir="${dir.classes}">
+				<include name="**/*.class" />
+				<include name="**/*.properties" />
+				<include name="**/*.xml" />
+			</fileset>
+			<manifest>
+				<attribute name="Git-SHA1" value="${head.sha1}" />
+			</manifest>
 		</jar>
 	</target>
 
+
+
+
 	<target name="src-jar">
-		<delete file="${dir.dist}/${ant.project.name}-src.jar"/>
+		<delete file="${dir.dist}/${ant.project.name}-src.jar" />
 		<jar destfile="${dir.dist}/${ant.project.name}-src.jar">
-	 	 	 <fileset dir="${dir.src}">
-	 	 	     <include name="**/*.java" />
-	 	 	 	 <include name="**/*.properties" />
-	 	 	 </fileset>
+			<fileset dir="${dir.src}">
+				<include name="**/*.java" />
+				<include name="**/*.properties" />
+			</fileset>
 		</jar>
 	</target>
 
 	<!-- ========== Clean Target ========== -->
 	<target name="clean">
 		<delete includeEmptyDirs="true" quiet="true">
-			<fileset dir="${dir.classes}" includes="**/*"/>
+			<fileset dir="${dir.classes}" includes="**/*" />
 		</delete>
 	</target>
 
 	<target name="javadoc" description="generate the javadoc subset to be placed online.">
 		<javadoc destdir="${dir.dist}/javadoc">
-		  <packageset dir="${dir.src}" defaultexcludes="yes">
-			  <include name="org/pm4j/core/pm/**"/>
-			  <exclude name="org/pm4j/core/pm/expr/**"/>
+			<packageset dir="${dir.src}" defaultexcludes="yes">
+				<include name="org/pm4j/core/pm/**" />
+				<exclude name="org/pm4j/core/pm/expr/**" />
 			</packageset>
 
 		</javadoc>
@@ -65,7 +79,7 @@
 
 
 	<!-- ========== All Target ========== -->
-    <target name="all" depends="clean,jar,src-jar">
-    </target>
+	<target name="all" depends="clean,jar,src-jar">
+	</target>
 
 </project>
