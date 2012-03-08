@@ -102,6 +102,7 @@ public class PmTabSetImpl extends PmElementImpl implements PmTabSet {
            toTab != null ? toTab.getPmRelativeName() : null,
            decorator);
     }
+
     public CmdDecoratorDefintion(String fromTabName, String toTabName, PmCommandDecorator decorator) {
       this.fromName = fromTabName;
       this.toName = toTabName;
@@ -109,8 +110,10 @@ public class PmTabSetImpl extends PmElementImpl implements PmTabSet {
     }
 
     public boolean isDecoratorForSwitch(PmObject fromTab, PmObject toTab) {
-      return (toTab == null || toTab.getPmRelativeName().equals(toName)) &&
-             (fromTab == null || fromTab.getPmRelativeName().equals(fromName));
+      return ((toName == null) ||
+              (toTab != null && toTab.getPmRelativeName().equals(toName))) &&
+             ((fromName == null) ||
+              (fromTab != null) && fromTab.getPmRelativeName().equals(fromName));
     }
 
     public PmCommandDecorator getDecorator() { return decorator; }
