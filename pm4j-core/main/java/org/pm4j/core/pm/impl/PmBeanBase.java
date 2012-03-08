@@ -83,9 +83,9 @@ public abstract class PmBeanBase<T_BEAN>
   @SuppressWarnings("unchecked")
   protected T_BEAN findPmBeanImpl() {
     T_BEAN bean = null;
-    String propKey = getOwnMetaData().beanPropertyKey;
+    String propKey = getOwnMetaDataAndEnsurePmInit().beanPropertyKey;
     if (StringUtils.isNotBlank(propKey)) {
-      bean = (T_BEAN) PmExpressionApi.findByExpression(this, propKey, getOwnMetaData().beanClass);
+      bean = (T_BEAN) PmExpressionApi.findByExpression(this, propKey, getOwnMetaDataAndEnsurePmInit().beanClass);
     }
     return bean;
   }
@@ -103,7 +103,7 @@ public abstract class PmBeanBase<T_BEAN>
     T_BEAN bean = findPmBeanImpl();
 
     if ((bean == null) &&
-        getOwnMetaData().autoCreateBean) {
+        getOwnMetaDataAndEnsurePmInit().autoCreateBean) {
       try {
         bean = (T_BEAN)getPmBeanClass().newInstance();
       } catch (Exception e) {
@@ -186,7 +186,7 @@ public abstract class PmBeanBase<T_BEAN>
   // TODO olaf: rename or remove.
   private Serializable getPmBeanId() {
     // TODO olaf: add support for multi attribute keys.
-    BeanAttrAccessor idAttrAccessor = getOwnMetaData().idAttrAccessor;
+    BeanAttrAccessor idAttrAccessor = getOwnMetaDataAndEnsurePmInit().idAttrAccessor;
     if (idAttrAccessor != null) {
       return idAttrAccessor.getBeanAttrValue(getPmBean());
     }
@@ -205,9 +205,9 @@ public abstract class PmBeanBase<T_BEAN>
 
   private void checkBeanClass(Object bean) {
     if (bean != null &&
-        ! getOwnMetaData().beanClass.isAssignableFrom(bean.getClass())) {
+        ! getPmBeanClass().isAssignableFrom(bean.getClass())) {
       throw new PmRuntimeException(this, "Class '" + bean.getClass()
-          + "' is not assignable to '" + getOwnMetaData().beanClass + "'.");
+          + "' is not assignable to '" + getPmBeanClass() + "'.");
     }
   }
 
@@ -223,7 +223,7 @@ public abstract class PmBeanBase<T_BEAN>
 
     /**
      * Creates the PM bound to a <code>null</code>-pmBean .
-     * 
+     *
      * @param parentPm The parent context PM.
      */
     public Nested(PmObject parentPm) {
@@ -315,8 +315,12 @@ public abstract class PmBeanBase<T_BEAN>
     private BeanAttrAccessor idAttrAccessor;
   }
 
-  private final MetaData getOwnMetaData() {
+  private final MetaData getOwnMetaDataAndEnsurePmInit() {
     return (MetaData) getPmMetaData();
+  }
+
+  private final MetaData getOwnMetaData() {
+    return (MetaData) getPmMetaDataWithoutPmInitCall();
   }
 
 }

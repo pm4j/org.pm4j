@@ -583,6 +583,13 @@ public abstract class PmObjectBase implements PmObject {
         }
       }
       pmInitState = PmInitState.FIELD_BOUND_CHILD_META_DATA_INITIALIZED;
+
+      for (int i=0; i<pmMetaData.childFieldAccessorArray.length; ++i) {
+        PmObjectBase child = pmMetaData.childFieldAccessorArray[i].getBeanAttrValue(this);
+        if (child.pmInitState == PmInitState.NOT_INITIALIZED) {
+          child.ensurePmMetaDataInitialization();
+        }
+      }
     }
   }
 
@@ -717,6 +724,14 @@ public abstract class PmObjectBase implements PmObject {
                 pmMetaData.nameToChildAccessorMap.put(attrName, a);
               }
               pmInitState = PmInitState.FIELD_BOUND_CHILD_META_DATA_INITIALIZED;
+
+              for (int i=0; i<pmMetaData.childFieldAccessorArray.length; ++i) {
+                PmObjectBase child = pmMetaData.childFieldAccessorArray[i].getBeanAttrValue(this);
+                if (child.pmInitState == PmInitState.NOT_INITIALIZED) {
+                  child.ensurePmMetaDataInitialization();
+                }
+              }
+
             }
           }
         }
