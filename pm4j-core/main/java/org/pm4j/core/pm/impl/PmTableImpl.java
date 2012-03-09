@@ -341,6 +341,14 @@ public class PmTableImpl
 //    }
 
       sortOrderSelection = new SortOrderSelection();
+      // register listener for selection change events
+      PmEventApi.addPmEventListener(this, PmEvent.SELECTION_CHANGE, new PmEventListener() {
+
+        @Override
+        public void handleEvent(PmEvent event) {
+          PmTableImpl.this.onPmSelectionChange(event);
+        }
+      });
   }
 
   private static PmObject zz_getPmRowCellForColumn(PmElement rowElement, PmTableCol column) {
@@ -433,4 +441,12 @@ public class PmTableImpl
     return pager;
   }
 
+  /**
+   * Is called whenever an event with the flag {@link PmEvent#SELECTION_CHANGE}
+   * was fired for this PM.
+   *
+   * @param event The fired event.
+   */
+  protected void onPmSelectionChange(PmEvent event) {
+  }
 }

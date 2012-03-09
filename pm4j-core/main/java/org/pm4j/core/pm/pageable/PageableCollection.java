@@ -123,6 +123,7 @@ public interface PageableCollection<T_ITEM> {
    * @param item
    *          The item to select.
    */
+  // TODO: change API to select(T_ITEM item, boolean selectable)
   void select(T_ITEM item);
 
   /**

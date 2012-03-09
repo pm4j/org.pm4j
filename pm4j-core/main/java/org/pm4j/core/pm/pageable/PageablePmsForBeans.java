@@ -5,7 +5,10 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.pm4j.core.pm.PmBean;
+import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmObject;
+import org.pm4j.core.pm.PmTable;
+import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmFactoryApi;
 
 /**
@@ -27,12 +30,12 @@ public class PageablePmsForBeans<T_PM extends PmBean<T_BEAN>, T_BEAN> implements
   private PmObject                   pmCtxt;
   private PageableCollection<T_BEAN> beans;
 
-  public PageablePmsForBeans(PmObject pmCtxt, PageableCollection<T_BEAN> beanItems) {
+  public PageablePmsForBeans(PmTable<T_PM> pmCtxt, PageableCollection<T_BEAN> beanItems) {
     this.pmCtxt = pmCtxt;
     this.beans = beanItems;
   }
 
-  public PageablePmsForBeans(PmObject pmCtxt, Collection<T_BEAN> beans) {
+  public PageablePmsForBeans(PmTable<T_PM> pmCtxt, Collection<T_BEAN> beans) {
 	    this(pmCtxt, new PageableListImpl<T_BEAN>(beans));
   }
 
@@ -109,6 +112,9 @@ public class PageablePmsForBeans<T_PM extends PmBean<T_BEAN>, T_BEAN> implements
 
   @Override
   public void select(T_PM item) {
+    if(!isSelected(item)) {
+      PmEventApi.firePmEvent(pmCtxt, PmEvent.SELECTION_CHANGE);
+    }
     beans.select(item != null
             ? item.getPmBean()
             : null);
@@ -116,6 +122,9 @@ public class PageablePmsForBeans<T_PM extends PmBean<T_BEAN>, T_BEAN> implements
 
   @Override
   public void deSelect(T_PM item) {
+    if(isSelected(item)) {
+      PmEventApi.firePmEvent(pmCtxt, PmEvent.SELECTION_CHANGE);
+    }
     beans.deSelect(item != null
         ? item.getPmBean()
         : null);

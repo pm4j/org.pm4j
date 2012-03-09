@@ -25,13 +25,14 @@ public class PmEvent extends EventObject {
   public static final int VALUE_CHANGED_STATE_CHANGE = 1 << 6;
   public static final int VALIDATION_STATE_CHANGE = 1 << 7;
   public static final int STYLECLASS_CHANGE = 1 << 8;
-  public static final int EXEC_COMMAND = 1 << 9;
+  public static final int SELECTION_CHANGE = 1 << 9;
+  public static final int EXEC_COMMAND = 1 << 10;
 
   public static final int ALL_CHANGE_EVENTS =
     VALUE_CHANGE | TITLE_CHANGE | TOOLTIP_CHANGE |
     VISIBILITY_CHANGE | ENABLEMENT_CHANGE |
     OPTIONSET_CHANGE | VALUE_CHANGED_STATE_CHANGE | VALIDATION_STATE_CHANGE |
-    STYLECLASS_CHANGE ;
+    STYLECLASS_CHANGE | SELECTION_CHANGE;
 
   public static final int ALL = ALL_CHANGE_EVENTS | EXEC_COMMAND;
 
