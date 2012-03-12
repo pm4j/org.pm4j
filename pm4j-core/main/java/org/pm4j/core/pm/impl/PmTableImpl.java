@@ -101,45 +101,6 @@ public class PmTableImpl
     }
   }
 
-  /**
-   * Sets an empty {@link #pageableCollection} if the given parameter is <code>null</code>.
-   *
-   * @param pageable The new data set to present.
-   * @param preseveSettings Defines if the currently selected items and filter definition should be preserved.
-   * @return <code>true</code> if the data set was new.
-   */
-  public void setPageableCollection(PageableCollection<T_ROW_ELEMENT_PM> pageable, boolean preseveSettings) {
-    Collection<T_ROW_ELEMENT_PM> selectedItems = Collections.emptyList();
-    Filter<?> filter = null;
-    if (pageableCollection != null && preseveSettings) {
-      selectedItems = pageableCollection.getSelectedItems();
-      filter = pageableCollection.getBackingItemFilter();
-    }
-
-    if (pageable != null) {
-      pageableCollection = pageable;
-
-      // XXX olaf: Risk of side effects to other users referencing the given collection.
-      //           Find a better solution...
-      //           Generates potentially an initialization problem if called in constructor
-      pageableCollection.setMultiSelect(isMultiSelect());
-      pageableCollection.setPageSize(getNumOfPageRows());
-    }
-    else {
-      pageableCollection = new PageableListImpl<T_ROW_ELEMENT_PM>(getNumOfPageRows(), isMultiSelect());
-    }
-
-    // re-apply the settings to preserve
-    if (preseveSettings) {
-      for (T_ROW_ELEMENT_PM r : selectedItems) {
-        pageableCollection.select(r);
-      }
-      pageableCollection.setBackingItemFilter(filter);
-    }
-
-    PmEventApi.firePmEventIfInitialized(this, PmEvent.VALUE_CHANGE);
-  }
-
   @Override
   public List<PmTableCol> getColumns() {
     return zz_getPmColumns();
@@ -170,12 +131,14 @@ public class PmTableImpl
   public List<T_ROW_ELEMENT_PM> getRowsWithChanges() {
     // TODO olaf: Add a changed row-set to get more efficient.
     // FIXME olaf: provides only the items of the current page!
-    List<T_ROW_ELEMENT_PM> allItems = getPageableCollection().getItemsOnPage();
     List<T_ROW_ELEMENT_PM> changedItems = new ArrayList<T_ROW_ELEMENT_PM>();
-    for (T_ROW_ELEMENT_PM row : allItems) {
-      if (! row.isPmReadonly() &&
-          row.isPmValueChanged()) {
-        changedItems.add(row);
+    if (pageableCollection != null) {
+      List<T_ROW_ELEMENT_PM> allItems = pageableCollection.getItemsOnPage();
+      for (T_ROW_ELEMENT_PM row : allItems) {
+        if (! row.isPmReadonly() &&
+            row.isPmValueChanged()) {
+          changedItems.add(row);
+        }
       }
     }
     return changedItems;
@@ -196,7 +159,7 @@ public class PmTableImpl
   public void setRowSelectMode(RowSelectMode rowSelectMode) {
     this.rowSelectMode = rowSelectMode;
     if (pageableCollection != null) {
-      getPageableCollection().setMultiSelect(rowSelectMode == RowSelectMode.MULTI);
+      pageableCollection.setMultiSelect(rowSelectMode == RowSelectMode.MULTI);
     }
   }
 
@@ -385,6 +348,84 @@ public class PmTableImpl
   }
 
 
+  /**
+   * @return The container that handles the table data to display.
+   */
+  public PageableCollection<T_ROW_ELEMENT_PM> getPageableCollection() {
+    zz_ensurePmInitialization();
+    if (pageableCollection == null) {
+      pageableCollection = getPageableCollectionImpl();
+    }
+    return pageableCollection;
+  }
+
+  /**
+   * Gets called whenever the internal collection is <code>null</code> and
+   * {@link #getPageableCollection()} gets called.
+   *
+   * @return The collection to use. Never <code>null</code>.
+   */
+  protected PageableCollection<T_ROW_ELEMENT_PM> getPageableCollectionImpl() {
+    return new PageableListImpl<T_ROW_ELEMENT_PM>(getNumOfPageRows(), getRowSelectMode() == RowSelectMode.MULTI);
+  }
+
+  /**
+   * Sets an empty {@link #pageableCollection} if the given parameter is <code>null</code>.
+   *
+   * @param pageable The new data set to present.
+   * @param preseveSettings Defines if the currently selected items and filter definition should be preserved.
+   * @return <code>true</code> if the data set was new.
+   */
+  public void setPageableCollection(PageableCollection<T_ROW_ELEMENT_PM> pageable, boolean preseveSettings) {
+    Collection<T_ROW_ELEMENT_PM> selectedItems = Collections.emptyList();
+    Filter<?> filter = null;
+    if (pageableCollection != null && preseveSettings) {
+      selectedItems = pageableCollection.getSelectedItems();
+      filter = pageableCollection.getBackingItemFilter();
+    }
+
+    pageableCollection = pageable;
+
+    if (pageable != null) {
+      // XXX olaf: Risk of side effects to other users referencing the given collection.
+      //           Find a better solution...
+      //           Generates potentially an initialization problem if called in constructor
+      pageableCollection.setMultiSelect(getRowSelectMode() == RowSelectMode.MULTI);
+      pageableCollection.setPageSize(getNumOfPageRows());
+    }
+
+    PmEventApi.firePmEventIfInitialized(this, PmEvent.VALUE_CHANGE);
+
+    // re-apply the settings to preserve
+    if (preseveSettings) {
+      // ensure that the internal field is set, even it was just reset to null.
+      getPageableCollection();
+
+      for (T_ROW_ELEMENT_PM r : selectedItems) {
+        pageableCollection.select(r);
+      }
+      pageableCollection.setBackingItemFilter(filter);
+    }
+
+  }
+
+
+  /**
+   * @return A pager that may be used to navigate through the table.
+   */
+  public PmPager getPager() {
+    return pager;
+  }
+
+  /**
+   * Is called whenever an event with the flag {@link PmEvent#SELECTION_CHANGE}
+   * was fired for this PM.
+   *
+   * @param event The fired event.
+   */
+  protected void onPmSelectionChange(PmEvent event) {
+  }
+
   // -- metadata handling --
 
   @Override
@@ -418,35 +459,4 @@ public class PmTableImpl
     return (MetaData) getPmMetaDataWithoutPmInitCall();
   }
 
-
-  // -- getter / setter --
-
-  /**
-   * @return The container that handles the table data to display.
-   */
-  public PageableCollection<T_ROW_ELEMENT_PM> getPageableCollection() {
-    if (pageableCollection == null) {
-      zz_ensurePmInitialization();
-      if (pageableCollection == null) {
-        pageableCollection = new PageableListImpl<T_ROW_ELEMENT_PM>(getNumOfPageRows(), isMultiSelect());
-      }
-    }
-    return pageableCollection;
-  }
-
-  /**
-   * @return A pager that may be used to navigate through the table.
-   */
-  public PmPager getPager() {
-    return pager;
-  }
-
-  /**
-   * Is called whenever an event with the flag {@link PmEvent#SELECTION_CHANGE}
-   * was fired for this PM.
-   *
-   * @param event The fired event.
-   */
-  protected void onPmSelectionChange(PmEvent event) {
-  }
 }
