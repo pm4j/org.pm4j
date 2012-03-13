@@ -112,22 +112,25 @@ public class PageablePmsForBeans<T_PM extends PmBean<T_BEAN>, T_BEAN> implements
 
   @Override
   public void select(T_PM item) {
-    if(!isSelected(item)) {
-      PmEventApi.firePmEvent(pmCtxt, PmEvent.SELECTION_CHANGE);
-    }
+    boolean wasUnselected = !isSelected(item);
     beans.select(item != null
             ? item.getPmBean()
             : null);
+    // fire the event after successful select
+    if(wasUnselected) {
+      PmEventApi.firePmEvent(pmCtxt, PmEvent.SELECTION_CHANGE);
+    }
   }
 
   @Override
   public void deSelect(T_PM item) {
-    if(isSelected(item)) {
-      PmEventApi.firePmEvent(pmCtxt, PmEvent.SELECTION_CHANGE);
-    }
+    boolean wasSelected = isSelected(item);
     beans.deSelect(item != null
         ? item.getPmBean()
         : null);
+    if(wasSelected) {
+      PmEventApi.firePmEvent(pmCtxt, PmEvent.SELECTION_CHANGE);
+    }
   }
 
   @Override
