@@ -32,6 +32,9 @@ public class PmCommandProxy extends PmCommandImpl {
     /** Defines what to do in case of a missing forward command. */
     private OnMissingDelegate onMissingDelegate;
 
+    /** The clone of the delegate that has executed the last <code>doIt</code> call. */
+    private PmCommand executedDelegateCmdClone;
+
     /**
      * @param pmParent The PM tree parent.
      * @param onMissingDelegate Defines what to do in case of a missing forward command.
@@ -67,7 +70,18 @@ public class PmCommandProxy extends PmCommandImpl {
 
     @Override
     protected void doItImpl() throws Exception {
-        delegateCmd.doIt();
+      executedDelegateCmdClone = delegateCmd.doIt();
+    }
+
+    /**
+     * Returns the clone of the delegate that has been executed.
+     */
+    @Override
+    public PmCommand doIt(boolean changeCommandHistory) {
+      PmCommandProxy proxyCmdClone = (PmCommandProxy) super.doIt(changeCommandHistory);
+      return proxyCmdClone != null
+                ? proxyCmdClone.executedDelegateCmdClone
+                : executedDelegateCmdClone;
     }
 
     /**
