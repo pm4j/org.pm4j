@@ -72,6 +72,18 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
   private Collection<PmCommandDecorator> commandDecorators = Collections.emptyList();
 
   /**
+   * The command decorator that returned <code>false</code> for its call of
+   * {@link PmCommandDecorator#beforeDo(PmCommand)}.
+   * <p>
+   * In other words: The decorator that prevented the execution of the
+   * {@link #doItImpl()} logic of this command.
+   */
+  private PmCommandDecorator vetoCommandDecorator;
+
+  /** The command (execution) state. */
+  private CommandState commandState = CommandState.TEMPLATE;
+
+  /**
    * Constructor for fix commands that have an associated field in the parent
    * PM.
    *
@@ -200,7 +212,7 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
    * @param changeCommandHistory
    * @return
    */
-  public final PmCommand doIt(boolean changeCommandHistory) {
+  public PmCommand doIt(boolean changeCommandHistory) {
     PmCommandImpl cmd = zz_doCloneAndRegisterEventSource();
 
     if (cmd.beforeDo()) {
@@ -208,8 +220,10 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
       try {
         cmd.doItImpl();
         link = cmd.afterDo(changeCommandHistory);
+        cmd.commandState = CommandState.EXECUTED;
       }
       catch (Exception e) {
+        cmd.commandState = CommandState.FAILED;
         link = getPmConversationImpl().getPmExceptionHandler().onException(cmd, e, false);
 
         if (LOG.isDebugEnabled()) {
@@ -217,6 +231,9 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
         }
       }
       execNavigateTo(link);
+    }
+    else {
+      cmd.commandState = CommandState.BEFORE_DO_RETURNED_FALSE;
     }
 
     return cmd;
@@ -227,14 +244,17 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
     NaviLink link = null;
 
     if (!cmd.beforeDo()) {
+      cmd.commandState = CommandState.BEFORE_DO_RETURNED_FALSE;
       link = cmd.actionReturnOnFailure(null);
     }
     else {
       try {
         cmd.doItImpl();
         link = cmd.afterDo(true);
+        cmd.commandState = CommandState.EXECUTED;
       }
       catch (Exception e) {
+        cmd.commandState = CommandState.FAILED;
         link = cmd.actionReturnOnFailure(getPmConversationImpl().getPmExceptionHandler().onException(cmd, e, true));
 
         if (LOG.isDebugEnabled()) {
@@ -474,6 +494,7 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
     zz_ensurePmInitialization();
 
     PmCommandImpl clone = clone();
+    clone.commandState = CommandState.CLONED;
     return clone;
   }
 
@@ -552,6 +573,7 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
     // XXX olaf: move to the calling methods?
     for (PmCommandDecorator d : commandDecorators) {
       if (! d.beforeDo(this)) {
+        vetoCommandDecorator = d;
         return false;
       }
     }
@@ -597,6 +619,25 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
     PmEventApi.firePmEvent(this, PmEvent.EXEC_COMMAND);
 
     return naviLink;
+  }
+
+  /**
+   * Provides the command decorator that returned <code>false</code> for its call of
+   * {@link PmCommandDecorator#beforeDo(PmCommand)}.
+   * <p>
+   * In other words: The decorator that prevented the execution of the
+   * {@link #doItImpl()} logic of this command.
+   *
+   * @return activeCommandDecorator
+   */
+  public PmCommandDecorator getVetoCommandDecorator() {
+    return vetoCommandDecorator;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public CommandState getCommandState() {
+    return commandState;
   }
 
   private String execNavigateTo(NaviLink link) {

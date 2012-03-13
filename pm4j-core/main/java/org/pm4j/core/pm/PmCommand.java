@@ -34,6 +34,19 @@ public interface PmCommand extends PmObject {
     SEPARATOR
   };
 
+  public static enum CommandState {
+    /** The command is just a template for command clones to be executed. */
+    TEMPLATE,
+    /** The initial state of a command execution clone instance. */
+    CLONED,
+    /** The <code>doItImpl</code> method was not executed because the <code>beforeDo</code> logic returned <code>false</code>. */
+    BEFORE_DO_RETURNED_FALSE,
+    /** The <code>doItImpl</code> method of the command was successfully executed. */
+    EXECUTED,
+    /** The execution of the command failed with an exception. */
+    FAILED
+  }
+
   public static enum CommandSet { ALL, POPUP, MENU_BAR, TOOL_BAR, BUTTONS };
 
   /**
@@ -121,5 +134,10 @@ public interface PmCommand extends PmObject {
    * @param commandDecorator The decorator to add to the command execution logic.
    */
   void addCommandDecorator(PmCommandDecorator commandDecorator);
+
+  /**
+   * @return The command (execution) state.
+   */
+  CommandState getCommandState();
 
 }
