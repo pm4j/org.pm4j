@@ -3,10 +3,15 @@ package org.pm4j.core.pm.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.pm4j.core.pm.PmCommand.CommandState;
 import org.pm4j.core.pm.PmCommandDecorator;
 import org.pm4j.core.pm.PmElement;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmTabSet;
+import org.pm4j.core.pm.annotation.PmCommandCfg;
+import org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO;
 import org.pm4j.core.pm.impl.connector.PmTabSetConnector;
 
 /**
@@ -15,6 +20,8 @@ import org.pm4j.core.pm.impl.connector.PmTabSetConnector;
  * @author olaf boede
  */
 public class PmTabSetImpl extends PmElementImpl implements PmTabSet {
+
+  private static final Log LOG = LogFactory.getLog(PmTabSetImpl.class);
 
   /** A view technology specific tab set logic connector. */
   private PmTabSetConnector pmToTabSetViewConnector;
@@ -55,6 +62,9 @@ public class PmTabSetImpl extends PmElementImpl implements PmTabSet {
 
   @Override
   public boolean switchToTabPm(PmElement fromTab, PmElement toTab) {
+    // ensure that the to-tab is initialized (was an issue in domain specific unit tests):
+    toTab.getPmTooltip();
+
     // Delegate to an undoable command.
     PmTabChangeCommand tabChangeCommand = new PmTabChangeCommand(this, fromTab, toTab);
     for (CmdDecoratorDefintion d : pmCmdDecoratorDefinitions) {
@@ -65,9 +75,20 @@ public class PmTabSetImpl extends PmElementImpl implements PmTabSet {
 
     PmTabChangeCommand executedCommand = (PmTabChangeCommand) tabChangeCommand.doIt();
 
+    if (executedCommand.getCommandState() != CommandState.EXECUTED &&
+        LOG.isDebugEnabled()) {
+      String msg = "The UI logic prevented a switch from tab " + PmUtil.getPmLogString(fromTab) + " to " +
+          PmUtil.getPmLogString(toTab) + ".";
+
+      if (executedCommand.getVetoCommandDecorator() != null) {
+        msg += " It has been prevented by the command decorator: " + executedCommand.getVetoCommandDecorator();
+      }
+      LOG.debug(msg);
+    }
+
     // If the UI logic prevents the tab navigation, no exception will be thrown.
     // So we check here if the tab navigation was really successfully performed.
-    return executedCommand.isExecuted();
+    return executedCommand.getCommandState() == CommandState.EXECUTED;
   }
 
   /**
@@ -118,4 +139,52 @@ public class PmTabSetImpl extends PmElementImpl implements PmTabSet {
 
     public PmCommandDecorator getDecorator() { return decorator; }
   }
+
+  /**
+   * The command that internally executes a tab switch.
+   * <p>
+   * It supports undo and command decorators.
+   */
+  @PmCommandCfg(beforeDo=BEFORE_DO.DO_NOTHING)
+  static class PmTabChangeCommand extends PmCommandImpl {
+
+    private final PmTabSetImpl tabSet;
+    private final PmElement fromTab;
+    private final PmElement toTab;
+
+    public PmTabChangeCommand(PmTabSetImpl tabSet, PmElement fromTab, PmElement toTab) {
+      super((fromTab != null)
+          ? fromTab
+          : tabSet);
+
+      this.tabSet = tabSet;
+      this.fromTab = fromTab;
+      this.toTab = toTab;
+
+      assert fromTab != null;
+      assert toTab != null;
+    }
+
+    /**
+     * The tab switch can only be executed if the usual preconditions are fulfilled
+     * and the PmTab
+     */
+    @Override
+    protected boolean beforeDo() {
+      boolean canDo = super.beforeDo();
+      if (canDo) {
+        canDo = tabSet.switchToTabPmImpl(fromTab, toTab);
+      }
+      return canDo;
+    }
+
+    @Override
+    protected void doItImpl() {
+      tabSet.getPmToTabSetViewConnector()._switchToTab(toTab);
+      // Only successfully executed tab switches need to be undone.
+      setUndoCommand(new PmTabChangeCommand(tabSet, toTab, fromTab));
+    }
+
+  }
+
 }
