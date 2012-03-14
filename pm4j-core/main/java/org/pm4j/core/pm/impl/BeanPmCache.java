@@ -47,13 +47,17 @@ class BeanPmCache {
   /**
    * Holds only a weak reference to the referenced bean.
    */
-  private static class BeanIdentity {
+  static class BeanIdentity {
     private final WeakReference<Object> beanRef;
     private final int hashCode;
 
     public BeanIdentity(Object bean) {
       this.beanRef = new WeakReference<Object>(bean);
       this.hashCode = bean.hashCode();
+    }
+
+    public boolean isActiveBeanRef() {
+      return beanRef.get() != null;
     }
 
     @Override

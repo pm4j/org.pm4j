@@ -2,6 +2,7 @@ package org.pm4j.core.pm.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmEventListener;
 import org.pm4j.core.pm.PmObject;
@@ -107,22 +108,29 @@ public class PmEventApiHandler {
   public void firePmEvent(PmObject pm, PmEvent event) {
     PmObjectBase pmImpl = (PmObjectBase)pm;
 
-    dispatchToOnEventMethodCalls(pmImpl, event, event.changeKind);
+    if (! event.isPropagationEvent()) {
+      dispatchToOnEventMethodCalls(pmImpl, event, event.changeKind);
 
-    if (LOG.isTraceEnabled()) {
-      LOG.trace("PMEvent: " + event.changeKind + " fired for: " + pm.getPmRelativeName());
+      if (LOG.isTraceEnabled()) {
+        LOG.trace("PMEvent: " + event.changeKind + " fired for: " + pm.getPmRelativeName());
+      }
     }
 
-    // TODO olaf: add option and state change.
-    // Or: check if that callback interface is really a good idea for the PM itself.
-    //     Possibly its better to add listeners manually...
-    //     We should check, how the rich client bindings work to get a good choice here.
+    fireOnEventTables(pm, event);
 
-    if (pmImpl.pmEventTable != null && pmImpl.pmEventTable.size() > 0) {
-      pmImpl.pmEventTable.fireEvent(event);
-    }
-    if (pmImpl.pmWeakEventTable != null && pmImpl.pmWeakEventTable.size() > 0) {
-      pmImpl.pmWeakEventTable.fireEvent(event);
+    // Non-init events will be propagated to the parent hierarchy.
+    // This allows to maintain the changed state of a sub-tree.
+    if (! event.isInitializationEvent()) {
+      // propagate the event to the parent hierarchy until the conversation is reached.
+      PmConversation conversationPm = pmImpl.getPmConversation();
+      PmEvent propagationEvent = new PmEvent(event.getSource(), event.pm, event.changeKind | PmEvent.IS_EVENT_PROPAGATION);
+      for (PmObject p = pmImpl; p != null; p = p.getPmParent()) {
+        fireOnEventTables(p, propagationEvent);
+        // stop after reaching the conversation.
+        if (p == conversationPm) {
+          break;
+        }
+      }
     }
   }
 
@@ -147,6 +155,16 @@ public class PmEventApiHandler {
     //           Idea for better performing and convenient call back structure wanted!
     if ((eventMask & PmEvent.VALUE_CHANGE) != 0) {
       pmImpl.onPmValueChange(event);
+    }
+  }
+
+  private void fireOnEventTables(PmObject pm, PmEvent event) {
+    PmObjectBase pmImpl = (PmObjectBase)pm;
+    if (pmImpl.pmEventTable != null && pmImpl.pmEventTable.size() > 0) {
+      pmImpl.pmEventTable.fireEvent(event);
+    }
+    if (pmImpl.pmWeakEventTable != null && pmImpl.pmWeakEventTable.size() > 0) {
+      pmImpl.pmWeakEventTable.fireEvent(event);
     }
   }
 

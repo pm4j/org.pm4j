@@ -144,6 +144,8 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     else {
       try {
         PmOptionSet os = getOptionSetImpl();
+        // TODO: ensure that there is an option for the current value.
+
         md.cacheStrategyForOptions.setAndReturnCachedValue(this, os);
         return os;
       }
@@ -869,6 +871,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     }
     catch (RuntimeException e) {
       PmRuntimeException pme = PmRuntimeException.asPmRuntimeException(this, e);
+      PmMessageUtil.makeExceptionMsg(this, Severity.ERROR, pme);
       LOG.error("setValueAsString failed to set value '" + vc.getStringValue() + "'", pme);
       throw pme;
     }

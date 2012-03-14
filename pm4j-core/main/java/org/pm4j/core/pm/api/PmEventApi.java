@@ -33,6 +33,11 @@ public class PmEventApi {
     apiHandler.addWeakPmEventListener(pm, eventMask, listener);
   }
 
+  public static void addHierarchyListener(PmObject hierachyRootPm, int eventMask, PmEventListener listener) {
+    apiHandler.addWeakPmEventListener(hierachyRootPm, eventMask | PmEvent.IS_EVENT_PROPAGATION, listener);
+  }
+
+
   /**
    * Removes the listener reference.
    *

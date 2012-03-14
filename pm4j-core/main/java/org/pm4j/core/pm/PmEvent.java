@@ -28,6 +28,9 @@ public class PmEvent extends EventObject {
   public static final int SELECTION_CHANGE = 1 << 9;
   public static final int EXEC_COMMAND = 1 << 10;
 
+  /** Indicator for an event that gets propagated to the parent hierarchy. */
+  public static final int IS_EVENT_PROPAGATION = 1 << 15;
+
   public static final int ALL_CHANGE_EVENTS =
     VALUE_CHANGE | TITLE_CHANGE | TOOLTIP_CHANGE |
     VISIBILITY_CHANGE | ENABLEMENT_CHANGE |
@@ -59,6 +62,25 @@ public class PmEvent extends EventObject {
 
     this.changeKind = changeKind;
     this.pm = pm;
+  }
+
+  /**
+   * @return <code>true</code> if the event is derived from an original event
+   *         just for propagating it within the event hierarchy.<br>
+   *         <code>false</code> if the event is an active event related to the
+   *         linked {@link #pm}.
+   */
+  public boolean isPropagationEvent() {
+    return (changeKind & IS_EVENT_PROPAGATION) != 0;
+  }
+
+  /**
+   * @return <code>true</code> if the event is caused by an initialization. This
+   *         event kind is also generated if <code>setPmBean</code> was called
+   *         and all values of the related PM sub-tree are exchanged.
+   */
+  public boolean isInitializationEvent() {
+    return changeKind == ALL_CHANGE_EVENTS;
   }
 
   /**

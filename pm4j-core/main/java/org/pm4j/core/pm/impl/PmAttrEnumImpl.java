@@ -82,6 +82,7 @@ public class PmAttrEnumImpl<T_ENUM extends Enum<T_ENUM>> extends PmAttrBase<T_EN
 
   @Override
   protected PmOptionSetDef<?> makeOptionSetDef(PmOptionCfg cfg, Method getOptionValuesMethod) {
+    // TODO olaf: make a single OS definition for enums.
     return cfg == null
               ? new EnumOptionSetDef(enumClass, getOptionValuesMethod)
               : new EnumOptionSetDefWithOptionCfg(enumClass, cfg, getOptionValuesMethod);

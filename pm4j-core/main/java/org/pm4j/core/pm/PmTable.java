@@ -1,5 +1,6 @@
 package org.pm4j.core.pm;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.pm4j.core.pm.pageable.PmPager;
@@ -70,6 +71,19 @@ public interface PmTable<T_ROW_OBJ> extends PmObject, PmDataInput {
    * @return The row selection mode for this table.
    */
   RowSelectMode getRowSelectMode();
+
+  /**
+   * Supports {@link RowSelectMode#SINGLE}.
+   * For other select modes it just provides the first selected item.
+   *
+   * @return The selected row or <code>null</code> if none is selected.
+   */
+  T_ROW_OBJ getSelectedRow();
+
+  /**
+   * @return The set of all selected rows.
+   */
+  Collection<T_ROW_OBJ> getSelectedRows();
 
   /**
    * @return <code>true</code> if the table supports the selection of multiple rows.

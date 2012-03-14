@@ -301,4 +301,16 @@ public class DeprecatedPmTableOfPmElementsImpl<T_ROW_ELEMENT_PM extends PmElemen
     return Collections.emptyList();
   }
 
+  @Override
+  public T_ROW_ELEMENT_PM getSelectedRow() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public Collection<T_ROW_ELEMENT_PM> getSelectedRows() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
 }

@@ -1473,11 +1473,24 @@ class PmEventTable {
             (hasListeners ? "\n\teventListeners: " + pmEventListeners : ""));
 
       if (hasListeners) {
+        boolean isPropagationEvent = event.isPropagationEvent();
         // copy the listener list to prevent problems with listener
         // set changes within the notification processing loop.
         for (Map.Entry<PmEventListener, Integer> e : pmEventListeners.entrySet().toArray(new Map.Entry[pmEventListeners.size()])) {
-          if ((e.getValue().intValue() & event.changeKind) != 0)
-            e.getKey().handleEvent(event);
+          int listenerMask = e.getValue().intValue();
+          boolean isPropagationListener = ((listenerMask & PmEvent.IS_EVENT_PROPAGATION) != 0);
+          // Propagation events have to be passed only to listeners that observe that special flag.
+          // Standard events will be passed to listeners that don't have set this flag.
+          if (isPropagationEvent) {
+            if (isPropagationListener &&
+                (listenerMask & event.changeKind) != 0)
+              e.getKey().handleEvent(event);
+          }
+          else {
+            if ((! isPropagationListener) &&
+                (listenerMask & event.changeKind) != 0)
+              e.getKey().handleEvent(event);
+          }
         }
       }
     }

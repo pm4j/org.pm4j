@@ -17,6 +17,7 @@ import org.pm4j.core.pm.PmDataInput;
 import org.pm4j.core.pm.PmElement;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.api.PmCacheApi;
+import org.pm4j.core.pm.impl.PmObjectBase.PmInitState;
 import org.pm4j.core.pm.impl.commands.PmCommandSeparator;
 
 /**
@@ -276,11 +277,12 @@ public final class PmUtil {
    * @return A 'toString' like output.
    */
   public static String getPmLogString(PmObject pm) {
-    if (pm.getPmConversation() != null) {
-      return pm.getPmConversation().getPmDefaults().getLogStringBuilder().makeName((PmObjectBase)pm);
+    if (((PmObjectBase)pm).pmInitState == PmInitState.NOT_INITIALIZED) {
+      // Prevents initialization calls only because of some log statements.
+      return pm.getClass().getName();
     }
     else {
-      return getAbsoluteName(pm);
+      return pm.getPmConversation().getPmDefaults().getLogStringBuilder().makeName((PmObjectBase)pm);
     }
   }
 

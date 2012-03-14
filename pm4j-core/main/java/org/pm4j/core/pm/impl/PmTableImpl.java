@@ -1,7 +1,5 @@
 package org.pm4j.core.pm.impl;
 
-import static org.pm4j.core.pm.impl.PmObjectBase.PmInitState.INITIALIZED;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -56,11 +54,11 @@ public class PmTableImpl
   /** Container for the sort specification and the sorted items. */
   private SortOrderSelection sortOrderSelection;
 
-  /**
-   * Defines the row-selection behavior.
-   */
+  /** Defines the row-selection behavior. */
   private RowSelectMode rowSelectMode;
 
+  /** Handles the changed state of the table. */
+  private final ChangedChildStateRegistry changedStateRegistry = new ChangedChildStateRegistry(this);
 
 
   /** A pager that may be used to navigate through the table. */
@@ -127,21 +125,30 @@ public class PmTableImpl
     return getPageableCollection().getItemsOnPage();
   }
 
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   @Override
   public List<T_ROW_ELEMENT_PM> getRowsWithChanges() {
-    // TODO olaf: Add a changed row-set to get more efficient.
-    // FIXME olaf: provides only the items of the current page!
-    List<T_ROW_ELEMENT_PM> changedItems = new ArrayList<T_ROW_ELEMENT_PM>();
-    if (pageableCollection != null) {
-      List<T_ROW_ELEMENT_PM> allItems = pageableCollection.getItemsOnPage();
-      for (T_ROW_ELEMENT_PM row : allItems) {
-        if (! row.isPmReadonly() &&
-            row.isPmValueChanged()) {
-          changedItems.add(row);
-        }
-      }
-    }
-    return changedItems;
+    return new ArrayList<T_ROW_ELEMENT_PM>((Collection)changedStateRegistry.getChangedItems());
+  }
+
+  /**
+   * Gets called whenever a new (transient) row gets added to the table.
+   * Maintains the corresponding changed state for this table.
+   *
+   * @param newRowPm The new row.
+   */
+  protected void onAddNewRow(T_ROW_ELEMENT_PM newRowPm) {
+    changedStateRegistry.onAddNewItem(newRowPm);
+  }
+
+  /**
+   * Gets called whenever a row gets deleted from the table.
+   * Maintains the corresponding changed state for this table.
+   *
+   * @param newRowPm The new row.
+   */
+  protected void onDeleteRow(T_ROW_ELEMENT_PM deletedRow) {
+    changedStateRegistry.onDeleteItem(deletedRow);
   }
 
   @Override
@@ -187,6 +194,18 @@ public class PmTableImpl
     }
   }
 
+  @Override
+  public T_ROW_ELEMENT_PM getSelectedRow() {
+    Collection<T_ROW_ELEMENT_PM> items = getSelectedRows();
+    return (!items.isEmpty())
+            ? items.iterator().next()
+            : null;
+  }
+
+  @Override
+  public Collection<T_ROW_ELEMENT_PM> getSelectedRows() {
+    return getPageableCollection().getSelectedItems();
+  }
 
   // -- row sort order support --
 
@@ -312,6 +331,7 @@ public class PmTableImpl
           PmTableImpl.this.onPmSelectionChange(event);
         }
       });
+
   }
 
   private static PmObject zz_getPmRowCellForColumn(PmElement rowElement, PmTableCol column) {
@@ -329,24 +349,8 @@ public class PmTableImpl
 
   @Override
   public boolean isPmValueChanged() {
-    // FIXME olaf: a quick hack. Does not work for rows on the next page!
-    //             Debug and fix base class implementation!
-    boolean changed = super.isPmValueChanged();
-    if ((!changed) &&
-        (pmInitState == INITIALIZED)) {
-      for (T_ROW_ELEMENT_PM r : getPageableCollection().getItemsOnPage()) {
-        if (! (r instanceof PmElement)) {
-          return false; // can't evaluate this for tables containing simple beans.
-        }
-
-        if (((PmElement)r).isPmValueChanged()) {
-          return true;
-        }
-      }
-    }
-    return changed;
+    return changedStateRegistry.isAChangeRegistered();
   }
-
 
   /**
    * @return The container that handles the table data to display.
