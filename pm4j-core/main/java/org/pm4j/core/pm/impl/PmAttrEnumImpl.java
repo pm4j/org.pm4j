@@ -43,7 +43,7 @@ public class PmAttrEnumImpl<T_ENUM extends Enum<T_ENUM>> extends PmAttrBase<T_EN
   protected String getTitleForEnumValue(Enum<?> value) {
     return value != null
             ? PmLocalizeApi.localizeEnumValue(this, value)
-            : getOwnMetaDataWithoutPmInitCall().getOptionSetDef().getNullOptionTitle(this);
+            : getOwnMetaData().getOptionSetDef().getNullOptionTitle(this);
   }
 
   /**
@@ -93,6 +93,14 @@ public class PmAttrEnumImpl<T_ENUM extends Enum<T_ENUM>> extends PmAttrBase<T_EN
     return new MetaData();
   }
 
+  @Override
+  protected void initMetaData(org.pm4j.core.pm.impl.PmObjectBase.MetaData metaData) {
+    super.initMetaData(metaData);
+    MetaData myMetaData = (MetaData) metaData;
+
+    myMetaData.setConverter(new PmConverterEnum());
+  }
+
   protected static class MetaData extends PmAttrBase.MetaData {
     @Override
     protected int getMaxLenDefault() {
@@ -101,7 +109,7 @@ public class PmAttrEnumImpl<T_ENUM extends Enum<T_ENUM>> extends PmAttrBase<T_EN
     }
   }
 
-  private MetaData getOwnMetaDataWithoutPmInitCall() {
+  private MetaData getOwnMetaData() {
     return (MetaData) getPmMetaDataWithoutPmInitCall();
   }
 
