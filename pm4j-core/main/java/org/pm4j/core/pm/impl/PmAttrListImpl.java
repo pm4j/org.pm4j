@@ -17,27 +17,31 @@ import org.pm4j.core.pm.impl.converter.PmConverterLong;
 import org.pm4j.core.pm.impl.converter.PmConverterString;
 import org.pm4j.core.util.reflection.ClassUtil;
 
+/**
+ * Provides an implementation for PMs that can bind to {@link Collection} values.
+ *
+ * @author olaf boede
+ *
+ * @param <T>
+ */
 public class PmAttrListImpl<T> extends PmAttrBase<List<T>, Collection<T>> implements PmAttrList<T> {
 
+  /** Binds to a {@link Collection} of {@link Long}s. */
   @PmAttrListCfg(itemConverter=PmConverterLong.class)
-  public static class PmAttrListOfLongs extends PmAttrListImpl<Long> {
-    public PmAttrListOfLongs(PmElementBase pmParentBean) {
-      super(pmParentBean);
-    }
+  public static class Longs extends PmAttrListImpl<Long> {
+    public Longs(PmObject pmParent) { super(pmParent); }
   }
 
+  /** Binds to a {@link Collection} of {@link Integer}s. */
   @PmAttrListCfg(itemConverter=PmConverterInteger.class)
-  public static class PmAttrListOfIntegers extends PmAttrListImpl<Integer> {
-    public PmAttrListOfIntegers(PmElementBase pmParentBean) {
-      super(pmParentBean);
-    }
+  public static class Integers extends PmAttrListImpl<Integer> {
+    public Integers(PmObject pmParent) { super(pmParent); }
   }
 
+  /** Binds to a {@link Collection} of {@link String}s. */
   @PmAttrListCfg(itemConverter=PmConverterString.class)
-  public static class PmAttrListOfStrings extends PmAttrListImpl<String> {
-    public PmAttrListOfStrings(PmElementBase pmParentBean) {
-      super(pmParentBean);
-    }
+  public static class Strings extends PmAttrListImpl<String> {
+    public Strings(PmObject pmParent) { super(pmParent); }
   }
 
   public PmAttrListImpl(PmObject pmParent) {
@@ -123,6 +127,19 @@ public class PmAttrListImpl<T> extends PmAttrBase<List<T>, Collection<T>> implem
   @Override
   public NullOption getNullOptionDefault() {
     return NullOption.NO;
+  }
+
+  /**
+   * If there is no expression based default value defined, an empty list will be generated
+   * as default value.
+   */
+  @Override
+  protected List<T> getDefaultValueImpl() {
+    List<T> value = super.getDefaultValueImpl();
+    if (value == null) {
+      value = new ArrayList<T>();
+    }
+    return value;
   }
 
   // ======== meta data ======== //

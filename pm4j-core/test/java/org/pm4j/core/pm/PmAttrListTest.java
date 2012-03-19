@@ -1,18 +1,17 @@
 package org.pm4j.core.pm;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.Arrays;
 
-import junit.framework.TestCase;
-
-import org.pm4j.core.pm.PmAttrList;
-import org.pm4j.core.pm.annotation.PmAttrListCfg;
+import org.junit.Test;
 import org.pm4j.core.pm.impl.PmAttrListImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
-import org.pm4j.core.pm.impl.converter.PmConverterLong;
 
-public class PmAttrListTest extends TestCase {
+public class PmAttrListTest {
 
-  public void testGetAndSetValue() {
+  @Test
+  public void testGetAndSetValueForAListOfLongs() {
     MyTestElement e = new MyTestElement();
 
     e.listOfLongs.setValueAsString("1,2,3");
@@ -25,9 +24,10 @@ public class PmAttrListTest extends TestCase {
     assertEquals("second 2-item subset", Arrays.asList(3L), e.listOfLongs.getValueSubset(2, 2));
   }
 
+
+  enum MyEnum { V1, V2, V3 };
   public static class MyTestElement extends PmConversationImpl {
-    @PmAttrListCfg(itemConverter=PmConverterLong.class)
-    public final PmAttrList<Long> listOfLongs = new PmAttrListImpl<Long>(this);
+    public final PmAttrList<Long> listOfLongs = new PmAttrListImpl.Longs(this);
   }
 
 }

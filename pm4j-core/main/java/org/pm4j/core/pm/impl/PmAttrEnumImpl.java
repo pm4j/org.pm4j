@@ -115,7 +115,7 @@ public class PmAttrEnumImpl<T_ENUM extends Enum<T_ENUM>> extends PmAttrBase<T_EN
 
   // ======== converter ======== //
 
-  protected static class PmConverterEnum  implements PmAttr.Converter<Enum<?>> {
+  public static class PmConverterEnum  implements PmAttr.Converter<Enum<?>> {
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
