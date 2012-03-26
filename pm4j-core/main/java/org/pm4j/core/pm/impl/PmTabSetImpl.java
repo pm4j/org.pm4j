@@ -206,9 +206,7 @@ public class PmTabSetImpl extends PmElementImpl implements PmTabSet {
     private final PmElement toTab;
 
     public PmTabChangeCommand(PmTabSetImpl tabSet, PmElement fromTab, PmElement toTab) {
-      super((fromTab != null)
-          ? fromTab
-          : tabSet);
+      super(toTab);
 
       this.tabSet = tabSet;
       this.fromTab = fromTab;
