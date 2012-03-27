@@ -93,7 +93,9 @@ public class PmJsfUtil {
    * @return The found property. May be <code>null</code> if the property is not defined.
    */
   public static Object getProperty(PmObject pm, String propName) {
-    return pm.getPmProperty(propName);
+    return pm != null
+            ? pm.getPmProperty(propName)
+            : null;
   }
 
   /**
