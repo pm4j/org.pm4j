@@ -49,6 +49,8 @@ public class PageableListImpl<T_ITEM> implements PageableCollection<T_ITEM> {
    */
   public PageableListImpl(int pageSize, boolean multiSelect) {
     this(new ArrayList<T_ITEM>());
+    this.pageSize = pageSize;
+    this.multiSelect = multiSelect;
   }
 
 

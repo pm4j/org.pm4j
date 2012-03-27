@@ -9,6 +9,7 @@ import java.util.List;
 import org.pm4j.common.util.InvertingComparator;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmAttrEnum;
+import org.pm4j.core.pm.PmDataInput;
 import org.pm4j.core.pm.PmElement;
 import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmEventListener;
@@ -353,12 +354,31 @@ public class PmTableImpl
   }
 
   /**
+   * Validates the changed row items only.
+   */
+  @Override
+  public void pmValidate() {
+    for (PmObject itemPm : changedStateRegistry.getChangedItems()) {
+      if (itemPm instanceof PmDataInput) {
+        ((PmDataInput)itemPm).pmValidate();
+      }
+    }
+  }
+
+
+  /**
    * @return The container that handles the table data to display.
    */
   public PageableCollection<T_ROW_ELEMENT_PM> getPageableCollection() {
     zz_ensurePmInitialization();
     if (pageableCollection == null) {
       pageableCollection = getPageableCollectionImpl();
+      // XXX olaf: Risk of side effects to other users referencing the given collection.
+      //           Find a better solution...
+      //           Generates potentially an initialization problem if called in constructor
+      pageableCollection.setMultiSelect(getRowSelectMode() == RowSelectMode.MULTI);
+      pageableCollection.setPageSize(getNumOfPageRows());
+      pager.setPmBean(pageableCollection);
     }
     return pageableCollection;
   }
@@ -411,6 +431,7 @@ public class PmTableImpl
       pageableCollection.setBackingItemFilter(filter);
     }
 
+    pager.setPmBean(pageableCollection);
   }
 
 
