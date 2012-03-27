@@ -29,6 +29,9 @@ public class PmTabSetImpl extends PmElementImpl implements PmTabSet {
   /** The set of tab switch command decorator definitions. */
   private List<CmdDecoratorDefintion> pmCmdDecoratorDefinitions = new ArrayList<CmdDecoratorDefintion>();
 
+  /** PM of the currently active tab. */
+  private PmElement currentTabPm;
+
   /**
    * Default constructor (for some dependency injection scenarios).<br>
    * {@link #setPmParent(PmObject)} needs to be called before the instance can be used.
@@ -61,23 +64,32 @@ public class PmTabSetImpl extends PmElementImpl implements PmTabSet {
   }
 
   @Override
+  public boolean switchToTabPm(PmElement toTab) {
+    return switchToTabPm(getCurrentTabPm(), toTab);
+  }
+
+  @Override
   public boolean switchToTabPm(PmElement fromTab, PmElement toTab) {
+    PmElement _fromTab = fromTab != null ? fromTab : getCurrentTabPm();
+
     // ensure that the to-tab is initialized (was an issue in domain specific unit tests):
     toTab.getPmTooltip();
 
     // Delegate to an undoable command.
-    PmTabChangeCommand tabChangeCommand = new PmTabChangeCommand(this, fromTab, toTab);
+    PmTabChangeCommand tabChangeCommand = new PmTabChangeCommand(this, _fromTab, toTab);
     for (CmdDecoratorDefintion d : pmCmdDecoratorDefinitions) {
-      if (d.isDecoratorForSwitch(fromTab, toTab)) {
+      if (d.isDecoratorForSwitch(_fromTab, toTab)) {
         tabChangeCommand.addCommandDecorator(d.getDecorator());
       }
     }
 
     PmTabChangeCommand executedCommand = (PmTabChangeCommand) tabChangeCommand.doIt();
 
-    if (executedCommand.getCommandState() != CommandState.EXECUTED &&
-        LOG.isDebugEnabled()) {
-      String msg = "The UI logic prevented a switch from tab " + PmUtil.getPmLogString(fromTab) + " to " +
+    if (executedCommand.getCommandState() == CommandState.EXECUTED) {
+      currentTabPm = toTab;
+    }
+    else if (LOG.isDebugEnabled()) {
+      String msg = "The UI logic prevented a switch from tab " + PmUtil.getPmLogString(_fromTab) + " to " +
           PmUtil.getPmLogString(toTab) + ".";
 
       if (executedCommand.getVetoCommandDecorator() != null) {
@@ -100,6 +112,47 @@ public class PmTabSetImpl extends PmElementImpl implements PmTabSet {
    */
   protected boolean switchToTabPmImpl(PmElement fromTab, PmElement toTab) {
     return true;
+  }
+
+  /**
+   * @return The currently active tab.
+   */
+  @Override
+  public PmElement getCurrentTabPm() {
+    return (currentTabPm != null)
+            ? currentTabPm
+            : getFirstTabPm();
+  }
+
+  /**
+   * The default implementation just provides the set of all sub-elements.
+   * <p>
+   * Please override the implementation if that default behavior does not match.
+   *
+   * @return The set of tabs.
+   */
+  @Override
+  public List<PmElement> getTabPms() {
+    return zz_getPmElements();
+  }
+
+  /**
+   * Provides the first tab within the tab set.
+   * <p>
+   * The default implementation just provides the first sub-element.<br>
+   * It should be overridden if the first tab is not the first sub-element.
+   *
+   * @return The first tab of the tab set.
+   */
+  protected PmElement getFirstTabPm() {
+    List<PmElement> subElements = getTabPms();
+    if (subElements.size() > 0) {
+      return subElements.get(0);
+    }
+    else {
+      LOG.warn("Tabset '" + getPmRelativeName() + "' has no sub tab PMs.");
+      return null;
+    }
   }
 
   /**

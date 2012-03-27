@@ -1,5 +1,7 @@
 package org.pm4j.core.pm;
 
+import java.util.List;
+
 import org.pm4j.core.pm.impl.PmTabSetImpl;
 
 
@@ -43,5 +45,18 @@ public interface PmTabSet extends PmElement {
    *         <code>false</code> if the PM logic implementation prevents the tab switch.
    */
   boolean switchToTabPm(PmElement fromTab, PmElement toTab);
+
+  boolean switchToTabPm(PmElement toTab);
+
+  /**
+   * @return The currently active tab.
+   */
+  PmElement getCurrentTabPm();
+
+  /**
+   * @return The set of tabs.
+   */
+  List<PmElement> getTabPms();
+
 
 }
