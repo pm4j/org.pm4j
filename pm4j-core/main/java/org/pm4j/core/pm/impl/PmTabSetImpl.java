@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmCommand.CommandState;
 import org.pm4j.core.pm.PmCommandDecorator;
 import org.pm4j.core.pm.PmElement;
@@ -13,6 +14,7 @@ import org.pm4j.core.pm.PmTabSet;
 import org.pm4j.core.pm.annotation.PmCommandCfg;
 import org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO;
 import org.pm4j.core.pm.impl.connector.PmTabSetConnector;
+import org.pm4j.navi.NaviLink;
 
 /**
  * Basic implementation of a {@link PmTabSet}.
@@ -110,10 +112,11 @@ public class PmTabSetImpl extends PmElementImpl implements PmTabSet {
    * <p>
    * Internally this method gets called by the {@link PmTabChangeCommand}.
    */
+  // TODO: clarification: call in PmCommand#before okay?
   protected boolean switchToTabPmImpl(PmElement fromTab, PmElement toTab) {
     return true;
   }
-
+  
   /**
    * @return The currently active tab.
    */
@@ -235,7 +238,39 @@ public class PmTabSetImpl extends PmElementImpl implements PmTabSet {
       // Only successfully executed tab switches need to be undone.
       setUndoCommand(new PmTabChangeCommand(tabSet, toTab, fromTab));
     }
-
+   
   }
+  
+  /**
+   * Provides a possibility to react on tab changes together with the information about the source and target tab.
+   * 
+   * @author MMANZ
+   */
+  public static class PmTabSetCommandDecoratorAdapter implements PmCommandDecorator {
+
+    @Override
+    public final boolean beforeDo(PmCommand cmd) {
+      PmTabChangeCommand tabChangeCommand = (PmTabChangeCommand) cmd;
+      return beforeTabChange(tabChangeCommand.fromTab, tabChangeCommand.toTab);
+    }
+
+    /* (non-Javadoc)
+     * @see org.pm4j.core.pm.PmCommandDecorator#afterDo(org.pm4j.core.pm.PmCommand)
+     */
+    @Override
+    public final void afterDo(PmCommand cmd) {
+      PmTabChangeCommand tabChangeCommand = (PmTabChangeCommand) cmd;
+      afterTabChange(tabChangeCommand.fromTab, tabChangeCommand.toTab);
+    }
+
+    protected void afterTabChange(PmElement fromTab, PmElement toTab) {
+      // do nothing
+    }
+
+    protected boolean beforeTabChange(PmElement fromTab, PmElement toTab) {
+      return true;
+    }
+  }
+
 
 }
