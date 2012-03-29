@@ -3,6 +3,7 @@ package org.pm4j.core.pm.pageable;
 import org.pm4j.core.pm.PmAttrInteger;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmLabel;
+import org.pm4j.core.pm.pageable.PmPagerImpl.PagerVisibility;
 
 /**
  * PM for a control that allows to switch between pages.
@@ -82,5 +83,10 @@ public interface PmPager {
    * @return A command that allows to de-select all items.
    */
   PmCommand getCmdDeSelectAll();
+
+  /**
+   * @return The pager visibility rule.
+   */
+  PagerVisibility getPagerVisibility();
 
 }

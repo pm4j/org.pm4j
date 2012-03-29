@@ -42,7 +42,9 @@ public class PmPagerImpl<T_ITEM>
     /** The pager will be displayed only if there is at least a second page to navigate to. */
     WHEN_SECOND_PAGE_EXISTS,
     /** The pager will be displayed only if the table has at least a single row. */
-    WHEN_TABLE_IS_NOT_EMPTY
+    WHEN_TABLE_IS_NOT_EMPTY,
+    /** The pager will not be displayed. */
+    NEVER
   }
 
   // TODO olaf: move to meta data or use the related pageable collection.
@@ -70,6 +72,7 @@ public class PmPagerImpl<T_ITEM>
       case ALWAYS: return true;
       case WHEN_SECOND_PAGE_EXISTS: return getPmBean().getNumOfItems() > getPageSize();
       case WHEN_TABLE_IS_NOT_EMPTY: return getPmBean().getNumOfItems() > 0;
+      case NEVER: return false;
       default: throw new PmRuntimeException(this, "Unknown enum value: " + pagerVisibility);
     }
   }
@@ -304,11 +307,8 @@ public class PmPagerImpl<T_ITEM>
   public PmCommand getCmdSelectAll() { return cmdSelectAll; }
   @Override
   public PmCommand getCmdDeSelectAll() { return cmdDeSelectAll; }
-
-  /**
-   * @param pagerVisibility The pager visibility rule to use.
-   */
-  public void setPagerVisibility(PagerVisibility pagerVisibility) {
-    this.pagerVisibility = pagerVisibility;
-  }
+  @Override
+  public PagerVisibility getPagerVisibility() { return pagerVisibility; }
+  /** @param pagerVisibility The pager visibility rule to use. */
+  public void setPagerVisibility(PagerVisibility pagerVisibility) { this.pagerVisibility = pagerVisibility; }
 }

@@ -20,12 +20,14 @@ import org.pm4j.core.pm.PmTableCol;
 import org.pm4j.core.pm.PmTableGenericRow;
 import org.pm4j.core.pm.PmTableRow;
 import org.pm4j.core.pm.PmVisitor;
+import org.pm4j.core.pm.annotation.PmTableCfg;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.pageable.PageableCollection;
 import org.pm4j.core.pm.pageable.PageableCollection.Filter;
 import org.pm4j.core.pm.pageable.PageableListImpl;
 import org.pm4j.core.pm.pageable.PmPager;
 import org.pm4j.core.pm.pageable.PmPagerImpl;
+import org.pm4j.core.pm.pageable.PmPagerImpl.PagerVisibility;
 
 /**
  * A table that presents the content of a set of {@link PmElement}s.
@@ -58,9 +60,13 @@ public class PmTableImpl
   /** Defines the row-selection behavior. */
   private RowSelectMode rowSelectMode;
 
+  /**
+   * The number of rows per page. If it is <code>null</code> the statically defined number of rows will be used.
+   */
+  private Integer numOfPageRows;
+
   /** Handles the changed state of the table. */
   private final ChangedChildStateRegistry changedStateRegistry = new ChangedChildStateRegistry(this);
-
 
   /** A pager that may be used to navigate through the table. */
   public final PmPagerImpl<T_ROW_ELEMENT_PM> pager = new PmPagerImpl<T_ROW_ELEMENT_PM>(this) {
@@ -173,7 +179,19 @@ public class PmTableImpl
 
   @Override
   public int getNumOfPageRows() {
-    return getOwnMetaDataWithoutPmInitCall().numOfPageRows;
+    return (numOfPageRows != null)
+        ? numOfPageRows
+        : getOwnMetaDataWithoutPmInitCall().numOfPageRows;
+  }
+
+  /**
+   * @param numOfPageRows
+   *          The number of rows per page. <br>
+   *          If it is <code>null</code> the statically defined number of rows
+   *          will be used.
+   */
+  public void setNumOfPageRows(Integer numOfPageRows) {
+    this.numOfPageRows = numOfPageRows;
   }
 
   // XXX olaf: should disappear. getRowSelectMode should be enough.
@@ -358,7 +376,7 @@ public class PmTableImpl
    */
   @Override
   public void pmValidate() {
-    for (PmObject itemPm : changedStateRegistry.getChangedItems()) {
+    for (PmObject itemPm : new ArrayList<PmObject>(changedStateRegistry.getChangedItems())) {
       if (itemPm instanceof PmDataInput) {
         ((PmDataInput)itemPm).pmValidate();
       }
