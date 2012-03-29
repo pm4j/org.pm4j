@@ -196,12 +196,26 @@ public class PageableListImpl<T_ITEM> implements PageableCollection<T_ITEM> {
       return unfilteredList;
     }
 
+    // remember selected item and clear selection if not multiSelect
+    T_ITEM selectedItem = null;
+    if(!multiSelect) {
+      if(!selectedItems.isEmpty()) {
+        selectedItem = selectedItems.iterator().next();
+        selectedItems.clear();
+      }
+    }
     List<T_ITEM> filteredList = new ArrayList<T_ITEM>();
     int listSize = unfilteredList.size();
     for (int i=0; i<listSize; ++i) {
       T_ITEM item = unfilteredList.get(i);
       if (currentFilter.doesItemMatch(item)) {
         filteredList.add(item);
+        // re-select item if not multiSelect and item is within filtered items
+        if(!multiSelect) {
+          if(item == selectedItem) {
+            select(selectedItem);
+          }
+        }
       }
     }
     return filteredList;
