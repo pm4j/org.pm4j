@@ -48,13 +48,6 @@ public interface PmPager {
   PmAttrInteger getCurrentPageIdx();
 
   /**
-   * Adjusts the page size.
-   *
-   * @param The new page size. Should be greater than zero.
-   */
-  void setPageSize(int pageSize);
-
-  /**
    * @return The maximal number of items on a single page.
    */
   int getPageSize();

@@ -47,9 +47,6 @@ public class PmPagerImpl<T_ITEM>
     NEVER
   }
 
-  // TODO olaf: move to meta data or use the related pageable collection.
-  private int pageSize = 10; // local member, should be initialized by meta data
-
   /** The pager visibility condition. */
   private PagerVisibility pagerVisibility = PagerVisibility.ALWAYS;
 
@@ -205,19 +202,7 @@ public class PmPagerImpl<T_ITEM>
 
   @Override
   public int getPageSize() {
-    return pageSize;
-  }
-
-  @Override
-  public void setPageSize(int pageSize) {
-    boolean changed = (this.pageSize != pageSize);
-
-    getPmBean().setPageSize(pageSize);
-    this.pageSize = pageSize;
-
-    // TODO olaf: add change notification.
-//    if (changed &&
-//        pm)
+    return getPmBean().getPageSize();
   }
 
   @Override

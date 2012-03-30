@@ -8,7 +8,7 @@ import org.pm4j.core.pm.pageable.PmPagerImpl.PagerVisibility;
  *
  * @author olaf boede
  */
-public class PmTableUtil {
+public final class PmTableUtil {
 
     /**
      * Defines the properties of the given table as needed for scrollable (not pageable) tables.
@@ -16,7 +16,7 @@ public class PmTableUtil {
      * @param table
      *            The table to adjust.
      */
-    public void setScrollableTableProperties(PmTableImpl<?> table) {
+    public static void setScrollableTableProperties(PmTableImpl<?> table) {
         table.setNumOfPageRows(Integer.MAX_VALUE);
         table.pager.setPagerVisibility(PagerVisibility.WHEN_SECOND_PAGE_EXISTS);
     }

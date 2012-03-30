@@ -20,14 +20,12 @@ import org.pm4j.core.pm.PmTableCol;
 import org.pm4j.core.pm.PmTableGenericRow;
 import org.pm4j.core.pm.PmTableRow;
 import org.pm4j.core.pm.PmVisitor;
-import org.pm4j.core.pm.annotation.PmTableCfg;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.pageable.PageableCollection;
 import org.pm4j.core.pm.pageable.PageableCollection.Filter;
 import org.pm4j.core.pm.pageable.PageableListImpl;
 import org.pm4j.core.pm.pageable.PmPager;
 import org.pm4j.core.pm.pageable.PmPagerImpl;
-import org.pm4j.core.pm.pageable.PmPagerImpl.PagerVisibility;
 
 /**
  * A table that presents the content of a set of {@link PmElement}s.
@@ -192,6 +190,9 @@ public class PmTableImpl
    */
   public void setNumOfPageRows(Integer numOfPageRows) {
     this.numOfPageRows = numOfPageRows;
+    if (pageableCollection != null) {
+      pageableCollection.setPageSize(numOfPageRows);
+    }
   }
 
   // XXX olaf: should disappear. getRowSelectMode should be enough.
