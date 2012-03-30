@@ -32,6 +32,7 @@ public class PmConstants {
   public static final String SUCCESS_MSG_KEY_POSTFIX = "_successInfo";
 
   public static final String MSGKEY_VALIDATION_CONVERSION_FROM_STRING_FAILED = "pmAttr_validationConversionFromStringFailed";
+  public static final String MSGKEY_VALIDATION_NUMBER_CONVERSION_FROM_STRING_FAILED = "pmAttr_validationNumberConversionFromStringFailed";
   public static final String MSGKEY_VALIDATION_FORMAT_FAILURE                = "pmAttr_validationFormatFailure";
   public static final String MSGKEY_VALIDATION_MISSING_REQUIRED_VALUE        = "pmAttr_validationMissingRequiredValue";
   public static final String MSGKEY_VALIDATION_MISSING_REQUIRED_SELECTION    = "pmAttr_validationMissingRequiredSelection";

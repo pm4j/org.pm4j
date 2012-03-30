@@ -3,8 +3,7 @@ package org.pm4j.core.pm.impl.converter;
 import java.text.NumberFormat;
 import java.text.ParseException;
 
-import org.pm4j.core.exception.PmResourceData;
-import org.pm4j.core.exception.PmRuntimeException;
+import org.pm4j.core.exception.PmResourceRuntimeException;
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmConstants;
 
@@ -24,14 +23,12 @@ public class PmConverterDouble extends PmConverterNumber<Double> {
     } catch (ParseException e) {
       String formatString = pmAttr.getFormatString();
       if (formatString != null) {
-        throw new PmRuntimeException(pmAttr,
-            new PmResourceData(pmAttr, PmConstants.MSGKEY_VALIDATION_FORMAT_FAILURE,
-                               pmAttr.getPmShortTitle(), formatString, s));
+        throw new PmResourceRuntimeException(pmAttr, PmConstants.MSGKEY_VALIDATION_FORMAT_FAILURE,
+                               pmAttr.getPmShortTitle(), formatString, s);
       }
       else {
-        throw new PmRuntimeException(pmAttr,
-            new PmResourceData(pmAttr, PmConstants.MSGKEY_VALIDATION_CONVERSION_FROM_STRING_FAILED,
-                               pmAttr.getPmShortTitle(), s));
+        throw new PmResourceRuntimeException(pmAttr, PmConstants.MSGKEY_VALIDATION_CONVERSION_FROM_STRING_FAILED,
+                               pmAttr.getPmShortTitle(), s);
       }
     }
   }

@@ -9,7 +9,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.FastDateFormat;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.pm4j.core.exception.PmResourceData;
+import org.pm4j.core.exception.PmResourceRuntimeException;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmConstants;
@@ -55,9 +55,8 @@ public class PmConverterDate extends PmConverterSerializeableBase<Date> {
     }
 
     // no format match
-    throw new PmRuntimeException(pmAttr,
-        new PmResourceData(pmAttr, PmConstants.MSGKEY_VALIDATION_FORMAT_FAILURE,
-                           pmAttr.getPmShortTitle(), getOutputFormat(pmAttr), s));
+    throw new PmResourceRuntimeException(pmAttr, PmConstants.MSGKEY_VALIDATION_FORMAT_FAILURE,
+                           pmAttr.getPmShortTitle(), getOutputFormat(pmAttr), s);
   }
 
   @Override

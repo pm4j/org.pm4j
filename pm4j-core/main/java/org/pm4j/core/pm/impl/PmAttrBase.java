@@ -820,7 +820,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
         // To prevent such effects, this code checks if the formatted string output is still the same...
         //
         // TODO: What about changing a
-        if (! StringUtils.equals(getValueAsString(), vc.getStringValue())) {
+        if (! StringUtils.equalsIgnoreCase(getValueAsString(), vc.getStringValue())) {
           throw new PmRuntimeException(this, "Illegal attempt to set a new value to a read only attribute.");
         }
         return true;

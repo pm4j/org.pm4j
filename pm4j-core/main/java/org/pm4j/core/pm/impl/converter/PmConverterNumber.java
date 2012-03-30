@@ -7,8 +7,10 @@ import java.text.NumberFormat;
 import java.util.Locale;
 
 import org.apache.commons.lang.StringUtils;
+import org.pm4j.core.exception.PmResourceRuntimeException;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmAttr;
+import org.pm4j.core.pm.PmConstants;
 
 /**
  * Base class for number type converters.
@@ -34,7 +36,7 @@ public class PmConverterNumber<T extends Number> extends PmConverterSerializeabl
     try {
       return numberCtor.newInstance(s.trim());
     } catch (Exception e) {
-      throw new PmRuntimeException(pmAttr, "Unable to convert string '" + s + "'.", e);
+      throw new PmResourceRuntimeException(pmAttr, PmConstants.MSGKEY_VALIDATION_NUMBER_CONVERSION_FROM_STRING_FAILED, s);
     }
   }
 
