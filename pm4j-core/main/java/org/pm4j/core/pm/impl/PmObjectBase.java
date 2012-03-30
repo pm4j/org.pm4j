@@ -165,6 +165,12 @@ public abstract class PmObjectBase implements PmObject {
         ? StringUtils.join(lines, "\n")
         : null;
     }
+
+    if (getPmConversation().getPmDefaults().debugHints) {
+      toolTip = toolTip != null ? toolTip + "/n" : "";
+      toolTip += PmUtil.getPmLogString(this);
+    }
+
     return toolTip;
   }
 

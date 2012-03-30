@@ -75,6 +75,8 @@ public class PmDefaults {
    */
   public boolean addErrorMessagesToTooltip = true;
 
+  public boolean debugHints = false;
+
   // TODO olaf: add something to the command that allows to configure that. - An application default may also be useful...
 //  /**
 //   * Defines if the application supports commands that can be undone.
