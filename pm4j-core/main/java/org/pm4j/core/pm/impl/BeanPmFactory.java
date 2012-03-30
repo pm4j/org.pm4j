@@ -41,6 +41,10 @@ class BeanPmFactory {
    */
   public BeanPmFactory(Class<?>... beanPmClasses) {
     for (Class<?> beanPmClass : beanPmClasses) {
+      if (! PmBean.class.isAssignableFrom(beanPmClass)) {
+        throw new PmRuntimeException("Only PmBean classes can be used for PmFactory configurations. Found class: " +
+            beanPmClass);
+      }
 
       PmBeanCfg annotation = AnnotationUtil.findAnnotationInClassTree(beanPmClass, PmBeanCfg.class);
       if (annotation == null) {

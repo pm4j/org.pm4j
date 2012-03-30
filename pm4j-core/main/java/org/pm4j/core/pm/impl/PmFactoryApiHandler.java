@@ -42,7 +42,7 @@ public class PmFactoryApiHandler {
           factory.canMakePmFor(bean)) {
         pm = factory.<T_PM>makePm(pmCtxt, bean);
       }
-      else {
+      else if (supportFactoryHierarchy) {
         PmObject pmParent = pmCtxt.getPmParent();
         if (pmParent != null) {
           pm = this.<T, T_PM>getPmForBean(pmParent, bean);
@@ -64,6 +64,7 @@ public class PmFactoryApiHandler {
     }
   }
 
+  private boolean supportFactoryHierarchy = true;
 
   /**
    * Searches an existing presentation model for the given bean.
@@ -87,8 +88,9 @@ public class PmFactoryApiHandler {
 
       // check in hierarchy only if the own factory (and cache) does not
       // manage objects of the given type.
-      if (factory == null ||
-          ! factory.canMakePmFor(bean)) {
+      if (supportFactoryHierarchy &&
+          (factory == null ||
+           ! factory.canMakePmFor(bean))) {
         PmObject pmParent = pmCtxtImpl.getPmParent();
         if (pmParent != null) {
           pmBean = this.<T>findPmForBean(pmParent, bean);

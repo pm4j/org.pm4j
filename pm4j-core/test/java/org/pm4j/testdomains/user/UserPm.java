@@ -8,9 +8,11 @@ import org.pm4j.core.pm.PmAttrPmRef;
 import org.pm4j.core.pm.PmAttrString;
 import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmCommand;
+import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.annotation.PmBeanCfg;
 import org.pm4j.core.pm.annotation.PmCommandCfg;
+import org.pm4j.core.pm.annotation.PmFactoryCfg;
 import org.pm4j.core.pm.annotation.PmOptionCfg;
 import org.pm4j.core.pm.annotation.PmOptionCfg.NullOption;
 import org.pm4j.core.pm.annotation.PmTitleCfg;
@@ -58,6 +60,7 @@ public class UserPm extends PmBeanBase<User> implements PmBean<User> {
    * All users of the domain will be presentend as option values.
    */
   @PmOptionCfg(values="pmBean.domain.users", id="name", title="name", nullOption=NullOption.NO)
+  @PmFactoryCfg(beanPmClasses=UserPm.class)
   public final PmAttrPmRef<UserPm> associate = new PmAttrPmRefImpl<UserPm, User>(this);
 
   public final PmAttrList<String> languages = new PmAttrListImpl<String>(this);
@@ -77,5 +80,9 @@ public class UserPm extends PmBeanBase<User> implements PmBean<User> {
       resetPmValues();
     }
   };
+
+  public UserPm(PmObject parentPm, User user) {
+    super(parentPm, user);
+  }
 
 }

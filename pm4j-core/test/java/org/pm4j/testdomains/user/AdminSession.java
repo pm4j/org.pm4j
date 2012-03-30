@@ -19,6 +19,7 @@ public class AdminSession extends PmConversationImpl {
 
   // -------- Session attributes -------- //
 
+  @PmFactoryCfg(beanPmClasses={DomainPm.class, UserPm.class})
   @PmOptionCfg(values="getDomainService().domains", id="id", title="name", nullOption=NullOption.NO)
   public final PmAttrPmRef<DomainPm> selectedDomain = new PmAttrPmRefImpl<DomainPm, Domain>(this) {
   };
@@ -29,6 +30,7 @@ public class AdminSession extends PmConversationImpl {
    * Constructor initializes the service as session variable:
    */
   public AdminSession(PmConversation parentSession) {
+    // XXX olaf: the classes
     super(parentSession);
     // fix Locale to ensure that title tests may run successfully on different machines.
     setPmLocale(Locale.GERMAN);

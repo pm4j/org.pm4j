@@ -7,6 +7,7 @@ import junit.framework.TestCase;
 
 import org.pm4j.common.util.collection.MapUtil;
 import org.pm4j.core.pm.annotation.PmBeanCfg;
+import org.pm4j.core.pm.annotation.PmFactoryCfg;
 import org.pm4j.core.pm.annotation.PmInject;
 import org.pm4j.core.pm.annotation.PmOptionCfg;
 import org.pm4j.core.pm.annotation.PmOptionCfg.NullOption;
@@ -66,6 +67,7 @@ public class PmAttrPmRefTest extends TestCase {
   @PmBeanCfg(beanClass=A.class)
   public static class APm extends PmBeanBase<A> {
 
+    @PmFactoryCfg(beanPmClasses=BPm.class)
     public final PmAttrPmRef<BPm> refToB = new PmAttrPmRefImpl<BPm, B>(this) {
       @Override
       @PmOptionCfg(id="i", title="s", nullOption=NullOption.NO)
@@ -80,7 +82,7 @@ public class PmAttrPmRefTest extends TestCase {
   // -- Tests --
 
   public void testRef() {
-    PmConversation session = new PmConversationImpl(APm.class, BPm.class);
+    PmConversation session = new PmConversationImpl(APm.class);
     session.setPmNamedObject("myServiceLayer", new MyServiceLayer());
 
     A a = new A();
