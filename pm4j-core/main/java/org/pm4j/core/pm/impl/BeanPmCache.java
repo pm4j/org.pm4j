@@ -13,7 +13,7 @@ import org.pm4j.core.pm.PmBean;
 class BeanPmCache {
 
   @SuppressWarnings("unused")
-  private static final Log LOG = LogFactory.getLog(PmConversationImpl.class);
+  private static final Log LOG = LogFactory.getLog(BeanPmCache.class);
 
   private Map<BeanIdentity, WeakReference<PmBean<?>>> beanIdentityToPmMap = new WeakHashMap<BeanIdentity, WeakReference<PmBean<?>>>();
 

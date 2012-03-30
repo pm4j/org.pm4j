@@ -453,7 +453,7 @@ public class PmConversationImpl extends PmElementBase implements PmConversation 
 
   public Object setPmNamedObject(Object key, Object value) {
     if (LOG.isDebugEnabled()) {
-      LOG.debug("Setting pmProperty '" + key + "' to '" + value + "'. PmConversation context: " + PmUtil.getPmLogString(this));
+      LOG.debug("setPmNamedObject '" + key + "' to '" + value + "'. PmConversation context: " + PmUtil.getPmLogString(this));
     }
 
     if (value == null) {
