@@ -116,6 +116,7 @@ public class ChangedChildStateRegistry {
 
   public void clearChangedItems() {
     changedItemPms.clear();
+    recordsDeleted = false;
   }
 
   public void onAddNewItem(PmObject newItemPm) {

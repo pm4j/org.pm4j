@@ -1,13 +1,17 @@
 package org.pm4j.core.pm.impl;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.pm4j.core.exception.PmRuntimeException;
+import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmEventListener;
 import org.pm4j.core.pm.PmObject;
+import org.pm4j.core.pm.PmTable;
 import org.pm4j.core.pm.annotation.PmBeanCfg;
 import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.api.PmEventApi;
@@ -121,7 +125,7 @@ public abstract class PmBeanBase<T_BEAN>
    * @param bean The new bean behind this PM.
    */
   public void setPmBean(T_BEAN bean) {
-    Object eventSource = PmEventApi.ensureThreadEventSource(this);
+    PmEventApi.ensureThreadEventSource(this);
 
     if (bean != pmBean) {
       pmBean = null;
@@ -129,7 +133,6 @@ public abstract class PmBeanBase<T_BEAN>
       // Old cache values are related to the old bean.
       PmMessageUtil.clearPmMessages(this);
       PmCacheApi.clearCachedPmValues(this);
-      new PmVisitorSetToUnchanged().visit(this);
 
       if (bean != null) {
         checkBeanClass(bean);
@@ -147,11 +150,50 @@ public abstract class PmBeanBase<T_BEAN>
       // This is not done if the bean gets set within the initialization phase.
       // Otherwise we get the risk if initialization race conditions.
       if (pmInitState == PmInitState.INITIALIZED) {
-        new PmVisitorFireEvent(new PmEvent(eventSource, this, PmEvent.ALL_CHANGE_EVENTS))
-              .visit(this);
+        new SetPmBeanEventVisitor().visit(this);
       }
     }
   }
+
+  public class SetPmBeanEventVisitor extends PmVisitorAdapter {
+    @Override
+    protected void onVisit(PmObject pm) {
+      PmEventApi.firePmEvent(pm, PmEvent.ALL_CHANGE_EVENTS);
+      for (PmObject child : PmUtil.getPmChildren(pm)) {
+        // Switch for each child to an event that is related to the child.
+        // Registered listeners for the child will expect that the event contains a
+        // reference to the PM it was registered for.
+        // TODO olaf: add a event cause to PmEvent.
+        SetPmBeanEventVisitor childVisitor = new SetPmBeanEventVisitor();
+        child.accept(childVisitor);
+      }
+    }
+
+    @Override
+    public void visit(@SuppressWarnings("rawtypes") PmTable table) {
+      @SuppressWarnings("unchecked")
+      List<Object> changedRows = new ArrayList<Object>(table.getRowsWithChanges());
+
+      // Informs the ChangedChildStateRegistry of the table.
+      // TODO olaf: check if the PMs of the current page need to be informed individually too.
+      //            I suspect not, since the all-change-event causes a re-binding of all table rows PMs.
+      PmEventApi.firePmEvent(table, PmEvent.ALL_CHANGE_EVENTS);
+
+      // Inform the changed rows to make sure that all invalid PM states get cleared.
+      for (Object row : changedRows) {
+        if (row instanceof PmObject) {
+          onVisit((PmObject) row);
+        }
+      }
+    }
+
+    @Override
+    public void visit(PmAttr<?> attr) {
+      attr.setPmValueChanged(false);
+      onVisit(attr);
+    }
+  }
+
 
   /**
    * The default implementation provides a unique identifier
