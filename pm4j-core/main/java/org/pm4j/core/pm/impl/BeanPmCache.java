@@ -1,6 +1,7 @@
 package org.pm4j.core.pm.impl;
 
 import java.lang.ref.WeakReference;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.WeakHashMap;
 
@@ -31,8 +32,25 @@ class BeanPmCache {
     if (oldPmRef != null && oldPmRef.get() != null) {
       throw new PmRuntimeException(pmElement, "Bean identity already added to the PM bean cache: " + beanIdentity);
     }
+
+    // Check if the set of beans for duplicates. That may indicate a bug:
+    // TODO olaf: This check adds an equals condition for the beans. Check if that is
+    //            correct for all use cases.
+    //            If not: Add a switch.
+    if (pmElement.getPmConversation().getPmDefaults().debugHints) {
+      HashSet<Object> beanSet = new HashSet<Object>();
+      for (BeanIdentity i : beanIdentityToPmMap.keySet()) {
+        Object o = i.beanRef.get();
+        if (o != null) {
+          if (!beanSet.add(o)) {
+            throw new PmRuntimeException(pmElement, "Bean already added to the PM bean cache: " + PmUtil.getPmLogString(pmElement));
+          }
+        }
+      }
+    }
+
     if (pmToBeanIdentityMap.put(pmElement, beanIdentity) != null) {
-      throw new PmRuntimeException(pmElement, "Bean presentation model already added to the PM bean cache: " + pmElement);
+      throw new PmRuntimeException(pmElement, "Bean presentation model already added to the PM bean cache: " + PmUtil.getPmLogString(pmElement));
     }
   }
 
@@ -53,7 +71,7 @@ class BeanPmCache {
 
     public BeanIdentity(Object bean) {
       this.beanRef = new WeakReference<Object>(bean);
-      this.hashCode = bean.hashCode();
+      this.hashCode = ObjectUtils.identityToString(bean).hashCode();
     }
 
     public boolean isActiveBeanRef() {

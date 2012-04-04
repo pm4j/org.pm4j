@@ -4,9 +4,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+
+import org.pm4j.core.exception.PmRuntimeException;
+import org.pm4j.core.pm.PmDefaults;
 
 /**
  * Implements a {@link PageableCollection} based on an {@link List} of items to
@@ -38,6 +42,14 @@ public class PageableListImpl<T_ITEM> implements PageableCollection<T_ITEM> {
   public PageableListImpl(Collection<T_ITEM> objects) {
     this.originalObjects = objects;
     this.currentPageIdx = 1;
+
+    // TODO olaf: add another switch to enable such expensive checks:
+    if (objects != null && PmDefaults.getInstance().debugHints) {
+      Set<T_ITEM> checkSet = new HashSet<T_ITEM>(objects);
+      if (checkSet.size() != objects.size()) {
+        throw new PmRuntimeException("Some instances of the pageable list are not unique!");
+      }
+    }
 
     onUpdateCollection();
   }
