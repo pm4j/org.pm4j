@@ -6,6 +6,8 @@ import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmAttrEnum;
 import org.pm4j.core.pm.PmAttrInteger;
 import org.pm4j.core.pm.PmCommand;
+import org.pm4j.core.pm.PmEvent;
+import org.pm4j.core.pm.PmEventListener;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmSortOrder;
 import org.pm4j.core.pm.PmTable;
@@ -14,6 +16,7 @@ import org.pm4j.core.pm.PmVisitor;
 import org.pm4j.core.pm.annotation.PmBoolean;
 import org.pm4j.core.pm.annotation.PmTableCfg;
 import org.pm4j.core.pm.annotation.PmTableColCfg;
+import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmLocalizeApi;
 import org.pm4j.core.pm.pageable.PageableCollection;
 import org.pm4j.core.util.table.ColSizeSpec;
@@ -55,6 +58,19 @@ public class PmTableColImpl extends PmObjectBase implements PmTableCol {
   public PmTableColImpl(PmTable<?> pmTable, Comparator<?> rowSortComparator) {
     super(pmTable);
     this.rowSortComparator = rowSortComparator;
+  }
+
+  @Override
+  protected void onPmInit() {
+    super.onPmInit();
+
+    PmEventApi.addPmEventListener(getSortOrderAttr(), PmEvent.VALUE_CHANGE, new PmEventListener() {
+      @Override
+      public void handleEvent(PmEvent event) {
+        PmTableImpl<?> tablePm = (PmTableImpl<?>) getPmParent();
+        tablePm.onSortOrderChange(PmTableColImpl.this);
+      }
+    });
   }
 
 

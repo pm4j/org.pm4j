@@ -229,38 +229,19 @@ public class PmTableImpl
 
   // -- row sort order support --
 
-  class SortOrderSelection implements PmEventListener {
+  void onSortOrderChange(PmTableCol sortColumnPm) {
+    PmTableCol newSortCol = (sortColumnPm.getSortOrderAttr().getValue() != PmSortOrder.NEUTRAL)
+                ? sortColumnPm
+                : null;
+    // mark current sort order as invalid and fire a value change event.
+    sortOrderSelection.sortBy(newSortCol);
+  }
+
+  class SortOrderSelection {
 // FIXME olaf: Check sort attribute event listener initialization.
 //             Currently there is a conflict with the too simple single phase initialization.
 //    /** The column to sort the rows by. */
-//    PmTableCol sortCol = null;
-//
-//    public SortOrderSelection(Collection<PmTableCol> columns) {
-//      for (PmTableCol c : columns) {
-//        PmAttrEnum<PmSortOrder> a = c.getSortOrderAttr();
-//
-//        // Whenever a the sort order attribute of a column changes, the sorted row
-//        // set needs to be updated.
-//        PmEventApi.addPmEventListener(a, PmEvent.VALUE_CHANGE, this);
-//
-//        // Identify the initial sort order (if there is one).
-//        if (a.getValue() != PmSortOrder.NEUTRAL) {
-//          sortCol = c;
-//        }
-//      }
-//    }
-
-    @Override
-    public void handleEvent(PmEvent event) {
-      @SuppressWarnings("unchecked")
-      PmAttrEnum<PmSortOrder> a = (PmAttrEnum<PmSortOrder>)event.pm;
-      PmTableCol sortCol = a.getValue() != PmSortOrder.NEUTRAL
-                  ? (PmTableCol) a.getPmParent()
-                  : null;
-
-      // mark current sort order as invalid and fire a value change event.
-      sortBy(sortCol);
-    }
+    PmTableCol sortCol = null;
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
     private void sortBy(PmTableCol sortCol) {
@@ -343,6 +324,7 @@ public class PmTableImpl
 //    }
 
       sortOrderSelection = new SortOrderSelection();
+
       // register listener for selection change events
       PmEventApi.addPmEventListener(this, PmEvent.SELECTION_CHANGE, new PmEventListener() {
 
@@ -351,7 +333,6 @@ public class PmTableImpl
           PmTableImpl.this.onPmSelectionChange(event);
         }
       });
-
   }
 
   private static PmObject zz_getPmRowCellForColumn(PmElement rowElement, PmTableCol column) {
