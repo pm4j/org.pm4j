@@ -54,6 +54,16 @@ public class PmCommandProxy extends PmCommandImpl {
         this.onMissingDelegate = OnMissingDelegate.DISABLE;
     }
 
+    /**
+     * Defines the command that really executes the tool bar command functionality.
+     *
+     * @param delegateCmd
+     *            The command that defines the logic.
+     */
+    public void setDelegateCmd(PmCommand delegateCmd) {
+        this.delegateCmd = delegateCmd;
+    }
+    
     @Override
     protected boolean isPmEnabledImpl() {
         return delegateCmd != null
@@ -84,13 +94,17 @@ public class PmCommandProxy extends PmCommandImpl {
                 : executedDelegateCmdClone;
     }
 
-    /**
-     * Defines the command that really executes the tool bar command functionality.
-     *
-     * @param delegateCmd
-     *            The command that defines the logic.
-     */
-    public void setDelegateCmd(PmCommand delegateCmd) {
-        this.delegateCmd = delegateCmd;
+    @Override
+    protected String getPmTitleImpl() {
+      return delegateCmd != null
+              ? delegateCmd.getPmTitle()
+              : super.getPmTitleImpl();
+    }
+
+    @Override
+    protected String getPmTooltipImpl() {
+      return delegateCmd != null
+              ? delegateCmd.getPmTooltip()
+              : super.getPmTitleImpl();
     }
 }
