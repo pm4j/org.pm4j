@@ -5,6 +5,7 @@ import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmMessage;
 import org.pm4j.core.pm.api.PmMessageUtil;
 
+@Deprecated
 public class PmViewMapperImpl implements PmViewMapper {
 
   @Override

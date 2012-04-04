@@ -11,7 +11,6 @@ import java.util.Set;
 public interface PmObject extends Comparable<PmObject> {
 
   static final String STYLE_CLASS_REQUIRED = "required";
-  static final String STYLE_CLASS_DISABLED = "disabled";
   static final String STYLE_CLASS_ERROR = "error";
   static final String STYLE_CLASS_WARN = "warn";
   static final String STYLE_CLASS_INFO = "info";

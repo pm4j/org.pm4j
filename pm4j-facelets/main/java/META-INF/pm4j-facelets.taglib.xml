@@ -126,12 +126,20 @@
 		<function-signature>java.lang.Object getProperty(org.pm4j.core.pm.PmObject, java.lang.String)</function-signature>
 	</function>
 
+
 	<function>
+		<function-name>pmStyleClasses</function-name>
+        <function-class>org.pm4j.web.PmViewUtil</function-class>
+		<function-signature>java.lang.String pmStyleClasses(org.pm4j.core.pm.PmObject, java.lang.String)</function-signature>
+	</function>
+	<function>
+		<!-- Deprecated! -->
 		<function-name>styleClassForPm</function-name>
         <function-class>org.pm4j.web.PmViewUtil</function-class>
 		<function-signature>java.lang.String styleClassForPm(org.pm4j.web.PmViewMapper, org.pm4j.core.pm.PmObject, java.lang.String)</function-signature>
 	</function>
     <function>
+		<!-- Deprecated! -->
         <function-name>styleClassForPmMsg</function-name>
         <function-class>org.pm4j.web.PmViewUtil</function-class>
         <function-signature>java.lang.String styleClassForPmMsg(org.pm4j.web.PmViewMapper, org.pm4j.core.pm.PmMessage)</function-signature>

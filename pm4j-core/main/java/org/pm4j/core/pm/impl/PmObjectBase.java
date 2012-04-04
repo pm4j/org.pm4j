@@ -1140,7 +1140,7 @@ public abstract class PmObjectBase implements PmObject {
   }
 
   @Override
-  public Set<String> getPmStyleClasses() {
+  public final Set<String> getPmStyleClasses() {
     // TODO olaf: add some caching here
     Set<String> styleClassSet = new TreeSet<String>();
     getPmStyleClassesImpl(styleClassSet);
@@ -1155,9 +1155,6 @@ public abstract class PmObjectBase implements PmObject {
   protected void getPmStyleClassesImpl(Set<String> styleClassSet) {
     for (PmMessage m : PmMessageUtil.getPmMessages(this)) {
       styleClassSet.add(m.getSeverity().getStyleClass());
-    }
-    if (!isPmEnabled()) {
-      styleClassSet.add(STYLE_CLASS_DISABLED);
     }
   }
 

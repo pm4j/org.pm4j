@@ -9,6 +9,7 @@ import org.pm4j.core.pm.PmMessage;
  *
  * @author olaf boede
  */
+@Deprecated
 public interface PmViewMapper {
 
 	/**
