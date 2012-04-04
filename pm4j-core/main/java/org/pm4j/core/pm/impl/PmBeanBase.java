@@ -177,6 +177,12 @@ public abstract class PmBeanBase<T_BEAN>
       onVisit(table);
 
       // Changed rows get informed to make sure that all invalid PM states get cleared.
+      // Informs the ChangedChildStateRegistry of the table.
+      // TODO olaf: check if the PMs of the current page need to be informed individually too.
+      //            I suspect not, since the all-change-event causes a re-binding of all table rows PMs.
+      PmEventApi.firePmEvent(table, PmEvent.ALL_CHANGE_EVENTS);
+
+      // Inform the changed rows to make sure that all invalid PM states get cleared.
       for (Object row : changedRows) {
         if (row instanceof PmObject) {
           onVisit((PmObject) row);
