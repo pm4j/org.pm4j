@@ -8,7 +8,6 @@ import java.util.List;
 
 import org.pm4j.common.util.InvertingComparator;
 import org.pm4j.core.exception.PmRuntimeException;
-import org.pm4j.core.pm.PmAttrEnum;
 import org.pm4j.core.pm.PmDataInput;
 import org.pm4j.core.pm.PmElement;
 import org.pm4j.core.pm.PmEvent;
@@ -238,13 +237,19 @@ public class PmTableImpl
   }
 
   class SortOrderSelection {
-// FIXME olaf: Check sort attribute event listener initialization.
-//             Currently there is a conflict with the too simple single phase initialization.
-//    /** The column to sort the rows by. */
+    /** The column to sort the rows by. */
     PmTableCol sortCol = null;
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
     private void sortBy(PmTableCol sortCol) {
+      if (this.sortCol != null &&
+          this.sortCol != sortCol) {
+        // XXX olaf: The backing value gets modified to prevent call back notifications.
+        //           Can be done better when the event source implementation is done ...
+        ((PmAttrEnumImpl<PmSortOrder>)this.sortCol.getSortOrderAttr()).setBackingValue(PmSortOrder.NEUTRAL);
+      }
+      this.sortCol = sortCol;
+
       Comparator<?> comparator = null;
       if (sortCol != null) {
         // The explicitly configured comparator will be used.
