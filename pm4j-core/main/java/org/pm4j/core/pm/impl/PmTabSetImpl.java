@@ -14,7 +14,6 @@ import org.pm4j.core.pm.PmTabSet;
 import org.pm4j.core.pm.annotation.PmCommandCfg;
 import org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO;
 import org.pm4j.core.pm.impl.connector.PmTabSetConnector;
-import org.pm4j.navi.NaviLink;
 
 /**
  * Basic implementation of a {@link PmTabSet}.
@@ -116,7 +115,7 @@ public class PmTabSetImpl extends PmElementImpl implements PmTabSet {
   protected boolean switchToTabPmImpl(PmElement fromTab, PmElement toTab) {
     return true;
   }
-  
+
   /**
    * @return The currently active tab.
    */
@@ -238,12 +237,12 @@ public class PmTabSetImpl extends PmElementImpl implements PmTabSet {
       // Only successfully executed tab switches need to be undone.
       setUndoCommand(new PmTabChangeCommand(tabSet, toTab, fromTab));
     }
-   
+
   }
-  
+
   /**
    * Provides a possibility to react on tab changes together with the information about the source and target tab.
-   * 
+   *
    * @author MMANZ
    */
   public static class PmTabSetCommandDecoratorAdapter implements PmCommandDecorator {
