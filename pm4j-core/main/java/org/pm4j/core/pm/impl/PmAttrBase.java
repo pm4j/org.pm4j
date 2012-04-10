@@ -208,6 +208,12 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     return super.isPmReadonlyImpl() ||
            getPmParentElement().isPmReadonly();
   }
+  
+  @Override
+  public final boolean isPmEnabled() {
+    // link enable status to read only even if the default impl of isPmEnabledImpl is overwritten
+    return super.isPmEnabled() && !isPmReadonly();
+  }
 
   @Override
   protected boolean isPmEnabledImpl() {

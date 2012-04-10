@@ -245,7 +245,7 @@ public abstract class PmObjectBase implements PmObject {
   }
 
   @Override
-  public final boolean isPmEnabled() {
+  public boolean isPmEnabled() {
     PmCacheStrategy strategy = getPmMetaData().cacheStrategyForEnablement;
     Object e = strategy.getCachedValue(this);
 
