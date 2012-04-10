@@ -31,6 +31,11 @@ public class PmMessage {
      * The existence of an error prevents the execution of commands that require valid values.
      */
     ERROR;
+    /**
+     * A feedback that should be presented noticeable.
+     * The existence of an fatal error prevents the execution of commands that require valid values.
+     * TODO: FATAL Severity for internal errors
+    FATAL*/
 
     /**
      * @return The CSS style class that is associated with this severity.<br>
