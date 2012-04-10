@@ -1,5 +1,7 @@
 package org.pm4j.swing.pb;
 
+import org.pm4j.core.pm.api.PmEventCallGate;
+
 import java.awt.Container;
 import java.util.List;
 
@@ -113,14 +115,15 @@ public class PbJListForOptions extends PbJComponentToAttrBase<JList, PmAttr<?>> 
     @Override
     public void valueChanged(ListSelectionEvent e) {
       int[] selection = view.getSelectedIndices();
-      PmEventApi.setThreadEventSource(view);
+      String value;
       if (selection.length == 1) {
         String[] optionIds = (String[]) view.getClientProperty(OPTION_ID_DATA_KEY);
-        pm.setValueAsString(optionIds[selection[0]]);
+        value = optionIds[selection[0]];
       } else {
         // TODO olaf: multi selection support
-        pm.setValueAsString(null);
+        value = null;
       }
+      PmEventCallGate.setValueAsString(view, pm, value);
     }
 
     protected DefaultListModel getModel() {

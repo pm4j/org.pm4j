@@ -16,6 +16,7 @@ import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmAttrString;
 import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.api.PmEventApi;
+import org.pm4j.core.pm.api.PmEventCallGate;
 import org.pm4j.swing.pb.base.PbJComponentToAttrBase;
 import org.pm4j.swing.pb.internal.util.MaxLenDocumentFilter;
 
@@ -88,15 +89,13 @@ public class PbJTextField extends PbJComponentToAttrBase<JTextField, PmAttr<?>> 
     @Override
     public void focusLost(FocusEvent e) {
       if (valueUpdateEvent == ValueUpdateEvent.FOCUS_LOST) {
-        PmEventApi.setThreadEventSource(view);
-        pm.setValueAsString(view.getText());
+        PmEventCallGate.setValueAsString(view, pm, view.getText());
       }
     }
 
     private void someUpdate(DocumentEvent e) {
       if (valueUpdateEvent == ValueUpdateEvent.MODIFY) {
-        PmEventApi.setThreadEventSource(view);
-        pm.setValueAsString(view.getText());
+        PmEventCallGate.setValueAsString(view, pm, view.getText());
       }
     }
 

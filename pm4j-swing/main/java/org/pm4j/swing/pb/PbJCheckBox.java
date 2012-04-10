@@ -1,5 +1,7 @@
 package org.pm4j.swing.pb;
 
+import org.pm4j.core.pm.api.PmEventCallGate;
+
 import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -52,8 +54,7 @@ public class PbJCheckBox extends
 
     @Override
     public void actionPerformed(ActionEvent e) {
-      PmEventApi.setThreadEventSource(view);
-      pm.setValue(view.isSelected());
+      PmEventCallGate.setValue(view, pm, view.isSelected());
     }
   }
 

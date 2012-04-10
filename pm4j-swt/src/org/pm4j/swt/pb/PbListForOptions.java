@@ -12,7 +12,7 @@ import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmOption;
 import org.pm4j.core.pm.PmOptionSet;
-import org.pm4j.core.pm.api.PmEventApi;
+import org.pm4j.core.pm.api.PmEventCallGate;
 import org.pm4j.core.pm.impl.PmUtil;
 import org.pm4j.swt.pb.base.PbControlToAttrBase;
 
@@ -104,15 +104,16 @@ public class PbListForOptions extends PbControlToAttrBase<List, PmAttr<?>> {
     @Override
     public void widgetSelected(SelectionEvent e) {
       int [] selection = view.getSelectionIndices();
-      PmEventApi.setThreadEventSource(view);
+      String valueString;
       if (selection.length == 1) {
         String[] optionIds = (String[])view.getData(OPTION_ID_DATA_KEY);
-        pm.setValueAsString(optionIds[selection[0]]);
+        valueString = optionIds[selection[0]];
       }
       else {
         // TODO olaf: multi selection support
-        pm.setValueAsString(null);
+        valueString = null;
       }
+      PmEventCallGate.setValueAsString(view, pm, valueString);
     }
 
     @Override
