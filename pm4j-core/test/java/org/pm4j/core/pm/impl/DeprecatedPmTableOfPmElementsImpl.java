@@ -273,12 +273,6 @@ public class DeprecatedPmTableOfPmElementsImpl<T_ROW_ELEMENT_PM extends PmElemen
   }
 
   @Override
-  public boolean isMultiSelect() {
-    // TODO Auto-generated method stub
-    return false;
-  }
-
-  @Override
   public org.pm4j.core.pm.PmTable.RowSelectMode getRowSelectMode() {
     // TODO Auto-generated method stub
     return RowSelectMode.SINGLE;

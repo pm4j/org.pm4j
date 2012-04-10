@@ -86,13 +86,6 @@ public interface PmTable<T_ROW_OBJ> extends PmObject, PmDataInput {
   Collection<T_ROW_OBJ> getSelectedRows();
 
   /**
-   * @return <code>true</code> if the table supports the selection of multiple rows.
-   * @deprecated Please use {@link #getRowSelectMode()}
-   */
-  @Deprecated
-  boolean isMultiSelect();
-
-  /**
    * PM for table with a pager.
    *
    * @param <T_ROW_OBJ> The type used for row objects.

@@ -166,7 +166,14 @@ public class PmTableImpl
               : getOwnMetaDataWithoutPmInitCall().rowSelectMode;
   }
 
-  // XXX olaf: Really required to have that?
+  /**
+   * Adjusts the row selection mode.<br>
+   * Should be called very early within the livecycle of the table.
+   * The implementation does currently not fire any change events
+   * sif this method gets called.
+   *
+   * @param rowSelectMode The {@link RowSelectMode} to be used by this table.
+   */
   public void setRowSelectMode(RowSelectMode rowSelectMode) {
     this.rowSelectMode = rowSelectMode;
     if (pageableCollection != null) {
@@ -192,12 +199,6 @@ public class PmTableImpl
     if (pageableCollection != null) {
       pageableCollection.setPageSize(numOfPageRows);
     }
-  }
-
-  // XXX olaf: should disappear. getRowSelectMode should be enough.
-  @Override
-  public boolean isMultiSelect() {
-    return getRowSelectMode() == RowSelectMode.MULTI;
   }
 
   @Override
@@ -317,7 +318,7 @@ public class PmTableImpl
   protected void onPmInit() {
     super.onPmInit();
 
-// FIXME olaf: find a way to do this without breaking the top-down initialization.
+// TODO olaf: find a way to do this without breaking the top-down initialization.
 //    if (columns == null) {
 //      columns = zz_getPmColumns();
 //
