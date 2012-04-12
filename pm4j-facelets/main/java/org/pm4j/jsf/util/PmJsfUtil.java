@@ -18,7 +18,6 @@ import org.pm4j.core.pm.PmMessage;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmOption;
 import org.pm4j.core.pm.PmOptionSet;
-import org.pm4j.core.pm.impl.PmAttrBase;
 import org.pm4j.jsf.Pm4jJsfConstants;
 import org.pm4j.jsf.PmMessageCleanupListener;
 import org.pm4j.jsf.UrlParamCoder;
@@ -63,10 +62,8 @@ public class PmJsfUtil {
       if (pmOptionSet != null) {
         List<PmOption> pmOptions = pmOptionSet.getOptions();
         List<SelectItem> items = new ArrayList<SelectItem>(pmOptions.size());
-        // XXX olaf: is that still required? I suppose that all id's are handled finally as strings only.
-        boolean useStringIds = ((PmAttrBase<?,?>)pmAttr).isSupportingAsStringValues();
         for (PmOption o : pmOptions) {
-          Serializable id = useStringIds ? o.getIdAsString() : o.getId();
+          Serializable id = o.getIdAsString();
 
           // for JSF 1.1:
           if (id == null)

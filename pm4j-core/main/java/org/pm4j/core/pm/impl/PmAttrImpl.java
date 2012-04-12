@@ -1,7 +1,6 @@
 package org.pm4j.core.pm.impl;
 
 import org.pm4j.core.pm.PmObject;
-import org.pm4j.core.pm.impl.PmAttrEnumImpl.MetaData;
 
 /**
  * Base implementation for user type attributes.
@@ -14,12 +13,6 @@ public class PmAttrImpl<T_VALUE> extends PmAttrBase<T_VALUE, T_VALUE> {
 
   public PmAttrImpl(PmObject pmParent) {
     super(pmParent);
-  }
-
-
-  @Override
-  public boolean isSupportingAsStringValues() {
-    return false;
   }
 
   // ======== meta data ======== //

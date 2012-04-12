@@ -1,14 +1,12 @@
 package org.pm4j.core.pm.impl;
 
-import java.util.Locale;
-
 import org.pm4j.core.pm.PmAttrBoolean;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmOptionSet;
 import org.pm4j.core.pm.api.PmLocalizeApi;
 import org.pm4j.core.pm.impl.converter.PmConverterBoolean;
-import org.pm4j.core.pm.impl.options.PmOptionImpl;
 import org.pm4j.core.pm.impl.options.PmOptionSetImpl;
+import org.pm4j.core.pm.impl.options.PmOptionSetUtil;
 
 public class PmAttrBooleanImpl extends PmAttrBase<Boolean, Boolean> implements PmAttrBoolean {
 
@@ -24,29 +22,14 @@ public class PmAttrBooleanImpl extends PmAttrBase<Boolean, Boolean> implements P
   @Override
   public String getValueLocalized() {
     Boolean value = getValue();
-
     return (value != null)
-      ? titleForNameAndValueKey(value, getPmConversation().getPmLocale())
+      ? PmLocalizeApi.localizeBooleanValue(this, value)
       : null;
   }
 
   @Override
   protected PmOptionSet getOptionSetImpl() {
-    PmOptionSetImpl pmOptionSetBean = new PmOptionSetImpl();
-
-    Locale locale = getPmConversation().getPmLocale();
-    String title = titleForNameAndValueKey(Boolean.TRUE, locale);
-    pmOptionSetBean.addOption(new PmOptionImpl(Boolean.TRUE.toString(), title, Boolean.TRUE));
-    title = titleForNameAndValueKey(Boolean.FALSE, locale);
-    pmOptionSetBean.addOption(new PmOptionImpl(Boolean.FALSE.toString(), title, Boolean.FALSE));
-
-    return pmOptionSetBean;
-  }
-
-  // -- Helper --
-
-  private String titleForNameAndValueKey(Object value, Locale locale) {
-    return PmLocalizeApi.localize(this, ResKeyUtil.classNameAndValue(value), locale);
+    return new PmOptionSetImpl(PmOptionSetUtil.makeBooleanOptions(this));
   }
 
   // ======== meta data ======== //

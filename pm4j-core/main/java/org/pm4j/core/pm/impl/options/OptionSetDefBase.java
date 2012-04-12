@@ -36,6 +36,8 @@ public abstract class OptionSetDefBase<T_ATTR extends PmAttrBase<?,?>> implement
   protected final Method getOptionValuesMethod;
   protected final PathResolver idPath;
   protected final PathResolver titlePath;
+  protected final PathResolver valuePath;
+
   protected final NullOption nullOption;
   protected final String nullOptionTitleResKey;
   protected final PathComparatorFactory sortComparatorFactory;
@@ -48,6 +50,7 @@ public abstract class OptionSetDefBase<T_ATTR extends PmAttrBase<?,?>> implement
     this.getOptionValuesMethod = getOptionValuesMethod;
     this.idPath = ExpressionPathResolver.parse(cfg.id());
     this.titlePath = ExpressionPathResolver.parse(cfg.title());
+    this.valuePath = ExpressionPathResolver.parse(cfg.value());
     this.nullOption = cfg.nullOption();
     this.nullOptionTitleResKey = StringUtils.defaultIfEmpty(cfg.nullOptionResKey(), null);
     this.sortComparatorFactory = PmOptionCfg.NO_SORT_SPEC.equals(cfg.sortBy())
@@ -101,11 +104,7 @@ public abstract class OptionSetDefBase<T_ATTR extends PmAttrBase<?,?>> implement
 
   @Override
   public String getNullOptionTitle(T_ATTR forAttr) {
-    return PmOptionCfg.NULL_OPTION_DEFAULT_RESKEY.equals(nullOptionTitleResKey)
-              // default key must not exist.
-              ? PmLocalizeApi.findLocalization(forAttr, nullOptionTitleResKey)
-              // user-defined key should exist. -> debug-title and a log message will appear.
-              : PmLocalizeApi.localize(forAttr, nullOptionTitleResKey);
+    return PmOptionSetUtil.getNullOptionTitle(forAttr, nullOptionTitleResKey);
   }
 
   /**
@@ -155,7 +154,8 @@ public abstract class OptionSetDefBase<T_ATTR extends PmAttrBase<?,?>> implement
 
     return nopt == NullOption.YES ||
           (nopt == NullOption.FOR_OPTIONAL_ATTR &&
-           ! forAttr.isRequired());
+           ! forAttr.isRequired()) ||
+           forAttr.getValue() == null;
   }
 
 

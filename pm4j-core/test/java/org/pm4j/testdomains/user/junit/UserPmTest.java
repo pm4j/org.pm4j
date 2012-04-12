@@ -37,8 +37,9 @@ public class UserPmTest extends TestCase {
     assertNull(userPm.description.getValue());
     assertEquals(1000, userPm.description.getMaxLen());
 
-    assertEquals(2, userPm.salutation.getOptionSet().getOptions().size());
+    assertEquals("An additional null-option because the current value is null.", "[---, Herr, Frau]", userPm.salutation.getOptionSet().getOptions().toString());
     userPm.salutation.setValue(Salutation.MR);
+    assertEquals("The null-option disappears if the value is not null.", "[Herr, Frau]", userPm.salutation.getOptionSet().getOptions().toString());
     assertEquals(Salutation.MR, userPm.salutation.getValue());
     assertEquals("Herr Willi", userPm.fullName.getValue());
 
@@ -47,8 +48,8 @@ public class UserPmTest extends TestCase {
     assertEquals("Anrede", userPm.salutation.getPmTitle());
     assertEquals("Frau", userPm.salutation.getOptionSet().getOptions().get(1).getPmTitle());
 
-    assertEquals(2, userPm.associate.getOptionSet().getOptions().size());
-    PmOption bertaOption = userPm.associate.getOptionSet().getOptions().get(0);
+    assertEquals("[---, Berta, Willi]", userPm.associate.getOptionSet().getOptions().toString());
+    PmOption bertaOption = userPm.associate.getOptionSet().getOptions().get(1);
     assertEquals("Berta", bertaOption.getPmTitle());
     userPm.associate.setValueAsString(bertaOption.getIdAsString());
     assertEquals("Berta", userPm.associate.getValue().name.getValue());
@@ -83,7 +84,7 @@ public class UserPmTest extends TestCase {
     assertNull(userPm.description.getValue());
     assertEquals(1000, userPm.description.getMaxLen());
 
-    assertEquals(2, userPm.salutation.getOptionSet().getOptions().size());
+    assertEquals("[---, Herr, Frau]", userPm.salutation.getOptionSet().getOptions().toString());
     userPm.salutation.setValue(Salutation.MR);
     assertEquals(Salutation.MR, userPm.salutation.getValue());
     userPm.salutation.setValueAsString("MRS");
@@ -91,8 +92,8 @@ public class UserPmTest extends TestCase {
     assertEquals("Anrede", userPm.salutation.getPmTitle());
     assertEquals("Frau", userPm.salutation.getOptionSet().getOptions().get(1).getPmTitle());
 
-    assertEquals(2, userPm.associate.getOptionSet().getOptions().size());
-    PmOption bertaOption = userPm.associate.getOptionSet().getOptions().get(0);
+    assertEquals("[---, Berta, Willi]", userPm.associate.getOptionSet().getOptions().toString());
+    PmOption bertaOption = userPm.associate.getOptionSet().getOptions().get(1);
     assertEquals("Berta", bertaOption.getPmTitle());
     userPm.associate.setValueAsString(bertaOption.getIdAsString());
     assertEquals("Berta", userPm.associate.getValue().name.getValue());

@@ -11,9 +11,7 @@ import org.pm4j.core.pm.annotation.PmOptionCfg.NullOption;
 import org.pm4j.core.pm.api.PmLocalizeApi;
 import org.pm4j.core.pm.impl.options.EnumOptionSetDef;
 import org.pm4j.core.pm.impl.options.EnumOptionSetDefWithOptionCfg;
-import org.pm4j.core.pm.impl.options.PmOptionImpl;
 import org.pm4j.core.pm.impl.options.PmOptionSetDef;
-import org.pm4j.core.pm.impl.options.PmOptionSetImpl;
 
 public class PmAttrEnumImpl<T_ENUM extends Enum<T_ENUM>> extends PmAttrBase<T_ENUM, T_ENUM> implements PmAttrEnum<T_ENUM> {
 
@@ -29,10 +27,9 @@ public class PmAttrEnumImpl<T_ENUM extends Enum<T_ENUM>> extends PmAttrBase<T_EN
   @Override
   public String getValueLocalized() {
     T_ENUM value = getValue();
-    if (value != null) {
-      return getTitleForEnumValue(value);
-    }
-    return null;
+    return (value != null)
+              ? PmLocalizeApi.localizeEnumValue(this, value)
+              : null;
   }
 
   @Override
@@ -44,31 +41,6 @@ public class PmAttrEnumImpl<T_ENUM extends Enum<T_ENUM>> extends PmAttrBase<T_EN
     return value != null
             ? PmLocalizeApi.localizeEnumValue(this, value)
             : getOwnMetaData().getOptionSetDef().getNullOptionTitle(this);
-  }
-
-  /**
-   * Helper for manual enum option creation.
-   *
-   * @param value The enum to get an option for.
-   * @return The option for the given enum.
-   */
-  protected PmOptionImpl makeEnumOption(Enum<?> value) {
-    String title = getTitleForEnumValue(value);
-    return new PmOptionImpl(value.name(), title, value);
-  }
-
-  /**
-   * Helper for manual enum option set creation.
-   *
-   * @param values The enum values to get an option for.
-   * @return The option set for the given enum set.
-   */
-  protected PmOptionSetImpl makeEnumOptions(Enum<?>... values) {
-    PmOptionSetImpl os = new PmOptionSetImpl();
-    for (Enum<?> v : values) {
-      os.addOption(makeEnumOption(v));
-    }
-    return os;
   }
 
   /**

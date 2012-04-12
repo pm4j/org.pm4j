@@ -370,7 +370,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
       }
 
       return value != null
-                ? getConverter().valueToString(this, value)
+                ? valueToStringImpl(value)
                 : null;
     }
     catch (PmRuntimeException pmrex) {
@@ -560,6 +560,43 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     }
   }
 
+  /**
+   * Gets called whenever a string value needs to be converted to the attribute value type.
+   * <p>
+   * The default implementation uses the converter provided by {@link #getConverter()}.
+   *
+   * @param s The string to convert.
+   * @return The converted value.
+   * @throws PmConverterException If the given string can't be converted.
+   */
+  protected T_PM_VALUE stringToValueImpl(String s) throws PmConverterException {
+    return (T_PM_VALUE) getConverter().stringToValue(this, s);
+  }
+
+  /**
+   * Gets called whenever the attribute value needs to be represented as a string.
+   * <p>
+   * The default implementation uses the converter provided by {@link #getConverter()}.
+   *
+   * @param v A value to convert.
+   * @return The string representation.
+   */
+  protected String valueToStringImpl(T_PM_VALUE v) {
+    return getConverter().valueToString(this, v);
+  }
+
+  /**
+   * @return The converter that translates from and to the corresponding string representation.
+   */
+  @SuppressWarnings("unchecked")
+  protected Converter<T_PM_VALUE> getConverter() {
+    Converter<T_PM_VALUE> c = (Converter<T_PM_VALUE>) getOwnMetaData().converter;
+    if (c == null) {
+      throw new PmRuntimeException(this, "Missing value converter.");
+    }
+    return c;
+  }
+
   @Override
   public boolean isPmValueChanged() {
     return  dataContainer != null &&
@@ -656,7 +693,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     String reqValue = getPmConversationImpl().getViewConnector().readRequestValue(getPmName());
     try {
       return (reqValue != null)
-                ? getConverter().stringToValue(this, reqValue)
+                ? stringToValueImpl(reqValue)
                 : null;
     } catch (PmConverterException e) {
       throw new PmRuntimeException(this, e);
@@ -697,7 +734,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     if (md.defaultValue == MetaData.NOT_INITIALIZED) {
       try {
         md.defaultValue = StringUtils.isNotBlank(md.defaultValueString)
-                ? getConverter().stringToValue(this, md.defaultValueString)
+                ? stringToValueImpl(md.defaultValueString)
                 : null;
       } catch (PmConverterException e) {
         throw new PmRuntimeException(this, e);
@@ -830,7 +867,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
       String stringValue = vc.getStringValue();
       try {
         vc.setPmValue(StringUtils.isNotBlank(stringValue)
-                          ? getConverter().stringToValue(this, stringValue)
+                          ? stringToValueImpl(stringValue)
                           : null);
       } catch (PmRuntimeException e) {
         PmResourceData resData = e.getResourceData();
@@ -875,35 +912,6 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
       LOG.error("setValueAsString failed to set value '" + vc.getStringValue() + "'", pme);
       throw pme;
     }
-  }
-
-  /**
-   * Defaults to <code>true</code>.
-   * <p>
-   * Subclasses that don't implement the 'toString' methods should return <code>false</code>.
-   *
-   * @return <code>true</code> when the 'asString' operations are supported.
-   */
-//  * FIXME olaf: A workaround for missing converter instances.
-//  * Only remaining usages:
-//  *   s:selectManyPicklist and
-//  *   m:selectManyCheckbox
-//  * Both should be refactored to use setValueAsStringList! After that this
-//  * method signature should be removed.
-  public boolean isSupportingAsStringValues() {
-    return true;
-  }
-
-  /**
-   * @return The converter that translates from and to the corresponding string representation.
-   */
-  @SuppressWarnings("unchecked")
-  protected Converter<T_PM_VALUE> getConverter() {
-    Converter<T_PM_VALUE> c = (Converter<T_PM_VALUE>) getOwnMetaData().converter;
-    if (c == null) {
-      throw new PmRuntimeException(this, "Missing value converter.");
-    }
-    return c;
   }
 
   // ======== Buffered data input support ======== //

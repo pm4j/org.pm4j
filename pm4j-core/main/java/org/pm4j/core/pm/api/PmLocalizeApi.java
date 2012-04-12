@@ -2,6 +2,7 @@ package org.pm4j.core.pm.api;
 
 import org.pm4j.common.util.collection.ArrayUtil;
 import org.pm4j.core.exception.PmRuntimeException;
+import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.impl.PmLocalizeApiHandler;
 import org.pm4j.core.pm.impl.PmObjectBase;
@@ -53,8 +54,12 @@ public final class PmLocalizeApi {
   public static String localizeEnumValue(PmObject pmCtxt, Enum<?> enumValue) {
     String key = ResKeyUtil.shortResKeyForClass(enumValue.getDeclaringClass()) + "." + enumValue.name();
     return localize(pmCtxt, key);
-
   }
+
+  public static String localizeBooleanValue(PmAttr<?> pmAttr, Boolean value) {
+    return PmLocalizeApi.localize(pmAttr, ResKeyUtil.classNameAndValue(value));
+  }
+
 
   /**
    * Provides a localization based on a key and option resource string
