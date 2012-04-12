@@ -16,7 +16,6 @@ import org.pm4j.core.pm.PmOption;
 import org.pm4j.core.pm.PmOptionSet;
 import org.pm4j.core.pm.annotation.PmOptionCfg;
 import org.pm4j.core.pm.annotation.PmOptionCfg.NullOption;
-import org.pm4j.core.pm.api.PmLocalizeApi;
 import org.pm4j.core.pm.impl.PmAttrBase;
 import org.pm4j.core.pm.impl.PmUtil;
 import org.pm4j.core.pm.impl.pathresolver.ExpressionPathResolver;
@@ -153,9 +152,17 @@ public abstract class OptionSetDefBase<T_ATTR extends PmAttrBase<?,?>> implement
                       : nullOption;
 
     return nopt == NullOption.YES ||
-          (nopt == NullOption.FOR_OPTIONAL_ATTR &&
-           ! forAttr.isRequired()) ||
-           forAttr.getValue() == null;
+            (nopt == NullOption.FOR_OPTIONAL_ATTR &&
+             ! forAttr.isRequired()) ||
+             forAttr.getValue() == null;
+// TODO olaf:
+//                      switch (nopt) {
+//      case YES: return true;
+//      case NO: return forAttr.getValue() != null;
+//      case DEFAULT: // fall through
+//      case FOR_OPTIONAL_ATTR: return (!forAttr.isRequired()) && forAttr.getValue() != null;
+//      default: throw new PmRuntimeException(forAttr, "Unknown enum attribute value " + nopt);
+//    }
   }
 
 

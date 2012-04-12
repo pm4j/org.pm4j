@@ -1,8 +1,8 @@
 package org.pm4j.core.pm.impl.title;
 
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.pm4j.core.pm.impl.title.ResStringCache.Entry;
 
@@ -13,7 +13,7 @@ public class ResStringCacheWithScopes {
    * That structure is required since the same key may be bound to different
    * values within different scope.
    */
-  private Map<Object, ResStringCache> classToResStringCacheMap = new HashMap<Object, ResStringCache>();
+  private Map<Object, ResStringCache> classToResStringCacheMap = new ConcurrentHashMap<Object, ResStringCache>();
 
   /**
    * Finds an entry for the given key and locale.

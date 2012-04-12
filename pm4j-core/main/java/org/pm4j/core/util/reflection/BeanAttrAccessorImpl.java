@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -27,14 +28,14 @@ public class BeanAttrAccessorImpl implements BeanAttrAccessor {
   /**
    * Cache of overridden getter methods for subclasses.
    */
-  private Map<Class<?>, Method> classToGetterMap = new HashMap<Class<?>, Method>();
+  private Map<Class<?>, Method> classToGetterMap = new ConcurrentHashMap<Class<?>, Method>();
 
   private Method              setterMethod;
 
   /**
    * Cache of overridden setter methods for subclasses.
    */
-  private Map<Class<?>, Method> classToSetterMap = new HashMap<Class<?>, Method>();
+  private Map<Class<?>, Method> classToSetterMap = new ConcurrentHashMap<Class<?>, Method>();
 
   /**
    * When there is no getter, the field might be used. Useful for prototype

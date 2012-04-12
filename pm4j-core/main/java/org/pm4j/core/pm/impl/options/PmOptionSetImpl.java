@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
@@ -170,7 +171,7 @@ public class PmOptionSetImpl implements PmOptionSet {
    */
   public static class WithIdMap extends PmOptionSetImpl {
 
-    private HashMap<String, PmOption> idToOptionMap;
+    private Map<String, PmOption> idToOptionMap;
 
     public WithIdMap(List<PmOption> pmOptions) {
       super(pmOptions);
@@ -182,7 +183,7 @@ public class PmOptionSetImpl implements PmOptionSet {
 
     @Override
     public PmOption findOptionForIdString(String id) {
-      HashMap<String, PmOption> map = this.idToOptionMap;
+      Map<String, PmOption> map = this.idToOptionMap;
       if (map == null) {
         List<PmOption> olist = getOptions();
         map = new HashMap<String, PmOption>(olist.size());

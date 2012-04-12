@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.WeakHashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import org.apache.commons.lang.ClassUtils;
@@ -525,7 +526,7 @@ public abstract class PmObjectBase implements PmObject {
   /**
    * A map of static definitions for presentation model.
    */
-  private static Map<Object, MetaData> pmKeyToMetaDataMap = new HashMap<Object, MetaData>();
+  private static Map<Object, MetaData> pmKeyToMetaDataMap = new ConcurrentHashMap<Object, MetaData>();
 
   /**
    * A reference to the static definition for this presentation model.
@@ -1166,7 +1167,7 @@ public abstract class PmObjectBase implements PmObject {
   @Override
   public void setPmProperty(String propName, Object value) {
     if (pmProperties.isEmpty()) {
-      pmProperties = new HashMap<String, Object>();
+      pmProperties = new ConcurrentHashMap<String, Object>();
     }
     pmProperties.put(propName, value);
   }
@@ -1424,10 +1425,10 @@ class PmEventTable {
   public PmEventTable(boolean isWeak) {
     pmEventListeners = isWeak
           ? new WeakHashMap<PmEventListener, Integer>()
-          : new HashMap<PmEventListener, Integer>();
+          : new ConcurrentHashMap<PmEventListener, Integer>();
   }
 
-  public void addListener(int eventMask, PmEventListener listener) {
+  public synchronized void addListener(int eventMask, PmEventListener listener) {
     Integer foundMask = pmEventListeners.get(listener);
 
     if (foundMask == null) {
@@ -1443,11 +1444,11 @@ class PmEventTable {
     }
   }
 
-  public void removeListener(PmEventListener listener) {
+  public synchronized void removeListener(PmEventListener listener) {
     pmEventListeners.remove(listener);
   }
 
-  public void removeListener(int eventMask, PmEventListener listener) {
+  public synchronized void removeListener(int eventMask, PmEventListener listener) {
     Integer foundMask = pmEventListeners.get(listener);
 
     if (foundMask != null) {
@@ -1462,41 +1463,39 @@ class PmEventTable {
     }
   }
 
-  int size() {
-    return pmEventListeners.size();
-  }
-
   @SuppressWarnings("unchecked")
   public void fireEvent(final PmEvent event) {
-    if (size() > 0) {
-      boolean hasListeners = (pmEventListeners.size() > 0);
+    boolean hasListeners = !pmEventListeners.isEmpty();
 
-      if (log.isTraceEnabled())
-        log.trace("fireChange[" + event.changeKind + "] for event source   : " + PmEventApi.getThreadEventSource() +
-            (hasListeners ? "\n\teventListeners: " + pmEventListeners : ""));
+    if (log.isTraceEnabled())
+      log.trace("fireChange[" + event.changeKind + "] for event source   : " + PmEventApi.getThreadEventSource() +
+          (hasListeners ? "\n\teventListeners: " + pmEventListeners : ""));
 
-      if (hasListeners) {
-        boolean isPropagationEvent = event.isPropagationEvent();
-        // copy the listener list to prevent problems with listener
-        // set changes within the notification processing loop.
-        for (Map.Entry<PmEventListener, Integer> e : pmEventListeners.entrySet().toArray(new Map.Entry[pmEventListeners.size()])) {
-          int listenerMask = e.getValue().intValue();
-          boolean isPropagationListener = ((listenerMask & PmEvent.IS_EVENT_PROPAGATION) != 0);
-          // Propagation events have to be passed only to listeners that observe that special flag.
-          // Standard events will be passed to listeners that don't have set this flag.
-          if (isPropagationEvent) {
-            if (isPropagationListener &&
-                (listenerMask & event.changeKind) != 0)
-              e.getKey().handleEvent(event);
-          }
-          else {
-            if ((! isPropagationListener) &&
-                (listenerMask & event.changeKind) != 0)
-              e.getKey().handleEvent(event);
-          }
+    if (hasListeners) {
+      boolean isPropagationEvent = event.isPropagationEvent();
+      // copy the listener list to prevent problems with listener
+      // set changes within the notification processing loop.
+      for (Map.Entry<PmEventListener, Integer> e : pmEventListeners.entrySet().toArray(new Map.Entry[pmEventListeners.size()])) {
+        int listenerMask = e.getValue().intValue();
+        boolean isPropagationListener = ((listenerMask & PmEvent.IS_EVENT_PROPAGATION) != 0);
+        // Propagation events have to be passed only to listeners that observe that special flag.
+        // Standard events will be passed to listeners that don't have set this flag.
+        if (isPropagationEvent) {
+          if (isPropagationListener &&
+              (listenerMask & event.changeKind) != 0)
+            e.getKey().handleEvent(event);
+        }
+        else {
+          if ((! isPropagationListener) &&
+              (listenerMask & event.changeKind) != 0)
+            e.getKey().handleEvent(event);
         }
       }
     }
+  }
+
+  boolean isEmpty() {
+    return pmEventListeners.isEmpty();
   }
 
 } // end of PmEventTable

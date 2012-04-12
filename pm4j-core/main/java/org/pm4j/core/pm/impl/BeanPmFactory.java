@@ -3,11 +3,10 @@ package org.pm4j.core.pm.impl;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang.ClassUtils;
 import org.apache.commons.logging.Log;
@@ -31,10 +30,10 @@ class BeanPmFactory {
   private static final Log LOG = LogFactory.getLog(BeanPmFactory.class);
 
   /** A cache that prevents repeated reflection analysis loops. */
-  private Map<Class<?>, Constructor<PmBean<?>>> beanClassToPmConstructorMap = new HashMap<Class<?>, Constructor<PmBean<?>>>();
+  private Map<Class<?>, Constructor<PmBean<?>>> beanClassToPmConstructorMap = new ConcurrentHashMap<Class<?>, Constructor<PmBean<?>>>();
 
   /** A cache that prevents repeated reflection analysis loops. */
-  private Set<Class<?>> classesNotHandledHere = new HashSet<Class<?>>();
+  private Map<Class<?>, Object> classesNotHandledHere = new ConcurrentHashMap<Class<?>, Object>();
 
   /**
    * @param beanPmClasses The set of handled {@link PmBean} classes.
@@ -144,7 +143,7 @@ class BeanPmFactory {
 
     // extra loop for proxies and super classes:
     // TODO: add support for Pms mapped to interfaces.
-    if ((pmCtor == null) && !classesNotHandledHere.contains(beanClass)) {
+    if ((pmCtor == null) && !classesNotHandledHere.containsKey(beanClass)) {
       Set<Class<?>> foundMatches = new TreeSet<Class<?>>(new LongestSuperPathComp());
       for (Map.Entry<Class<?>, Constructor<PmBean<?>>> e : beanClassToPmConstructorMap.entrySet()) {
         if (e.getKey().isAssignableFrom(beanClass)) {
@@ -165,7 +164,7 @@ class BeanPmFactory {
       }
       else {
         // Remember that not mapped class to prevent permanent re-evaluations.
-        classesNotHandledHere.add(beanClass);
+        classesNotHandledHere.put(beanClass, beanClass);
       }
     }
 

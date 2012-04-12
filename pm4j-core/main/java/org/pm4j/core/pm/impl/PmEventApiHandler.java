@@ -76,13 +76,13 @@ public class PmEventApiHandler {
 
     if (pmImpl.pmEventTable != null) {
       pmImpl.pmEventTable.removeListener(listener);
-      if (pmImpl.pmEventTable.size() == 0) {
+      if (pmImpl.pmEventTable.isEmpty()) {
         pmImpl.pmEventTable = null;
       }
     }
     if (pmImpl.pmWeakEventTable != null) {
       pmImpl.pmWeakEventTable.removeListener(listener);
-      if (pmImpl.pmWeakEventTable.size() == 0) {
+      if (pmImpl.pmWeakEventTable.isEmpty()) {
         pmImpl.pmWeakEventTable = null;
       }
     }
@@ -93,13 +93,13 @@ public class PmEventApiHandler {
 
     if (pmImpl.pmEventTable != null) {
       pmImpl.pmEventTable.removeListener(eventMask, listener);
-      if (pmImpl.pmEventTable.size() == 0) {
+      if (pmImpl.pmEventTable.isEmpty()) {
         pmImpl.pmEventTable = null;
       }
     }
     if (pmImpl.pmWeakEventTable != null) {
       pmImpl.pmWeakEventTable.removeListener(eventMask, listener);
-      if (pmImpl.pmWeakEventTable.size() == 0) {
+      if (pmImpl.pmWeakEventTable.isEmpty()) {
         pmImpl.pmWeakEventTable = null;
       }
     }
@@ -160,10 +160,10 @@ public class PmEventApiHandler {
 
   private void fireOnEventTables(PmObject pm, PmEvent event) {
     PmObjectBase pmImpl = (PmObjectBase)pm;
-    if (pmImpl.pmEventTable != null && pmImpl.pmEventTable.size() > 0) {
+    if (pmImpl.pmEventTable != null && !pmImpl.pmEventTable.isEmpty()) {
       pmImpl.pmEventTable.fireEvent(event);
     }
-    if (pmImpl.pmWeakEventTable != null && pmImpl.pmWeakEventTable.size() > 0) {
+    if (pmImpl.pmWeakEventTable != null && !pmImpl.pmWeakEventTable.isEmpty()) {
       pmImpl.pmWeakEventTable.fireEvent(event);
     }
   }

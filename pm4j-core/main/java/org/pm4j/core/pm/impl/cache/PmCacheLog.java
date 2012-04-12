@@ -3,6 +3,7 @@ package org.pm4j.core.pm.impl.cache;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -15,8 +16,8 @@ public final class PmCacheLog {
 
   private static final Log LOG = LogFactory.getLog(PmCacheLog.class);
 
-  private Map<String, Long> pmCacheHitMap = Collections.synchronizedMap(new HashMap<String, Long>());
-  private Map<String, Long> pmCacheInitMap = Collections.synchronizedMap(new HashMap<String, Long>());
+  private Map<String, Long> pmCacheHitMap = new ConcurrentHashMap<String, Long>();
+  private Map<String, Long> pmCacheInitMap = new ConcurrentHashMap<String, Long>();
 
   public final void logPmCacheHit(PmObject pm, String cacheItem) {
     if (LOG.isTraceEnabled()) {

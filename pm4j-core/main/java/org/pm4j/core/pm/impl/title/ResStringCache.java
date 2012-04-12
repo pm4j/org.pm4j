@@ -3,6 +3,7 @@ package org.pm4j.core.pm.impl.title;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * A cache for string resource values.
@@ -18,7 +19,7 @@ import java.util.Map;
  */
 public class ResStringCache {
 
-  private Map<Locale, Map<String, Entry>> localeToKeyToValueMap = new HashMap<Locale, Map<String, Entry>>();
+  private Map<Locale, Map<String, Entry>> localeToKeyToValueMap = new ConcurrentHashMap<Locale, Map<String, Entry>>();
 
   private static final Entry EMPTY_ENTRY = new Entry(null);
 
@@ -76,7 +77,7 @@ public class ResStringCache {
   private final Map<String, Entry> getKeyToValueMap(Locale locale) {
     Map<String, Entry> map = localeToKeyToValueMap.get(locale);
     if (map == null) {
-      map = new HashMap<String, Entry>();
+      map = new ConcurrentHashMap<String, Entry>();
       localeToKeyToValueMap.put(locale, map);
     }
     return map;

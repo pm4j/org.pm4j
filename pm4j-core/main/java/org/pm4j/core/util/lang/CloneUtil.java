@@ -4,6 +4,7 @@ import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.pm4j.common.exception.CheckedExceptionWrapper;
 
@@ -54,6 +55,6 @@ public final class CloneUtil {
   /**
    * A performance helper map for the reflection based generic clone implementation.
    */
-  private static Map<Class<?>, Method> cloneMethodMap = Collections.synchronizedMap(new HashMap<Class<?>, Method>());
+  private static Map<Class<?>, Method> cloneMethodMap = new ConcurrentHashMap<Class<?>, Method>();
 
 }

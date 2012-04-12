@@ -2,11 +2,11 @@ package org.pm4j.navi.impl;
 
 import java.io.Serializable;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang.SerializationUtils;
 import org.apache.commons.lang.StringUtils;
@@ -57,7 +57,7 @@ class NaviSessionImpl {
   /**
    * Properties that are stored within the scope of this navigation session.
    */
-  private HashMap<String, Serializable> conversationProperties;
+  private ConcurrentHashMap<String, Serializable> conversationProperties;
 
   /**
    * Creates a new empty session instance.
@@ -124,7 +124,7 @@ class NaviSessionImpl {
   private NaviSessionImpl(NaviSessionImpl baseSession, NaviHistoryImpl baseHistory, NaviLink newLastItem) {
     this(baseSession.naviManager);
     if (baseSession.conversationProperties != null) {
-      this.conversationProperties = (HashMap<String, Serializable>)
+      this.conversationProperties = (ConcurrentHashMap<String, Serializable>)
         SerializationUtils.clone(baseSession.conversationProperties);
     }
 
@@ -404,7 +404,7 @@ class NaviSessionImpl {
    */
   public void setConversationProperty(String propName, Serializable value) {
     if (conversationProperties == null) {
-      conversationProperties = new HashMap<String, Serializable>();
+      conversationProperties = new ConcurrentHashMap<String, Serializable>();
     }
     conversationProperties.put(propName, value);
   }

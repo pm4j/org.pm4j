@@ -7,12 +7,18 @@ import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmAttrEnum;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmOptionCfg;
-import org.pm4j.core.pm.annotation.PmOptionCfg.NullOption;
 import org.pm4j.core.pm.api.PmLocalizeApi;
 import org.pm4j.core.pm.impl.options.EnumOptionSetDef;
 import org.pm4j.core.pm.impl.options.EnumOptionSetDefWithOptionCfg;
 import org.pm4j.core.pm.impl.options.PmOptionSetDef;
 
+/**
+ * PM for attributes with enum values.
+ *
+ * @author olaf boede
+ *
+ * @param <T_ENUM> The enum value type.
+ */
 public class PmAttrEnumImpl<T_ENUM extends Enum<T_ENUM>> extends PmAttrBase<T_ENUM, T_ENUM> implements PmAttrEnum<T_ENUM> {
 
   private Class<T_ENUM> enumClass;
@@ -30,11 +36,6 @@ public class PmAttrEnumImpl<T_ENUM extends Enum<T_ENUM>> extends PmAttrBase<T_EN
     return (value != null)
               ? PmLocalizeApi.localizeEnumValue(this, value)
               : null;
-  }
-
-  @Override
-  public NullOption getNullOptionDefault() {
-    return getPmConversation().getPmDefaults().getEnumNullOptionDefault();
   }
 
   protected String getTitleForEnumValue(Enum<?> value) {

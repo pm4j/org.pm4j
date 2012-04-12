@@ -2,7 +2,6 @@ package org.pm4j.core.pm;
 
 import org.pm4j.core.pm.annotation.PmCommandCfg;
 import org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO;
-import org.pm4j.core.pm.annotation.PmOptionCfg;
 import org.pm4j.core.pm.impl.PmObjectBase.NameBuilder;
 import org.pm4j.core.pm.impl.PmObjectBase.NameBuilderAbsoluteName;
 import org.pm4j.core.pm.impl.title.AsteriskAttrTitleProvider;
@@ -48,9 +47,6 @@ public class PmDefaults {
    * The default implementation provides a name that reflects the complete PM hierarchy.
    */
   private NameBuilder logStringBuilder = NameBuilderAbsoluteName.INSTANCE;
-
-  // TODO olaf: I suspect that we don't need a special option configuration only for enums. Deprecate/Delete?
-  private PmOptionCfg.NullOption enumNullOptionDefault = PmOptionCfg.NullOption.FOR_OPTIONAL_ATTR;
 
   /**
    * Defines the default {@link PmCommandCfg#beforeDo()} setting for commands
@@ -127,14 +123,6 @@ public class PmDefaults {
 
   public void setPmAttrTitleProvider(PmTitleProvider pmAttrTitleProvider) {
     this.pmAttrTitleProvider = pmAttrTitleProvider;
-  }
-
-  public PmOptionCfg.NullOption getEnumNullOptionDefault() {
-    return enumNullOptionDefault;
-  }
-
-  public void setEnumNullOptionDefault(PmOptionCfg.NullOption enumNullOption) {
-    this.enumNullOptionDefault = enumNullOption;
   }
 
   public NameBuilder getToStringNameBuilder() {

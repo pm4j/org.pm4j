@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -73,7 +74,7 @@ public class PmConversationImpl extends PmElementBase implements PmConversation 
   /**
    * A container for named objects that are bound to this conversation.
    */
-  private Map<Object, Object> pmNamedObjects = new HashMap<Object, Object>();
+  private Map<Object, Object> pmNamedObjects = new ConcurrentHashMap<Object, Object>();
 
   /**
    * The history of undo/redo commands.

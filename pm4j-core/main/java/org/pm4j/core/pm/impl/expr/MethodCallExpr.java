@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.pm4j.core.pm.impl.expr.parser.ParseCtxt;
 import org.pm4j.core.pm.impl.expr.parser.ParseException;
@@ -25,7 +26,7 @@ public class MethodCallExpr
   private static final Object[] EMPTY_OBJ_ARRAY = {};
 
   private final NameWithModifier nameWithModifier;
-  private Map<Class<?>, Method> classToMethodMap = Collections.synchronizedMap(new HashMap<Class<?>, Method>());
+  private Map<Class<?>, Method> classToMethodMap = new ConcurrentHashMap<Class<?>, Method>();
   private Expression[] paramExpressions = {};
   private Class<?>[] paramTypes = {};
 
