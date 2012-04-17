@@ -41,7 +41,6 @@ import org.pm4j.standards.PmConfirmedCommand;
  *
  * @author olaf boede
  */
-// TODO: missing doIt() signature with eventSource.
 public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable {
 
   private static final Log LOG = LogFactory.getLog(PmCommandImpl.class);
@@ -529,12 +528,20 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
       return false;
     }
 
+    PmConversationImpl conversation = getPmConversationImpl();
+
+    // Clear any message related to this command. A message for a failed previous execution attempt
+    // should not prevent an attempt to try it again...
+    conversation.clearPmMessages(this, null);
+
     switch (getOwnMetaData().beforeDo) {
       case VALIDATE:
+
+
         // identify existing validation errors. If one exists, the command should not be executed.
         List<PmMessage> oldNotAttributeRelatedMessages = new ArrayList<PmMessage>();
-        PmConversationImpl converation = getPmConversationImpl();
-        for (PmMessage m : converation.getPmMessages()) {
+
+        for (PmMessage m : conversation.getPmMessages()) {
           if (!(m.getPm() instanceof PmAttr)) {
             oldNotAttributeRelatedMessages.add(m);
           }
@@ -542,10 +549,13 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
 
         validate();
 
+        // FIXME olaf: Check if that cleanup shouldn't be done before calling the validate() method.
+        //            There was some irritation in a case of an overridden validate() method that tried to check
+        //            if the validation did provide an error...
         // all old non-attribute related messages can be cleared.
-        // the old attribute related messages not. They contain the string conversion problems to report.
+        // the old attribute related messages not. They may contain string conversion problems to report.
         for (PmMessage m : oldNotAttributeRelatedMessages) {
-          converation.clearPmMessage(m);
+          conversation.clearPmMessage(m);
         }
 
         List<PmMessage> errors = PmMessageUtil.getPmErrors(getPmConversation());
@@ -562,7 +572,7 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
         }
         break;
       case CLEAR:
-        PmMessageUtil.clearPmMessages(getPmConversation());
+        PmMessageUtil.clearSubTreeMessages(getPmConversation());
         break;
       case DO_NOTHING:
         break;
@@ -698,13 +708,6 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
     PmCommandCfg annotation = AnnotationUtil.findAnnotation(this, PmCommandCfg.class, getPmParent().getClass());
     if (annotation != null) {
       myMetaData.beforeDo = annotation.beforeDo();
-
-      // TODO olaf: remove asap.
-      if (myMetaData.beforeDo == BEFORE_DO.DEFAULT &&
-          annotation.requiresValidValues() == false) {
-        myMetaData.beforeDo = BEFORE_DO.CLEAR;
-      }
-
       myMetaData.cmdKind = annotation.cmdKind();
       myMetaData.hideWhenNotEnabled = annotation.hideWhenNotEnabled();
       if (annotation.clearCaches().length > 0) {

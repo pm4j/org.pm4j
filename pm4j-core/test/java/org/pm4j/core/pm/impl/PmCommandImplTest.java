@@ -55,7 +55,7 @@ public class PmCommandImplTest extends TestCase {
     assertEquals(1, PmMessageUtil.getPmErrors(pm.getPmConversation()).size());
     assertEquals(1, PmMessageUtil.getPmErrors(pm.cmdDynNaviRule.getPmConversation()).size());
 
-    PmMessageUtil.clearPmMessages(pm.getPmConversation());
+    PmMessageUtil.clearSubTreeMessages(pm.getPmConversation());
 
     // Command throws an internal exception that can't be handled well.
 

@@ -200,13 +200,37 @@ public class PmMessageUtil {
    * @return All messages that are related to this presentation model.<br>
    *         In case of no messages an empty collection.
    */
-  public static List<PmMessage> clearPmMessages(PmObject pm) {
-    PmEventApi.ensureThreadEventSource(pm);
-    List<PmMessage> messages = new ArrayList<PmMessage>(getPmMessages(pm));
-    ((PmConversationImpl)pm.getPmConversation()).clearPmMessages(pm, null);
+  public static List<PmMessage> clearSubTreeMessages(PmObject pm) {
+    List<PmMessage> messages = getSubTreeMessages(pm, Severity.INFO);
+    for (PmMessage m : messages) {
+      PmConversationImpl pmConversation = (PmConversationImpl)pm.getPmConversation();
+      pmConversation.clearPmMessage(m);
+    }
+    return messages;
+  }
 
-    for (PmObject p : PmUtil.getPmChildren(pm)) {
-      messages.addAll(PmMessageUtil.clearPmMessages(p));
+  /** @deprecated Please use {@link #clearSubTreeMessages(PmObject)}. */
+  @Deprecated
+  public static List<PmMessage> clearPmMessages(PmObject pm) {
+    return clearSubTreeMessages(pm);
+  }
+
+  /**
+   * Provides the messages of a PM sub tree.
+   *
+   * @param pm Root of the PM sub tree to check.
+   * @param minSeverity The minimal message severity to consider.
+   * @return
+   */
+  public static List<PmMessage> getSubTreeMessages(PmObject pm, Severity minSeverity) {
+    List<PmMessage> messages = new ArrayList<PmMessage>();
+
+    for (PmMessage m : pm.getPmConversation().getPmMessages()) {
+      if (m.getSeverity().ordinal() >= minSeverity.ordinal() &&
+          (m.getPm() == pm ||
+           PmUtil.isChild(pm, m.getPm()))) {
+        messages.add(m);
+      }
     }
 
     return messages;

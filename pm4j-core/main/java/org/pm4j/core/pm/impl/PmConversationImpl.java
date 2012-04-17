@@ -3,7 +3,6 @@ package org.pm4j.core.pm.impl;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -362,7 +361,7 @@ public class PmConversationImpl extends PmElementBase implements PmConversation 
    *         <code>false</code> when the message was not part of the message
    *         set.
    */
-  /* package */ boolean clearPmMessage(PmMessage pmMessage) {
+  public boolean clearPmMessage(PmMessage pmMessage) {
     return pmMessages.remove(pmMessage);
   }
 
