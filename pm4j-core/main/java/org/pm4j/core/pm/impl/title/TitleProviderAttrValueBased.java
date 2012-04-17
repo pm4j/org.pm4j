@@ -4,6 +4,7 @@ import org.apache.commons.lang.StringUtils;
 import org.pm4j.core.pm.PmElement;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.impl.PmObjectBase;
+import org.pm4j.core.pm.impl.PmUtil;
 
 /**
  * A simple provider that provides titles based on attribute values.
@@ -31,7 +32,7 @@ public class TitleProviderAttrValueBased extends TitleProviderPmResBased<PmObjec
    */
   @Override
   public String getTitle(PmObjectBase pm) {
-    return getPmElement(pm).getPmAttribute(attrName).getValueAsString();
+    return PmUtil.getPmAttribute(getPmElement(pm), attrName).getValueAsString();
   }
 
   // FIXME olaf: Quick Hack for non-element types.
