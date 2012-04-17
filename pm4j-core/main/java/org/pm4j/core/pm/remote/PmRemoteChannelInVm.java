@@ -42,7 +42,7 @@ public class PmRemoteChannelInVm implements PmRemoteChannel {
     finally {
       // The direct receiver PM on client side should get the content.
       content = serverSerializer.serializeWithPmMessages(serverPm);
-      PmMessageUtil.clearPmMessages(serverPm);
+      PmMessageUtil.clearSubTreeMessages(serverPm);
     }
 
     // De-serialize server PM content and messages to the client PM.

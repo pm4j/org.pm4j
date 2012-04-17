@@ -1,5 +1,7 @@
 package org.pm4j.core.pm.impl;
 
+import java.util.List;
+
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmDataInput;
 import org.pm4j.core.pm.PmObject;
@@ -13,7 +15,9 @@ public abstract class PmDataInputBase extends PmObjectBase implements PmDataInpu
   @Override
   public boolean isPmValueChanged() {
     // TODO olaf: add caching (and event support to update the cache state).
-    for (PmDataInput d : zz_getPmDataInputPms()) {
+    List<PmDataInput> items = zz_getPmDataInputPms();
+    for (int i = 0; i < items.size(); ++i) {
+      PmDataInput d = items.get(i);
       if (d.isPmValueChanged() && d.isPmVisible()) {
         return true;
       }
