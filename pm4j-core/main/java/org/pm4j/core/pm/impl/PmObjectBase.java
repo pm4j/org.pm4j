@@ -510,7 +510,7 @@ public abstract class PmObjectBase implements PmObject {
     BeanPmFactory f = getOwnPmElementFactory();
     if ((f != null) && f.canMakePmFor(pmBean.getPmBean())) {
       if (pmBeanFactoryCache == null) {
-        pmBeanFactoryCache = new BeanPmCache();
+        pmBeanFactoryCache = new BeanPmCacheImpl();
       }
       pmBeanFactoryCache.add(pmBean);
     }

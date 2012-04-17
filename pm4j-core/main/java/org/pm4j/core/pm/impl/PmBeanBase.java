@@ -131,7 +131,7 @@ public abstract class PmBeanBase<T_BEAN>
       pmBean = null;
 
       // Old cache values are related to the old bean.
-      PmMessageUtil.clearPmMessages(this);
+      PmMessageUtil.clearSubTreeMessages(this);
       PmCacheApi.clearCachedPmValues(this);
 
       if (bean != null) {
@@ -158,6 +158,8 @@ public abstract class PmBeanBase<T_BEAN>
   public class SetPmBeanEventVisitor extends PmVisitorAdapter {
     @Override
     protected void onVisit(PmObject pm) {
+      // the cached dynamic sub PMs are obsolete after switching to a new bean value.
+      BeanPmCacheUtil.clearBeanPmCache(pm);
       PmEventApi.firePmEvent(pm, PmEvent.ALL_CHANGE_EVENTS);
       for (PmObject child : PmUtil.getPmChildren(pm)) {
         // Switch for each child to an event that is related to the child.
@@ -175,6 +177,7 @@ public abstract class PmBeanBase<T_BEAN>
       List<Object> changedRows = new ArrayList<Object>(table.getRowsWithChanges());
 
       onVisit(table);
+      ((PmTableImpl<?>)table).setPmValueChanged(false);
 
       // Changed rows get informed to make sure that all invalid PM states get cleared.
       // Informs the ChangedChildStateRegistry of the table.

@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.pm4j.common.util.InvertingComparator;
 import org.pm4j.core.exception.PmRuntimeException;
+import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmDataInput;
 import org.pm4j.core.pm.PmElement;
 import org.pm4j.core.pm.PmEvent;
@@ -153,6 +154,9 @@ public class PmTableImpl
    */
   protected void onDeleteRow(T_ROW_ELEMENT_PM deletedRow) {
     changedStateRegistry.onDeleteItem(deletedRow);
+    if (deletedRow instanceof PmBean) {
+      BeanPmCacheUtil.removeBeanPm(this, (PmBean<?>)deletedRow);
+    }
   }
 
   @Override
@@ -359,6 +363,11 @@ public class PmTableImpl
     return changedStateRegistry.isAChangeRegistered();
   }
 
+  // TODO olaf: move two methode to a value change util: set individual and sub-tree changed states
+  void setPmValueChanged(boolean newChangedState) {
+    changedStateRegistry.clearChangedItems();
+  }
+
   /**
    * Validates the changed row items only.
    */
@@ -422,6 +431,10 @@ public class PmTableImpl
       //           Generates potentially an initialization problem if called in constructor
       pageableCollection.setMultiSelect(getRowSelectMode() == RowSelectMode.MULTI);
       pageableCollection.setPageSize(getNumOfPageRows());
+    }
+
+    if (!preseveSettings) {
+      BeanPmCacheUtil.clearBeanPmCache(this);
     }
 
     PmEventApi.firePmEventIfInitialized(this, PmEvent.VALUE_CHANGE);
