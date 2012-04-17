@@ -12,6 +12,7 @@ import org.eclipse.swt.widgets.Widget;
 import org.pm4j.core.pb.PbFactory;
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmElement;
+import org.pm4j.core.pm.impl.PmUtil;
 import org.pm4j.swt.pb.base.PbCompositeChildToPmBase;
 
 public class PbGridLayout <PM extends PmElement> extends PbCompositeBase<Composite, PM>  {
@@ -46,7 +47,7 @@ public class PbGridLayout <PM extends PmElement> extends PbCompositeBase<Composi
           for (Control c : view.getChildren()) {
             c.dispose();
           }
-          buildRows(view, pm.getPmAttributes());
+          buildRows(view, PmUtil.getPmAttributes(pm));
         }
       };
     }

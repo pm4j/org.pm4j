@@ -138,7 +138,7 @@ public class UserPmTest extends TestCase {
     assertFalse(userPm.name.isPmValid());
     assertEquals(null, userPm.name.getValue());
     assertEquals("Willi", user.getName());
-    PmMessageUtil.clearPmMessages(userPm);
+    PmMessageUtil.clearSubTreeMessages(userPm);
 
     userPm.name.setValue("");
     userPm.cmdCommitChanges.doIt();
@@ -146,7 +146,7 @@ public class UserPmTest extends TestCase {
     // FIXME: should return the invalid value...
 //    assertEquals("", userPm.name.getValue());
     assertEquals("Willi", user.getName());
-    PmMessageUtil.clearPmMessages(userPm);
+    PmMessageUtil.clearSubTreeMessages(userPm);
 
     userPm.name.setValue("ab");
     userPm.cmdCommitChanges.doIt();
@@ -170,7 +170,7 @@ public class UserPmTest extends TestCase {
     assertEquals(1, messages.size());
     assertEquals(userPm.name, messages.get(0).getPm());
 
-    PmMessageUtil.clearPmMessages(userPm.getPmConversation());
+    PmMessageUtil.clearSubTreeMessages(userPm.getPmConversation());
     // FIXME: the invalid value should have been cleaned...
     // assertEquals("ab", userPm.name.getValue());
     assertEquals(0, userPm.getPmConversation().getPmMessages().size());

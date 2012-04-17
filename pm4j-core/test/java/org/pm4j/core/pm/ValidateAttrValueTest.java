@@ -46,13 +46,13 @@ public class ValidateAttrValueTest extends TestCase {
     assertEquals("abc", o.i.getValueAsString());
     assertFalse(PmUtil.hasValidAttributes(o));
     assertEquals(1, PmMessageUtil.getPmErrors(o).size());
-    PmMessageUtil.clearPmMessages(o);
+    PmMessageUtil.clearSubTreeMessages(o);
 
     o.i.setValueAsString("");
     o.cmdWithValidation.doIt();
     assertEquals(null, o.i.getValueAsString());
     assertEquals(1, PmMessageUtil.getPmErrors(o).size());
-    PmMessageUtil.clearPmMessages(o);
+    PmMessageUtil.clearSubTreeMessages(o);
 
     o.i.setValueAsString("12");
     o.cmdWithValidation.doIt();
