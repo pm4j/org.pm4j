@@ -172,9 +172,8 @@ public final class PmUtil {
    * @param pm The element to check.
    * @return <code>true</code> if all attributes do not have an error state.
    */
-  // TODO olaf: move to PmElement
   public static boolean hasValidAttributes(PmElement pm) {
-    for (PmAttr<?> a : pm.getPmAttributes()) {
+    for (PmAttr<?> a : getPmAttributes(pm)) {
       if (!a.isPmValid()) {
         return false;
       }
@@ -256,6 +255,31 @@ public final class PmUtil {
    */
   public static List<PmCommand> getVisiblePmCommands(PmObject pm, PmCommand.CommandSet commandSet) {
     return getVisiblePmCommands(pm);
+  }
+
+  /**
+   * @param pm The pm to get all attributes from.
+   * @return The set of attributes.
+   */
+  public static List<PmAttr<?>> getPmAttributes(PmObject pm) {
+    return ((PmObjectBase)pm).zz_getPmAttributes();
+  }
+
+  /**
+   * @param pm The pm to get the attribute from.
+   * @param attrName
+   *          Name of the requested attribute.
+   * @return The matching attribute instance. Never <code>null</code>.
+   * @throws PmRuntimeException
+   *           when there is no matching attribute.
+   */
+  public static PmAttr<?> getPmAttribute(PmObject pm, String attrName) {
+    PmObject pmAttr = ((PmObjectBase)pm).findChildPm(attrName);
+    if (!(pmAttr instanceof PmAttr)) {
+      throw new PmRuntimeException(pm, "The found child PM with name '" + attrName +
+          "' is not an attribute or null. Found item: " + pmAttr);
+    }
+    return (PmAttr<?>)pmAttr;
   }
 
   /**

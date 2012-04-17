@@ -65,18 +65,16 @@ public abstract class PmElementBase
     visitor.visit(this);
   }
 
+  @Override
+  @Deprecated
   public List<PmAttr<?>> getPmAttributes() {
-    return super.zz_getPmAttributes();
+    return PmUtil.getPmAttributes(this);
   }
 
   @Override
+  @Deprecated
   public final PmAttr<?> getPmAttribute(String attrName) {
-    PmObject pm = findChildPm(attrName);
-    if (!(pm instanceof PmAttr)) {
-      throw new PmRuntimeException(this, "The found child PM with name '" + attrName +
-          "' is not an attribute or null. Found item: " + pm);
-    }
-    return (PmAttr<?>)pm;
+    return PmUtil.getPmAttribute(this, attrName);
   }
 
   @Override
@@ -163,7 +161,7 @@ public abstract class PmElementBase
   @SuppressWarnings("unchecked")
   protected List<? extends PmTreeNode> getPmChildNodesImpl() {
     List<PmTreeNode> list = new ArrayList<PmTreeNode>();
-    for (PmAttr<?> a : getPmAttributes()) {
+    for (PmAttr<?> a : PmUtil.getPmAttributes(this)) {
       if (a instanceof PmTreeNode) {
         list.add((PmTreeNode)a);
       }
