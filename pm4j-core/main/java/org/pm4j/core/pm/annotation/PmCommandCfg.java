@@ -21,15 +21,6 @@ import org.pm4j.core.pm.impl.PmCommandImpl;
 @Target({ ElementType.TYPE, ElementType.FIELD })
 public @interface PmCommandCfg {
 
-  /**
-   * @return <code>true</code> when the command should fail when there are
-   *         invalid values within the current session.
-   *
-   * @deprecated Please use {@link #beforeDo()}.
-   */
-  @Deprecated()
-  boolean requiresValidValues() default false;
-
   public enum BEFORE_DO {
     /**
      * {@link PmCommandImpl#validate()} will be executed before the
