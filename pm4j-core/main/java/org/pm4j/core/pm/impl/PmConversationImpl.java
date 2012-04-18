@@ -271,7 +271,7 @@ public class PmConversationImpl extends PmElementBase implements PmConversation 
     }
 
     if (LOG.isDebugEnabled()) {
-      LOG.debug(pmMessage.getTitle());
+      LOG.debug(pmMessage.getPm() + ": " + pmMessage.getTitle());
     }
   }
 
