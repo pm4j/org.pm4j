@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
 
 import org.pm4j.core.pm.PmAttrEnum;
 import org.pm4j.core.pm.PmElement;
@@ -18,8 +17,7 @@ import org.pm4j.core.pm.PmTableCol;
 import org.pm4j.core.pm.PmTableGenericRow;
 import org.pm4j.core.pm.PmVisitor;
 import org.pm4j.core.pm.api.PmEventApi;
-import org.pm4j.core.pm.api.PmMessageUtil;
-import org.pm4j.core.util.reflection.ClassUtil;
+import org.pm4j.core.pm.api.PmValidationApi;
 
 /**
  * @deprecated Use {@link PmTableImpl} now.
@@ -117,7 +115,7 @@ public class DeprecatedPmTableOfPmElementsImpl<T_ROW_ELEMENT_PM extends PmElemen
     for (PmTableGenericRow<T_ROW_ELEMENT_PM> r : getRowsImpl()) {
       T_ROW_ELEMENT_PM obj = r.getBackingBean();
       if (obj instanceof PmObject) {
-        PmMessageUtil.clearPmInvalidValues((PmObject)obj);
+        PmValidationApi.clearInvalidValuesOfSubtree((PmObject)obj);
       }
     }
   }

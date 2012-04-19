@@ -18,7 +18,7 @@ import org.pm4j.core.pm.PmMessage;
 import org.pm4j.core.pm.PmMessage.Severity;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.api.PmEventApi;
-import org.pm4j.core.pm.api.PmMessageUtil;
+import org.pm4j.core.pm.api.PmValidationApi;
 import org.pm4j.core.pm.impl.connector.PmToNoViewTechnologyConnector;
 import org.pm4j.core.pm.impl.connector.PmToViewTechnologyConnector;
 import org.pm4j.navi.NaviHistory;
@@ -389,7 +389,7 @@ public class PmConversationImpl extends PmElementBase implements PmConversation 
           if ((pm == null || pm == m.getPm()) &&
               (severity == null || m.getSeverity().equals(severity))) {
             if (m instanceof PmValidationMessage) {
-              PmMessageUtil.clearPmInvalidValues(m.getPm());
+              PmValidationApi.clearInvalidValuesOfSubtree(m.getPm());
             }
             pmMessages.remove(m);
           }
@@ -415,7 +415,7 @@ public class PmConversationImpl extends PmElementBase implements PmConversation 
           if (debugEnabled) {
             LOG.debug("Cleaning invalid value state for attribute '" + PmUtil.getPmLogString(value.getPm()) + "'.");
           }
-          PmMessageUtil.clearPmInvalidValues(value.getPm());
+          PmValidationApi.clearInvalidValuesOfSubtree(value.getPm());
         }
       }
       pmInvalidValues.clear();

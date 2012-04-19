@@ -15,7 +15,6 @@ import org.pm4j.core.pm.PmMessage.Severity;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.impl.PmAttrBase;
 import org.pm4j.core.pm.impl.PmConversationImpl;
-import org.pm4j.core.pm.impl.PmObjectBase;
 import org.pm4j.core.pm.impl.PmUtil;
 
 public class PmMessageUtil {
@@ -235,13 +234,5 @@ public class PmMessageUtil {
 
     return messages;
   }
-
-  /**
-   * Clears not yet validated values within the scope of this PM.
-   */
-  public static void clearPmInvalidValues(PmObject pm) {
-    ((PmObjectBase)pm).clearPmInvalidValues();
-  }
-
 
 }

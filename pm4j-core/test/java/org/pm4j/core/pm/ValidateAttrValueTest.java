@@ -3,6 +3,7 @@ package org.pm4j.core.pm;
 import static org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO.VALIDATE;
 import junit.framework.TestCase;
 
+import org.pm4j.core.pm.PmCommand.CommandState;
 import org.pm4j.core.pm.PmMessage.Severity;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.annotation.PmAttrIntegerCfg;
@@ -42,8 +43,11 @@ public class ValidateAttrValueTest extends TestCase {
     assertEquals(0, PmMessageUtil.getPmErrors(o).size());
 
     o.i.setValueAsString("abc");
-    o.cmdWithValidation.doIt();
+    assertEquals(1, PmMessageUtil.getSubTreeMessages(o.getPmConversation(), Severity.ERROR).size());
+    PmCommand.CommandState cmdState = o.cmdWithValidation.doIt().getCommandState();
+    assertEquals(CommandState.BEFORE_DO_RETURNED_FALSE, cmdState);
     assertEquals("abc", o.i.getValueAsString());
+    assertEquals(1, PmMessageUtil.getSubTreeMessages(o.getPmConversation(), Severity.ERROR).size());
     assertFalse(PmUtil.hasValidAttributes(o));
     assertEquals(1, PmMessageUtil.getPmErrors(o).size());
     PmMessageUtil.clearSubTreeMessages(o);
@@ -83,9 +87,10 @@ public class ValidateAttrValueTest extends TestCase {
     MyPmClass o = new MyPmClass();
 
     PmMessageUtil.makeMsg(o, Severity.INFO, "hello");
-    assertEquals("A non attribute relatged message exists.", 1, o.getPmMessages().size());
+    assertEquals("A non attribute related message exists.", 1, o.getPmMessages().size());
 
     o.cmdWithValidation.doIt();
+    System.out.println(o.getPmMessages());
     assertEquals("A failed validating command execution clears other messages and provides attribute related messages", 1, o.getPmMessages().size());
 
     PmMessageUtil.makeMsg(o, Severity.INFO, "hello");

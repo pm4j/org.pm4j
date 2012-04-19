@@ -12,10 +12,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.exception.PmUserMessageException;
-import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmCommandDecorator;
 import org.pm4j.core.pm.PmConstants;
+import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.PmDataInput;
 import org.pm4j.core.pm.PmDefaults;
 import org.pm4j.core.pm.PmElement;
@@ -30,6 +30,7 @@ import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmLocalizeApi;
 import org.pm4j.core.pm.api.PmMessageUtil;
+import org.pm4j.core.pm.api.PmValidationApi;
 import org.pm4j.navi.NaviHistory;
 import org.pm4j.navi.NaviLink;
 import org.pm4j.navi.NaviRuleLink;
@@ -443,7 +444,7 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
 
   @Override
   public boolean isRequiresValidValues() {
-    return getOwnMetaData().beforeDo == BEFORE_DO.VALIDATE;
+    return getBeforeDoStrategy() == BEFORE_DO.VALIDATE;
   }
 
   // -- internal helper --
@@ -503,10 +504,47 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
    * <p>
    * The default implementation checks {@link #isRequiresValidValues()} and
    * triggers the validation of the parent element.
+   *
+   * @return <code>true</code> if the validation was successful. That means: There are no errors related to
+   * {@link #getValidationErrorRootPm()}.
    */
-  protected void validate() {
-    PmDataInput parentElement = PmUtil.getPmParentOfType(this, PmDataInput.class);
-    parentElement.pmValidate();
+  protected boolean validate() {
+    return PmValidationApi.validateSubTree(getValidationExecRootPm(), getValidationErrorRootPm());
+  }
+
+  /**
+   * @return Defines what happens before {@link #doItImpl()} gets called.
+   */
+  protected BEFORE_DO getBeforeDoStrategy() {
+    return getOwnMetaData().beforeDo;
+  }
+
+  /**
+   * Provides the object that defines the area (PM sub tree) that should not contain
+   * an error after command validation.
+   * <p>
+   * It will only be considered if the command validates before execution.
+   * <p>
+   * The default implementation provides the related {@link PmConversation}. 
+   * 
+   * @return The root object of the PM subtree that should be valid for this command.
+   */
+  protected PmObject getValidationErrorRootPm() {
+    return getPmConversation();
+  }
+  
+  /**
+   * Provides the object that defines the area (PM sub tree) the validation should be
+   * called for before command execution.
+   * <p>
+   * It will only be considered if the command validates before execution.
+   * <p>
+   * The default implementation provides the next parent of type {@link PmDataInput}.
+   * 
+   * @return 
+   */
+  protected PmDataInput getValidationExecRootPm() {
+    return PmUtil.getPmParentOfType(this, PmDataInput.class);
   }
 
   /**
@@ -534,39 +572,11 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
     // should not prevent an attempt to try it again...
     conversation.clearPmMessages(this, null);
 
-    switch (getOwnMetaData().beforeDo) {
+    switch (getBeforeDoStrategy()) {
       case VALIDATE:
-
-
-        // identify existing validation errors. If one exists, the command should not be executed.
-        List<PmMessage> oldNotAttributeRelatedMessages = new ArrayList<PmMessage>();
-
-        for (PmMessage m : conversation.getPmMessages()) {
-          if (!(m.getPm() instanceof PmAttr)) {
-            oldNotAttributeRelatedMessages.add(m);
-          }
-        }
-
-        validate();
-
-        // FIXME olaf: Check if that cleanup shouldn't be done before calling the validate() method.
-        //            There was some irritation in a case of an overridden validate() method that tried to check
-        //            if the validation did provide an error...
-        // all old non-attribute related messages can be cleared.
-        // the old attribute related messages not. They may contain string conversion problems to report.
-        for (PmMessage m : oldNotAttributeRelatedMessages) {
-          conversation.clearPmMessage(m);
-        }
-
-        List<PmMessage> errors = PmMessageUtil.getPmErrors(getPmConversation());
-        if (! errors.isEmpty()) {
+        if (! validate()) {
           if (LOG.isDebugEnabled()) {
-            StringBuilder sb = new StringBuilder(160);
-            sb.append("Command '").append(PmUtil.getPmLogString(this)).append("' not executed because of validation errors:");
-            for (PmMessage m : errors) {
-              sb.append("\n\t").append(m.getTitle());
-            }
-            LOG.debug(sb.toString());
+            LOG.debug("Command '" + PmUtil.getPmLogString(this) + "' was not executed because of validation errors.");
           }
           return false;
         }
