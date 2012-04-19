@@ -20,7 +20,10 @@ import org.pm4j.core.pm.PmTableCol;
 import org.pm4j.core.pm.PmTableGenericRow;
 import org.pm4j.core.pm.PmTableRow;
 import org.pm4j.core.pm.PmVisitor;
+import org.pm4j.core.pm.annotation.PmCommandCfg;
+import org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO;
 import org.pm4j.core.pm.api.PmEventApi;
+import org.pm4j.core.pm.api.PmValidationApi;
 import org.pm4j.core.pm.pageable.PageableCollection;
 import org.pm4j.core.pm.pageable.PageableCollection.Filter;
 import org.pm4j.core.pm.pageable.PageableListImpl;
@@ -501,6 +504,22 @@ public class PmTableImpl
 
   private final MetaData getOwnMetaDataWithoutPmInitCall() {
     return (MetaData) getPmMetaDataWithoutPmInitCall();
+  }
+
+  /**
+   * Validates the related table before execution.
+   */
+  @PmCommandCfg(beforeDo=BEFORE_DO.VALIDATE)
+  public static class PmTableValidatingCommand extends PmCommandImpl {
+
+    public PmTableValidatingCommand(PmObject pmParent) {
+      super(pmParent);
+    }
+
+    @Override
+    protected boolean validate() {
+      return PmValidationApi.validateSubTree(PmUtil.getPmParentOfType(this, PmTable.class));
+    }
   }
 
 }

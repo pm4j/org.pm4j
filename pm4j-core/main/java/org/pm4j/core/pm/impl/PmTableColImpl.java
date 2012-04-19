@@ -6,6 +6,7 @@ import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmAttrEnum;
 import org.pm4j.core.pm.PmAttrInteger;
 import org.pm4j.core.pm.PmCommand;
+import org.pm4j.core.pm.PmDataInput;
 import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmEventListener;
 import org.pm4j.core.pm.PmObject;
@@ -14,10 +15,13 @@ import org.pm4j.core.pm.PmTable;
 import org.pm4j.core.pm.PmTableCol;
 import org.pm4j.core.pm.PmVisitor;
 import org.pm4j.core.pm.annotation.PmBoolean;
+import org.pm4j.core.pm.annotation.PmCommandCfg;
+import org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO;
 import org.pm4j.core.pm.annotation.PmTableCfg;
 import org.pm4j.core.pm.annotation.PmTableColCfg;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmLocalizeApi;
+import org.pm4j.core.pm.api.PmValidationApi;
 import org.pm4j.core.pm.pageable.PageableCollection;
 import org.pm4j.core.util.table.ColSizeSpec;
 
@@ -109,6 +113,7 @@ public class PmTableColImpl extends PmObjectBase implements PmTableCol {
     return new CmdSortPm();
   }
 
+  @PmCommandCfg(beforeDo=BEFORE_DO.VALIDATE)
   protected class CmdSortPm extends PmCommandImpl {
 
     public CmdSortPm() {
@@ -123,11 +128,6 @@ public class PmTableColImpl extends PmObjectBase implements PmTableCol {
     @Override
     protected boolean isPmVisibleImpl() {
       return getSortOrderAttr().isPmVisible();
-    }
-
-    @Override
-    public boolean isRequiresValidValues() {
-      return false;
     }
 
     @Override
@@ -156,6 +156,16 @@ public class PmTableColImpl extends PmObjectBase implements PmTableCol {
         case NEUTRAL: sortAttr.setValue(PmSortOrder.ASC); break;
         default: throw new PmRuntimeException(this, "Unknown enum value: " + sortAttr.getValue());
       }
+    }
+
+    @Override
+    protected PmDataInput getValidationExecRootPm() {
+      return PmUtil.getPmParentOfType(this, PmTable.class);
+    }
+
+    @Override
+    protected PmObject getValidationErrorRootPm() {
+      return PmUtil.getPmParentOfType(this, PmTable.class);
     }
   }
 
@@ -234,6 +244,8 @@ public class PmTableColImpl extends PmObjectBase implements PmTableCol {
   /**
    * Default sort order PM attribute class.
    * <p>
+   * Changes the value only after successful validation if the table content.
+   * <p>
    * May be extended or replaced by domain specific implementations.
    */
   public class SortOrderAttr extends PmAttrEnumImpl<PmSortOrder> {
@@ -257,6 +269,18 @@ public class PmTableColImpl extends PmObjectBase implements PmTableCol {
       return isPmEnabledImpl();
     }
 
+    /**
+     * The set value operation is overridden to ensure table validity before setting the value.
+     * This was not done within {@link #setBackingValueImpl(PmSortOrder)} because this gets also called
+     * by internal functionality. E.g. on {@link #getValue()} to apply the default value.
+     */
+    @Override
+    protected boolean setValueImpl(SetValueContainer<PmSortOrder> value) {
+      // XXX olaf: a set value decorator would be better.
+      return PmValidationApi.validateSubTree(PmUtil.getPmParentOfType(this, PmTable.class))
+          ? super.setValueImpl(value)
+          : false;
+    }
   }
 
 }
