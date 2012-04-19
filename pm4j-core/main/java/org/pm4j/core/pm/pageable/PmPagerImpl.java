@@ -8,20 +8,25 @@ import org.pm4j.core.pm.PmAttrInteger;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmLabel;
 import org.pm4j.core.pm.PmObject;
+import org.pm4j.core.pm.PmTable;
 import org.pm4j.core.pm.annotation.PmBeanCfg;
 import org.pm4j.core.pm.annotation.PmCommandCfg;
 import org.pm4j.core.pm.annotation.PmTitleCfg;
 import org.pm4j.core.pm.api.PmLocalizeApi;
+import org.pm4j.core.pm.api.PmValidationApi;
 import org.pm4j.core.pm.impl.PmAttrBooleanImpl;
 import org.pm4j.core.pm.impl.PmAttrIntegerImpl;
 import org.pm4j.core.pm.impl.PmBeanBase;
 import org.pm4j.core.pm.impl.PmCommandImpl;
 import org.pm4j.core.pm.impl.PmLabelImpl;
+import org.pm4j.core.pm.impl.PmTableImpl;
 import org.pm4j.core.pm.impl.PmUtil;
 import org.pm4j.core.pm.impl.SetValueContainer;
 
 /**
  * Implementation for some standard pager functionality.
+ * <p>
+ *
  *
  * @author olaf boede
  *
@@ -66,16 +71,15 @@ public class PmPagerImpl<T_ITEM>
   @Override
   protected boolean isPmVisibleImpl() {
     switch (pagerVisibility) {
-      case ALWAYS: return true;
+      case ALWAYS:                  return true;
       case WHEN_SECOND_PAGE_EXISTS: return getPmBean().getNumOfItems() > getPageSize();
       case WHEN_TABLE_IS_NOT_EMPTY: return getPmBean().getNumOfItems() > 0;
-      case NEVER: return false;
+      case NEVER:                   return false;
       default: throw new PmRuntimeException(this, "Unknown enum value: " + pagerVisibility);
     }
   }
 
-  @PmCommandCfg(beforeDo=DO_NOTHING)
-  public final PmCommand cmdFirst = new PmCommandImpl(this) {
+  public final PmCommand cmdFirst = new PmTableImpl.PmTableValidatingCommand(this) {
     @Override
     protected boolean isPmEnabledImpl() {
         return PageableCollectionUtil.hasPrevPage(getPmBean());
@@ -87,8 +91,7 @@ public class PmPagerImpl<T_ITEM>
     }
   };
 
-  @PmCommandCfg(beforeDo=DO_NOTHING)
-  public final PmCommand cmdPrev = new PmCommandImpl(this) {
+  public final PmCommand cmdPrev = new PmTableImpl.PmTableValidatingCommand(this) {
     @Override
     protected boolean isPmEnabledImpl() {
         return PageableCollectionUtil.hasPrevPage(getPmBean());
@@ -100,8 +103,7 @@ public class PmPagerImpl<T_ITEM>
     }
   };
 
-  @PmCommandCfg(beforeDo=DO_NOTHING)
-  public final PmCommand cmdNext = new PmCommandImpl(this) {
+  public final PmCommand cmdNext = new PmTableImpl.PmTableValidatingCommand(this) {
     @Override
     protected boolean isPmEnabledImpl() {
       return PageableCollectionUtil.hasNextPage(getPmBean());
@@ -113,8 +115,7 @@ public class PmPagerImpl<T_ITEM>
     }
   };
 
-  @PmCommandCfg(beforeDo=DO_NOTHING)
-  public final PmCommand cmdLast = new PmCommandImpl(this) {
+  public final PmCommand cmdLast = new PmTableImpl.PmTableValidatingCommand(this) {
       @Override
       protected boolean isPmEnabledImpl() {
           return PageableCollectionUtil.hasNextPage(getPmBean());
@@ -154,7 +155,11 @@ public class PmPagerImpl<T_ITEM>
           if (newValue != null &&
               newValue > 0 &&
               newValue <= getNumOfPages() ) {
-              return super.setValueImpl(value);
+
+            // XXX olaf: a set value decorator would be better.
+            return PmValidationApi.validateSubTree(PmUtil.getPmParentOfType(this, PmTable.class))
+                ? super.setValueImpl(value)
+                : false;
           }
           else {
               return false;

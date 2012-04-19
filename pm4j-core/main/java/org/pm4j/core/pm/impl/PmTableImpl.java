@@ -506,6 +506,7 @@ public class PmTableImpl
     return (MetaData) getPmMetaDataWithoutPmInitCall();
   }
 
+
   /**
    * Validates the related table before execution.
    */
