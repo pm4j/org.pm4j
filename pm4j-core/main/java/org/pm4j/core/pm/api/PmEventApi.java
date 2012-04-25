@@ -7,7 +7,7 @@ import org.pm4j.core.pm.impl.PmEventApiHandler;
 
 public class PmEventApi {
 
-  private static final PmEventApiHandler apiHandler = new PmEventApiHandler();
+  private static PmEventApiHandler apiHandler = new PmEventApiHandler();
 
   /**
    * The provided <tt>listener</tt> will receive {@link PmEvent} events whenever
@@ -89,4 +89,13 @@ public class PmEventApi {
         ? apiHandler.setThreadEventSource(param)
         : currSrc;
   }
+
+  /**
+   * Defines an application specific event api call handler.
+   * @param newApiHandler The alternate handler to use within the application.
+   */
+  public static void setApiHandler(PmEventApiHandler newApiHandler) {
+    apiHandler = newApiHandler;
+  }
+
 }

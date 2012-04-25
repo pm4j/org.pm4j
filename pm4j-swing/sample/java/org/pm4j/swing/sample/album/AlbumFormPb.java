@@ -5,6 +5,8 @@ import java.awt.Frame;
 
 import javax.swing.JDialog;
 
+import org.pm4j.core.pm.api.PmEventApi;
+import org.pm4j.core.pm.impl.PmEventApiHandler;
 import org.pm4j.core.sample.album.AlbumFormPm;
 import org.pm4j.core.sample.album.AlbumPm;
 import org.pm4j.core.sample.album.AlbumSessionPm;
@@ -16,9 +18,10 @@ public class AlbumFormPb extends PbFormBase<AlbumForm, AlbumFormPm> {
   public AlbumForm makeView(Container parent, AlbumFormPm pm) {
     return new AlbumForm();
   }
-  
+
   @Override
   protected void bindImpl(AlbumForm view, AlbumFormPm pm) {
+
     AlbumPm albumPm = pm.album;
 
     bindAttr(null, view.albumSelectionList, pm.albumSelection);
@@ -30,7 +33,7 @@ public class AlbumFormPb extends PbFormBase<AlbumForm, AlbumFormPm> {
     bindCommand(view.btnCancel, pm.cmdCancel);
     bindCommand(view.btnSave, pm.cmdSave);
   }
-  
+
 
   public static void main(String[] args) {
     JDialog dlg = new JDialog((Frame) null, "Album Demo Application", true);
@@ -43,6 +46,7 @@ public class AlbumFormPb extends PbFormBase<AlbumForm, AlbumFormPm> {
     dlg.setSize(450, 200);
     dlg.setLocationRelativeTo(null); // centered
     dlg.setVisible(true);
+    PmEventApi.setApiHandler(new PmEventApiHandler.WithThreadLocalEventSource());
   }
 
 }
