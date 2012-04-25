@@ -29,7 +29,9 @@ public class PmAttrBooleanImpl extends PmAttrBase<Boolean, Boolean> implements P
 
   @Override
   protected PmOptionSet getOptionSetImpl() {
-    return new PmOptionSetImpl(PmOptionSetUtil.makeBooleanOptions(this));
+    boolean withNullOption = !isRequired() ||
+                             (getValue() == null);
+    return new PmOptionSetImpl(PmOptionSetUtil.makeBooleanOptions(this, withNullOption));
   }
 
   // ======== meta data ======== //
