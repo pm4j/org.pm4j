@@ -21,7 +21,7 @@ public class PmEventApiHandler {
    * <b>Attention</b>: In case of environments with re-used threads it needs to be ensured that
    * the {@link #setThreadEventSource(Object)} gets called with a <code>null</code> parameter.
    */
-  static class WithThreadLocalEventSource extends PmEventApiHandler {
+  public static class WithThreadLocalEventSource extends PmEventApiHandler {
 
     private ThreadLocal<Object> threadEventSource = new ThreadLocal<Object>();
 
