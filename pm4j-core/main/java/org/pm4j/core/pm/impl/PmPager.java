@@ -1,9 +1,10 @@
-package org.pm4j.core.pm.pageable;
+package org.pm4j.core.pm.impl;
 
 import org.pm4j.core.pm.PmAttrInteger;
 import org.pm4j.core.pm.PmCommand;
+import org.pm4j.core.pm.PmCommandDecorator;
 import org.pm4j.core.pm.PmLabel;
-import org.pm4j.core.pm.pageable.PmPagerImpl.PagerVisibility;
+import org.pm4j.core.pm.impl.PmPagerImpl.PagerVisibility;
 
 /**
  * PM for a control that allows to switch between pages.
@@ -82,4 +83,14 @@ public interface PmPager {
    */
   PagerVisibility getPagerVisibility();
 
+  /**
+   * Registers a decorator to be called before and after a page change triggered by
+   * this pager.
+   * <p>
+   * A decorator may prevent the page switch by returning <code>true</code> in it's
+   * <code>beforDo</code> implementation.
+   *
+   * @param decorator The decorator.
+   */
+  void addPageChangeDecorator(PmCommandDecorator decorator);
 }
