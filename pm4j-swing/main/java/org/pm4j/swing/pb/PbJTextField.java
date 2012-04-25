@@ -15,7 +15,6 @@ import org.apache.commons.lang.StringUtils;
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmAttrString;
 import org.pm4j.core.pm.PmEvent;
-import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmEventCallGate;
 import org.pm4j.swing.pb.base.PbJComponentToAttrBase;
 import org.pm4j.swing.pb.internal.util.MaxLenDocumentFilter;
