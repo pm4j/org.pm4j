@@ -102,7 +102,8 @@ public abstract class PbFactoryBase<VIEW, PARENT_VIEW_CTXT, PM extends PmObject>
       ((Binding)binding).pm = (PM)pm;
       ((Binding)binding).view = view;
 
-      // TODO: check!
+      // All PM messages will be passed to the binder instance.
+      // The listener exists as long as the PM is in memory.
       PmEventApi.addWeakPmEventListener(pm, PmEvent.ALL, binding.getPmEventListener());
 
       setBinding(view, binding);
