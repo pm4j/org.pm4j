@@ -118,7 +118,7 @@ public class PageablePmsForBeans<T_PM extends PmBean<T_BEAN>, T_BEAN> implements
             : null);
     // fire the event after successful select
     if(wasUnselected) {
-      PmEventApi.firePmEvent(pmCtxt, PmEvent.SELECTION_CHANGE);
+      PmEventApi.firePmEventIfInitialized(pmCtxt, PmEvent.SELECTION_CHANGE);
     }
   }
 
@@ -129,7 +129,7 @@ public class PageablePmsForBeans<T_PM extends PmBean<T_BEAN>, T_BEAN> implements
         ? item.getPmBean()
         : null);
     if(wasSelected) {
-      PmEventApi.firePmEvent(pmCtxt, PmEvent.SELECTION_CHANGE);
+      PmEventApi.firePmEventIfInitialized(pmCtxt, PmEvent.SELECTION_CHANGE);
     }
   }
 
