@@ -22,17 +22,17 @@ public final class PmOptionSetUtil {
    * @param pmAttr An attribute to generate the options for.
    * @return The generated options.
    */
-  public static List<PmOption> makeBooleanOptions(PmAttr<?> pmAttr) {
+  public static List<PmOption> makeBooleanOptions(PmAttr<?> pmAttr, boolean withNullOption) {
     List<PmOption> options = new ArrayList<PmOption>();
 
-    // TODO olaf: generate optionally a null-option.
-
+    if (withNullOption) {
+      options.add(new PmOptionImpl("", getNullOptionTitle(pmAttr), null));
+    }
     options.add(new PmOptionImpl(Boolean.TRUE.toString(), PmLocalizeApi.localizeBooleanValue(pmAttr, Boolean.TRUE), Boolean.TRUE));
     options.add(new PmOptionImpl(Boolean.FALSE.toString(), PmLocalizeApi.localizeBooleanValue(pmAttr, Boolean.FALSE), Boolean.FALSE));
 
     return options;
   }
-
 
   /**
    * Helper for manual enum option set creation.
@@ -43,9 +43,10 @@ public final class PmOptionSetUtil {
   public static List<PmOption> makeEnumOptions(PmAttr<?> pmAttr, Enum<?>... values) {
     List<PmOption> options = new ArrayList<PmOption>();
 
-    // TODO olaf: generate optionally a null-option.
-
     for (Enum<?> v : values) {
+      if (v == null) {
+        options.add(new PmOptionImpl("", getNullOptionTitle(pmAttr), null));
+      }
       options.add(new PmOptionImpl(v.name(), PmLocalizeApi.localizeEnumValue(pmAttr, v), v));
     }
 
