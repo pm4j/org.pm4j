@@ -4,11 +4,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.pm4j.common.util.InvertingComparator;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmBean;
+import org.pm4j.core.pm.PmCommandDecorator;
 import org.pm4j.core.pm.PmDataInput;
 import org.pm4j.core.pm.PmElement;
 import org.pm4j.core.pm.PmEvent;
@@ -20,15 +23,10 @@ import org.pm4j.core.pm.PmTableCol;
 import org.pm4j.core.pm.PmTableGenericRow;
 import org.pm4j.core.pm.PmTableRow;
 import org.pm4j.core.pm.PmVisitor;
-import org.pm4j.core.pm.annotation.PmCommandCfg;
-import org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO;
 import org.pm4j.core.pm.api.PmEventApi;
-import org.pm4j.core.pm.api.PmValidationApi;
 import org.pm4j.core.pm.pageable.PageableCollection;
 import org.pm4j.core.pm.pageable.PageableCollection.Filter;
 import org.pm4j.core.pm.pageable.PageableListImpl;
-import org.pm4j.core.pm.pageable.PmPager;
-import org.pm4j.core.pm.pageable.PmPagerImpl;
 
 /**
  * A table that presents the content of a set of {@link PmElement}s.
@@ -81,6 +79,9 @@ public class PmTableImpl
       });
     }
   };
+
+  /** The set of decorators for various table change kinds. */
+  private Map<TableChange, PmCommandDecoratorSetImpl> changeDecoratorMap = Collections.emptyMap();
 
   /**
    * Creates an empty table.
@@ -234,12 +235,41 @@ public class PmTableImpl
     return getPageableCollection().getSelectedItems();
   }
 
+  @Override
+  public void addDecorator(PmCommandDecorator decorator, TableChange... changes) {
+    if (changeDecoratorMap.isEmpty()) {
+      changeDecoratorMap = new HashMap<PmTable.TableChange, PmCommandDecoratorSetImpl>();
+    }
+
+    TableChange[] changesToConsider = changes.length == 0 ? TableChange.values() : changes;
+    for (TableChange c : changesToConsider) {
+      PmCommandDecoratorSetImpl set = changeDecoratorMap.get(c);
+      if (set == null) {
+        set = new PmCommandDecoratorSetImpl();
+        changeDecoratorMap.put(c, set);
+      }
+      set.addDecorator(decorator);
+
+      // XXX olaf: check for a better solution:
+      if (c == TableChange.PAGE && getPager() != null) {
+        getPager().addPageChangeDecorator(decorator);
+      }
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public Collection<PmCommandDecorator> getDecorators(TableChange change) {
+    PmCommandDecoratorSetImpl set = changeDecoratorMap.get(change);
+    return (set != null) ? set.getDecorators() : Collections.EMPTY_LIST;
+  }
+
   // -- row sort order support --
 
-  void onSortOrderChange(PmTableCol sortColumnPm) {
+  void triggerSortOrderChange(PmTableCol sortColumnPm) {
     PmTableCol newSortCol = (sortColumnPm.getSortOrderAttr().getValue() != PmSortOrder.NEUTRAL)
-                ? sortColumnPm
-                : null;
+        ? sortColumnPm
+        : null;
     // mark current sort order as invalid and fire a value change event.
     sortOrderSelection.sortBy(newSortCol);
   }
@@ -504,23 +534,5 @@ public class PmTableImpl
 
   private final MetaData getOwnMetaDataWithoutPmInitCall() {
     return (MetaData) getPmMetaDataWithoutPmInitCall();
-  }
-
-
-  /**
-   * Validates the related table before execution.
-   */
-  @PmCommandCfg(beforeDo=BEFORE_DO.VALIDATE)
-  public static class PmTableValidatingCommand extends PmCommandImpl {
-
-    public PmTableValidatingCommand(PmObject pmParent) {
-      super(pmParent);
-    }
-
-    @Override
-    protected boolean validate() {
-      return PmValidationApi.validateSubTree(PmUtil.getPmParentOfType(this, PmTable.class));
-    }
-  }
-
+  };
 }

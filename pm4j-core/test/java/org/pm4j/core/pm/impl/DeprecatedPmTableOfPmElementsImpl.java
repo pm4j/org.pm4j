@@ -7,6 +7,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.pm4j.core.pm.PmAttrEnum;
+import org.pm4j.core.pm.PmCommandDecorator;
 import org.pm4j.core.pm.PmElement;
 import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmEventListener;
@@ -301,6 +302,18 @@ public class DeprecatedPmTableOfPmElementsImpl<T_ROW_ELEMENT_PM extends PmElemen
 
   @Override
   public Collection<T_ROW_ELEMENT_PM> getSelectedRows() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public void addDecorator(PmCommandDecorator decorator, org.pm4j.core.pm.PmTable.TableChange... changes) {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public Collection<PmCommandDecorator> getDecorators(org.pm4j.core.pm.PmTable.TableChange change) {
     // TODO Auto-generated method stub
     return null;
   }

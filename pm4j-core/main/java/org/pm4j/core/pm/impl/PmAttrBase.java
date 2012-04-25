@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -33,6 +35,7 @@ import org.pm4j.core.exception.PmValidationException;
 import org.pm4j.core.pm.PmAspect;
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmBean;
+import org.pm4j.core.pm.PmCommandDecorator;
 import org.pm4j.core.pm.PmConstants;
 import org.pm4j.core.pm.PmElement;
 import org.pm4j.core.pm.PmEvent;
@@ -45,8 +48,11 @@ import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.annotation.PmAttrCfg.AttrAccessKind;
 import org.pm4j.core.pm.annotation.PmCacheCfg;
 import org.pm4j.core.pm.annotation.PmCacheCfg.CacheMode;
+import org.pm4j.core.pm.annotation.PmCommandCfg;
+import org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO;
 import org.pm4j.core.pm.annotation.PmOptionCfg;
 import org.pm4j.core.pm.annotation.PmOptionCfg.NullOption;
+import org.pm4j.core.pm.annotation.PmTitleCfg;
 import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmExpressionApi;
@@ -56,7 +62,6 @@ import org.pm4j.core.pm.impl.cache.PmCacheStrategy;
 import org.pm4j.core.pm.impl.cache.PmCacheStrategyBase;
 import org.pm4j.core.pm.impl.cache.PmCacheStrategyNoCache;
 import org.pm4j.core.pm.impl.cache.PmCacheStrategyRequest;
-import org.pm4j.core.pm.impl.commands.PmValueChangeCommand;
 import org.pm4j.core.pm.impl.converter.PmConverterOptionBased;
 import org.pm4j.core.pm.impl.options.GenericOptionSetDef;
 import org.pm4j.core.pm.impl.options.OptionSetDefNoOption;
@@ -66,6 +71,7 @@ import org.pm4j.core.pm.impl.pathresolver.PathResolver;
 import org.pm4j.core.pm.impl.pathresolver.PmExpressionPathResolver;
 import org.pm4j.core.util.reflection.BeanAttrAccessor;
 import org.pm4j.core.util.reflection.BeanAttrAccessorImpl;
+import org.pm4j.navi.NaviLink;
 
 /**
  * <p> Basic implementation for PM attributes.  </p>
@@ -114,6 +120,9 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
 
   /** Shortcut to the next parent element. */
   private PmElement pmParentElement;
+
+  /** The decorators to execute before and after setting the attribute value. */
+  private Collection<PmCommandDecorator> valueChangeDecorators = Collections.emptyList();
 
 
   public PmAttrBase(PmObject pmParent) {
@@ -208,7 +217,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     return super.isPmReadonlyImpl() ||
            getPmParentElement().isPmReadonly();
   }
-  
+
   @Override
   public final boolean isPmEnabled() {
     // link enable status to read only even if the default impl of isPmEnabledImpl is overwritten
@@ -345,10 +354,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   public final void setValue(T_PM_VALUE value) {
     if (!isPmReadonly()) {
       SetValueContainer<T_PM_VALUE> vc = SetValueContainer.makeWithPmValue(this, value);
-      PmValueChangeCommand cmd = new PmValueChangeCommand(this, vc.getPmValue());
-      if (setValueImpl(vc)) {
-        getPmConversation().getPmCommandHistory().commandDone(cmd);
-      }
+      setValueImpl(vc);
     }
     else {
       // XXX olaf: is only a workaround for the standard jsf-form behavior...
@@ -412,10 +418,73 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
 
   @Override
   public final void setValueAsString(String text) {
+    zz_ensurePmInitialization();
     SetValueContainer<T_PM_VALUE> vc = new SetValueContainer<T_PM_VALUE>(this, text);
-    PmValueChangeCommand cmd = new PmValueChangeCommand(this, vc.getPmValue());
-    if (zz_validateAndSetValueAsString(vc)) {
-      getPmConversation().getPmCommandHistory().commandDone(cmd);
+
+    try {
+      if (isPmReadonly() &&
+          getFormatString() != null) {
+        // Some UI controls (e.g. SWT Text) send an immediate value change event when they get initialized.
+        // To prevent unnecessary (and problematic) set value loops, nothing happens if the actual
+        // value gets set to a read-only attribute.
+        // In case of formatted string representations the value change detection mechanism on value level
+        // may detect a change if the format does not represent all details of the actual value.
+        // To prevent such effects, this code checks if the formatted string output is still the same...
+        //
+        // TODO: What about changing a
+        if (! StringUtils.equalsIgnoreCase(getValueAsString(), vc.getStringValue())) {
+          throw new PmRuntimeException(this, "Illegal attempt to set a new value to a read only attribute.");
+        }
+        return;
+      }
+
+      clearPmInvalidValues();
+      try {
+        vc.setPmValue(StringUtils.isNotBlank(text)
+                          ? stringToValueImpl(text)
+                          : null);
+      } catch (PmRuntimeException e) {
+        PmResourceData resData = e.getResourceData();
+        if (resData == null) {
+          // XXX olaf: That happens in case of program bugs.
+          // Should we re-throw the exception here?
+          zz_setAndPropagateInvalidValue(vc, PmConstants.MSGKEY_VALIDATION_CONVERSION_FROM_STRING_FAILED, getPmShortTitle());
+          LOG.error(e.getMessage(), e);
+        }
+        else {
+          zz_setAndPropagateInvalidValue(vc, resData.msgKey, resData.msgArgs);
+          if (LOG.isDebugEnabled()) {
+            LOG.debug("String to value conversion failed in attribute '" + PmUtil.getPmLogString(this) + "'. String value: " + text);
+          }
+        }
+        return;
+      } catch (PmConverterException e) {
+        PmResourceData resData = e.getResourceData();
+        Object[] args = Arrays.copyOf(resData.msgArgs, resData.msgArgs.length+1);
+        args[resData.msgArgs.length] = getPmShortTitle();
+        zz_setAndPropagateInvalidValue(vc, resData.msgKey, args);
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("String to value conversion failed in attribute '" + PmUtil.getPmLogString(this) +
+              "'. String value: '" + text +
+              "'. Caused by: " + e.getMessage());
+        }
+        return;
+      } catch (RuntimeException e) {
+        zz_setAndPropagateInvalidValue(vc, PmConstants.MSGKEY_VALIDATION_CONVERSION_FROM_STRING_FAILED, getPmShortTitle());
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("String to value conversion failed in attribute '" + PmUtil.getPmLogString(this) + "'. String value: " + text,
+              e);
+        }
+        return;
+      }
+
+      setValueImpl(vc);
+    }
+    catch (RuntimeException e) {
+      PmRuntimeException pme = PmRuntimeException.asPmRuntimeException(this, e);
+      PmMessageUtil.makeExceptionMsg(this, Severity.ERROR, pme);
+      LOG.error("setValueAsString failed to set value '" + vc.getStringValue() + "'", pme);
+      throw pme;
     }
   }
 
@@ -497,11 +566,22 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     try {
       assert value.isPmValueSet();
 
-      // New game. Forget all the old invalid stuff.
-      clearPmInvalidValues();
 
       T_PM_VALUE newPmValue = value.getPmValue();
       T_PM_VALUE currentValue = getUncachedValidValue();
+
+      ValueChangeCommandImpl<T_PM_VALUE> cmd = new ValueChangeCommandImpl<T_PM_VALUE>(this, currentValue, newPmValue);
+
+      for (PmCommandDecorator d : getValueChangeDecorators()) {
+        if (!d.beforeDo(cmd)) {
+          LOG.debug("Value '" + getPmRelativeName() + "' was not set because of the beforeDo result of decorator: " + d);
+          return false;
+        }
+      }
+
+      // New game. Forget all the old invalid stuff.
+      clearPmInvalidValues();
+
       boolean pmValueChanged = ! equalValues(currentValue, newPmValue);
 
       // Ensure that primitive types will not be set to null.
@@ -550,7 +630,11 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
         valueWasSet = true;
 
         setValueChanged(currentValue, newPmValue);
+        for (PmCommandDecorator d : getValueChangeDecorators()) {
+          d.afterDo(cmd);
+        }
         PmEventApi.firePmEvent(this, PmEvent.VALUE_CHANGE);
+        getPmConversation().getPmCommandHistory().commandDone(cmd);
 
         return true;
       }
@@ -850,76 +934,6 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     }
   }
 
-  private final boolean zz_validateAndSetValueAsString(SetValueContainer<T_PM_VALUE> vc) {
-    zz_ensurePmInitialization();
-    try {
-      if (isPmReadonly() &&
-          getFormatString() != null) {
-        // Some UI controls (e.g. SWT Text) send an immediate value change event when they get initialized.
-        // To prevent unnecessary (and problematic) set value loops, nothing happens if the actual
-        // value gets set to a read-only attribute.
-        // In case of formatted string representations the value change detection mechanism on value level
-        // may detect a change if the format does not represent all details of the actual value.
-        // To prevent such effects, this code checks if the formatted string output is still the same...
-        //
-        // TODO: What about changing a
-        if (! StringUtils.equalsIgnoreCase(getValueAsString(), vc.getStringValue())) {
-          throw new PmRuntimeException(this, "Illegal attempt to set a new value to a read only attribute.");
-        }
-        return true;
-      }
-
-      clearPmInvalidValues();
-      String stringValue = vc.getStringValue();
-      try {
-        vc.setPmValue(StringUtils.isNotBlank(stringValue)
-                          ? stringToValueImpl(stringValue)
-                          : null);
-      } catch (PmRuntimeException e) {
-        PmResourceData resData = e.getResourceData();
-        if (resData == null) {
-          // XXX olaf: That happens in case of program bugs.
-          // Should we re-throw the exception here?
-          zz_setAndPropagateInvalidValue(vc, PmConstants.MSGKEY_VALIDATION_CONVERSION_FROM_STRING_FAILED, getPmShortTitle());
-          LOG.error(e.getMessage(), e);
-        }
-        else {
-          zz_setAndPropagateInvalidValue(vc, resData.msgKey, resData.msgArgs);
-          if (LOG.isDebugEnabled()) {
-            LOG.debug("String to value conversion failed in attribute '" + PmUtil.getPmLogString(this) + "'. String value: " + stringValue);
-          }
-        }
-        return false;
-      } catch (PmConverterException e) {
-        PmResourceData resData = e.getResourceData();
-        Object[] args = Arrays.copyOf(resData.msgArgs, resData.msgArgs.length+1);
-        args[resData.msgArgs.length] = getPmShortTitle();
-        zz_setAndPropagateInvalidValue(vc, resData.msgKey, args);
-        if (LOG.isDebugEnabled()) {
-          LOG.debug("String to value conversion failed in attribute '" + PmUtil.getPmLogString(this) +
-              "'. String value: '" + stringValue +
-              "'. Caused by: " + e.getMessage());
-        }
-        return false;
-      } catch (RuntimeException e) {
-        zz_setAndPropagateInvalidValue(vc, PmConstants.MSGKEY_VALIDATION_CONVERSION_FROM_STRING_FAILED, getPmShortTitle());
-        if (LOG.isDebugEnabled()) {
-          LOG.debug("String to value conversion failed in attribute '" + PmUtil.getPmLogString(this) + "'. String value: " + stringValue,
-              e);
-        }
-        return false;
-      }
-
-      return setValueImpl(vc);
-    }
-    catch (RuntimeException e) {
-      PmRuntimeException pme = PmRuntimeException.asPmRuntimeException(this, e);
-      PmMessageUtil.makeExceptionMsg(this, Severity.ERROR, pme);
-      LOG.error("setValueAsString failed to set value '" + vc.getStringValue() + "'", pme);
-      throw pme;
-    }
-  }
-
   // ======== Buffered data input support ======== //
 
   public boolean isBufferedPmValueMode() {
@@ -1027,6 +1041,14 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   }
 
   @Override
+  public void addValueChangeDecorator(PmCommandDecorator decorator) {
+    if (valueChangeDecorators.isEmpty()) {
+      valueChangeDecorators = new ArrayList<PmCommandDecorator>();
+    }
+    valueChangeDecorators.add(decorator);
+  }
+
+  @Override
   Serializable getPmContentAspect(PmAspect aspect) {
     switch (aspect) {
       case VALUE:
@@ -1035,6 +1057,13 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
       default:
         return super.getPmContentAspect(aspect);
     }
+  }
+
+  /**
+   * @return The set of decorators to consider on value change.
+   */
+  protected Collection<PmCommandDecorator> getValueChangeDecorators() {
+    return valueChangeDecorators;
   }
 
   @Override
@@ -1561,4 +1590,65 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
       return ((PmBean<Object>)attr.getPmParentElement()).getPmBean();
     }
   }
+
+
+  /**
+   * A command that changes an attribute value.
+   */
+  @PmTitleCfg(resKey="pmValueChangeCommand")
+  @PmCommandCfg(beforeDo=BEFORE_DO.DO_NOTHING)
+  public static class ValueChangeCommandImpl<T_VALUE> extends PmCommandImpl {
+
+    private final T_VALUE oldValue;
+    private final T_VALUE newValue;
+
+    public ValueChangeCommandImpl(PmAttrBase<T_VALUE,?> changedPmAttr, T_VALUE oldValue, T_VALUE newValue) {
+      super(changedPmAttr);
+      this.oldValue = oldValue;
+      this.newValue = newValue;
+      setUndoCommand(new ValueChangeCommandImpl<T_VALUE>(this));
+    }
+
+    /**
+     * Constructor for the corresponding undo command.
+     *
+     * @param doCommand The command to undo.
+     */
+    private ValueChangeCommandImpl(ValueChangeCommandImpl<T_VALUE> doCommand) {
+      super(doCommand.getPmParent());
+      this.newValue = doCommand.oldValue;
+      this.oldValue = doCommand.newValue;
+      setUndoCommand(doCommand);
+    }
+
+    @Override @SuppressWarnings("unchecked")
+    protected void doItImpl() throws Exception {
+      ((PmAttrBase<Object, ?>)getPmParent()).setValue(newValue);
+    }
+
+    /**
+     * The referenced presentation model should be enabled.
+     */
+    @Override
+    protected boolean isPmEnabledImpl() {
+      return super.isPmEnabledImpl() && getPmParent().isPmEnabled();
+    }
+
+    protected NaviLink afterDo(boolean changeCommandHistory) {
+      if (changeCommandHistory) {
+        getPmConversationImpl().getPmCommandHistory().commandDone(this);
+      }
+//      PmEventApi.firePmEvent(this, PmEvent.EXEC_COMMAND);
+      return null;
+    }
+
+    public T_VALUE getNewValue() {
+      return newValue;
+    }
+
+    public T_VALUE getOldValue() {
+      return oldValue;
+    }
+  }
+
 }

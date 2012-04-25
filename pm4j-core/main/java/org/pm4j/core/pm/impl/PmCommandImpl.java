@@ -2,7 +2,6 @@ package org.pm4j.core.pm.impl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -69,7 +68,7 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
   private PmCommand undoCommand;
 
   /** The command logic commandDecorators to execute. */
-  private Collection<PmCommandDecorator> commandDecorators = Collections.emptyList();
+  /* package */ PmCommandDecoratorSetImpl commandDecorators = new PmCommandDecoratorSetImpl();
 
   /**
    * The command decorator that returned <code>false</code> for its call of
@@ -107,23 +106,11 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
   }
 
   /**
-   * Defines the command that may undo this one.
-   *
-   * @param undoCommand
-   */
-  public void setUndoCommand(PmCommand undoCommand) {
-    this.undoCommand = undoCommand;
-  }
-
-  /**
    * @param commandDecorator The decorator to add to the command execution logic.
    */
   @Override
   public void addCommandDecorator(PmCommandDecorator commandDecorator) {
-    if (commandDecorators.isEmpty()) {
-      commandDecorators = new ArrayList<PmCommandDecorator>();
-    }
-    commandDecorators.add(commandDecorator);
+    commandDecorators.addDecorator(commandDecorator);
   }
 
   /**
@@ -271,8 +258,17 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
   }
 
   @Override
-  public final PmCommand getUndoCommand() {
+  public PmCommand getUndoCommand() {
     return undoCommand;
+  }
+
+  /**
+   * Defines the command that may undo this one.
+   *
+   * @param undoCommand
+   */
+  public void setUndoCommand(PmCommand undoCommand) {
+    this.undoCommand = undoCommand;
   }
 
   /**
@@ -443,6 +439,7 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
   }
 
   @Override
+  @Deprecated
   public boolean isRequiresValidValues() {
     return getBeforeDoStrategy() == BEFORE_DO.VALIDATE;
   }
@@ -525,14 +522,14 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
    * <p>
    * It will only be considered if the command validates before execution.
    * <p>
-   * The default implementation provides the related {@link PmConversation}. 
-   * 
+   * The default implementation provides the related {@link PmConversation}.
+   *
    * @return The root object of the PM subtree that should be valid for this command.
    */
   protected PmObject getValidationErrorRootPm() {
     return getPmConversation();
   }
-  
+
   /**
    * Provides the object that defines the area (PM sub tree) the validation should be
    * called for before command execution.
@@ -540,8 +537,8 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
    * It will only be considered if the command validates before execution.
    * <p>
    * The default implementation provides the next parent of type {@link PmDataInput}.
-   * 
-   * @return 
+   *
+   * @return
    */
   protected PmDataInput getValidationExecRootPm() {
     return PmUtil.getPmParentOfType(this, PmDataInput.class);
@@ -582,7 +579,7 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
         }
         break;
       case CLEAR:
-        PmMessageUtil.clearSubTreeMessages(getPmConversation());
+        PmMessageUtil.clearSubTreeMessages(getValidationErrorRootPm());
         break;
       case DO_NOTHING:
         break;
@@ -590,15 +587,9 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
         throw new PmRuntimeException(this, "Can't handle 'beforeDo' definition: " + getOwnMetaData().beforeDo);
     }
 
-    // XXX olaf: move to the calling methods?
-    for (PmCommandDecorator d : commandDecorators) {
-      if (! d.beforeDo(this)) {
-        vetoCommandDecorator = d;
-        return false;
-      }
-    }
-
-    return true;
+    vetoCommandDecorator = commandDecorators.beforeDoReturnVetoDecorator(this);
+    // before-do was successful if all decorators agree.
+    return vetoCommandDecorator == null;
   }
 
   protected NaviLink afterDo(boolean changeCommandHistory) {
@@ -606,14 +597,10 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
       LOG.debug("Command '" + PmUtil.getPmLogString(this) + "' successfully executed.");
     }
 
-    for (PmCommandDecorator d : commandDecorators) {
-      d.afterDo(this);
-    }
-
     // TODO olaf: that's not really always true. Subclasses should be able to control that.
-    if (isRequiresValidValues()) {
-      PmElement parentElement = PmUtil.getPmParentOfType(this, PmElement.class);
-      new PmVisitorSetToUnchanged().visit(parentElement);
+    if (getBeforeDoStrategy() == BEFORE_DO.VALIDATE) {
+      PmDataInput validationParentPm = getValidationExecRootPm();
+      validationParentPm.accept(new PmVisitorSetToUnchanged());
     }
 
     // Clear specified caches the pm-tree up till the enclosing element.
@@ -628,6 +615,7 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
       PmCacheApi.clearCachedPmValues(pmToClear, md.clearCachesSet);
     }
 
+
     PmConversationImpl pmConversation = getPmConversationImpl();
 
     if (changeCommandHistory) {
@@ -635,11 +623,14 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
     }
 
     makeOptionalSuccessMsg();
+    commandDecorators.afterDo(this);
 
     PmEventApi.firePmEvent(this, PmEvent.EXEC_COMMAND);
 
     return naviLink;
   }
+
+
 
   /**
    * Provides the command decorator that returned <code>false</code> for its call of

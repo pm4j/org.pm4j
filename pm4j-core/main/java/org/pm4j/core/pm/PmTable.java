@@ -3,7 +3,7 @@ package org.pm4j.core.pm;
 import java.util.Collection;
 import java.util.List;
 
-import org.pm4j.core.pm.pageable.PmPager;
+import org.pm4j.core.pm.impl.PmPager;
 
 /**
  * PM for tables.<br>
@@ -84,6 +84,31 @@ public interface PmTable<T_ROW_OBJ> extends PmObject, PmDataInput {
    * @return The set of all selected rows.
    */
   Collection<T_ROW_OBJ> getSelectedRows();
+
+  /** The set of table changes that can be considered. */
+  enum TableChange { SELECTION, FILTER, PAGE, SORT }
+
+  /**
+   * Adds a change decorator for table changes.
+   * <p>
+   * A table change can be prevented by the before-do logic of the decorator.
+   *
+   * @param decorator
+   *          The decorator to add.
+   * @param changes
+   *          The set of aspects to apply the decorator for. If no change aspect
+   *          is passed, the decorator will be used for all table change
+   *          aspects.
+   */
+  void addDecorator(PmCommandDecorator decorator, TableChange... changes);
+
+  /**
+   * Provides the decorators to consider for a given change kind.
+   *
+   * @param change The change kind.
+   * @return The decorators, defined for the given change kind.
+   */
+  Collection<PmCommandDecorator> getDecorators(TableChange change);
 
   /**
    * PM for table with a pager.

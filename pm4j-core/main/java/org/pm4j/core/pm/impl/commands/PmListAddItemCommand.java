@@ -36,7 +36,7 @@ public class PmListAddItemCommand extends PmCommandImpl implements PmCommand {
     @SuppressWarnings("unchecked")
     PmAttrPmList<PmElement> pmListAttr = (PmAttrPmList<PmElement>) getPmParent();
 
-    PmValueChangeCommand undoCommand = new PmValueChangeCommand((PmAttrBase<?,?>)pmListAttr, pmListAttr.getValue());
+    PmCommandImpl undoCommand = new PmCommandImpl((PmAttrBase<?,?>)pmListAttr);
     undoCommand.setUndoCommand(this);
     this.setUndoCommand(undoCommand);
 

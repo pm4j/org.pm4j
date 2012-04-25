@@ -1,17 +1,19 @@
 package org.pm4j.core.pm.impl;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmAttrEnum;
 import org.pm4j.core.pm.PmAttrInteger;
 import org.pm4j.core.pm.PmCommand;
-import org.pm4j.core.pm.PmDataInput;
+import org.pm4j.core.pm.PmCommandDecorator;
 import org.pm4j.core.pm.PmEvent;
-import org.pm4j.core.pm.PmEventListener;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmSortOrder;
 import org.pm4j.core.pm.PmTable;
+import org.pm4j.core.pm.PmTable.TableChange;
 import org.pm4j.core.pm.PmTableCol;
 import org.pm4j.core.pm.PmVisitor;
 import org.pm4j.core.pm.annotation.PmBoolean;
@@ -19,9 +21,7 @@ import org.pm4j.core.pm.annotation.PmCommandCfg;
 import org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO;
 import org.pm4j.core.pm.annotation.PmTableCfg;
 import org.pm4j.core.pm.annotation.PmTableColCfg;
-import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmLocalizeApi;
-import org.pm4j.core.pm.api.PmValidationApi;
 import org.pm4j.core.pm.pageable.PageableCollection;
 import org.pm4j.core.util.table.ColSizeSpec;
 
@@ -65,20 +65,6 @@ public class PmTableColImpl extends PmObjectBase implements PmTableCol {
   }
 
   @Override
-  protected void onPmInit() {
-    super.onPmInit();
-
-    PmEventApi.addPmEventListener(getSortOrderAttr(), PmEvent.VALUE_CHANGE, new PmEventListener() {
-      @Override
-      public void handleEvent(PmEvent event) {
-        PmTableImpl<?> tablePm = (PmTableImpl<?>) getPmParent();
-        tablePm.onSortOrderChange(PmTableColImpl.this);
-      }
-    });
-  }
-
-
-  @Override
   public ColSizeSpec getPmColSize() {
     return getOwnMetaData().colSizeSpec;
   }
@@ -113,7 +99,7 @@ public class PmTableColImpl extends PmObjectBase implements PmTableCol {
     return new CmdSortPm();
   }
 
-  @PmCommandCfg(beforeDo=BEFORE_DO.VALIDATE)
+  @PmCommandCfg(beforeDo=BEFORE_DO.DO_NOTHING)
   protected class CmdSortPm extends PmCommandImpl {
 
     public CmdSortPm() {
@@ -158,27 +144,11 @@ public class PmTableColImpl extends PmObjectBase implements PmTableCol {
       }
     }
 
-    @Override
-    protected PmDataInput getValidationExecRootPm() {
-      return PmUtil.getPmParentOfType(this, PmTable.class);
-    }
-
-    @Override
-    protected PmObject getValidationErrorRootPm() {
-      return PmUtil.getPmParentOfType(this, PmTable.class);
-    }
   }
 
   @Override
   public void accept(PmVisitor visitor) {
     visitor.visit(this);
-  }
-
-  /**
-   * @return The {@link PmTable} that contains this column.
-   */
-  private PmTable<?> getPmTable() {
-    return (PmTable<?>)getPmParent();
   }
 
   @Override
@@ -195,6 +165,12 @@ public class PmTableColImpl extends PmObjectBase implements PmTableCol {
     this.rowFilter = rowFilter;
   }
 
+  /**
+   * @return The {@link PmTable} that contains this column.
+   */
+  private PmTableImpl<?> getPmTableImpl() {
+    return (PmTableImpl<?>)getPmParent();
+  }
 
   // ======== Meta data ======== //
 
@@ -261,7 +237,7 @@ public class PmTableColImpl extends PmObjectBase implements PmTableCol {
     @Override
     protected boolean isPmEnabledImpl() {
       return  (getOwnMetaData().sortable != PmBoolean.FALSE) &&
-              (getPmTable().getTotalNumOfRows() > 1); // TODO olaf: The set of visible rows would be better...
+              (getPmTableImpl().getTotalNumOfRows() > 1); // TODO olaf: The set of visible rows would be better...
     }
 
     @Override
@@ -269,17 +245,18 @@ public class PmTableColImpl extends PmObjectBase implements PmTableCol {
       return isPmEnabledImpl();
     }
 
-    /**
-     * The set value operation is overridden to ensure table validity before setting the value.
-     * This was not done within {@link #setBackingValueImpl(PmSortOrder)} because this gets also called
-     * by internal functionality. E.g. on {@link #getValue()} to apply the default value.
-     */
     @Override
-    protected boolean setValueImpl(SetValueContainer<PmSortOrder> value) {
-      // XXX olaf: a set value decorator would be better.
-      return PmValidationApi.validateSubTree(PmUtil.getPmParentOfType(this, PmTable.class))
-          ? super.setValueImpl(value)
-          : false;
+    protected Collection<PmCommandDecorator> getValueChangeDecorators() {
+      ArrayList<PmCommandDecorator> list = new ArrayList<PmCommandDecorator>(getPmTableImpl().getDecorators(TableChange.SORT));
+      list.addAll(super.getValueChangeDecorators());
+      return list;
+    }
+
+    @Override
+    protected void onPmValueChange(PmEvent event) {
+      if (event.changeKind != PmEvent.ALL_CHANGE_EVENTS) {
+        getPmTableImpl().triggerSortOrderChange(PmTableColImpl.this);
+      }
     }
   }
 

@@ -168,6 +168,15 @@ public interface PmAttr<T> extends PmObject, PmDataInput {
 	String getFormatString();
 
 	/**
+	 * Adds a decorator that gets notified before and after changing the attribute value.
+	 * <p>
+	 * The value change can be prevented if method {@link PmCommandDecorator#beforeDo(PmCommand)} returns <code>false</code>.
+	 *
+	 * @param decorator The decorator to use.
+	 */
+	void addValueChangeDecorator(PmCommandDecorator decorator);
+
+	/**
 	 * Converts single values between its attribute type representation and {@link String}
 	 * or {@link Serializable} representation.
 	 *
@@ -184,6 +193,12 @@ public interface PmAttr<T> extends PmObject, PmDataInput {
 
 		Serializable valueToSerializable(PmAttr<?> pmAttr, T v);
 
+	}
+
+  interface ValueChangeCommand<T_VALUE> extends PmCommand {
+    PmAttr<T_VALUE> getPmAttr();
+    T_VALUE getNewValue();
+    T_VALUE getOldValue();
 	}
 
 }

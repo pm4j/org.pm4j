@@ -12,15 +12,22 @@ import org.pm4j.core.pm.PmCommandDecorator;
  *
  * @author olaf boede
  */
-public class PmCommandDecoratorImpl implements PmCommandDecorator {
+public abstract class PmCommandDecoratorBase<T extends PmCommand> implements PmCommandDecorator {
 
+  @SuppressWarnings("unchecked")
   @Override
   public boolean beforeDo(PmCommand cmd) {
-    return true;
+    return beforeDoImpl((T)cmd);
   }
 
+  protected abstract boolean beforeDoImpl(T cmd);
+
+  @SuppressWarnings("unchecked")
   @Override
   public void afterDo(PmCommand cmd) {
+    afterDoImpl((T)cmd);
   }
+
+  protected abstract void afterDoImpl(T cmd);
 
 }
