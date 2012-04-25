@@ -10,7 +10,6 @@ import java.util.Set;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.pm4j.core.exception.PmConverterException;
-import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmAspect;
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmConversation;
@@ -63,18 +62,6 @@ public abstract class PmElementBase
   @Override
   public void accept(PmVisitor visitor) {
     visitor.visit(this);
-  }
-
-  @Override
-  @Deprecated
-  public List<PmAttr<?>> getPmAttributes() {
-    return PmUtil.getPmAttributes(this);
-  }
-
-  @Override
-  @Deprecated
-  public final PmAttr<?> getPmAttribute(String attrName) {
-    return PmUtil.getPmAttribute(this, attrName);
   }
 
   @Override
