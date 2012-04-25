@@ -1,8 +1,8 @@
 package org.pm4j.core.util.lang;
 
 import java.lang.reflect.Method;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -15,6 +15,23 @@ import org.pm4j.common.exception.CheckedExceptionWrapper;
  * @author olaf boede
  */
 public final class CloneUtil {
+
+  /**
+   * Clones all items of the given list to a new one.
+   *
+   * @param srcList The list to clone.
+   * @return The clone list.
+   */
+  public static <T extends Cloneable> List<T> cloneList(List<T> srcList) {
+    if (srcList == null) {
+      return null;
+    }
+    List<T> cloneList = new ArrayList<T>(srcList.size());
+    for (T srcItem : srcList) {
+      cloneList.add(clone(srcItem));
+    }
+    return cloneList;
+  }
 
   @SuppressWarnings("unchecked")
   public static <T extends Cloneable> T clone(T ori) {
