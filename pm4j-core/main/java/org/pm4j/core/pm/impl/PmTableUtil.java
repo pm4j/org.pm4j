@@ -1,7 +1,6 @@
 package org.pm4j.core.pm.impl;
 
-import org.pm4j.core.pm.impl.PmTableImpl;
-import org.pm4j.core.pm.pageable.PmPagerImpl.PagerVisibility;
+import org.pm4j.core.pm.impl.PmPagerImpl.PagerVisibility;
 
 /**
  * Some table related helper functions.
