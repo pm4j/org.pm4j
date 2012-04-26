@@ -2,6 +2,7 @@ package org.pm4j.core.pm;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import org.pm4j.core.pm.PmMessage.Severity;
 import org.pm4j.navi.NaviHistory;
@@ -48,6 +49,20 @@ public interface PmConversation extends PmElement {
    *          language of the Java VM.
    */
   void setPmLocale(Locale locale);
+  
+  /**
+   * Used for date conversions.
+   * 
+   * @return The time zone that is used within this conversation.<br>
+   *         Returns never <code>null</code>.
+   */
+  public TimeZone getPmTimeZone();
+
+  /**
+   * @param pmTimeZone The time zone that is used within this conversation.<br>
+   *         Must never be <code>null</code>.
+   */
+  public void setPmTimeZone(TimeZone pmTimeZone);
 
   /**
    * @return The undo/redo command history of this conversation.

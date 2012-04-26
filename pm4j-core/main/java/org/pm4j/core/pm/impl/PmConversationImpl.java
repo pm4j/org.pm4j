@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.logging.Log;
@@ -38,6 +39,7 @@ public class PmConversationImpl extends PmElementBase implements PmConversation 
   // initialized with self-reference which indicates that the reference is not yet resolved.
   private PmConversationImpl pmParentConversation = this;
   private Locale pmLocale;
+  private TimeZone pmTimeZone = TimeZone.getDefault();
   private PmExceptionHandler pmExceptionHandler;
   private PmToViewTechnologyConnector pmViewConnector;
 
@@ -162,6 +164,14 @@ public class PmConversationImpl extends PmElementBase implements PmConversation 
   @Override
   public void setPmLocale(Locale locale) {
     this.pmLocale = locale;
+  }
+
+  public TimeZone getPmTimeZone() {
+    return this.pmTimeZone;
+  }
+
+  public void setPmTimeZone(TimeZone pmTimeZone) {
+    this.pmTimeZone = pmTimeZone;
   }
 
   @Override

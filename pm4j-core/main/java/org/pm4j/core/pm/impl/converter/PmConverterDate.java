@@ -4,6 +4,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.FastDateFormat;
@@ -37,9 +38,11 @@ public class PmConverterDate extends PmConverterSerializeableBase<Date> {
     }
 
     Locale locale = pmAttr.getPmConversation().getPmLocale();
+    TimeZone timeZone = pmAttr.getPmConversation().getPmTimeZone();
     for (String format : getParseFormats(pmAttr)) {
       try {
         SimpleDateFormat sdf = new SimpleDateFormat(format, locale);
+        sdf.setTimeZone(timeZone);
 
         // we will not allow dates of the form 00.00.08 etc, hence lenient is set to false
         sdf.setLenient(false);
@@ -63,7 +66,8 @@ public class PmConverterDate extends PmConverterSerializeableBase<Date> {
   public String valueToString(PmAttr<?> pmAttr, Date value) {
     String outputFormat = getOutputFormat(pmAttr);
     try {
-      return FastDateFormat.getInstance(outputFormat, pmAttr.getPmConversation().getPmLocale()).format(value);
+      TimeZone timeZone = pmAttr.getPmConversation().getPmTimeZone();
+      return FastDateFormat.getInstance(outputFormat, timeZone, pmAttr.getPmConversation().getPmLocale()).format(value);
     }
     catch (RuntimeException e) {
       throw new PmRuntimeException(pmAttr, "Unable to apply format '" +
