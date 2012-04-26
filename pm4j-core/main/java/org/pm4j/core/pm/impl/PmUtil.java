@@ -283,6 +283,24 @@ public final class PmUtil {
   }
 
   /**
+   * @param pm The pm to get the child PM from.
+   * @param childName
+   *          Name of the requested child PM.
+   * @return The matching child instance. Or <code>null</code> if there is no matching child with the given name.
+   * @throws PmRuntimeException
+   *           if the found child has a different type.
+   */
+  public static <T extends PmObject> T findPmChildOfType(PmObject pm, String childName, Class<T> childClass) {
+    PmObject childPm = ((PmObjectBase)pm).findChildPm(childName);
+    if (childPm != null && !(childClass.isAssignableFrom(childPm.getClass()))) {
+      throw new PmRuntimeException(pm, "The found child PM with name '" + childName +
+          "' is not compatible to the expected type '" + childClass.getName() + "'. Found item: " + childPm);
+    }
+    return childClass.cast(childPm);
+  }
+
+
+  /**
    * A name that includes the names of all elements and sessions within the
    * complete context hierarchy of the PM.
    * <p>
