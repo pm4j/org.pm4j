@@ -572,9 +572,13 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
 
       ValueChangeCommandImpl<T_PM_VALUE> cmd = new ValueChangeCommandImpl<T_PM_VALUE>(this, currentValue, newPmValue);
 
+      if (!beforeValueChange(currentValue, newPmValue)) {
+        LOG.debug("Value '" + getPmRelativeName() + "' was not changed because of the beforeDo result of the beforeValueChange() implementation");
+        return false;
+      }
       for (PmCommandDecorator d : getValueChangeDecorators()) {
         if (!d.beforeDo(cmd)) {
-          LOG.debug("Value '" + getPmRelativeName() + "' was not set because of the beforeDo result of decorator: " + d);
+          LOG.debug("Value '" + getPmRelativeName() + "' was not changed because of the beforeDo result of decorator: " + d);
           return false;
         }
       }
@@ -633,6 +637,8 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
         for (PmCommandDecorator d : getValueChangeDecorators()) {
           d.afterDo(cmd);
         }
+        afterValueChange(currentValue, newPmValue);
+
         PmEventApi.firePmEvent(this, PmEvent.VALUE_CHANGE);
         getPmConversation().getPmCommandHistory().commandDone(cmd);
 
@@ -648,6 +654,29 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
       getPmConversationImpl().getPmExceptionHandler().onException(this, pmex, false);
       return false;
     }
+  }
+
+  /**
+   * Gets called before a value change will be applied.
+   * <p>
+   * It may be overridden for application specific needs.<br>
+   * It may prevent the change to be applied by returning <code>false</code>.
+   *
+   * @param oldValue The old (current) attribute value.
+   * @param newValue The new value that should be applied.
+   * @return A return value <code>false</code> will prevent the value change.
+   */
+  protected boolean beforeValueChange(T_PM_VALUE oldValue, T_PM_VALUE newValue) {
+    return true;
+  }
+
+  /**
+   * Gets called after a value change.
+   *
+   * @param oldValue The old attribute value.
+   * @param newValue The new (current) value.
+   */
+  protected void afterValueChange(T_PM_VALUE oldValue, T_PM_VALUE newValue) {
   }
 
   /**

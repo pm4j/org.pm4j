@@ -332,7 +332,10 @@ public abstract class PmObjectBase implements PmObject {
    * was fired for this PM.
    *
    * @param event The fired event.
+   *
+   * @deprecated Please use PmAttr.beforeValueChange/afterValueChange or an PmEventListener to {@link PmEvent#VALUE_CHANGE} instead.
    */
+  @Deprecated
   protected void onPmValueChange(PmEvent event) {
   }
 
