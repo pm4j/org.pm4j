@@ -3,6 +3,7 @@ package org.pm4j.core.pm.impl;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -203,6 +204,27 @@ public final class PmUtil {
     return ((PmObjectBase)pm).findChildPm(localName);
   }
 
+  /**
+   * @param pm The parent to get the direct child PMs for.
+   * @param childClass Type of the requested children.
+   * @return The set of all child PM's of the given type. Includes field bound PM's as well as
+   *         dynamically created PM's.
+   */
+  public static <T extends PmObject> List<T> getPmChildrenOfType(PmObject pm, Class<T> childClass) {
+    List<PmObject> allChildren = ((PmObjectBase)pm).getPmChildren();
+    if (allChildren.isEmpty()) {
+      return Collections.emptyList();
+    }
+    else {
+      List<T> children = new ArrayList<T>();
+      for (PmObject c : allChildren) {
+        if (childClass.isAssignableFrom(c.getClass())) {
+          children.add(childClass.cast(c));
+        }
+      }
+      return children;
+    }
+  }
 
   /**
    * Determines if the given instances are participants of a parent child relation.
