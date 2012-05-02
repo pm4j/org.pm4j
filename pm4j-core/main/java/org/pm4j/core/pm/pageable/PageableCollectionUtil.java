@@ -21,7 +21,7 @@ public final class PageableCollectionUtil {
    */
   public static int getIdxOfFirstItemOnPage(PageableCollection<?> pageable) {
     int pageSize = pageable.getPageSize();
-    return (pageSize > 0)
+    return (pageable.getNumOfItems() > 0)
             ? (pageSize * (pageable.getCurrentPageIdx()-1)) + 1
             : 0;
   }
@@ -36,7 +36,7 @@ public final class PageableCollectionUtil {
    */
   public static int getIdxOfLastItemOnPage(PageableCollection<?> pageable) {
     int pageSize = pageable.getPageSize();
-    return (pageSize > 0)
+    return (pageable.getNumOfItems() > 0)
             ? Math.min(
                     getIdxOfFirstItemOnPage(pageable) + pageSize - 1,
                     pageable.getNumOfItems())
