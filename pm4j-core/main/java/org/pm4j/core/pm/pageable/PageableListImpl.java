@@ -188,6 +188,13 @@ public class PageableListImpl<T_ITEM> implements PageableCollection<T_ITEM> {
   private void _applyFilterAndSortOrder() {
     List<T_ITEM> filteredList = _filter(objectsInOriginalSortOrder);
     _sortAndAssignToObjects(filteredList);
+
+    // XXX olaf: just moves to the last possible page if necessary.
+    // The user may want to stay on the page with his selected item.
+    // We need to define strategies for application specific definitions.
+    if (currentPageIdx * pageSize >= filteredList.size()) {
+      currentPageIdx = PageableCollectionUtil.getNumOfPages(this);
+    }
   }
 
   @SuppressWarnings("unchecked")
@@ -230,6 +237,7 @@ public class PageableListImpl<T_ITEM> implements PageableCollection<T_ITEM> {
         }
       }
     }
+
     return filteredList;
   }
 
