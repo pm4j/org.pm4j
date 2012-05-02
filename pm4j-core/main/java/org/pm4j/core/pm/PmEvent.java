@@ -40,15 +40,49 @@ public class PmEvent extends EventObject {
   public static final int ALL = ALL_CHANGE_EVENTS | EXEC_COMMAND;
 
   /**
-   * A bit mask for the change kind.
+   * Types of value change event.
    */
-  public final int changeKind;
+  public enum ValueChangeKind {
+    /** The specific value change is not defined. */
+    UNKNOWN,
+    /** A value was (ex-)changed. */
+    VALUE_CHANGE,
+    /** One or more items where added to value (E.g. a list value). */
+    ADD_ITEM,
+    /** One or more items where deleted from a value. */
+    DELETE_ITEM,
+    /** The value was re-loaded from the backend. */
+    RELOAD,
+    /** Sort order change */
+    SORT_ORDER,
+    /** Item Filter definition change */
+    FILTER_CHANGE;
+
+    /**
+     * @return <code>true</code> if the value may be replaced by this value change.
+     */
+    public boolean isContentReplacingChangeKind() {
+      return this == UNKNOWN || this == VALUE_CHANGE || this == RELOAD;
+    }
+  }
 
   /**
    * The {@link PmObject} that is related to the event.
    * May be <code>null</code> if the event is not related to a particular PM.
    */
   public final PmObject pm;
+
+  /**
+   * A bit mask for the change kind.
+   * @deprecated Please use {@link #getChangeMask()}.
+   */
+  @Deprecated
+  public final int changeKind;
+
+  /**
+   * In case of a value changing event, this field can be used to specify the kind of value change.
+   */
+  private final ValueChangeKind valueChangeKind;
 
   /**
    * @param eventSource
@@ -62,6 +96,24 @@ public class PmEvent extends EventObject {
 
     this.changeKind = changeKind;
     this.pm = pm;
+    this.valueChangeKind = ValueChangeKind.UNKNOWN;
+  }
+
+  /**
+   * @param eventSource
+   *          The control or command that triggered the change.<br>
+   *          Should not be <code>null</code>.
+   * @param changeMask
+   *          A bit mask for the change kind.
+   * @param valueChange
+   *          A value change kind specification.
+   */
+  public PmEvent(Object eventSource, PmObject pm, int changeMask, ValueChangeKind valueChange) {
+    super(eventSource);
+
+    this.changeKind = changeMask;
+    this.pm = pm;
+    this.valueChangeKind = valueChange;
   }
 
   /**
@@ -84,25 +136,29 @@ public class PmEvent extends EventObject {
   }
 
   /**
-   * @return The command that triggered the change.
+   * @return The {@link PmObject} that is related to the event.
    */
-  public PmCommand getChangingCommand() {
-    Object src = super.getSource();
-    return src instanceof PmCommand
-              ? (PmCommand)src
-              : null;
+  public PmObject getPm() {
+    return pm;
   }
 
   /**
-   * @return A bit mask for the change kind.
+   * @return In case of a value changing event, this field can be used to specify the kind of value change.
    */
-  public final int getChangeKind() {
+  public ValueChangeKind getValueChangeKind() {
+    return valueChangeKind;
+  }
+
+  /**
+   * @return The bit-mask that indicates the set of influenced PM aspects.
+   */
+  public int getChangeMask() {
     return changeKind;
   }
 
   @Override
   public String toString() {
-    return getClass().getSimpleName() + "[source=" + source + ", changeKind=" + changeKind + "]";
+    return getClass().getSimpleName() + "[source=" + source + ", changeMask=" + getChangeMask() + "]";
   }
 
 }

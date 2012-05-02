@@ -51,7 +51,9 @@ public class ChangedChildStateRegistry {
     PmEventApi.addPmEventListener(observedRootPm, PmEvent.VALUE_CHANGE, new PmEventListener() {
       @Override
       public void handleEvent(PmEvent event) {
-        clearChangedItems();
+        if (event.getValueChangeKind().isContentReplacingChangeKind()) {
+          clearChangedItems();
+        }
       }
     });
   }

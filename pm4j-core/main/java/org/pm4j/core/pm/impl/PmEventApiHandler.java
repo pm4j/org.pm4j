@@ -4,6 +4,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.PmEvent;
+import org.pm4j.core.pm.PmEvent.ValueChangeKind;
 import org.pm4j.core.pm.PmEventListener;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.api.PmEventApi;
@@ -109,10 +110,10 @@ public class PmEventApiHandler {
     PmObjectBase pmImpl = (PmObjectBase)pm;
 
     if (! event.isPropagationEvent()) {
-      dispatchToOnEventMethodCalls(pmImpl, event, event.changeKind);
+      dispatchToOnEventMethodCalls(pmImpl, event, event.getChangeMask());
 
       if (LOG.isTraceEnabled()) {
-        LOG.trace("PMEvent: " + event.changeKind + " fired for: " + pm.getPmRelativeName());
+        LOG.trace("PMEvent: " + event.getChangeMask() + " fired for: " + pm.getPmRelativeName());
       }
     }
 
@@ -123,7 +124,7 @@ public class PmEventApiHandler {
     if (! event.isInitializationEvent()) {
       // propagate the event to the parent hierarchy until the conversation is reached.
       PmConversation conversationPm = pmImpl.getPmConversation();
-      PmEvent propagationEvent = new PmEvent(event.getSource(), event.pm, event.changeKind | PmEvent.IS_EVENT_PROPAGATION);
+      PmEvent propagationEvent = new PmEvent(event.getSource(), event.pm, event.getChangeMask() | PmEvent.IS_EVENT_PROPAGATION);
       for (PmObject p = pmImpl; p != null; p = p.getPmParent()) {
         fireOnEventTables(p, propagationEvent);
         // stop after reaching the conversation.
@@ -134,10 +135,18 @@ public class PmEventApiHandler {
     }
   }
 
-  public void firePmEventIfInitialized(PmObject pm, int eventMask) {
+  public void firePmEventIfInitialized(PmObject pm, PmEvent event) {
     PmObjectBase pmImpl = (PmObjectBase)pm;
     if (pmImpl.pmInitState == PmInitState.INITIALIZED) {
-      PmEventApi.firePmEvent(pmImpl, eventMask);
+      PmEventApi.firePmEvent(pmImpl, event);
+    }
+  }
+
+
+  public void firePmEventIfInitialized(PmObject pm, int eventMask, ValueChangeKind valueChangeKind) {
+    PmObjectBase pmImpl = (PmObjectBase)pm;
+    if (pmImpl.pmInitState == PmInitState.INITIALIZED) {
+      PmEventApi.firePmEvent(pmImpl, eventMask, valueChangeKind);
     }
   }
 
@@ -148,6 +157,7 @@ public class PmEventApiHandler {
    * @param event The event to propagate.
    * @param eventMask Defines the set of on-methods to be called.
    */
+  @SuppressWarnings("deprecation")
   protected void dispatchToOnEventMethodCalls(PmObjectBase pmImpl, PmEvent event, int eventMask) {
     // XXX olaf: the onPmXXX methods are really convenient to use, but
     //           this construction costs some performance...

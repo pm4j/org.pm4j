@@ -254,7 +254,7 @@ public class PmTableColImpl extends PmObjectBase implements PmTableCol {
 
     @Override
     protected void onPmValueChange(PmEvent event) {
-      if (event.changeKind != PmEvent.ALL_CHANGE_EVENTS) {
+      if (!event.isInitializationEvent()) {
         getPmTableImpl().triggerSortOrderChange(PmTableColImpl.this);
       }
     }

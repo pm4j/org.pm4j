@@ -15,6 +15,7 @@ import org.pm4j.core.pm.PmCommandDecorator;
 import org.pm4j.core.pm.PmDataInput;
 import org.pm4j.core.pm.PmElement;
 import org.pm4j.core.pm.PmEvent;
+import org.pm4j.core.pm.PmEvent.ValueChangeKind;
 import org.pm4j.core.pm.PmEventListener;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmSortOrder;
@@ -157,6 +158,7 @@ public class PmTableImpl
    * @param newRowPm The new row.
    */
   protected void onDeleteRow(T_ROW_ELEMENT_PM deletedRow) {
+    getPageableCollection().deSelect(deletedRow);
     changedStateRegistry.onDeleteItem(deletedRow);
     if (deletedRow instanceof PmBean) {
       BeanPmCacheUtil.removeBeanPm(this, (PmBean<?>)deletedRow);
@@ -441,6 +443,11 @@ public class PmTableImpl
     return new PageableListImpl<T_ROW_ELEMENT_PM>(getNumOfPageRows(), getRowSelectMode() == RowSelectMode.MULTI);
   }
 
+  // FIXME olaf: a test...
+  public void setPageableCollection(PageableCollection<T_ROW_ELEMENT_PM> pageable, boolean preseveSettings) {
+    setPageableCollection(pageable, preseveSettings, ValueChangeKind.UNKNOWN);
+  }
+
   /**
    * Sets an empty {@link #pageableCollection} if the given parameter is <code>null</code>.
    *
@@ -448,7 +455,7 @@ public class PmTableImpl
    * @param preseveSettings Defines if the currently selected items and filter definition should be preserved.
    * @return <code>true</code> if the data set was new.
    */
-  public void setPageableCollection(PageableCollection<T_ROW_ELEMENT_PM> pageable, boolean preseveSettings) {
+  public void setPageableCollection(PageableCollection<T_ROW_ELEMENT_PM> pageable, boolean preseveSettings, ValueChangeKind valueChangeKind) {
     Collection<T_ROW_ELEMENT_PM> selectedItems = Collections.emptyList();
     Filter<?> filter = null;
     if (pageableCollection != null && preseveSettings) {
@@ -470,7 +477,7 @@ public class PmTableImpl
       BeanPmCacheUtil.clearBeanPmCache(this);
     }
 
-    PmEventApi.firePmEventIfInitialized(this, PmEvent.VALUE_CHANGE);
+    PmEventApi.firePmEventIfInitialized(this, PmEvent.VALUE_CHANGE, valueChangeKind);
 
     // re-apply the settings to preserve
     if (preseveSettings) {

@@ -1471,7 +1471,7 @@ class PmEventTable {
     boolean hasListeners = !pmEventListeners.isEmpty();
 
     if (log.isTraceEnabled())
-      log.trace("fireChange[" + event.changeKind + "] for event source   : " + PmEventApi.getThreadEventSource() +
+      log.trace("fireChange[" + event + "] for event source   : " + PmEventApi.getThreadEventSource() +
           (hasListeners ? "\n\teventListeners: " + pmEventListeners : ""));
 
     if (hasListeners) {
@@ -1485,12 +1485,12 @@ class PmEventTable {
         // Standard events will be passed to listeners that don't have set this flag.
         if (isPropagationEvent) {
           if (isPropagationListener &&
-              (listenerMask & event.changeKind) != 0)
+              (listenerMask & event.getChangeMask()) != 0)
             e.getKey().handleEvent(event);
         }
         else {
           if ((! isPropagationListener) &&
-              (listenerMask & event.changeKind) != 0)
+              (listenerMask & event.getChangeMask()) != 0)
             e.getKey().handleEvent(event);
         }
       }

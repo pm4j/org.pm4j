@@ -1,6 +1,7 @@
 package org.pm4j.core.pm.api;
 
 import org.pm4j.core.pm.PmEvent;
+import org.pm4j.core.pm.PmEvent.ValueChangeKind;
 import org.pm4j.core.pm.PmEventListener;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.impl.PmEventApiHandler;
@@ -55,23 +56,37 @@ public class PmEventApi {
   /**
    * Creates and sends a {@link PmEvent} instance to each registered event
    * listener.
-   *
-   * @param eventSource
-   *          The instance that triggered the event.
+   */
+  public static void firePmEvent(PmObject pm, int eventMask, ValueChangeKind valueChangeKind) {
+    apiHandler.firePmEvent(pm,
+        new PmEvent(ensureThreadEventSource(pm),
+                    pm, eventMask, valueChangeKind));
+  }
+
+  /**
+   * Creates and sends a {@link PmEvent} instance to each registered event
+   * listener.
    */
   public static void firePmEvent(PmObject pm, int eventMask) {
     apiHandler.firePmEvent(pm,
         new PmEvent(ensureThreadEventSource(pm),
-                    pm,
-                    eventMask));
+                    pm, eventMask, ValueChangeKind.UNKNOWN));
+  }
+
+  public static void firePmEventIfInitialized(PmObject pm, int eventMask, ValueChangeKind valueChangeKind) {
+    apiHandler.firePmEventIfInitialized(pm, eventMask, valueChangeKind);
+  }
+
+  public static void firePmEventIfInitialized(PmObject pm, int eventMask) {
+    apiHandler.firePmEventIfInitialized(pm, eventMask, ValueChangeKind.UNKNOWN);
   }
 
   public static void firePmEvent(PmObject pm, PmEvent event) {
     apiHandler.firePmEvent(pm, event);
   }
 
-  public static void firePmEventIfInitialized(PmObject pm, int eventMask) {
-    apiHandler.firePmEventIfInitialized(pm, eventMask);
+  public static void firePmEventIfInitialized(PmObject pm, PmEvent event) {
+    apiHandler.firePmEventIfInitialized(pm, event);
   }
 
   public static Object setThreadEventSource(Object src) {

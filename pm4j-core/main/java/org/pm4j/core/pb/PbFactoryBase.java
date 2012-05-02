@@ -246,13 +246,13 @@ public abstract class PbFactoryBase<VIEW, PARENT_VIEW_CTXT, PM extends PmObject>
       //           this construction costs some performance...
       //           Is this really an issue?
       //           Idea for better performing and convenient call back structure wanted!
-      int eventKind = event.changeKind;
+      int changeMask = event.getChangeMask();
 
       if (event.getSource() == view) {
-        eventKind &= (PmEvent.ALL ^ boomerangEventExcludeMask);
+        changeMask &= (PmEvent.ALL ^ boomerangEventExcludeMask);
       }
 
-      dispatchToOnEventMethodCalls(event, eventKind);
+      dispatchToOnEventMethodCalls(event, changeMask);
     }
 
     protected void onPmStyleClassChange(PmEvent event) {

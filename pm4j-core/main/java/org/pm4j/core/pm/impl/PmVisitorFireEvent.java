@@ -23,8 +23,7 @@ public class PmVisitorFireEvent extends PmVisitorAdapter {
       // Switch for each child to an event that is related to the child.
       // Registered listeners for the child will expect that the event contains a
       // reference to the PM it was registered for.
-      // TODO olaf: add a event cause to PmEvent.
-      PmVisitorFireEvent childVisitor = new PmVisitorFireEvent(new PmEvent(event.getSource(), child, event.changeKind));
+      PmVisitorFireEvent childVisitor = new PmVisitorFireEvent(new PmEvent(event.getSource(), child, event.getChangeMask(), event.getValueChangeKind()));
       child.accept(childVisitor);
     }
   }
