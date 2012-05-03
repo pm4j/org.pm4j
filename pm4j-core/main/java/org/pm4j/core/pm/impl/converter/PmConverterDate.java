@@ -14,6 +14,7 @@ import org.pm4j.core.exception.PmResourceRuntimeException;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmConstants;
+import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.impl.PmUtil;
 
 public class PmConverterDate extends PmConverterSerializeableBase<Date> {
@@ -31,6 +32,8 @@ public class PmConverterDate extends PmConverterSerializeableBase<Date> {
   /** The separator string used in case of a multi-format resource string specification. */
   protected String formatSplitString = ";";
 
+  boolean timeZoneAware = true;
+  
   @Override
   public Date stringToValue(PmAttr<?> pmAttr, String s) {
     if (StringUtils.isBlank(s)) {
@@ -38,7 +41,7 @@ public class PmConverterDate extends PmConverterSerializeableBase<Date> {
     }
 
     Locale locale = pmAttr.getPmConversation().getPmLocale();
-    TimeZone timeZone = pmAttr.getPmConversation().getPmTimeZone();
+    TimeZone timeZone = getTimeZone(pmAttr);
     for (String format : getParseFormats(pmAttr)) {
       try {
         SimpleDateFormat sdf = new SimpleDateFormat(format, locale);
@@ -66,13 +69,17 @@ public class PmConverterDate extends PmConverterSerializeableBase<Date> {
   public String valueToString(PmAttr<?> pmAttr, Date value) {
     String outputFormat = getOutputFormat(pmAttr);
     try {
-      TimeZone timeZone = pmAttr.getPmConversation().getPmTimeZone();
+      TimeZone timeZone = getTimeZone(pmAttr);
       return FastDateFormat.getInstance(outputFormat, timeZone, pmAttr.getPmConversation().getPmLocale()).format(value);
     }
     catch (RuntimeException e) {
       throw new PmRuntimeException(pmAttr, "Unable to apply format '" +
                                          outputFormat + "' to value '" + value + "'.");
     }
+  }
+
+  private TimeZone getTimeZone(PmAttr<?> pmAttr) {
+    return timeZoneAware ? pmAttr.getPmConversation().getPmTimeZone() : TimeZone.getTimeZone("UTC");
   }
 
   /**
@@ -106,5 +113,21 @@ public class PmConverterDate extends PmConverterSerializeableBase<Date> {
     String[] formats = getParseFormats(pmAttr);
     return formats[formats.length-1];
   }
+
+  /**
+   * @return true, if time zone conversion base on {@link PmConversation#getPmTimeZone()} is activated
+   */
+  public boolean isTimeZoneAware() {
+    return timeZoneAware;
+  }
+
+  /**
+   * @param timeZoneAware the timeZoneAware to set
+   */
+  public void setTimeZoneAware(boolean timeZoneAware) {
+    this.timeZoneAware = timeZoneAware;
+  }
+  
+  
 
 }
