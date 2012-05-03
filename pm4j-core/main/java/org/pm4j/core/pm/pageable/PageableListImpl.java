@@ -195,6 +195,13 @@ public class PageableListImpl<T_ITEM> implements PageableCollection<T_ITEM> {
     if (currentPageIdx * pageSize >= filteredList.size()) {
       currentPageIdx = PageableCollectionUtil.getNumOfPages(this);
     }
+
+    // TODO olaf: if the filter gets changed to find items again, we need to do this to prevent
+    //            negative page item index identification...
+    // Check if it was really a good idea to have a 0-page index for empty collections.
+    if (objects.size() > 0 && currentPageIdx == 0) {
+      currentPageIdx = 1;
+    }
   }
 
   @SuppressWarnings("unchecked")
