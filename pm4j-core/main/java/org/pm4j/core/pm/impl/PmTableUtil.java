@@ -1,6 +1,6 @@
 package org.pm4j.core.pm.impl;
 
-import org.pm4j.core.pm.impl.PmPagerImpl.PagerVisibility;
+import org.pm4j.core.pm.PmPager.PagerVisibility;
 
 /**
  * Some table related helper functions.
@@ -17,7 +17,9 @@ public final class PmTableUtil {
      */
     public static void setScrollableTableProperties(PmTableImpl<?> table) {
         table.setNumOfPageRows(Integer.MAX_VALUE);
-        table.pager.setPagerVisibility(PagerVisibility.WHEN_SECOND_PAGE_EXISTS);
+        if (table.getPager() != null) {
+          table.getPager().setPagerVisibility(PagerVisibility.WHEN_SECOND_PAGE_EXISTS);
+        }
     }
 
 }

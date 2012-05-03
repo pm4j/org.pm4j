@@ -1,10 +1,6 @@
-package org.pm4j.core.pm.impl;
+package org.pm4j.core.pm;
 
-import org.pm4j.core.pm.PmAttrInteger;
-import org.pm4j.core.pm.PmCommand;
-import org.pm4j.core.pm.PmCommandDecorator;
-import org.pm4j.core.pm.PmLabel;
-import org.pm4j.core.pm.impl.PmPagerImpl.PagerVisibility;
+import org.pm4j.core.pm.pageable.PageableCollection;
 
 /**
  * PM for a control that allows to switch between pages.
@@ -12,6 +8,21 @@ import org.pm4j.core.pm.impl.PmPagerImpl.PagerVisibility;
  * @author olaf boede
  */
 public interface PmPager {
+
+  /**
+   * The set of standard pager visibility conditions.
+   */
+  public enum PagerVisibility {
+    /** The pager will always be displayed. */
+    ALWAYS,
+    /** The pager will be displayed only if there is at least a second page to navigate to. */
+    WHEN_SECOND_PAGE_EXISTS,
+    /** The pager will be displayed only if the table has at least a single row. */
+    WHEN_TABLE_IS_NOT_EMPTY,
+    /** The pager will not be displayed. */
+    NEVER
+  }
+
 
   /**
    * @return A command that navigates to the first page.
@@ -82,6 +93,17 @@ public interface PmPager {
    * @return The pager visibility rule.
    */
   PagerVisibility getPagerVisibility();
+
+  /**
+   * @param pagerVisibility The pager visibility rule to use.
+   */
+  void setPagerVisibility(PagerVisibility pagerVisibility);
+
+
+  /**
+   * @param pageableCollection The pageable collection to handle.
+   */
+  void setPageableCollection(PageableCollection<?> pageableCollection);
 
   /**
    * Registers a decorator to be called before and after a page change triggered by

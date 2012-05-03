@@ -4,12 +4,12 @@ import static org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO.DO_NOTHING;
 
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmAttr;
-import org.pm4j.core.pm.PmAttrBoolean;
 import org.pm4j.core.pm.PmAttrInteger;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmCommandDecorator;
 import org.pm4j.core.pm.PmLabel;
 import org.pm4j.core.pm.PmObject;
+import org.pm4j.core.pm.PmPager;
 import org.pm4j.core.pm.annotation.PmBeanCfg;
 import org.pm4j.core.pm.annotation.PmCommandCfg;
 import org.pm4j.core.pm.annotation.PmTitleCfg;
@@ -19,9 +19,7 @@ import org.pm4j.core.pm.pageable.PageableCollectionUtil;
 import org.pm4j.core.pm.pageable.PageableListImpl;
 
 /**
- * Implementation for some standard pager functionality.
- * <p>
- *
+ * Implementation for standard pager functionality.
  *
  * @author olaf boede
  *
@@ -29,23 +27,10 @@ import org.pm4j.core.pm.pageable.PageableListImpl;
  */
 @PmTitleCfg(resKeyBase = "pmPager")
 @PmBeanCfg(beanClass=PageableCollection.class)
-public class PmPagerImpl<T_ITEM>
-          extends PmBeanBase<PageableCollection<T_ITEM>>
+public class PmPagerImpl
+          extends PmBeanBase<PageableCollection<?>>
           implements PmPager {
 
-  /**
-   * The set of standard pager visibility conditions.
-   */
-  public enum PagerVisibility {
-    /** The pager will always be displayed. */
-    ALWAYS,
-    /** The pager will be displayed only if there is at least a second page to navigate to. */
-    WHEN_SECOND_PAGE_EXISTS,
-    /** The pager will be displayed only if the table has at least a single row. */
-    WHEN_TABLE_IS_NOT_EMPTY,
-    /** The pager will not be displayed. */
-    NEVER
-  }
 
   /** The pager visibility condition. */
   private PagerVisibility pagerVisibility = PagerVisibility.ALWAYS;
@@ -116,7 +101,7 @@ public class PmPagerImpl<T_ITEM>
   public final PmLabel itemXtillYofZ = new PmLabelImpl(this) {
     @Override
     protected String getPmTitleImpl() {
-        PageableCollection<T_ITEM> ps = getPmBean();
+        PageableCollection<?> ps = getPmBean();
         return PmLocalizeApi.localize(this, getPmResKey(),
                 PageableCollectionUtil.getIdxOfFirstItemOnPage(ps),
                 PageableCollectionUtil.getIdxOfLastItemOnPage(ps),
@@ -186,8 +171,9 @@ public class PmPagerImpl<T_ITEM>
   public final PmCommand cmdSelectAll = new PmCommandImpl(this) {
     @Override
     protected void doItImpl() {
-      PageableCollection<T_ITEM> coll = getPmBean();
-      for (T_ITEM i : coll.getItemsOnPage()) {
+      @SuppressWarnings("unchecked")
+      PageableCollection<Object> coll = (PageableCollection<Object>)getPmBean();
+      for (Object i : coll.getItemsOnPage()) {
           coll.select(i);
       }
     }
@@ -197,8 +183,9 @@ public class PmPagerImpl<T_ITEM>
   public final PmCommand cmdDeSelectAll = new PmCommandImpl(this) {
     @Override
     protected void doItImpl() {
-      PageableCollection<T_ITEM> coll = getPmBean();
-      for (T_ITEM i : coll.getItemsOnPage()) {
+      @SuppressWarnings("unchecked")
+      PageableCollection<Object> coll = (PageableCollection<Object>)getPmBean();
+      for (Object i : coll.getItemsOnPage()) {
           coll.select(i);
       }
     }
@@ -240,8 +227,8 @@ public class PmPagerImpl<T_ITEM>
 
   /** Provides an initial empty backing bean if there is none. */
   @Override
-  protected PageableCollection<T_ITEM> getPmBeanImpl() {
-      return new PageableListImpl<T_ITEM>(null);
+  protected PageableCollection<?> getPmBeanImpl() {
+      return new PageableListImpl<Object>(null);
   }
 
   /**
@@ -258,44 +245,15 @@ public class PmPagerImpl<T_ITEM>
   }
 
   @Override
+  public void setPageableCollection(PageableCollection<?> pageableCollection) {
+    setPmBean(pageableCollection);
+  }
+
+  @Override
   public void addPageChangeDecorator(PmCommandDecorator decorator) {
     pageChangeDecorators.addDecorator(decorator);
   }
 
-  /**
-   * PM base class for items that support item selection functionality.
-   *
-   * @param <T_BEAN>
-   *            Type of the items.
-   */
-  public static class SelectableItemPm<T_BEAN> extends PmBeanBase<T_BEAN> {
-
-      public final PmAttrBoolean selected = new PmAttrBooleanImpl(this) {
-          @Override
-          protected Boolean getBackingValueImpl() {
-              return getPageableObjectSet().isSelected(getPmBean());
-          }
-
-          @Override
-          protected void setBackingValueImpl(Boolean value) {
-              if (value == Boolean.TRUE) {
-                  getPageableObjectSet().select(getPmBean());
-              } else {
-                  getPageableObjectSet().deSelect(getPmBean());
-              }
-          }
-
-          private PageableCollection<T_BEAN> getPageableObjectSet() {
-              @SuppressWarnings("unchecked")
-              PmPagerImpl<T_BEAN> parent = PmUtil.getPmParentOfType(this, PmPagerImpl.class);
-              return parent.getPmBean();
-          }
-      };
-
-      public PmAttrBoolean getSelected() {
-          return selected;
-      }
-  }
 
   // -- getter / setter --
 
@@ -321,6 +279,6 @@ public class PmPagerImpl<T_ITEM>
   public PmCommand getCmdDeSelectAll() { return cmdDeSelectAll; }
   @Override
   public PagerVisibility getPagerVisibility() { return pagerVisibility; }
-  /** @param pagerVisibility The pager visibility rule to use. */
+  @Override
   public void setPagerVisibility(PagerVisibility pagerVisibility) { this.pagerVisibility = pagerVisibility; }
 }

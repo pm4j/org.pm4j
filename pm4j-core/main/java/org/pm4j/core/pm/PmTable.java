@@ -3,7 +3,6 @@ package org.pm4j.core.pm;
 import java.util.Collection;
 import java.util.List;
 
-import org.pm4j.core.pm.impl.PmPager;
 
 /**
  * PM for tables.<br>

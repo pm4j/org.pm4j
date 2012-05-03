@@ -18,6 +18,7 @@ import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmEvent.ValueChangeKind;
 import org.pm4j.core.pm.PmEventListener;
 import org.pm4j.core.pm.PmObject;
+import org.pm4j.core.pm.PmPager;
 import org.pm4j.core.pm.PmSortOrder;
 import org.pm4j.core.pm.PmTable;
 import org.pm4j.core.pm.PmTableCol;
@@ -67,19 +68,6 @@ public class PmTableImpl
 
   /** Handles the changed state of the table. */
   private final ChangedChildStateRegistry changedStateRegistry = new ChangedChildStateRegistry(this);
-
-  /** A pager that may be used to navigate through the table. */
-  public final PmPagerImpl<T_ROW_ELEMENT_PM> pager = new PmPagerImpl<T_ROW_ELEMENT_PM>(this) {
-    @Override
-    protected void onPmInit() {
-      PmEventApi.addPmEventListener(PmTableImpl.this, PmEvent.VALUE_CHANGE, new PmEventListener() {
-        @Override
-        public void handleEvent(PmEvent event) {
-          setPmBean(getPageableCollection());
-        }
-      });
-    }
-  };
 
   /** The set of decorators for various table change kinds. */
   private Map<TableChange, PmCommandDecoratorSetImpl> changeDecoratorMap = Collections.emptyMap();
@@ -428,7 +416,9 @@ public class PmTableImpl
       //           Generates potentially an initialization problem if called in constructor
       pageableCollection.setMultiSelect(getRowSelectMode() == RowSelectMode.MULTI);
       pageableCollection.setPageSize(getNumOfPageRows());
-      pager.setPmBean(pageableCollection);
+      if (getPager() != null) {
+        getPager().setPageableCollection(pageableCollection);
+      }
     }
     return pageableCollection;
   }
@@ -490,15 +480,19 @@ public class PmTableImpl
       pageableCollection.setBackingItemFilter(filter);
     }
 
-    pager.setPmBean(pageableCollection);
+    // XXX olaf: Check - is redundant to the change listener within Pager!
+    if (getPager() != null) {
+      getPager().setPageableCollection(pageableCollection);
+    }
   }
 
-
   /**
-   * @return A pager that may be used to navigate through the table.
+   * @return A pager that may be used to navigate through the table.<br>
+   *         May return <code>null</code> if there is no pager defined for this
+   *         table.
    */
   public PmPager getPager() {
-    return pager;
+    return null;
   }
 
   /**
@@ -508,6 +502,26 @@ public class PmTableImpl
    * @param event The fired event.
    */
   protected void onPmSelectionChange(PmEvent event) {
+  }
+
+  /**
+   * Base implementation for a table specific pager.
+   */
+  public class Pager extends PmPagerImpl {
+
+    public Pager(PmTable<?> parentTablePm) {
+      super(parentTablePm);
+    }
+
+    @Override
+    protected void onPmInit() {
+      PmEventApi.addPmEventListener(PmTableImpl.this, PmEvent.VALUE_CHANGE, new PmEventListener() {
+        @Override
+        public void handleEvent(PmEvent event) {
+          setPageableCollection(PmTableImpl.this.getPageableCollection());
+        }
+      });
+    }
   }
 
   // -- metadata handling --
