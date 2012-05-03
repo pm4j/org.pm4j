@@ -234,9 +234,9 @@ public abstract class PmObjectBase implements PmObject {
   }
 
   @Override
-  public void setPmVisible(Boolean visible) {
+  public void setPmVisible(boolean visible) {
     PmEventApi.ensureThreadEventSource(this);
-    boolean changed = !ObjectUtils.equals(pmVisible, visible);
+    boolean changed = (pmVisible != visible);
     pmVisible = visible;
     // Does not fire change events if called within the initialization phase.
     if (changed) {
@@ -263,9 +263,9 @@ public abstract class PmObjectBase implements PmObject {
   }
 
   @Override
-  public void setPmEnabled(Boolean enabled) {
+  public void setPmEnabled(boolean enabled) {
     PmEventApi.ensureThreadEventSource(this);
-    boolean changed = !ObjectUtils.equals(pmEnabled, enabled);
+    boolean changed = (pmEnabled != enabled);
     pmEnabled = enabled;
     // Does not fire change events if called within the initialization phase.
     if (changed) {

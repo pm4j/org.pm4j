@@ -109,11 +109,9 @@ public interface PmObject extends Comparable<PmObject> {
    * calling this setter.
    *
    * @param visible
-   *          The new local visibility state. If set to <code>null</code>,
-   *          the visibility provided by <code>isPmVisibleImpl()</code>
-   *          will be applied.
+   *          The new local visibility state.
    */
-  void setPmVisible(Boolean visible);
+  void setPmVisible(boolean visible);
 
   /**
    * @return <code>true</code> when the element should be rendered as enabled
@@ -124,7 +122,7 @@ public interface PmObject extends Comparable<PmObject> {
   /**
    * @param enabled The new local enabled state.
    */
-  void setPmEnabled(Boolean enabled);
+  void setPmEnabled(boolean enabled);
 
   /**
    * @return <code>true</code> when the values of this PM may not be
