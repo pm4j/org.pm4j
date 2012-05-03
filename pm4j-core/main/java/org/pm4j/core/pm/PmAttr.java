@@ -183,7 +183,7 @@ public interface PmAttr<T> extends PmObject, PmDataInput {
 	 * @param <T>
 	 *          The type of the items to convert.
 	 */
-	public interface Converter<T> {
+	interface Converter<T> {
 
 		T stringToValue(PmAttr<?> pmAttr, String s) throws PmConverterException;
 
@@ -195,7 +195,15 @@ public interface PmAttr<T> extends PmObject, PmDataInput {
 
 	}
 
-  interface ValueChangeCommand<T_VALUE> extends PmCommand {
+  /**
+   * Interface for the internally generated command that gets generated for each value change operation.
+   * <p>
+   * This command based value change implementation provides the basis for the features: undo and value change
+   * command decorator.
+   *
+   * @param <T_VALUE> The attribute value type.
+   */
+	interface ValueChangeCommand<T_VALUE> extends PmCommand {
     PmAttr<T_VALUE> getPmAttr();
     T_VALUE getNewValue();
     T_VALUE getOldValue();

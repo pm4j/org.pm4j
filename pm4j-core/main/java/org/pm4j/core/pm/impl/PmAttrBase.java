@@ -566,27 +566,17 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     try {
       assert value.isPmValueSet();
 
-
       T_PM_VALUE newPmValue = value.getPmValue();
       T_PM_VALUE currentValue = getUncachedValidValue();
+      // Check both values for null-value because they might be different but
+      // may both represent a null-value.
+      boolean pmValueChanged = (! equalValues(currentValue, newPmValue)) &&
+                               (! (isEmptyValue(newPmValue) && isEmptyValue(currentValue)));
 
       ValueChangeCommandImpl<T_PM_VALUE> cmd = new ValueChangeCommandImpl<T_PM_VALUE>(this, currentValue, newPmValue);
 
-      if (!beforeValueChange(currentValue, newPmValue)) {
-        LOG.debug("Value '" + getPmRelativeName() + "' was not changed because of the beforeDo result of the beforeValueChange() implementation");
-        return false;
-      }
-      for (PmCommandDecorator d : getValueChangeDecorators()) {
-        if (!d.beforeDo(cmd)) {
-          LOG.debug("Value '" + getPmRelativeName() + "' was not changed because of the beforeDo result of decorator: " + d);
-          return false;
-        }
-      }
-
       // New game. Forget all the old invalid stuff.
       clearPmInvalidValues();
-
-      boolean pmValueChanged = ! equalValues(currentValue, newPmValue);
 
       // Ensure that primitive types will not be set to null.
       if ((newPmValue == null) && getOwnMetaData().primitiveType) {
@@ -594,6 +584,8 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
         return false;
       }
 
+      // FIXME olaf: read only control should be done within the calling setValueAsString method!
+      //             The set operation should not be performed in this case. Check for side effects...
       if (pmValueChanged && isPmReadonly()) {
         PmMessageUtil.makeMsg(this, Severity.ERROR, PmConstants.MSGKEY_VALIDATION_READONLY);
         return false;
@@ -612,11 +604,18 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
         }
       }
 
-      // Check both values for null-value because they might be different but
-      // may both represent a null-value.
-      if (pmValueChanged &&
-          (!(isEmptyValue(newPmValue) && isEmptyValue(currentValue)))
-         ) {
+      if (pmValueChanged) {
+        if (!beforeValueChange(currentValue, newPmValue)) {
+          LOG.debug("Value '" + getPmRelativeName() + "' was not changed because of the beforeDo result of the beforeValueChange() implementation");
+          return false;
+        }
+        for (PmCommandDecorator d : getValueChangeDecorators()) {
+          if (!d.beforeDo(cmd)) {
+            LOG.debug("Value '" + getPmRelativeName() + "' was not changed because of the beforeDo result of decorator: " + d);
+            return false;
+          }
+        }
+
         // TODO olaf: a quick hack to hide password data. Should be done more general for other field names too.
         if (LOG.isDebugEnabled() && !ObjectUtils.equals(getPmName(), "password")) {
           LOG.debug("Changing PM value of '" + PmUtil.getPmLogString(this) + "' from '" + currentValue + "' to '" + newPmValue + "'.");
@@ -1626,7 +1625,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
    */
   @PmTitleCfg(resKey="pmValueChangeCommand")
   @PmCommandCfg(beforeDo=BEFORE_DO.DO_NOTHING)
-  public static class ValueChangeCommandImpl<T_VALUE> extends PmCommandImpl {
+  public static class ValueChangeCommandImpl<T_VALUE> extends PmCommandImpl implements ValueChangeCommand<T_VALUE> {
 
     private final T_VALUE oldValue;
     private final T_VALUE newValue;
@@ -1677,6 +1676,12 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
 
     public T_VALUE getOldValue() {
       return oldValue;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public PmAttr<T_VALUE> getPmAttr() {
+      return (PmAttr<T_VALUE>) getPmParent();
     }
   }
 
