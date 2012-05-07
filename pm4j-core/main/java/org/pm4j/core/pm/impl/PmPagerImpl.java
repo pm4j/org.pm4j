@@ -3,7 +3,6 @@ package org.pm4j.core.pm.impl;
 import static org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO.DO_NOTHING;
 
 import org.pm4j.core.exception.PmRuntimeException;
-import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmAttrInteger;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmCommandDecorator;
@@ -110,45 +109,33 @@ public class PmPagerImpl
   };
 
   public final PmAttrInteger currentPageIdx = new PmAttrIntegerImpl(this) {
-      @Override
-      protected boolean isPmEnabledImpl() {
-          return getNumOfPages() > 1;
-      }
+    @Override
+    protected boolean isPmReadonlyImpl() {
+        return getNumOfPages() < 2;
+    }
 
-      /**
-       * Simply ignores invalid values.
-       * <p>
-       * TODO olaf: does not handle converter problems. (non numeric values)
-       */
-      @Override
-      protected boolean setValueImpl(SetValueContainer<Integer> value) {
-          Integer newValue = value.getPmValue();
-          return (newValue != null) &&
-                 (newValue > 0) &&
-                 (newValue <= getNumOfPages());
-      }
+    /**
+     * Simply ignores invalid values.
+     */
+    protected boolean beforeValueChange(Integer oldValue, Integer newValue) {
+      return  (newValue != null) &&
+              (newValue > 0) &&
+              (newValue <= getNumOfPages());
+    }
 
+    /** Is not required. Even if the bound value is an 'int' scalar. */
+    @Override
+    public boolean isRequired() {
+      return false;
+    }
 
-      /** Is not required. Even if the bound value is an 'int' scalar. */
-      @Override
-      public boolean isRequired() {
-        return false;
-      }
-
-      /**
-       * Refuses values out of range and considers the restrictions of registered page change decorators.
-       */
-      @Override
-      protected void onPmInit() {
-        addValueChangeDecorator(new PmAttrValueChangeDecoratorImpl<Integer>() {
-          protected boolean beforeChange(PmAttr<Integer> pmAttr, Integer oldValue, Integer newValue) {
-            return (newValue == null) ||
-                   (newValue < 1) ||
-                   (newValue >= getNumOfPages());
-          }
-        });
-        addValueChangeDecorator(pageChangeDecorators);
-      }
+    /**
+     * Refuses values out of range and considers the restrictions of registered page change decorators.
+     */
+    @Override
+    protected void onPmInit() {
+      addValueChangeDecorator(pageChangeDecorators);
+    }
   };
 
   @PmCommandCfg(beforeDo=DO_NOTHING)
