@@ -26,6 +26,7 @@ import org.pm4j.core.pm.PmTableGenericRow;
 import org.pm4j.core.pm.PmTableRow;
 import org.pm4j.core.pm.PmVisitor;
 import org.pm4j.core.pm.api.PmEventApi;
+import org.pm4j.core.pm.api.PmMessageUtil;
 import org.pm4j.core.pm.pageable.PageableCollection;
 import org.pm4j.core.pm.pageable.PageableCollection.Filter;
 import org.pm4j.core.pm.pageable.PageableListImpl;
@@ -146,6 +147,7 @@ public class PmTableImpl
    * @param newRowPm The new row.
    */
   protected void onDeleteRow(T_ROW_ELEMENT_PM deletedRow) {
+    PmMessageUtil.clearSubTreeMessages(deletedRow);
     getPageableCollection().deSelect(deletedRow);
     changedStateRegistry.onDeleteItem(deletedRow);
     if (deletedRow instanceof PmBean) {
