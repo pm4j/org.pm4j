@@ -210,9 +210,7 @@ public class PageableListImpl<T_ITEM> implements PageableCollection<T_ITEM> {
       objects = srcList;
     } else {
       // prevent unintended sort operation on the source list.
-      if (objects == srcList) {
-        objects = new ArrayList<T_ITEM>(srcList);
-      }
+      objects = new ArrayList<T_ITEM>(srcList);
       Collections.sort(objects, (Comparator<T_ITEM>)currentSortComparator);
     }
   }
