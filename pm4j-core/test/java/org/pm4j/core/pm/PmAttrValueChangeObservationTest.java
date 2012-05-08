@@ -5,8 +5,9 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
-import org.pm4j.core.pm.impl.PmAttrValueChangeDecoratorImpl;
+import org.pm4j.core.pm.impl.PmAttrValueChangeDecorator;
 import org.pm4j.core.pm.impl.PmConversationImpl;
+
 
 public class PmAttrValueChangeObservationTest {
 
@@ -67,7 +68,7 @@ public class PmAttrValueChangeObservationTest {
   private String expectedOldValue, expectedNewValue;
   private boolean allowValueChange = true;
 
-  private PmCommandDecorator valueChangeDecorator = new PmAttrValueChangeDecoratorImpl<String>() {
+  private PmCommandDecorator valueChangeDecorator = new PmAttrValueChangeDecorator<String>() {
 
     @Override
     protected boolean beforeChange(PmAttr<String> pmAttr, String oldValue, String newValue) {

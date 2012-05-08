@@ -5,7 +5,7 @@ import java.io.Serializable;
 import org.pm4j.core.exception.PmConverterException;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.impl.PmAttrImpl;
-import org.pm4j.core.pm.impl.PmAttrValueChangeDecoratorImpl;
+import org.pm4j.core.pm.impl.PmAttrValueChangeDecorator;
 
 
 
@@ -175,7 +175,7 @@ public interface PmAttr<T> extends PmObject, PmDataInput {
    * The value change can be prevented if method
    * {@link PmCommandDecorator#beforeDo(PmCommand)} returns <code>false</code>.
    * <p>
-   * The decorator base class {@link PmAttrValueChangeDecoratorImpl} provides a
+   * The decorator base class {@link PmAttrValueChangeDecorator} provides a
    * convenient base implementation that provides old and new value as
    * parameters for the before- and after-change methods.
    *
