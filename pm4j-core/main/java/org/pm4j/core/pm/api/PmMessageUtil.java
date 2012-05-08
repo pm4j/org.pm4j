@@ -200,9 +200,9 @@ public class PmMessageUtil {
    *         In case of no messages an empty collection.
    */
   public static List<PmMessage> clearSubTreeMessages(PmObject pm) {
+    PmConversationImpl pmConversation = (PmConversationImpl)pm.getPmConversation();
     List<PmMessage> messages = getSubTreeMessages(pm, Severity.INFO);
     for (PmMessage m : messages) {
-      PmConversationImpl pmConversation = (PmConversationImpl)pm.getPmConversation();
       pmConversation.clearPmMessage(m);
     }
     return messages;

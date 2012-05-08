@@ -293,7 +293,7 @@ public class PmTableImpl
             comparator = new RowPmComparator<T_ROW_ELEMENT_PM>(sortCol);
             // sort the PM items.
             getPageableCollection().sortItems(comparator);
-            PmEventApi.firePmEvent(PmTableImpl.this, PmEvent.VALUE_CHANGE);
+            PmEventApi.firePmEvent(PmTableImpl.this, PmEvent.VALUE_CHANGE, ValueChangeKind.SORT_ORDER);
             return;
           }
         }
@@ -307,7 +307,7 @@ public class PmTableImpl
 
       // sort based on a backing items related comparator.
       getPageableCollection().sortBackingItems(comparator);
-      PmEventApi.firePmEvent(PmTableImpl.this, PmEvent.VALUE_CHANGE);
+      PmEventApi.firePmEvent(PmTableImpl.this, PmEvent.VALUE_CHANGE, ValueChangeKind.SORT_ORDER);
     }
   }
 

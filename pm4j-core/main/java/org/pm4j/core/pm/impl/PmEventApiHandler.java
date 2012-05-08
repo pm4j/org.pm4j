@@ -124,7 +124,7 @@ public class PmEventApiHandler {
     if (! event.isInitializationEvent()) {
       // propagate the event to the parent hierarchy until the conversation is reached.
       PmConversation conversationPm = pmImpl.getPmConversation();
-      PmEvent propagationEvent = new PmEvent(event.getSource(), event.pm, event.getChangeMask() | PmEvent.IS_EVENT_PROPAGATION);
+      PmEvent propagationEvent = new PmEvent(event.getSource(), event.pm, event.getChangeMask() | PmEvent.IS_EVENT_PROPAGATION, event.getValueChangeKind());
       for (PmObject p = pmImpl; p != null; p = p.getPmParent()) {
         fireOnEventTables(p, propagationEvent);
         // stop after reaching the conversation.
