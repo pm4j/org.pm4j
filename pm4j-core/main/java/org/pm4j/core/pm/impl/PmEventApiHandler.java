@@ -2,6 +2,8 @@ package org.pm4j.core.pm.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.pm4j.core.pm.PmAttr;
+import org.pm4j.core.pm.PmCommandDecorator;
 import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmEvent.ValueChangeKind;
@@ -42,6 +44,10 @@ public class PmEventApiHandler {
 
   public Object getThreadEventSource() {
     return null;
+  }
+
+  public void addValueChangeDecorator(PmAttr<?> pmAttr, PmCommandDecorator decorator) {
+    ((PmAttrBase<?, ?>)pmAttr).addValueChangeDecorator(decorator);
   }
 
   public void addPmEventListener(PmObject pm, int eventMask, PmEventListener listener) {

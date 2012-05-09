@@ -1,14 +1,38 @@
 package org.pm4j.core.pm.api;
 
+import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmEvent.ValueChangeKind;
+import org.pm4j.core.pm.PmCommand;
+import org.pm4j.core.pm.PmCommandDecorator;
 import org.pm4j.core.pm.PmEventListener;
 import org.pm4j.core.pm.PmObject;
+import org.pm4j.core.pm.impl.PmAttrValueChangeDecorator;
 import org.pm4j.core.pm.impl.PmEventApiHandler;
 
 public class PmEventApi {
 
   private static PmEventApiHandler apiHandler = new PmEventApiHandler();
+
+  /**
+   * Adds a decorator that gets notified before and after changing the attribute
+   * value.
+   * <p>
+   * The value change can be prevented if method
+   * {@link PmCommandDecorator#beforeDo(PmCommand)} returns <code>false</code>.
+   * <p>
+   * The decorator base class {@link PmAttrValueChangeDecorator} provides a
+   * convenient base implementation that provides old and new value as
+   * parameters for the before- and after-change methods.
+   *
+   * @param pmAttr
+   *          The attribute to attach the decorator to.
+   * @param decorator
+   *          The decorator to use.
+   */
+  public static void addValueChangeDecorator(PmAttr<?> pmAttr, PmCommandDecorator decorator) {
+    apiHandler.addValueChangeDecorator(pmAttr, decorator);
+  }
 
   /**
    * The provided <tt>listener</tt> will receive {@link PmEvent} events whenever
@@ -38,7 +62,6 @@ public class PmEventApi {
     apiHandler.addWeakPmEventListener(hierachyRootPm, eventMask | PmEvent.IS_EVENT_PROPAGATION, listener);
   }
 
-
   /**
    * Removes the listener reference.
    *
@@ -58,9 +81,7 @@ public class PmEventApi {
    * listener.
    */
   public static void firePmEvent(PmObject pm, int eventMask, ValueChangeKind valueChangeKind) {
-    apiHandler.firePmEvent(pm,
-        new PmEvent(ensureThreadEventSource(pm),
-                    pm, eventMask, valueChangeKind));
+    apiHandler.firePmEvent(pm, new PmEvent(ensureThreadEventSource(pm), pm, eventMask, valueChangeKind));
   }
 
   /**
@@ -68,9 +89,7 @@ public class PmEventApi {
    * listener.
    */
   public static void firePmEvent(PmObject pm, int eventMask) {
-    apiHandler.firePmEvent(pm,
-        new PmEvent(ensureThreadEventSource(pm),
-                    pm, eventMask, ValueChangeKind.UNKNOWN));
+    apiHandler.firePmEvent(pm, new PmEvent(ensureThreadEventSource(pm), pm, eventMask, ValueChangeKind.UNKNOWN));
   }
 
   public static void firePmEventIfInitialized(PmObject pm, int eventMask, ValueChangeKind valueChangeKind) {
@@ -100,14 +119,14 @@ public class PmEventApi {
 
   public static Object ensureThreadEventSource(Object param) {
     Object currSrc = apiHandler.getThreadEventSource();
-    return (currSrc == null)
-        ? apiHandler.setThreadEventSource(param)
-        : currSrc;
+    return (currSrc == null) ? apiHandler.setThreadEventSource(param) : currSrc;
   }
 
   /**
    * Defines an application specific event api call handler.
-   * @param newApiHandler The alternate handler to use within the application.
+   *
+   * @param newApiHandler
+   *          The alternate handler to use within the application.
    */
   public static void setApiHandler(PmEventApiHandler newApiHandler) {
     apiHandler = newApiHandler;
