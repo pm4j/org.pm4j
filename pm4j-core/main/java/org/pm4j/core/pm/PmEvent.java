@@ -46,7 +46,7 @@ public class PmEvent extends EventObject {
     /** The specific value change is not defined. */
     UNKNOWN,
     /** A value was (ex-)changed. */
-    VALUE_CHANGE,
+    VALUE,
     /** One or more items where added to value (E.g. a list value). */
     ADD_ITEM,
     /** One or more items where deleted from a value. */
@@ -56,13 +56,13 @@ public class PmEvent extends EventObject {
     /** Sort order change */
     SORT_ORDER,
     /** Item Filter definition change */
-    FILTER_CHANGE;
+    FILTER;
 
     /**
      * @return <code>true</code> if the value may be replaced by this value change.
      */
     public boolean isContentReplacingChangeKind() {
-      return this == UNKNOWN || this == VALUE_CHANGE || this == RELOAD;
+      return this == UNKNOWN || this == VALUE || this == RELOAD;
     }
   }
 
@@ -74,10 +74,8 @@ public class PmEvent extends EventObject {
 
   /**
    * A bit mask for the change kind.
-   * @deprecated Please use {@link #getChangeMask()}.
    */
-  @Deprecated
-  public final int changeKind;
+  private final int changeMask;
 
   /**
    * In case of a value changing event, this field can be used to specify the kind of value change.
@@ -94,7 +92,7 @@ public class PmEvent extends EventObject {
   public PmEvent(Object eventSource, PmObject pm, int changeKind) {
     super(eventSource);
 
-    this.changeKind = changeKind;
+    this.changeMask = changeKind;
     this.pm = pm;
     this.valueChangeKind = ValueChangeKind.UNKNOWN;
   }
@@ -111,7 +109,7 @@ public class PmEvent extends EventObject {
   public PmEvent(Object eventSource, PmObject pm, int changeMask, ValueChangeKind valueChange) {
     super(eventSource);
 
-    this.changeKind = changeMask;
+    this.changeMask = changeMask;
     this.pm = pm;
     this.valueChangeKind = valueChange;
   }
@@ -123,7 +121,7 @@ public class PmEvent extends EventObject {
    *         linked {@link #pm}.
    */
   public boolean isPropagationEvent() {
-    return (changeKind & IS_EVENT_PROPAGATION) != 0;
+    return (changeMask & IS_EVENT_PROPAGATION) != 0;
   }
 
   /**
@@ -132,7 +130,7 @@ public class PmEvent extends EventObject {
    *         and all values of the related PM sub-tree are exchanged.
    */
   public boolean isInitializationEvent() {
-    return changeKind == ALL_CHANGE_EVENTS;
+    return changeMask == ALL_CHANGE_EVENTS;
   }
 
   /**
@@ -153,7 +151,7 @@ public class PmEvent extends EventObject {
    * @return The bit-mask that indicates the set of influenced PM aspects.
    */
   public int getChangeMask() {
-    return changeKind;
+    return changeMask;
   }
 
   @Override
