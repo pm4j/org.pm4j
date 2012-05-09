@@ -11,11 +11,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.pm4j.core.pm.PmAttrString;
 import org.pm4j.core.pm.PmCommand;
+import org.pm4j.core.pm.PmCommand.CommandState;
 import org.pm4j.core.pm.PmConversation;
+import org.pm4j.core.pm.PmMessage.Severity;
+import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.annotation.PmCommandCfg;
-import org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO;
 import org.pm4j.core.pm.api.PmMessageUtil;
+import org.pm4j.navi.NaviLink;
 
 /**
  * Tests for the command logic that should happen before it gets executed.
@@ -24,7 +27,7 @@ import org.pm4j.core.pm.api.PmMessageUtil;
  */
 public class PmCommandImplBeforeLogicTest {
 
-  private PmConversation conversationPm;
+  private PmConversationImpl conversationPm;
   private MyTestPm myTestPm;
 
   @Before
@@ -34,6 +37,15 @@ public class PmCommandImplBeforeLogicTest {
 
     assertEquals("The test starts without validation errors.",
         0, PmMessageUtil.getPmErrors(conversationPm).size() );
+
+    // TODO olaf: enhance the default exception handler!
+    conversationPm.setPmExceptionHandler(new PmExceptionHandler() {
+      @Override
+      public NaviLink onException(PmObject pmObject, Throwable throwable, boolean inNaviContext) {
+        PmMessageUtil.makeExceptionMsg(pmObject, Severity.ERROR, throwable);
+        return null;
+      }
+    });
   }
 
   @Test
@@ -91,6 +103,19 @@ public class PmCommandImplBeforeLogicTest {
     assertTrue("The doItImpl() method should have been called.", myTestPm.doItImplHasBeenExecuted);
   }
 
+  @Test
+  public void testFailingCommand() {
+    assertEquals(CommandState.FAILED, myTestPm.cmdThatDoesNothingBeforeDoButFails.doIt().getCommandState());
+    assertFalse("The command should be marked as 'invalid'.",
+                myTestPm.cmdThatDoesNothingBeforeDoButFails.isPmValid());
+    assertEquals("That means: There is an error message for this command.",
+                  1, PmMessageUtil.getPmErrors(myTestPm.cmdThatDoesNothingBeforeDoButFails).size());
+
+    assertEquals(CommandState.FAILED, myTestPm.cmdThatDoesNothingBeforeDoButFails.doIt().getCommandState());
+    assertEquals("After a second (failing) attempt there should still only be one (new) error message for the command.",
+                  1, PmMessageUtil.getPmErrors(myTestPm.cmdThatDoesNothingBeforeDoButFails).size());
+  }
+
 
   /**
    * A PM with some command variations to test.
@@ -111,6 +136,13 @@ public class PmCommandImplBeforeLogicTest {
 
     public final PmCommand cmdWithDefaultBeforeLogic = new ExecReportingCmdPm();
 
+    @PmCommandCfg(beforeDo=DO_NOTHING)
+    public final PmCommand cmdThatDoesNothingBeforeDoButFails = new ExecReportingCmdPm() {
+      @Override
+      protected void doItImpl() throws Exception {
+        throw new RuntimeException("This command intentially fails.");
+      }
+    };
 
     public MyTestPm(PmConversation conversationPm) {
       super(conversationPm);

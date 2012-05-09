@@ -351,7 +351,7 @@ public class PmConversationImpl extends PmElementBase implements PmConversation 
     List<PmMessage> list = new ArrayList<PmMessage>();
     synchronized(pmMessages) {
       for (PmMessage m : pmMessages) {
-        if ((forAllPms || forPm == m.getPm()) &&
+        if ((forAllPms || m.isMessageFor(forPm)) &&
             (severity == null || severity.equals(m.getSeverity()))
            ) {
             list.add(m);
@@ -396,7 +396,7 @@ public class PmConversationImpl extends PmElementBase implements PmConversation 
         Iterator<PmMessage> iter = new ArrayList<PmMessage>(pmMessages).iterator();
         while(iter.hasNext()) {
           PmMessage m = iter.next();
-          if ((pm == null || pm == m.getPm()) &&
+          if ((pm == null || m.isMessageFor(pm)) &&
               (severity == null || m.getSeverity().equals(severity))) {
             if (m instanceof PmValidationMessage) {
               PmValidationApi.clearInvalidValuesOfSubtree(m.getPm());

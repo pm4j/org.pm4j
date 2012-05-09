@@ -10,6 +10,7 @@ import org.apache.commons.logging.LogFactory;
 import org.pm4j.core.exception.PmResourceData;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.api.PmLocalizeApi;
+import org.pm4j.core.pm.impl.PmCommandImpl;
 
 /**
  * A string resource based presentation model message.
@@ -141,6 +142,34 @@ public class PmMessage {
 
   public Severity getSeverity() {
     return severity;
+  }
+
+  /**
+   * Checks if the message is related to the given PM.
+   * <p>
+   * This is especially for commands not only a simple compare operation. It has to consider
+   * that commands get cloned before execution. Any message created for the clone is then
+   * also relevant for the original command.
+   *
+   * @param pmToCheck The PM to check.
+   * @return <code>true</code> if the message is related to the given PM.
+   */
+  public boolean isMessageFor(PmObject pmToCheck) {
+    PmObject pm = getPm();
+    if (pmToCheck == pm) {
+      return true;
+    }
+
+    if (pm instanceof PmCommandImpl && pmToCheck instanceof PmCommandImpl) {
+      PmObject templateOfMessageCommand = ((PmCommandImpl)pm).getTemplateCommand();
+      PmObject templateOfCommandToCheck = ((PmCommandImpl)pmToCheck).getTemplateCommand();
+      return templateOfMessageCommand == pmToCheck ||
+             templateOfMessageCommand == templateOfCommandToCheck ||
+             pm == templateOfCommandToCheck;
+    }
+
+    // does not match.
+    return false;
   }
 
   /**

@@ -83,6 +83,12 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
   private CommandState commandState = CommandState.TEMPLATE;
 
   /**
+   * A processed command (after starting {@link #doItImpl()}) was cloned from a
+   * template. In this state this member identifies the clone source.
+   */
+  private PmCommand templateCommand;
+
+  /**
    * Constructor for fix commands that have an associated field in the parent
    * PM.
    *
@@ -478,7 +484,9 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
   @Override
   protected PmCommandImpl clone() {
     try {
-      return (PmCommandImpl)super.clone();
+      PmCommandImpl clone = (PmCommandImpl)super.clone();
+      clone.templateCommand = this;
+      return clone;
     }
     catch (CloneNotSupportedException e) {
       throw new PmRuntimeException(this, "This command is not cloneable.");
@@ -691,6 +699,15 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
     }
 
     return naviString;
+  }
+
+  /**
+   * @return A processed command (after starting {@link #doItImpl()}) was cloned
+   *         from a template. In this state this member identifies the clone
+   *         source.
+   */
+  public PmCommand getTemplateCommand() {
+    return templateCommand;
   }
 
   // ======== meta data ======== //
