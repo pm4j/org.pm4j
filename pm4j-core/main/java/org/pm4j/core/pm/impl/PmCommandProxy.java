@@ -94,6 +94,16 @@ public class PmCommandProxy extends PmCommandImpl {
                 : executedDelegateCmdClone;
     }
 
+    /**
+     * Provides the state of the executed delegate command (if it already exists).
+     */
+    @Override
+    public CommandState getCommandState() {
+      return executedDelegateCmdClone != null
+                ? executedDelegateCmdClone.getCommandState()
+                : super.getCommandState();
+    }
+
     @Override
     protected String getPmTitleImpl() {
       return delegateCmd != null
