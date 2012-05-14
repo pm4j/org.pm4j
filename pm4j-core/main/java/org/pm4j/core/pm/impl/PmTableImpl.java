@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.pm4j.common.util.InvertingComparator;
-import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmCommandDecorator;
 import org.pm4j.core.pm.PmDataInput;
@@ -330,8 +329,8 @@ public class PmTableImpl
 
     @Override
     public int compare(T_ROW_ELEMENT_PM o1, T_ROW_ELEMENT_PM o2) {
-      PmObject cellPm1 = zz_getPmRowCellForColumn(o1, sortColumn);
-      PmObject cellPm2 = zz_getPmRowCellForColumn(o2, sortColumn);
+      PmObject cellPm1 = PmTableUtil.getRowCellForTableCol(sortColumn, o1);
+      PmObject cellPm2 = PmTableUtil.getRowCellForTableCol(sortColumn, o2);
 
       switch (sortColumn.getSortOrderAttr().getValue()) {
         case ASC:  return cellPm1.compareTo(cellPm2);
@@ -368,14 +367,6 @@ public class PmTableImpl
           PmTableImpl.this.onPmSelectionChange(event);
         }
       });
-  }
-
-  private static PmObject zz_getPmRowCellForColumn(PmElement rowElement, PmTableCol column) {
-    PmObject pm = PmUtil.findChildPm(rowElement, column.getPmName());
-    if (pm == null) {
-      throw new PmRuntimeException(rowElement, "No table row item found for column '" + column.getPmName());
-    }
-    return pm;
   }
 
   @Override

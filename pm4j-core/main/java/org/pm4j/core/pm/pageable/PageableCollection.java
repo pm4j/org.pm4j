@@ -97,16 +97,25 @@ public interface PageableCollection<T_ITEM> {
    *          May be <code>null</code> to switch filtering off.
    */
   void setBackingItemFilter(Filter<?> filter);
-  
+
   /**
    * @return The current filter definition for the backing collection.
    */
   Filter<?> getBackingItemFilter();
 
   /**
-   * @return The total number of object within this set.
+   * @return The total number of objects within this set.
+   *         <p>
+   *         A filter definition may influence this number.
    */
   int getNumOfItems();
+
+  /**
+   * @return The total number of object within this set.
+   *         <p>
+   *         A filter definition does <b>not</b> influence this number.
+   */
+  int getNumOfUnfilteredItems();
 
   /**
    * @param item

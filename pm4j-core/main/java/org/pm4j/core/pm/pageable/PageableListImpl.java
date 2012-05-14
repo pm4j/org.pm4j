@@ -87,6 +87,11 @@ public class PageableListImpl<T_ITEM> implements PageableCollection<T_ITEM> {
   }
 
   @Override
+  public int getNumOfUnfilteredItems() {
+    return originalObjects != null ? originalObjects.size() : 0;
+  }
+
+  @Override
   public int getPageSize() {
     return pageSize;
   }

@@ -104,6 +104,11 @@ public class PageablePmsForBeans<T_PM extends PmBean<T_BEAN>, T_BEAN> implements
   }
 
   @Override
+  public int getNumOfUnfilteredItems() {
+    return beans.getNumOfUnfilteredItems();
+  }
+
+  @Override
   public boolean isSelected(T_PM item) {
     return item != null
             ? beans.isSelected(item.getPmBean())

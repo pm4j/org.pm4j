@@ -9,6 +9,7 @@ import org.pm4j.core.pm.PmAttrEnum;
 import org.pm4j.core.pm.PmAttrInteger;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmCommandDecorator;
+import org.pm4j.core.pm.PmElement;
 import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmSortOrder;
@@ -144,6 +145,18 @@ public class PmTableColImpl extends PmObjectBase implements PmTableCol {
       }
     }
 
+  }
+
+  /**
+   * Identifies the corresponding cell PM within the given row.
+   * <p>
+   * The default implementation just looks for a child with a similar name within the given row.
+   *
+   * @param rowPm PM of the row that contains
+   * @return The found cell PM. <code>null</code> if there is no corresponding item.
+   */
+  protected PmObject findCorrespondingRowCell(PmElement rowPm) {
+    return PmUtil.findChildPm(rowPm, this.getPmName());
   }
 
   @Override
