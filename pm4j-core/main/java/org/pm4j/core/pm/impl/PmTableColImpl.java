@@ -253,6 +253,14 @@ public class PmTableColImpl extends PmObjectBase implements PmTableCol {
               (getPmTableImpl().getTotalNumOfRows() > 1); // TODO olaf: The set of visible rows would be better...
     }
 
+    // XXX olaf: Should not be influenced by the read-only state of a dialog part.
+    //           It should still be possible to sort read-only tables.
+    //           Check if it's the place for this logic.
+    @Override
+    protected boolean isPmReadonlyImpl() {
+      return false;
+    }
+
     @Override
     protected boolean isPmVisibleImpl() {
       return isPmEnabledImpl();
