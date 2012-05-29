@@ -30,28 +30,32 @@ public @interface PmOptionCfg {
   String values() default "";
 
   /**
-   * @return Path from a found object to the value that provides the identifier
-   *         of the option.<br>
-   *         Example: 'id'.
+   * Expression for the path from an item object to its value that provides the option identifier.<br>
+   * Example: 'id'.
+   *
+   * @return The id value expression.
    */
   String id() default "";
 
   /**
-   * @return Path from a found object to the value that provides the title of
-   *         the option.<br>
-   *         Example: 'name'.
+   * Path from an item object to the value that provides the option title.<br>
+   * Example: 'name'.
+   *
+   * @return The title value expression.
    */
   String title() default "";
 
   /**
-   * @return Path from a found object to the value that provides the value of
-   *         the option.<br>
-   *         Examples:<br>
-   *         '' - specifies the found object itself;<br>
-   *         'mySubfield.anotherField' - specifies some related content to use.
+   * Path from an item object to the value that provides the option value.<br>
+   * Examples:<br>
+   *  '' - specifies the found object itself;<br>
+   *  'mySubfield.anotherField' - specifies some related content to use.
+   *
+   * @return The value expression.
    */
   String value() default "";
 
+  /** Internal identifier string for no sort-by definition. */
   static final String NO_SORT_SPEC = "- No sortBy specified. -";
 
   /**
