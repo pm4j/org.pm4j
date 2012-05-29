@@ -55,12 +55,6 @@ public class PmAttrOptionsProvidedByGetOptionValuesMethodTest extends TestCase {
       }
     };
 
-    // - Methods that provide options in different ways: -
-
-    /** A method that provides options. */
-    public List<Item> getItemOpts() {
-      return Arrays.asList(new Item(1, "a"), new Item(2, "b"));
-    }
   }
 
   public static class MyItemService {
