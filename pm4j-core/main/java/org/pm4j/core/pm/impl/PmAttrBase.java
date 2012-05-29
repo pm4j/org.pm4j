@@ -169,6 +169,11 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   }
 
   /**
+   * Override this method to provide a specific option set.
+   * <p>
+   * Alternatively you may use {@link PmOptionCfg} in combination with an
+   * overridden {@link #getOptionValues()} method.
+   *
    * @return An option set. In case of no options an empty option set.
    */
   protected PmOptionSet getOptionSetImpl() {
