@@ -4,7 +4,13 @@ public class PmConverterLong extends PmConverterNumber<Long> {
 
   public static final PmConverterLong INSTANCE = new PmConverterLong();
 
-  public PmConverterLong() {
-    super(Long.class);
+  @Override
+  protected String getDefaultNumberFormatPattern() {
+    return "#";
+  }
+
+  @Override
+  protected Long convertParseResultToType(Number parse) {
+    return parse.longValue();
   }
 }

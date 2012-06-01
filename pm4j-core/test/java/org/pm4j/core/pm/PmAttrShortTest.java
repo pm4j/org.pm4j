@@ -31,8 +31,8 @@ public class PmAttrShortTest {
     myPm.shortAttr.setValueAsString("abc");
 
     assertEquals("There should be a string conversion error", 1, PmMessageUtil.getPmErrors(myPm.shortAttr).size());
-    assertEquals("The error should be a number conversion error.",
-          PmConstants.MSGKEY_VALIDATION_NUMBER_CONVERSION_FROM_STRING_FAILED, PmMessageUtil.findMostSevereMessage(myPm.shortAttr).getMsgKey());
+    assertEquals("The error should be a format error.",
+          PmConstants.MSGKEY_VALIDATION_FORMAT_FAILURE, PmMessageUtil.findMostSevereMessage(myPm.shortAttr).getMsgKey());
   }
 
   static class MyPm extends PmConversationImpl {

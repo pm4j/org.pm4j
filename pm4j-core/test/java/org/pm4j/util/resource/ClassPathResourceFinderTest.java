@@ -13,6 +13,23 @@ import junit.framework.TestCase;
 public class ClassPathResourceFinderTest extends TestCase {
 
   /**
+   * Saves the locale before the test and restores it after the test so the test is able to play around with it.
+   */
+  private Locale defaultLocale;
+
+  @Override
+  protected void setUp() throws Exception {
+    super.setUp();
+    defaultLocale = Locale.getDefault();
+  }
+
+  @Override
+  protected void tearDown() throws Exception {
+    super.tearDown();
+    Locale.setDefault(defaultLocale);
+  }
+
+  /**
    * Just checks how the resource bundle strategy without default language
    * fallback works.
    */
