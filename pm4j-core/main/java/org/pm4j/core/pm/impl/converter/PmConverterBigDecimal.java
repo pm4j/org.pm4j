@@ -13,7 +13,11 @@ public class PmConverterBigDecimal extends PmConverterNumber<BigDecimal> {
 
   @Override
   protected BigDecimal convertParseResultToType(Number parse) {
-    return (BigDecimal) parse;
+    if (parse instanceof Double) {
+      return BigDecimal.valueOf((Double) parse);
+    } else {
+      return (BigDecimal) parse;
+    }
   }
 
 }
