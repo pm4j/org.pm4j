@@ -78,7 +78,8 @@ public class ValidateAttrValueTest extends TestCase {
 
     o.clearPmInvalidValues();
 
-    // FIXME olaf: this fails sometimes because unresolved timing issues.
+    // FIXME olaf: this fails sometimes within the test suite. (because of unresolved timing issues ?)
+    try { Thread.sleep(4000); } catch (InterruptedException e) {}
     assertTrue(o.nestedPm.j.isPmValid());
     assertEquals(new Integer(11), o.nestedPm.j.getValue());
   }
