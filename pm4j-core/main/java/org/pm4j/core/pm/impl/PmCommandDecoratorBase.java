@@ -4,7 +4,7 @@ import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmCommandDecorator;
 
 /**
- * A basic {@link PmCommandDecorator} implementation, providing empty
+ * A type safe basic {@link PmCommandDecorator} implementation, providing empty
  * implementations for all interface methods.
  * <p>
  * It may be used as a convenient base class for decorators that need to
@@ -16,7 +16,7 @@ public abstract class PmCommandDecoratorBase<T extends PmCommand> implements PmC
 
   @SuppressWarnings("unchecked")
   @Override
-  public boolean beforeDo(PmCommand cmd) {
+  public final boolean beforeDo(PmCommand cmd) {
     return beforeDoImpl((T)cmd);
   }
 
@@ -24,7 +24,7 @@ public abstract class PmCommandDecoratorBase<T extends PmCommand> implements PmC
 
   @SuppressWarnings("unchecked")
   @Override
-  public void afterDo(PmCommand cmd) {
+  public final void afterDo(PmCommand cmd) {
     afterDoImpl((T)cmd);
   }
 
