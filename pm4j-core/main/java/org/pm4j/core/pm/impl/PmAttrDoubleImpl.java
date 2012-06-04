@@ -4,12 +4,13 @@ import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.exception.PmValidationException;
 import org.pm4j.core.pm.PmAttrDouble;
 import org.pm4j.core.pm.PmConstants;
+import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmAttrDoubleCfg;
 import org.pm4j.core.pm.impl.converter.PmConverterDouble;
 
 public class PmAttrDoubleImpl extends PmAttrNumBase<Double> implements PmAttrDouble {
 
-  public PmAttrDoubleImpl(PmElementBase pmParent) {
+  public PmAttrDoubleImpl(PmObject pmParent) {
     super(pmParent);
   }
 

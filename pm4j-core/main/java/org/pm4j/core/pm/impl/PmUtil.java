@@ -321,6 +321,14 @@ public final class PmUtil {
     return childClass.cast(childPm);
   }
 
+  public static Object convertStringToValue(PmAttr<?> pmAttr, String s) throws PmConverterException {
+    return ((PmAttrBase<?, ?>)pmAttr).stringToValueImpl(s);
+  }
+
+  @SuppressWarnings("unchecked")
+  public static String convertToString(PmAttr<?> pmAttr, Object v) {
+    return ((PmAttrBase<Object, ?>)pmAttr).valueToStringImpl(v);
+  }
 
   /**
    * A name that includes the names of all elements and sessions within the

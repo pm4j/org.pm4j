@@ -1274,23 +1274,25 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
       }
     }
 
-    if (useReflection) {
-      if (beanClass != null) {
-        try {
-          myMetaData.beanAttrAccessor = new BeanAttrAccessorImpl(beanClass, getPmName());
-        }
-        catch (RuntimeException e) {
-          PmObjectUtil.throwAsPmRuntimeException(this, e);
-        }
-
-        if (myMetaData.beanAttrAccessor.getFieldClass().isPrimitive()) {
-          myMetaData.primitiveType = true;
-          if (fieldAnnotation == null) {
-            myMetaData.required = true;
-          }
-        }
-        myMetaData.valueAccessStrategy = ValueAccessReflection.INSTANCE;
+    // Automatic reflection access is only supported for fix PmAttr fields in a PmBean container:
+    if (useReflection  &&
+        myMetaData.isPmField &&
+        beanClass != null) {
+      try {
+        myMetaData.beanAttrAccessor = new BeanAttrAccessorImpl(beanClass, getPmName());
       }
+      catch (RuntimeException e) {
+        PmObjectUtil.throwAsPmRuntimeException(this, e);
+      }
+
+      if (myMetaData.beanAttrAccessor.getFieldClass().isPrimitive()) {
+        myMetaData.primitiveType = true;
+        if (fieldAnnotation == null) {
+          myMetaData.required = true;
+        }
+      }
+
+      myMetaData.valueAccessStrategy = ValueAccessReflection.INSTANCE;
     }
 
     // Use default attribute title provider if no specific provider was configured.
@@ -1447,7 +1449,6 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
      * @return The maximal number of characters default.
      */
     protected abstract int getMaxLenDefault();
-
   }
 
   private final MetaData getOwnMetaData() {

@@ -19,6 +19,8 @@ import org.pm4j.core.pm.PmTableGenericRow;
 import org.pm4j.core.pm.PmVisitor;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmValidationApi;
+import org.pm4j.core.pm.filter.Filter;
+import org.pm4j.core.pm.filter.FilterByDefinition;
 
 /**
  * @deprecated Use {@link PmTableImpl} now.
@@ -314,6 +316,24 @@ public class DeprecatedPmTableOfPmElementsImpl<T_ROW_ELEMENT_PM extends PmElemen
 
   @Override
   public Collection<PmCommandDecorator> getDecorators(org.pm4j.core.pm.PmTable.TableChange change) {
+    // TODO Auto-generated method stub
+    return Collections.emptyList();
+  }
+
+  @Override
+  public List<FilterByDefinition> getFilterByDefinitions() {
+    // TODO Auto-generated method stub
+    return Collections.emptyList();
+  }
+
+  @Override
+  public boolean setFilter(String filterId, Filter filter) {
+    // TODO Auto-generated method stub
+    return false;
+  }
+
+  @Override
+  public Filter getFilter(String filterId) {
     // TODO Auto-generated method stub
     return null;
   }

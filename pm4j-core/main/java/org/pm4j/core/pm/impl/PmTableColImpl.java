@@ -2,15 +2,17 @@ package org.pm4j.core.pm.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
 import org.pm4j.core.exception.PmRuntimeException;
+import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmAttrEnum;
 import org.pm4j.core.pm.PmAttrInteger;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmCommandDecorator;
 import org.pm4j.core.pm.PmElement;
-import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmSortOrder;
 import org.pm4j.core.pm.PmTable;
@@ -20,10 +22,14 @@ import org.pm4j.core.pm.PmVisitor;
 import org.pm4j.core.pm.annotation.PmBoolean;
 import org.pm4j.core.pm.annotation.PmCommandCfg;
 import org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO;
+import org.pm4j.core.pm.annotation.PmFilterCfg;
 import org.pm4j.core.pm.annotation.PmTableCfg;
 import org.pm4j.core.pm.annotation.PmTableColCfg;
 import org.pm4j.core.pm.api.PmLocalizeApi;
+import org.pm4j.core.pm.filter.FilterByDefinition;
+import org.pm4j.core.pm.filter.impl.FilterByDefinitionBase;
 import org.pm4j.core.pm.pageable.PageableCollection;
+import org.pm4j.core.util.reflection.ClassUtil;
 import org.pm4j.core.util.table.ColSizeSpec;
 
 /**
@@ -43,10 +49,10 @@ public class PmTableColImpl extends PmObjectBase implements PmTableCol {
    */
   private Comparator<?> rowSortComparator;
 
-  /**
-   * The filter that is active for this column.
-   */
-  private Filter<?> rowFilter;
+  /** The filter definitions for this column. */
+  private List<FilterByDefinition> filterByDefinitions;
+
+
 
   public PmTableColImpl(PmTable<?> pmTable) {
     this(pmTable, null);
@@ -164,18 +170,66 @@ public class PmTableColImpl extends PmObjectBase implements PmTableCol {
     visitor.visit(this);
   }
 
+  @SuppressWarnings("unchecked")
+  @Override
+  public List<FilterByDefinition> getFilterByDefinitions() {
+    if (filterByDefinitions == null) {
+      List<FilterByDefinition> list = getFilterByDefinitionsImpl();
+      filterByDefinitions = (list != null)
+                ? list
+                : Collections.EMPTY_LIST;
+    }
+
+    return filterByDefinitions;
+  }
+
+  /**
+   * Provides the set of filter definitions the user may use for this table
+   * column.
+   * <p>
+   * The default implementation calls {@link #getFilterByDefinitionImpl()} and adds
+   * filter instances for the filters declared in {@link PmTableColCfg#filterBy()}.
+   *
+   * @return The set of column filter definitions.<br>
+   *         May return <code>null</code> if there is no filter definition.
+   */
+  protected List<FilterByDefinition> getFilterByDefinitionsImpl() {
+    FilterByDefinition fd = getFilterByDefinitionImpl();
+    int itemCount = getOwnMetaData().filterByCfgs.length + (fd != null ? 1 : 0);
+    if (itemCount == 0) {
+      return null;
+    }
+    else {
+      List<FilterByDefinition> list = new ArrayList<FilterByDefinition>(itemCount);
+      if (fd != null) {
+        list.add(fd);
+      }
+      for (PmFilterCfg cfg : getOwnMetaData().filterByCfgs) {
+        fd = ClassUtil.newInstance((Class<?>)cfg.value(), this);
+        if (cfg.valueAttrPm() != PmAttr.class) {
+          ((FilterByDefinitionBase<?, ?>)fd).setValueAttrPmClass(cfg.valueAttrPm());
+        }
+        list.add(fd);
+      }
+      return list;
+    }
+  }
+
+  /**
+   * A convenience method that allows to define a single user filter definition
+   * for this column.
+   * <p>
+   * Gets called by {@link #getFilterByDefinitionsImpl()}.
+   *
+   * @return A single filter definition or <code>null</code>.
+   */
+  protected FilterByDefinition getFilterByDefinitionImpl() {
+    return null;
+  }
+
   @Override
   public Comparator<?> getRowSortComparator() {
     return rowSortComparator;
-  }
-
-  @Override
-  public Filter<?> getRowFilter() {
-    return rowFilter;
-  }
-
-  public void setRowFilter(Filter<?> rowFilter) {
-    this.rowFilter = rowFilter;
   }
 
   /**
@@ -207,7 +261,9 @@ public class PmTableColImpl extends PmObjectBase implements PmTableCol {
       if (annotation.sortable() != PmBoolean.UNDEFINED) {
         myMetaData.sortable = annotation.sortable();
       }
-      else {
+
+      if (annotation.filterBy().length > 0) {
+        myMetaData.filterByCfgs = annotation.filterBy();
       }
     }
 
@@ -223,6 +279,7 @@ public class PmTableColImpl extends PmObjectBase implements PmTableCol {
   protected static class MetaData extends PmObjectBase.MetaData {
     private ColSizeSpec colSizeSpec = null;
     private PmBoolean sortable = PmBoolean.UNDEFINED;
+    private PmFilterCfg[] filterByCfgs = {};
   }
 
   private final MetaData getOwnMetaData() {
@@ -250,7 +307,7 @@ public class PmTableColImpl extends PmObjectBase implements PmTableCol {
     @Override
     protected boolean isPmEnabledImpl() {
       return  (getOwnMetaData().sortable != PmBoolean.FALSE) &&
-              (getPmTableImpl().getTotalNumOfRows() > 1); // TODO olaf: The set of visible rows would be better...
+              (getPmTableImpl().getTotalNumOfRows() > 1);
     }
 
     // XXX olaf: Should not be influenced by the read-only state of a dialog part.
@@ -274,10 +331,8 @@ public class PmTableColImpl extends PmObjectBase implements PmTableCol {
     }
 
     @Override
-    protected void onPmValueChange(PmEvent event) {
-      if (!event.isInitializationEvent()) {
-        getPmTableImpl().triggerSortOrderChange(PmTableColImpl.this);
-      }
+    protected void afterValueChange(PmSortOrder oldValue, PmSortOrder newValue) {
+      getPmTableImpl().triggerSortOrderChange(PmTableColImpl.this);
     }
   }
 

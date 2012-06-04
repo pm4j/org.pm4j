@@ -10,6 +10,7 @@ import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmTable;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmFactoryApi;
+import org.pm4j.core.pm.filter.Filter;
 
 /**
  * A {@link PageableItems} instance that provides {@link PmBean} instances in
@@ -79,22 +80,20 @@ public class PageablePmsForBeans<T_PM extends PmBean<T_BEAN>, T_BEAN> implements
     beans.sortItems(sortComparator);
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public void setItemFilter(Filter<?> filter) {
+  public void setItemFilter(Filter filter) {
     beans.setItemFilter(filter != null
-        ? new BeanFilterBasedOnPmFilter<T_PM, T_BEAN>(
-              (Filter<T_PM>)filter)
+        ? new BeanFilterBasedOnPmFilter(filter)
         : null);
   }
 
   @Override
-  public void setBackingItemFilter(Filter<?> filter) {
+  public void setBackingItemFilter(Filter filter) {
     this.beans.setItemFilter(filter);
   }
 
   @Override
-  public Filter<?> getBackingItemFilter() {
+  public Filter getBackingItemFilter() {
     return beans.getBackingItemFilter();
   }
 
@@ -193,20 +192,17 @@ public class PageablePmsForBeans<T_PM extends PmBean<T_BEAN>, T_BEAN> implements
   /**
    * A filter that can compare backing beans based on another filter
    * that compares the corresponding PMs.
-   *
-   * @param <T_ITEM_PM>
-   * @param <T_ITEM>
    */
-  class BeanFilterBasedOnPmFilter<T_ITEM_PM extends PmBean<T_ITEM>, T_ITEM> implements Filter<T_ITEM> {
+  class BeanFilterBasedOnPmFilter implements Filter {
 
-    private final Filter<T_ITEM_PM> pmFilter;
+    private final Filter pmFilter;
 
-    public BeanFilterBasedOnPmFilter(Filter<T_ITEM_PM> pmFilter) {
+    public BeanFilterBasedOnPmFilter(Filter pmFilter) {
       this.pmFilter = pmFilter;
     }
 
-    public boolean doesItemMatch(T_ITEM item) {
-      T_ITEM_PM itemPm = PmFactoryApi.<T_ITEM, T_ITEM_PM>getPmForBean(pmCtxt, item);
+    public boolean doesItemMatch(Object item) {
+      PmBean<Object> itemPm = PmFactoryApi.<Object, PmBean<Object>>getPmForBean(pmCtxt, item);
       return pmFilter.doesItemMatch(itemPm);
     }
 

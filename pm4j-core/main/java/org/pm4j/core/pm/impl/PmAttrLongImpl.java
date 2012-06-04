@@ -4,13 +4,14 @@ import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.exception.PmValidationException;
 import org.pm4j.core.pm.PmAttrLong;
 import org.pm4j.core.pm.PmConstants;
+import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmAttrLongCfg;
 import org.pm4j.core.pm.impl.converter.PmConverterLong;
 
 public class PmAttrLongImpl extends PmAttrNumBase<Long> implements PmAttrLong {
 
-  public PmAttrLongImpl(PmElementBase pmParentBean) {
-    super(pmParentBean);
+  public PmAttrLongImpl(PmObject pmParent) {
+    super(pmParent);
   }
 
   // ======== Interface implementation ======== //

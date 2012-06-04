@@ -43,17 +43,17 @@ public class ClassUtil {
    *           when the given class has no public default constructor.
    */
   @SuppressWarnings("unchecked")
-  public static <T> T newInstance(Class<?> forClass) {
+  public static <T> T newInstance(Class<?> forClass, Object... args) {
     Object result = null;
 
     try {
-      Constructor<?> ctor = forClass.getConstructor(EMPTY_CLASS_ARRAY);
+      Constructor<Object> ctor = findConstructorByArgNum(forClass, args.length);
 
       if (ctor == null) {
-        throw new IllegalStateException("Default constructor missing for class " + forClass);
+        throw new IllegalStateException(args.length + "-argument constructor missing for class " + forClass);
       }
 
-      result = ctor.newInstance(EMPTY_OBJECT_ARRAY);
+      result = ctor.newInstance(args);
     }
     catch (Exception e) {
       CheckedExceptionWrapper.throwAsRuntimeException(e);
@@ -61,6 +61,7 @@ public class ClassUtil {
 
     return (T) result;
   }
+
 
   /**
    * Creates an instance with the given constructor instance.
@@ -143,6 +144,21 @@ public class ClassUtil {
         if (doesMatch) {
           constructor = (Constructor<Object>) ctors[i];
         }
+      }
+    }
+
+    return constructor;
+  }
+
+  @SuppressWarnings("unchecked")
+  private static Constructor<Object> findConstructorByArgNum(Class< ? > cls, int argNum) {
+    Constructor<Object> constructor = null;
+
+    Constructor<?>[] ctors = cls.getConstructors();
+    for (int i = 0; i < ctors.length; i++) {
+      Class< ? >[] ptypes = ctors[i].getParameterTypes();
+      if (argNum == ptypes.length) {
+        return (Constructor<Object>) ctors[i];
       }
     }
 

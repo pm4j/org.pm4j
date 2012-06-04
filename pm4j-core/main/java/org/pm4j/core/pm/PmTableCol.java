@@ -1,7 +1,10 @@
 package org.pm4j.core.pm;
 
 import java.util.Comparator;
+import java.util.List;
 
+import org.pm4j.core.pm.filter.FilterByDefinition;
+import org.pm4j.core.pm.filter.FilterByDefinitionProvider;
 import org.pm4j.core.pm.pageable.PageableCollection;
 import org.pm4j.core.util.table.ColSizeSpec;
 
@@ -10,7 +13,7 @@ import org.pm4j.core.util.table.ColSizeSpec;
  *
  * @author olaf boede
  */
-public interface PmTableCol extends PmObject {
+public interface PmTableCol extends PmObject, FilterByDefinitionProvider {
 
   /**
    * @return The column size specification.<br>
@@ -41,6 +44,17 @@ public interface PmTableCol extends PmObject {
   PmAttrInteger getColPosAttr();
 
   /**
+   * Provides the set of current filter definitions that can be
+   * specified for this column.
+   *
+   * @return The set of column filter definitions.<br>
+   *         Provides an empty collection if there is no filter definition.
+   *         Never <code>null</code>.
+   */
+  List<FilterByDefinition> getFilterByDefinitions();
+
+
+  /**
    * Provides the configured row sort comparator. It no specific comparator is configured, the default
    * implementation simply compares the column specific cell-PMs.
    * <p>
@@ -50,11 +64,5 @@ public interface PmTableCol extends PmObject {
    */
   // XXX olaf: move to Impl?
   Comparator<?> getRowSortComparator();
-
-  public interface Filter<T> {
-    boolean doesMatch(T rowObject);
-  }
-
-  Filter<?> getRowFilter();
 
 }

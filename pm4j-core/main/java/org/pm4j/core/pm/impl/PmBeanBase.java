@@ -9,7 +9,6 @@ import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmEvent;
-import org.pm4j.core.pm.PmEvent.ValueChangeKind;
 import org.pm4j.core.pm.PmEventListener;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmTable;
@@ -98,10 +97,11 @@ public abstract class PmBeanBase<T_BEAN>
   /**
    * Will be called if {@link #pmBean} is <code>null</code>.
    * <p>
-   * The default implementation tries to get a the bean addressed by
-   * {@link #getPmBeanKey()}.
+   * The default implementation calls {@link #findPmBeanImpl()}. If that returns
+   * <code>null</code> and {@link PmBeanCfg#autoCreateBean()} is configured a
+   * bean gets created by calling the default constructor.
    *
-   * @return The found bean.
+   * @return The found (or new) bean.
    */
   @SuppressWarnings("unchecked")
   protected T_BEAN getPmBeanImpl() {

@@ -3,6 +3,10 @@ package org.pm4j.core.pm;
 import java.util.Collection;
 import java.util.List;
 
+import org.pm4j.core.pm.filter.FilterByDefinition;
+import org.pm4j.core.pm.filter.FilterByDefinitionProvider;
+import org.pm4j.core.pm.filter.Filterable;
+
 
 /**
  * PM for tables.<br>
@@ -12,7 +16,7 @@ import java.util.List;
  *
  * @param <T_ROW_OBJ> The type used for row objects.
  */
-public interface PmTable<T_ROW_OBJ> extends PmObject, PmDataInput {
+public interface PmTable<T_ROW_OBJ> extends PmObject, PmDataInput, Filterable, FilterByDefinitionProvider {
 
   /**
    * The set of supported row selection modes.
@@ -43,10 +47,16 @@ public interface PmTable<T_ROW_OBJ> extends PmObject, PmDataInput {
   List<T_ROW_OBJ> getRows();
 
   /**
+   * @return The set of current filter definitions that can be
+   *         specified/modified for this table.<br>
+   *         Returns never <code>null</code>.
+   */
+  List<FilterByDefinition> getFilterByDefinitions();
+
+  /**
    * @return The set of rows that contains changed data.
    */
   List<T_ROW_OBJ> getRowsWithChanges();
-
 
   /**
    * Provides a row representation that may be used by generic a renderer.

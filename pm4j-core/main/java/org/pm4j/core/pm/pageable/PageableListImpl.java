@@ -11,6 +11,7 @@ import java.util.Set;
 
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmDefaults;
+import org.pm4j.core.pm.filter.Filter;
 
 /**
  * Implements a {@link PageableCollection} based on an {@link List} of items to
@@ -31,7 +32,7 @@ public class PageableListImpl<T_ITEM> implements PageableCollection<T_ITEM> {
   private boolean            multiSelect;
   private Set<T_ITEM>        selectedItems = new LinkedHashSet<T_ITEM>();
   private Comparator<?>      currentSortComparator;
-  private Filter<T_ITEM>     currentFilter;
+  private Filter             currentFilter;
 
   /**
    * @param objects
@@ -123,20 +124,19 @@ public class PageableListImpl<T_ITEM> implements PageableCollection<T_ITEM> {
     sortItems(sortComparator);
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public void setItemFilter(Filter<?> filter) {
-    currentFilter = (Filter<T_ITEM>)filter;
+  public void setItemFilter(Filter filter) {
+    currentFilter = filter;
     _applyFilterAndSortOrder();
   }
 
   @Override
-  public void setBackingItemFilter(Filter<?> filter) {
+  public void setBackingItemFilter(Filter filter) {
     setItemFilter(filter);
   }
 
   @Override
-  public Filter<?> getBackingItemFilter() {
+  public Filter getBackingItemFilter() {
     return currentFilter;
   }
 

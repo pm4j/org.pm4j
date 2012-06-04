@@ -12,7 +12,7 @@ public class IterableUtil {
   /**
    * Generates a new {@link Iterable} that references the items of the given
    * {@link Iterable}.
-   * 
+   *
    * @param <T>
    *          The collection item fieldClass.
    * @param ori
@@ -33,7 +33,7 @@ public class IterableUtil {
    * Generates a collection that references the items of the given
    * {@link Iterator}.<br>
    * The iterator should be at its start position.
-   * 
+   *
    * @param <T>
    *          The collection item fieldClass.
    * @param iter
@@ -48,6 +48,17 @@ public class IterableUtil {
     }
 
     return copy;
+  }
+
+  /**
+   * @param i
+   *          An {@link Iterable} to check.
+   * @return <code>true</code> if the parameter is <code>null</code> or it has
+   *         an empty item set.
+   */
+  public static boolean isEmpty(Iterable<?> i) {
+    return i == null ||
+           !i.iterator().hasNext();
   }
 
   private IterableUtil() {

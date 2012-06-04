@@ -10,6 +10,7 @@ import java.util.Map;
 
 import org.pm4j.common.util.InvertingComparator;
 import org.pm4j.core.pm.PmBean;
+import org.pm4j.core.pm.PmCommand.CommandState;
 import org.pm4j.core.pm.PmCommandDecorator;
 import org.pm4j.core.pm.PmDataInput;
 import org.pm4j.core.pm.PmElement;
@@ -22,18 +23,17 @@ import org.pm4j.core.pm.PmSortOrder;
 import org.pm4j.core.pm.PmTable;
 import org.pm4j.core.pm.PmTableCol;
 import org.pm4j.core.pm.PmTableGenericRow;
-import org.pm4j.core.pm.PmTableRow;
 import org.pm4j.core.pm.PmVisitor;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmMessageUtil;
+import org.pm4j.core.pm.filter.Filter;
+import org.pm4j.core.pm.filter.FilterByDefinition;
+import org.pm4j.core.pm.filter.MultiFilter;
 import org.pm4j.core.pm.pageable.PageableCollection;
-import org.pm4j.core.pm.pageable.PageableCollection.Filter;
 import org.pm4j.core.pm.pageable.PageableListImpl;
 
 /**
  * A table that presents the content of a set of {@link PmElement}s.
- * <p>
- * This class provides the model for visual table components ({@link PmTableCol}, {@link PmTableRow}, {@link PmPager}).
  * <p>
  * The table data related logic is provided by a {@link PageableCollection}.
  * This collection supports the logic for
@@ -71,6 +71,9 @@ public class PmTableImpl
 
   /** The set of decorators for various table change kinds. */
   private Map<TableChange, PmCommandDecoratorSetImpl> changeDecoratorMap = Collections.emptyMap();
+
+  /** The set of named table row filters. */
+  private MultiFilter rowFilter = new MultiFilter();
 
   /**
    * Creates an empty table.
@@ -121,6 +124,42 @@ public class PmTableImpl
   @Override
   public List<T_ROW_ELEMENT_PM> getRows() {
     return getPageableCollection().getItemsOnPage();
+  }
+
+  @Override
+  public List<FilterByDefinition> getFilterByDefinitions() {
+    List<FilterByDefinition> list = new ArrayList<FilterByDefinition>();
+    for (PmTableCol c : getColumns()) {
+      Collection<FilterByDefinition> colFilters = c.getFilterByDefinitions();
+      if (colFilters != null) {
+        list.addAll(colFilters);
+      }
+    }
+    return list;
+  }
+
+
+
+  @Override
+  public Filter getFilter(String filterId) {
+    return rowFilter.getFilter(filterId);
+  }
+
+  @Override
+  public boolean setFilter(final String filterId, final Filter filter) {
+    PmCommandImpl cmd = new PmCommandImpl(this) {
+      @Override
+      protected void doItImpl() {
+        rowFilter.setFilter(filterId, filter);
+        getPageableCollection().setItemFilter(rowFilter);
+      }
+    };
+
+    for (PmCommandDecorator d : getDecorators(TableChange.FILTER)) {
+      cmd.addCommandDecorator(d);
+    }
+
+    return cmd.doIt().getCommandState() == CommandState.EXECUTED;
   }
 
   @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -440,10 +479,8 @@ public class PmTableImpl
    */
   public void setPageableCollection(PageableCollection<T_ROW_ELEMENT_PM> pageable, boolean preseveSettings, ValueChangeKind valueChangeKind) {
     Collection<T_ROW_ELEMENT_PM> selectedItems = Collections.emptyList();
-    Filter<?> filter = null;
     if (pageableCollection != null && preseveSettings) {
       selectedItems = pageableCollection.getSelectedItems();
-      filter = pageableCollection.getBackingItemFilter();
     }
 
     pageableCollection = pageable;
@@ -458,6 +495,11 @@ public class PmTableImpl
 
     if (!preseveSettings) {
       BeanPmCacheUtil.clearBeanPmCache(this);
+      rowFilter.clear();
+    }
+
+    if (!rowFilter.isEmpty()) {
+      pageableCollection.setItemFilter(rowFilter);
     }
 
     PmEventApi.firePmEventIfInitialized(this, PmEvent.VALUE_CHANGE, valueChangeKind);
@@ -470,7 +512,6 @@ public class PmTableImpl
       for (T_ROW_ELEMENT_PM r : selectedItems) {
         pageableCollection.select(r);
       }
-      pageableCollection.setBackingItemFilter(filter);
     }
 
     // XXX olaf: Check - is redundant to the change listener within Pager!

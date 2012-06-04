@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 
+import org.pm4j.core.pm.filter.Filter;
+
 /**
  * Common interface for pageable object sets.
  * <p>
@@ -15,15 +17,6 @@ import java.util.List;
  *          The type of items handled by this set.
  */
 public interface PageableCollection<T_ITEM> {
-
-  /**
-   * Interface for classes used to filter collection items.
-   *
-   * @param <T> The item type.
-   */
-  public interface Filter<T> {
-    boolean doesItemMatch(T item);
-  }
 
   /**
    * @return The set of item to display on the current page.
@@ -83,7 +76,7 @@ public interface PageableCollection<T_ITEM> {
    *          The item filter to use.<br>
    *          May be <code>null</code> to switch filtering off.
    */
-  void setItemFilter(Filter<?> filter);
+  void setItemFilter(Filter filter);
 
   /**
    * Provides a filter that will be applied to the items of the backing
@@ -96,12 +89,12 @@ public interface PageableCollection<T_ITEM> {
    *          The item filter to use.<br>
    *          May be <code>null</code> to switch filtering off.
    */
-  void setBackingItemFilter(Filter<?> filter);
+  void setBackingItemFilter(Filter filter);
 
   /**
    * @return The current filter definition for the backing collection.
    */
-  Filter<?> getBackingItemFilter();
+  Filter getBackingItemFilter();
 
   /**
    * @return The total number of objects within this set.

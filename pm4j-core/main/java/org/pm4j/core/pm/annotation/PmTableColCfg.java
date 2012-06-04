@@ -6,10 +6,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.pm4j.core.pm.PmTableCol;
+import org.pm4j.core.pm.filter.FilterByDefinition;
 
 /**
  * Annotation configuration for {@link PmTableCol} instances.
- * 
+ *
  * @author olaf boede
  */
 @Retention(RetentionPolicy.RUNTIME)
@@ -38,5 +39,17 @@ public @interface PmTableColCfg {
    *         If no table default is defined, the column is not sortable.
    */
   PmBoolean sortable() default PmBoolean.UNDEFINED;
-  
+
+  /**
+   * The filter definition(s) used for this column.
+   * <p>
+   * The provided filter class(es) need to have a constructor signature with a single PM
+   * parameter. The column PM will be passed as constructor argument.
+   *
+   * @return The column filter definitions.
+   */
+//  Class<? extends FilterByDefinition>[] filterBy() default {};
+
+  PmFilterCfg[] filterBy() default {};
+
 }

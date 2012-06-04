@@ -626,7 +626,7 @@ public abstract class PmObjectBase implements PmObject {
    *          The name of this presentation model. Is often used to find
    *          annotations attached to a field or getter.
    */
-  private void zz_initMetaData(PmObjectBase parentPm, String name, boolean isPmField, boolean isSubPm) {
+  /* package */ void zz_initMetaData(PmObjectBase parentPm, String name, boolean isPmField, boolean isSubPm) {
     if (pmMetaData == null) {
       String lastKeyPart = (name != null)
                             ? name
