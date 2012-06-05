@@ -103,7 +103,6 @@ public class PmAttrProxyImpl<T_VALUE> extends PmAttrImpl<T_VALUE> implements PmA
     if (delegate != null) {
       delegate.resetPmValues();
     }
-    super.resetPmValues();
   }
 
   @Override

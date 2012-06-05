@@ -114,7 +114,7 @@ public class PmFilterItemBase extends PmBeanBase<FilterItem> implements PmFilter
    * It allows to select the compare operations that correspond to the selected
    * filter-by criterium.
    */
-  @PmAttrCfg(valuePath="pmBean.compOp")
+  @PmAttrCfg(valuePath="pmBean.compOp", required=true)
   public class CompOpAttrPm extends PmAttrImpl<CompOp> {
 
     public CompOpAttrPm() {

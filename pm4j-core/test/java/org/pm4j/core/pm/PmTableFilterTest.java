@@ -9,9 +9,9 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.pm4j.core.pm.PmCommand.CommandState;
+import org.pm4j.core.pm.annotation.FilterCfg;
 import org.pm4j.core.pm.annotation.PmBeanCfg;
 import org.pm4j.core.pm.annotation.PmFactoryCfg;
-import org.pm4j.core.pm.annotation.PmFilterCfg;
 import org.pm4j.core.pm.annotation.PmTableColCfg;
 import org.pm4j.core.pm.filter.FilterByDefinition;
 import org.pm4j.core.pm.filter.FilterItem;
@@ -21,9 +21,11 @@ import org.pm4j.core.pm.filter.impl.CompOpStringContains;
 import org.pm4j.core.pm.filter.impl.CompOpStringEquals;
 import org.pm4j.core.pm.filter.impl.CompOpStringNotContains;
 import org.pm4j.core.pm.filter.impl.CompOpStringNotEquals;
+import org.pm4j.core.pm.filter.impl.FilterByPmAttrValue;
 import org.pm4j.core.pm.filter.impl.FilterByPmAttrValueLocalized;
 import org.pm4j.core.pm.filter.impl.FilterItemFilter;
 import org.pm4j.core.pm.filter.impl.PmFilterSetDefaultImpl;
+import org.pm4j.core.pm.impl.PmAttrIntegerImpl;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
 import org.pm4j.core.pm.impl.PmBeanBase;
 import org.pm4j.core.pm.impl.PmConversationImpl;
@@ -34,19 +36,34 @@ import org.pm4j.core.pm.pageable.PageablePmsForBeans;
 
 public class PmTableFilterTest {
 
-  /** A table with some column filter definitions. */
   @PmFactoryCfg(beanPmClasses=RowPm.class)
   public static class TablePm extends PmTableImpl<RowPm> {
+
     public TablePm(PmObject pmParent) { super(pmParent); }
 
+    /** A column with a method based filter defintion. */
     public final PmTableCol name = new PmTableColImpl(this) {
+      @Override
       protected FilterByDefinition getFilterByDefinitionImpl() {
         return new FilterByPmAttrValueLocalized(this);
       };
     };
 
-    @PmTableColCfg(filterBy=@PmFilterCfg())
+    /** A column with an annotation based filter definition. */
+    @PmTableColCfg(filterBy=@FilterCfg())
     public final PmTableCol description = new PmTableColImpl(this);
+
+    /** A column with a filter annotation that defines . */
+    @PmTableColCfg(
+        filterBy=@FilterCfg(
+            /** Filters by comparing the row attribute value against the entered filter value. */
+            value=FilterByPmAttrValue.class,
+            /** Uses an integer attribute to enter the compare-to value. */
+            valueAttrPm=PmAttrIntegerImpl.class
+        )
+     )
+    public final PmTableCol counter = new PmTableColImpl(this);
+
   }
 
 
@@ -57,9 +74,9 @@ public class PmTableFilterTest {
   @Before
   public void setUp() {
     editedRowBeanList = new ArrayList<PmTableFilterTest.RowBean>(Arrays.asList(
-        new RowBean("a", "an 'a'"),
-        new RowBean("b", "a 'b'"),
-        new RowBean("c", "a 'c'")
+        new RowBean("a", "an 'a'", 1),
+        new RowBean("b", "a 'b'", 2),
+        new RowBean("c", "a 'c'", 3)
     ));
 
     myTablePm = new TablePm(new PmConversationImpl());
@@ -126,7 +143,7 @@ public class PmTableFilterTest {
 
     assertEquals("Three filter lines are configured.", 3, pmFilterSet.getFilterItems().getValue().size());
     PmFilterItem item = pmFilterSet.getFilterItems().getValue().get(0);
-    assertEquals("There are two columns to filter by and a null-option.", 3, item.getFilterBy().getOptionSet().getSize().intValue());
+    assertEquals("There are two columns to filter by and a null-option.", 4, item.getFilterBy().getOptionSet().getSize().intValue());
 
     item.getFilterBy().setValueAsString("name");
     item.getCompOp().setValueAsString(CompOpStringEquals.NAME);
@@ -157,15 +174,18 @@ public class PmTableFilterTest {
   public static class RowPm extends PmBeanBase<RowBean> {
     public final PmAttrString name = new PmAttrStringImpl(this);
     public final PmAttrString description = new PmAttrStringImpl(this);
+    public final PmAttrInteger counter = new PmAttrIntegerImpl(this);
   }
 
   public static class RowBean {
     public String name;
     public String description;
+    public Integer counter;
 
-    public RowBean(String name, String description) {
+    public RowBean(String name, String description, int counter) {
       this.name = name;
       this.description = description;
+      this.counter = counter;
     }
   }
 

@@ -57,18 +57,20 @@ public class PmFilterSetBase extends PmBeanBase<FilterSet> implements PmFilterSe
   protected FilterSet findPmBeanImpl() {
     FilterSet fs = null;
     // 1. Get the already existing filter to display.
-    Filter f = filterable.getFilter(filterId);
-    if (f instanceof FilterSetFilter) {
-      fs = ((FilterSetFilter)f).getFilterSet();
-      if (fs != null) {
-        return fs;
+    if (filterable != null) {
+      Filter f = filterable.getFilter(filterId);
+      if (f instanceof FilterSetFilter) {
+        fs = ((FilterSetFilter)f).getFilterSet();
+        if (fs != null) {
+          return fs;
+        }
       }
     }
 
     // 2. No existing filter set: Create a new one based on the filter definitions.
     return filterByDefinitionProvider != null
               ? getDefaultFilterSet()
-              : null;
+              : new FilterSet();
   }
 
   /**

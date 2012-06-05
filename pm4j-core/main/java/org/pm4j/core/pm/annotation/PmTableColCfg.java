@@ -48,8 +48,6 @@ public @interface PmTableColCfg {
    *
    * @return The column filter definitions.
    */
-//  Class<? extends FilterByDefinition>[] filterBy() default {};
-
-  PmFilterCfg[] filterBy() default {};
+  FilterCfg[] filterBy() default {};
 
 }

@@ -4,18 +4,17 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 import org.pm4j.core.pm.PmAttr;
-import org.pm4j.core.pm.PmTableCol;
 import org.pm4j.core.pm.filter.FilterByDefinition;
 import org.pm4j.core.pm.filter.impl.FilterByPmAttrValueLocalized;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
 
 /**
- * Annotation configuration for {@link PmTableCol} instances.
+ * Annotation configuration for a {@link FilterByDefinition}.
  *
  * @author olaf boede
  */
 @Retention(RetentionPolicy.RUNTIME)
-public @interface PmFilterCfg {
+public @interface FilterCfg {
 
   /**
    * The type of filter definition used for this column.

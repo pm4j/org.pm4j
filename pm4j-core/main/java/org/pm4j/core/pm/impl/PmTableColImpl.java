@@ -22,7 +22,7 @@ import org.pm4j.core.pm.PmVisitor;
 import org.pm4j.core.pm.annotation.PmBoolean;
 import org.pm4j.core.pm.annotation.PmCommandCfg;
 import org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO;
-import org.pm4j.core.pm.annotation.PmFilterCfg;
+import org.pm4j.core.pm.annotation.FilterCfg;
 import org.pm4j.core.pm.annotation.PmTableCfg;
 import org.pm4j.core.pm.annotation.PmTableColCfg;
 import org.pm4j.core.pm.api.PmLocalizeApi;
@@ -204,7 +204,7 @@ public class PmTableColImpl extends PmObjectBase implements PmTableCol {
       if (fd != null) {
         list.add(fd);
       }
-      for (PmFilterCfg cfg : getOwnMetaData().filterByCfgs) {
+      for (FilterCfg cfg : getOwnMetaData().filterByCfgs) {
         fd = ClassUtil.newInstance((Class<?>)cfg.value(), this);
         if (cfg.valueAttrPm() != PmAttr.class) {
           ((FilterByDefinitionBase<?, ?>)fd).setValueAttrPmClass(cfg.valueAttrPm());
@@ -279,7 +279,7 @@ public class PmTableColImpl extends PmObjectBase implements PmTableCol {
   protected static class MetaData extends PmObjectBase.MetaData {
     private ColSizeSpec colSizeSpec = null;
     private PmBoolean sortable = PmBoolean.UNDEFINED;
-    private PmFilterCfg[] filterByCfgs = {};
+    private FilterCfg[] filterByCfgs = {};
   }
 
   private final MetaData getOwnMetaData() {
