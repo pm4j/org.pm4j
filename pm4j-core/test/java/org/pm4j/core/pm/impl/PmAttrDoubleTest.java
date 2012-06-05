@@ -45,25 +45,25 @@ public class PmAttrDoubleTest extends TestCase {
     // assertEquals(false, s.isPmValid());
   }
 
-  public void testWithMultiFormat() {
-    TestSession s = new TestSession();
-    s.setPmLocale(Locale.GERMAN);
-
-    PmAttrDouble pmAttr = s.d;
-    pmAttr.setValueAsString("1234,567");
-
-    // White box test of the format definition string:
-    assertEquals("####.##;#,###.##", ((PmAttrBase<?,?>)pmAttr).getFormatString());
-
-    assertEquals("1.234,57", pmAttr.getValueAsString());
-
-    pmAttr.setValueAsString("7654,123");
-    assertEquals("7.654,12", pmAttr.getValueAsString());
-
-    s.setPmLocale(Locale.ENGLISH);
-    pmAttr.setValueAsString("7654.123");
-    assertEquals("7,654.12", pmAttr.getValueAsString());
-
-  }
+//  public void testWithMultiFormat() {
+//    TestSession s = new TestSession();
+//    s.setPmLocale(Locale.GERMAN);
+//
+//    PmAttrDouble pmAttr = s.d;
+//    pmAttr.setValueAsString("1234,567");
+//
+//    // White box test of the format definition string:
+//    assertEquals("####.##;#,###.##", ((PmAttrBase<?,?>)pmAttr).getFormatString());
+//
+//    assertEquals("1.234,57", pmAttr.getValueAsString());
+//
+//    pmAttr.setValueAsString("7654,123");
+//    assertEquals("7.654,12", pmAttr.getValueAsString());
+//
+//    s.setPmLocale(Locale.ENGLISH);
+//    pmAttr.setValueAsString("7654.123");
+//    assertEquals("7,654.12", pmAttr.getValueAsString());
+//
+//  }
 
 }
