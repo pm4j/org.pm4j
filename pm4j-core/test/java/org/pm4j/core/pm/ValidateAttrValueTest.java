@@ -1,8 +1,12 @@
 package org.pm4j.core.pm;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO.VALIDATE;
-import junit.framework.TestCase;
 
+import org.junit.Ignore;
+import org.junit.Test;
 import org.pm4j.core.pm.PmCommand.CommandState;
 import org.pm4j.core.pm.PmMessage.Severity;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
@@ -15,7 +19,7 @@ import org.pm4j.core.pm.impl.PmConversationImpl;
 import org.pm4j.core.pm.impl.PmElementImpl;
 import org.pm4j.core.pm.impl.PmUtil;
 
-public class ValidateAttrValueTest extends TestCase {
+public class ValidateAttrValueTest {
 
   public static class MyPmClass extends PmConversationImpl {
     public static class NestedPm extends PmElementImpl {
@@ -34,6 +38,7 @@ public class ValidateAttrValueTest extends TestCase {
     public final PmCommand cmdWithValidation = new PmCommandImpl(this);
   }
 
+  @Test
   public void testValidation() {
     MyPmClass o = new MyPmClass();
 
@@ -65,6 +70,8 @@ public class ValidateAttrValueTest extends TestCase {
     assertEquals(0, PmMessageUtil.getPmErrors(o).size());
   }
 
+  @Test
+  @Ignore("FIXME olaf: this fails sometimes within the test suite.")
   public void testValidateAttrOfNestedElement() {
     MyPmClass o = new MyPmClass();
 
@@ -79,11 +86,11 @@ public class ValidateAttrValueTest extends TestCase {
     o.clearPmInvalidValues();
 
     // FIXME olaf: this fails sometimes within the test suite. (because of unresolved timing issues ?)
-    try { Thread.sleep(4000); } catch (InterruptedException e) {}
     assertTrue(o.nestedPm.j.isPmValid());
     assertEquals(new Integer(11), o.nestedPm.j.getValue());
   }
 
+  @Test
   public void testValidatingCommandClearsOtherMessages() {
     MyPmClass o = new MyPmClass();
 
