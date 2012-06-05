@@ -87,15 +87,15 @@ public class PageablePmsForBeans<T_PM extends PmBean<T_BEAN>, T_BEAN> implements
         : null);
   }
 
-  @Override
-  public void setBackingItemFilter(Filter filter) {
-    this.beans.setItemFilter(filter);
-  }
-
-  @Override
-  public Filter getBackingItemFilter() {
-    return beans.getBackingItemFilter();
-  }
+//  @Override
+//  public void setBackingItemFilter(Filter filter) {
+//    this.beans.setItemFilter(filter);
+//  }
+//
+//  @Override
+//  public Filter getBackingItemFilter() {
+//    return beans.getBackingItemFilter();
+//  }
 
   @Override
   public int getNumOfItems() {
@@ -189,6 +189,7 @@ public class PageablePmsForBeans<T_PM extends PmBean<T_BEAN>, T_BEAN> implements
     }
   }
 
+  // TODO olaf: this reverse reference construction should skipped asap.
   /**
    * A filter that can compare backing beans based on another filter
    * that compares the corresponding PMs.
@@ -204,6 +205,11 @@ public class PageablePmsForBeans<T_PM extends PmBean<T_BEAN>, T_BEAN> implements
     public boolean doesItemMatch(Object item) {
       PmBean<Object> itemPm = PmFactoryApi.<Object, PmBean<Object>>getPmForBean(pmCtxt, item);
       return pmFilter.doesItemMatch(itemPm);
+    }
+
+    @Override
+    public boolean isBeanFilter() {
+      return true;
     }
 
   }

@@ -2,6 +2,10 @@ package org.pm4j.core.pm.filter;
 
 /**
  * Interface for classes used to filter collection items.
+ * <p>
+ * A filter may be declared to filter PM items by passing the {@link #doesItemMatch(Object)} method
+ * to beans behind the PM items.<br>
+ * In this case the method {@link #isBeanFilter()} should provide the value <code>true</code>.
  */
 public interface Filter {
 
@@ -14,5 +18,17 @@ public interface Filter {
    *         <code>false</code> if the item should be hidden.
    */
   boolean doesItemMatch(Object item);
+
+  /**
+   * A filter may be declared to filter PM items by passing the
+   * {@link #doesItemMatch(Object)} method to beans behind the PM items.<br>
+   * In this case the method {@link #isBeanFilter()} should provide the value
+   * <code>true</code>.
+   *
+   * @return <code>true</code> if the backing beans should be passed to
+   *         {@link #doesItemMatch(Object)}. <code>false</code> if the PM items
+   *         should be passed to {@link #doesItemMatch(Object)}.
+   */
+  boolean isBeanFilter();
 
 }

@@ -63,6 +63,11 @@ public class FilterSetFilter implements Filter {
     return combinedBy == CombinedBy.AND;
   }
 
+  @Override
+  public boolean isBeanFilter() {
+    return false;
+  }
+
   /**
    * Returns <code>true</code> if the filter contains some definitions that really may filter.
    *

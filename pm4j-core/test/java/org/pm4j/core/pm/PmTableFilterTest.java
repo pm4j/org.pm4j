@@ -39,19 +39,17 @@ public class PmTableFilterTest {
   @PmFactoryCfg(beanPmClasses=RowPm.class)
   public static class TablePm extends PmTableImpl<RowPm> {
 
-    public TablePm(PmObject pmParent) { super(pmParent); }
+    /** A column with an annotation based filter definition. */
+    @PmTableColCfg(filterBy=@FilterCfg())
+    public final PmTableCol name = new PmTableColImpl(this);
 
     /** A column with a method based filter defintion. */
-    public final PmTableCol name = new PmTableColImpl(this) {
+    public final PmTableCol description = new PmTableColImpl(this) {
       @Override
       protected FilterByDefinition getFilterByDefinitionImpl() {
         return new FilterByPmAttrValueLocalized(this);
-      };
+      }
     };
-
-    /** A column with an annotation based filter definition. */
-    @PmTableColCfg(filterBy=@FilterCfg())
-    public final PmTableCol description = new PmTableColImpl(this);
 
     /** A column with a filter annotation that defines . */
     @PmTableColCfg(
@@ -60,10 +58,11 @@ public class PmTableFilterTest {
             value=FilterByPmAttrValue.class,
             /** Uses an integer attribute to enter the compare-to value. */
             valueAttrPm=PmAttrIntegerImpl.class
-        )
-     )
+        ) )
     public final PmTableCol counter = new PmTableColImpl(this);
 
+    /** ctor */
+    public TablePm(PmObject pmParent) { super(pmParent); }
   }
 
 

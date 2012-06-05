@@ -162,6 +162,21 @@ public class PmTableImpl
     return cmd.doIt().getCommandState() == CommandState.EXECUTED;
   }
 
+  /**
+   * Defines a fix filter that will not be cleared when the table gets re-initialized.
+   * <p>
+   * Can be called already within the constructor.
+   *
+   * @param filterId
+   * @param filter
+   */
+  public void setFixFilter(final String filterId, final Filter filter) {
+    rowFilter.setFixFilter(filterId, filter);
+    if (pageableCollection != null) {
+      pageableCollection.setItemFilter(rowFilter);
+    }
+  }
+
   @SuppressWarnings({ "unchecked", "rawtypes" })
   @Override
   public List<T_ROW_ELEMENT_PM> getRowsWithChanges() {
@@ -451,6 +466,11 @@ public class PmTableImpl
       if (getPager() != null) {
         getPager().setPageableCollection(pageableCollection);
       }
+
+      // The row-filter needs to be re-applied to the pageable collection.
+      if (!rowFilter.isEmpty()) {
+        pageableCollection.setItemFilter(rowFilter);
+      }
     }
     return pageableCollection;
   }
@@ -479,8 +499,13 @@ public class PmTableImpl
    */
   public void setPageableCollection(PageableCollection<T_ROW_ELEMENT_PM> pageable, boolean preseveSettings, ValueChangeKind valueChangeKind) {
     Collection<T_ROW_ELEMENT_PM> selectedItems = Collections.emptyList();
+    // FIXME olaf: The internal filter needs to disappear asap.
+    //  - Change code that uses it.
+    //  - Remove it from the public interface.
+//    Filter internalFilter = null;
     if (pageableCollection != null && preseveSettings) {
       selectedItems = pageableCollection.getSelectedItems();
+//      internalFilter = pageableCollection.getBackingItemFilter();
     }
 
     pageableCollection = pageable;
@@ -501,6 +526,11 @@ public class PmTableImpl
     if (!rowFilter.isEmpty()) {
       pageableCollection.setItemFilter(rowFilter);
     }
+//    else {
+//      if (internalFilter != null) {
+//        pageableCollection.setBackingItemFilter(internalFilter);
+//      }
+//    }
 
     PmEventApi.firePmEventIfInitialized(this, PmEvent.VALUE_CHANGE, valueChangeKind);
 

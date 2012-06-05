@@ -130,15 +130,15 @@ public class PageableListImpl<T_ITEM> implements PageableCollection<T_ITEM> {
     _applyFilterAndSortOrder();
   }
 
-  @Override
-  public void setBackingItemFilter(Filter filter) {
-    setItemFilter(filter);
-  }
-
-  @Override
-  public Filter getBackingItemFilter() {
-    return currentFilter;
-  }
+//  @Override
+//  public void setBackingItemFilter(Filter filter) {
+//    setItemFilter(filter);
+//  }
+//
+//  @Override
+//  public Filter getBackingItemFilter() {
+//    return currentFilter;
+//  }
 
   @Override
   public boolean isSelected(T_ITEM item) {

@@ -25,4 +25,9 @@ public class FilterItemFilter implements Filter {
             filterItem.getFilterBy().doesItemMatch(item, filterItem.getCompOp(), filterItem.getFilterByValue());
   }
 
+  @Override
+  public boolean isBeanFilter() {
+    return false;
+  }
+
 }
