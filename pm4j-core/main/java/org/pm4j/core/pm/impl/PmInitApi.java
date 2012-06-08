@@ -7,7 +7,7 @@ public class PmInitApi {
   /**
    * EXPERIMENTAL STATE: Helper for dynamic PM creation.
    */
-  public static PmAttr<?> initDynamicPmAttr(PmAttr<?> pmAttr, String name) {
+  public static <T> PmAttr<T> initDynamicPmAttr(PmAttr<T> pmAttr, String name) {
     PmAttrBase<?, ?> pm = (PmAttrBase<?, ?>)pmAttr;
     // Make the name based meta data identifier unique based on the attribute class identifier.
     // TODO: the methods getPmName,getPmReskey etc. provide strange results now :-(
