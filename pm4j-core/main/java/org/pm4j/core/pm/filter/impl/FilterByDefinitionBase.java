@@ -19,6 +19,8 @@ public abstract class FilterByDefinitionBase<T_ITEM, T_FILTER_VALUE> implements 
   private String title;
   private List<CompOp> compOps;
   private Constructor<?> valueAttrConstructor;
+  private CompOp defaultCompOp;
+  private Object defaultFilterByValue;
 
   public FilterByDefinitionBase(String name, String title) {
     this.name = name;
@@ -73,11 +75,23 @@ public abstract class FilterByDefinitionBase<T_ITEM, T_FILTER_VALUE> implements 
    * The default implementation creates a simple string attribute.
    */
   public PmAttr<?> makeValueAttrPm(PmObject parentPm) {
-    return ClassUtil.newInstance(valueAttrConstructor, parentPm);
+    return valueAttrConstructor != null
+        ? (PmAttr<?>)ClassUtil.newInstance(valueAttrConstructor, parentPm)
+        : null;
   }
 
+  /**
+   * Sets an attribute value class that will be used to generate the filter-by-value
+   * attribute PM dynamically.
+   * <p>
+   * The passed class needs to have a constructor with a single {@link PmObject} parameter.
+   *
+   * @param valueAttrPmClass The value attribute PM class.
+   */
   public void setValueAttrPmClass(Class<?> valueAttrPmClass) {
-    this.valueAttrConstructor = ClassUtil.getConstructor(valueAttrPmClass, PmObject.class);
+    this.valueAttrConstructor = valueAttrPmClass != null
+        ? ClassUtil.getConstructor(valueAttrPmClass, PmObject.class)
+        : null;
   }
 
   /**
@@ -100,4 +114,9 @@ public abstract class FilterByDefinitionBase<T_ITEM, T_FILTER_VALUE> implements 
   public String getTitle() { return title; }
   public void setTitle(String title) { this.title = title; }
 
+  public CompOp getDefaultCompOp() { return defaultCompOp; }
+  public void setDefaultCompOp(CompOp defaultCompOp) { this.defaultCompOp = defaultCompOp; }
+
+  public Object getDefaultFilterByValue() { return defaultFilterByValue; }
+  public void setDefaultFilterByValue(Object defaultFilterByValue) { this.defaultFilterByValue = defaultFilterByValue; }
 }

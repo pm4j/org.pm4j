@@ -4,8 +4,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 import org.pm4j.core.pm.PmAttr;
+import org.pm4j.core.pm.PmDefaults;
 import org.pm4j.core.pm.filter.FilterByDefinition;
-import org.pm4j.core.pm.filter.impl.FilterByPmAttrValueLocalized;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
 
 /**
@@ -14,17 +14,20 @@ import org.pm4j.core.pm.impl.PmAttrStringImpl;
  * @author olaf boede
  */
 @Retention(RetentionPolicy.RUNTIME)
-public @interface FilterCfg {
+public @interface FilterByCfg {
 
   /**
    * The type of filter definition used for this column.
    * <p>
-   * The provided filter class need to have a constructor signature with a single PM
-   * parameter. The column PM will be passed as constructor argument.
+   * The provided filter class need to have a constructor signature with a
+   * single PM parameter. The column PM will be passed as constructor argument.
+   * <p>
+   * If this parameter is omitted the class provided by
+   * {@link PmDefaults#getDefaultFilterByDefintionClass()} will be used.
    *
    * @return The column filter definitions.
    */
-  Class<? extends FilterByDefinition> value() default FilterByPmAttrValueLocalized.class;
+  Class<? extends FilterByDefinition> value() default FilterByDefinition.class;
 
   /**
    * Defines the PM class that can be used to enter the filter value.

@@ -29,6 +29,16 @@ public interface FilterByDefinition {
   Collection<CompOp> getCompOps();
 
   /**
+   * @return The default compare operator.
+   */
+  CompOp getDefaultCompOp();
+
+  /**
+   * @return The default filter-by value.
+   */
+  Object getDefaultFilterByValue();
+
+  /**
    * @return Type of the value to enter.
    */
   Class<?> getValueType();
@@ -76,9 +86,12 @@ public interface FilterByDefinition {
   boolean doesItemMatch(Object item, CompOp compOp, Object filterValue);
 
   /**
-   * Creates a value type specific attribute.
+   * Creates a value type specific attribute.<br>
+   * May return <code>null</code> if this filter definition does not need a
+   * value attribute.
    *
-   * @return An attribute that supports the field- and condition-specific value data entry logic.
+   * @return An attribute that supports the field- and condition-specific value
+   *         data entry logic.
    */
   public abstract PmAttr<?> makeValueAttrPm(PmObject parentPm);
 

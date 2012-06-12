@@ -28,8 +28,17 @@ public class PmEvent extends EventObject {
   public static final int SELECTION_CHANGE = 1 << 9;
   public static final int EXEC_COMMAND = 1 << 10;
 
+  /**
+   * Indicator for an event that fired because of re-loaded data.<br>
+   * An example: After saving a record, its current state gets reloaded from the DB.
+   * In this case the application may fire {@link #ALL_CHANGE_EVENTS} combined with this
+   * {@link #RELOAD} flag.<br>
+   * This allows to react differently in each case.
+   */
+  public static final int RELOAD = 1 << 30;
+
   /** Indicator for an event that gets propagated to the parent hierarchy. */
-  public static final int IS_EVENT_PROPAGATION = 1 << 15;
+  public static final int IS_EVENT_PROPAGATION = 1 << 31;
 
   public static final int ALL_CHANGE_EVENTS =
     VALUE_CHANGE | TITLE_CHANGE | TOOLTIP_CHANGE |
@@ -130,7 +139,20 @@ public class PmEvent extends EventObject {
    *         and all values of the related PM sub-tree are exchanged.
    */
   public boolean isInitializationEvent() {
-    return changeMask == ALL_CHANGE_EVENTS;
+    return (changeMask & ALL_CHANGE_EVENTS) == ALL_CHANGE_EVENTS;
+  }
+
+  /**
+   * <code>true</code> if the event {@link #changeMask} contains all bits of the
+   * given parameter.
+   *
+   * @param eventMask
+   *          The bits to be found in the {@link #changeMask}.
+   * @return <code>true</code> if the event {@link #changeMask} contains all
+   *         bits of the given parameter.
+   */
+  public boolean hasEventMaskBits(int eventMask) {
+    return (changeMask & eventMask) == eventMask;
   }
 
   /**

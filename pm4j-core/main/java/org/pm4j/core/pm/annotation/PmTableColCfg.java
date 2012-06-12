@@ -6,7 +6,6 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.pm4j.core.pm.PmTableCol;
-import org.pm4j.core.pm.filter.FilterByDefinition;
 
 /**
  * Annotation configuration for {@link PmTableCol} instances.
@@ -48,6 +47,6 @@ public @interface PmTableColCfg {
    *
    * @return The column filter definitions.
    */
-  FilterCfg[] filterBy() default {};
+  FilterByCfg[] filterBy() default {};
 
 }

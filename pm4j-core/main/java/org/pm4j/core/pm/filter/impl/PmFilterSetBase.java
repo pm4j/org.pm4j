@@ -81,7 +81,7 @@ public class PmFilterSetBase extends PmBeanBase<FilterSet> implements PmFilterSe
    * @return A initial filter set instance.
    */
   protected FilterSet getDefaultFilterSet() {
-    return FilterSetUtil.makeFilterSet(filterByDefinitionProvider.getFilterByDefinitions(), numOfFilterConditionLines);
+    return FilterSetUtil.makeFilterSetStartingWithDefaultConditions(filterByDefinitionProvider.getFilterByDefinitions(), numOfFilterConditionLines);
   }
 
 

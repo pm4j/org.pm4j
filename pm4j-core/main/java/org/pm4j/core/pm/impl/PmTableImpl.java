@@ -8,7 +8,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.pm4j.common.util.InvertingComparator;
+import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmCommand.CommandState;
 import org.pm4j.core.pm.PmCommandDecorator;
@@ -24,6 +26,8 @@ import org.pm4j.core.pm.PmTable;
 import org.pm4j.core.pm.PmTableCol;
 import org.pm4j.core.pm.PmTableGenericRow;
 import org.pm4j.core.pm.PmVisitor;
+import org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO;
+import org.pm4j.core.pm.annotation.PmTableCfg;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmMessageUtil;
 import org.pm4j.core.pm.filter.Filter;
@@ -75,29 +79,16 @@ public class PmTableImpl
   /** The set of named table row filters. */
   private MultiFilter rowFilter = new MultiFilter();
 
+
   /**
    * Creates an empty table.
    * <p>
    * The table may be connected to some data source by calling {@link #setPageableCollection(PageableCollection)}.
    *
    * @param pmParent The presentation model context for this table.
-   * @param pageableItems Provides the items to be displayed by this table.
    */
   public PmTableImpl(PmObject pmParent) {
-    this(pmParent, null);
-  }
-
-  /**
-   * Creates a table that is connected to a data source (a {@link PageableCollection}).
-   *
-   * @param pmParent The presentation model context for this table.
-   * @param pageableItems Provides the items to be displayed by this table.
-   */
-  public PmTableImpl(PmObject pmParent, PageableCollection<T_ROW_ELEMENT_PM> pageableItems) {
     super(pmParent);
-    if (pageableItems != null) {
-      setPageableCollection(pageableItems, false);
-    }
   }
 
   @Override
@@ -152,6 +143,10 @@ public class PmTableImpl
       protected void doItImpl() {
         rowFilter.setFilter(filterId, filter);
         getPageableCollection().setItemFilter(rowFilter);
+      }
+      @Override
+      protected BEFORE_DO getBeforeDoStrategy() {
+        return BEFORE_DO.DO_NOTHING;
       }
     };
 
@@ -311,12 +306,35 @@ public class PmTableImpl
 
   // -- row sort order support --
 
-  void triggerSortOrderChange(PmTableCol sortColumnPm) {
-    PmTableCol newSortCol = (sortColumnPm.getSortOrderAttr().getValue() != PmSortOrder.NEUTRAL)
+  @SuppressWarnings("unchecked")
+  void triggerSortOrderChange(PmTableCol sortColumnPm, PmSortOrder sortOrder) {
+    zz_ensurePmInitialization();
+
+    PmSortOrder newSortOrder = sortOrder != null
+        ? sortOrder
+        : PmSortOrder.NEUTRAL;
+    PmTableCol newSortCol = (newSortOrder != PmSortOrder.NEUTRAL)
         ? sortColumnPm
         : null;
+
+    if (sortColumnPm != null && sortColumnPm.getSortOrderAttr().getValue() != newSortOrder) {
+      // XXX olaf: a quick hack to prevent an event loop.
+      ((PmAttrBase<?, PmSortOrder>)sortColumnPm.getSortOrderAttr()).setBackingValue(newSortOrder);
+    }
+
     // mark current sort order as invalid and fire a value change event.
     sortOrderSelection.sortBy(newSortCol);
+  }
+
+
+  protected static class SortOrderSpec {
+    PmTableCol sortByColumn;
+    PmSortOrder sortOrder;
+
+    public SortOrderSpec(PmTableCol sortByColumn, PmSortOrder sortOrder) {
+      this.sortByColumn = sortByColumn;
+      this.sortOrder = sortOrder;
+    }
   }
 
   class SortOrderSelection {
@@ -325,12 +343,15 @@ public class PmTableImpl
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
     private void sortBy(PmTableCol sortCol) {
+      // Sort column changed: Reset the sort order of the current sort column.
       if (this.sortCol != null &&
           this.sortCol != sortCol) {
+
         // XXX olaf: The backing value gets modified to prevent call back notifications.
         //           Can be done better when the event source implementation is done ...
         ((PmAttrEnumImpl<PmSortOrder>)this.sortCol.getSortOrderAttr()).setBackingValue(PmSortOrder.NEUTRAL);
       }
+
       this.sortCol = sortCol;
 
       Comparator<?> comparator = null;
@@ -346,7 +367,7 @@ public class PmTableImpl
             comparator = new RowPmComparator<T_ROW_ELEMENT_PM>(sortCol);
             // sort the PM items.
             getPageableCollection().sortItems(comparator);
-            PmEventApi.firePmEvent(PmTableImpl.this, PmEvent.VALUE_CHANGE, ValueChangeKind.SORT_ORDER);
+            PmEventApi.firePmEventIfInitialized(PmTableImpl.this, PmEvent.VALUE_CHANGE, ValueChangeKind.SORT_ORDER);
             return;
           }
         }
@@ -360,7 +381,7 @@ public class PmTableImpl
 
       // sort based on a backing items related comparator.
       getPageableCollection().sortBackingItems(comparator);
-      PmEventApi.firePmEvent(PmTableImpl.this, PmEvent.VALUE_CHANGE, ValueChangeKind.SORT_ORDER);
+      PmEventApi.firePmEventIfInitialized(PmTableImpl.this, PmEvent.VALUE_CHANGE, ValueChangeKind.SORT_ORDER);
     }
   }
 
@@ -499,13 +520,9 @@ public class PmTableImpl
    */
   public void setPageableCollection(PageableCollection<T_ROW_ELEMENT_PM> pageable, boolean preseveSettings, ValueChangeKind valueChangeKind) {
     Collection<T_ROW_ELEMENT_PM> selectedItems = Collections.emptyList();
-    // FIXME olaf: The internal filter needs to disappear asap.
-    //  - Change code that uses it.
-    //  - Remove it from the public interface.
-//    Filter internalFilter = null;
+
     if (pageableCollection != null && preseveSettings) {
       selectedItems = pageableCollection.getSelectedItems();
-//      internalFilter = pageableCollection.getBackingItemFilter();
     }
 
     pageableCollection = pageable;
@@ -521,16 +538,20 @@ public class PmTableImpl
     if (!preseveSettings) {
       BeanPmCacheUtil.clearBeanPmCache(this);
       rowFilter.clear();
+
+      // Switch back to the default sort order.
+      SortOrderSpec s = getDefaultSortOrderSpec();
+      if (s != null) {
+        triggerSortOrderChange(s.sortByColumn, s.sortOrder);
+      }
+      else {
+        triggerSortOrderChange(null, null);
+      }
     }
 
     if (!rowFilter.isEmpty()) {
       pageableCollection.setItemFilter(rowFilter);
     }
-//    else {
-//      if (internalFilter != null) {
-//        pageableCollection.setBackingItemFilter(internalFilter);
-//      }
-//    }
 
     PmEventApi.firePmEventIfInitialized(this, PmEvent.VALUE_CHANGE, valueChangeKind);
 
@@ -548,6 +569,49 @@ public class PmTableImpl
     if (getPager() != null) {
       getPager().setPageableCollection(pageableCollection);
     }
+  }
+
+  /**
+   * Provides the default sort order column.
+   * <p>
+   * The default implementation reads this information from the annotation {@link PmTableCfg#defaultSortCol()}.
+   *
+   * @return The default sort order or <code>null</code>.
+   */
+  protected SortOrderSpec getDefaultSortOrderSpec() {
+    PmTableCfg tableCfg = AnnotationUtil.findAnnotation(this, PmTableCfg.class);
+
+    if (tableCfg != null &&
+        StringUtils.isNotBlank(tableCfg.defaultSortCol()))  {
+      // first part: Column name. Second part: optional 'asc'/'desc' order spec
+      String[] strings = tableCfg.defaultSortCol().split(",");
+      PmTableCol col = PmUtil.getPmChildOfType(this, strings[0], PmTableCol.class);
+      if (strings.length == 1) {
+        return new SortOrderSpec(col, PmSortOrder.ASC);
+      }
+      if (strings.length == 2) {
+        if ("asc".equalsIgnoreCase(strings[1])) {
+          return new SortOrderSpec(col, PmSortOrder.ASC);
+        } else if ("desc".equalsIgnoreCase(strings[1])) {
+          return new SortOrderSpec(col, PmSortOrder.ASC);
+        } else {
+          throw new PmRuntimeException(
+              getPmParent(),
+              "Unknown sort direction identifier '"
+                  + strings[1]
+                  + "' found in annotation attribute 'defaultSortCol'."
+                  + "\n\tPlease specify 'asc', 'desc' or simply omit the comma separated sort direction identifier to get the default ('asc').");
+        }
+      } else {
+        throw new PmRuntimeException(
+            getPmParent(),
+            "Invalid 'defaultSortCol' value '"
+                + tableCfg.defaultSortCol()
+                + "'. It may only have a single comma separator.");
+      }
+    }
+    // no default sort spec
+    return null;
   }
 
   /**

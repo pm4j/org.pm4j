@@ -19,10 +19,10 @@ import org.pm4j.core.pm.PmTable;
 import org.pm4j.core.pm.PmTable.TableChange;
 import org.pm4j.core.pm.PmTableCol;
 import org.pm4j.core.pm.PmVisitor;
+import org.pm4j.core.pm.annotation.FilterByCfg;
 import org.pm4j.core.pm.annotation.PmBoolean;
 import org.pm4j.core.pm.annotation.PmCommandCfg;
 import org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO;
-import org.pm4j.core.pm.annotation.FilterCfg;
 import org.pm4j.core.pm.annotation.PmTableCfg;
 import org.pm4j.core.pm.annotation.PmTableColCfg;
 import org.pm4j.core.pm.api.PmLocalizeApi;
@@ -42,6 +42,8 @@ public class PmTableColImpl extends PmObjectBase implements PmTableCol {
   public final PmAttrEnum<PmSortOrder> defaultSortOrderAttr = new SortOrderAttr(this);
   public final PmCommand defaultCmdSort = new CmdSortPm();
   public final PmAttrInteger defaultColPosAttr = new PmAttrIntegerImpl(this);
+  private PmSortOrder sortOrder = PmSortOrder.NEUTRAL;
+
 
   /**
    * A specific row sort comparator. The type of items to compare depends on the kind of {@link PageableCollection} container
@@ -204,8 +206,11 @@ public class PmTableColImpl extends PmObjectBase implements PmTableCol {
       if (fd != null) {
         list.add(fd);
       }
-      for (FilterCfg cfg : getOwnMetaData().filterByCfgs) {
-        fd = ClassUtil.newInstance((Class<?>)cfg.value(), this);
+      for (FilterByCfg cfg : getOwnMetaData().filterByCfgs) {
+        Class<?> filterClass = cfg.value() != FilterByDefinition.class
+            ? cfg.value()
+            : getPmConversation().getPmDefaults().getDefaultFilterByDefintionClass();
+        fd = ClassUtil.newInstance(filterClass, this);
         if (cfg.valueAttrPm() != PmAttr.class) {
           ((FilterByDefinitionBase<?, ?>)fd).setValueAttrPmClass(cfg.valueAttrPm());
         }
@@ -239,6 +244,15 @@ public class PmTableColImpl extends PmObjectBase implements PmTableCol {
     return (PmTableImpl<?>)getPmParent();
   }
 
+  public PmSortOrder getSortOrder() {
+    return sortOrder;
+  }
+
+  public void setSortOrder(PmSortOrder sortOrder) {
+    this.sortOrder = sortOrder;
+  }
+
+
   // ======== Meta data ======== //
 
   @Override
@@ -250,8 +264,6 @@ public class PmTableColImpl extends PmObjectBase implements PmTableCol {
   protected void initMetaData(PmObjectBase.MetaData metaData) {
     super.initMetaData(metaData);
     MetaData myMetaData = (MetaData) metaData;
-
-    // myMetaData.setConverterDefault(PmConverterLong.INSTANCE);
 
     PmTableColCfg annotation = AnnotationUtil.findAnnotation(this, PmTableColCfg.class);
     if (annotation != null) {
@@ -268,18 +280,21 @@ public class PmTableColImpl extends PmObjectBase implements PmTableCol {
     }
 
     if (myMetaData.sortable == PmBoolean.UNDEFINED) {
+      // Read the default sort definition from the table.
       PmTableCfg tableCfg = AnnotationUtil.findAnnotation((PmObjectBase)getPmParent(), PmTableCfg.class);
-      myMetaData.sortable = (tableCfg != null &&
-                             tableCfg.sortable() == PmBoolean.TRUE)
-                               ? PmBoolean.TRUE
-                               : PmBoolean.FALSE;
+      if (tableCfg != null)  {
+        myMetaData.sortable = (tableCfg != null &&
+            tableCfg.sortable() == PmBoolean.TRUE)
+              ? PmBoolean.TRUE
+              : PmBoolean.FALSE;
+      }
     }
   }
 
   protected static class MetaData extends PmObjectBase.MetaData {
     private ColSizeSpec colSizeSpec = null;
     private PmBoolean sortable = PmBoolean.UNDEFINED;
-    private FilterCfg[] filterByCfgs = {};
+    private FilterByCfg[] filterByCfgs = {};
   }
 
   private final MetaData getOwnMetaData() {
@@ -332,7 +347,17 @@ public class PmTableColImpl extends PmObjectBase implements PmTableCol {
 
     @Override
     protected void afterValueChange(PmSortOrder oldValue, PmSortOrder newValue) {
-      getPmTableImpl().triggerSortOrderChange(PmTableColImpl.this);
+      getPmTableImpl().triggerSortOrderChange(PmTableColImpl.this, newValue);
+    }
+
+    @Override
+    protected PmSortOrder getBackingValueImpl() {
+      return sortOrder;
+    }
+
+    @Override
+    protected void setBackingValueImpl(PmSortOrder value) {
+      sortOrder = value;
     }
   }
 

@@ -321,6 +321,23 @@ public final class PmUtil {
     return childClass.cast(childPm);
   }
 
+  /**
+   * Imperative version of {@link #findPmChildOfType(PmObject, String, Class)}.
+   *
+   * @param pm
+   * @param childName
+   * @param childClass
+   * @return
+   */
+  public static <T extends PmObject> T getPmChildOfType(PmObject pm, String childName, Class<T> childClass) {
+    T childPm = findPmChildOfType(pm, childName, childClass);
+    if (childPm == null) {
+      throw new PmRuntimeException(pm, "No child PM found for name '" + childName + "'.");
+    }
+    return childPm;
+  }
+
+
   public static Object convertStringToValue(PmAttr<?> pmAttr, String s) throws PmConverterException {
     return ((PmAttrBase<?, ?>)pmAttr).stringToValueImpl(s);
   }

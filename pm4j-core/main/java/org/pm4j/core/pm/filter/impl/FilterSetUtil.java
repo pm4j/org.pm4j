@@ -38,4 +38,45 @@ public class FilterSetUtil {
     return fs;
   }
 
+  /**
+   * Creates a {@link FilterSet} with a define number of filter items (filter
+   * condition lines).
+   * <p>
+   * The first items will be contain the default values of the passed
+   * {@link FilterByDefinition}s.
+   * <p>
+   * ATTENTION: If there are more {@link FilterByDefinition}s with defaults than
+   * <code>numOfFilterConditionLines</code> some of these defaults will not be
+   * applied!
+   *
+   * @param filterByDefinitions
+   *          The set of filter-by options.
+   * @param numOfFilterConditionLines
+   *          The number of filter items to be generated.
+   * @return A new {@link FilterSet}.
+   */
+  public static FilterSet makeFilterSetStartingWithDefaultConditions(Collection<? extends FilterByDefinition> filterByDefinitions, int numOfFilterConditionLines) {
+    List<FilterByDefinition> fbdWithDefaults = new ArrayList<FilterByDefinition>();
+    for (FilterByDefinition fbd : filterByDefinitions) {
+      if (fbd.getDefaultCompOp() != null || fbd.getDefaultFilterByValue() != null) {
+        fbdWithDefaults.add(fbd);
+      }
+    }
+
+    FilterSet fs = new FilterSet();
+    List<FilterItem> filterItems = new ArrayList<FilterItem>(numOfFilterConditionLines);
+    for (int i=0; i<numOfFilterConditionLines; ++i) {
+      FilterItem item = new FilterItem();
+      item.setFilterByOptions(filterByDefinitions);
+      if (i<fbdWithDefaults.size()) {
+        FilterByDefinition fbd = fbdWithDefaults.get(i);
+        item.setFilterBy(fbd);
+        item.setCompOp(fbd.getDefaultCompOp());
+        item.setFilterByValue(fbd.getDefaultFilterByValue());
+      }
+      filterItems.add(item);
+    }
+    fs.setFilterItems(filterItems);
+    return fs;
+  }
 }

@@ -126,48 +126,81 @@ public abstract class PmBeanBase<T_BEAN>
    * @param bean The new bean behind this PM.
    */
   public void setPmBean(T_BEAN bean) {
-    PmEventApi.ensureThreadEventSource(this);
-
-    if (bean != pmBean) {
-      pmBean = null;
-
-      // Old cache values are related to the old bean.
-      PmMessageUtil.clearSubTreeMessages(this);
-      PmCacheApi.clearCachedPmValues(this);
-
-      if (bean != null) {
-        checkBeanClass(bean);
-        pmBean = bean;
-
-        // Re-register the bean to PM association to keep the PM system
-        // intact.
-        synchronized (getPmConversation()) {
-          // FIXME olaf: what about un-registration in case of bean==null ?
-          registerInPmBeanCache(this);
-        }
-      }
-
+    if (doSetPmBean(bean)) {
       // Inform all sub PMs.
       // This is not done if the bean gets set within the initialization phase.
       // Otherwise we get the risk if initialization race conditions.
       if (pmInitState == PmInitState.INITIALIZED) {
-        new SetPmBeanEventVisitor().visit(this);
+        new SetPmBeanEventVisitor(PmEvent.ALL_CHANGE_EVENTS).visit(this);
       }
     }
   }
 
+  /**
+   * Re-associates the PM to a reloaded bean instance and fires all change events
+   * for this instance and all children.<br>
+   * The fired change event also has the flag {@link PmEvent#RELOAD}.
+   *
+   * @param bean The new bean behind this PM.
+   */
+  public void reloadPmBean(T_BEAN reloadedBean) {
+    doSetPmBean(reloadedBean);
+
+    // Inform all sub PMs.
+    // This is not done if the bean gets set within the initialization phase.
+    // Otherwise we get the risk if initialization race conditions.
+    if (pmInitState == PmInitState.INITIALIZED) {
+      new SetPmBeanEventVisitor(PmEvent.ALL_CHANGE_EVENTS & PmEvent.RELOAD).visit(this);
+    }
+  }
+
+  private boolean doSetPmBean(T_BEAN bean) {
+    if (pmBean == bean) {
+      return false;
+    }
+
+    PmEventApi.ensureThreadEventSource(this);
+
+    pmBean = null;
+
+    // Old cache values are related to the old bean.
+    PmMessageUtil.clearSubTreeMessages(this);
+    PmCacheApi.clearCachedPmValues(this);
+
+    if (bean != null) {
+      checkBeanClass(bean);
+      pmBean = bean;
+
+      // Re-register the bean to PM association to keep the PM system
+      // intact.
+      synchronized (getPmConversation()) {
+        // FIXME olaf: what about un-registration in case of bean==null ?
+        registerInPmBeanCache(this);
+      }
+    }
+
+    return true;
+  }
+
   public class SetPmBeanEventVisitor extends PmVisitorAdapter {
+
+    private final int eventMask;
+
+    public SetPmBeanEventVisitor(int eventMask) {
+      this.eventMask = eventMask;
+    }
+
     @Override
     protected void onVisit(PmObject pm) {
       // the cached dynamic sub PMs are obsolete after switching to a new bean value.
       BeanPmCacheUtil.clearBeanPmCache(pm);
-      PmEventApi.firePmEvent(pm, PmEvent.ALL_CHANGE_EVENTS);
+      PmEventApi.firePmEvent(pm, eventMask);
       for (PmObject child : PmUtil.getPmChildren(pm)) {
         // Switch for each child to an event that is related to the child.
         // Registered listeners for the child will expect that the event contains a
         // reference to the PM it was registered for.
         // TODO olaf: add a event cause to PmEvent.
-        SetPmBeanEventVisitor childVisitor = new SetPmBeanEventVisitor();
+        SetPmBeanEventVisitor childVisitor = new SetPmBeanEventVisitor(eventMask);
         child.accept(childVisitor);
       }
     }
@@ -184,7 +217,7 @@ public abstract class PmBeanBase<T_BEAN>
       // Informs the ChangedChildStateRegistry of the table.
       // TODO olaf: check if the PMs of the current page need to be informed individually too.
       //            I suspect not, since the all-change-event causes a re-binding of all table rows PMs.
-      PmEventApi.firePmEvent(table, PmEvent.ALL_CHANGE_EVENTS);
+      PmEventApi.firePmEvent(table, eventMask);
 
       // Inform the changed rows to make sure that all invalid PM states get cleared.
       for (Object row : changedRows) {

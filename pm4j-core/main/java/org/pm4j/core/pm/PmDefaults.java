@@ -2,6 +2,8 @@ package org.pm4j.core.pm;
 
 import org.pm4j.core.pm.annotation.PmCommandCfg;
 import org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO;
+import org.pm4j.core.pm.filter.FilterByDefinition;
+import org.pm4j.core.pm.filter.impl.FilterByPmAttrValueLocalized;
 import org.pm4j.core.pm.impl.PmObjectBase.NameBuilder;
 import org.pm4j.core.pm.impl.PmObjectBase.NameBuilderAbsoluteName;
 import org.pm4j.core.pm.impl.title.AsteriskAttrTitleProvider;
@@ -35,6 +37,8 @@ public class PmDefaults {
    * Default value for this attribute: {@link TitleProviderPmResBased}.
    */
   private PmTitleProvider pmAttrTitleProvider = TitleProviderPmResBased.INSTANCE;
+
+  private Class<? extends FilterByDefinition> defaultFilterByDefintionClass = FilterByPmAttrValueLocalized.class;
 
   /**
    * Defines the algorithm used for the toString() implementation of PMs.<br>
@@ -157,6 +161,14 @@ public class PmDefaults {
 
   public void setBeforeDoCommandDefault(PmCommandCfg.BEFORE_DO beforeDoCommandDefault) {
     this.beforeDoCommandDefault = beforeDoCommandDefault;
+  }
+
+  public Class<? extends FilterByDefinition> getDefaultFilterByDefintionClass() {
+    return defaultFilterByDefintionClass;
+  }
+
+  public void setDefaultFilterByDefintionClass(Class<? extends FilterByDefinition> defaultFilterByDefintionClass) {
+    this.defaultFilterByDefintionClass = defaultFilterByDefintionClass;
   }
 
 }

@@ -58,15 +58,15 @@ public class PmFilterItemBase extends PmBeanBase<FilterItem> implements PmFilter
       CompOp co = compOp.getValue();
       if (co != null) {
         @SuppressWarnings("unchecked")
-        PmAttr<Object> a = (PmAttr<Object>) PmInitApi.initDynamicPmAttr(fd.makeValueAttrPm(this), "filterBy");
-
-        a.setValue(getPmBean().getFilterByValue());
-
-        // XXX olaf: should be done on proxy level...
-        PmEventApi.addValueChangeDecorator(a, filterValueChangeDecorator);
-
-        filterByValue.setDelegate(a);
-        return;
+        PmAttr<Object> a = (PmAttr<Object>) fd.makeValueAttrPm(this);
+        if (a != null) {
+          a =  PmInitApi.initDynamicPmAttr(a, "filterBy");
+          a.setValue(getPmBean().getFilterByValue());
+          // XXX olaf: should be done on proxy level...
+          PmEventApi.addValueChangeDecorator(a, filterValueChangeDecorator);
+          filterByValue.setDelegate(a);
+          return;
+        }
       }
     }
     // in all other cases:
@@ -174,18 +174,10 @@ public class PmFilterItemBase extends PmBeanBase<FilterItem> implements PmFilter
   }
 
   @Override
-  public PmAttr<? extends FilterByDefinition> getFilterBy() {
-    return filterBy;
-  }
-
+  public PmAttr<? extends FilterByDefinition> getFilterBy() { return filterBy; }
   @Override
-  public PmAttr<?> getCompOp() {
-    return compOp;
-  }
-
+  public PmAttr<?> getCompOp() { return compOp; }
   @Override
-  public PmAttr<?> getFilterByValue() {
-    return filterByValue;
-  }
+  public PmAttr<?> getFilterByValue() { return filterByValue; }
 
 }

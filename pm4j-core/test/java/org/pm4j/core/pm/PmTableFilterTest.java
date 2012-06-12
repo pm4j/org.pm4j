@@ -9,7 +9,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.pm4j.core.pm.PmCommand.CommandState;
-import org.pm4j.core.pm.annotation.FilterCfg;
+import org.pm4j.core.pm.annotation.FilterByCfg;
 import org.pm4j.core.pm.annotation.PmBeanCfg;
 import org.pm4j.core.pm.annotation.PmFactoryCfg;
 import org.pm4j.core.pm.annotation.PmTableColCfg;
@@ -40,7 +40,7 @@ public class PmTableFilterTest {
   public static class TablePm extends PmTableImpl<RowPm> {
 
     /** A column with an annotation based filter definition. */
-    @PmTableColCfg(filterBy=@FilterCfg())
+    @PmTableColCfg(filterBy=@FilterByCfg())
     public final PmTableCol name = new PmTableColImpl(this);
 
     /** A column with a method based filter defintion. */
@@ -53,7 +53,7 @@ public class PmTableFilterTest {
 
     /** A column with a filter annotation that defines . */
     @PmTableColCfg(
-        filterBy=@FilterCfg(
+        filterBy=@FilterByCfg(
             /** Filters by comparing the row attribute value against the entered filter value. */
             value=FilterByPmAttrValue.class,
             /** Uses an integer attribute to enter the compare-to value. */
@@ -139,6 +139,8 @@ public class PmTableFilterTest {
   public void testFilterPm() {
     PmFilterSet pmFilterSet = new PmFilterSetDefaultImpl(myTablePm);
     ((PmFilterSetDefaultImpl)pmFilterSet).setNumOfFilterConditionLines(3);
+
+    assertEquals("AND", pmFilterSet.getCombinedBy().getValueAsString());
 
     assertEquals("Three filter lines are configured.", 3, pmFilterSet.getFilterItems().getValue().size());
     PmFilterItem item = pmFilterSet.getFilterItems().getValue().get(0);
