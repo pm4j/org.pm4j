@@ -25,6 +25,15 @@ public @interface PmTableCfg {
   PmBoolean sortable() default PmBoolean.UNDEFINED;
 
   /**
+   * Defines the (optional) default sort column.
+   * <p>
+   * Format: column-name
+   *
+   * @return
+   */
+  String defaultSortCol() default "";
+
+  /**
    * @return The row selection mode.
    */
 //  RowSelectMode rowSelectMode() default RowSelectMode.SINGLE;

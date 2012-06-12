@@ -347,7 +347,7 @@ public class PmTableColImpl extends PmObjectBase implements PmTableCol {
 
     @Override
     protected void afterValueChange(PmSortOrder oldValue, PmSortOrder newValue) {
-      getPmTableImpl().triggerSortOrderChange(PmTableColImpl.this, newValue);
+      getPmTableImpl().sortBy(PmTableColImpl.this, newValue);
     }
 
     @Override

@@ -306,8 +306,20 @@ public class PmTableImpl
 
   // -- row sort order support --
 
+  /**
+   * Sorts that table by the given column and sort order.
+   * <p>
+   * It the given <code>sortColumnPm</code> or <code>sortOrder</code> is
+   * <code>null</code> or {@link PmSortOrder#NEUTRAL} the table switches to a
+   * not sorted state.
+   *
+   * @param sortColumnPm
+   *          The column to sort by.
+   * @param sortOrder
+   *          The sort order to apply.
+   */
   @SuppressWarnings("unchecked")
-  void triggerSortOrderChange(PmTableCol sortColumnPm, PmSortOrder sortOrder) {
+  protected void sortBy(PmTableCol sortColumnPm, PmSortOrder sortOrder) {
     zz_ensurePmInitialization();
 
     PmSortOrder newSortOrder = sortOrder != null
@@ -540,12 +552,12 @@ public class PmTableImpl
       rowFilter.clear();
 
       // Switch back to the default sort order.
-      SortOrderSpec s = getDefaultSortOrderSpec();
+      SortOrderSpec s = getDefaultSortOrder();
       if (s != null) {
-        triggerSortOrderChange(s.sortByColumn, s.sortOrder);
+        sortBy(s.sortByColumn, s.sortOrder);
       }
       else {
-        triggerSortOrderChange(null, null);
+        sortBy(null, null);
       }
     }
 
@@ -578,7 +590,7 @@ public class PmTableImpl
    *
    * @return The default sort order or <code>null</code>.
    */
-  protected SortOrderSpec getDefaultSortOrderSpec() {
+  protected SortOrderSpec getDefaultSortOrder() {
     PmTableCfg tableCfg = AnnotationUtil.findAnnotation(this, PmTableCfg.class);
 
     if (tableCfg != null &&
