@@ -209,9 +209,16 @@ public class PmTableImpl
   }
 
   public RowSelectMode getRowSelectMode() {
-    return rowSelectMode != null
-              ? rowSelectMode
-              : getOwnMetaDataWithoutPmInitCall().rowSelectMode;
+    if (rowSelectMode == null) {
+      PmTableCfg cfg = AnnotationUtil.findAnnotation(this, PmTableCfg.class);
+      rowSelectMode = (cfg != null &&
+                       cfg.rowSelectMode() != RowSelectMode.DEFAULT)
+          ? cfg.rowSelectMode()
+          // TODO: add to PmDefaults.
+          : RowSelectMode.NO_SELECTION;
+    }
+
+    return rowSelectMode;
   }
 
   /**
@@ -231,9 +238,15 @@ public class PmTableImpl
 
   @Override
   public int getNumOfPageRows() {
-    return (numOfPageRows != null)
-        ? numOfPageRows
-        : getOwnMetaDataWithoutPmInitCall().numOfPageRows;
+    if (numOfPageRows == null) {
+      PmTableCfg cfg = AnnotationUtil.findAnnotation(this, PmTableCfg.class);
+      numOfPageRows = (cfg != null &&
+                       cfg.numOfPageRows() > 0)
+          ? cfg.numOfPageRows()
+          // TODO: add to PmDefaults.
+          : 10;
+    }
+    return numOfPageRows;
   }
 
   /**
@@ -671,12 +684,13 @@ public class PmTableImpl
     return new MetaData();
   }
 
+// TODO olaf: Not yet implemented.
+
 //  @Override
 //  protected void initMetaData(PmObjectBase.MetaData metaData) {
 //    super.initMetaData(metaData);
 //    MetaData myMetaData = (MetaData) metaData;
 
-// TODO olaf: Not yet implemented.
 //    PmTableCfg annotation = AnnotationUtil.findAnnotation(this, PmTableCfg.class);
 //    if (annotation != null) {
 //      if (annotation.rowSelectMode() != RowSelectMode.DEFAULT) {
@@ -688,12 +702,12 @@ public class PmTableImpl
 //    }
 //  }
 
-  protected static class MetaData extends PmObjectBase.MetaData {
-    private RowSelectMode rowSelectMode = RowSelectMode.SINGLE;
-    private int numOfPageRows = 10;
-  }
-
-  private final MetaData getOwnMetaDataWithoutPmInitCall() {
-    return (MetaData) getPmMetaDataWithoutPmInitCall();
-  };
+//  protected static class MetaData extends PmObjectBase.MetaData {
+//    private RowSelectMode rowSelectMode = RowSelectMode.SINGLE;
+//    private int numOfPageRows = 10;
+//  }
+//
+//  private final MetaData getOwnMetaDataWithoutPmInitCall() {
+//    return (MetaData) getPmMetaDataWithoutPmInitCall();
+//  };
 }

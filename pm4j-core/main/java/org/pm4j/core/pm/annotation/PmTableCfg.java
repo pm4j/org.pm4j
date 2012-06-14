@@ -6,6 +6,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.pm4j.core.pm.PmTable;
+import org.pm4j.core.pm.PmTable.RowSelectMode;
+import org.pm4j.core.pm.impl.PmTableImpl;
 
 /**
  * Annotation configuration for {@link PmTable} instances.
@@ -34,14 +36,21 @@ public @interface PmTableCfg {
   String defaultSortCol() default "";
 
   /**
+   * Defines the {@link RowSelectMode} to use.
+   * <p>
+   * This definition may be overridden by a call to {@link PmTableImpl#setRowSelectMode(RowSelectMode)}.
+   *
    * @return The row selection mode.
    */
-//  RowSelectMode rowSelectMode() default RowSelectMode.SINGLE;
+  RowSelectMode rowSelectMode() default RowSelectMode.DEFAULT;
 
   /**
+   * Defines the maximum number of rows per page.
+   * <p>
+   * This definition may be overridden by a call to {@link PmTableImpl#setNumOfPageRows(Integer)}.
+   *
    * @return The maximum number of rows per page. Only a positive value has an effect on the table.
    */
-//  int numOfPageRows() default 0;
-
+  int numOfPageRows() default 0;
 
 }
