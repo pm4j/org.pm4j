@@ -21,9 +21,6 @@ public class PmConverterDate extends PmConverterSerializeableBase<Date> {
 
   public static final PmConverterDate INSTANCE = new PmConverterDate();
 
-  /** The separator string used in case of a multi-format resource string specification. */
-  protected String formatSplitString = ";";
-
   boolean timeZoneAware = true;
 
   /**

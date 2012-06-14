@@ -37,9 +37,9 @@ public class ClassPathResourceFinderTest extends TestCase {
     Locale.setDefault(Locale.CHINESE);
 
     ResourceBundle b = ResourceBundle.getBundle("Resources", Locale.ENGLISH);
-    assertEquals("d/M/yy;dd/MM/yyyy", b.getString("pmAttrDate_defaultFormat"));
+    assertEquals("d/M/yy|dd/MM/yyyy", b.getString("pmAttrDate_defaultFormat"));
     b = ResourceBundle.getBundle("Resources", Locale.GERMAN);
-    assertEquals("d.M.yy;dd.MM.yyyy", b.getString("pmAttrDate_defaultFormat"));
+    assertEquals("d.M.yy|dd.MM.yyyy", b.getString("pmAttrDate_defaultFormat"));
 
     Locale.setDefault(Locale.GERMAN);
 
@@ -53,10 +53,10 @@ public class ClassPathResourceFinderTest extends TestCase {
 
     // no ..._en file. default resource file used.
     b = ResourceBundle.getBundle("Resources", Locale.ENGLISH, ClassPathResourceFinder.instance().getResBundleStrategy());
-    assertEquals("d/M/yy;dd/MM/yyyy", b.getString("pmAttrDate_defaultFormat"));
+    assertEquals("d/M/yy|dd/MM/yyyy", b.getString("pmAttrDate_defaultFormat"));
 
     b = ResourceBundle.getBundle("Resources", Locale.GERMAN, ClassPathResourceFinder.instance().getResBundleStrategy());
-    assertEquals("d.M.yy;dd.MM.yyyy", b.getString("pmAttrDate_defaultFormat"));
+    assertEquals("d.M.yy|dd.MM.yyyy", b.getString("pmAttrDate_defaultFormat"));
   }
 
   /**
@@ -67,13 +67,13 @@ public class ClassPathResourceFinderTest extends TestCase {
 
     Locale.setDefault(Locale.CHINESE);
 
-    assertEquals("d/M/yy;dd/MM/yyyy", finder.findString(getClass(), "pmAttrDate_defaultFormat", Locale.ENGLISH));
-    assertEquals("d.M.yy;dd.MM.yyyy", finder.findString(getClass(), "pmAttrDate_defaultFormat", Locale.GERMAN));
+    assertEquals("d/M/yy|dd/MM/yyyy", finder.findString(getClass(), "pmAttrDate_defaultFormat", Locale.ENGLISH));
+    assertEquals("d.M.yy|dd.MM.yyyy", finder.findString(getClass(), "pmAttrDate_defaultFormat", Locale.GERMAN));
 
     Locale.setDefault(Locale.GERMAN);
 
-    assertEquals("d/M/yy;dd/MM/yyyy", finder.findString(getClass(), "pmAttrDate_defaultFormat", Locale.ENGLISH));
-    assertEquals("d.M.yy;dd.MM.yyyy", finder.findString(getClass(), "pmAttrDate_defaultFormat", Locale.GERMAN));
+    assertEquals("d/M/yy|dd/MM/yyyy", finder.findString(getClass(), "pmAttrDate_defaultFormat", Locale.ENGLISH));
+    assertEquals("d.M.yy|dd.MM.yyyy", finder.findString(getClass(), "pmAttrDate_defaultFormat", Locale.GERMAN));
   }
 
 }

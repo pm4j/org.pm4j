@@ -38,7 +38,28 @@ public class PmDefaults {
    */
   private PmTitleProvider pmAttrTitleProvider = TitleProviderPmResBased.INSTANCE;
 
+  /**
+   * The default filter-by definition class that is used if no specific
+   * definition is provided. An example:
+   *
+   * <pre>@PmTableColCfg(filterBy=@FilterByCfg)</pre>
+   *
+   * This will use the filter-by definition that is declared here.
+   * <p>
+   * The default value is {@link FilterByPmAttrValueLocalized} which allows to
+   * filter by the value string that is visible for the user.
+   */
   private Class<? extends FilterByDefinition> defaultFilterByDefintionClass = FilterByPmAttrValueLocalized.class;
+
+  /**
+   * The delimiter that is used to terminate multiple format strings in resource string definitions.
+   * An example:
+   * <pre>myPm.myDateAttr_format=d/M/yy|dd/MM/yyyy<pre>
+   * This defines two accepted input formats. (The last one will be used as output format.)
+   * <p>
+   * The default delimiter is the pipe symbol '|'.
+   */
+  private String multiFormatPatternDelimiter = "|";
 
   /**
    * Defines the algorithm used for the toString() implementation of PMs.<br>
@@ -169,6 +190,14 @@ public class PmDefaults {
 
   public void setDefaultFilterByDefintionClass(Class<? extends FilterByDefinition> defaultFilterByDefintionClass) {
     this.defaultFilterByDefintionClass = defaultFilterByDefintionClass;
+  }
+
+  public String getMultiFormatPatternDelimiter() {
+    return multiFormatPatternDelimiter;
+  }
+
+  public void setMultiFormatPatternDelimiter(String multiFormatPatternDelimiter) {
+    this.multiFormatPatternDelimiter = multiFormatPatternDelimiter;
   }
 
 }

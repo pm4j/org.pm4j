@@ -13,11 +13,12 @@ import org.apache.commons.logging.LogFactory;
 import org.pm4j.core.exception.PmResourceRuntimeException;
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmConstants;
+import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.impl.PmUtil;
 
 /**
  * Base implementation to be used by converters to support parsing of multiple input formats.
- *
+ * <p>
  * The input formats will be checked one-by-one, the first matching format will be used.
  *
  * @author Harm Gnoyke
@@ -29,7 +30,7 @@ public abstract class MultiFormatParserBase<T extends Serializable> {
   private static final Log LOG = LogFactory.getLog(MultiFormatParserBase.class);
 
   /** The default separator string used in case of a multi-format resource string specification. */
-  private static final String DEFAULT_FORMAT_SPLIT_STRING = ";";
+  private String formatSplitString;
 
   /**
    * Implementation of {@link PmAttr.Converter#stringToValue(PmAttr, String)} to be used to support the subsequent
@@ -50,8 +51,8 @@ public abstract class MultiFormatParserBase<T extends Serializable> {
         return parseValue(s, format, locale, pmAttr);
       } catch (ParseException e) {
         // ignore it and try the next format.
-        if (LOG.isDebugEnabled()) {
-          LOG.debug("Format '" + format + "' not applicable for value '" + s +
+        if (LOG.isTraceEnabled()) {
+          LOG.trace("Format '" + format + "' not applicable for value '" + s +
                     "'. Attribute context: " + PmUtil.getPmLogString(pmAttr));
         }
       }
@@ -101,10 +102,14 @@ public abstract class MultiFormatParserBase<T extends Serializable> {
    * Default format split string, may be overridden by implementations (must be overridden if
    * formats contain the default format split string).
    * Default is a single semicolon.
+   *
    * @return The format split string.
    */
-  public String getFormatSplitString() {
-    return DEFAULT_FORMAT_SPLIT_STRING;
+  protected String getFormatSplitString(PmObject pmCtxt) {
+    if (formatSplitString == null) {
+      formatSplitString = pmCtxt.getPmConversation().getPmDefaults().getMultiFormatPatternDelimiter();
+    }
+    return formatSplitString;
   }
 
   /**
@@ -114,7 +119,7 @@ public abstract class MultiFormatParserBase<T extends Serializable> {
    */
   public String[] getParseFormats(PmAttr<?> pmAttr) {
     String formatString = StringUtils.defaultIfEmpty(pmAttr != null ? pmAttr.getFormatString() : null, getDefaultFormatPattern());
-    String[] formats = formatString.split(getFormatSplitString());
+    String[] formats = StringUtils.split(formatString, getFormatSplitString(pmAttr));
     return formats;
   }
 

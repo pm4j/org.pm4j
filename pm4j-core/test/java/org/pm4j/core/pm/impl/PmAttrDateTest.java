@@ -110,7 +110,7 @@ public class PmAttrDateTest extends TestCase {
     pmElement.setPmLocale(Locale.GERMAN);
 
     // White box test of the format definition string:
-    assertEquals("d. MMMMM yyyy;dd.MM.yy;yyyy/MM/dd;d. MMMMM yyyy", ((PmAttrBase<?,?>)pmAttr).getFormatString());
+    assertEquals("d. MMMMM yyyy|dd.MM.yy|yyyy/MM/dd|d. MMMMM yyyy", ((PmAttrBase<?,?>)pmAttr).getFormatString());
 
     assertEquals("9. September 1999", pmAttr.getValueAsString());
 
