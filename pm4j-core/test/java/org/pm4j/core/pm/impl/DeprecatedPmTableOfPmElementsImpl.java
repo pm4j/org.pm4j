@@ -63,7 +63,7 @@ public class DeprecatedPmTableOfPmElementsImpl<T_ROW_ELEMENT_PM extends PmElemen
     // Reason: Can't access child PMs onPmInit. A second PM initialization phase could solve this issue.
     // XXX: May get easier with separated UI control settings PM session.
     if (this.sortOrderSelection == null) {
-      List<PmTableCol> cols = zz_getPmColumns();
+      List<PmTableCol> cols = PmUtil.getPmChildrenOfType(this, PmTableCol.class);
       for (int i=0; i<cols.size(); ++i) {
         cols.get(i).getColPosAttr().setValue(i);
       }
@@ -71,7 +71,7 @@ public class DeprecatedPmTableOfPmElementsImpl<T_ROW_ELEMENT_PM extends PmElemen
       return cols;
     }
     else {
-      return zz_getPmColumns();
+      return PmUtil.getPmChildrenOfType(this, PmTableCol.class);
     }
   }
 

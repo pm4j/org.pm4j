@@ -47,7 +47,7 @@ public class PbGridLayout <PM extends PmElement> extends PbCompositeBase<Composi
           for (Control c : view.getChildren()) {
             c.dispose();
           }
-          buildRows(view, PmUtil.getPmAttributes(pm));
+          buildRows(view, PmUtil.getPmChildrenOfType(pm, PmAttr.class).toArray(new PmAttr[]{}));
         }
       };
     }

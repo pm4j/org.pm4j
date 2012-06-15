@@ -26,11 +26,9 @@ import org.pm4j.common.util.collection.MapUtil;
 import org.pm4j.core.exception.PmConverterException;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmAspect;
-import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmConversation;
-import org.pm4j.core.pm.PmDataInput;
 import org.pm4j.core.pm.PmDefaults;
 import org.pm4j.core.pm.PmElement;
 import org.pm4j.core.pm.PmEvent;
@@ -53,7 +51,6 @@ import org.pm4j.core.pm.impl.cache.PmCacheStrategy;
 import org.pm4j.core.pm.impl.cache.PmCacheStrategyBase;
 import org.pm4j.core.pm.impl.cache.PmCacheStrategyNoCache;
 import org.pm4j.core.pm.impl.cache.PmCacheStrategyRequest;
-import org.pm4j.core.pm.impl.commands.PmCommandSeparator;
 import org.pm4j.core.pm.impl.pathresolver.PathResolver;
 import org.pm4j.core.pm.impl.pathresolver.PmExpressionPathResolver;
 import org.pm4j.core.pm.impl.title.PmTitleProvider;
@@ -413,39 +410,12 @@ public abstract class PmObjectBase implements PmObject {
     return getPmMetaDataWithoutPmInitCall().resLoaderCtxtClasses;
   }
 
-  protected List<PmCommand> getVisiblePmCommands() {
-    return PmCommandSeparator.filterVisibleCommandsAndSeparators(zz_getPmCommands());
-  }
-
   protected List<PmCommand> getVisiblePmCommands(PmCommand.CommandSet commandSet) {
-    return getVisiblePmCommands();
-  }
-
-  /**
-   * @return All available commands, even commands that are not visible in the UI.
-   */
-  /* package */ List<PmCommand> zz_getPmCommands() {
-    return BeanAttrArrayList.makeList(this, getPmMetaData().childFieldCommandAccessorArray, pmDynamicSubPms.commands);
+    return PmUtil.getVisiblePmCommands(this);
   }
 
   /* package */ List<PmObject> getPmChildren() {
     return BeanAttrArrayList.makeList(this, getPmMetaData().childFieldAccessorArray, pmDynamicSubPms.all);
-  }
-
-  /* package */ List<PmDataInput> zz_getPmDataInputPms() {
-    return BeanAttrArrayList.makeList(this, getPmMetaData().childFieldDataInputAccessorArray, pmDynamicSubPms.dataInputPms);
-  }
-
-  /* package */ List<PmAttr<?>> zz_getPmAttributes() {
-    return BeanAttrArrayList.makeList(this, getPmMetaData().childFieldAttrAccessorArray, pmDynamicSubPms.attrs);
-  }
-
-  /* package */ List<PmElement> zz_getPmElements() {
-    return BeanAttrArrayList.makeList(this, getPmMetaData().childFieldElementAccessorArray, pmDynamicSubPms.elements);
-  }
-
-  /* package */ List<PmTableCol> zz_getPmColumns() {
-    return BeanAttrArrayList.makeList(this, getPmMetaData().childFieldColumnAccessorArray, pmDynamicSubPms.columns);
   }
 
   /* package */ PmObject findChildPm(String localChildName) {
@@ -674,10 +644,6 @@ public abstract class PmObjectBase implements PmObject {
 
             // -- Meta data initialization for PM fields --
             List<BeanAttrAccessor> allFields = new ArrayList<BeanAttrAccessor>();
-            List<BeanAttrAccessor> dataInputFields = new ArrayList<BeanAttrAccessor>();
-            List<BeanAttrAccessor> attrFields = new ArrayList<BeanAttrAccessor>();
-            List<BeanAttrAccessor> cmdFields = new ArrayList<BeanAttrAccessor>();
-            List<BeanAttrAccessor> elemFields = new ArrayList<BeanAttrAccessor>();
             List<BeanAttrAccessor> columnFields = new ArrayList<BeanAttrAccessor>();
             for (Field f : ClassUtil.getAllFields(getClass())) {
               // XXX olaf: Currently only public fields are considered.
@@ -694,14 +660,6 @@ public abstract class PmObjectBase implements PmObject {
                   }
 
                   allFields.add(accessor);
-                  if (fieldValue instanceof PmDataInput)
-                    dataInputFields.add(accessor);
-                  if (fieldValue instanceof PmAttr)
-                    attrFields.add(accessor);
-                  if (fieldValue instanceof PmCommand)
-                    cmdFields.add(accessor);
-                  if (fieldValue instanceof PmElement)
-                    elemFields.add(accessor);
                   if (fieldValue instanceof PmTableCol)
                     columnFields.add(accessor);
                 }
@@ -712,16 +670,6 @@ public abstract class PmObjectBase implements PmObject {
             if (numOfPmFields > 0) {
               pmMetaData.childFieldAccessorArray = new BeanAttrAccessor[numOfPmFields];
               allFields.toArray(pmMetaData.childFieldAccessorArray);
-              pmMetaData.childFieldDataInputAccessorArray = new BeanAttrAccessor[dataInputFields.size()];
-              dataInputFields.toArray(pmMetaData.childFieldDataInputAccessorArray);
-              pmMetaData.childFieldAttrAccessorArray = new BeanAttrAccessor[attrFields.size()];
-              attrFields.toArray(pmMetaData.childFieldAttrAccessorArray);
-              pmMetaData.childFieldCommandAccessorArray = new BeanAttrAccessor[cmdFields.size()];
-              cmdFields.toArray(pmMetaData.childFieldCommandAccessorArray);
-              pmMetaData.childFieldElementAccessorArray = new BeanAttrAccessor[elemFields.size()];
-              elemFields.toArray(pmMetaData.childFieldElementAccessorArray);
-              pmMetaData.childFieldColumnAccessorArray = new BeanAttrAccessor[columnFields.size()];
-              columnFields.toArray(pmMetaData.childFieldColumnAccessorArray);
 
               pmMetaData.childFieldMetaDataArray = new MetaData[numOfPmFields];
               pmMetaData.nameToChildAccessorMap = new HashMap<String, BeanAttrAccessor>(numOfPmFields);
@@ -1060,11 +1008,6 @@ public abstract class PmObjectBase implements PmObject {
      * Provides generic top-down access to fix (field bound) PM structure.
      */
     private BeanAttrAccessor[] childFieldAccessorArray = {};
-    private BeanAttrAccessor[] childFieldDataInputAccessorArray = {};
-    private BeanAttrAccessor[] childFieldAttrAccessorArray = {};
-    private BeanAttrAccessor[] childFieldCommandAccessorArray = {};
-    private BeanAttrAccessor[] childFieldElementAccessorArray = {};
-    private BeanAttrAccessor[] childFieldColumnAccessorArray = {};
     private Map<String, BeanAttrAccessor> nameToChildAccessorMap = Collections.emptyMap();
 
     public String getName() { return name; }
@@ -1294,11 +1237,6 @@ public abstract class PmObjectBase implements PmObject {
     };
 
     private List<PmObject> all = Collections.emptyList();
-    private List<PmDataInput> dataInputPms = Collections.emptyList();
-    private List<PmAttr<?>> attrs = Collections.emptyList();
-    private List<PmCommand> commands = Collections.emptyList();
-    private List<PmElement> elements = Collections.emptyList();
-    private List<PmTableCol> columns = Collections.emptyList();
     private Map<String, PmObject> nameToPmMap = Collections.emptyMap();
 
     public void addPm(String name, PmObject pm) {
@@ -1318,48 +1256,11 @@ public abstract class PmObjectBase implements PmObject {
       if (all.isEmpty())
         all = new ArrayList<PmObject>();
       all.add(pm);
-
-      if (pm instanceof PmDataInput) {
-        if (dataInputPms.isEmpty())
-          dataInputPms = new ArrayList<PmDataInput>();
-        dataInputPms.add((PmAttr<?>)pm);
-      }
-
-      if (pm instanceof PmAttr) {
-        if (attrs.isEmpty())
-          attrs = new ArrayList<PmAttr<?>>();
-        attrs.add((PmAttr<?>)pm);
-      }
-      else if (pm instanceof PmCommand) {
-        if (commands.isEmpty())
-          commands = new ArrayList<PmCommand>();
-        commands.add((PmCommand)pm);
-      }
-      else if (pm instanceof PmElement) {
-        if (elements.isEmpty())
-          elements = new ArrayList<PmElement>();
-        elements.add((PmElement)pm);
-      }
-      else if (pm instanceof PmTableCol) {
-        if (columns.isEmpty())
-          columns = new ArrayList<PmTableCol>();
-        columns.add((PmTableCol)pm);
-      }
     }
 
     public void removePm(PmObject pm) {
       nameToPmMap.remove(pm.getPmName());
       all.remove(pm);
-      if (pm instanceof PmDataInput)
-        dataInputPms.remove(pm);
-      if (pm instanceof PmAttr)
-        attrs.remove(pm);
-      else if (pm instanceof PmCommand)
-        commands.remove(pm);
-      else if (pm instanceof PmElement)
-        elements.remove(pm);
-      else if (pm instanceof PmTableCol)
-        columns.remove(pm);
     }
 
   }

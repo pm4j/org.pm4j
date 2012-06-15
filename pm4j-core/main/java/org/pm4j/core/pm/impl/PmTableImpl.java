@@ -93,7 +93,7 @@ public class PmTableImpl
 
   @Override
   public List<PmTableCol> getColumns() {
-    return zz_getPmColumns();
+    return PmUtil.getPmChildrenOfType(this, PmTableCol.class);
   }
 
   @Override

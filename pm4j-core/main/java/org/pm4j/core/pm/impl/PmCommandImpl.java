@@ -176,7 +176,7 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
   public List<PmCommand> getVisiblePmCommands(CommandSet commandSet) {
     return (commandSet == CommandSet.POPUP)
               ? Collections.EMPTY_LIST
-              : getVisiblePmCommands();
+              : super.getVisiblePmCommands(commandSet);
   }
 
   @Override
@@ -457,7 +457,7 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
    * @return <code>true</code> when at least a single child command is enabled.
    */
   protected boolean isASubCommandEnabled() {
-    List<PmCommand> subCmdList = getVisiblePmCommands();
+    List<PmCommand> subCmdList = PmUtil.getVisiblePmCommands(this);
     int subCmdNum = subCmdList.size();
     for (int i=0; i<subCmdNum; ++i) {
       if (subCmdList.get(i).isPmEnabled()) {
@@ -471,7 +471,7 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
    * @return <code>true</code> when at least a single child command is visible.
    */
   protected boolean isASubCommandVisible() {
-    List<PmCommand> subCmdList = getVisiblePmCommands();
+    List<PmCommand> subCmdList = PmUtil.getVisiblePmCommands(this);
     int subCmdNum = subCmdList.size();
     for (int i=0; i<subCmdNum; ++i) {
       if (subCmdList.get(i).isPmVisible()) {

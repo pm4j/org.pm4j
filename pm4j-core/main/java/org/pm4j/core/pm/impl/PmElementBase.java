@@ -148,7 +148,7 @@ public abstract class PmElementBase
   @SuppressWarnings("unchecked")
   protected List<? extends PmTreeNode> getPmChildNodesImpl() {
     List<PmTreeNode> list = new ArrayList<PmTreeNode>();
-    for (PmAttr<?> a : PmUtil.getPmAttributes(this)) {
+    for (PmAttr<?> a : PmUtil.getPmChildrenOfType(this, PmAttr.class)) {
       if (a instanceof PmTreeNode) {
         list.add((PmTreeNode)a);
       }

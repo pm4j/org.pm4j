@@ -7,11 +7,13 @@ import org.apache.commons.logging.LogFactory;
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.PmDataInput;
+import org.pm4j.core.pm.PmElement;
 import org.pm4j.core.pm.PmMessage;
 import org.pm4j.core.pm.PmMessage.Severity;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.impl.PmConversationImpl;
 import org.pm4j.core.pm.impl.PmObjectBase;
+import org.pm4j.core.pm.impl.PmUtil;
 
 public final class PmValidationApi {
 
@@ -85,6 +87,20 @@ public final class PmValidationApi {
    */
   public static void clearInvalidValuesOfSubtree(PmObject pm) {
     ((PmObjectBase)pm).clearPmInvalidValues();
+  }
+
+  /**
+   * @param pm The element to check.
+   * @return <code>true</code> if all attributes do not have an error state.
+   */
+  public static boolean hasValidAttributes(PmElement pm) {
+    for (PmAttr<?> a : PmUtil.getPmChildrenOfType(pm, PmAttr.class)) {
+      if (!a.isPmValid()) {
+        return false;
+      }
+    }
+    // all attributes are valid
+    return true;
   }
 
 

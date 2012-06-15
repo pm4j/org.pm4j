@@ -15,7 +15,7 @@ public abstract class PmDataInputBase extends PmObjectBase implements PmDataInpu
   @Override
   public boolean isPmValueChanged() {
     // TODO olaf: add caching (and event support to update the cache state).
-    List<PmDataInput> items = zz_getPmDataInputPms();
+    List<PmDataInput> items = PmUtil.getPmChildrenOfType(this, PmDataInput.class);
     for (int i = 0; i < items.size(); ++i) {
       PmDataInput d = items.get(i);
       if (d.isPmValueChanged() && d.isPmVisible()) {
@@ -28,7 +28,7 @@ public abstract class PmDataInputBase extends PmObjectBase implements PmDataInpu
 
   @Override
   public void resetPmValues() {
-    for (PmDataInput d : zz_getPmDataInputPms()) {
+    for (PmDataInput d : PmUtil.getPmChildrenOfType(this, PmDataInput.class)) {
       d.resetPmValues();
     }
   }
@@ -44,7 +44,7 @@ public abstract class PmDataInputBase extends PmObjectBase implements PmDataInpu
   @Override
   public void pmValidate() {
     if (isPmVisible() && !isPmReadonly()) {
-      for (PmDataInput d : zz_getPmDataInputPms()) {
+      for (PmDataInput d : PmUtil.getPmChildrenOfType(this, PmDataInput.class)) {
         if (d.isPmVisible() && !d.isPmReadonly()) {
           if (d instanceof PmAttr<?>) {
             // XXX olaf: duplicate validation may occur in case of duplicate command calls
@@ -72,14 +72,14 @@ public abstract class PmDataInputBase extends PmObjectBase implements PmDataInpu
 
   @Override
   public void rollbackBufferedPmChanges() {
-    for (PmDataInput d : zz_getPmDataInputPms()) {
+    for (PmDataInput d : PmUtil.getPmChildrenOfType(this, PmDataInput.class)) {
       d.rollbackBufferedPmChanges();
     }
   }
 
   @Override
   public void commitBufferedPmChanges() {
-    for (PmDataInput d : zz_getPmDataInputPms()) {
+    for (PmDataInput d : PmUtil.getPmChildrenOfType(this, PmDataInput.class)) {
       d.commitBufferedPmChanges();
     }
   }

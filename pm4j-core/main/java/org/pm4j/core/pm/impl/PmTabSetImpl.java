@@ -135,7 +135,7 @@ public class PmTabSetImpl extends PmElementImpl implements PmTabSet {
    */
   @Override
   public List<PmElement> getTabPms() {
-    return zz_getPmElements();
+    return PmUtil.getPmChildrenOfType(this, PmElement.class);
   }
 
   /**

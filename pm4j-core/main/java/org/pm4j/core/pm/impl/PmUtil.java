@@ -15,7 +15,6 @@ import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.PmDataInput;
-import org.pm4j.core.pm.PmElement;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.impl.PmObjectBase.PmInitState;
@@ -170,20 +169,6 @@ public final class PmUtil {
   }
 
   /**
-   * @param pm The element to check.
-   * @return <code>true</code> if all attributes do not have an error state.
-   */
-  public static boolean hasValidAttributes(PmElement pm) {
-    for (PmAttr<?> a : getPmAttributes(pm)) {
-      if (!a.isPmValid()) {
-        return false;
-      }
-    }
-    // all attributes are valid
-    return true;
-  }
-
-  /**
    * @return The set of all child PM's. Includes field bound PM's as well as
    *         dynamically created PM's.
    */
@@ -267,8 +252,8 @@ public final class PmUtil {
    * @return The list of visible commands and separators.
    */
   public static List<PmCommand> getVisiblePmCommands(PmObject pm) {
-    return PmCommandSeparator.filterVisibleCommandsAndSeparators(
-              ((PmObjectBase)pm).zz_getPmCommands());
+    List<PmCommand> commands = getPmChildrenOfType(pm, PmCommand.class);
+    return PmCommandSeparator.filterVisibleCommandsAndSeparators(commands);
   }
 
   /**
@@ -276,32 +261,7 @@ public final class PmUtil {
    * @return The command set that should be shown within the given command set kind.
    */
   public static List<PmCommand> getVisiblePmCommands(PmObject pm, PmCommand.CommandSet commandSet) {
-    return getVisiblePmCommands(pm);
-  }
-
-  /**
-   * @param pm The pm to get all attributes from.
-   * @return The set of attributes.
-   */
-  public static List<PmAttr<?>> getPmAttributes(PmObject pm) {
-    return ((PmObjectBase)pm).zz_getPmAttributes();
-  }
-
-  /**
-   * @param pm The pm to get the attribute from.
-   * @param attrName
-   *          Name of the requested attribute.
-   * @return The matching attribute instance. Never <code>null</code>.
-   * @throws PmRuntimeException
-   *           when there is no matching attribute.
-   */
-  public static PmAttr<?> getPmAttribute(PmObject pm, String attrName) {
-    PmObject pmAttr = ((PmObjectBase)pm).findChildPm(attrName);
-    if (!(pmAttr instanceof PmAttr)) {
-      throw new PmRuntimeException(pm, "The found child PM with name '" + attrName +
-          "' is not an attribute or null. Found item: " + pmAttr);
-    }
-    return (PmAttr<?>)pmAttr;
+    return ((PmObjectBase)pm).getVisiblePmCommands(commandSet);
   }
 
   /**
