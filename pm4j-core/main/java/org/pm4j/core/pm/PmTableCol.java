@@ -54,15 +54,4 @@ public interface PmTableCol extends PmObject, FilterByDefinitionProvider {
   List<FilterByDefinition> getFilterByDefinitions();
 
 
-  /**
-   * Provides the configured row sort comparator. It no specific comparator is configured, the default
-   * implementation simply compares the column specific cell-PMs.
-   * <p>
-   * The type of items to compare depends on the kind of {@link PageableCollection} container behind the table.
-   *
-   * @return The configured comparator or <code>null</code>.
-   */
-  // XXX olaf: move to Impl?
-  Comparator<?> getRowSortComparator();
-
 }

@@ -158,11 +158,7 @@ public class PmPagerImpl
   public final PmCommand cmdSelectAll = new PmCommandImpl(this) {
     @Override
     protected void doItImpl() {
-      @SuppressWarnings("unchecked")
-      PageableCollection<Object> coll = (PageableCollection<Object>)getPmBean();
-      for (Object i : coll.getItemsOnPage()) {
-          coll.select(i);
-      }
+      PageableCollectionUtil.selectAll(getPmBean(), true);
     }
   };
 
@@ -170,11 +166,7 @@ public class PmPagerImpl
   public final PmCommand cmdDeSelectAll = new PmCommandImpl(this) {
     @Override
     protected void doItImpl() {
-      @SuppressWarnings("unchecked")
-      PageableCollection<Object> coll = (PageableCollection<Object>)getPmBean();
-      for (Object i : coll.getItemsOnPage()) {
-          coll.select(i);
-      }
+      PageableCollectionUtil.selectAll(getPmBean(), false);
     }
   };
 

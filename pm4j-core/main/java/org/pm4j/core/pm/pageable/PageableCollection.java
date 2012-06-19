@@ -2,6 +2,7 @@ package org.pm4j.core.pm.pageable;
 
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 
 import org.pm4j.core.pm.filter.Filter;
@@ -69,6 +70,15 @@ public interface PageableCollection<T_ITEM> {
   void sortBackingItems(Comparator<?> sortComparator);
 
   /**
+   * Defines the (optional) comparator used to sort the items initially by.
+   * <p>
+   * ATTENTION: Gets currently only delegated to a {@link PageableListImpl}.
+   *
+   * @param comparator A comparator.
+   */
+  void setInitialBeanSortComparator(Comparator<?> comparator);
+
+  /**
    * Provides a filter that will be applied to the items of this
    * collection.
    *
@@ -111,6 +121,18 @@ public interface PageableCollection<T_ITEM> {
   int getNumOfUnfilteredItems();
 
   /**
+   * Provides an iterator over the item set.<br>
+   * The current filter and sort order settings are considered.
+   * <p>
+   * ATTENTION: In case of large collections with page wise data loading the the
+   * provided iterator has some performance impact.
+   *
+   * @return An iterator over all items that are visible according to the
+   *         current filter settings.
+   */
+  Iterator<T_ITEM> getAllItemsIterator();
+
+  /**
    * @param item
    *          The item to check.
    * @return <code>true</code> if the item was selected.
@@ -125,8 +147,12 @@ public interface PageableCollection<T_ITEM> {
    * @param item
    *          The item to select.
    */
-  // TODO: change API to select(T_ITEM item, boolean selectable)
+  void select(T_ITEM item, boolean select);
+  @Deprecated
   void select(T_ITEM item);
+  @Deprecated
+  void deSelect(T_ITEM item);
+
 
   /**
    * Removes the given item from the set of selected items.
@@ -136,7 +162,7 @@ public interface PageableCollection<T_ITEM> {
    * @param item
    *          The item to deselect.
    */
-  void deSelect(T_ITEM item);
+//  void deSelect(T_ITEM item);
 
   /**
    * @return <code>true</code> if more than one item can be selected.

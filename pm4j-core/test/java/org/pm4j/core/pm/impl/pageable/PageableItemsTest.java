@@ -3,6 +3,7 @@ package org.pm4j.core.pm.impl.pageable;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 import org.junit.Test;
@@ -33,4 +34,27 @@ public class PageableItemsTest {
     assertEquals("5 items should occupy 3 pages.", 3, PageableCollectionUtil.getNumOfPages(items));
     assertEquals("Last item of first page should have the index 2.", 2, PageableCollectionUtil.getIdxOfLastItemOnPage(items));
   }
+
+  @Test
+  public void testPageableCollectionWithInitialSortOrder() {
+    Comparator<MyBean> reverseOrderComparator = new Comparator<MyBean>() {
+      @Override
+      public int compare(MyBean o1, MyBean o2) {
+        return - o1.name.compareTo(o2.name);
+      }
+    };
+    PageableListImpl<MyBean> items = new PageableListImpl<MyBean>(TEST_ITEM_LIST, reverseOrderComparator);
+
+    assertEquals("e", items.getItemsOnPage().get(0).name);
+    assertEquals("d", items.getItemsOnPage().get(1).name);
+  }
+
+  @Test
+  public void testPageableCollectionWithoutInitialSortOrder() {
+    PageableListImpl<MyBean> items = new PageableListImpl<MyBean>(TEST_ITEM_LIST);
+
+    assertEquals("a", items.getItemsOnPage().get(0).name);
+    assertEquals("b", items.getItemsOnPage().get(1).name);
+  }
+
 }

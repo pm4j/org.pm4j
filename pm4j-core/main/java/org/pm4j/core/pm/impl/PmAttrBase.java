@@ -12,10 +12,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.ValidationException;
 import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.validation.metadata.BeanDescriptor;
@@ -42,6 +39,7 @@ import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmMessage;
 import org.pm4j.core.pm.PmMessage.Severity;
 import org.pm4j.core.pm.PmObject;
+import org.pm4j.core.pm.PmOption;
 import org.pm4j.core.pm.PmOptionSet;
 import org.pm4j.core.pm.PmVisitor;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
@@ -401,11 +399,22 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   }
 
   /**
-   * The default implementation returns the result of {@link #getValueAsString()}.
+   * The default implementation returns the result of {@link #getValueAsString()}.<br>
+   * If the attribute has options it tries to identify the selected option and returns the
+   * title for the current option.
    */
   @Override
   public String getValueLocalized() {
-    return getValueAsString();
+    String valueAsString = getValueAsString();
+    PmOptionSet os = getOptionSet();
+    if (os != null) {
+      PmOption option = os.findOptionForIdString(valueAsString);
+      if (option != null) {
+        return option.getPmTitle();
+      }
+    }
+    // default:
+    return valueAsString;
   }
 
   /**
@@ -929,18 +938,14 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   }
 
   void performJsr303Validations() {
-    if (zz_getValidator() != null) {
+    Validator validator = PmImplUtil.getBeanValidator();
+    if (validator != null) {
       Object validationBean = getOwnMetaData().valueAccessStrategy.getPropertyContainingBean(this);
       if (validationBean != null &&
           getOwnMetaData().validationFieldName != null) {
-        Set<ConstraintViolation<Object>> violations = zz_getValidator().validateProperty(validationBean, getOwnMetaData().validationFieldName);
-        for (ConstraintViolation<Object> v : violations) {
-          // FIXME olaf: add handling for translated strings.
-          //             what is the result of:
-          System.out.println("v.getMessageTemplate: '" + v.getMessageTemplate() + "'  message: " + v.getMessage());
-          PmValidationMessage msg = new PmValidationMessage(this, v.getMessage());
-          getPmConversationImpl().addPmMessage(msg);
-        }
+        @SuppressWarnings("unchecked")
+        Set<ConstraintViolation<?>> violations = (Set<ConstraintViolation<?>>)(Object)validator.validateProperty(validationBean, getOwnMetaData().validationFieldName);
+        PmImplUtil.beanConstraintViolationsToPmMessages(this, violations);
       }
     }
   }
@@ -1125,20 +1130,6 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
 
   // ======== meta data ======== //
 
-  /** The optional JSR-303 bean validator to be considered. */
-  private static Validator zz_validator = zz_getValidator();
-
-  private static Validator zz_getValidator() {
-    try {
-      ValidatorFactory f = Validation.buildDefaultValidatorFactory();
-      return f.getValidator();
-    }
-    catch (ValidationException e) {
-      LOG.info("No JSR-303 bean validation configuration found: " + e.getMessage());
-      return null;
-    }
-  }
-
   // XXX olaf: really required? May be solved by overriding initMetaData too.
   protected PmOptionSetDef<?> makeOptionSetDef(PmOptionCfg cfg, Method getOptionValuesMethod) {
     return cfg != null
@@ -1310,7 +1301,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   }
 
   private void zz_readBeanValidationRestrictions(Class<?> beanClass, PmAttrCfg fieldAnnotation, MetaData myMetaData) {
-    if (zz_validator == null)
+    if (PmImplUtil.getBeanValidator() == null)
       return;
 
     Class<?> srcClass = ((fieldAnnotation != null) &&
@@ -1319,7 +1310,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
           : beanClass;
 
     if (srcClass != null) {
-      BeanDescriptor beanDescriptor = zz_validator.getConstraintsForClass(srcClass);
+      BeanDescriptor beanDescriptor = PmImplUtil.getBeanValidator().getConstraintsForClass(srcClass);
 
       if (beanDescriptor != null) {
         myMetaData.validationFieldName = (fieldAnnotation != null) &&

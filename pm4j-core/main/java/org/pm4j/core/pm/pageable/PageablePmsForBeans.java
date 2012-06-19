@@ -2,6 +2,7 @@ package org.pm4j.core.pm.pageable;
 
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 
 import org.pm4j.core.pm.PmBean;
@@ -31,14 +32,45 @@ public class PageablePmsForBeans<T_PM extends PmBean<T_BEAN>, T_BEAN> implements
   private PmObject                   pmCtxt;
   private PageableCollection<T_BEAN> beans;
 
+  /**
+   * Creates a collection backed by the given {@link PageableCollection} of beans.
+   *
+   * @param pmCtxt
+   *          The PM context used to create the PM's for the bean items.
+   * @param beanItems
+   *          The collection of beans to represent by this collection of bean-PM's.
+   */
   public PageablePmsForBeans(PmTable<T_PM> pmCtxt, PageableCollection<T_BEAN> beanItems) {
     this.pmCtxt = pmCtxt;
     this.beans = beanItems;
   }
 
-  public PageablePmsForBeans(PmTable<T_PM> pmCtxt, Collection<T_BEAN> beans) {
-	    this(pmCtxt, new PageableListImpl<T_BEAN>(beans));
+  /**
+   * Creates a collection backed by a {@link PageableListImpl}.
+   *
+   * @param pmCtxt
+   *          The PM context used to create the PM's for the bean items.
+   * @param beans
+   *          The set of beans to handle.
+   * @param initialSortComparator
+   *          A comparator that defines the initial sort order. May be <code>null</code>.
+   */
+  public PageablePmsForBeans(PmTable<T_PM> pmCtxt, Collection<T_BEAN> beans, Comparator<T_BEAN> initialSortComparator) {
+	    this(pmCtxt, new PageableListImpl<T_BEAN>(beans, initialSortComparator));
   }
+
+  /**
+   * Creates a collection backed by a {@link PageableListImpl} with no initial
+   * sort order definition.
+   *
+   * @param pmCtxt
+   *          The PM context used to create the PM's for the bean items.
+   * @param beans
+   *          The set of beans to handle.
+   */
+  public PageablePmsForBeans(PmTable<T_PM> pmCtxt, Collection<T_BEAN> beans) {
+    this(pmCtxt, beans, null);
+}
 
   @SuppressWarnings("unchecked")
   @Override
@@ -81,21 +113,16 @@ public class PageablePmsForBeans<T_PM extends PmBean<T_BEAN>, T_BEAN> implements
   }
 
   @Override
+  public void setInitialBeanSortComparator(Comparator<?> comparator) {
+    beans.setInitialBeanSortComparator(comparator);
+  }
+
+  @Override
   public void setItemFilter(Filter filter) {
     beans.setItemFilter(filter != null
         ? new BeanFilterBasedOnPmFilter(filter)
         : null);
   }
-
-//  @Override
-//  public void setBackingItemFilter(Filter filter) {
-//    this.beans.setItemFilter(filter);
-//  }
-//
-//  @Override
-//  public Filter getBackingItemFilter() {
-//    return beans.getBackingItemFilter();
-//  }
 
   @Override
   public int getNumOfItems() {
@@ -108,6 +135,28 @@ public class PageablePmsForBeans<T_PM extends PmBean<T_BEAN>, T_BEAN> implements
   }
 
   @Override
+  public Iterator<T_PM> getAllItemsIterator() {
+    final Iterator<T_BEAN> beanIter = beans.getAllItemsIterator();
+    return new Iterator<T_PM>() {
+      @Override
+      public boolean hasNext() {
+        return beanIter.hasNext();
+      }
+      @Override
+      public T_PM next() {
+        T_BEAN b = beanIter.next();
+        return b != null
+            ? (T_PM) PmFactoryApi.<T_BEAN, T_PM>getPmForBean(pmCtxt, b)
+            : null;
+      }
+      @Override
+      public void remove() {
+        throw new UnsupportedOperationException();
+      }
+    };
+  }
+
+  @Override
   public boolean isSelected(T_PM item) {
     return item != null
             ? beans.isSelected(item.getPmBean())
@@ -115,26 +164,22 @@ public class PageablePmsForBeans<T_PM extends PmBean<T_BEAN>, T_BEAN> implements
   }
 
   @Override
-  public void select(T_PM item) {
+  public void select(T_PM item, boolean doSelect) {
     boolean wasUnselected = !isSelected(item);
-    beans.select(item != null
-            ? item.getPmBean()
-            : null);
+    T_BEAN b = item != null
+        ? item.getPmBean()
+        : null;
+    beans.select(b, doSelect);
     // fire the event after successful select
     if(wasUnselected) {
       PmEventApi.firePmEventIfInitialized(pmCtxt, PmEvent.SELECTION_CHANGE);
     }
   }
-
-  @Override
+  public void select(T_PM item) {
+    select(item, true);
+  }
   public void deSelect(T_PM item) {
-    boolean wasSelected = isSelected(item);
-    beans.deSelect(item != null
-        ? item.getPmBean()
-        : null);
-    if(wasSelected) {
-      PmEventApi.firePmEventIfInitialized(pmCtxt, PmEvent.SELECTION_CHANGE);
-    }
+    select(item, false);
   }
 
   @Override

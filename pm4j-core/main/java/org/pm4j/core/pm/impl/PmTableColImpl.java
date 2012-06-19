@@ -3,7 +3,6 @@ package org.pm4j.core.pm.impl;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import org.pm4j.core.exception.PmRuntimeException;
@@ -28,7 +27,6 @@ import org.pm4j.core.pm.annotation.PmTableColCfg;
 import org.pm4j.core.pm.api.PmLocalizeApi;
 import org.pm4j.core.pm.filter.FilterByDefinition;
 import org.pm4j.core.pm.filter.impl.FilterByDefinitionBase;
-import org.pm4j.core.pm.pageable.PageableCollection;
 import org.pm4j.core.util.reflection.ClassUtil;
 import org.pm4j.core.util.table.ColSizeSpec;
 
@@ -44,33 +42,17 @@ public class PmTableColImpl extends PmObjectBase implements PmTableCol {
   public final PmAttrInteger defaultColPosAttr = new PmAttrIntegerImpl(this);
   private PmSortOrder sortOrder = PmSortOrder.NEUTRAL;
 
-
-  /**
-   * A specific row sort comparator. The type of items to compare depends on the kind of {@link PageableCollection} container
-   * behind the table.
-   */
-  private Comparator<?> rowSortComparator;
-
   /** The filter definitions for this column. */
   private List<FilterByDefinition> filterByDefinitions;
 
 
 
-  public PmTableColImpl(PmTable<?> pmTable) {
-    this(pmTable, null);
-  }
-
   /**
    * @param pmTable
    *          The table containing this column.
-   * @param rowSortComparator
-   *          A specific row sort comparator. The type of items to compare
-   *          depends on the kind of {@link PageableCollection} container behind the
-   *          table.
    */
-  public PmTableColImpl(PmTable<?> pmTable, Comparator<?> rowSortComparator) {
+  public PmTableColImpl(PmTable<?> pmTable) {
     super(pmTable);
-    this.rowSortComparator = rowSortComparator;
   }
 
   @Override
@@ -230,11 +212,6 @@ public class PmTableColImpl extends PmObjectBase implements PmTableCol {
    */
   protected FilterByDefinition getFilterByDefinitionImpl() {
     return null;
-  }
-
-  @Override
-  public Comparator<?> getRowSortComparator() {
-    return rowSortComparator;
   }
 
   /**

@@ -1,6 +1,7 @@
 package org.pm4j.core.pm.pageable;
 
 import java.awt.print.Pageable;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -160,13 +161,10 @@ public final class PageableCollectionUtil {
    *          <code>true</code> selects all items of the current page.<br>
    *          <code>false</code> does deselect all items of the current page.
    */
+  // TODO: rename to 'selectAllOnPage'
   public static <T> void setAllOnPageSelected(PageableCollection<T> pageable, boolean doSelect) {
     for (T i : pageable.getItemsOnPage()) {
-      if (doSelect) {
-        pageable.select(i);
-      } else {
-        pageable.deSelect(i);
-      }
+      pageable.select(i, doSelect);
     }
   }
 
@@ -190,5 +188,19 @@ public final class PageableCollectionUtil {
     // all items are selected:
     return true;
   }
+
+  public static <T> void selectAll(PageableCollection<T> pageable, boolean doSelect) {
+    Iterator<T> i = doSelect
+          ? pageable.getAllItemsIterator()
+          : pageable.getSelectedItems().iterator();
+    while (i.hasNext()) {
+      pageable.select(i.next(), doSelect);
+    }
+  }
+
+// TODO olaf: maintain a set of selected items of the current filter settings
+//  public boolean isAllSelected(PageableCollection<?> pageable) {
+//    return pageable.getSelectedItems().size() == pageable.getNumOfItems();
+//  }
 
 }

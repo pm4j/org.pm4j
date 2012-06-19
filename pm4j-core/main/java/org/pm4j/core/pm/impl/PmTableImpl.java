@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
-import org.pm4j.common.util.InvertingComparator;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmCommand.CommandState;
@@ -35,6 +34,7 @@ import org.pm4j.core.pm.filter.FilterByDefinition;
 import org.pm4j.core.pm.filter.MultiFilter;
 import org.pm4j.core.pm.pageable.PageableCollection;
 import org.pm4j.core.pm.pageable.PageableListImpl;
+import org.pm4j.core.util.reflection.ClassUtil;
 
 /**
  * A table that presents the content of a set of {@link PmElement}s.
@@ -78,6 +78,12 @@ public class PmTableImpl
 
   /** The set of named table row filters. */
   private MultiFilter rowFilter = new MultiFilter();
+
+  private final Comparator<Object> NO_COMPARATOR = new Comparator<Object>() {
+    @Override public int compare(Object o1, Object o2) { throw new PmRuntimeException(PmTableImpl.this, "The internal NO_COMPARATOR should not be used."); }
+  };
+
+  private Comparator<?> initialBeanSortComparator = NO_COMPARATOR;
 
 
   /**
@@ -196,7 +202,7 @@ public class PmTableImpl
    */
   protected void onDeleteRow(T_ROW_ELEMENT_PM deletedRow) {
     PmMessageUtil.clearSubTreeMessages(deletedRow);
-    getPageableCollection().deSelect(deletedRow);
+    getPageableCollection().select(deletedRow, false);
     changedStateRegistry.onDeleteItem(deletedRow);
     if (deletedRow instanceof PmBean) {
       BeanPmCacheUtil.removeBeanPm(this, (PmBean<?>)deletedRow);
@@ -366,7 +372,6 @@ public class PmTableImpl
     /** The column to sort the rows by. */
     PmTableCol sortCol = null;
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
     private void sortBy(PmTableCol sortCol) {
       // Sort column changed: Reset the sort order of the current sort column.
       if (this.sortCol != null &&
@@ -379,33 +384,21 @@ public class PmTableImpl
 
       this.sortCol = sortCol;
 
-      Comparator<?> comparator = null;
       if (sortCol != null) {
-        // The explicitly configured comparator will be used.
-        // Otherwise the generic row comparator.
-        comparator = sortCol.getRowSortComparator();
-        if (comparator == null) {
-          PmSortOrder order = sortCol.getSortOrderAttr().getValue();
+        PmSortOrder order = sortCol.getSortOrderAttr().getValue();
 
-          // prevent unnecessary non-sorting sort operations.
-          if (order != null && order != PmSortOrder.NEUTRAL) {
-            comparator = new RowPmComparator<T_ROW_ELEMENT_PM>(sortCol);
-            // sort the PM items.
-            getPageableCollection().sortItems(comparator);
-            PmEventApi.firePmEventIfInitialized(PmTableImpl.this, PmEvent.VALUE_CHANGE, ValueChangeKind.SORT_ORDER);
-            return;
-          }
+        // prevent unnecessary non-sorting sort operations.
+        if (order != null && order != PmSortOrder.NEUTRAL) {
+          Comparator<?> comparator = new RowPmComparator<T_ROW_ELEMENT_PM>(sortCol);
+          // sort the PM items.
+          getPageableCollection().sortItems(comparator);
+          PmEventApi.firePmEventIfInitialized(PmTableImpl.this, PmEvent.VALUE_CHANGE, ValueChangeKind.SORT_ORDER);
+          return;
         }
-        else {
-          if (sortCol.getSortOrderAttr().getValue() == PmSortOrder.DESC) {
-            comparator = new InvertingComparator(comparator);
-          }
-        }
-
       }
 
-      // sort based on a backing items related comparator.
-      getPageableCollection().sortBackingItems(comparator);
+      // Reset the sort order:
+      getPageableCollection().sortBackingItems(null);
       PmEventApi.firePmEventIfInitialized(PmTableImpl.this, PmEvent.VALUE_CHANGE, ValueChangeKind.SORT_ORDER);
     }
   }
@@ -517,6 +510,8 @@ public class PmTableImpl
       if (!rowFilter.isEmpty()) {
         pageableCollection.setItemFilter(rowFilter);
       }
+
+      applyDefaultSortOrder();
     }
     return pageableCollection;
   }
@@ -563,19 +558,14 @@ public class PmTableImpl
     if (!preseveSettings) {
       BeanPmCacheUtil.clearBeanPmCache(this);
       rowFilter.clear();
-
-      // Switch back to the default sort order.
-      SortOrderSpec s = getDefaultSortOrder();
-      if (s != null) {
-        sortBy(s.sortByColumn, s.sortOrder);
-      }
-      else {
-        sortBy(null, null);
-      }
     }
 
     if (!rowFilter.isEmpty()) {
       pageableCollection.setItemFilter(rowFilter);
+    }
+
+    if (!preseveSettings) {
+      applyDefaultSortOrder();
     }
 
     PmEventApi.firePmEventIfInitialized(this, PmEvent.VALUE_CHANGE, valueChangeKind);
@@ -586,7 +576,7 @@ public class PmTableImpl
       getPageableCollection();
 
       for (T_ROW_ELEMENT_PM r : selectedItems) {
-        pageableCollection.select(r);
+        pageableCollection.select(r, true);
       }
     }
 
@@ -640,6 +630,40 @@ public class PmTableImpl
   }
 
   /**
+   * Defines a bean comparator that provides the initial table sort order.
+   * <p>
+   * The default implementation provides the comparator defined in {@link PmTableCfg#initialBeanSortComparator()}.
+   *
+   * @return The bean sort comparator. May be <code>null</code>.
+   */
+  Comparator<?> getInitialBeanSortComparator() {
+    if (initialBeanSortComparator == NO_COMPARATOR) {
+      PmTableCfg tableCfg = AnnotationUtil.findAnnotation(this, PmTableCfg.class);
+      initialBeanSortComparator = (tableCfg != null && tableCfg.initialBeanSortComparator() != Comparator.class)
+          ? (Comparator<?>) ClassUtil.newInstance(tableCfg.initialBeanSortComparator())
+          : null;
+    }
+    return initialBeanSortComparator;
+  }
+
+  /**
+   * Applies the initial- and column based sort order to the {@link PageableCollection}.
+   */
+  protected void applyDefaultSortOrder() {
+    // get the initial sort order
+    pageableCollection.setInitialBeanSortComparator(getInitialBeanSortComparator());
+
+    // Switch back to the default sort order.
+    SortOrderSpec s = getDefaultSortOrder();
+    if (s != null) {
+      sortBy(s.sortByColumn, s.sortOrder);
+    }
+    else {
+      sortBy(null, null);
+    }
+  }
+
+  /**
    * @return A pager that may be used to navigate through the table.<br>
    *         May return <code>null</code> if there is no pager defined for this
    *         table.
@@ -656,6 +680,7 @@ public class PmTableImpl
    */
   protected void onPmSelectionChange(PmEvent event) {
   }
+
 
   /**
    * Base implementation for a table specific pager.
