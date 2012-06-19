@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmAttrEnum;
@@ -260,10 +261,16 @@ public class PmTableColImpl extends PmObjectBase implements PmTableCol {
       // Read the default sort definition from the table.
       PmTableCfg tableCfg = AnnotationUtil.findAnnotation((PmObjectBase)getPmParent(), PmTableCfg.class);
       if (tableCfg != null)  {
-        myMetaData.sortable = (tableCfg != null &&
-            tableCfg.sortable() == PmBoolean.TRUE)
+        myMetaData.sortable = (tableCfg.sortable() == PmBoolean.TRUE)
               ? PmBoolean.TRUE
               : PmBoolean.FALSE;
+
+        // the column gets automatically sortable if it is mentioned as default sort column.
+        if (tableCfg.defaultSortCol().length() > 0 &&
+            (tableCfg.defaultSortCol().equals(getPmName()) ||
+             getPmName().equals(StringUtils.substringBefore(tableCfg.defaultSortCol(), ",")))) {
+          myMetaData.sortable = PmBoolean.TRUE;
+        }
       }
     }
   }
