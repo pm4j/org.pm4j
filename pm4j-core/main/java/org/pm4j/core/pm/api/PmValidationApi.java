@@ -15,6 +15,13 @@ import org.pm4j.core.pm.impl.PmConversationImpl;
 import org.pm4j.core.pm.impl.PmObjectBase;
 import org.pm4j.core.pm.impl.PmUtil;
 
+/**
+ * API for PM validation related operations.
+ * <p>
+ * TODO olaf: needs to be completed.
+ *
+ * @author olaf boede
+ */
 public final class PmValidationApi {
 
   private static final Log LOG = LogFactory.getLog(PmValidationApi.class);

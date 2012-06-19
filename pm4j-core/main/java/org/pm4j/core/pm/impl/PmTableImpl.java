@@ -171,7 +171,7 @@ public class PmTableImpl
       pageableCollection.setItemFilter(rowFilter);
     }
   }
-
+  
   @SuppressWarnings({ "unchecked", "rawtypes" })
   @Override
   public List<T_ROW_ELEMENT_PM> getRowsWithChanges() {
@@ -196,7 +196,7 @@ public class PmTableImpl
    */
   protected void onDeleteRow(T_ROW_ELEMENT_PM deletedRow) {
     PmMessageUtil.clearSubTreeMessages(deletedRow);
-    getPageableCollection().deSelect(deletedRow);
+    getPageableCollection().select(deletedRow, false);
     changedStateRegistry.onDeleteItem(deletedRow);
     if (deletedRow instanceof PmBean) {
       BeanPmCacheUtil.removeBeanPm(this, (PmBean<?>)deletedRow);
@@ -586,7 +586,7 @@ public class PmTableImpl
       getPageableCollection();
 
       for (T_ROW_ELEMENT_PM r : selectedItems) {
-        pageableCollection.select(r);
+        pageableCollection.select(r, true);
       }
     }
 

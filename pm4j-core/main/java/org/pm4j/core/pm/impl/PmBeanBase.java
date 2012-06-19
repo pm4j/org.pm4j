@@ -3,6 +3,10 @@ package org.pm4j.core.pm.impl;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
 
 import org.apache.commons.lang.StringUtils;
 import org.pm4j.core.exception.PmRuntimeException;
@@ -10,6 +14,7 @@ import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmEventListener;
+import org.pm4j.core.pm.PmMessage.Severity;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmTable;
 import org.pm4j.core.pm.annotation.PmBeanCfg;
@@ -89,7 +94,8 @@ public abstract class PmBeanBase<T_BEAN>
     T_BEAN bean = null;
     String propKey = getOwnMetaDataAndEnsurePmInit().beanPropertyKey;
     if (StringUtils.isNotBlank(propKey)) {
-      bean = (T_BEAN) PmExpressionApi.findByExpression(this, propKey, getOwnMetaDataAndEnsurePmInit().beanClass);
+      zz_ensurePmInitialization();
+      bean = (T_BEAN) PmExpressionApi.findByExpression(this, propKey, getPmBeanClass());
     }
     return bean;
   }
@@ -283,6 +289,25 @@ public abstract class PmBeanBase<T_BEAN>
   @Override
   public Class<?> getPmBeanClass() {
     return getOwnMetaData().beanClass;
+  }
+
+  /**
+   * Validates all sub-PMs.<br>
+   * It the validation of all sub-PM's did not provide an error it performs a bean-validation on
+   * the bean provided by {@link #getPmBean()}.
+   */
+  @Override
+  public void pmValidate() {
+    super.pmValidate();
+    if (getPmBean() != null &&
+        PmMessageUtil.getSubTreeMessages(this, Severity.ERROR).size() == 0) {
+      Validator validator = PmImplUtil.getBeanValidator();
+      if (validator != null) {
+        @SuppressWarnings("unchecked")
+        Set<ConstraintViolation<?>> violations = (Set<ConstraintViolation<?>>)(Object) validator.validate(getPmBean());
+        PmImplUtil.beanConstraintViolationsToPmMessages(this, violations);
+      }
+    }
   }
 
   private void checkBeanClass(Object bean) {

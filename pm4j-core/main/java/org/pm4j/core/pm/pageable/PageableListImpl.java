@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -24,24 +25,29 @@ import org.pm4j.core.pm.filter.Filter;
  */
 public class PageableListImpl<T_ITEM> implements PageableCollection<T_ITEM> {
 
+  /** Contains the not filtered set of items in their original sort order. */
   private Collection<T_ITEM> originalObjects;
-  private List<T_ITEM>       objectsInOriginalSortOrder;
+  /** The filtered set of all items sorted by {@link #initialSortComparator}. */
+  private List<T_ITEM>       allObjectsInInitialSortOrder;
+  /** The current set of filtered and sorted items. */
   private List<T_ITEM>       objects;
   private int                pageSize = 10;
   private int                currentPageIdx;
   private boolean            multiSelect;
   private Set<T_ITEM>        selectedItems = new LinkedHashSet<T_ITEM>();
+  private Comparator<T_ITEM> initialSortComparator;
   private Comparator<?>      currentSortComparator;
   private Filter             currentFilter;
 
   /**
    * @param objects
    *          The set of objects to iterate over.
-   * @param pageSize
-   *          The page size to use.
+   * @param initialSortComparator
+   *          The initial sort order to apply. May be <code>null</code>.
    */
-  public PageableListImpl(Collection<T_ITEM> objects) {
+  public PageableListImpl(Collection<T_ITEM> objects, Comparator<T_ITEM> initialSortComparator) {
     this.originalObjects = objects;
+    this.initialSortComparator = initialSortComparator;
     this.currentPageIdx = 1;
 
     // TODO olaf: add another switch to enable such expensive checks:
@@ -56,12 +62,23 @@ public class PageableListImpl<T_ITEM> implements PageableCollection<T_ITEM> {
   }
 
   /**
+   * Creates a collection without a special initial sort order definition.
+   *
+   * @param objects
+   *          The set of objects to iterate over.
+   */
+  public PageableListImpl(Collection<T_ITEM> objects) {
+    this(objects, null);
+  }
+
+  /**
    * Creates an empty collection.
    * @param pageSize The page size.
    * @param multiSelect The multi selection behavior definition.
    */
+  @SuppressWarnings("unchecked")
   public PageableListImpl(int pageSize, boolean multiSelect) {
-    this(new ArrayList<T_ITEM>());
+    this(Collections.EMPTY_LIST, null);
     this.pageSize = pageSize;
     this.multiSelect = multiSelect;
   }
@@ -90,6 +107,11 @@ public class PageableListImpl<T_ITEM> implements PageableCollection<T_ITEM> {
   @Override
   public int getNumOfUnfilteredItems() {
     return originalObjects != null ? originalObjects.size() : 0;
+  }
+
+  @Override
+  public Iterator<T_ITEM> getAllItemsIterator() {
+    return objects.iterator();
   }
 
   @Override
@@ -146,17 +168,23 @@ public class PageableListImpl<T_ITEM> implements PageableCollection<T_ITEM> {
   }
 
   @Override
-  public void select(T_ITEM item) {
-    if (!multiSelect) {
-      selectedItems.clear();
-    }
+  public void select(T_ITEM item, boolean doSelect) {
+    if (doSelect) {
+      if (!multiSelect) {
+        selectedItems.clear();
+      }
 
-    if (item != null) {
-      selectedItems.add(item);
+      if (item != null) {
+        selectedItems.add(item);
+      }
+    }
+    else {
+      selectedItems.remove(item);
     }
   }
-
-  @Override
+  public void select(T_ITEM item) {
+    select(item, true);
+  }
   public void deSelect(T_ITEM item) {
     selectedItems.remove(item);
   }
@@ -182,16 +210,23 @@ public class PageableListImpl<T_ITEM> implements PageableCollection<T_ITEM> {
     _applyFilterAndSortOrder();
   }
 
-  @SuppressWarnings("unchecked")
   private void _assignObjectsFromOri() {
-    this.objectsInOriginalSortOrder = (originalObjects == null || originalObjects.isEmpty())
+    _assignAllObjectsInInitialSortOrderFromOri();
+    this.objects = allObjectsInInitialSortOrder;
+  }
+
+  @SuppressWarnings("unchecked")
+  private void _assignAllObjectsInInitialSortOrderFromOri() {
+    this.allObjectsInInitialSortOrder = (originalObjects == null || originalObjects.isEmpty())
         ? java.util.Collections.EMPTY_LIST
         : new ArrayList<T_ITEM>(originalObjects);
-    this.objects = objectsInOriginalSortOrder;
+    if (initialSortComparator != null) {
+      Collections.sort(allObjectsInInitialSortOrder, initialSortComparator);
+    }
   }
 
   private void _applyFilterAndSortOrder() {
-    List<T_ITEM> filteredList = _filter(objectsInOriginalSortOrder);
+    List<T_ITEM> filteredList = _filter(allObjectsInInitialSortOrder);
     _sortAndAssignToObjects(filteredList);
 
     // XXX olaf: just moves to the last possible page if necessary.
@@ -220,6 +255,7 @@ public class PageableListImpl<T_ITEM> implements PageableCollection<T_ITEM> {
     }
   }
 
+  /** Generates a list of filtered items based on the given list. */
   private List<T_ITEM> _filter(List<T_ITEM> unfilteredList) {
     if (currentFilter == null) {
       return unfilteredList;
@@ -242,7 +278,7 @@ public class PageableListImpl<T_ITEM> implements PageableCollection<T_ITEM> {
         // re-select item if not multiSelect and item is within filtered items
         if(!multiSelect) {
           if(item == selectedItem) {
-            select(selectedItem);
+            select(selectedItem, true);
           }
         }
       }
