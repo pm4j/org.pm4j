@@ -24,7 +24,7 @@ import org.pm4j.core.pm.filter.Filter;
  *          The kind of {@link PmBean} provided by this class.
  * @param <T_BEAN>
  *          The kind of corresponding bean, handled by the backing
- *          {@link PageableItems} instance.
+ *          {@link PageableCollection} instance.
  */
 // TODO olaf: control/ensure that the PM factory releases the PMs for the beans that are no longer on the current page.
 public class PageablePmsForBeans<T_PM extends PmBean<T_BEAN>, T_BEAN> implements PageableCollection<T_PM> {

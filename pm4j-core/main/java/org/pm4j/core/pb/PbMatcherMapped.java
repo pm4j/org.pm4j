@@ -13,7 +13,7 @@ import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.impl.PmUtil;
 
 /**
- * A set of {@link PresentationModel} to {@link PbMatcher} associations.
+ * A set of {@link PmObject} to {@link PbMatcher} associations.
  *
  * @author olaf boede
  */

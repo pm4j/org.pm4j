@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.pm4j.core.exception.PmConverterException;
 import org.pm4j.core.exception.PmRuntimeException;
+import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmAttrList;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmAttrListCfg;
@@ -88,10 +89,10 @@ public class PmAttrListImpl<T> extends PmAttrBase<List<T>, Collection<T>> implem
   }
 
   /**
-   * The item-{@link Converter} can be configured using the annotation
+   * The item-{@link PmAttr.Converter} can be configured using the annotation
    * {@link PmAttrListCfg#itemConverter()} or by overriding this method.
    *
-   * @return The {@link Converter} used for the list item values.
+   * @return The {@link tableCfg.defaultSortCol()Converter} used for the list item values.
    */
   protected Converter<T> getItemConverter() {
     @SuppressWarnings("unchecked")

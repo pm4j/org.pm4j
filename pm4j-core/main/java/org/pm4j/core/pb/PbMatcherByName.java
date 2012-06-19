@@ -8,7 +8,7 @@ import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.impl.PmUtil;
 
 /**
- * Uses {@link PresentationModel#getPmLongName()} to identify the match.
+ * Uses {@link PmUtil#getAbsoluteName(PmObject)} to identify the match.
  *
  * @author olaf boede
  */
