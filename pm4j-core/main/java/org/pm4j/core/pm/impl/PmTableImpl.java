@@ -397,9 +397,12 @@ public class PmTableImpl
         }
       }
 
-      // Reset the sort order:
-      getPageableCollection().sortBackingItems(null);
-      PmEventApi.firePmEventIfInitialized(PmTableImpl.this, PmEvent.VALUE_CHANGE, ValueChangeKind.SORT_ORDER);
+      // Reset the sort order.
+      // Can be postponed to the next getPageableColleciton call if the collection is not yet created.
+      if (pageableCollection != null) {
+        getPageableCollection().sortBackingItems(null);
+        PmEventApi.firePmEventIfInitialized(PmTableImpl.this, PmEvent.VALUE_CHANGE, ValueChangeKind.SORT_ORDER);
+      }
     }
   }
 
@@ -493,25 +496,11 @@ public class PmTableImpl
   /**
    * @return The container that handles the table data to display.
    */
-  public PageableCollection<T_ROW_ELEMENT_PM> getPageableCollection() {
+  public final PageableCollection<T_ROW_ELEMENT_PM> getPageableCollection() {
     zz_ensurePmInitialization();
     if (pageableCollection == null) {
       pageableCollection = getPageableCollectionImpl();
-      // XXX olaf: Risk of side effects to other users referencing the given collection.
-      //           Find a better solution...
-      //           Generates potentially an initialization problem if called in constructor
-      pageableCollection.setMultiSelect(getRowSelectMode() == RowSelectMode.MULTI);
-      pageableCollection.setPageSize(getNumOfPageRows());
-      if (getPager() != null) {
-        getPager().setPageableCollection(pageableCollection);
-      }
-
-      // The row-filter needs to be re-applied to the pageable collection.
-      if (!rowFilter.isEmpty()) {
-        pageableCollection.setItemFilter(rowFilter);
-      }
-
-      applyDefaultSortOrder();
+      initPageableCollection(pageableCollection, false);
     }
     return pageableCollection;
   }
@@ -526,6 +515,46 @@ public class PmTableImpl
     return new PageableListImpl<T_ROW_ELEMENT_PM>(getNumOfPageRows(), getRowSelectMode() == RowSelectMode.MULTI);
   }
 
+  /**
+   * A post processing method that allow to apply some default settings to a new pageable collection.
+   * <p>
+   * Gets called whenever a new {@link #pageableCollection} gets assigned:
+   * <ul>
+   *  <li>by calling {@link #getPageableCollectionImpl()} or </li>
+   *  <li>by a call to {@link #setPageableCollection(PageableCollection, boolean, ValueChangeKind)}.</li>
+   * </ul>
+   * The default settings applied in this base implementation are:
+   * <ul>
+   *  <li>Number of page rows and multi-select setting.</li>
+   *  <li>The reference of the (optional) pager to the collection.</li>
+   *  <li>The current filter and sort order settings.</li>
+   * </ul>
+   * Sub classes may override this method to extend this logic.
+   *
+   * @param pageableCollection The collection to initialize.
+   */
+  protected void initPageableCollection(PageableCollection<T_ROW_ELEMENT_PM> pageableCollection, boolean preserveSettings) {
+    // XXX olaf: Risk of side effects to other users referencing the given collection.
+    //           Find a better solution...
+    //           Generates potentially an initialization problem if called in constructor
+    pageableCollection.setMultiSelect(getRowSelectMode() == RowSelectMode.MULTI);
+    pageableCollection.setPageSize(getNumOfPageRows());
+
+    // The row-filter needs to be re-applied to the pageable collection.
+    if (!rowFilter.isEmpty()) {
+      pageableCollection.setItemFilter(rowFilter);
+    }
+
+    if (!preserveSettings) {
+      applyDefaultSortOrder();
+    }
+
+    // XXX olaf: Check - is redundant to the change listener within Pager!
+    if (getPager() != null) {
+      getPager().setPageableCollection(pageableCollection);
+    }
+  }
+
   // FIXME olaf: a test...
   public void setPageableCollection(PageableCollection<T_ROW_ELEMENT_PM> pageable, boolean preseveSettings) {
     setPageableCollection(pageable, preseveSettings, ValueChangeKind.UNKNOWN);
@@ -535,54 +564,38 @@ public class PmTableImpl
    * Sets an empty {@link #pageableCollection} if the given parameter is <code>null</code>.
    *
    * @param pageable The new data set to present.
-   * @param preseveSettings Defines if the currently selected items and filter definition should be preserved.
+   * @param preserveSettings Defines if the currently selected items and filter definition should be preserved.
    * @return <code>true</code> if the data set was new.
    */
-  public void setPageableCollection(PageableCollection<T_ROW_ELEMENT_PM> pageable, boolean preseveSettings, ValueChangeKind valueChangeKind) {
+  public void setPageableCollection(PageableCollection<T_ROW_ELEMENT_PM> pageable, boolean preserveSettings, ValueChangeKind valueChangeKind) {
     Collection<T_ROW_ELEMENT_PM> selectedItems = Collections.emptyList();
 
-    if (pageableCollection != null && preseveSettings) {
-      selectedItems = pageableCollection.getSelectedItems();
+    if (preserveSettings) {
+      if (pageableCollection != null) {
+        selectedItems = pageableCollection.getSelectedItems();
+      }
     }
-
-    pageableCollection = pageable;
-
-    if (pageable != null) {
-      // XXX olaf: Risk of side effects to other users referencing the given collection.
-      //           Find a better solution...
-      //           Generates potentially an initialization problem if called in constructor
-      pageableCollection.setMultiSelect(getRowSelectMode() == RowSelectMode.MULTI);
-      pageableCollection.setPageSize(getNumOfPageRows());
-    }
-
-    if (!preseveSettings) {
+    else {
       BeanPmCacheUtil.clearBeanPmCache(this);
       rowFilter.clear();
     }
 
-    if (!rowFilter.isEmpty()) {
-      pageableCollection.setItemFilter(rowFilter);
-    }
+    pageableCollection = pageable;
 
-    if (!preseveSettings) {
-      applyDefaultSortOrder();
+    if (pageableCollection != null) {
+      initPageableCollection(pageableCollection, preserveSettings);
     }
 
     PmEventApi.firePmEventIfInitialized(this, PmEvent.VALUE_CHANGE, valueChangeKind);
 
     // re-apply the settings to preserve
-    if (preseveSettings) {
+    if (preserveSettings && !selectedItems.isEmpty()) {
       // ensure that the internal field is set, even it was just reset to null.
       getPageableCollection();
 
       for (T_ROW_ELEMENT_PM r : selectedItems) {
         pageableCollection.select(r, true);
       }
-    }
-
-    // XXX olaf: Check - is redundant to the change listener within Pager!
-    if (getPager() != null) {
-      getPager().setPageableCollection(pageableCollection);
     }
   }
 
@@ -608,7 +621,7 @@ public class PmTableImpl
         if ("asc".equalsIgnoreCase(strings[1])) {
           return new SortOrderSpec(col, PmSortOrder.ASC);
         } else if ("desc".equalsIgnoreCase(strings[1])) {
-          return new SortOrderSpec(col, PmSortOrder.ASC);
+          return new SortOrderSpec(col, PmSortOrder.DESC);
         } else {
           throw new PmRuntimeException(
               getPmParent(),
