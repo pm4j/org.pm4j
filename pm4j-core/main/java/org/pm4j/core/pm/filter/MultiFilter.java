@@ -98,11 +98,13 @@ public class MultiFilter implements Filter {
   }
 
   /**
-   * Removes all filter definitions.
+   * Removes all filter definitions added by calls to {@link #setFilter(String, Filter)}.
+   * <p>
+   * All fix filters stay untouched.
    */
   public void clear() {
     filterMap.clear();
-    activeFilters = new Filter[0];
+    updateActiveFilters();
   }
 
   /**
