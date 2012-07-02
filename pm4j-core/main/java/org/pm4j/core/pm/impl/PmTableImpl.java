@@ -177,7 +177,7 @@ public class PmTableImpl
       pageableCollection.setItemFilter(rowFilter);
     }
   }
-
+  
   @SuppressWarnings({ "unchecked", "rawtypes" })
   @Override
   public List<T_ROW_ELEMENT_PM> getRowsWithChanges() {

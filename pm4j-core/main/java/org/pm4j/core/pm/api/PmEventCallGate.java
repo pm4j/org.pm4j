@@ -3,16 +3,39 @@ package org.pm4j.core.pm.api;
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmCommand;
 
+/**
+ * The {@link PmEventCallGate} is used for (rich client) views to call PM methods that may
+ * cause call-back event, sent back to the view.
+ * <p>
+ * The gate stores a reference to the event source (usually a view component).
+ * This reference is used by view bindings to check if a PM event was triggered
+ * by the bound view. In this case the view should not be updated by the PM event.<br>
+ * This helps to prevent endless event loops.
+ * <p>
+ * After finishing the call gate secured operation, the thread local reference to the event source
+ * gets removed. This prevents memory leaks.
+ *
+ * @author olaf boede
+ */
+// TODO olaf: move to package pb?
 public abstract class PmEventCallGate {
 
-  private final Object oldEvenSrc = PmEventApi.getThreadEventSource();
-
+  /**
+   * Creates a PM event call gate for the given event source (usually a view component).
+   * <p>
+   * Calls immediately the {@link #exec()} method.
+   * <p>
+   * Resets the event source afterwards.
+   *
+   * @param eventSource The event source for the call to process.
+   */
   public PmEventCallGate(Object eventSource) {
+    Object oldEvenSrc = PmEventApi.getThreadEventSource();
     try {
       if (eventSource != null) {
         PmEventApi.setThreadEventSource(eventSource);
       }
-      // XXX olaf: Check if a call to an overridden method works.
+      // Execute the specific task to do.
       exec();
     }
     finally {
@@ -20,6 +43,9 @@ public abstract class PmEventCallGate {
     }
   }
 
+  /**
+   * Concrete instances implement here the call to execute.
+   */
   protected abstract void exec();
 
 

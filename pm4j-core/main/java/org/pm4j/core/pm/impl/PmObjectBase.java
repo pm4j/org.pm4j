@@ -62,7 +62,7 @@ import org.pm4j.core.util.reflection.BeanAttrArrayList;
 import org.pm4j.core.util.reflection.ClassUtil;
 
 /**
- * Provides base functionality if presentation model classes.
+ * Provides common presentation model base functionality.
  *
  * @author olaf boede
  */
@@ -1096,6 +1096,11 @@ public abstract class PmObjectBase implements PmObject {
 
   /**
    * Provides subclass specific style class definitions.
+   * <p>
+   * This base implementation provides style classes for active messages
+   * that are related to this PM.<br>
+   * See: {@link Severity#getStyleClass()}.
+   *
    *
    * @param styleClassSet The container to add the style classes to.
    */

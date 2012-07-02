@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 import org.pm4j.core.exception.PmConverterException;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmAspect;
@@ -305,6 +306,33 @@ public final class PmUtil {
   @SuppressWarnings("unchecked")
   public static String convertToString(PmAttr<?> pmAttr, Object v) {
     return ((PmAttrBase<Object, ?>)pmAttr).valueToStringImpl(v);
+  }
+
+  /**
+   * Provides the a space separated lists of style classes for the given PM.
+   *
+   * @param viewMap
+   *          An optional mapper that generates style classes according to PM
+   *          states.
+   * @param pm
+   *          The PM that provides the style classes (by calling {@link PmObject#getPmStyleClasses()}.
+   * @param fixStyleClass
+   *          An optional string with fix style definitions to be added to the PM provided style classes.
+   * @return All style classes to be applied to the PM.
+   */
+  public static String getStyleClassesString(PmObject pm, String fixStyleClass) {
+    if (pm != null) {
+      Set<String> styleClasses = pm.getPmStyleClasses();
+      if (! styleClasses.isEmpty()) {
+        StringBuilder sb = new StringBuilder(StringUtils.join(styleClasses, " "));
+        if (StringUtils.isNotBlank(fixStyleClass)) {
+          sb.append(" ").append(fixStyleClass);
+        }
+        return sb.toString();
+      }
+    }
+
+    return StringUtils.defaultString(fixStyleClass);
   }
 
   /**

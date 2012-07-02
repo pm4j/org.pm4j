@@ -17,7 +17,6 @@ import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmOption;
 import org.pm4j.core.pm.PmOptionSet;
-import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.impl.PmUtil;
 import org.pm4j.swing.pb.base.PbJComponentToAttrBase;
 

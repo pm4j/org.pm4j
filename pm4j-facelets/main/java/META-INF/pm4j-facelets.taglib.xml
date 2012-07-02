@@ -129,8 +129,8 @@
 
 	<function>
 		<function-name>pmStyleClasses</function-name>
-        <function-class>org.pm4j.web.PmViewUtil</function-class>
-		<function-signature>java.lang.String pmStyleClasses(org.pm4j.core.pm.PmObject, java.lang.String)</function-signature>
+        <function-class>org.pm4j.core.pm.impl.PmUtil</function-class>
+		<function-signature>java.lang.String getStyleClassesString(org.pm4j.core.pm.PmObject, java.lang.String)</function-signature>
 	</function>
 	<function>
 		<!-- Deprecated! -->

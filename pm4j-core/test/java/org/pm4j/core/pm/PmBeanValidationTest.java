@@ -13,10 +13,13 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.pm4j.core.pm.annotation.PmBeanCfg;
+import org.pm4j.core.pm.annotation.PmBoolean;
+import org.pm4j.core.pm.annotation.PmValidationCfg;
 import org.pm4j.core.pm.impl.PmAttrIntegerImpl;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
 import org.pm4j.core.pm.impl.PmBeanImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
+import org.pm4j.core.pm.impl.PmElementBase;
 
 /**
  * Tests JSR-303 bean validation support.
@@ -51,6 +54,11 @@ public class PmBeanValidationTest {
     public MyBeanPm(PmObject pmParent, MyBean b) {
       super(pmParent, b);
     }
+  }
+
+  @PmValidationCfg(useJavaxValidationForBeans=PmBoolean.FALSE)
+  public static class ElementThatSwitchesBeanValidationOff extends PmElementBase  {
+    public ElementThatSwitchesBeanValidationOff(PmObject pmParent) { super(pmParent); }
   }
 
   private PmConversation pmConversation;

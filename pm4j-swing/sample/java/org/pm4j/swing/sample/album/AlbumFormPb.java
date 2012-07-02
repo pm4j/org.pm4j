@@ -36,6 +36,8 @@ public class AlbumFormPb extends PbFormBase<AlbumForm, AlbumFormPm> {
 
 
   public static void main(String[] args) {
+    PmEventApi.setApiHandler(new PmEventApiHandler.WithThreadLocalEventSource());
+
     JDialog dlg = new JDialog((Frame) null, "Album Demo Application", true);
 
     AlbumForm form = new AlbumFormPb().build(null,
@@ -46,7 +48,6 @@ public class AlbumFormPb extends PbFormBase<AlbumForm, AlbumFormPm> {
     dlg.setSize(450, 200);
     dlg.setLocationRelativeTo(null); // centered
     dlg.setVisible(true);
-    PmEventApi.setApiHandler(new PmEventApiHandler.WithThreadLocalEventSource());
   }
 
 }

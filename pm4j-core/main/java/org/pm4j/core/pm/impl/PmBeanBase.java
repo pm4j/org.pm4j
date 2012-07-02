@@ -18,6 +18,8 @@ import org.pm4j.core.pm.PmMessage.Severity;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmTable;
 import org.pm4j.core.pm.annotation.PmBeanCfg;
+import org.pm4j.core.pm.annotation.PmBoolean;
+import org.pm4j.core.pm.annotation.PmValidationCfg;
 import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmExpressionApi;
@@ -300,6 +302,7 @@ public abstract class PmBeanBase<T_BEAN>
   public void pmValidate() {
     super.pmValidate();
     if (getPmBean() != null &&
+        getOwnMetaData().validateUsesBeanValidation &&
         PmMessageUtil.getSubTreeMessages(this, Severity.ERROR).size() == 0) {
       Validator validator = PmImplUtil.getBeanValidator();
       if (validator != null) {
@@ -409,6 +412,19 @@ public abstract class PmBeanBase<T_BEAN>
     if (myMetaData.beanClass == null) {
       throw new IllegalArgumentException("Missing annotation " + PmBeanCfg.class.getSimpleName() + " for class " + getClass());
     }
+
+    // Check if bean validation can be used:
+    // Use the nearest definition found within the PM parent hierarchy.
+    // If not found: Use the default (true)
+    List<PmObject> list = PmUtil.getPmHierarchy(this, true);
+    for (PmObject p : list) {
+      PmValidationCfg vcfg = AnnotationUtil.findAnnotation((PmObjectBase)p, PmValidationCfg.class);
+      if (vcfg != null && vcfg.useJavaxValidationForBeans() != PmBoolean.UNDEFINED) {
+        myMetaData.validateUsesBeanValidation = (vcfg.useJavaxValidationForBeans() == PmBoolean.TRUE);
+        break;
+      }
+    }
+
   }
 
   /**
@@ -420,6 +436,8 @@ public abstract class PmBeanBase<T_BEAN>
     private boolean autoCreateBean = false;
     private String beanPropertyKey = "";
     private BeanAttrAccessor idAttrAccessor;
+    private boolean validateUsesBeanValidation = true;
+
   }
 
   private final MetaData getOwnMetaDataAndEnsurePmInit() {
