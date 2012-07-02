@@ -538,8 +538,10 @@ public abstract class PmObjectBase implements PmObject {
         pmParent.ensurePmMetaDataInitialization();
       }
       if (pmMetaData == null) {
-        // prevent concurrent double initialization:
-        synchronized(getClass()) {
+        // Prevent concurrent double initialization.
+        // Can't be done on class level because of
+        // http://bugs.sun.com/bugdatabase/view_bug.do;jsessionid=82a8144e020c83fd1bd1bd741b6e?bug_id=7031759
+        synchronized(pmKeyToMetaDataMap) {
           try {
             zz_initMetaData(pmParent, (String) null, false, false);
           }
@@ -607,10 +609,10 @@ public abstract class PmObjectBase implements PmObject {
 
       setPmMetaData(pmKeyToMetaDataMap.get(key));
       if (pmMetaData == null) {
-
-        // With this double synchronization it should be OK to have a non-
-        // synchronized meta data map.
-        synchronized (getClass()) {
+        // Double check with synchronization to ensure maximum get performance and to ensure that
+        // meta data for each PM class gets initialized only once.
+        // This can't be done on class level because of http://bugs.sun.com/bugdatabase/view_bug.do;jsessionid=82a8144e020c83fd1bd1bd741b6e?bug_id=7031759
+        synchronized (pmKeyToMetaDataMap) {
           setPmMetaData(pmKeyToMetaDataMap.get(key));
           if (pmMetaData == null) {
             setPmMetaData(makeMetaData());
