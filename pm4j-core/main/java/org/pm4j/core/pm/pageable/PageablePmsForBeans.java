@@ -175,12 +175,6 @@ public class PageablePmsForBeans<T_PM extends PmBean<T_BEAN>, T_BEAN> implements
       PmEventApi.firePmEventIfInitialized(pmCtxt, PmEvent.SELECTION_CHANGE);
     }
   }
-  public void select(T_PM item) {
-    select(item, true);
-  }
-  public void deSelect(T_PM item) {
-    select(item, false);
-  }
 
   @Override
   public boolean isMultiSelect() {

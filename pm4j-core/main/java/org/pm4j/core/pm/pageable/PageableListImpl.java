@@ -199,12 +199,6 @@ public class PageableListImpl<T_ITEM> implements PageableCollection<T_ITEM> {
       selectedItems.remove(item);
     }
   }
-  public void select(T_ITEM item) {
-    select(item, true);
-  }
-  public void deSelect(T_ITEM item) {
-    selectedItems.remove(item);
-  }
 
   @Override
   public boolean isMultiSelect() {

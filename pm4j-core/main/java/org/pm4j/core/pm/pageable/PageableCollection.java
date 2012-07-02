@@ -89,24 +89,6 @@ public interface PageableCollection<T_ITEM> {
   void setItemFilter(Filter filter);
 
   /**
-   * Provides a filter that will be applied to the items of the backing
-   * collection.
-   * <p>
-   * In case of a simple collection (without backing collection), the filter
-   * will be applied to the items of this collection.
-   *
-   * @param filter
-   *          The item filter to use.<br>
-   *          May be <code>null</code> to switch filtering off.
-   */
-//  void setBackingItemFilter(Filter filter);
-
-  /**
-   * @return The current filter definition for the backing collection.
-   */
-//  Filter getBackingItemFilter();
-
-  /**
    * @return The total number of objects within this set.
    *         <p>
    *         A filter definition may influence this number.
@@ -140,29 +122,14 @@ public interface PageableCollection<T_ITEM> {
   boolean isSelected(T_ITEM item);
 
   /**
-   * Adds the given item to the set of selected items.
+   * Adds/removes the given item to/from the set of selected items.
    * <p>
-   * Has no effect if the item is already selected.
+   * Has no effect if the item is already selected/de-selected.
    *
    * @param item
    *          The item to select.
    */
   void select(T_ITEM item, boolean select);
-  @Deprecated
-  void select(T_ITEM item);
-  @Deprecated
-  void deSelect(T_ITEM item);
-
-
-  /**
-   * Removes the given item from the set of selected items.
-   * <p>
-   * Has no effect if the item was not selected.
-   *
-   * @param item
-   *          The item to deselect.
-   */
-//  void deSelect(T_ITEM item);
 
   /**
    * @return <code>true</code> if more than one item can be selected.
