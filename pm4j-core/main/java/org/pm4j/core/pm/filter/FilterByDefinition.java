@@ -39,11 +39,6 @@ public interface FilterByDefinition {
   Object getDefaultFilterByValue();
 
   /**
-   * @return Type of the value to enter.
-   */
-  Class<?> getValueType();
-
-  /**
    * Defines if this filter filters the beans behind the item PMs or directly the item PMs.
    * <p>
    * An example: In a UserTablePm we have rows of type UserPm and behind these rows beans of type UserBean.<br>

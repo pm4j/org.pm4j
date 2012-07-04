@@ -35,11 +35,6 @@ public class FilterByPmAttrValueLocalized extends FilterByPmAttrBase<String> {
   }
 
   @Override
-  public Class<?> getValueType() {
-    return String.class;
-  }
-
-  @Override
   protected boolean doesItemMatchImpl(PmAttr<?> pmAttr, CompOp compOp, String filterValue) {
     return compOp.doesValueMatch(pmAttr.getValueLocalized(), filterValue);
   }

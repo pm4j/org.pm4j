@@ -32,11 +32,6 @@ public class FilterByPmAttrValue extends FilterByPmAttrBase<Object> {
   }
 
   @Override
-  public Class<?> getValueType() {
-    return Comparable.class;
-  }
-
-  @Override
   protected boolean doesItemMatchImpl(PmAttr<?> pmAttr, CompOp compOp, Object filterValue) {
     try {
       Object filterObj = (filterValue instanceof String)
