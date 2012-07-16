@@ -6,9 +6,11 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.pm4j.core.pm.PmBean;
+import org.pm4j.core.pm.PmCommandDecorator;
 import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmTable;
+import org.pm4j.core.pm.PmTable.TableChange;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmFactoryApi;
 import org.pm4j.core.pm.filter.Filter;
@@ -29,7 +31,7 @@ import org.pm4j.core.pm.filter.Filter;
 // TODO olaf: control/ensure that the PM factory releases the PMs for the beans that are no longer on the current page.
 public class PageablePmsForBeans<T_PM extends PmBean<T_BEAN>, T_BEAN> implements PageableCollection<T_PM> {
 
-  private PmObject                   pmCtxt;
+  private PmTable<T_PM>             pmCtxt;
   private PageableCollection<T_BEAN> beans;
 
   /**
@@ -165,14 +167,23 @@ public class PageablePmsForBeans<T_PM extends PmBean<T_BEAN>, T_BEAN> implements
 
   @Override
   public void select(T_PM item, boolean doSelect) {
-    boolean wasUnselected = !isSelected(item);
-    T_BEAN b = item != null
-        ? item.getPmBean()
-        : null;
-    beans.select(b, doSelect);
-    // fire the event after successful select
-    if(wasUnselected) {
-      PmEventApi.firePmEventIfInitialized(pmCtxt, PmEvent.SELECTION_CHANGE);
+    boolean prevSelectionStatus = isSelected(item);
+    T_BEAN b = item != null ? item.getPmBean() : null;
+    Collection<PmCommandDecorator> decorators = pmCtxt.getDecorators(TableChange.SELECTION);
+    boolean beforeSuccess = true;
+    for (PmCommandDecorator pmCommandDecorator : decorators) {
+      // ignore beforeDo outcome
+      beforeSuccess = beforeSuccess && pmCommandDecorator.beforeDo(null);
+    }
+    if (beforeSuccess) {
+      beans.select(b, doSelect);
+      for (PmCommandDecorator pmCommandDecorator : decorators) {
+        pmCommandDecorator.afterDo(null);
+      }
+      // fire the event after successful select
+      if (prevSelectionStatus != doSelect) {
+        PmEventApi.firePmEventIfInitialized(pmCtxt, PmEvent.SELECTION_CHANGE);
+      }
     }
   }
 
