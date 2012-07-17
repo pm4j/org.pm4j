@@ -10,7 +10,6 @@ import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.annotation.PmBeanCfg;
 import org.pm4j.core.pm.annotation.PmFactoryCfg;
 import org.pm4j.core.pm.filter.CombinedBy;
-import org.pm4j.core.pm.filter.Filter;
 import org.pm4j.core.pm.filter.FilterByDefinitionProvider;
 import org.pm4j.core.pm.filter.FilterItem;
 import org.pm4j.core.pm.filter.FilterSet;
@@ -55,15 +54,11 @@ public class PmFilterSetBase extends PmBeanBase<FilterSet> implements PmFilterSe
    */
   @Override
   protected FilterSet findPmBeanImpl() {
-    FilterSet fs = null;
     // 1. Get the already existing filter to display.
     if (filterable != null) {
-      Filter f = filterable.getFilter(filterId);
-      if (f instanceof FilterSetFilter) {
-        fs = ((FilterSetFilter)f).getFilterSet();
-        if (fs != null) {
-          return fs;
-        }
+      FilterSet fs = FilterSetUtil.findActiveFilterSet(filterable, filterId);
+      if (fs != null) {
+        return fs;
       }
     }
 

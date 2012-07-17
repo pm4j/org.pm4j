@@ -4,9 +4,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.pm4j.core.pm.filter.Filter;
 import org.pm4j.core.pm.filter.FilterByDefinition;
 import org.pm4j.core.pm.filter.FilterItem;
 import org.pm4j.core.pm.filter.FilterSet;
+import org.pm4j.core.pm.filter.Filterable;
+import org.pm4j.core.pm.filter.PmFilterSet;
 
 
 /**
@@ -15,6 +18,23 @@ import org.pm4j.core.pm.filter.FilterSet;
  * @author olaf boede
  */
 public class FilterSetUtil {
+
+  /**
+   * Looks for an active {@link FilterSet} within a given {@link Filterable}.
+   *
+   * @param filterable The {@link Filterable} that may have an active {@link FilterSet} for the given id.
+   * @param filterId The filter identifier. E.g. {@link PmFilterSet#USER_FILTER_SET_ID}.
+   * @return The found active {@link FilterSet} or <code>null</code>.
+   */
+  public static FilterSet findActiveFilterSet(Filterable filterable, String filterId) {
+    FilterSet fs = null;
+    Filter f = filterable.getFilter(filterId);
+
+    if (f instanceof FilterSetFilter) {
+      fs = ((FilterSetFilter)f).getFilterSet();
+    }
+    return fs;
+  }
 
   /**
    * Creates a {@link FilterSet} with a define number of filter items (filter
