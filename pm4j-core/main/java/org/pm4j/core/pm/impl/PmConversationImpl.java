@@ -2,7 +2,9 @@ package org.pm4j.core.pm.impl;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -362,6 +364,32 @@ public class PmConversationImpl extends PmElementBase implements PmConversation 
     return list;
   }
 
+  @Override
+  public Collection<PmObject> getPmsWithInvalidValues() {
+    if (pmInvalidValues.isEmpty()) {
+      return Collections.emptyList();
+    }
+
+    Collection<PmObject> pms = new HashSet<PmObject>();
+
+    synchronized (pmInvalidValues) {
+      Iterator<WeakReference<SetValueContainer<?>>> iter = pmInvalidValues.iterator();
+      while (iter.hasNext()) {
+        WeakReference<SetValueContainer<?>> ref = iter.next();
+        SetValueContainer<?> value = ref.get();
+        // immediate cleanup of garbage collected items
+        if (value == null) {
+          iter.remove();
+          // XXX olaf: double check if null can ever happen.
+        } else if (value.getPm() != null) {
+          pms.add(value.getPm());
+        }
+      }
+    }
+
+    return pms;
+  }
+
   /**
    * Removes a single message.
    *
@@ -405,30 +433,6 @@ public class PmConversationImpl extends PmElementBase implements PmConversation 
           }
         }
       }
-    }
-  }
-
-  /**
-   * Clears:
-   * <ul>
-   *   <li>All messages of all models within this conversation.</li>
-   *   <li>The not validated attribute values of all elements within this conversation.</li>
-   * <ul>
-   */
-  @Override
-  public void clearPmInvalidValues() {
-    boolean debugEnabled = LOG.isDebugEnabled();
-    synchronized(pmInvalidValues) {
-      for (WeakReference<SetValueContainer<?>> ref : pmInvalidValues) {
-        SetValueContainer<?> value = ref.get();
-        if (value != null) {
-          if (debugEnabled) {
-            LOG.debug("Cleaning invalid value state for attribute '" + PmUtil.getPmLogString(value.getPm()) + "'.");
-          }
-          PmValidationApi.clearInvalidValuesOfSubtree(value.getPm());
-        }
-      }
-      pmInvalidValues.clear();
     }
   }
 

@@ -9,6 +9,7 @@ import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmEventListener;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.api.PmEventApi;
+import org.pm4j.core.pm.api.PmValidationApi;
 
 /**
  * A registry that observes changes of items within parent PM.
@@ -117,6 +118,7 @@ public class ChangedChildStateRegistry {
   }
 
   public void clearChangedItems() {
+    PmValidationApi.clearInvalidValuesOfSubtree(observedRootPm);
     changedItemPms.clear();
     recordsDeleted = false;
   }

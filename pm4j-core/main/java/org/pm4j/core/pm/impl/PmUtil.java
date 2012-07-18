@@ -217,8 +217,9 @@ public final class PmUtil {
    *
    * @param parentCandidate The parent candidate.
    * @param childCandidate The child candidate.
-   * @return <code>true</code> if the given child has the given PM as parent.
+   * @return <code>true</code> if the given child has the given PM as parent or is the parent object itself.
    */
+  // TODO: rename to something like isChildOrSelf
   public static boolean isChild(PmObject parentCandidate, PmObject childCandidate) {
     PmObject pm = childCandidate;
 

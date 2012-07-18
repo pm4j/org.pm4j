@@ -93,7 +93,14 @@ public final class PmValidationApi {
    * Clears not yet validated values within the scope of this PM.
    */
   public static void clearInvalidValuesOfSubtree(PmObject pm) {
-    ((PmObjectBase)pm).clearPmInvalidValues();
+    for (PmObject p : pm.getPmConversation().getPmsWithInvalidValues()) {
+      if (PmUtil.isChild(pm, p)) {
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("Cleaning invalid value state for attribute '" + PmUtil.getPmLogString(p) + "'.");
+        }
+        ((PmObjectBase)p).clearPmInvalidValues();
+      }
+    }
   }
 
   /**

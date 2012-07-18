@@ -477,7 +477,9 @@ public class PmTableImpl
 
   // TODO olaf: move two methode to a value change util: set individual and sub-tree changed states
   void setPmValueChanged(boolean newChangedState) {
-    changedStateRegistry.clearChangedItems();
+    if (newChangedState == false) {
+      changedStateRegistry.clearChangedItems();
+    }
   }
 
   /**

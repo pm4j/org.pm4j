@@ -46,6 +46,7 @@ import org.pm4j.core.pm.annotation.PmTitleCfg;
 import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmMessageUtil;
+import org.pm4j.core.pm.api.PmValidationApi;
 import org.pm4j.core.pm.impl.cache.PmCacheLog;
 import org.pm4j.core.pm.impl.cache.PmCacheStrategy;
 import org.pm4j.core.pm.impl.cache.PmCacheStrategyBase;
@@ -1079,13 +1080,15 @@ public abstract class PmObjectBase implements PmObject {
   }
 
   /**
-   * Clears not yet validated values within the scope of this PM.
+   * Clears:
+   * <ul>
+   *   <li>All invalid attribute value messages within the scope of this PM.</li>
+   *   <li>The not validated attribute values within the scope of this PM.</li>
+   * <ul>
    */
   public void clearPmInvalidValues() {
     PmEventApi.ensureThreadEventSource(this);
-    for (PmObject p : getPmChildren()) {
-      ((PmObjectBase)p).clearPmInvalidValues();
-    }
+    PmValidationApi.clearInvalidValuesOfSubtree(this);
   }
 
   @Override

@@ -1,5 +1,6 @@
 package org.pm4j.core.pm;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -49,10 +50,10 @@ public interface PmConversation extends PmElement {
    *          language of the Java VM.
    */
   void setPmLocale(Locale locale);
-  
+
   /**
    * Used for date conversions.
-   * 
+   *
    * @return The time zone that is used within this conversation.<br>
    *         Returns never <code>null</code>.
    */
@@ -85,6 +86,13 @@ public interface PmConversation extends PmElement {
    * @return The messages. An empty collection if there are no messages.
    */
   List<PmMessage> getPmMessages(PmObject forPm, Severity severity);
+
+  /**
+   * Provides all PM's (attributes) with invalid attribute values.
+   *
+   * @return The PM collection. Never <code>null</code>.
+   */
+  Collection<PmObject> getPmsWithInvalidValues();
 
   /**
    * @return <code>true</code> when any validation has failed and/or another
