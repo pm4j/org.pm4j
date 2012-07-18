@@ -14,6 +14,7 @@ import org.pm4j.core.pm.PmTabSet;
 import org.pm4j.core.pm.annotation.PmCommandCfg;
 import org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO;
 import org.pm4j.core.pm.impl.connector.PmTabSetConnector;
+import org.pm4j.navi.NaviLink;
 
 /**
  * Basic implementation of a {@link PmTabSet}.
@@ -86,10 +87,7 @@ public class PmTabSetImpl extends PmElementImpl implements PmTabSet {
 
     PmTabChangeCommand executedCommand = (PmTabChangeCommand) tabChangeCommand.doIt();
 
-    if (executedCommand.getCommandState() == CommandState.EXECUTED) {
-      currentTabPm = toTab;
-    }
-    else if (LOG.isDebugEnabled()) {
+    if (LOG.isDebugEnabled() && executedCommand.getCommandState() != CommandState.EXECUTED) {
       String msg = "The UI logic prevented a switch from tab " + PmUtil.getPmLogString(_fromTab) + " to " +
           PmUtil.getPmLogString(toTab) + ".";
 
@@ -238,6 +236,11 @@ public class PmTabSetImpl extends PmElementImpl implements PmTabSet {
       setUndoCommand(new PmTabChangeCommand(tabSet, toTab, fromTab));
     }
 
+    @Override
+    protected NaviLink afterDo(boolean changeCommandHistory) {
+      tabSet.currentTabPm = toTab;
+      return super.afterDo(changeCommandHistory);
+    }
   }
 
   /**
