@@ -8,7 +8,6 @@ import java.util.List;
 import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmCommandDecorator;
 import org.pm4j.core.pm.PmEvent;
-import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmTable;
 import org.pm4j.core.pm.PmTable.TableChange;
 import org.pm4j.core.pm.api.PmEventApi;
@@ -167,7 +166,17 @@ public class PageablePmsForBeans<T_PM extends PmBean<T_BEAN>, T_BEAN> implements
 
   @Override
   public void select(T_PM item, boolean doSelect) {
-    boolean prevSelectionStatus = isSelected(item);
+    // do nothing if the selection status will not be changed.
+    if (doSelect == isSelected(item)) {
+      return;
+    }
+
+    // FIXME olaf: report the automatic de-selection in case of single-select.
+    //  Idea: create a kind of selection event that contains info about the old and the new
+    //        selection state.
+    //        This could also be used to prevent a flood of selection change events for cases
+    //        like 'selectAll'...
+
     T_BEAN b = item != null ? item.getPmBean() : null;
     Collection<PmCommandDecorator> decorators = pmCtxt.getDecorators(TableChange.SELECTION);
     boolean beforeSuccess = true;
@@ -181,9 +190,7 @@ public class PageablePmsForBeans<T_PM extends PmBean<T_BEAN>, T_BEAN> implements
         pmCommandDecorator.afterDo(null);
       }
       // fire the event after successful select
-      if (prevSelectionStatus != doSelect) {
-        PmEventApi.firePmEventIfInitialized(pmCtxt, PmEvent.SELECTION_CHANGE);
-      }
+      PmEventApi.firePmEventIfInitialized(pmCtxt, PmEvent.SELECTION_CHANGE);
     }
   }
 
