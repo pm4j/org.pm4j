@@ -158,7 +158,7 @@ public abstract class PmBeanBase<T_BEAN>
     // This is not done if the bean gets set within the initialization phase.
     // Otherwise we get the risk if initialization race conditions.
     if (pmInitState == PmInitState.INITIALIZED) {
-      new SetPmBeanEventVisitor(PmEvent.ALL_CHANGE_EVENTS & PmEvent.RELOAD).visit(this);
+      new SetPmBeanEventVisitor(PmEvent.ALL_CHANGE_EVENTS | PmEvent.RELOAD).visit(this);
     }
   }
 
