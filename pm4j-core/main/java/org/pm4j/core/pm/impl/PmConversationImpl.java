@@ -43,7 +43,7 @@ public class PmConversationImpl extends PmElementBase implements PmConversation 
   private Locale pmLocale;
   private TimeZone pmTimeZone = TimeZone.getDefault();
   private PmExceptionHandler pmExceptionHandler;
-  private PmToViewTechnologyConnector pmViewConnector;
+  private PmToViewTechnologyConnector pmToViewTechnologyConnector;
 
   /**
    * Configurable default settings for this conversation.
@@ -144,7 +144,7 @@ public class PmConversationImpl extends PmElementBase implements PmConversation 
 
   @Override
   public NaviHistory getPmNaviHistory() {
-    return getViewConnector().getNaviHistory();
+    return getPmToViewTechnologyConnector().getNaviHistory();
   }
 
   @Override
@@ -219,8 +219,8 @@ public class PmConversationImpl extends PmElementBase implements PmConversation 
     return result;
   }
 
-  public void setPmViewConnector(PmToViewTechnologyConnector navigationHandler) {
-    this.pmViewConnector = navigationHandler;
+  public void setPmToViewTechnologyConnector(PmToViewTechnologyConnector navigationHandler) {
+    this.pmToViewTechnologyConnector = navigationHandler;
   }
 
   /**
@@ -230,19 +230,19 @@ public class PmConversationImpl extends PmElementBase implements PmConversation 
    *         returned.<br>
    *         Will never return <code>null</code>.
    */
-  public PmToViewTechnologyConnector getViewConnector() {
+  public PmToViewTechnologyConnector getPmToViewTechnologyConnector() {
     PmToViewTechnologyConnector result;
-    if (pmViewConnector != null) {
-      result = pmViewConnector;
+    if (pmToViewTechnologyConnector != null) {
+      result = pmToViewTechnologyConnector;
     }
     else {
       if (getPmParent() != null) {
-        result = pmViewConnector = ((PmConversationImpl)getPmParentConversation()).getViewConnector();
+        result = pmToViewTechnologyConnector = ((PmConversationImpl)getPmParentConversation()).getPmToViewTechnologyConnector();
       }
       else {
         // Root conversation without explicitly defined handler.
         // A default handler will be defined on the fly here:
-        result = pmViewConnector = new PmToNoViewTechnologyConnector();
+        result = pmToViewTechnologyConnector = new PmToNoViewTechnologyConnector();
       }
     }
     return result;

@@ -2,14 +2,13 @@ package org.pm4j.jsf.connector;
 
 import java.util.Map;
 
-import javax.faces.application.FacesMessage;
-import javax.faces.application.FacesMessage.Severity;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.pm4j.core.pm.PmMessage;
+import org.pm4j.core.pm.PmAttr;
+import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmTabSet;
 import org.pm4j.core.pm.impl.connector.NamedObjectResolver;
 import org.pm4j.core.pm.impl.connector.NamedObjectResolverNullImpl;
@@ -146,6 +145,18 @@ public class PmConnectorForJsf implements PmToViewTechnologyConnector {
   public PmTabSetConnector createTabSetConnector(PmTabSet pmTabSet) {
     return new PmTabSetConnectorDefaultImpl();
   }
+
+  @Override
+  public Object createPmToViewAdapter(PmObject pm) {
+    if (pm instanceof PmAttr) {
+      return new JsfViewAdapterForPmAttrWithValueChangeListener((PmAttr<?>)pm);
+    }
+
+    // default:
+    return null;
+  }
+
+
 
 //  private Severity pmSeverityToFacesSeverity(PmMessage.Severity pmSeverity) {
 //    switch (pmSeverity) {

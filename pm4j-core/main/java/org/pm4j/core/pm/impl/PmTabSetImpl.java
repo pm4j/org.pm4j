@@ -49,7 +49,7 @@ public class PmTabSetImpl extends PmElementImpl implements PmTabSet {
   @Override
   protected void onPmInit() {
     super.onPmInit();
-    pmToTabSetViewConnector = getPmConversationImpl().getViewConnector().createTabSetConnector(this);
+    pmToTabSetViewConnector = getPmConversationImpl().getPmToViewTechnologyConnector().createTabSetConnector(this);
 
     assert pmToTabSetViewConnector != null;
   }

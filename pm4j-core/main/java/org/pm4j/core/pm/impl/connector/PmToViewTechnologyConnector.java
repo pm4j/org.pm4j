@@ -1,5 +1,6 @@
 package org.pm4j.core.pm.impl.connector;
 
+import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmTabSet;
 import org.pm4j.navi.NaviHistory;
 import org.pm4j.navi.impl.NaviLinkImpl;
@@ -87,5 +88,18 @@ public interface PmToViewTechnologyConnector {
    * @return The view technology specific tab set connector.
    */
   PmTabSetConnector createTabSetConnector(PmTabSet pmTabSet);
+
+  /**
+   * Provides a view technology specific connector.
+   * <p>
+   * An example use case:<br>
+   * For some JSF use cases it makes sense to set attribute values using a
+   * valueChangeListener. For such scenarios a JSF connector may provide
+   * a connector instance having a corresponding value change listener method.
+   *
+   * @param pm The PM to create a connector for.
+   * @return The view technology specific connector.
+   */
+  Object createPmToViewAdapter(PmObject pm);
 
 }

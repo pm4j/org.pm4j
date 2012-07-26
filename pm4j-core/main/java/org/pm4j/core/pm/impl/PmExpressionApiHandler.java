@@ -67,7 +67,7 @@ public class PmExpressionApiHandler {
   protected static Object _findNamedObjectImpl(PmObject pm, String objName) {
     Object result = null;
     PmConversationImpl pmConversation = (PmConversationImpl)pm.getPmConversation();
-    PmToViewTechnologyConnector viewTechnologyConnector = pmConversation.getViewConnector();
+    PmToViewTechnologyConnector viewTechnologyConnector = pmConversation.getPmToViewTechnologyConnector();
     NaviHistory h = viewTechnologyConnector.getNaviHistory();
 
     if (h != null) {

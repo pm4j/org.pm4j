@@ -5,10 +5,13 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.pm4j.core.pm.PmAttr;
+import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmTabSet;
 import org.pm4j.core.pm.impl.connector.PmTabSetConnector;
 import org.pm4j.core.pm.impl.connector.PmTabSetConnectorDefaultImpl;
 import org.pm4j.core.pm.impl.connector.PmToViewTechnologyConnector;
+import org.pm4j.jsf.connector.JsfViewAdapterForPmAttrWithValueChangeListener;
 import org.pm4j.jsf.impl.PmToJsfConnectorImpl;
 import org.pm4j.jsf.util.JsfUtil;
 import org.pm4j.jsf.util.NaviJsfUtil;
@@ -125,6 +128,16 @@ public class PmConnectorForJsf implements PmToViewTechnologyConnector {
   @Override
   public PmTabSetConnector createTabSetConnector(PmTabSet pmTabSet) {
     return new PmTabSetConnectorDefaultImpl();
+  }
+
+  @Override
+  public Object createPmToViewAdapter(PmObject pm) {
+    if (pm instanceof PmAttr) {
+      return new JsfViewAdapterForPmAttrWithValueChangeListener((PmAttr<?>)pm);
+    }
+
+    // default:
+    return null;
   }
 
   // -- getter setter --

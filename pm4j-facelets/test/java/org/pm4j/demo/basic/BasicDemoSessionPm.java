@@ -11,7 +11,7 @@ public class BasicDemoSessionPm extends PmConversationImpl {
 
 	public BasicDemoSessionPm() {
 		// FIXME olaf: Try to configure that externally only...
-		setPmViewConnector(new PmConnectorForJsf());
+		setPmToViewTechnologyConnector(new PmConnectorForJsf());
 	}
 
 }

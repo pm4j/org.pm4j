@@ -16,20 +16,20 @@ public class PmCacheStrategyRequest extends PmCacheStrategyBase<PmObjectBase> {
 
   @Override
   protected Object readRawValue(PmObjectBase pm) {
-    return pmConversationImplOf(pm).getViewConnector()
+    return pmConversationImplOf(pm).getPmToViewTechnologyConnector()
               .readRequestAttribute(getCacheIdentity(pm));
   }
 
   @Override
   protected void writeRawValue(PmObjectBase pm, Object value) {
-    pmConversationImplOf(pm).getViewConnector().setRequestAttribute(
+    pmConversationImplOf(pm).getPmToViewTechnologyConnector().setRequestAttribute(
         getCacheIdentity(pm), value);
   }
 
   @Override
   protected void clearImpl(PmObjectBase pm) {
     // TODO: Aus removeAttribute weiterleiten.
-    pmConversationImplOf(pm).getViewConnector().setRequestAttribute(
+    pmConversationImplOf(pm).getPmToViewTechnologyConnector().setRequestAttribute(
         getCacheIdentity(pm), null);
   }
 

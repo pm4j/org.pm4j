@@ -3,6 +3,7 @@ package org.pm4j.core.pm.impl.connector;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmTabSet;
 import org.pm4j.navi.NaviHistory;
 import org.pm4j.navi.NaviLink;
@@ -72,4 +73,8 @@ public class PmToNoViewTechnologyConnector implements PmToViewTechnologyConnecto
     return new PmTabSetConnectorDefaultImpl();
   }
 
+  @Override
+  public Object createPmToViewAdapter(PmObject pm) {
+    return null;
+  }
 }

@@ -822,7 +822,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
    *         within the given request.
    */
   private T_PM_VALUE getDefaultValueFromRequest() {
-    String reqValue = getPmConversationImpl().getViewConnector().readRequestValue(getPmName());
+    String reqValue = getPmConversationImpl().getPmToViewTechnologyConnector().readRequestValue(getPmName());
     try {
       return (reqValue != null)
                 ? stringToValueImpl(reqValue)

@@ -335,7 +335,7 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
     NaviLink prevLink = h.getPrevOrStartLink(linksToSkip);
     // FIXME: in case of some links to skip, the backPos has to be read from the
     //        history item before the link to go back to.
-    String backPos = getPmConversationImpl().getViewConnector().readRequestValue(NaviLink.BACK_POS_PARAM);
+    String backPos = getPmConversationImpl().getPmToViewTechnologyConnector().readRequestValue(NaviLink.BACK_POS_PARAM);
 
     return backPos != null
           ? new NaviLinkImpl((NaviLinkImpl)prevLink, backPos)
@@ -680,7 +680,7 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
           LOG.debug("Command '" + PmUtil.getPmLogString(this) + "' redirects to '" + link + "'.");
         }
 
-        getPmConversationImpl().getViewConnector().redirect((NaviLinkImpl)link);
+        getPmConversationImpl().getPmToViewTechnologyConnector().redirect((NaviLinkImpl)link);
       }
     }
     else {
