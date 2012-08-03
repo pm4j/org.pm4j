@@ -462,11 +462,11 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
         if (resData == null) {
           // XXX olaf: That happens in case of program bugs.
           // Should we re-throw the exception here?
-          zz_setAndPropagateInvalidValue(vc, PmConstants.MSGKEY_VALIDATION_CONVERSION_FROM_STRING_FAILED, getPmShortTitle());
+          setAndPropagateInvalidValue(vc, PmConstants.MSGKEY_VALIDATION_CONVERSION_FROM_STRING_FAILED, getPmShortTitle());
           LOG.error(e.getMessage(), e);
         }
         else {
-          zz_setAndPropagateInvalidValue(vc, resData.msgKey, resData.msgArgs);
+          setAndPropagateInvalidValue(vc, resData.msgKey, resData.msgArgs);
           if (LOG.isDebugEnabled()) {
             LOG.debug("String to value conversion failed in attribute '" + PmUtil.getPmLogString(this) + "'. String value: " + text);
           }
@@ -476,7 +476,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
         PmResourceData resData = e.getResourceData();
         Object[] args = Arrays.copyOf(resData.msgArgs, resData.msgArgs.length+1);
         args[resData.msgArgs.length] = getPmShortTitle();
-        zz_setAndPropagateInvalidValue(vc, resData.msgKey, args);
+        setAndPropagateInvalidValue(vc, resData.msgKey, args);
         if (LOG.isDebugEnabled()) {
           LOG.debug("String to value conversion failed in attribute '" + PmUtil.getPmLogString(this) +
               "'. String value: '" + text +
@@ -484,7 +484,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
         }
         return;
       } catch (RuntimeException e) {
-        zz_setAndPropagateInvalidValue(vc, PmConstants.MSGKEY_VALIDATION_CONVERSION_FROM_STRING_FAILED, getPmShortTitle());
+        setAndPropagateInvalidValue(vc, PmConstants.MSGKEY_VALIDATION_CONVERSION_FROM_STRING_FAILED, getPmShortTitle());
         if (LOG.isDebugEnabled()) {
           LOG.debug("String to value conversion failed in attribute '" + PmUtil.getPmLogString(this) + "'. String value: " + text,
               e);
@@ -594,7 +594,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
 
       // Ensure that primitive types will not be set to null.
       if ((newPmValue == null) && getOwnMetaData().primitiveType) {
-        zz_setAndPropagateInvalidValue(value, PmConstants.MSGKEY_VALIDATION_MISSING_REQUIRED_VALUE);
+        setAndPropagateInvalidValue(value, PmConstants.MSGKEY_VALIDATION_MISSING_REQUIRED_VALUE);
         return false;
       }
 
@@ -613,7 +613,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
         }
         catch (PmValidationException e) {
           PmResourceData resData = e.getResourceData();
-          zz_setAndPropagateInvalidValue(value, resData.msgKey, resData.msgArgs);
+          setAndPropagateInvalidValue(value, resData.msgKey, resData.msgArgs);
           return false;
         }
       }
@@ -662,11 +662,35 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
       }
     }
     catch (RuntimeException e) {
-      PmRuntimeException pmex = new PmRuntimeException(this, "Unable to set value: " + value, e);
-      // handle exception
-      getPmConversationImpl().getPmExceptionHandler().onException(this, pmex, false);
+      handleSetValueException(value, e);
       return false;
     }
+  }
+
+  /**
+   * Gets called whenever the {@link #setValueImpl(SetValueContainer)} method fails with an exception.
+   * <p>
+   * These exceptions are not conversion and validation errors. They are already handled.
+   * <p>
+   * The default implementation
+   * <ul>
+   *  <li>logs an error,</li>
+   *  <li>reports a message {@link PmConstants#MSGKEY_SET_VALUE_EXCEPTION} with the root cause message.</li>
+   *  <li>and keeps internally the invalid value.</li>
+   * </ul>
+   *
+   * @param value The value that can't be applied.
+   * @param e The exception.
+   */
+  protected void handleSetValueException(SetValueContainer<T_PM_VALUE> value, Throwable e) {
+    LOG.error("Unable to set '" + getPmRelativeName() + "' to " + value, e);
+
+    Throwable cause = e;
+    while (cause.getCause() != null && cause.getCause() != cause) {
+      cause = cause.getCause();
+    }
+
+    setAndPropagateInvalidValue(value, PmConstants.MSGKEY_SET_VALUE_EXCEPTION, getPmTitle(), cause.getMessage());
   }
 
   /**
@@ -880,7 +904,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
 
   /**
    * Sets the invalid value and propagates a {@link PmValidationMessage} to the
-   * session.
+   * conversation.
    *
    * @param invValue
    *          The invalid value.
@@ -889,7 +913,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
    * @param msgArgs
    *          Values for the user message.
    */
-  private void zz_setAndPropagateInvalidValue(SetValueContainer<T_PM_VALUE> invValue, String msgKey, Object... msgArgs) {
+  protected void setAndPropagateInvalidValue(SetValueContainer<T_PM_VALUE> invValue, String msgKey, Object... msgArgs) {
     zz_getDataContainer().invalidValue = invValue;
     this.getPmConversationImpl().addPmMessage(new PmValidationMessage(this, invValue, msgKey, msgArgs));
     PmEventApi.firePmEvent(this, getOwnMetaData().validationChangeEventMask);

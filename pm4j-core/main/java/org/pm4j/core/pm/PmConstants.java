@@ -41,6 +41,8 @@ public class PmConstants {
   public static final String MSGKEY_VALIDATION_VALUE_TOO_LOW                 = "pmAttr_validationValueTooLow";
   public static final String MSGKEY_VALIDATION_VALUE_TOO_HIGH                = "pmAttr_validationValueTooHigh";
   public static final String MSGKEY_VALIDATION_READONLY                      = "pmAttr_validationReadonly";
+  /** A message like: Unable to set value in field "{field-title}": {exception-message} */
+  public static final String MSGKEY_SET_VALUE_EXCEPTION                      = "pmAttr_setValueException";
 
   /**
    * A resource key for cached exceptions. The first Parameter of the resource is used to transfer the exception message.
