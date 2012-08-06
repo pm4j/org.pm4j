@@ -32,6 +32,7 @@ public abstract class PmBeanBase<T_BEAN>
       extends PmElementBase
       implements PmBean<T_BEAN> {
 
+  /** The bean data object behind this PM. */
   private T_BEAN pmBean;
 
   /**
@@ -139,6 +140,8 @@ public abstract class PmBeanBase<T_BEAN>
       // This is not done if the bean gets set within the initialization phase.
       // Otherwise we get the risk if initialization race conditions.
       if (pmInitState == PmInitState.INITIALIZED) {
+        // the cached dynamic sub PMs are obsolete after switching to a new bean value.
+        BeanPmCacheUtil.clearBeanPmCachesOfSubtree(this);
         new SetPmBeanEventVisitor(PmEvent.ALL_CHANGE_EVENTS).visit(this);
       }
     }
@@ -158,11 +161,13 @@ public abstract class PmBeanBase<T_BEAN>
     // This is not done if the bean gets set within the initialization phase.
     // Otherwise we get the risk if initialization race conditions.
     if (pmInitState == PmInitState.INITIALIZED) {
+      // the cached dynamic sub PMs are obsolete after switching to a new bean value.
+      BeanPmCacheUtil.clearBeanPmCachesOfSubtree(this);
       new SetPmBeanEventVisitor(PmEvent.ALL_CHANGE_EVENTS | PmEvent.RELOAD).visit(this);
     }
   }
 
-  private boolean doSetPmBean(T_BEAN bean) {
+  /* package */ boolean doSetPmBean(T_BEAN bean) {
     if (pmBean == bean) {
       return false;
     }
@@ -200,8 +205,6 @@ public abstract class PmBeanBase<T_BEAN>
 
     @Override
     protected void onVisit(PmObject pm) {
-      // the cached dynamic sub PMs are obsolete after switching to a new bean value.
-      BeanPmCacheUtil.clearBeanPmCache(pm);
       PmEventApi.firePmEvent(pm, eventMask);
       for (PmObject child : PmUtil.getPmChildren(pm)) {
         // Switch for each child to an event that is related to the child.
@@ -350,7 +353,9 @@ public abstract class PmBeanBase<T_BEAN>
       pmEmbeddingBeanPmValueChangeListener = new PmEventListener() {
         @Override
         public void handleEvent(PmEvent event) {
-          setPmBean(null);
+          // Re-sets the pmBean without calling setPmBean() to prevent additional event propagations.
+          // The handler gets actually called within an event propagation that was triggered by the parent.
+          doSetPmBean(null);
         }
       };
 

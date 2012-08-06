@@ -10,10 +10,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmBean;
+import org.pm4j.core.pm.PmObject;
 
 class BeanPmCacheImpl implements BeanPmCache {
 
-  @SuppressWarnings("unused")
   private static final Log LOG = LogFactory.getLog(BeanPmCacheImpl.class);
 
   private Map<Object, WeakReference<PmBean<?>>> beanEqualToPmMap = new WeakHashMap<Object, WeakReference<PmBean<?>>>();
@@ -35,6 +35,10 @@ class BeanPmCacheImpl implements BeanPmCache {
     Object bean = pmElement.getPmBean();
     BeanIdentity beanIdentity = new BeanIdentity(bean);
     WeakReference<PmBean<?>> pmRef = new WeakReference<PmBean<?>>(pmElement);
+
+    if (LOG.isTraceEnabled()) {
+      LOG.trace(this + ": added PM '" + logString(pmElement) + "' for bean: " + bean);
+    }
 
     // Add it to the identity map. The bean should not yet be registered there.
     WeakReference<PmBean<?>> oldPmRef = beanIdentityToPmMap.put(beanIdentity, pmRef);
@@ -97,6 +101,11 @@ class BeanPmCacheImpl implements BeanPmCache {
   @Override
   public void removePm(PmBean<?> pmBean) {
     Object bean = pmBean.getPmBean();
+
+    if (LOG.isTraceEnabled()) {
+      LOG.trace(this + ": removed PM '" + logString(pmBean) + "' for bean: " + bean);
+    }
+
     pmToBeanIdentityMap.remove(pmBean);
     if (bean != null) {
       beanEqualToPmMap.remove(bean);
@@ -107,6 +116,11 @@ class BeanPmCacheImpl implements BeanPmCache {
   @Override
   public void removeBean(Object bean) {
     WeakReference<PmBean<?>> pmRef = beanIdentityToPmMap.remove(bean);
+
+    if (LOG.isTraceEnabled()) {
+      LOG.trace(this + ": removed bean '" + bean + "' cached PM was: " + (pmRef != null ? logString(pmRef.get()) : null));
+    }
+
     if (pmRef != null && pmRef.get() != null) {
       pmToBeanIdentityMap.remove(pmRef.get());
     }
@@ -118,11 +132,24 @@ class BeanPmCacheImpl implements BeanPmCache {
 
   @Override
   public void clear() {
+    int size = pmToBeanIdentityMap.size();
+    if (size > 0 && LOG.isTraceEnabled()) {
+      LOG.trace(this + ": clear called. Removed " + size + " entries.");
+      for (Object o : beanEqualToPmMap.keySet()) {
+        LOG.trace("  cleared bean reference: " + o);
+      }
+    }
+
     pmToBeanIdentityMap.clear();
     beanEqualToPmMap.clear();
     beanIdentityToPmMap.clear();
   }
 
+  private String logString(PmObject pm) {
+    return pm != null
+        ? (PmInitApi.isPmInitialized(pm) ? pm.getPmRelativeName() : pm.getClass().getSimpleName()) + "(" + Integer.toHexString(pm.hashCode()) + ")"
+        : null;
+  }
 
   /**
    * Holds only a weak reference to the referenced bean.
