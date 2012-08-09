@@ -11,6 +11,7 @@ import org.pm4j.core.pm.impl.PmConversationImpl;
 
 public class PmLocalizeApiTest {
 
+  /** An anonymous class is used because the default resource loader uses... */
   private PmConversation pmCtxt = new PmConversationImpl() {};
 
   @Before
@@ -32,6 +33,12 @@ public class PmLocalizeApiTest {
   }
 
   @Test
+  public void testLocalizeWithParameterSet() {
+    assertEquals("Resource string parameters are embedded in the localized string.",
+        "Item 2 of 20", PmLocalizeApi.localize(pmCtxt, "pmLocalizeApiTest.localizeWithParameterSet", 2, 20));
+  }
+
+  @Test
   public void testFindLocalization() {
     assertEquals("Find an existing the English resource string.",
         "A simple text", PmLocalizeApi.findLocalization(pmCtxt, "pmLocalizeApiTest.simpleText"));
@@ -48,6 +55,36 @@ public class PmLocalizeApiTest {
     pmCtxt.setPmLocale(Locale.GERMAN);
     assertEquals("Get a resource that is defined only in English (default language) for German locale. - Provides the English default text.",
         "Default language text", PmLocalizeApi.localize(pmCtxt, "pmLocalizeApiTest.simpleTextDefinedOnlyForDefaultLanguage"));
+  }
+
+  @Test
+  public void testLocalizeOneOrMany() {
+    assertEquals("If the provided number argument is 1, the resource key with the _one gets used.",
+        "A single item", PmLocalizeApi.localizeOneOrMany(pmCtxt, "pmLocalizeApiTest.oneOrManyItems", 1));
+    assertEquals("If the provided number argument is greter than one, the resource key with the _many gets used."
+        + "The number parameter is the first resource string parameter in this case.",
+        "3 items", PmLocalizeApi.localizeOneOrMany(pmCtxt, "pmLocalizeApiTest.oneOrManyItems", 3));
+  }
+
+  @Test
+  public void testLocalizeNoneOneOrMany() {
+    assertEquals("If the provided number argument is zero, the resource key with the _none gets used.",
+        "No item found", PmLocalizeApi.localizeOneOrMany(pmCtxt, "pmLocalizeApiTest.noneOneOrManyItems", 0));
+    assertEquals("If the provided number argument is 1, the resource key with the _one gets used.",
+        "A single item", PmLocalizeApi.localizeOneOrMany(pmCtxt, "pmLocalizeApiTest.noneOneOrManyItems", 1));
+    assertEquals("If the provided number argument is greter than one, the resource key with the _many gets used."
+        + "The number parameter is the first resource string parameter in this case.",
+        "3 items", PmLocalizeApi.localizeOneOrMany(pmCtxt, "pmLocalizeApiTest.noneOneOrManyItems", 3));
+  }
+
+  @Test
+  public void testLocalizeItemsWithNoneFallback() {
+    assertEquals("If the provided number argument is zero, the resource key with the _none gets used.",
+        "There is no item.", PmLocalizeApi.localizeOneOrMany(pmCtxt, "pmLocalizeApiTest.itemsWithNoneFallback", 0));
+    assertEquals("If the provided number argument is 1, the provided resource key will be used directly since there is no key with the _one postfix defined.",
+        "1 items", PmLocalizeApi.localizeOneOrMany(pmCtxt, "pmLocalizeApiTest.itemsWithNoneFallback", 1));
+    assertEquals("If the provided number argument is greter than one, the provided resource key will be used directly since there is no key with the _many postfix defined.",
+        "3 items", PmLocalizeApi.localizeOneOrMany(pmCtxt, "pmLocalizeApiTest.itemsWithNoneFallback", 3));
   }
 
 }

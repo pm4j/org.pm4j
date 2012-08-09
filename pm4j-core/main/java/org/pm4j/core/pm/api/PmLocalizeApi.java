@@ -1,5 +1,7 @@
 package org.pm4j.core.pm.api;
 
+import java.text.MessageFormat;
+
 import org.pm4j.common.util.collection.ArrayUtil;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmAttr;
@@ -7,8 +9,25 @@ import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.impl.PmLocalizeApiHandler;
 import org.pm4j.core.pm.impl.PmObjectBase;
 import org.pm4j.core.pm.impl.ResKeyUtil;
+import org.pm4j.core.pm.impl.title.ClassPathResourceStringProvider;
 import org.pm4j.core.pm.impl.title.ResourceStringProvider;
 
+/**
+ * The localization api provides support for resource string localization.
+ * <p>
+ * For information about resource string parameter interpretation see
+ * {@link MessageFormat}.
+ * <p>
+ * The resources are located using a {@link ResourceStringProvider} which may be
+ * configured by a call to
+ * {@link #setResourceStringProvider(ResourceStringProvider)}.
+ * <p>
+ * The default {@link ResourceStringProvider} is
+ * {@link ClassPathResourceStringProvider} which parses the package tree to find
+ * a resource file with the matching resource key.
+ *
+ * @author olaf boede
+ */
 public final class PmLocalizeApi {
 
   private static PmLocalizeApiHandler apiHandler = new PmLocalizeApiHandler();
@@ -74,6 +93,8 @@ public final class PmLocalizeApi {
    * <li>localizeOneOrMany("myKey", 0) - provides the string for the resource
    * key 'myKey_none'</li>
    * </ul>
+   * If one of number related the postfixed keys (e.g. myKey_none) is not defined,
+   * the base key will be used as the fallback defintion (e.g. myKey instead of myKey_none).
    *
    * @param keybase
    *          A resource key base that will be concatenated with 'one' or
@@ -91,15 +112,11 @@ public final class PmLocalizeApi {
     Object[] resArgsWithNumber = ArrayUtil.copyOf(resArgs, resArgs.length+1, 1);
     resArgsWithNumber[0] = number;
 
-    return localize(pm, key, resArgsWithNumber);
-  }
+    String text = findLocalization(pm, key, resArgsWithNumber);
+    return (text != null)
+        ? text
+        : localize(pm, keybase, resArgsWithNumber);
 
-  /**
-   * Calls {@link #localizeOneOrMany(String, int, Object...)} with the resource
-   * key provided by {@link #getPmResKey()}.
-   */
-  public static String localizeOneOrMany(PmObject pm, int number, Object... resArgs) {
-    return localizeOneOrMany(pm, ((PmObjectBase)pm).getPmResKey(), number, resArgs);
   }
 
   /**
@@ -111,21 +128,13 @@ public final class PmLocalizeApi {
    * @param resStringArgs Optional resource string arguments.
    * @return The localized string.
    * @throws PmRuntimeException if no localization for the given key was found.
+   * @deprecated Please use PmLocalizeApi.findLocalization(this, getResKey() + "myPostfix")
    */
+  @Deprecated
   public static String findLocalizationWithPfx(PmObject pm, String key, Object... resStringArgs) {
     return findLocalization(pm, ((PmObjectBase)pm).getPmResKeyBase() + key, resStringArgs);
   }
 
-  /**
-   * Provides a localization based on a key and option resource string arguments.
-   *
-   * @param key A resource key with
-   * @param resStringArgs Optional resource string arguments.
-   * @return The localized string or <code>null</code> when no localization is available.
-   */
-  public static String localizeWithPfx(PmObject pm, String key, Object... resStringArgs) {
-    return localize(pm, ((PmObjectBase)pm).getPmResKeyBase() + key, resStringArgs);
-  }
 
   /**
    * @param resourceStringProvider The algorithm that provides resource strings for given resource keys.
