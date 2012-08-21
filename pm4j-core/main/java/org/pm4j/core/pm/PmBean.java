@@ -24,6 +24,23 @@ public interface PmBean<T_BEAN> extends PmElement {
   T_BEAN getPmBean();
 
   /**
+   * Re-associates the PM to another bean instance and fires all change events
+   * for this instance and all children.
+   *
+   * @param bean The new bean behind this PM.
+   */
+  void setPmBean(T_BEAN bean);
+
+  /**
+   * Re-associates the PM to a reloaded bean instance and fires all change events
+   * for this instance and all children.<br>
+   * The fired change event also has the flag {@link PmEvent#RELOAD}.
+   *
+   * @param bean The new bean behind this PM.
+   */
+  void reloadPmBean(T_BEAN reloadedBean);
+
+  /**
    * @return The class of the bean behind this PM.
    */
   Class<?> getPmBeanClass();

@@ -134,6 +134,7 @@ public abstract class PmBeanBase<T_BEAN>
    *
    * @param bean The new bean behind this PM.
    */
+  @Override
   public void setPmBean(T_BEAN bean) {
     if (doSetPmBean(bean)) {
       // Inform all sub PMs.
@@ -154,6 +155,7 @@ public abstract class PmBeanBase<T_BEAN>
    *
    * @param bean The new bean behind this PM.
    */
+  @Override
   public void reloadPmBean(T_BEAN reloadedBean) {
     doSetPmBean(reloadedBean);
 
