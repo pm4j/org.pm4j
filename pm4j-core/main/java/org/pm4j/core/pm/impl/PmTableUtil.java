@@ -5,9 +5,10 @@ import java.util.List;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmElement;
 import org.pm4j.core.pm.PmObject;
+import org.pm4j.core.pm.PmPager.PagerVisibility;
 import org.pm4j.core.pm.PmTable;
 import org.pm4j.core.pm.PmTableCol;
-import org.pm4j.core.pm.PmPager.PagerVisibility;
+import org.pm4j.core.pm.impl.changehandler.DetailsPmHandler;
 
 /**
  * Some table related helper functions.
@@ -68,6 +69,23 @@ public final class PmTableUtil {
       throw new PmRuntimeException(column, "No corresponding table row cell PM found in row: " + rowElement);
     }
     return pm;
+  }
+
+  /**
+   * Adds a details change handler to a table that should know about the changes
+   * reported by the change handler.
+   *
+   * @param pmTable
+   *          The table that should consider the details changes.
+   * @param handler
+   *          The handler that reports changes that are related to the content
+   *          handled within the table.
+   * @return The passed handler (for inline code style support).
+   */
+  public static <T extends DetailsPmHandler> T addDetailsPmHandler(PmTable<?> pmTable, T handler) {
+    PmTableImpl<?> pmTableImpl = (PmTableImpl<?>) pmTable;
+    pmTableImpl.changedStateRegistry.addDetailsPmHandler(handler);
+    return handler;
   }
 
 }

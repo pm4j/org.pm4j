@@ -1,5 +1,6 @@
-package org.pm4j.core.pm.impl;
+package org.pm4j.core.pm.impl.changehandler;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.IdentityHashMap;
 import java.util.Map;
@@ -39,6 +40,8 @@ public class ChangedChildStateRegistry {
   /** Listens for changed state changes in the subtree and updates the changedRows accordingly. */
   private PmChangeListener itemHierarchyChangeListener = new PmChangeListener();
 
+  private Collection<DetailsPmHandler> detailsPmHandlers = new ArrayList<DetailsPmHandler>();
+
   /**
    * @param observedRootPm The PM to observe the child item change states for.
    * @param itemPmClass The class of the child items to observe.
@@ -59,9 +62,24 @@ public class ChangedChildStateRegistry {
     });
   }
 
+  /**
+   * Adds a {@link DetailsPmHandler} to consider for changed state information.
+   *
+   * @param detailsPmHandler
+   */
+  public void addDetailsPmHandler(DetailsPmHandler detailsPmHandler) {
+    detailsPmHandlers.add(detailsPmHandler);
+  }
+
+  /**
+   * Checks if something is changed within the observed scope.
+   *
+   * @return <code>true</code> if there is a registered change.
+   */
   public boolean isAChangeRegistered() {
     return recordsDeleted ||
-           ! changedItemPms.isEmpty();
+           ! changedItemPms.isEmpty() ||
+           isDetailsChangeRegistered();
   }
 
   protected PmDataInput findChildItemToObserve(PmObject changedItem) {
@@ -87,6 +105,16 @@ public class ChangedChildStateRegistry {
 
     // the changed item is not a child of the observed PM.
     return null;
+  }
+
+  private boolean isDetailsChangeRegistered() {
+    for (DetailsPmHandler d : detailsPmHandlers) {
+      if (d.isDetailsChangeRegistered()) {
+        return true;
+      }
+    }
+    // no change
+    return false;
   }
 
   /** Listens for changed state changes in the subtree and updates the changedRows accordingly. */

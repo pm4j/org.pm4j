@@ -32,6 +32,7 @@ import org.pm4j.core.pm.api.PmMessageUtil;
 import org.pm4j.core.pm.filter.Filter;
 import org.pm4j.core.pm.filter.FilterByDefinition;
 import org.pm4j.core.pm.filter.MultiFilter;
+import org.pm4j.core.pm.impl.changehandler.ChangedChildStateRegistry;
 import org.pm4j.core.pm.pageable.PageableCollection;
 import org.pm4j.core.pm.pageable.PageableListImpl;
 import org.pm4j.core.util.reflection.ClassUtil;
@@ -71,7 +72,7 @@ public class PmTableImpl
   private Integer numOfPageRows;
 
   /** Handles the changed state of the table. */
-  private final ChangedChildStateRegistry changedStateRegistry = new ChangedChildStateRegistry(this);
+  /* package */ final ChangedChildStateRegistry changedStateRegistry = new ChangedChildStateRegistry(this);
 
   /** The set of decorators for various table change kinds. */
   private Map<TableChange, PmCommandDecoratorSetImpl> changeDecoratorMap = Collections.emptyMap();
@@ -177,7 +178,7 @@ public class PmTableImpl
       pageableCollection.setItemFilter(rowFilter);
     }
   }
-  
+
   @SuppressWarnings({ "unchecked", "rawtypes" })
   @Override
   public List<T_ROW_ELEMENT_PM> getRowsWithChanges() {
