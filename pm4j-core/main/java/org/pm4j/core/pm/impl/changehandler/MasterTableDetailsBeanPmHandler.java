@@ -97,7 +97,10 @@ public class MasterTableDetailsBeanPmHandler<T_DETAILS_BEAN> implements DetailsP
     @SuppressWarnings("unchecked")
     protected void setDetailsForSelectedRow() {
         PmBean<?> row = (PmBean<?>) masterTablePm.getSelectedRow();
-        ((PmBeanBase<Object>) detailsPm).setPmBean(row.getPmBean());
+        Object bean = (row != null)
+                ? row.getPmBean()
+                : null;
+        ((PmBeanBase<Object>) detailsPm).setPmBean(bean);
     }
 
     /**
