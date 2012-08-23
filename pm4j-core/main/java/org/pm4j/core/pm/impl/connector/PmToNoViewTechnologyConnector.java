@@ -4,7 +4,6 @@ import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.pm4j.core.pm.PmObject;
-import org.pm4j.core.pm.PmTabSet;
 import org.pm4j.navi.NaviHistory;
 import org.pm4j.navi.NaviLink;
 import org.pm4j.navi.impl.NaviLinkImpl;
@@ -69,12 +68,7 @@ public class PmToNoViewTechnologyConnector implements PmToViewTechnologyConnecto
   }
 
   @Override
-  public PmTabSetConnector createTabSetConnector(PmTabSet pmTabSet) {
-    return new PmTabSetConnectorDefaultImpl();
-  }
-
-  @Override
-  public Object createPmToViewAdapter(PmObject pm) {
+  public Object createPmToViewConnector(PmObject pm) {
     return null;
   }
 }

@@ -9,11 +9,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmObject;
-import org.pm4j.core.pm.PmTabSet;
 import org.pm4j.core.pm.impl.connector.NamedObjectResolver;
 import org.pm4j.core.pm.impl.connector.NamedObjectResolverNullImpl;
-import org.pm4j.core.pm.impl.connector.PmTabSetConnector;
-import org.pm4j.core.pm.impl.connector.PmTabSetConnectorDefaultImpl;
 import org.pm4j.core.pm.impl.connector.PmToViewTechnologyConnector;
 import org.pm4j.jsf.PmToJsfConnector;
 import org.pm4j.jsf.impl.PmToJsfConnectorImpl;
@@ -142,14 +139,9 @@ public class PmConnectorForJsf implements PmToViewTechnologyConnector {
   }
 
   @Override
-  public PmTabSetConnector createTabSetConnector(PmTabSet pmTabSet) {
-    return new PmTabSetConnectorDefaultImpl();
-  }
-
-  @Override
-  public Object createPmToViewAdapter(PmObject pm) {
+  public Object createPmToViewConnector(PmObject pm) {
     if (pm instanceof PmAttr) {
-      return new JsfViewAdapterForPmAttrWithValueChangeListener((PmAttr<?>)pm);
+      return new AttrToJsfViewConnectorWithValueChangeListener((PmAttr<?>)pm);
     }
 
     // default:

@@ -1,7 +1,6 @@
 package org.pm4j.core.pm.impl.connector;
 
 import org.pm4j.core.pm.PmObject;
-import org.pm4j.core.pm.PmTabSet;
 import org.pm4j.navi.NaviHistory;
 import org.pm4j.navi.impl.NaviLinkImpl;
 
@@ -82,14 +81,6 @@ public interface PmToViewTechnologyConnector {
   Object findNamedObject(String attrName);
 
   /**
-   * Provides a view technology specific connector for tab views.
-   *
-   * @param pmTabSet The tab set model to get a connector for.
-   * @return The view technology specific tab set connector.
-   */
-  PmTabSetConnector createTabSetConnector(PmTabSet pmTabSet);
-
-  /**
    * Provides a view technology specific connector.
    * <p>
    * An example use case:<br>
@@ -98,8 +89,8 @@ public interface PmToViewTechnologyConnector {
    * a connector instance having a corresponding value change listener method.
    *
    * @param pm The PM to create a connector for.
-   * @return The view technology specific connector.
+   * @return The view technology specific component connector.
    */
-  Object createPmToViewAdapter(PmObject pm);
+  Object createPmToViewConnector(PmObject pm);
 
 }

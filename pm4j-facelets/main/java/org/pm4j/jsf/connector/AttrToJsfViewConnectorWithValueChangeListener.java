@@ -16,11 +16,11 @@ import org.pm4j.core.pm.PmAttr;
  *
  * @author olaf boede
  */
-public class JsfViewAdapterForPmAttrWithValueChangeListener {
+public class AttrToJsfViewConnectorWithValueChangeListener {
 
   private final PmAttr<?> pmAttr;
 
-  public JsfViewAdapterForPmAttrWithValueChangeListener(PmAttr<?> pmAttr) {
+  public AttrToJsfViewConnectorWithValueChangeListener(PmAttr<?> pmAttr) {
     this.pmAttr = pmAttr;
   }
 

@@ -25,9 +25,6 @@ public class PmTabSetImpl extends PmElementImpl implements PmTabSet {
 
   private static final Log LOG = LogFactory.getLog(PmTabSetImpl.class);
 
-  /** A view technology specific tab set logic connector. */
-  private PmTabSetConnector pmToTabSetViewConnector;
-
   /** The set of tab switch command decorator definitions. */
   private List<CmdDecoratorDefintion> pmCmdDecoratorDefinitions = new ArrayList<CmdDecoratorDefintion>();
 
@@ -44,14 +41,6 @@ public class PmTabSetImpl extends PmElementImpl implements PmTabSet {
 
   public PmTabSetImpl(PmObject pmParent) {
     super(pmParent);
-  }
-
-  @Override
-  protected void onPmInit() {
-    super.onPmInit();
-    pmToTabSetViewConnector = getPmConversationImpl().getPmToViewTechnologyConnector().createTabSetConnector(this);
-
-    assert pmToTabSetViewConnector != null;
   }
 
   /**
@@ -158,9 +147,8 @@ public class PmTabSetImpl extends PmElementImpl implements PmTabSet {
   /**
    * @return A view technology specific tab set logic connector.
    */
-  public PmTabSetConnector getPmToTabSetViewConnector() {
-    zz_ensurePmInitialization();
-    return pmToTabSetViewConnector;
+  private PmTabSetConnector getPmToTabSetViewConnector() {
+    return (PmTabSetConnector) getPmToViewConnector();
   }
 
   /**
@@ -231,7 +219,10 @@ public class PmTabSetImpl extends PmElementImpl implements PmTabSet {
 
     @Override
     protected void doItImpl() {
-      tabSet.getPmToTabSetViewConnector()._switchToTab(toTab);
+      PmTabSetConnector viewConnector = tabSet.getPmToTabSetViewConnector();
+      if (viewConnector != null) {
+        viewConnector._switchToTab(toTab);
+      }
       // Only successfully executed tab switches need to be undone.
       setUndoCommand(new PmTabChangeCommand(tabSet, toTab, fromTab));
     }

@@ -34,4 +34,8 @@ public class PmInitApi {
     return pmAttr;
   }
 
+  public static void ensurePmInitialization(PmObject pm) {
+    ((PmObjectBase)pm).zz_ensurePmInitialization();
+  }
+
 }

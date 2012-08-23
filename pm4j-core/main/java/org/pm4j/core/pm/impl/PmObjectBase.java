@@ -72,7 +72,7 @@ public abstract class PmObjectBase implements PmObject {
   private static final Log LOG = LogFactory.getLog(PmObjectBase.class);
 
   /** Indicator for view adapters . */
-  private static String VIEW_ADAPTER_NOT_YET_INITIALIZED = "The view adapter is not yet initialized.";
+  private static String PM_TO_VIEW_CONNECTOR_NOT_YET_INITIALIZED = "The PM to view connector is not yet initialized.";
 
   /**
    * The parent context, this PM was created in.
@@ -115,10 +115,10 @@ public abstract class PmObjectBase implements PmObject {
 
   /**
    * An optional view technology specific adapter class.<br>
-   * If {@link #getPmViewAdapter()} was not yet called it is <code>null</code>.<br>
+   * If {@link #getPmToViewConnector()} was not yet called it is <code>null</code>.<br>
    * If there is no view technology connector available, this member will be set to a self-reference.
    */
-  private Object pmViewAdapter = VIEW_ADAPTER_NOT_YET_INITIALIZED;
+  private Object pmToViewConnector = PM_TO_VIEW_CONNECTOR_NOT_YET_INITIALIZED;
 
   /** Logger for cache usage statistics. */
   protected static final PmCacheLog pmCacheLog = new PmCacheLog();
@@ -481,11 +481,11 @@ public abstract class PmObjectBase implements PmObject {
    *
    * @return The view adapter or <code>null</code> if none is available (needed) for the view technology.
    */
-  public Object getPmViewAdapter() {
-    if (pmViewAdapter == VIEW_ADAPTER_NOT_YET_INITIALIZED) {
-      pmViewAdapter = getPmConversationImpl().getPmToViewTechnologyConnector().createPmToViewAdapter(this);
+  public Object getPmToViewConnector() {
+    if (pmToViewConnector == PM_TO_VIEW_CONNECTOR_NOT_YET_INITIALIZED) {
+      pmToViewConnector = getPmConversationImpl().getPmToViewTechnologyConnector().createPmToViewConnector(this);
     }
-    return pmViewAdapter;
+    return pmToViewConnector;
   }
 
   @Override
