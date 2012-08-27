@@ -40,7 +40,7 @@ public class ChangedChildStateRegistry {
   /** Listens for changed state changes in the subtree and updates the changedRows accordingly. */
   private PmChangeListener itemHierarchyChangeListener = new PmChangeListener();
 
-  private Collection<DetailsPmHandler> detailsPmHandlers = new ArrayList<DetailsPmHandler>();
+  private Collection<MasterDetailsPmHandler> detailsPmHandlers = new ArrayList<MasterDetailsPmHandler>();
 
   /**
    * @param observedRootPm The PM to observe the child item change states for.
@@ -63,11 +63,11 @@ public class ChangedChildStateRegistry {
   }
 
   /**
-   * Adds a {@link DetailsPmHandler} to consider for changed state information.
+   * Adds a {@link MasterDetailsPmHandler} to consider for changed state information.
    *
    * @param detailsPmHandler
    */
-  public void addDetailsPmHandler(DetailsPmHandler detailsPmHandler) {
+  public void addDetailsPmHandler(MasterDetailsPmHandler detailsPmHandler) {
     detailsPmHandlers.add(detailsPmHandler);
   }
 
@@ -108,8 +108,8 @@ public class ChangedChildStateRegistry {
   }
 
   private boolean isDetailsChangeRegistered() {
-    for (DetailsPmHandler d : detailsPmHandlers) {
-      if (d.isDetailsChangeRegistered()) {
+    for (MasterDetailsPmHandler d : detailsPmHandlers) {
+      if (d.isChangeRegistered()) {
         return true;
       }
     }

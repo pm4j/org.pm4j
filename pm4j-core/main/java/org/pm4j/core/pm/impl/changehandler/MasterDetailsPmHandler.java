@@ -1,0 +1,63 @@
+package org.pm4j.core.pm.impl.changehandler;
+
+import java.util.Set;
+
+import org.pm4j.core.pm.PmDataInput;
+import org.pm4j.core.pm.PmEvent;
+import org.pm4j.core.pm.PmTable;
+import org.pm4j.core.pm.impl.PmTableUtil;
+
+/**
+ * Interface for handlers that observes changes within some details area. The
+ * observed details changes can be inclueded in value change identification of
+ * the 'master' PM.
+ * <p>
+ * For master tables you may add a details change handler by calling
+ * {@link PmTableUtil#addDetailsPmHandler(org.pm4j.core.pm.PmTable, DetailsPmHandlerImpl)}
+ * .<br>
+ * After that call, the changes observed by the details handler are considered
+ * in the <code>isPmValueChanged()</code> result of the master table.
+ *
+ * @author olaf boede
+ */
+public interface MasterDetailsPmHandler {
+
+  /**
+   * Indicates if changes occurred within the handled details area.
+   * <p>
+   * Considered time: The time span after the last {@link PmEvent#VALUE_CHANGE}
+   * sent by the master PM.<br>
+   * If there was not yet a master value change, it's the live time of the master.
+   *
+   * @return <code>true</code> .
+   */
+  boolean isChangeRegistered();
+
+  /**
+   * Provides the set of master record beans, a change in the details area was observed for.
+   * <p>
+   * A change handler that can't provide the detailled set of changed beans may
+   * provide here <code>null</code>.<br>
+   * In this case the table uses only the information provided by
+   * {@link #isChangeRegistered()}.
+   *
+   * @return The changed bean set.<br>
+   *         <code>null</code> if that detailed information level is not
+   *         supported.
+   */
+  Set<?> getChangedMasterBeans();
+
+  /**
+   * This method needs to be called once before the handler gets active.
+   * This is usually internally done within {@link PmTableUtil#addDetailsPmHandler(PmTable, MasterDetailsPmHandler)}.
+   */
+  void startObservers();
+
+  /**
+   * Provides the details PM specific handler.
+   *
+   * @return The configured {@link DetailsPmHandlerImpl}.
+   */
+  DetailsPmHandler<? extends PmDataInput> getDetailsPmHandler();
+
+}

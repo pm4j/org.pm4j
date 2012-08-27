@@ -8,7 +8,7 @@ import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmPager.PagerVisibility;
 import org.pm4j.core.pm.PmTable;
 import org.pm4j.core.pm.PmTableCol;
-import org.pm4j.core.pm.impl.changehandler.DetailsPmHandler;
+import org.pm4j.core.pm.impl.changehandler.MasterDetailsPmHandler;
 
 /**
  * Some table related helper functions.
@@ -82,9 +82,10 @@ public final class PmTableUtil {
    *          handled within the table.
    * @return The passed handler (for inline code style support).
    */
-  public static <T extends DetailsPmHandler> T addDetailsPmHandler(PmTable<?> pmTable, T handler) {
+  public static <T extends MasterDetailsPmHandler> T addDetailsPmHandler(PmTable<?> pmTable, T handler) {
     PmTableImpl<?> pmTableImpl = (PmTableImpl<?>) pmTable;
     pmTableImpl.changedStateRegistry.addDetailsPmHandler(handler);
+    handler.startObservers();
     return handler;
   }
 

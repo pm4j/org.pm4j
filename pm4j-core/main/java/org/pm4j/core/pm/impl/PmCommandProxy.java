@@ -63,7 +63,14 @@ public class PmCommandProxy extends PmCommandImpl {
     public void setDelegateCmd(PmCommand delegateCmd) {
         this.delegateCmd = delegateCmd;
     }
-    
+
+    /**
+     * @return The command that defines the logic. May be <code>null</code> if there is no delegate configured.
+     */
+    public PmCommand getDelegateCmd() {
+      return delegateCmd;
+    }
+
     @Override
     protected boolean isPmEnabledImpl() {
         return delegateCmd != null
