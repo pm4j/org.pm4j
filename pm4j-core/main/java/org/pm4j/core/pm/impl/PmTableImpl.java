@@ -384,7 +384,10 @@ public class PmTableImpl
       }
 
       this.sortCol = sortCol;
+      applySortOrder();
+    }
 
+    private void applySortOrder() {
       if (sortCol != null) {
         PmSortOrder order = sortCol.getSortOrderAttr().getValue();
 
@@ -548,7 +551,16 @@ public class PmTableImpl
       pageableCollection.setItemFilter(rowFilter);
     }
 
-    if (!preserveSettings) {
+    if (preserveSettings) {
+      if (sortOrderSelection.sortCol != null) {
+        // re-apply the current sort order.
+        sortOrderSelection.applySortOrder();
+      }
+      else {
+        applyDefaultSortOrder();
+      }
+    }
+    else {
       applyDefaultSortOrder();
     }
 
