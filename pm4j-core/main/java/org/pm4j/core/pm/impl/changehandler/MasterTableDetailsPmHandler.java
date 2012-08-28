@@ -26,8 +26,6 @@ import org.pm4j.core.pm.impl.PmUtil;
  * <li>Prevents the selection change if the details area is not valid.</li>
  * <li>Registers details area changes. See {@link #isChangeRegistered()}
  * and {@link #getChangedMasterBeans()}</li>
- * <li>Resets the details change information when the master table sends a
- * {@link PmEvent#VALUE_CHANGE}.</li>
  * </ul>
  *
  * @param <T_MASTER_BEAN>
