@@ -1091,7 +1091,10 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
 
     // 1. fix resource key definition
     if (key != null) {
-      format = PmLocalizeApi.localize(this, key);
+      format = PmLocalizeApi.findLocalization(this, key);
+      if (format == null) {
+        throw new PmRuntimeException(this, "No resource string found for configured format resource key '" + key +"'.");
+      }
     }
     // 2. no fix key: try to find a postfix based definition
     else {
