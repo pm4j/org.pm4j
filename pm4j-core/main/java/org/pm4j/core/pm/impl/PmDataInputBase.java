@@ -2,7 +2,6 @@ package org.pm4j.core.pm.impl;
 
 import java.util.List;
 
-import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmDataInput;
 import org.pm4j.core.pm.PmObject;
 
@@ -46,18 +45,7 @@ public abstract class PmDataInputBase extends PmObjectBase implements PmDataInpu
     if (isPmVisible() && !isPmReadonly()) {
       for (PmDataInput d : PmUtil.getPmChildrenOfType(this, PmDataInput.class)) {
         if (d.isPmVisible() && !d.isPmReadonly()) {
-          if (d instanceof PmAttr<?>) {
-            // XXX olaf: duplicate validation may occur in case of duplicate command calls
-            // (some Ajax calls do that.)
-            // Find a clean way to prevent that.
-
-            if (d.isPmValid()) {
-              d.pmValidate();
-            }
-          }
-          else {
-            d.pmValidate();
-          }
+          d.pmValidate();
         }
       }
     }

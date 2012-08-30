@@ -463,11 +463,11 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
         if (resData == null) {
           // XXX olaf: That happens in case of program bugs.
           // Should we re-throw the exception here?
-          setAndPropagateInvalidValue(vc, PmConstants.MSGKEY_VALIDATION_CONVERSION_FROM_STRING_FAILED, getPmShortTitle());
+          setAndPropagateValueConverterMessage(vc, PmConstants.MSGKEY_VALIDATION_CONVERSION_FROM_STRING_FAILED, getPmShortTitle());
           LOG.error(e.getMessage(), e);
         }
         else {
-          setAndPropagateInvalidValue(vc, resData.msgKey, resData.msgArgs);
+          setAndPropagateValueConverterMessage(vc, resData.msgKey, resData.msgArgs);
           if (LOG.isDebugEnabled()) {
             LOG.debug("String to value conversion failed in attribute '" + PmUtil.getPmLogString(this) + "'. String value: " + text);
           }
@@ -996,22 +996,38 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   public void pmValidate() {
     if (isPmVisible() &&
         !isPmReadonly()) {
-      boolean wasValid = isPmValid();
-      try {
-        validate(getValue());
-        performJsr303Validations();
-      }
-      catch (PmValidationException e) {
-        PmResourceData exResData = e.getResourceData();
-        PmValidationMessage msg = new PmValidationMessage(this, exResData.msgKey, exResData.msgArgs);
-        getPmConversationImpl().addPmMessage(msg);
-      }
+      // A validation can only be performed if the last setValue() did not generate a converter exception.
+      // Otherwise the attribute will simply stay in its value converter error state.
+      if (!hasPmConverterErrors()) {
+        boolean wasValid = isPmValid();
+        PmConversationImpl conversation = getPmConversationImpl();
+        conversation.clearPmMessages(this, null);
+        try {
+          validate(getValue());
+          performJsr303Validations();
+        }
+        catch (PmValidationException e) {
+          PmResourceData exResData = e.getResourceData();
+          PmValidationMessage msg = new PmValidationMessage(this, exResData.msgKey, exResData.msgArgs);
+          conversation.addPmMessage(msg);
+        }
 
-      boolean isValid = isPmValid();
-      if (isValid != wasValid) {
-        PmEventApi.firePmEvent(this, getOwnMetaData().validationChangeEventMask);
+        boolean isValid = isPmValid();
+        if (isValid != wasValid) {
+          PmEventApi.firePmEvent(this, getOwnMetaData().validationChangeEventMask);
+        }
       }
     }
+  }
+
+  private boolean hasPmConverterErrors() {
+    for (PmMessage m : getPmConversation().getPmMessages(this, Severity.ERROR)) {
+      if (m instanceof PmConverterErrorMessage) {
+        return true;
+      }
+    }
+    // no converter message found.
+    return false;
   }
 
   // ======== Buffered data input support ======== //
