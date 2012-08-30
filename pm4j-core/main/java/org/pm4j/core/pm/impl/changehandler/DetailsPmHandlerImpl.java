@@ -1,7 +1,9 @@
 package org.pm4j.core.pm.impl.changehandler;
 
 import org.pm4j.core.pm.PmDataInput;
+import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.api.PmMessageUtil;
+import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
 
 /**
  * Default details handler implementation.
@@ -49,6 +51,8 @@ public class DetailsPmHandlerImpl<T_DETAILS_PM extends PmDataInput, T_MASTER_REC
     // The details area has now a new content to handle. The old messages of
     // that area where related to the record that is no longer active.
     PmMessageUtil.clearSubTreeMessages(detailsPm);
+    // All cached information within the details area should be refreshed.
+    PmCacheApi.clearCachedPmValues(detailsPm, CacheKind.ALL);
   }
 
   @Override
