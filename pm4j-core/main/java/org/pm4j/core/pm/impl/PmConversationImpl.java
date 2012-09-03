@@ -395,11 +395,16 @@ public class PmConversationImpl extends PmElementBase implements PmConversation 
    *
    * @param pmMessage
    *          The message to remove.
-   * @return <code>true</code> when the message was member of the message set.<br/>
-   *         <code>false</code> when the message was not part of the message
-   *         set.
    */
-  public boolean clearPmMessage(PmMessage pmMessage) {
+  public void clearPmMessage(PmMessage pmMessage) {
+    if (pmMessage instanceof PmValidationMessage) {
+      ((PmObjectBase)pmMessage.getPm()).clearPmInvalidValues();
+    }
+    pmMessages.remove(pmMessage);
+  }
+
+  /** Internal interface. Removes the message without taking care of the set of invalid values. */
+  boolean _clearPmMessage(PmMessage pmMessage) {
     return pmMessages.remove(pmMessage);
   }
 

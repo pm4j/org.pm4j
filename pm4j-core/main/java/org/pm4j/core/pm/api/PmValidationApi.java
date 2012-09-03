@@ -14,7 +14,6 @@ import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.impl.PmConversationImpl;
 import org.pm4j.core.pm.impl.PmObjectBase;
 import org.pm4j.core.pm.impl.PmUtil;
-import org.pm4j.core.pm.impl.converter.PmConverterErrorMessage;
 
 /**
  * API for PM validation related operations.
@@ -46,7 +45,7 @@ public final class PmValidationApi {
       // Clear existing, not attribute related, error messages within the validation exec scope.
       // Attribute messages can't be cleared because the conversion errors are handled internally by the attribute validation.
       // The invalid data entry values are bound to the attribute validation message.
-      // Clearing them would lead to loss of entered data. The only get cleared by a successful re-validation or
+      // Clearing them would lead to loss of entered data. They only get cleared by a successful re-validation or
       // setting a new value.
       // XXX olaf: This logic needs to be simplified!
       for (PmMessage m : PmMessageUtil.getSubTreeMessages(validationExecTreeRootPm, Severity.INFO)) {

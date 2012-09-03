@@ -271,7 +271,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
 
     if (!wasValid) {
       for (PmMessage m : PmMessageUtil.getPmErrors(this)) {
-        this.getPmConversationImpl().clearPmMessage(m);
+        this.getPmConversationImpl()._clearPmMessage(m);
       }
       PmEventApi.firePmEvent(this, getOwnMetaData().validationChangeEventMask);
     }
