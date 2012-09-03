@@ -67,15 +67,7 @@ public abstract class FilterByPmAttrBase<T_FILTER_VALUE> extends FilterByDefinit
     return PmUtil.findPmChildOfType(item, getName(), PmAttr.class);
   }
 
-  /**
-   * This filter uses a PM for filtering.
-   */
-  @Override
-  public boolean isBeanFilter() {
-    return false;
-  }
-
-  protected final boolean doesItemMatchImpl(PmObject item, CompOp compOp, Object T_FILTER_VALUE) {
+  protected final boolean doesItemMatchImpl(PmObject item, CompOp compOp, T_FILTER_VALUE filterValue) {
     throw new RuntimeException("Only the attribute parameter version of this method should be called. Please consider another filter-by base class if you want to use this method.");
   }
 

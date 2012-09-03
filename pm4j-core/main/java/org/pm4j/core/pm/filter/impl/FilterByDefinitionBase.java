@@ -13,6 +13,15 @@ import org.pm4j.core.pm.filter.CompOp;
 import org.pm4j.core.pm.filter.FilterByDefinition;
 import org.pm4j.core.util.reflection.ClassUtil;
 
+/**
+ * Implements basic filter-by functionality.
+ *
+ * @param <T_ITEM> the type of items to filter. May be a row-PM or a row bean.
+ *   The method {@link #isBeanFilter()} defines which of these has to be used.
+ * @param <T_FILTER_VALUE>
+ *
+ * @author olaf boede
+ */
 public abstract class FilterByDefinitionBase<T_ITEM, T_FILTER_VALUE> implements FilterByDefinition {
 
   private String name;
@@ -40,7 +49,6 @@ public abstract class FilterByDefinitionBase<T_ITEM, T_FILTER_VALUE> implements 
     }
   }
 
-
   /**
    * The type save match implementation version to be implemented.
    *
@@ -49,7 +57,7 @@ public abstract class FilterByDefinitionBase<T_ITEM, T_FILTER_VALUE> implements 
    * @param T_FILTER_VALUE
    * @return
    */
-  protected abstract boolean doesItemMatchImpl(T_ITEM item, CompOp compOp, Object T_FILTER_VALUE);
+  protected abstract boolean doesItemMatchImpl(T_ITEM item, CompOp compOp, T_FILTER_VALUE filterValue);
 
   @SuppressWarnings("unchecked")
   @Override
