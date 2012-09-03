@@ -1,9 +1,9 @@
 package org.pm4j.core.pm.impl.changehandler;
 
-import org.pm4j.core.pm.PmDataInput;
+import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.api.PmCacheApi;
-import org.pm4j.core.pm.api.PmMessageUtil;
 import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
+import org.pm4j.core.pm.api.PmMessageUtil;
 
 /**
  * Default details handler implementation.
@@ -15,14 +15,14 @@ import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
  * @param <T_DETAILS_PM>
  *          Type of the supported details PM.
  */
-public class DetailsPmHandlerImpl<T_DETAILS_PM extends PmDataInput, T_MASTER_RECORD> implements DetailsPmHandler<T_DETAILS_PM> {
+public class DetailsPmObjectHandlerImpl<T_DETAILS_PM extends PmObject, T_MASTER_RECORD> implements DetailsPmHandler<T_DETAILS_PM> {
 
   private final T_DETAILS_PM detailsPm;
 
   /**
    * @param detailsPm The details PM to handle.
    */
-  public DetailsPmHandlerImpl(T_DETAILS_PM detailsPm) {
+  public DetailsPmObjectHandlerImpl(T_DETAILS_PM detailsPm) {
     this.detailsPm = detailsPm;
   }
 
@@ -53,11 +53,6 @@ public class DetailsPmHandlerImpl<T_DETAILS_PM extends PmDataInput, T_MASTER_REC
     PmMessageUtil.clearSubTreeMessages(detailsPm);
     // All cached information within the details area should be refreshed.
     PmCacheApi.clearCachedPmValues(detailsPm, CacheKind.ALL);
-  }
-
-  @Override
-  public void onResetMasterContent() {
-    PmMessageUtil.clearSubTreeMessages(detailsPm);
   }
 
 }

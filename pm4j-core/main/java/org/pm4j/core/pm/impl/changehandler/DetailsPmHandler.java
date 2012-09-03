@@ -1,6 +1,6 @@
 package org.pm4j.core.pm.impl.changehandler;
 
-import org.pm4j.core.pm.PmDataInput;
+import org.pm4j.core.pm.PmObject;
 
 /**
  * Master-details handling can be very details PM specific.<br>
@@ -11,7 +11,7 @@ import org.pm4j.core.pm.PmDataInput;
  * @param <T_DETAILS_PM>
  *          Type of the supported details PM.
  */
-public interface DetailsPmHandler<T_DETAILS_PM extends PmDataInput> {
+public interface DetailsPmHandler<T_DETAILS_PM extends PmObject> {
 
   /**
    * Provides the details area PM to handle.
@@ -29,13 +29,8 @@ public interface DetailsPmHandler<T_DETAILS_PM extends PmDataInput> {
    * object may represent the selected combo box item.
    *
    * @param newMasterBean
-   *          The new master record.
+   *          The new master record. May be <code>null</code>.
    */
   void afterMasterRecordChange(Object newMasterBean);
-
-  /**
-   * Gets called when the master PM starts to represent completely new data.
-   */
-  void onResetMasterContent();
 
 }

@@ -1,6 +1,11 @@
 package org.pm4j.core.pm.impl.changehandler;
 
+import java.io.DataInput;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
@@ -11,6 +16,7 @@ import org.pm4j.core.pm.PmCommandDecorator;
 import org.pm4j.core.pm.PmDataInput;
 import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmEventListener;
+import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmTable;
 import org.pm4j.core.pm.PmTable.TableChange;
 import org.pm4j.core.pm.api.PmEventApi;
@@ -18,7 +24,7 @@ import org.pm4j.core.pm.api.PmValidationApi;
 import org.pm4j.core.pm.impl.PmUtil;
 
 /**
- * A details handler for tables with an associated details PM that displays
+ * A master-details handler for tables with an associated details PM that displays
  * additional information for the currently selected master table row. <br>
  * It supports the following functionality:
  * <ul>
@@ -33,13 +39,13 @@ import org.pm4j.core.pm.impl.PmUtil;
  *
  * @author olaf boede
  */
-public class MasterTableDetailsPmHandler<T_MASTER_BEAN> implements MasterDetailsPmHandler {
+public class MasterPmTableHandlerImpl<T_MASTER_BEAN> implements MasterPmHandler {
 
-  private static final Log    LOG                = LogFactory.getLog(MasterTableDetailsPmHandler.class);
+  private static final Log    LOG                = LogFactory.getLog(MasterPmTableHandlerImpl.class);
 
   private final PmTable<?>    masterTablePm;
   private Set<T_MASTER_BEAN>  changedMasterBeans = new HashSet<T_MASTER_BEAN>();
-  private final DetailsPmHandler<? extends PmDataInput> detailsHandler;
+  private List<DetailsPmHandler<?>> detailsHandlers = new ArrayList<DetailsPmHandler<?>>();
 
   /**
    * Creates an instance uing a {@link DetailsPmHandler} that is responsible
@@ -49,21 +55,41 @@ public class MasterTableDetailsPmHandler<T_MASTER_BEAN> implements MasterDetails
    *          The table PM to observe.
    * @param detailsHandler A handler for the details PM
    */
-  public MasterTableDetailsPmHandler(PmTable<?> masterTablePm, DetailsPmHandler<? extends PmDataInput> detailsHandler) {
+  public MasterPmTableHandlerImpl(PmTable<?> masterTablePm, DetailsPmHandler<?>... detailsHandlers) {
     this.masterTablePm = masterTablePm;
-    this.detailsHandler = detailsHandler;
+    for (DetailsPmHandler<?> dh : detailsHandlers) {
+      addDetailsHander(dh);
+    }
   }
 
   /**
-   * Creates an instance with a details-default handler ({@link DetailsPmHandlerImpl})
+   * Creates for each passed details PM a details-default handler ({@link DetailsPmObjectHandlerImpl})
    * that just clears the details area on master record change.
    *
    * @param masterTablePm
    *          The table to observe.
-   * @param detailsPm The details PM to observe.
+   * @param detailsPms The details PM's to observe.
    */
-  public MasterTableDetailsPmHandler(PmTable<?> masterTablePm, PmDataInput detailsPm) {
-    this(masterTablePm, new DetailsPmHandlerImpl<PmDataInput, T_MASTER_BEAN>(detailsPm));
+  public MasterPmTableHandlerImpl(PmTable<?> masterTablePm, PmObject... detailsPms) {
+    this.masterTablePm = masterTablePm;
+    for (PmObject pm : detailsPms) {
+      addDetailsHander(new DetailsPmObjectHandlerImpl<PmObject, T_MASTER_BEAN>(pm));
+    }
+  }
+
+  @Override
+  public final void addDetailsHander(DetailsPmHandler<?> detailsHandler) {
+    this.detailsHandlers.add(detailsHandler);
+  }
+
+  @Override
+  public final void addDetailsHanders(DetailsPmHandler<?>... detailsHandlers) {
+    this.detailsHandlers.addAll(Arrays.asList(detailsHandlers));
+  }
+
+  @Override
+  public Collection<DetailsPmHandler<?>> getDetailsPmHandlers() {
+    return detailsHandlers;
   }
 
   @Override
@@ -72,11 +98,36 @@ public class MasterTableDetailsPmHandler<T_MASTER_BEAN> implements MasterDetails
     PmEventApi.addPmEventListener(masterTablePm, PmEvent.VALUE_CHANGE, makeTableValueChangeListener());
   }
 
+  /**
+   * Checks first for already registered details-triggered master record changes.<br>
+   * If none is found, the details areas are checked if they are actually changed.
+   */
   @Override
   public boolean isChangeRegistered() {
     Set<T_MASTER_BEAN> changedMasterBeans = getChangedMasterBeans();
-    return (changedMasterBeans != null && !changedMasterBeans.isEmpty()) ||
-           detailsHandler.getDetailsPm().isPmValueChanged();
+    if (changedMasterBeans != null && !changedMasterBeans.isEmpty()) {
+      return true;
+    }
+    else {
+      return isCurrentDetailsAreaChanged();
+    }
+  }
+
+  /**
+   * Checks the current state of the details area PMs.
+   *
+   * @return <code>true</code> if one details area returns <code>true</code> for the call <code>isPmValueChanged()</code>.
+   */
+  protected boolean isCurrentDetailsAreaChanged() {
+    for (DetailsPmHandler<?> dh : detailsHandlers) {
+      Object detail = dh.getDetailsPm();
+      if ((detail instanceof DataInput) &&
+          ((PmDataInput)detail).isPmValueChanged()) {
+        return true;
+      }
+    }
+    // no registerd change and no current change found in details areas:
+    return false;
   }
 
   protected T_MASTER_BEAN getSelectedMasterBean() {
@@ -91,7 +142,7 @@ public class MasterTableDetailsPmHandler<T_MASTER_BEAN> implements MasterDetails
   public Set<T_MASTER_BEAN> getChangedMasterBeans() {
     T_MASTER_BEAN masterBean = getSelectedMasterBean();
     if (masterBean != null &&
-        detailsHandler.getDetailsPm().isPmValueChanged()) {
+        isCurrentDetailsAreaChanged()) {
       HashSet<T_MASTER_BEAN> set = new HashSet<T_MASTER_BEAN>(changedMasterBeans);
       if (!changedMasterBeans.contains(masterBean)) {
         set.add(masterBean);
@@ -103,13 +154,19 @@ public class MasterTableDetailsPmHandler<T_MASTER_BEAN> implements MasterDetails
   }
 
   /**
-   * Sets the handler to an 'unchanged' state.
+   * Sets the handler to an 'unchanged' state by clearing the set of {@link #changedMasterBeans}.
+   * Re-adjusts the details area by calling {@link DetailsPmHandler#afterMasterRecordChange(Object)}
+   * with the new selected table row.
    */
   protected void onMasterTableValueChange() {
     if (LOG.isDebugEnabled() && isChangeRegistered()) {
-      LOG.debug("Reset master-details changed state for " + PmUtil.getPmLogString(detailsHandler.getDetailsPm()));
+      LOG.debug("Reset master-details changed state for " + PmUtil.getPmLogString(masterTablePm));
     }
     changedMasterBeans.clear();
+    T_MASTER_BEAN selectedMasterBean = getSelectedMasterBean();
+    for (DetailsPmHandler<?> dh : detailsHandlers) {
+      dh.afterMasterRecordChange(selectedMasterBean);
+    }
   }
 
   /**
@@ -140,14 +197,38 @@ public class MasterTableDetailsPmHandler<T_MASTER_BEAN> implements MasterDetails
 
   /**
    * Checks if it is allowed to swich to another master record.
-   * <br>
-   * The default implementation checks if the details area is valid.
+   * <p>
+   * The default implementation allows the switch if there is no currently selected master
+   * record.<br>
+   * If that's tha case it checks if the details area is valid.
    *
    * @return <code>true</code> if the switch can be performed.
    */
   protected boolean canSwitch() {
-    return  masterTablePm.getSelectedRow() == null ||
-            PmValidationApi.validateSubTree(detailsHandler.getDetailsPm());
+    return (masterTablePm.getSelectedRow() == null)
+        ? true
+        : validateDetails();
+  }
+
+  /**
+   * Validates all registered details PMs.
+   * <p>
+   * Validates all details areas, even if the first one is already invalid.
+   * This way the user gets all relevant validation messages for the user operation.
+   *
+   * @return <code>true</code> if all details areas are valid.
+   */
+  protected boolean validateDetails() {
+    boolean allDetailsValid = true;
+    for (DetailsPmHandler<?> dh : detailsHandlers) {
+      Object d = dh.getDetailsPm();
+      if ((d instanceof PmDataInput) &&
+          !PmValidationApi.validateSubTree((PmDataInput)d)) {
+        allDetailsValid = false;
+      }
+    }
+
+    return allDetailsValid;
   }
 
   /**
@@ -163,7 +244,7 @@ public class MasterTableDetailsPmHandler<T_MASTER_BEAN> implements MasterDetails
       if (canSwitch()) {
         T_MASTER_BEAN masterBean = getSelectedMasterBean();
         changedMasterBean =
-            (masterBean != null) && detailsHandler.getDetailsPm().isPmValueChanged()
+            (masterBean != null) && isCurrentDetailsAreaChanged()
             ? getCurrentModifiedMasterRecord()
             : null;
 
@@ -180,24 +261,21 @@ public class MasterTableDetailsPmHandler<T_MASTER_BEAN> implements MasterDetails
         changedMasterBeans.add(changedMasterBean);
 
         if (LOG.isDebugEnabled()) {
-          LOG.debug("Registered a master-details change for " + PmUtil.getPmLogString(detailsHandler.getDetailsPm()) +
+          LOG.debug("Registered a master-details change for " + PmUtil.getPmLogString(masterTablePm) +
               ". Changed bean: " + changedMasterBean);
         }
       }
 
-      detailsHandler.afterMasterRecordChange(getSelectedMasterBean());
+      T_MASTER_BEAN selectedMasterBean = getSelectedMasterBean();
+      for (DetailsPmHandler<?> dh : detailsHandlers) {
+        dh.afterMasterRecordChange(selectedMasterBean);
+      }
       changedMasterBean = null;
     }
 
   }
 
-
-
-  @Override
-  public DetailsPmHandler<? extends PmDataInput> getDetailsPmHandler() {
-    return detailsHandler;
-  }
-  public PmTable<?> getMasterTablePm() {
+  protected PmTable<?> getMasterTablePm() {
     return masterTablePm;
   }
 
@@ -205,7 +283,7 @@ public class MasterTableDetailsPmHandler<T_MASTER_BEAN> implements MasterDetails
    * @return The currently selected master record in case it is marked a actually changed within the details area. May be <code>null</code>.
    */
   private T_MASTER_BEAN getCurrentModifiedMasterRecord() {
-    return detailsHandler.getDetailsPm().isPmValueChanged()
+    return isCurrentDetailsAreaChanged()
         ? getSelectedMasterBean()
         : null;
   }
