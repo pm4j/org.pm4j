@@ -130,10 +130,10 @@ public class PmCommandProxy extends PmCommandImpl {
     @Override
     protected void getPmStyleClassesImpl(Set<String> styleClassSet) {
       if (delegateCmd != null) {
-        super.getPmStyleClassesImpl(styleClassSet);
+        styleClassSet.addAll(delegateCmd.getPmStyleClasses());
       }
       else {
-        styleClassSet.addAll(delegateCmd.getPmStyleClasses());
+        super.getPmStyleClassesImpl(styleClassSet);
       }
     }
 }

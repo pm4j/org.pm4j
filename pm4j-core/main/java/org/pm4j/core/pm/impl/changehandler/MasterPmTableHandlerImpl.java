@@ -39,7 +39,7 @@ import org.pm4j.core.pm.impl.PmUtil;
  *
  * @author olaf boede
  */
-public class MasterPmTableHandlerImpl<T_MASTER_BEAN> implements MasterPmHandler {
+public class MasterPmTableHandlerImpl<T_MASTER_BEAN> implements MasterPmRecordHandler<T_MASTER_BEAN> {
 
   private static final Log    LOG                = LogFactory.getLog(MasterPmTableHandlerImpl.class);
 

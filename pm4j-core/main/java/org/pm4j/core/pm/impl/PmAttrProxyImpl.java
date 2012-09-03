@@ -152,10 +152,10 @@ public class PmAttrProxyImpl<T_VALUE> extends PmAttrImpl<T_VALUE> implements PmA
   @Override
   protected void getPmStyleClassesImpl(Set<String> styleClassSet) {
     if (delegate != null) {
-      super.getPmStyleClassesImpl(styleClassSet);
+      styleClassSet.addAll(delegate.getPmStyleClasses());
     }
     else {
-      styleClassSet.addAll(delegate.getPmStyleClasses());
+      super.getPmStyleClassesImpl(styleClassSet);
     }
   }
 
