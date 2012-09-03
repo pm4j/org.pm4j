@@ -1,5 +1,7 @@
 package org.pm4j.core.pm.impl;
 
+import java.util.Set;
+
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmCommandCfg;
@@ -123,5 +125,15 @@ public class PmCommandProxy extends PmCommandImpl {
       return delegateCmd != null
               ? delegateCmd.getPmTooltip()
               : super.getPmTitleImpl();
+    }
+
+    @Override
+    protected void getPmStyleClassesImpl(Set<String> styleClassSet) {
+      if (delegateCmd != null) {
+        super.getPmStyleClassesImpl(styleClassSet);
+      }
+      else {
+        styleClassSet.addAll(delegateCmd.getPmStyleClasses());
+      }
     }
 }

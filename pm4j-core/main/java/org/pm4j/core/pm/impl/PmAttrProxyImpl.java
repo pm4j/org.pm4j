@@ -1,5 +1,7 @@
 package org.pm4j.core.pm.impl;
 
+import java.util.Set;
+
 import org.apache.commons.lang.ObjectUtils;
 import org.pm4j.core.exception.PmConverterException;
 import org.pm4j.core.exception.PmRuntimeException;
@@ -145,6 +147,16 @@ public class PmAttrProxyImpl<T_VALUE> extends PmAttrImpl<T_VALUE> implements PmA
     return delegate != null
         ? delegate.getPmTooltip()
         : super.getPmTitleImpl();
+  }
+
+  @Override
+  protected void getPmStyleClassesImpl(Set<String> styleClassSet) {
+    if (delegate != null) {
+      super.getPmStyleClassesImpl(styleClassSet);
+    }
+    else {
+      styleClassSet.addAll(delegate.getPmStyleClasses());
+    }
   }
 
 }
