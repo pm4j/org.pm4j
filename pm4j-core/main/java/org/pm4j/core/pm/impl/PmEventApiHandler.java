@@ -163,7 +163,6 @@ public class PmEventApiHandler {
    * @param event The event to propagate.
    * @param eventMask Defines the set of on-methods to be called.
    */
-  @SuppressWarnings("deprecation")
   protected void dispatchToOnEventMethodCalls(PmObjectBase pmImpl, PmEvent event, int eventMask) {
     // XXX olaf: the onPmXXX methods are really convenient to use, but
     //           this construction costs some performance...
