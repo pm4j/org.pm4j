@@ -1,6 +1,5 @@
 package org.pm4j.core.pm.impl.changehandler;
 
-import java.io.DataInput;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -121,7 +120,7 @@ public class MasterPmTableHandlerImpl<T_MASTER_BEAN> implements MasterPmRecordHa
   protected boolean isCurrentDetailsAreaChanged() {
     for (DetailsPmHandler<?> dh : detailsHandlers) {
       Object detail = dh.getDetailsPm();
-      if ((detail instanceof DataInput) &&
+      if ((detail instanceof PmDataInput) &&
           ((PmDataInput)detail).isPmValueChanged()) {
         return true;
       }
@@ -157,12 +156,21 @@ public class MasterPmTableHandlerImpl<T_MASTER_BEAN> implements MasterPmRecordHa
    * Sets the handler to an 'unchanged' state by clearing the set of {@link #changedMasterBeans}.
    * Re-adjusts the details area by calling {@link DetailsPmHandler#afterMasterRecordChange(Object)}
    * with the new selected table row.
+   *
+   * @param event the master PM value change event.
    */
-  protected void onMasterTableValueChange() {
+  protected void onMasterTableValueChange(PmEvent event) {
     if (LOG.isDebugEnabled() && isChangeRegistered()) {
       LOG.debug("Reset master-details changed state for " + PmUtil.getPmLogString(masterTablePm));
     }
-    changedMasterBeans.clear();
+
+    switch (event.getValueChangeKind()) {
+      case RELOAD: // fall through
+      case VALUE:
+        changedMasterBeans.clear();
+      default: // nothing to do
+    }
+
     T_MASTER_BEAN selectedMasterBean = getSelectedMasterBean();
     for (DetailsPmHandler<?> dh : detailsHandlers) {
       dh.afterMasterRecordChange(selectedMasterBean);
@@ -179,7 +187,7 @@ public class MasterPmTableHandlerImpl<T_MASTER_BEAN> implements MasterPmRecordHa
     return new PmEventListener() {
       @Override
       public void handleEvent(PmEvent event) {
-        onMasterTableValueChange();
+        onMasterTableValueChange(event);
       }
     };
   }
