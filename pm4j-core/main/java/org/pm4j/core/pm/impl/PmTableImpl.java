@@ -404,7 +404,7 @@ public class PmTableImpl
       // Reset the sort order.
       // Can be postponed to the next getPageableColleciton call if the collection is not yet created.
       if (pageableCollection != null) {
-        getPageableCollection().sortBackingItems(null);
+        getPageableCollection().sortItems(null);
         PmEventApi.firePmEventIfInitialized(PmTableImpl.this, PmEvent.VALUE_CHANGE, ValueChangeKind.SORT_ORDER);
       }
     }

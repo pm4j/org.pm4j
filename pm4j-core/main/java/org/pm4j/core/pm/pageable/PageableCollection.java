@@ -57,22 +57,7 @@ public interface PageableCollection<T_ITEM> {
   void sortItems(Comparator<?> sortComparator);
 
   /**
-   * Provides a sort comparator that will be applied to the items of the backing
-   * collection.
-   * <p>
-   * In case of a simple collection (without backing collection), the comparator
-   * will be applied to the items of this collection.
-   *
-   * @param sortComparator
-   *          The item comparator to use.<br>
-   *          May be <code>null</code> to switch sorting off.
-   */
-  void sortBackingItems(Comparator<?> sortComparator);
-
-  /**
    * Defines the (optional) comparator used to sort the items initially by.
-   * <p>
-   * ATTENTION: Gets currently only delegated to a {@link PageableListImpl}.
    *
    * @param comparator A comparator.
    */

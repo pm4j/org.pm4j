@@ -141,11 +141,6 @@ public class PageableListImpl<T_ITEM> implements PageableCollection<T_ITEM> {
     _applyFilterAndSortOrder();
   }
 
-  @Override
-  public void sortBackingItems(Comparator<?> sortComparator) {
-    sortItems(sortComparator);
-  }
-
   /**
    * Assigns an initial sort order.
    * <p>
