@@ -13,7 +13,6 @@ import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmEvent;
-import org.pm4j.core.pm.PmEventListener;
 import org.pm4j.core.pm.PmEvent.ValueChangeKind;
 import org.pm4j.core.pm.PmMessage.Severity;
 import org.pm4j.core.pm.PmObject;
@@ -339,6 +338,9 @@ public abstract class PmBeanBase<T_BEAN>
    */
   public static class Nested<T_BEAN> extends PmBeanBase<T_BEAN> {
 
+    /** The optional exisiting embedding context PM. */
+    private PmBeanBase<T_BEAN> embeddingBeanPm;
+
     /**
      * Creates the PM bound to a <code>null</code>-pmBean .
      *
@@ -348,41 +350,19 @@ public abstract class PmBeanBase<T_BEAN>
       super(parentPm, null);
     }
 
-    /** A reference that binds the listener life cycle to this instance. */
-    private PmEventListener pmEmbeddingBeanPmValueChangeListener;
-
+    @SuppressWarnings("unchecked")
     @Override
     protected void onPmInit() {
       super.onPmInit();
-
-      pmEmbeddingBeanPmValueChangeListener = new PmEventListener() {
-        @Override
-        public void handleEvent(PmEvent event) {
-          // Re-sets the pmBean without calling setPmBean() to prevent additional event propagations.
-          // The handler gets actually called within an event propagation that was triggered by the parent.
-          doSetPmBean(null);
-        }
-      };
-
-      PmBeanBase<T_BEAN> embeddingBeanPm = findEmbeddingBeanPm();
-      if (embeddingBeanPm != null) {
-        PmEventApi.addWeakPmEventListener(embeddingBeanPm, PmEvent.VALUE_CHANGE, pmEmbeddingBeanPmValueChangeListener);
-      }
+      embeddingBeanPm = PmUtil.findPmParentOfType(this, PmBeanBase.class);
     }
 
     @Override
-    protected T_BEAN findPmBeanImpl() {
-      PmBeanBase<T_BEAN> embeddingBeanPm = findEmbeddingBeanPm();
+    public T_BEAN getPmBean() {
       return embeddingBeanPm != null
-                ? embeddingBeanPm.getPmBean()
-                : super.findPmBeanImpl();
+          ? embeddingBeanPm.getPmBean()
+          : super.getPmBean();
     }
-
-    @SuppressWarnings("unchecked")
-    private PmBeanBase<T_BEAN> findEmbeddingBeanPm() {
-      return PmUtil.findPmParentOfType(this, PmBeanBase.class);
-    }
-
   }
 
   // ======== meta data ======== //
