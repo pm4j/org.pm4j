@@ -1,43 +1,36 @@
 package org.pm4j.core.pm.impl.changehandler;
 
-import java.util.Set;
-
-import org.pm4j.core.pm.impl.PmTableUtil;
+import org.pm4j.core.pm.PmObject;
 
 /**
- * Interface for handlers that observes changes within some details area. The
- * observed details changes can be inclueded in value change identification of
- * the 'master' PM.
- * <p>
- * For master tables you may add a details change handler by calling
- * {@link PmTableUtil#addDetailsPmHandler(org.pm4j.core.pm.PmTable, DetailsPmHandler)}
- * .<br>
- * After that call, the changes observed by the details handler are considered
- * in the <code>isPmValueChanged()</code> result of the master table.
+ * Master-details handling can be very details PM specific.<br>
+ * Implementations of this handler may consider this.
  *
  * @author olaf boede
+ *
+ * @param <T_DETAILS_PM>
+ *          Type of the supported details PM.
  */
-public interface DetailsPmHandler {
+public interface DetailsPmHandler<T_DETAILS_PM extends PmObject> {
 
   /**
-   * Indicates if something was changed within the observed details area.
+   * Provides the details area PM to handle.
    *
-   * @return The change state.
+   * @return The details PM to handle.
    */
-  boolean isDetailsChangeRegistered();
+  T_DETAILS_PM getDetailsPm();
 
   /**
-   * Provides the set of changed detail beans.
+   * Gets called after a master record selection change.
    * <p>
-   * A change handler that can't provide the detailled set of changed beans may
-   * provide here <code>null</code>.<br>
-   * In this case the table uses only the information provided by
-   * {@link #isDetailsChangeRegistered()}.
+   * In case of a master table the provided object may be the object behind the
+   * selected table row.<br>
+   * In case of a master combo box (PM layer: PmAttr with options) the provided
+   * object may represent the selected combo box item.
    *
-   * @return The changed bean set.<br>
-   *         <code>null</code> if that detailed information level is not
-   *         supported.
+   * @param newMasterBean
+   *          The new master record. May be <code>null</code>.
    */
-  Set<?> getChangedDetailBeans();
+  void afterMasterRecordChange(Object newMasterBean);
 
 }

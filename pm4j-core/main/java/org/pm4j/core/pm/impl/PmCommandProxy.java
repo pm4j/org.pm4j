@@ -1,5 +1,7 @@
 package org.pm4j.core.pm.impl;
 
+import java.util.Set;
+
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmCommandCfg;
@@ -63,7 +65,14 @@ public class PmCommandProxy extends PmCommandImpl {
     public void setDelegateCmd(PmCommand delegateCmd) {
         this.delegateCmd = delegateCmd;
     }
-    
+
+    /**
+     * @return The command that defines the logic. May be <code>null</code> if there is no delegate configured.
+     */
+    public PmCommand getDelegateCmd() {
+      return delegateCmd;
+    }
+
     @Override
     protected boolean isPmEnabledImpl() {
         return delegateCmd != null
@@ -116,5 +125,15 @@ public class PmCommandProxy extends PmCommandImpl {
       return delegateCmd != null
               ? delegateCmd.getPmTooltip()
               : super.getPmTitleImpl();
+    }
+
+    @Override
+    protected void getPmStyleClassesImpl(Set<String> styleClassSet) {
+      if (delegateCmd != null) {
+        styleClassSet.addAll(delegateCmd.getPmStyleClasses());
+      }
+      else {
+        super.getPmStyleClassesImpl(styleClassSet);
+      }
     }
 }

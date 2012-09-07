@@ -109,11 +109,6 @@ public class PageablePmsForBeans<T_PM extends PmBean<T_BEAN>, T_BEAN> implements
   }
 
   @Override
-  public void sortBackingItems(Comparator<?> sortComparator) {
-    beans.sortItems(sortComparator);
-  }
-
-  @Override
   public void setInitialBeanSortComparator(Comparator<?> comparator) {
     beans.setInitialBeanSortComparator(comparator);
   }

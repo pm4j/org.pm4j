@@ -39,18 +39,6 @@ public interface FilterByDefinition {
   Object getDefaultFilterByValue();
 
   /**
-   * Defines if this filter filters the beans behind the item PMs or directly the item PMs.
-   * <p>
-   * An example: In a UserTablePm we have rows of type UserPm and behind these rows beans of type UserBean.<br>
-   * If we define a filter that expects the UserBeanPm to be passed to {@link #doesItemMatch(Object, CompOp, Object)}
-   * ...
-   * TODO olaf: Check if it is really needed.
-   *
-   * @return
-   */
-  boolean isBeanFilter();
-
-  /**
    * Checks if a filter definition with the given values is a filter condition
    * that needs to be evaluated for each item to filter.
    * <p>

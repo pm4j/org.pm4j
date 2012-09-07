@@ -384,7 +384,10 @@ public class PmTableImpl
       }
 
       this.sortCol = sortCol;
+      applySortOrder();
+    }
 
+    private void applySortOrder() {
       if (sortCol != null) {
         PmSortOrder order = sortCol.getSortOrderAttr().getValue();
 
@@ -401,7 +404,7 @@ public class PmTableImpl
       // Reset the sort order.
       // Can be postponed to the next getPageableColleciton call if the collection is not yet created.
       if (pageableCollection != null) {
-        getPageableCollection().sortBackingItems(null);
+        getPageableCollection().sortItems(null);
         PmEventApi.firePmEventIfInitialized(PmTableImpl.this, PmEvent.VALUE_CHANGE, ValueChangeKind.SORT_ORDER);
       }
     }
@@ -548,7 +551,16 @@ public class PmTableImpl
       pageableCollection.setItemFilter(rowFilter);
     }
 
-    if (!preserveSettings) {
+    if (preserveSettings) {
+      if (sortOrderSelection.sortCol != null) {
+        // re-apply the current sort order.
+        sortOrderSelection.applySortOrder();
+      }
+      else {
+        applyDefaultSortOrder();
+      }
+    }
+    else {
       applyDefaultSortOrder();
     }
 
@@ -558,13 +570,31 @@ public class PmTableImpl
     }
   }
 
-  // FIXME olaf: a test...
+  /**
+   * Defines the data set to be presented by the table.
+   *
+   * @param pageable
+   *          the data set to present. If it is <code>null</code> an empty
+   *          collection will be created internally.
+   * @param preseveSettings
+   *          defines if the settings (sort order, (non-fix)filter, item
+   *          selection) should be preserved.<br>
+   *          If set to <code>false</code> a {@link PmEvent} with the
+   *          {@link ValueChangeKind#VALUE} will be fired. Otherwise the
+   *          {@link ValueChangeKind#UNKNOWN} will be sent.
+   */
   public void setPageableCollection(PageableCollection<T_ROW_ELEMENT_PM> pageable, boolean preseveSettings) {
-    setPageableCollection(pageable, preseveSettings, ValueChangeKind.UNKNOWN);
+    setPageableCollection(
+        pageable,
+        preseveSettings,
+        preseveSettings
+          ? ValueChangeKind.UNKNOWN
+          : ValueChangeKind.VALUE);
   }
 
   /**
    * Sets an empty {@link #pageableCollection} if the given parameter is <code>null</code>.
+   *
    *
    * @param pageable The new data set to present.
    * @param preserveSettings Defines if the currently selected items and filter definition should be preserved.

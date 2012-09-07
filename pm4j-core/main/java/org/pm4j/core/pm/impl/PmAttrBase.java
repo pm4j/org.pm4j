@@ -60,6 +60,7 @@ import org.pm4j.core.pm.impl.cache.PmCacheStrategy;
 import org.pm4j.core.pm.impl.cache.PmCacheStrategyBase;
 import org.pm4j.core.pm.impl.cache.PmCacheStrategyNoCache;
 import org.pm4j.core.pm.impl.cache.PmCacheStrategyRequest;
+import org.pm4j.core.pm.impl.converter.PmConverterErrorMessage;
 import org.pm4j.core.pm.impl.converter.PmConverterOptionBased;
 import org.pm4j.core.pm.impl.options.GenericOptionSetDef;
 import org.pm4j.core.pm.impl.options.OptionSetDefNoOption;
@@ -270,7 +271,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
 
     if (!wasValid) {
       for (PmMessage m : PmMessageUtil.getPmErrors(this)) {
-        this.getPmConversationImpl().clearPmMessage(m);
+        this.getPmConversationImpl()._clearPmMessage(m);
       }
       PmEventApi.firePmEvent(this, getOwnMetaData().validationChangeEventMask);
     }
@@ -462,11 +463,11 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
         if (resData == null) {
           // XXX olaf: That happens in case of program bugs.
           // Should we re-throw the exception here?
-          setAndPropagateInvalidValue(vc, PmConstants.MSGKEY_VALIDATION_CONVERSION_FROM_STRING_FAILED, getPmShortTitle());
+          setAndPropagateValueConverterMessage(vc, PmConstants.MSGKEY_VALIDATION_CONVERSION_FROM_STRING_FAILED, getPmShortTitle());
           LOG.error(e.getMessage(), e);
         }
         else {
-          setAndPropagateInvalidValue(vc, resData.msgKey, resData.msgArgs);
+          setAndPropagateValueConverterMessage(vc, resData.msgKey, resData.msgArgs);
           if (LOG.isDebugEnabled()) {
             LOG.debug("String to value conversion failed in attribute '" + PmUtil.getPmLogString(this) + "'. String value: " + text);
           }
@@ -476,7 +477,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
         PmResourceData resData = e.getResourceData();
         Object[] args = Arrays.copyOf(resData.msgArgs, resData.msgArgs.length+1);
         args[resData.msgArgs.length] = getPmShortTitle();
-        setAndPropagateInvalidValue(vc, resData.msgKey, args);
+        setAndPropagateValueConverterMessage(vc, resData.msgKey, args);
         if (LOG.isDebugEnabled()) {
           LOG.debug("String to value conversion failed in attribute '" + PmUtil.getPmLogString(this) +
               "'. String value: '" + text +
@@ -484,7 +485,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
         }
         return;
       } catch (RuntimeException e) {
-        setAndPropagateInvalidValue(vc, PmConstants.MSGKEY_VALIDATION_CONVERSION_FROM_STRING_FAILED, getPmShortTitle());
+        setAndPropagateValueConverterMessage(vc, PmConstants.MSGKEY_VALIDATION_CONVERSION_FROM_STRING_FAILED, getPmShortTitle());
         if (LOG.isDebugEnabled()) {
           LOG.debug("String to value conversion failed in attribute '" + PmUtil.getPmLogString(this) + "'. String value: " + text,
               e);
@@ -541,6 +542,8 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     try {
       T_BEAN_VALUE beanAttrValue = getBackingValue();
 
+      // TODO olaf: After conversion the value should be checked using
+      // #isEmptyValue() to be able to control the default value logic precisely.
       if (beanAttrValue != null) {
         return convertBackingValueToPmValue(beanAttrValue);
       }
@@ -913,11 +916,26 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
    * @param msgArgs
    *          Values for the user message.
    */
-  protected void setAndPropagateInvalidValue(SetValueContainer<T_PM_VALUE> invValue, String msgKey, Object... msgArgs) {
+  private void setAndPropagateInvalidValue(SetValueContainer<T_PM_VALUE> invValue, String msgKey, Object... msgArgs) {
     zz_getDataContainer().invalidValue = invValue;
     this.getPmConversationImpl().addPmMessage(new PmValidationMessage(this, invValue, msgKey, msgArgs));
     PmEventApi.firePmEvent(this, getOwnMetaData().validationChangeEventMask);
   }
+
+  /**
+   * @param invValue
+   *          The invalid value.
+   * @param msgKey
+   *          Key for the user message.
+   * @param msgArgs
+   *          Values for the user message.
+   */
+  private void setAndPropagateValueConverterMessage(SetValueContainer<T_PM_VALUE> invValue, String msgKey, Object... msgArgs) {
+    zz_getDataContainer().invalidValue = invValue;
+    this.getPmConversationImpl().addPmMessage(new PmConverterErrorMessage(this, invValue, msgKey, msgArgs));
+    PmEventApi.firePmEvent(this, getOwnMetaData().validationChangeEventMask);
+  }
+
 
   /**
    * @return <code>true</code> when there is an invalid user data entry.
@@ -978,22 +996,38 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   public void pmValidate() {
     if (isPmVisible() &&
         !isPmReadonly()) {
-      boolean wasValid = isPmValid();
-      try {
-        validate(getValue());
-        performJsr303Validations();
-      }
-      catch (PmValidationException e) {
-        PmResourceData exResData = e.getResourceData();
-        PmValidationMessage msg = new PmValidationMessage(this, exResData.msgKey, exResData.msgArgs);
-        getPmConversationImpl().addPmMessage(msg);
-      }
+      // A validation can only be performed if the last setValue() did not generate a converter exception.
+      // Otherwise the attribute will simply stay in its value converter error state.
+      if (!hasPmConverterErrors()) {
+        boolean wasValid = isPmValid();
+        PmConversationImpl conversation = getPmConversationImpl();
+        conversation.clearPmMessages(this, null);
+        try {
+          validate(getValue());
+          performJsr303Validations();
+        }
+        catch (PmValidationException e) {
+          PmResourceData exResData = e.getResourceData();
+          PmValidationMessage msg = new PmValidationMessage(this, exResData.msgKey, exResData.msgArgs);
+          conversation.addPmMessage(msg);
+        }
 
-      boolean isValid = isPmValid();
-      if (isValid != wasValid) {
-        PmEventApi.firePmEvent(this, getOwnMetaData().validationChangeEventMask);
+        boolean isValid = isPmValid();
+        if (isValid != wasValid) {
+          PmEventApi.firePmEvent(this, getOwnMetaData().validationChangeEventMask);
+        }
       }
     }
+  }
+
+  private boolean hasPmConverterErrors() {
+    for (PmMessage m : getPmConversation().getPmMessages(this, Severity.ERROR)) {
+      if (m instanceof PmConverterErrorMessage) {
+        return true;
+      }
+    }
+    // no converter message found.
+    return false;
   }
 
   // ======== Buffered data input support ======== //
@@ -1073,7 +1107,10 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
 
     // 1. fix resource key definition
     if (key != null) {
-      format = PmLocalizeApi.localize(this, key);
+      format = PmLocalizeApi.findLocalization(this, key);
+      if (format == null) {
+        throw new PmRuntimeException(this, "No resource string found for configured format resource key '" + key +"'.");
+      }
     }
     // 2. no fix key: try to find a postfix based definition
     else {

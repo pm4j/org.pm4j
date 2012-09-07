@@ -42,8 +42,11 @@ public final class PmValidationApi {
   public static boolean validateSubTree(PmDataInput validationExecTreeRootPm, PmObject requiredValidSubtreeRoot) {
       PmConversationImpl pmConversation = (PmConversationImpl) validationExecTreeRootPm.getPmConversation();
 
-      // Clear existing not attribute related messages within the validation exec scope.
+      // Clear existing, not attribute related, error messages within the validation exec scope.
       // Attribute messages can't be cleared because the conversion errors are handled internally by the attribute validation.
+      // The invalid data entry values are bound to the attribute validation message.
+      // Clearing them would lead to loss of entered data. They only get cleared by a successful re-validation or
+      // setting a new value.
       // XXX olaf: This logic needs to be simplified!
       for (PmMessage m : PmMessageUtil.getSubTreeMessages(validationExecTreeRootPm, Severity.INFO)) {
         if (m.getSeverity().ordinal() < Severity.ERROR.ordinal() ||

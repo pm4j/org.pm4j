@@ -18,7 +18,6 @@ import org.pm4j.core.pm.impl.PmAttrIntegerImpl;
 import org.pm4j.core.pm.impl.PmCommandImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
 import org.pm4j.core.pm.impl.PmElementImpl;
-import org.pm4j.core.pm.impl.PmUtil;
 
 public class ValidateAttrValueTest {
 
@@ -37,6 +36,18 @@ public class ValidateAttrValueTest {
 
     @PmCommandCfg(beforeDo=VALIDATE)
     public final PmCommand cmdWithValidation = new PmCommandImpl(this);
+  }
+
+  @Test
+  public void testClearMessagesShouldClearInvalidValuesToo() {
+    MyPmClass o = new MyPmClass();
+    o.i.setValueAsString("xyz");
+    assertFalse("An integer attribute can't accept letters.", o.i.isPmValid());
+    assertEquals("The invalid value should be available as 'string' value for display purposes.", "xyz", o.i.getValueAsString());
+
+    PmMessageUtil.clearSubTreeMessages(o.i);
+    assertTrue("After clearing all messages the attribute should be valid again.", o.i.isPmValid());
+    assertEquals("After clearing the valueAsString should be null again.", null, o.i.getValueAsString());
   }
 
   @Test
