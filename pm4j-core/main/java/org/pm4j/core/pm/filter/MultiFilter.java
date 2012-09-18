@@ -10,6 +10,9 @@ import org.pm4j.core.pm.PmBean;
  * All sub-filters are combined by an AND-logic. That means an item must pass
  * the checks of all registered filters to get visible.
  * <p>
+ * But: If an item matches a 'keep visible' filter definition it also stays visible.
+ * All 'keep visible' filters are combined by an OR-logic.
+ * <p>
  * Each sub-filter can be added with an identifier.<br>
  * This allows to replace and remove specific filters.
  *
@@ -23,17 +26,23 @@ public class MultiFilter implements Filter {
   /** A set of filters that is not affected by a {@link #clear()} call. */
   private Map<String, Filter> fixFilterMap = new HashMap<String, Filter>();
 
+  /** A set of filters that defines items that stay visible, even if the other filters would hide them.
+   *  This map is not affected by a {@link #clear()} call. */
+  private Map<String, Filter> fixKeepVisibleFilterMap = new HashMap<String, Filter>();
+
+  private Filter[] activeKeepVisibleFilters = {};
   private Filter[] activeFilters = {};
 
   @Override
   public boolean doesItemMatch(Object item) {
-    for (Filter f : activeFilters) {
-      @SuppressWarnings("unchecked")
-      boolean match = f.isBeanFilter()
-          ? f.doesItemMatch(((PmBean<Object>)item).getPmBean())
-          : f.doesItemMatch(item);
+    for (Filter f : activeKeepVisibleFilters) {
+      if (doesItemMatch(f, item)) {
+        return true;
+      }
+    }
 
-      if (! match) {
+    for (Filter f : activeFilters) {
+      if (! doesItemMatch(f, item)) {
         return false;
       }
     }
@@ -59,7 +68,6 @@ public class MultiFilter implements Filter {
    * @param filter
    *          The filter to apply.<br>
    *          <code>null</code> removes the filter definition.
-   * @return <code>true</code>.
    */
   public void setFilter(String filterId, Filter filter) {
     if (filter != null) {
@@ -82,6 +90,18 @@ public class MultiFilter implements Filter {
     return filterMap.get(filterId);
   }
 
+  /**
+   * Activates the given fix filter.<br>
+   * Replaces the filter that was formerly defined for the given id.<br>
+   * Removes the filter if <code>null</code> will be passed as
+   * <code>filter</code> parameter.
+   *
+   * @param filterId
+   *          The filter identifier.
+   * @param filter
+   *          The filter to apply.<br>
+   *          <code>null</code> removes the filter definition.
+   */
   public void setFixFilter(String filterId, Filter filter) {
     if (filter != null) {
       fixFilterMap.put(filterId, filter);
@@ -95,6 +115,34 @@ public class MultiFilter implements Filter {
 
   public Filter getFixFilter(String filterId) {
     return fixFilterMap.get(filterId);
+  }
+
+  /**
+   * Activates a 'positive' filter. All items with a match to a single 'keep visible' filter
+   * will be visible in the result set.<br>
+   * Replaces the filter that was formerly defined for the given id.<br>
+   * Removes the filter if <code>null</code> will be passed as
+   * <code>filter</code> parameter.
+   *
+   * @param filterId
+   *          The filter identifier.
+   * @param filter
+   *          The filter to apply.<br>
+   *          <code>null</code> removes the filter definition.
+   */
+  public void setFixKeepVisibleFilter(String filterId, Filter filter) {
+    if (filter != null) {
+      fixKeepVisibleFilterMap.put(filterId, filter);
+    }
+    else {
+      fixKeepVisibleFilterMap.remove(filterId);
+    }
+
+    updateActiveFilters();
+  }
+
+  public Filter getFixKeepVisibleFilter(String filterId) {
+    return fixKeepVisibleFilterMap.get(filterId);
   }
 
   /**
@@ -114,13 +162,27 @@ public class MultiFilter implements Filter {
     return activeFilters.length == 0;
   }
 
+  @SuppressWarnings("unchecked")
+  private static final boolean doesItemMatch(Filter f, Object item) {
+    return f.isBeanFilter()
+        ? f.doesItemMatch(((PmBean<Object>)item).getPmBean())
+        : f.doesItemMatch(item);
+  }
+
   private void updateActiveFilters() {
     int size = fixFilterMap.size() + filterMap.size();
-    activeFilters = new Filter[size];
+    Filter[] activeFilters = new Filter[size];
 
     int i = 0;
     for (Filter f : fixFilterMap.values()) { activeFilters[i++] = f; }
     for (Filter f : filterMap.values()) { activeFilters[i++] = f; }
+
+    Filter[] keepVisibleFilters = new Filter[fixKeepVisibleFilterMap.size()];
+    i = 0;
+    for (Filter f : fixKeepVisibleFilterMap.values()) { keepVisibleFilters[i++] = f; }
+
+    this.activeKeepVisibleFilters = keepVisibleFilters;
+    this.activeFilters = activeFilters;
   }
 
 }

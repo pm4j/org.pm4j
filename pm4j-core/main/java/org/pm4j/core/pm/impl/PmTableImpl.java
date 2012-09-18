@@ -169,8 +169,8 @@ public class PmTableImpl
    * <p>
    * Can be called already within the constructor.
    *
-   * @param filterId
-   * @param filter
+   * @param filterId identifier of the filter.
+   * @param filter the filter to set. The filter gets removed if <code>null</code> gets passed here.
    */
   public void setFixFilter(final String filterId, final Filter filter) {
     rowFilter.setFixFilter(filterId, filter);
@@ -178,6 +178,24 @@ public class PmTableImpl
       pageableCollection.setItemFilter(rowFilter);
     }
   }
+
+  /**
+   * Defines a fix 'keep visible' filter that will not be cleared when the table gets re-initialized.<br>
+   * If an item matches a single 'keep visible' filter, it will stay visible even if other filters would
+   * hide them.
+   * <p>
+   * Can be called already within the constructor.
+   *
+   * @param filterId identifier of the filter.
+   * @param filter the filter to set. The filter gets removed if <code>null</code> gets passed here.
+   */
+  public void setFixKeepPmRowVisibleFilter(final String filterId, final Filter filter) {
+    rowFilter.setFixKeepVisibleFilter(filterId, filter);
+    if (pageableCollection != null) {
+      pageableCollection.setItemFilter(rowFilter);
+    }
+  }
+
 
   @SuppressWarnings({ "unchecked", "rawtypes" })
   @Override
