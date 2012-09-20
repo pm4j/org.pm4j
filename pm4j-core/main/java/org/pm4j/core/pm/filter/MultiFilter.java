@@ -6,22 +6,36 @@ import java.util.Map;
 import org.pm4j.core.pm.PmBean;
 
 /**
- * A filter that is a composition of multiple filters.<br>
- * All sub-filters are combined by an AND-logic. That means an item must pass
- * the checks of all registered filters to get visible.
- * <p>
- * But: If an item matches a 'keep visible' filter definition it also stays visible.
- * All 'keep visible' filters are combined by an OR-logic.
- * <p>
- * Each sub-filter can be added with an identifier.<br>
+ * A {@link MultiFilter} supports three filter sets with the following logic:
+ * <ol>
+ *  <li>A set of <b>fix filters</b>:<br>
+ *      They get executed for each item and will not be removed by a {@link #clear()} call.<br>
+ *      Only items that pass all fix filters will be visible.</li>
+ *      Such filters may be used for some fix UI constraints. Example: A table should only display items
+ *      defined for a currently selected language.<br>
+ *      See also {@link #setFixFilter(String, Filter)}
+ *  <li>A set of <b>fix keep visible filters</b>:<br>
+ *      They will be executed for items that passed the 'fix filter' checks.<br>
+ *      If one of these filters matches, the item will be visible.<br>
+ *      They may be used to define some cross cutting filter exceptions.<br>
+ *      Example: A filter may define that not yet persisted items should stay
+ *      visible, even if the user specified another dynamic filter condition.<br>
+ *      See also {@link #setFixKeepVisibleFilter(String, Filter)}
+ *  </li>
+ *  <li>A set of <b>filters</b>:<br>
+ *      They will be executed for all remaining items.<br>
+ *      All filters are combined by an AND-logic. That means an item must pass
+ *      the checks of all registered filters to get visible.<br>
+ *      See also {@link #setFixFilter(String, Filter)}
+ *  </li>
+ * </ol>
+ *
+ * Each filter will be added with an identifier.<br>
  * This allows to replace and remove specific filters.
  *
  * @author olaf boede
  */
 public class MultiFilter implements Filter {
-
-  /** The 'normal' filter set that will be removed when {@link #clear()} gets called. */
-  private Map<String, Filter> filterMap = new HashMap<String, Filter>();
 
   /** A set of filters that is not affected by a {@link #clear()} call. */
   private Map<String, Filter> fixFilterMap = new HashMap<String, Filter>();
@@ -30,18 +44,27 @@ public class MultiFilter implements Filter {
    *  This map is not affected by a {@link #clear()} call. */
   private Map<String, Filter> fixKeepVisibleFilterMap = new HashMap<String, Filter>();
 
-  private Filter[] activeKeepVisibleFilters = {};
-  private Filter[] activeFilters = {};
+  /** The 'normal' filter set that will be removed when {@link #clear()} gets called. */
+  private Map<String, Filter> filterMap = new HashMap<String, Filter>();
+
+  /** A quick access member for fast filter iteration. */
+  private FilterArrays filterArrays = new FilterArrays();
 
   @Override
   public boolean doesItemMatch(Object item) {
-    for (Filter f : activeKeepVisibleFilters) {
+    for (Filter f : filterArrays.activeFixFilters) {
+      if (! doesItemMatch(f, item)) {
+        return false;
+      }
+    }
+
+    for (Filter f : filterArrays.activeKeepVisibleFilters) {
       if (doesItemMatch(f, item)) {
         return true;
       }
     }
 
-    for (Filter f : activeFilters) {
+    for (Filter f : filterArrays.activeFilters) {
       if (! doesItemMatch(f, item)) {
         return false;
       }
@@ -77,7 +100,7 @@ public class MultiFilter implements Filter {
       filterMap.remove(filterId);
     }
 
-    updateActiveFilters();
+    updateFilterArrays();
   }
 
   /**
@@ -110,7 +133,7 @@ public class MultiFilter implements Filter {
       fixFilterMap.remove(filterId);
     }
 
-    updateActiveFilters();
+    updateFilterArrays();
   }
 
   public Filter getFixFilter(String filterId) {
@@ -138,7 +161,7 @@ public class MultiFilter implements Filter {
       fixKeepVisibleFilterMap.remove(filterId);
     }
 
-    updateActiveFilters();
+    updateFilterArrays();
   }
 
   public Filter getFixKeepVisibleFilter(String filterId) {
@@ -152,14 +175,14 @@ public class MultiFilter implements Filter {
    */
   public void clear() {
     filterMap.clear();
-    updateActiveFilters();
+    updateFilterArrays();
   }
 
   /**
-   * @return <code>true</code> if there is no filter defined.
+   * @return <code>true</code> if there is no dynamic filter defined.
    */
   public boolean isEmpty() {
-    return activeFilters.length == 0;
+    return filterArrays.empty;
   }
 
   @SuppressWarnings("unchecked")
@@ -169,20 +192,14 @@ public class MultiFilter implements Filter {
         : f.doesItemMatch(item);
   }
 
-  private void updateActiveFilters() {
-    int size = fixFilterMap.size() + filterMap.size();
-    Filter[] activeFilters = new Filter[size];
-
-    int i = 0;
-    for (Filter f : fixFilterMap.values()) { activeFilters[i++] = f; }
-    for (Filter f : filterMap.values()) { activeFilters[i++] = f; }
-
-    Filter[] keepVisibleFilters = new Filter[fixKeepVisibleFilterMap.size()];
-    i = 0;
-    for (Filter f : fixKeepVisibleFilterMap.values()) { keepVisibleFilters[i++] = f; }
-
-    this.activeKeepVisibleFilters = keepVisibleFilters;
-    this.activeFilters = activeFilters;
+  private void updateFilterArrays() {
+    filterArrays = new FilterArrays();
   }
 
+  private class FilterArrays {
+    final Filter[] activeFixFilters         = fixFilterMap.values().toArray(new Filter[fixFilterMap.size()]);
+    final Filter[] activeKeepVisibleFilters = fixKeepVisibleFilterMap.values().toArray(new Filter[fixKeepVisibleFilterMap.size()]);
+    final Filter[] activeFilters            = filterMap.values().toArray(new Filter[filterMap.size()]);
+    final boolean  empty                    = fixFilterMap.isEmpty() && fixKeepVisibleFilterMap.isEmpty() && filterMap.isEmpty();
+  }
 }
