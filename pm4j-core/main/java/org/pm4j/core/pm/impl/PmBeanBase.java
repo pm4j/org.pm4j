@@ -357,9 +357,8 @@ public abstract class PmBeanBase<T_BEAN>
       embeddingBeanPm = PmUtil.findPmParentOfType(this, PmBeanBase.class);
     }
 
-    /** This special class calls always {@link #getPmBeanImpl()}. */
     @Override
-    public final T_BEAN getPmBean() {
+    public T_BEAN getPmBean() {
       zz_ensurePmInitialization();
       return embeddingBeanPm != null
               ? embeddingBeanPm.getPmBean()
