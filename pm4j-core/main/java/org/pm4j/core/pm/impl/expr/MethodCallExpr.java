@@ -3,12 +3,11 @@ package org.pm4j.core.pm.impl.expr;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.pm4j.core.pm.impl.expr.NameWithModifier.Modifier;
 import org.pm4j.core.pm.impl.expr.parser.ParseCtxt;
 import org.pm4j.core.pm.impl.expr.parser.ParseException;
 
@@ -166,7 +165,7 @@ public class MethodCallExpr
           }
 
           if (m == null &&
-              !isOptional()) {
+              ! hasNameModifier(Modifier.OPTIONAL)) {
             throw new ExprExecExeption(ctxt, "Method '" + nameWithModifier.getName() + "' not found in class: " + objClass.getName());
           }
         }
@@ -174,7 +173,7 @@ public class MethodCallExpr
       } catch (SecurityException e) {
         throw new ExprExecExeption(ctxt, "Unable to access method.", e);
       } catch (NoSuchMethodException e) {
-        if (!isOptional()) {
+        if (! hasNameModifier(Modifier.OPTIONAL)) {
           throw new ExprExecExeption(ctxt, "Method '" + nameWithModifier.getName() + "' not found in class: " + objClass.getName());
         }
       }
@@ -184,8 +183,8 @@ public class MethodCallExpr
   }
 
   @Override
-  public boolean isOptional() {
-    return nameWithModifier.isOptional();
+  public boolean hasNameModifier(Modifier nameModifier) {
+    return nameWithModifier.getModifiers().contains(nameModifier);
   }
 
   @Override

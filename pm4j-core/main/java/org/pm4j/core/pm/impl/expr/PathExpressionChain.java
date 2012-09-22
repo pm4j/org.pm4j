@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.pm4j.core.pm.impl.expr.NameWithModifier.Modifier;
 import org.pm4j.core.pm.impl.expr.parser.ParseCtxt;
 import org.pm4j.core.pm.impl.expr.parser.ParseException;
 
@@ -22,7 +23,7 @@ public class PathExpressionChain extends ExprBase<ExprExecCtxt> {
       r.exec(ctxt);
       if (ctxt.getCurrentValue() == null) {
         if (i != chain.length-1 &&
-            ! r.isOptional()) {
+            ! r.hasNameModifier(Modifier.OPTIONAL)) {
           throw new ExprExecExeption(ctxt, "Mandatory expression returns 'null'.");
         }
         break;
@@ -40,7 +41,7 @@ public class PathExpressionChain extends ExprBase<ExprExecCtxt> {
       r.exec(ctxt);
 
       if (ctxt.getCurrentValue() == null) {
-        if (r.isOptional()) {
+        if (r.hasNameModifier(Modifier.OPTIONAL)) {
           // not reachable optional path.
           return;
         }
@@ -101,13 +102,13 @@ public class PathExpressionChain extends ExprBase<ExprExecCtxt> {
     if (scalarExpr != null) {
       return scalarExpr;
     }
-    
+
     OptionalExpression startExpr = MethodCallExpr.parse(ctxt);
     if (startExpr == null) {
       // allow expressions to start with 'this'.
       startExpr = ThisExpr.parse(ctxt);
-      
-      // Special handling that allows to forbid attribute usage as expression starter. 
+
+      // Special handling that allows to forbid attribute usage as expression starter.
       // Useful to prevent conflicts between attribute names and names of named objects.
       if (startExpr == null) {
         startExpr = isStartAttrAllowed

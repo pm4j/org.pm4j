@@ -1,5 +1,6 @@
 package org.pm4j.core.pm.impl.expr;
 
+import org.pm4j.core.pm.impl.expr.NameWithModifier.Modifier;
 import org.pm4j.core.pm.impl.expr.parser.ParseCtxt;
 
 
@@ -13,14 +14,14 @@ public class ThisExpr extends ExprBase<ExprExecCtxt> implements OptionalExpressi
   public static ThisExpr INSTANCE = new ThisExpr();
 
   public static final String THIS_KEYWORD = "this";
-  
+
   @Override
   protected Object execImpl(ExprExecCtxt ctxt) {
     return ctxt.getCurrentValue();
   }
 
   @Override
-  public boolean isOptional() {
+  public boolean hasNameModifier(Modifier nameModifier) {
     return false;
   }
 
@@ -30,9 +31,9 @@ public class ThisExpr extends ExprBase<ExprExecCtxt> implements OptionalExpressi
    *         Otherwise <code>null</code>.
    */
   public static ThisExpr parse(ParseCtxt ctxt) {
-    return ctxt.readOptionalString("this") 
+    return ctxt.readOptionalString("this")
               ? ThisExpr.INSTANCE
               : null;
   }
-  
+
 }

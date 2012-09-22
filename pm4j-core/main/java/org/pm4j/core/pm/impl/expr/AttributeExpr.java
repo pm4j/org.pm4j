@@ -1,5 +1,6 @@
 package org.pm4j.core.pm.impl.expr;
 
+import org.pm4j.core.pm.impl.expr.NameWithModifier.Modifier;
 import org.pm4j.core.pm.impl.expr.parser.ParseCtxt;
 import org.pm4j.core.util.reflection.BeanAttrAccessor;
 import org.pm4j.core.util.reflection.BeanAttrAccessorImpl;
@@ -36,7 +37,7 @@ public class AttributeExpr
     Object currentObj = ctxt.getCurrentValue();
 
     if (currentObj == null) {
-      if (!isOptional()) {
+      if (!hasNameModifier(Modifier.OPTIONAL)) {
         throw new ExprExecExeption(ctxt, "Unable to resolve expression part '" + name + "' on a 'null' value.");
       }
       else {
@@ -53,8 +54,8 @@ public class AttributeExpr
   }
 
   @Override
-  public boolean isOptional() {
-    return name.isOptional();
+  public boolean hasNameModifier(Modifier nameModifier) {
+    return name.getModifiers().contains(nameModifier);
   }
 
   private BeanAttrAccessor ensureAccessor(ExprExecCtxt ctxt) {
@@ -64,7 +65,8 @@ public class AttributeExpr
         accessor = new BeanAttrAccessorImpl(ctxt.getCurrentValue().getClass(), name.getName());
       }
       catch (ReflectionException e) {
-        if (! isOptional()) {
+        // TODO olaf: isExistsOptionally() should be used here...
+        if (! (hasNameModifier(Modifier.OPTIONAL) || hasNameModifier(Modifier.EXISTS_OPTIONALLY))) {
           throw new ExprExecExeption(ctxt, "Unable to resolve expression part '" + name + "'.", e);
         }
         return null;

@@ -2,6 +2,7 @@ package org.pm4j.core.pm.impl.expr;
 
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.api.PmExpressionApi;
+import org.pm4j.core.pm.impl.expr.NameWithModifier.Modifier;
 import org.pm4j.core.pm.impl.expr.parser.ParseCtxt;
 
 public class PmVariableExpr
@@ -28,8 +29,8 @@ public class PmVariableExpr
   }
 
   @Override
-  public boolean isOptional() {
-    return nameWithModifier.isOptional();
+  public boolean hasNameModifier(Modifier nameModifier) {
+    return nameWithModifier.getModifiers().contains(nameModifier);
   }
 
   @Override

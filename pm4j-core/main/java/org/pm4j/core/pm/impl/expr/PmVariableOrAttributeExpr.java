@@ -1,5 +1,6 @@
 package org.pm4j.core.pm.impl.expr;
 
+import org.pm4j.core.pm.impl.expr.NameWithModifier.Modifier;
 import org.pm4j.core.pm.impl.expr.parser.ParseCtxt;
 import org.pm4j.core.util.reflection.BeanAttrAccessor;
 import org.pm4j.core.util.reflection.BeanAttrAccessorImpl;
@@ -43,8 +44,8 @@ public class PmVariableOrAttributeExpr implements OptionalExpression {
   }
 
   @Override
-  public boolean isOptional() {
-    return nameWithModifier.isOptional();
+  public boolean hasNameModifier(Modifier nameModifier) {
+    return nameWithModifier.getModifiers().contains(nameModifier);
   }
 
   private void ensureResolver(ExprExecCtxt ctxt) {

@@ -1,5 +1,8 @@
 package org.pm4j.core.pm.impl.expr;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.pm4j.common.exception.CheckedExceptionWrapper;
 import org.pm4j.core.pm.impl.expr.parser.ParseCtxt;
 import org.pm4j.core.pm.impl.expr.parser.ParseException;
@@ -19,29 +22,15 @@ import org.pm4j.core.pm.impl.expr.parser.ParseException;
  */
 public class NameWithModifier implements Cloneable {
 
-  private boolean optional;
+  private Set<Modifier> modifiers = new HashSet<Modifier>();
   private boolean variable;
   private String name;
 
-  public boolean isOptional() {
-    return optional;
-  }
-
-  public boolean isVariable() {
-    return variable;
-  }
-
-  public void setOptional(boolean optional) {
-    this.optional = optional;
-  }
-
-  public void setVariable(boolean variable) {
-    this.variable = variable;
-  }
-
-  public String getName() {
-    return name;
-  }
+  public Set<Modifier> getModifiers() { return modifiers; }
+  public boolean isOptional() { return modifiers.contains(Modifier.OPTIONAL); }
+  public boolean isVariable() { return variable; }
+  public void setVariable(boolean variable) { this.variable = variable; }
+  public String getName() { return name; }
 
   @Override
   public NameWithModifier clone() {
@@ -55,7 +44,17 @@ public class NameWithModifier implements Cloneable {
   static enum Modifier {
     OPTIONAL("o") {
       @Override public void applyModifier(NameWithModifier n) {
-        n.setOptional(true);
+        n.modifiers.add(OPTIONAL);
+      }
+    },
+    EXISTS_OPTIONALLY("x") {
+      @Override public void applyModifier(NameWithModifier n) {
+        n.modifiers.add(EXISTS_OPTIONALLY);
+      }
+    },
+    REPEATED("r") {
+      @Override public void applyModifier(NameWithModifier n) {
+        n.modifiers.add(REPEATED);
       }
     };
 
@@ -87,8 +86,14 @@ public class NameWithModifier implements Cloneable {
   public String toString() {
     StringBuilder sb = new StringBuilder();
 
-    if (optional) {
-      sb.append("(o)");
+    if (!modifiers.isEmpty()) {
+      sb.append("(");
+      for (Modifier m : Modifier.values()) {
+        if (modifiers.contains(m)) {
+          sb.append(m.id);
+        }
+      }
+      sb.append(")");
     }
 
     if (variable) {
@@ -155,5 +160,6 @@ public class NameWithModifier implements Cloneable {
 
     return n;
   }
+
 
 }
