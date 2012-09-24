@@ -1,7 +1,10 @@
 package org.pm4j.core.pm.impl.expr;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+
+import org.pm4j.common.exception.CheckedExceptionWrapper;
 
 /**
  * The execution context for expressions.<br>
@@ -12,11 +15,11 @@ import java.util.List;
  *
  * @author olaf boede
  */
-public class ExprExecCtxt {
+public class ExprExecCtxt implements Cloneable {
 
   private Object currentValue;
   private final Object startValue;
-  private final List<HistoryItem> execHistory = new ArrayList<HistoryItem>();
+  private List<HistoryItem> execHistory = new ArrayList<HistoryItem>();
   private Expression startExpr;
   private Expression currentExpr;
 
@@ -25,6 +28,17 @@ public class ExprExecCtxt {
    */
   public ExprExecCtxt(Object startObject) {
     this.currentValue = this.startValue = startObject;
+  }
+
+  @Override
+  protected ExprExecCtxt clone() {
+    try {
+      ExprExecCtxt clone = (ExprExecCtxt) super.clone();
+      clone.execHistory = new ArrayList<HistoryItem>(this.execHistory);
+      return clone;
+    } catch (CloneNotSupportedException e) {
+      throw new CheckedExceptionWrapper(e);
+    }
   }
 
   public void setCurrentExpr(Expression expr) {
@@ -65,7 +79,7 @@ public class ExprExecCtxt {
    * @return The expression execution history.
    */
   public List<HistoryItem> getExecHistory() {
-    return execHistory;
+    return Collections.unmodifiableList(execHistory);
   }
 
   /**

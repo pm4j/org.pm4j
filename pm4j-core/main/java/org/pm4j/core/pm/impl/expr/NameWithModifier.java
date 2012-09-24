@@ -52,7 +52,7 @@ public class NameWithModifier implements Cloneable {
         n.modifiers.add(EXISTS_OPTIONALLY);
       }
     },
-    REPEATED("r") {
+    REPEATED("*") {
       @Override public void applyModifier(NameWithModifier n) {
         n.modifiers.add(REPEATED);
       }
@@ -61,23 +61,24 @@ public class NameWithModifier implements Cloneable {
     private final String id;
 
     private Modifier(String id) {
+      if (id.length() != 1) {
+        throw new IllegalArgumentException("The parse algorithm needs to be extended to support more than one character.");
+      }
       this.id = id;
     }
 
     public abstract void applyModifier(NameWithModifier n);
 
     static Modifier parse(ParseCtxt ctxt) {
-      String s = ctxt.skipBlanksAndReadNameString();
+      char ch = ctxt.skipBlanks().readCharAndAdvance();
 
       for (Modifier m : values()) {
-        if (m.id.equals(s)) {
+        if (m.id.charAt(0) == ch) {
           return m;
         }
       }
 
-      throw new ParseException(ctxt, s != null
-                              ? "Unknown modifier '" + s + "' found."
-                      		    : null);
+      throw new ParseException(ctxt, "Unknown modifier '" + ch + "' found.");
     }
 
   }

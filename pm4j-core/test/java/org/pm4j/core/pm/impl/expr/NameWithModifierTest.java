@@ -34,7 +34,7 @@ public class NameWithModifierTest {
     assertEquals(true, n.getModifiers().contains(Modifier.EXISTS_OPTIONALLY));
     assertEquals(false, n.getModifiers().contains(Modifier.REPEATED));
 
-    n = NameWithModifier.parseNameAndModifier(new ParseCtxt("(x,o,r)hallo"));
+    n = NameWithModifier.parseNameAndModifier(new ParseCtxt("(x,o,*)hallo"));
     assertEquals("hallo", n.getName());
     assertEquals(true, n.getModifiers().contains(Modifier.OPTIONAL));
     assertEquals(true, n.getModifiers().contains(Modifier.EXISTS_OPTIONALLY));
