@@ -1,5 +1,6 @@
 package org.pm4j.core.pm;
 
+import java.util.Locale;
 import java.util.Set;
 
 import javax.validation.ConstraintViolation;
@@ -9,6 +10,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.ScriptAssert;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -63,11 +65,20 @@ public class PmBeanValidationTest {
 
   private PmConversation pmConversation;
   private MyBeanPm myBeanPm;
+  // TODO olaf: check how to configure the validator language.
+  private Locale systemDefaultLocale = Locale.getDefault();
+
 
   @Before
   public void setUp() {
+    Locale.setDefault(Locale.ENGLISH);
     pmConversation = new PmConversationImpl();
     myBeanPm = new MyBeanPm(pmConversation, null);
+  }
+
+  @After
+  public void tearDown() {
+    Locale.setDefault(systemDefaultLocale);
   }
 
   @Test
@@ -104,7 +115,6 @@ public class PmBeanValidationTest {
     Assert.assertEquals(1, violations.size());
     Assert.assertEquals("script expression \"_this.i < _this.j\" didn't evaluate to true", violations.iterator().next().getMessage());
   }
-
 
 
 }
