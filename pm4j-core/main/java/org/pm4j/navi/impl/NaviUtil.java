@@ -1,6 +1,15 @@
 package org.pm4j.navi.impl;
 
+import java.io.Serializable;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.commons.lang.SerializationUtils;
 import org.apache.commons.lang.StringUtils;
+import org.pm4j.core.pm.PmObject;
+import org.pm4j.core.util.lang.CloneUtil;
 import org.pm4j.core.util.reflection.ClassUtil;
 
 
@@ -17,7 +26,8 @@ public final class NaviUtil {
    *          The parameter value to check.
    */
   public static void checkNaviScopeParam(String pName, Object pValue) {
-    if (! ClassUtil.canCloneOrSerialize(pValue)) {
+    boolean canClone = canCloneOrSerialize(pValue) || pValue instanceof PmObject;
+    if (! canClone) {
       throw new IllegalArgumentException("The passed navigation scope parameter '" +
           pName + "' is not cloneable and not serializable. Passed value was: " + pValue);
     }
@@ -84,6 +94,92 @@ public final class NaviUtil {
     sarr[1] = versBuilder.toString();
     return sarr;
   }
+
+  /**
+   * Puts all entries of srcMap to targetMap. The values will be cloned using
+   * {@link ClassUtil#cloneOrSerialize(Object)}.
+   *
+   * @param srcMap
+   *          A map with the values to clone.
+   * @param targetMap
+   *          The map to put the cloned entries to.
+   * @return A reference to the targetMap.
+   */
+  static <K, V> Map<K, V> deepCloneValues(Map<K, V> srcMap, Map<K, V> targetMap) {
+    for (Map.Entry<K, V> e : srcMap.entrySet()) {
+      targetMap.put(e.getKey(), cloneOrSerialize(e.getValue()));
+    }
+    return targetMap;
+  }
+
+  @SuppressWarnings("unchecked")
+  private static final Set<Class<?>> IMMUTABLE_CLASSES = new HashSet<Class<?>>(Arrays.asList(
+      String.class,
+      Integer.class, Long.class, Short.class, Double.class, Float.class,
+      Class.class));
+
+
+  /**
+   * Generates a clone for the given object.<br>
+   * If the object is {@link Cloneable}, its <code>clone</code> method will be
+   * called.<br>
+   * If the object is not {@link Cloneable} but {@link Serializable}, a clone
+   * will be created using the serialization and de-serialization.
+   *
+   * @param ori
+   *          The object to copy.
+   * @return The copy.
+   * @throws IllegalArgumentException
+   *           if the given object can't be copied because it is not cloneable
+   *           or serializable.
+   */
+  @SuppressWarnings("unchecked")
+  private static <T> T cloneOrSerialize(T ori) {
+    if (ori == null) {
+      return null;
+    }
+
+    Class<?> objClass = ori.getClass();
+
+    if (IMMUTABLE_CLASSES.contains(objClass)) {
+      return ori;
+    }
+
+    Object clone = null;
+
+    if (ori instanceof Cloneable) {
+      clone = CloneUtil.clone((Cloneable)ori);
+    }
+    else if (ori instanceof Serializable) {
+      clone = SerializationUtils.clone((Serializable)ori);
+    }
+    else if (ori instanceof PmObject) {
+      // Exception for PMs: If they are not marked as cloneable, they will be used
+      // as shared instances.
+      // FIXME olaf: this code is very PM logic specific. Find a way to express it not PM-specific
+      //             in a technology utility.
+      // alternative: Simply don't clone not cloneable stuff.
+      //              Disadvantage: Provides tricky error scenarios with unintended shared instances...
+      clone = ori;
+    }
+    else {
+      throw new IllegalArgumentException("Class '" + objClass.getName() + "' does neither implement Cloneable nor Serializable.");
+    }
+
+    return (T) clone;
+  }
+
+  /**
+   * @param o The instance to test. May be <code>null</code>.
+   * @return <code>true</code> if the given object is a formally correct
+   *         argument for {@link #cloneOrSerialize(Object)}.
+   */
+  private static boolean canCloneOrSerialize(Object o) {
+    return o == null ||
+           o instanceof Cloneable ||
+           o instanceof Serializable;
+  }
+
 
   private static boolean isVersionDigit(char c) {
     return ((c >= 'a' && c <= 'z') || (c >= '0' && c <= '9'));

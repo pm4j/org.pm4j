@@ -12,7 +12,6 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.pm4j.common.util.collection.ListUtil;
-import org.pm4j.common.util.collection.MapUtil;
 import org.pm4j.navi.NaviHistory;
 import org.pm4j.navi.NaviHistoryCfg;
 import org.pm4j.navi.NaviLink;
@@ -373,7 +372,7 @@ public class NaviHistoryImpl implements NaviHistory {
 
       if (cloneNaviProps) {
         this.naviScopeProperties =
-          MapUtil.deepCloneValues(naviScopeProperties, new TreeMap<String, Object>());
+          NaviUtil.deepCloneValues(naviScopeProperties, new TreeMap<String, Object>());
       }
       else {
         this.naviScopeProperties = naviScopeProperties;
