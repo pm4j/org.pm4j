@@ -301,6 +301,15 @@ public abstract class PmBeanBase<T_BEAN>
   }
 
   /**
+   * A PM for a <code>null</code> bean is by default read-only.
+   */
+  @Override
+  protected boolean isPmReadonlyImpl() {
+    return (getPmBean() == null) ||
+           super.isPmReadonlyImpl();
+  }
+
+  /**
    * Validates all sub-PMs.<br>
    * It the validation of all sub-PM's did not provide an error it performs a bean-validation on
    * the bean provided by {@link #getPmBean()}.
@@ -339,7 +348,7 @@ public abstract class PmBeanBase<T_BEAN>
   public static class Nested<T_BEAN> extends PmBeanBase<T_BEAN> {
 
     /** The optional exisiting embedding context PM. */
-    private PmBeanBase<T_BEAN> embeddingBeanPm;
+    private PmBean<T_BEAN> embeddingBeanPm;
 
     /**
      * Creates the PM bound to a <code>null</code>-pmBean .
@@ -354,7 +363,7 @@ public abstract class PmBeanBase<T_BEAN>
     @Override
     protected void onPmInit() {
       super.onPmInit();
-      embeddingBeanPm = PmUtil.findPmParentOfType(this, PmBeanBase.class);
+      embeddingBeanPm = PmUtil.findPmParentOfType(this, PmBean.class);
     }
 
     @Override
