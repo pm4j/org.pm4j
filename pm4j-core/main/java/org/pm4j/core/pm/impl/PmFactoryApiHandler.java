@@ -31,13 +31,24 @@ public class PmFactoryApiHandler {
     }
 
     PmConversation pmConversation = pmCtxt.getPmConversation();
+    boolean supportFactoryHierarchy = pmConversation.getPmDefaults().supportFactoryHierarchy;
     synchronized (pmConversation) {
       T_PM pm = this.<T_PM>findPmForBean(pmCtxt, bean);
       if (pm != null) {
         return pm;
       }
 
-      BeanPmFactory factory = ((PmObjectBase)pmCtxt).getOwnPmElementFactory();
+      BeanPmFactory factory = null;
+      if (supportFactoryHierarchy) {
+        factory = ((PmObjectBase)pmCtxt).getOwnPmElementFactory();
+      }
+      else {
+        factory = findPmFactory(pmCtxt);
+        if (factory == null) {
+          throw new PmRuntimeException(pmCtxt, "Please add a @PmFactoryCfg configuration to be able to create a PM for a bean of type " + bean.getClass());
+        }
+      }
+
       if (factory != null &&
           factory.canMakePmFor(bean)) {
         pm = factory.<T_PM>makePm(pmCtxt, bean);
@@ -64,8 +75,6 @@ public class PmFactoryApiHandler {
     }
   }
 
-  private boolean supportFactoryHierarchy = true;
-
   /**
    * Searches an existing presentation model for the given bean.
    * Will <b>not</b> create a new model when none found.
@@ -88,7 +97,7 @@ public class PmFactoryApiHandler {
 
       // check in hierarchy only if the own factory (and cache) does not
       // manage objects of the given type.
-      if (supportFactoryHierarchy &&
+      if (pmCtxt.getPmConversation().getPmDefaults().supportFactoryHierarchy &&
           (factory == null ||
            ! factory.canMakePmFor(bean))) {
         PmObject pmParent = pmCtxtImpl.getPmParent();
@@ -173,6 +182,16 @@ public class PmFactoryApiHandler {
     else {
       return Collections.emptyList();
     }
+  }
+
+  private static BeanPmFactory findPmFactory(PmObject pm) {
+    BeanPmFactory factory = ((PmObjectBase)pm).getOwnPmElementFactory();
+
+    if ((factory == null) && (pm.getPmParent() != null)) {
+        factory = findPmFactory(pm.getPmParent());
+    }
+
+    return factory;
   }
 
 }

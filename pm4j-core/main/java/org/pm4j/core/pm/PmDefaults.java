@@ -1,5 +1,6 @@
 package org.pm4j.core.pm;
 
+import org.pm4j.common.exception.CheckedExceptionWrapper;
 import org.pm4j.core.pm.annotation.PmCommandCfg;
 import org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO;
 import org.pm4j.core.pm.filter.FilterByDefinition;
@@ -17,7 +18,7 @@ import org.pm4j.core.pm.impl.title.TitleProviderPmResBased;
  * @author olaf boede
  */
 @SuppressWarnings("rawtypes")
-public class PmDefaults {
+public class PmDefaults implements Cloneable {
 
   /**
    * The singleton.
@@ -98,6 +99,16 @@ public class PmDefaults {
 
   public boolean debugHints = false;
 
+  /**
+   * The default defines that a factory must be declared on the PM that uses the factory.
+   * E.g. a PmTable should declare the factory for its row PMs directly.
+   * <p>
+   * If this property is set to <code>true</code>, a factory in the parent hierarchy may be
+   * used also.<br>
+   * This hierarchy feature will be removed in one of the next releases.
+   */
+  public boolean supportFactoryHierarchy = false;
+
   // TODO olaf: add something to the command that allows to configure that. - An application default may also be useful...
 //  /**
 //   * Defines if the application supports commands that can be undone.
@@ -110,6 +121,15 @@ public class PmDefaults {
 
   @Deprecated
   private boolean elementsInheritAnnotationsOnlyFromSession = false;
+
+  @Override
+  protected PmDefaults clone() {
+    try {
+      return (PmDefaults) super.clone();
+    } catch (CloneNotSupportedException e) {
+      throw new CheckedExceptionWrapper(e);
+    }
+  }
 
   /**
    * @return The application wide default strategies.
