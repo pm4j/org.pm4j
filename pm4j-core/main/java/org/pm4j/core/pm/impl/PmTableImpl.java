@@ -700,7 +700,7 @@ public class PmTableImpl
    *
    * @return The bean sort comparator. May be <code>null</code>.
    */
-  Comparator<?> getInitialBeanSortComparator() {
+  protected Comparator<?> getInitialBeanSortComparator() {
     if (initialBeanSortComparator == NO_COMPARATOR) {
       PmTableCfg tableCfg = AnnotationUtil.findAnnotation(this, PmTableCfg.class);
       initialBeanSortComparator = (tableCfg != null && tableCfg.initialBeanSortComparator() != Comparator.class)
