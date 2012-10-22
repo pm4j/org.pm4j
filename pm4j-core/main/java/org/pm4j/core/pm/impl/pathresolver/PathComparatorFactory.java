@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import org.pm4j.common.expr.parser.ParseCtxt;
+import org.pm4j.common.expr.parser.ParseException;
 import org.pm4j.common.util.CompareUtil;
-import org.pm4j.core.pm.impl.expr.parser.ParseCtxt;
-import org.pm4j.core.pm.impl.expr.parser.ParseException;
 
 public class PathComparatorFactory {
 

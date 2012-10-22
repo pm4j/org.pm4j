@@ -1,12 +1,12 @@
 package org.pm4j.core.pm.impl.pathresolver;
 
 import org.apache.commons.lang.StringUtils;
+import org.pm4j.common.expr.ExprExecCtxt;
+import org.pm4j.common.expr.Expression;
+import org.pm4j.common.expr.parser.ParseCtxt;
 import org.pm4j.core.pm.PmObject;
-import org.pm4j.core.pm.impl.expr.ExprExecCtxt;
-import org.pm4j.core.pm.impl.expr.Expression;
 import org.pm4j.core.pm.impl.expr.PathExpressionChain;
 import org.pm4j.core.pm.impl.expr.PmExprExecCtxt;
-import org.pm4j.core.pm.impl.expr.parser.ParseCtxt;
 
 /**
  * A path resolver that uses an {@link Expression}.

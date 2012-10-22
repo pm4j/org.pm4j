@@ -142,6 +142,13 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
     }
   }
 
+  /** Finalized in this class. Please override {@link #isPmEnabledImpl()} if needed. */
+  // TODO: activate in v0.4
+//  @Override
+//  public final boolean isPmEnabled() {
+//    return super.isPmEnabled();
+//  }
+
   /**
    * The default implementation checks the own enabled flag and the enablement of
    * its parent context element.

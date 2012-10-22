@@ -1,9 +1,14 @@
 package org.pm4j.core.pm.impl.expr;
 
+import org.pm4j.common.expr.ExprBase;
+import org.pm4j.common.expr.ExprExecExeption;
+import org.pm4j.common.expr.NameWithModifier;
+import org.pm4j.common.expr.OptionalExpression;
+import org.pm4j.common.expr.ThisExpr;
+import org.pm4j.common.expr.NameWithModifier.Modifier;
+import org.pm4j.common.expr.parser.ParseCtxt;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.api.PmExpressionApi;
-import org.pm4j.core.pm.impl.expr.NameWithModifier.Modifier;
-import org.pm4j.core.pm.impl.expr.parser.ParseCtxt;
 
 public class PmVariableExpr
     extends ExprBase<PmExprExecCtxt>

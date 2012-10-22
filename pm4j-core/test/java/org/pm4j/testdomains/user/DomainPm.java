@@ -5,6 +5,7 @@ import org.pm4j.core.pm.PmAttrString;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.annotation.PmBeanCfg;
+import org.pm4j.core.pm.annotation.PmFactoryCfg;
 import org.pm4j.core.pm.annotation.PmTitleCfg;
 import org.pm4j.core.pm.api.PmFactoryApi;
 import org.pm4j.core.pm.impl.PmAttrPmListImpl;
@@ -24,8 +25,10 @@ public class DomainPm extends PmBeanBase<Domain> {
   @PmAttrCfg(maxLen=1000)
   public final PmAttrString description = new PmAttrStringImpl(this);
 
+  @PmFactoryCfg(beanPmClasses=UserPm.class)
   public final PmAttrPmList<UserPm> users = new PmAttrPmListImpl<UserPm, User>(this);
 
+  @PmFactoryCfg(beanPmClasses=DomainPm.class)
   public final PmAttrPmList<DomainPm> subDomains = new PmAttrPmListImpl<DomainPm, Domain>(this);
 
   // ------- Commands ---------- //

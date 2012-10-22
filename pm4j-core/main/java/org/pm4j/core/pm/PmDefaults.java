@@ -107,7 +107,7 @@ public class PmDefaults implements Cloneable {
    * used also.<br>
    * This hierarchy feature will be removed in one of the next releases.
    */
-  public boolean supportFactoryHierarchy = false;
+  public boolean supportFactoryHierarchy = true;
 
   // TODO olaf: add something to the command that allows to configure that. - An application default may also be useful...
 //  /**

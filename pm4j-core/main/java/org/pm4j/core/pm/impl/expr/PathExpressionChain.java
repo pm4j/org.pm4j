@@ -5,9 +5,18 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.pm4j.core.pm.impl.expr.NameWithModifier.Modifier;
-import org.pm4j.core.pm.impl.expr.parser.ParseCtxt;
-import org.pm4j.core.pm.impl.expr.parser.ParseException;
+import org.pm4j.common.expr.AttributeExpr;
+import org.pm4j.common.expr.ExprBase;
+import org.pm4j.common.expr.ExprExecCtxt;
+import org.pm4j.common.expr.ExprExecExeption;
+import org.pm4j.common.expr.Expression;
+import org.pm4j.common.expr.MethodCallExpr;
+import org.pm4j.common.expr.NameWithModifier.Modifier;
+import org.pm4j.common.expr.OptionalExpression;
+import org.pm4j.common.expr.ScalarExpr;
+import org.pm4j.common.expr.ThisExpr;
+import org.pm4j.common.expr.parser.ParseCtxt;
+import org.pm4j.common.expr.parser.ParseException;
 
 public class PathExpressionChain extends ExprBase<ExprExecCtxt> {
 

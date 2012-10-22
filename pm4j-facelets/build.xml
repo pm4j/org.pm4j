@@ -4,9 +4,12 @@
 	<property name="repository.dir" location="../pm4j-libs-temp-solution/lib" />
 	<property name="dir.classes" location="target/classes"/>
 	<property name="dir.dist" location="target/dist"/>
+	<property name="dir.pm4j-common" location="../pm4j-common" />
 
 	<!-- ========== Compile Target ========== -->
 	<target name="compile">
+		<ant antfile="${dir.pm4j-common}/build.xml" dir="${dir.pm4j-common}" target="all" inheritAll="false" inheritRefs="false" />
+
 		<mkdir dir="${dir.classes}"/>
 		<javac srcdir="${dir.src}" destdir="${dir.classes}" includes="org/**" debug="true" fork="true" >
 			<classpath>
@@ -15,6 +18,7 @@
 				<fileset file="${repository.dir}/junit/jars/junit-4.6.jar" />
 				<fileset file="${repository.dir}/log4j/jars/log4j-1.2.16.jar" />
 				<fileset file="../pm4j-core/target/dist/pm4j-core.jar" />
+				<fileset file="${dir.pm4j-common}/target/dist/pm4j-common.jar" />
 
 				<fileset file="${repository.dir}/myfaces/jars/myfaces-api-1.2.10.jar" />
 				<fileset file="${repository.dir}/javax.servlet/jars/servlet-api-2.4.jar" />
@@ -37,7 +41,7 @@
 			<arg value="rev-parse" />
 			<arg value="HEAD" />
 		</exec>
-		
+
 		<echo>Including HEAD SHA1 ${head.sha1}</echo>
 
 		<jar destfile="${dir.dist}/${ant.project.name}.jar">

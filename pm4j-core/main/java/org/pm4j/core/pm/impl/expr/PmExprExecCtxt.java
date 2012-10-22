@@ -1,5 +1,6 @@
 package org.pm4j.core.pm.impl.expr;
 
+import org.pm4j.common.expr.ExprExecCtxt;
 import org.pm4j.core.pm.PmObject;
 
 public class PmExprExecCtxt extends ExprExecCtxt {

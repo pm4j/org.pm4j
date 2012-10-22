@@ -2,10 +2,10 @@ package org.pm4j.core.pm.impl.pathresolver;
 
 import junit.framework.TestCase;
 
+import org.pm4j.common.expr.ExprExecCtxt;
+import org.pm4j.common.expr.Expression;
 import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.impl.PmConversationImpl;
-import org.pm4j.core.pm.impl.expr.ExprExecCtxt;
-import org.pm4j.core.pm.impl.expr.Expression;
 import org.pm4j.core.pm.impl.expr.PathExpressionChain;
 import org.pm4j.core.pm.impl.expr.PmExprExecCtxt;
 

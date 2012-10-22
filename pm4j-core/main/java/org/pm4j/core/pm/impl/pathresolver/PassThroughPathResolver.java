@@ -1,8 +1,8 @@
 package org.pm4j.core.pm.impl.pathresolver;
 
-import org.pm4j.core.pm.impl.expr.ExprExecCtxt;
-import org.pm4j.core.pm.impl.expr.ExprExecExeption;
-import org.pm4j.core.pm.impl.expr.ThisExpr;
+import org.pm4j.common.expr.ExprExecCtxt;
+import org.pm4j.common.expr.ExprExecExeption;
+import org.pm4j.common.expr.ThisExpr;
 
 /**
  * Just passes the given object back.<br>

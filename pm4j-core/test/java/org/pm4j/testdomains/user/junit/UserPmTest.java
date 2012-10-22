@@ -1,16 +1,21 @@
 package org.pm4j.testdomains.user.junit;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Locale;
 
-import junit.framework.TestCase;
-
+import org.junit.Ignore;
+import org.junit.Test;
 import org.pm4j.core.pm.PmBean;
+import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.PmMessage;
 import org.pm4j.core.pm.PmOption;
-import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.api.PmFactoryApi;
 import org.pm4j.core.pm.api.PmMessageUtil;
 import org.pm4j.core.pm.impl.PmConversationImpl;
@@ -21,8 +26,10 @@ import org.pm4j.testdomains.user.User;
 import org.pm4j.testdomains.user.User.Salutation;
 import org.pm4j.testdomains.user.UserPm;
 
-public class UserPmTest extends TestCase {
+public class UserPmTest {
 
+  @Test
+  @Ignore("olaf: Factory delegation to the conversation is no longer supported. Rewrite this test.")
   public void testUserModel() {
     PmConversation pmConversation = new AdminSession(null);
     Domain domain = new Domain("testDomain");
@@ -68,12 +75,15 @@ public class UserPmTest extends TestCase {
     assertEquals(3, domainPm.users.getValue().size());
   }
 
+  @Test
+  @Ignore("olaf: Factory delegation to the conversation is no longer supported. Rewrite this test.")
   public void testUserModelWithDefaultSession() {
     Domain domain = new Domain("testDomain");
     /*User user1 =*/ domain.addToUsers(new User("Berta"));
     User user2 = domain.addToUsers(new User("Willi"));
 
     PmConversation pmConversation = new PmConversationImpl(UserPm.class, DomainPm.class);
+
     pmConversation.setPmLocale(Locale.GERMAN);
     UserPm userPm = PmFactoryApi.getPmForBean(pmConversation, user2);
     // new UserPm(pmConversation, user2);
@@ -111,6 +121,7 @@ public class UserPmTest extends TestCase {
     assertEquals(3, domainPm.users.getValue().size());
   }
 
+  @Test
   public void testPmIdentityWithDefaultSession() {
     Domain domain = new Domain("testDomain");
     User user1 = domain.addToUsers(new User("Willi"));
@@ -125,6 +136,7 @@ public class UserPmTest extends TestCase {
     assertEquals(user2, userPm.associate.getValueAsBean());
   }
 
+  @Test
   public void testValidation() {
     User user = new User("Willi");
     PmConversation session = new PmConversationImpl(UserPm.class);

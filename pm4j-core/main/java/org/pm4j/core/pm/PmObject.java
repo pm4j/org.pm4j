@@ -110,7 +110,9 @@ public interface PmObject extends Comparable<PmObject> {
    *
    * @param visible
    *          The new local visibility state.
+   * @deprecated Please define the logic in isPmVisibleImpl().
    */
+  @Deprecated
   void setPmVisible(boolean visible);
 
   /**
@@ -121,7 +123,9 @@ public interface PmObject extends Comparable<PmObject> {
 
   /**
    * @param enabled The new local enabled state.
+   * @deprecated Please define the logic in isPmEnabledImpl().
    */
+  @Deprecated
   void setPmEnabled(boolean enabled);
 
   /**

@@ -178,6 +178,7 @@ public class BeanPmCacheTest {
   public static class MyConversation extends PmConversationImpl {
     List<MyBean> beanList = new ArrayList<BeanPmCacheTest.MyBean>();
 
+    @PmFactoryCfg(beanPmClasses=MyBeanPm.class)
     public final PmAttrPmList<MyBeanPm> pmList = new PmAttrPmListImpl<MyBeanPm, MyBean>(this) {
       protected Collection<MyBean> getBackingValueImpl() {
         return beanList;

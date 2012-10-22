@@ -1,7 +1,13 @@
 package org.pm4j.core.pm.impl.expr;
 
-import org.pm4j.core.pm.impl.expr.NameWithModifier.Modifier;
-import org.pm4j.core.pm.impl.expr.parser.ParseCtxt;
+import org.pm4j.common.expr.AttributeExpr;
+import org.pm4j.common.expr.ExprExecCtxt;
+import org.pm4j.common.expr.ExprExecExeption;
+import org.pm4j.common.expr.Expression;
+import org.pm4j.common.expr.NameWithModifier;
+import org.pm4j.common.expr.OptionalExpression;
+import org.pm4j.common.expr.NameWithModifier.Modifier;
+import org.pm4j.common.expr.parser.ParseCtxt;
 import org.pm4j.core.util.reflection.BeanAttrAccessor;
 import org.pm4j.core.util.reflection.BeanAttrAccessorImpl;
 import org.pm4j.core.util.reflection.ReflectionException;

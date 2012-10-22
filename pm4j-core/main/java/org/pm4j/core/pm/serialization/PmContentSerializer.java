@@ -10,6 +10,7 @@ import java.io.OutputStream;
 import org.apache.commons.lang.SerializationUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.pm4j.common.expr.ThisExpr;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmAspect;
 import org.pm4j.core.pm.PmConversation;
@@ -18,7 +19,6 @@ import org.pm4j.core.pm.PmMessage.Severity;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.api.PmExpressionApi;
 import org.pm4j.core.pm.impl.PmUtil;
-import org.pm4j.core.pm.impl.expr.ThisExpr;
 
 /**
  * Supports serialization and de-serialization of PM content.

@@ -3,6 +3,7 @@ package org.pm4j.core.pm;
 import java.util.Collection;
 import java.util.List;
 
+import org.pm4j.common.selection.SelectMode;
 import org.pm4j.core.pm.filter.FilterByDefinition;
 import org.pm4j.core.pm.filter.FilterByDefinitionProvider;
 import org.pm4j.core.pm.filter.Filterable;
@@ -21,6 +22,7 @@ public interface PmTable<T_ROW_OBJ> extends PmObject, PmDataInput, Filterable, F
   /**
    * The set of supported row selection modes.
    */
+  // TODO olaf: remove after switch to new table implementation.
   public static enum RowSelectMode {
     /** Only a single row may be selected. */
     SINGLE,
@@ -29,7 +31,16 @@ public interface PmTable<T_ROW_OBJ> extends PmObject, PmDataInput, Filterable, F
     /** No row can be marked as selected. */
     NO_SELECTION,
     /** This value defines no specific mode. The default should be applied. */
-    DEFAULT
+    DEFAULT;
+
+    public SelectMode toSelectMode() {
+      switch (this) {
+        case SINGLE: return SelectMode.SINGLE;
+        case MULTI: return SelectMode.MULTI;
+        case NO_SELECTION: return SelectMode.NO_SELECTION;
+        default: return SelectMode.DEFAULT;
+      }
+    }
   }
 
 

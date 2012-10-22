@@ -2,6 +2,7 @@ package org.pm4j.core.pm;
 
 import java.util.List;
 
+import org.pm4j.common.query.SortOrder;
 import org.pm4j.core.pm.filter.FilterByDefinition;
 import org.pm4j.core.pm.filter.FilterByDefinitionProvider;
 import org.pm4j.core.util.table.ColSizeSpec;

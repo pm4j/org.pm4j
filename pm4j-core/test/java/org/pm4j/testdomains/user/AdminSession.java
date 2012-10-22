@@ -4,6 +4,7 @@ import java.util.Locale;
 
 import org.pm4j.core.pm.PmAttrPmRef;
 import org.pm4j.core.pm.PmConversation;
+import org.pm4j.core.pm.PmDefaults;
 import org.pm4j.core.pm.annotation.PmFactoryCfg;
 import org.pm4j.core.pm.annotation.PmOptionCfg;
 import org.pm4j.core.pm.annotation.PmOptionCfg.NullOption;
@@ -34,6 +35,11 @@ public class AdminSession extends PmConversationImpl {
     super(parentSession);
     // fix Locale to ensure that title tests may run successfully on different machines.
     setPmLocale(Locale.GERMAN);
+
+    // XXX olaf: this feature will be removed in one of the next releases.
+    PmDefaults d = new PmDefaults();
+    d.supportFactoryHierarchy = true;
+    setPmDefaults(d);
   }
 
   // -------- Generated stuff -------- //

@@ -12,5 +12,6 @@
 	<classpathentry kind="lib" path="/pm4j-libs-temp-solution/lib/hibernate-validator-4.1.0.Final.jar"/>
 	<classpathentry kind="lib" path="/pm4j-libs-temp-solution/lib/slf4j-api-1.6.1.jar"/>
 	<classpathentry kind="lib" path="/pm4j-libs-temp-solution/lib/slf4j-log4j12-1.6.1.jar"/>
+	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/pm4j-common"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

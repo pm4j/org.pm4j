@@ -1,0 +1,2 @@
+Platzhalterdatei fuer die dennaechst hier erscheienden Tests.
+Fuer cvs notwendig um die Verzeichnisstruktur zu uebertragen.

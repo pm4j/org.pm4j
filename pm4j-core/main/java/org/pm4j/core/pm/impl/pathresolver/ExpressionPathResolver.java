@@ -1,8 +1,8 @@
 package org.pm4j.core.pm.impl.pathresolver;
 
 import org.apache.commons.lang.StringUtils;
-import org.pm4j.core.pm.impl.expr.ExprExecCtxt;
-import org.pm4j.core.pm.impl.expr.Expression;
+import org.pm4j.common.expr.ExprExecCtxt;
+import org.pm4j.common.expr.Expression;
 import org.pm4j.core.pm.impl.expr.PathExpressionChain;
 
 /**
