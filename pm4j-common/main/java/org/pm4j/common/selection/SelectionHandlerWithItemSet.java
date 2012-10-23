@@ -154,6 +154,12 @@ public class SelectionHandlerWithItemSet<T_ITEM> extends SelectionHandlerBase<T_
     public boolean contains(T_ITEM item) {
       return selectedItems.contains(item);
     }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T_BEAN> Selection<T_BEAN> getBeanSelection() {
+      return (Selection<T_BEAN>)this;
+    }
   }
 
 }

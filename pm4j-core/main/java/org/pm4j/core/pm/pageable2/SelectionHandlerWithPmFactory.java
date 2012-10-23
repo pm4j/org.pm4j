@@ -105,7 +105,7 @@ public class SelectionHandlerWithPmFactory<T_PM extends PmBean<T_BEAN>, T_BEAN> 
    * A non serializeable selection that provides PMs.
    */
   @SuppressWarnings("serial")
-  class PmSelection implements Selection<T_PM> {
+  public class PmSelection implements Selection<T_PM> {
     private final Selection<T_BEAN> beanSelection;
 
     public PmSelection(Selection<T_BEAN> selectedBeans) {
@@ -146,6 +146,10 @@ public class SelectionHandlerWithPmFactory<T_PM extends PmBean<T_BEAN>, T_BEAN> 
       return item != null
           ? beanSelection.contains(item.getPmBean())
           : false;
+    }
+
+    public Selection<T_BEAN> getBeanSelection() {
+      return beanSelection;
     }
   }
 

@@ -137,8 +137,8 @@ public class PmTableColImpl2 extends PmObjectBase implements PmTableCol2 {
   /**
    * @return The {@link PmTable} that contains this column.
    */
-  private PmTableImpl2<?> getPmTableImpl() {
-    return (PmTableImpl2<?>)getPmParent();
+  private PmTableImpl2<?, ?> getPmTableImpl() {
+    return (PmTableImpl2<?, ?>)getPmParent();
   }
 
   public PmSortOrder getSortOrder() {
@@ -223,7 +223,7 @@ public class PmTableColImpl2 extends PmObjectBase implements PmTableCol2 {
           sortOrder = sortOrder.getReverseSortOrder();
         }
       }
-      PmTableImpl2<?> pmTable = getPmTableImpl();
+      PmTableImpl2<?, ?> pmTable = getPmTableImpl();
       pmTable.getPmPageableCollection().getQuery().setSortOrder(sortOrder);
 
       // TODO: move to a listerner within the table implementation.

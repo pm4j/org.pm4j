@@ -39,4 +39,14 @@ public interface Selection<T_ITEM> extends Iterable<T_ITEM>, Serializable {
   @Override
   Iterator<T_ITEM> iterator();
 
+  /**
+   * In case of a stacked selection implementation a {@link Selection} of PMs
+   * is usually backed by a {@link Selection} of beans.
+   * <p>
+   * This method provides access to this bean selection.<br>
+   * The result of this call may provide this instance or one backing selection.
+   *
+   * @return the bean selection.
+   */
+  <T_BEAN> Selection<T_BEAN> getBeanSelection();
 }

@@ -43,7 +43,7 @@ public class PageableQueryCollection<T_ITEM, T_ID extends Serializable> extends 
   }
 
   @SuppressWarnings("unchecked")
-@Override
+  @Override
   public List<T_ITEM> getItemsOnPage() {
     long startIdx = PageableCollectionUtil2.getIdxOfFirstItemOnPage(this)-1;
     return (startIdx > -1)
@@ -102,6 +102,12 @@ public class PageableQueryCollection<T_ITEM, T_ID extends Serializable> extends 
   @Override
   public SelectionHandler<T_ITEM> getSelectionHandler() {
     return selectionHandler;
+  }
+
+  @Override
+  public void clearCaches() {
+    itemCount = -1;
+    unfilteredItemCount = -1;
   }
 
 }

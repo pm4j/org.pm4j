@@ -6,7 +6,6 @@ import java.util.List;
 import org.pm4j.common.query.Query;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.selection.SelectionHandler;
-import org.pm4j.common.util.beanproperty.PropertyChangeSupported;
 
 /**
  * Common interface for pageable object sets.
@@ -110,4 +109,9 @@ public interface PageableCollection2<T_ITEM> extends Iterable<T_ITEM> {
    */
   SelectionHandler<T_ITEM> getSelectionHandler();
 
+  /**
+   * Clears all cached information.<br>
+   * Gets called if everything needs to be re-evalueated.
+   */
+  void clearCaches();
 }

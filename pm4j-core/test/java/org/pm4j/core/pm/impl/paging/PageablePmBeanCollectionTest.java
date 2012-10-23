@@ -68,7 +68,7 @@ public class PageablePmBeanCollectionTest extends PageableCollectionTestBase<Pag
   }
 
   @PmFactoryCfg(beanPmClasses=BeanRowPm.class)
-  public static class BeanTablePm extends PmTableImpl2<BeanRowPm> {
+  public static class BeanTablePm extends PmTableImpl2<BeanRowPm, PageableCollectionTestBase.Bean> {
 
 //    @PmTableColCfg(sortable=PmBoolean.TRUE)
     public final PmTableCol2 name = new PmTableColImpl2(this);

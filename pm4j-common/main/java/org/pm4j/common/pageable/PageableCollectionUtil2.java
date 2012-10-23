@@ -158,7 +158,7 @@ public final class PageableCollectionUtil2 {
 
   /**
    * @param pageable
-   *          The set to handle.
+   *          the collection to handle.
    * @return <code>true</code> if there is a following page to navigate to.
    */
   public static boolean hasNextPage(PageableCollection2<?> pageable) {
@@ -173,6 +173,24 @@ public final class PageableCollectionUtil2 {
    */
   public static boolean hasPrevPage(PageableCollection2<?> pageable) {
     return pageable.getCurrentPageIdx() > 1;
+  }
+
+  /**
+   * Ensures that the page index is not out of range.
+   * <p>
+   * If the current page index is behind the last page it will be corrected to
+   * point to the last page.
+   *
+   * @param pageable the collection to handle.
+   */
+  public static void ensureCurrentPageInRange(PageableCollection2<?> pageable) {
+    // ensure that the current page index is not behind the last page after filtering.
+    int numOfPages = getNumOfPages(pageable);
+    int currentPageIdx = pageable.getCurrentPageIdx();
+    if (currentPageIdx >= numOfPages) {
+      pageable.setCurrentPageIdx(numOfPages == 0 ? 1 : numOfPages);
+    }
+
   }
 
   /**

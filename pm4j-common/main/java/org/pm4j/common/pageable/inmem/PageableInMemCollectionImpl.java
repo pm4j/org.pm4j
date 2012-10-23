@@ -113,6 +113,12 @@ public class PageableInMemCollectionImpl<T_ITEM> extends PageableCollectionBase2
   }
 
   @Override
+  public void clearCaches() {
+    sortOrderComparator = null;
+    objects = null;
+  }
+
+  @Override
   public void setSortOrderComparator(Comparator<T_ITEM> comparator) {
     if (comparator != this.sortOrderComparator) {
       sortOrderComparator = comparator;
@@ -120,7 +126,6 @@ public class PageableInMemCollectionImpl<T_ITEM> extends PageableCollectionBase2
     }
   }
 
-  // TODO: include attribute path evaluation in comparator. a) as part of the comparator b) as part of the evaluator context.
   private Comparator<T_ITEM> _getSortOrderComparator() {
     if (sortOrderComparator == null) {
       sortOrderComparator = inMemQueryEvaluator.getComparator(getQuery().getEffectiveSortOrder());
@@ -161,30 +166,6 @@ public class PageableInMemCollectionImpl<T_ITEM> extends PageableCollectionBase2
 
     return objects;
   }
-
-//  private InMemoryFilter<T_ITEM> frontCollectionFilter;
-//
-//  static class FrontFilterProxy<T_ITEM> implements InMemoryFilter<T_ITEM> {
-//
-//    private final InMemoryFilter<?> delegate;
-//
-//    public FrontFilterProxy(InMemoryFilter<?> delegate) {
-//      this.delegate = delegate;
-//    }
-//
-//    @Override
-//    public boolean isBeanFilter() {
-//      return true;
-//    }
-//
-//    public boolean doesItemMatch(Object item) {
-//      // TODO: get front item.
-//
-//      return delegate.doesItemMatch(item);
-//    };
-//
-//  }
-
 
   /** Generates a list of filtered items based on the given list. */
   private List<T_ITEM> _filter(List<T_ITEM> unfilteredList) {

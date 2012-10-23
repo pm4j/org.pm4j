@@ -54,7 +54,7 @@ public class PmTable2Test {
 
 
   @PmFactoryCfg(beanPmClasses=RowPm.class)
-  public static class TablePm extends PmTableImpl2<RowPm> {
+  public static class TablePm extends PmTableImpl2<RowPm, RowBean> {
 
     /** A column with an annotation based filter definition. */
     public final PmTableCol2 name = new PmTableColImpl2(this);

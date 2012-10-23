@@ -60,9 +60,9 @@ public class TitleProviderPmResBased<T extends PmObjectBase> implements PmTitleP
   /**
    * Provides an icon resource string that is defined within the resource file(s).
    * <p>
-   * For enabled items a resource string with the postfix '.icon' will be used.<br>
-   * For disabled item a resource string with the postfix '.icon_disabled' will be used.<br>
-   * If there is no '.icon_disabled' resource defined, the '.icon' resource will be used
+   * For enabled items a resource string with the postfix '_icon' will be used.<br>
+   * For disabled item a resource string with the postfix '_iconDisabled' will be used.<br>
+   * If there is no '.icon_disabled' resource defined, the '_icon' resource will be used
    * for the disabled state too.
    */
   public String getIconPath(T item) {

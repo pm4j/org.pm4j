@@ -43,7 +43,7 @@ public final class PmTableUtil2 {
    * @param table
    *          The table to adjust.
    */
-  public static void setScrollableTableProperties(PmTableImpl2<?> table) {
+  public static void setScrollableTableProperties(PmTableImpl2<?, ?> table) {
     table.setNumOfPageRows(Integer.MAX_VALUE);
     if (table.getPager() != null) {
       table.getPager().setPagerVisibility(PagerVisibility.WHEN_SECOND_PAGE_EXISTS);
@@ -83,7 +83,7 @@ public final class PmTableUtil2 {
    * @return The passed handler (for inline code style support).
    */
   public static <T extends MasterPmHandler> T addMasterDetailsPmHandler(PmTable2<?> pmTable, T handler) {
-    PmTableImpl2<?> pmTableImpl = (PmTableImpl2<?>) pmTable;
+    PmTableImpl2<?, ?> pmTableImpl = (PmTableImpl2<?, ?>) pmTable;
     pmTableImpl.changedStateRegistry.addDetailsPmHandler(handler);
     handler.startObservers();
     return handler;

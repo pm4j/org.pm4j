@@ -197,4 +197,9 @@ public class PageablePmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> imple
     return selectionHandler;
   }
 
+  @Override
+  public void clearCaches() {
+    beans.clearCaches();
+  }
+
 }

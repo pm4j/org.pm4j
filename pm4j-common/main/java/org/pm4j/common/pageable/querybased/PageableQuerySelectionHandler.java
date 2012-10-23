@@ -186,6 +186,12 @@ public class PageableQuerySelectionHandler<T_ITEM, T_ID extends Serializable> ex
       return new ItemIterator();
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T_BEAN> Selection<T_BEAN> getBeanSelection() {
+      return (Selection<T_BEAN>)this;
+    }
+
     protected Collection<T_ID> getSelectedOrDeselectedIds() {
       return ids;
     }
@@ -245,6 +251,12 @@ public class PageableQuerySelectionHandler<T_ITEM, T_ID extends Serializable> ex
     @Override
     public Iterator<T_ITEM> iterator() {
       return new ItemIterator();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T_BEAN> Selection<T_BEAN> getBeanSelection() {
+      return (Selection<T_BEAN>)this;
     }
 
     class ItemIterator implements Iterator<T_ITEM> {

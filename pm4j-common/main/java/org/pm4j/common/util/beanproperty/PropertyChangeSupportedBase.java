@@ -46,6 +46,12 @@ public class PropertyChangeSupportedBase implements PropertyChangeSupported {
     addVetoableChangeListener(propertyName, listener);
   }
 
+  @Override
+  public void removePropertyAndVetoableListener(String propertyName, PropertyAndVetoableChangeListener listener) {
+    removePropertyChangeListener(propertyName, listener);
+    removeVetoableChangeListener(propertyName, listener);
+  }
+
   protected void fireVetoableChange(String propertyName, Object oldValue, Object newValue) throws PropertyVetoException {
     getVpcs().fireVetoableChange(propertyName, oldValue, newValue);
   }

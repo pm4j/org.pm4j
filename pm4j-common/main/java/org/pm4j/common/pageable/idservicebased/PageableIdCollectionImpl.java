@@ -27,8 +27,7 @@ public class PageableIdCollectionImpl<T_ITEM, T_ID> extends PageableCollectionBa
   private PropertyChangeListener          resetItemsOnQueryChangeListener = new PropertyChangeListener() {
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-      ids = null;
-      currentPageItems = null;
+      clearCaches();
     }
   };
 
@@ -101,6 +100,13 @@ public class PageableIdCollectionImpl<T_ITEM, T_ID> extends PageableCollectionBa
   @Override
   public SelectionHandler<T_ITEM> getSelectionHandler() {
     return selectionHandler;
+  }
+
+  @Override
+  public void clearCaches() {
+    ids = null;
+    currentPageItems = null;
+    unfilteredItemCount = -1;
   }
 
   protected List<T_ID> getCurrentPageIds() {

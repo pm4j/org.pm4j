@@ -38,4 +38,5 @@ public interface PropertyChangeSupported {
   void removeVetoableChangeListener(String propertyName, VetoableChangeListener listener);
 
   void addPropertyAndVetoableListener(String propertyName, PropertyAndVetoableChangeListener listener);
+  void removePropertyAndVetoableListener(String propertyName, PropertyAndVetoableChangeListener listener);
 }
