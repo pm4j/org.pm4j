@@ -106,7 +106,7 @@ public class ChangeSetHandlerImpl<T_ITEM extends PmDataInput> implements ChangeS
     }
 
     if (changeKinds.length == 0) {
-      return (Collection<T_ITEM>)changedItemPms.keySet();
+      return (Collection<T_ITEM>)(Object)changedItemPms.keySet();
     }
 
     Collection<ChangeKind> changeKindColleciton = Arrays.asList(changeKinds);

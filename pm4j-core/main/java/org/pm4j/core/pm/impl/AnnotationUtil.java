@@ -59,8 +59,8 @@ public class AnnotationUtil {
    */
   public static <T extends Annotation> T findAnnotation(PmObjectBase pm, Class<? extends T> annotationClass) {
     return pm.getPmMetaDataWithoutPmInitCall().isPmField
-              ? findAnnotation(pm, annotationClass, pm.getPmParent().getClass())
-              : findAnnotationInClassTree(pm.getClass(), annotationClass);
+              ? (T) findAnnotation(pm, annotationClass, pm.getPmParent().getClass())
+              : (T) findAnnotationInClassTree(pm.getClass(), annotationClass);
   }
 
   /**
