@@ -43,6 +43,8 @@ import org.pm4j.core.pm.annotation.PmCacheCfg.CacheMode;
 import org.pm4j.core.pm.annotation.PmFactoryCfg;
 import org.pm4j.core.pm.annotation.PmInject;
 import org.pm4j.core.pm.annotation.PmTitleCfg;
+import org.pm4j.core.pm.annotation.customize.PmAnnotationApi;
+import org.pm4j.core.pm.annotation.customize.CustomizedAnnotationUtil;
 import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmMessageUtil;
@@ -224,15 +226,17 @@ public abstract class PmObjectBase implements PmObject {
 
   @Override
   public final boolean isPmVisible() {
-    PmCacheStrategy strategy = getPmMetaData().cacheStrategyForVisibility;
-    Object v = strategy.getCachedValue(this);
+    MetaData metaData = getPmMetaData();
+    Object v = metaData.cacheStrategyForVisibility.getCachedValue(this);
 
     if (v != PmCacheStrategy.NO_CACHE_VALUE) {
       // just return the cache hit (if there was one)
       return (Boolean) v;
     }
     else {
-      return (Boolean) strategy.setAndReturnCachedValue(this, isPmVisibleImpl());
+      boolean visible = isPmVisibleImpl() &&
+                        CustomizedAnnotationUtil.isVisible(this, metaData.permissionAnnotations);
+      return (Boolean) metaData.cacheStrategyForVisibility.setAndReturnCachedValue(this, visible);
     }
   }
 
@@ -240,7 +244,7 @@ public abstract class PmObjectBase implements PmObject {
     return pmVisible;
   }
 
-  @Override
+  @Override @Deprecated
   public void setPmVisible(boolean visible) {
     PmEventApi.ensureThreadEventSource(this);
     boolean changed = (pmVisible != visible);
@@ -253,15 +257,17 @@ public abstract class PmObjectBase implements PmObject {
 
   @Override
   public boolean isPmEnabled() {
-    PmCacheStrategy strategy = getPmMetaData().cacheStrategyForEnablement;
-    Object e = strategy.getCachedValue(this);
+    MetaData metaData = getPmMetaData();
+    Object e = metaData.cacheStrategyForEnablement.getCachedValue(this);
 
     if (e != PmCacheStrategy.NO_CACHE_VALUE) {
       // just return the cache hit (if there was one)
       return (Boolean) e;
     }
     else {
-      return (Boolean) strategy.setAndReturnCachedValue(this, isPmEnabledImpl());
+      boolean enabled = isPmEnabledImpl() &&
+                        CustomizedAnnotationUtil.isEnabled(this, metaData.permissionAnnotations);
+      return (Boolean) metaData.cacheStrategyForEnablement.setAndReturnCachedValue(this, enabled);
     }
   }
 
@@ -269,7 +275,7 @@ public abstract class PmObjectBase implements PmObject {
     return pmEnabled;
   }
 
-  @Override
+  @Override @Deprecated
   public void setPmEnabled(boolean enabled) {
     PmEventApi.ensureThreadEventSource(this);
     boolean changed = (pmEnabled != enabled);
@@ -291,7 +297,9 @@ public abstract class PmObjectBase implements PmObject {
    */
   @Override
   public final boolean isPmReadonly() {
-    return isPmReadonlyImpl();
+    boolean readonly  = isPmReadonlyImpl() ||
+                        CustomizedAnnotationUtil.isReadonly(this, getPmMetaData().permissionAnnotations);
+    return readonly;
   }
 
   /**
@@ -922,6 +930,9 @@ public abstract class PmObjectBase implements PmObject {
     metaData.cacheStrategyForVisibility = readCacheStrategy(PmCacheCfg.ATTR_VISIBILITY, cacheAnnotations, CACHE_STRATEGIES_FOR_VISIBILITY);
     metaData.cacheStrategyForEnablement = readCacheStrategy(PmCacheCfg.ATTR_ENABLEMENT, cacheAnnotations, CACHE_STRATEGIES_FOR_ENABLEMENT);
 
+    // -- Check for registered domain specific annotations
+    metaData.permissionAnnotations = AnnotationUtil.findAnnotations(this, PmAnnotationApi.getPermissionAnnotations()).toArray(new Annotation[0]);
+
     // -- Dependency injection configuration --
     metaData.fieldInjectionMap = new HashMap<Field, PathResolver>();
     for (Field f : ClassUtil.getAllFields(getClass())) {
@@ -1005,6 +1016,7 @@ public abstract class PmObjectBase implements PmObject {
      * informs all relevant listeners.
      */
     public int validationChangeEventMask;
+    private Annotation[] permissionAnnotations = {};
 
     private PmCacheStrategy cacheStrategyForTitle = PmCacheStrategyNoCache.INSTANCE;
     private PmCacheStrategy cacheStrategyForEnablement = PmCacheStrategyNoCache.INSTANCE;

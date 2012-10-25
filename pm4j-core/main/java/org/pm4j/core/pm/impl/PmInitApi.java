@@ -12,6 +12,15 @@ import org.pm4j.core.pm.impl.PmObjectBase.PmInitState;
 public class PmInitApi {
 
   /**
+   * Ensures that the passed PM gets initialized.
+   *
+   * @param pm the PM to initialize.
+   */
+  public static void ensurePmInitialization(PmObject pm) {
+    ((PmObjectBase)pm).zz_ensurePmInitialization();
+  }
+
+  /**
    * Checks if the given PM is completely initialized.
    *
    * @param pm The PM to check.
@@ -23,6 +32,8 @@ public class PmInitApi {
             : false;
   }
 
+
+
   /**
    * EXPERIMENTAL STATE: Helper for dynamic PM creation.
    */
@@ -32,10 +43,6 @@ public class PmInitApi {
     // TODO: the methods getPmName,getPmReskey etc. provide strange results now :-(
     pm.zz_initMetaData((PmObjectBase)pm.getPmParent(), name+"_"+pm.getClass().getName(), false, true);
     return pmAttr;
-  }
-
-  public static void ensurePmInitialization(PmObject pm) {
-    ((PmObjectBase)pm).zz_ensurePmInitialization();
   }
 
 }

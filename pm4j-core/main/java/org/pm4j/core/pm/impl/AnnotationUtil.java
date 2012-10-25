@@ -3,7 +3,9 @@ package org.pm4j.core.pm.impl;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.pm4j.common.exception.CheckedExceptionWrapper;
 import org.pm4j.core.pm.annotation.PmCacheCfg;
@@ -55,7 +57,7 @@ public class AnnotationUtil {
    *          The annotation class to find.
    * @return The annotation instance of <code>null</code> when not found.
    */
-  public static <T extends Annotation> T findAnnotation(PmObjectBase pm, Class<T> annotationClass) {
+  public static <T extends Annotation> T findAnnotation(PmObjectBase pm, Class<? extends T> annotationClass) {
     return pm.getPmMetaDataWithoutPmInitCall().isPmField
               ? findAnnotation(pm, annotationClass, pm.getPmParent().getClass())
               : findAnnotationInClassTree(pm.getClass(), annotationClass);
@@ -96,7 +98,25 @@ public class AnnotationUtil {
     return foundAnnotation;
   }
 
-
+  /**
+   * Finds a set of predefined annotation types for the given PM.
+   *
+   * @param pm
+   *          the PM to analyze.
+   * @param annotationClassesToConsider
+   *          the annotation types to look for.
+   * @return the set of found annotations. Is never <code>null</code>.
+   */
+  public static List<Annotation> findAnnotations(PmObjectBase pm, Collection<Class<? extends Annotation>> annotationClassesToConsider) {
+    List<Annotation> foundAnnotationList = new ArrayList<Annotation>();
+    for (Class<? extends Annotation> c : annotationClassesToConsider) {
+      Annotation a = AnnotationUtil.findAnnotation(pm, c);
+      if (a != null) {
+        foundAnnotationList.add(a);
+      }
+    }
+    return foundAnnotationList;
+  }
 
   /**
    * Searches for the first {@link CacheMode} property with the given
