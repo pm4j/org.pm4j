@@ -6,6 +6,8 @@ import java.util.Collection;
  * An quite internal collection of individually selected or unselected items.
  * <p>
  * In case of an inverted selection it contains the manually de-selected items.
+ * <p>
+ * Inverted selection is a synonym for 'select all'.
  *
  * @author OBOEDE
  *
