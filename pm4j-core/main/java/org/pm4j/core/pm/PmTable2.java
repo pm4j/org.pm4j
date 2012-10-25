@@ -6,6 +6,7 @@ import java.util.List;
 import org.pm4j.common.query.Query;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.selection.SelectionHandler;
+import org.pm4j.core.pm.impl.changehandler.ChangeSetHandler;
 
 
 /**
@@ -17,6 +18,18 @@ import org.pm4j.common.selection.SelectionHandler;
  * @param <T_ROW_OBJ> The type used for row objects.
  */
 public interface PmTable2<T_ROW_OBJ> extends PmObject, PmDataInput {
+
+  /** Identifer for things that may be cleared by calling {@link PmTable2#updatePmTable(UpdateAspect...)} */
+  public enum UpdateAspect {
+    /** Switches back to the default sort order. */
+    CLEAR_SORT_ORDER,
+    /** Clears user defined filters. */
+    CLEAR_USER_FILTER,
+    /** Clears the selection. */
+    CLEAR_SELECTION,
+    /** Clears any registered changed-data states. */
+    CLEAR_CHANGES
+  }
 
   /**
    * @return The set of columns.
@@ -30,11 +43,6 @@ public interface PmTable2<T_ROW_OBJ> extends PmObject, PmDataInput {
    * @return The set of table rows to display.
    */
   List<T_ROW_OBJ> getRows();
-
-  /**
-   * @return The set of rows that contains changed data.
-   */
-  List<T_ROW_OBJ> getRowsWithChanges();
 
   /**
    * Provides a row representation that may be used by generic a renderer.
@@ -61,7 +69,14 @@ public interface PmTable2<T_ROW_OBJ> extends PmObject, PmDataInput {
    */
   SelectionHandler<T_ROW_OBJ> getPmSelectionHandler();
 
+  /**
+   * @return the query behind this table.
+   */
   Query getPmQuery();
+
+  /**
+   * @return the query options that can be offered to the user to define query constraints.
+   */
   QueryOptions getPmQueryOptions();
 
   /** The set of table changes that can be considered. */
@@ -88,6 +103,21 @@ public interface PmTable2<T_ROW_OBJ> extends PmObject, PmDataInput {
    * @return The decorators, defined for the given change kind.
    */
   Collection<PmCommandDecorator> getDecorators(TableChange change);
+
+  /**
+   * Provides the change set handler.<br>
+   * It provides information about table changes.
+   *
+   * @return the table change registry.
+   */
+  ChangeSetHandler<T_ROW_OBJ> getPmChangeSetHandler();
+
+  /**
+   * Clears a defined set of table state aspects.
+   *
+   * @param updateAspect the updates to do. If no value is passed, all updates will be done.
+   */
+  void updatePmTable(UpdateAspect... updateAspect);
 
   /**
    * PM for table with a pager.

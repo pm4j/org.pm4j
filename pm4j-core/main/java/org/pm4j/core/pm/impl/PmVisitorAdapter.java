@@ -6,6 +6,7 @@ import org.pm4j.core.pm.PmElement;
 import org.pm4j.core.pm.PmLabel;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmTable;
+import org.pm4j.core.pm.PmTable2;
 import org.pm4j.core.pm.PmTableCol;
 import org.pm4j.core.pm.PmTreeNode;
 import org.pm4j.core.pm.PmVisitor;
@@ -38,6 +39,11 @@ public class PmVisitorAdapter implements PmVisitor {
   }
 
   @Override
+  public void visit(PmTable2<?> table) {
+    onVisit(table);
+  }
+
+  @Override
   public void visit(PmTableCol tableCol) {
     onVisit(tableCol);
   }
@@ -56,10 +62,10 @@ public class PmVisitorAdapter implements PmVisitor {
       onVisitPmTreeNode((PmTreeNode)pm);
     }
   }
-  
+
   /**
    * Call back for {@link PmTreeNode} related handling.
-   * 
+   *
    * @param pm
    */
   protected void onVisitPmTreeNode(PmTreeNode pm) {

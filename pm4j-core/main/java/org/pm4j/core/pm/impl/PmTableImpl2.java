@@ -21,6 +21,7 @@ import org.pm4j.common.selection.SelectMode;
 import org.pm4j.common.selection.Selection;
 import org.pm4j.common.selection.SelectionHandler;
 import org.pm4j.common.util.beanproperty.PropertyAndVetoableChangeListener;
+import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmCommandDecorator;
 import org.pm4j.core.pm.PmDataInput;
@@ -39,7 +40,10 @@ import org.pm4j.core.pm.annotation.PmTableCfg;
 import org.pm4j.core.pm.annotation.PmTableCfg2;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmMessageUtil;
-import org.pm4j.core.pm.impl.changehandler.ChangedChildStateRegistry;
+import org.pm4j.core.pm.api.PmValidationApi;
+import org.pm4j.core.pm.impl.changehandler.ChangeSetHandler;
+import org.pm4j.core.pm.impl.changehandler.ChangeSetHandler.ChangeKind;
+import org.pm4j.core.pm.impl.changehandler.ChangeSetHandlerImpl;
 import org.pm4j.core.pm.pageable.PageableCollection;
 import org.pm4j.core.pm.pageable2.InMemPmQueryEvaluator;
 import org.pm4j.core.pm.pageable2.PmTable2Util;
@@ -78,7 +82,7 @@ public class PmTableImpl2
   private Integer numOfPageRows;
 
   /** Handles the changed state of the table. */
-  /* package */ final ChangedChildStateRegistry changedStateRegistry = new ChangedChildStateRegistry(this);
+  private final ChangeSetHandlerImpl<T_ROW_PM> changeSetRegistry = new ChangeSetHandlerImpl<T_ROW_PM>(this);
 
   /** The set of decorators for various table change kinds. */
   private Map<TableChange, PmCommandDecoratorSetImpl> changeDecoratorMap = Collections.emptyMap();
@@ -126,12 +130,6 @@ public class PmTableImpl2
     return getPmPageableCollection().getItemsOnPage();
   }
 
-  @SuppressWarnings({ "unchecked", "rawtypes" })
-  @Override
-  public List<T_ROW_PM> getRowsWithChanges() {
-    return new ArrayList<T_ROW_PM>((Collection)changedStateRegistry.getChangedItems());
-  }
-
   /**
    * Gets called whenever a new (transient) row gets added to the table.
    * Maintains the corresponding changed state for this table.
@@ -139,7 +137,7 @@ public class PmTableImpl2
    * @param newRowPm The new row.
    */
   protected void onAddNewRow(T_ROW_PM newRowPm) {
-    changedStateRegistry.onAddNewItem(newRowPm);
+    changeSetRegistry.registerChange(ChangeKind.ADD, newRowPm);
   }
 
   /**
@@ -151,7 +149,7 @@ public class PmTableImpl2
   protected void onDeleteRow(T_ROW_PM deletedRow) {
     PmMessageUtil.clearSubTreeMessages(deletedRow);
     getPmPageableCollection().getSelectionHandler().select(false, deletedRow);
-    changedStateRegistry.onDeleteItem(deletedRow);
+    changeSetRegistry.registerChange(ChangeKind.DELETE, deletedRow);
     if (deletedRow instanceof PmBean) {
       BeanPmCacheUtil.removeBeanPm(this, (PmBean<?>)deletedRow);
     }
@@ -265,6 +263,52 @@ public class PmTableImpl2
     return (set != null) ? set.getDecorators() : Collections.EMPTY_LIST;
   }
 
+  @Override
+  public ChangeSetHandler<T_ROW_PM> getPmChangeSetHandler() {
+    return changeSetRegistry;
+  }
+
+  @Override
+  public final void updatePmTable(UpdateAspect... clearOptions) {
+    UpdateAspect[] toProcess = clearOptions.length == 0
+                      ? UpdateAspect.values()
+                      : clearOptions;
+
+    getPmPageableCollection().clearCaches();
+
+    for (UpdateAspect o : toProcess) {
+      clearPmAspectImpl(o);
+    }
+  }
+
+  /**
+   * Implements the table subclass sepecific update operation.
+   * <p>
+   * Should not be called directly. Please use {@link #updatePmTable(org.pm4j.core.pm.PmTable2.ClearAspect...)}
+   * to trigger an update.
+   *
+   * @param clearAspect
+   */
+  protected void clearPmAspectImpl(UpdateAspect clearAspect) {
+    switch (clearAspect) {
+      case CLEAR_SELECTION:
+        getPmSelectionHandler().selectAll(false);
+        break;
+      case CLEAR_SORT_ORDER:
+        getPmQuery().setSortOrder(getPmQueryOptions().getDefaultSortOrder());
+        break;
+      case CLEAR_CHANGES:
+        PmValidationApi.clearInvalidValuesOfSubtree(this);
+        changeSetRegistry.clearChanges();
+        break;
+      case CLEAR_USER_FILTER:
+        // User filters can't be cleared on this level. More detailed implementations
+        // may implement user defined filters that may be cleared.
+        break;
+      default: throw new PmRuntimeException(this, "Unknown clear aspect: " + clearAspect);
+    }
+  }
+
   // -- helper methods --
 
   @Override
@@ -274,14 +318,7 @@ public class PmTableImpl2
 
   @Override
   public boolean isPmValueChanged() {
-    return changedStateRegistry.isAChangeRegistered();
-  }
-
-  // TODO olaf: move method to a value change util: set individual and sub-tree changed states
-  void setPmValueChanged(boolean newChangedState) {
-    if (newChangedState == false) {
-      changedStateRegistry.clearChangedItems();
-    }
+    return changeSetRegistry.isChanged();
   }
 
   /**
@@ -289,9 +326,9 @@ public class PmTableImpl2
    */
   @Override
   public void pmValidate() {
-    for (PmObject itemPm : new ArrayList<PmObject>(changedStateRegistry.getChangedItems())) {
+    for (PmObject itemPm : new ArrayList<PmObject>(changeSetRegistry.getChangedItems(ChangeKind.ADD, ChangeKind.UPDATE))) {
       if (itemPm instanceof PmDataInput) {
-        ((PmDataInput)itemPm).pmValidate();
+        PmValidationApi.validateSubTree((PmDataInput)itemPm);
       }
     }
   }

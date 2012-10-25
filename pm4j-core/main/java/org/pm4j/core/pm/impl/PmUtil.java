@@ -106,7 +106,7 @@ public final class PmUtil {
    *         object with the given type.
    */
   @SuppressWarnings("unchecked")
-  public static <T extends PmObject> T findPmParentOfType(PmObject startPm, Class<T> type) {
+  public static <T> T findPmParentOfType(PmObject startPm, Class<T> type) {
     PmObject pm = startPm.getPmParent();
     while (pm != null) {
       if (type.isAssignableFrom(pm.getClass())) {
@@ -129,7 +129,7 @@ public final class PmUtil {
    * @return The found parent instance.
    * @throws PmRuntimeException if there is no parent PM with the given type.
    */
-  public static <T extends PmObject> T getPmParentOfType(PmObject startPm, Class<T> type) {
+  public static <T> T getPmParentOfType(PmObject startPm, Class<T> type) {
     T pm = findPmParentOfType(startPm, type);
     if (pm == null) {
       throw new PmRuntimeException(startPm, "Can't find a parent PM of type '" + type + "'.");

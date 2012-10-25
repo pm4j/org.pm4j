@@ -72,6 +72,13 @@ public class PageableCollectionWithTransientItems<T_ITEM> implements PageableCol
   }
 
   /**
+   * Clears all transient items.
+   */
+  public void clearTransientItems() {
+    transientItems.clear();
+  }
+
+  /**
    * Provides the subset of all non-transient selected items.
    *
    * @return the selection.

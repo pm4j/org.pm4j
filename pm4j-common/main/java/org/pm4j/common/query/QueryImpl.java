@@ -1,6 +1,8 @@
 package org.pm4j.common.query;
 
-import org.apache.commons.lang.ObjectUtils;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.pm4j.common.exception.CheckedExceptionWrapper;
 import org.pm4j.common.util.beanproperty.PropertyChangeSupportedBase;
 
@@ -11,6 +13,7 @@ public class QueryImpl extends PropertyChangeSupportedBase implements Query {
   private SortOrder sortOrder;
   private SortOrder defaultSortOrder;
   private FilterExpression filterExpression;
+  private Map<String, Object> baseQueryParams = new HashMap<String, Object>();
 
   /**
    * @param defaultSortOrder the default sort order.
@@ -31,19 +34,12 @@ public class QueryImpl extends PropertyChangeSupportedBase implements Query {
 
   @Override
   public void setSortOrder(SortOrder sortOrder) {
-    SortOrder oldOrder = this.sortOrder;
     SortOrder oldEffectiveOrder = getEffectiveSortOrder();
 
     this.sortOrder = sortOrder;
 
-    if (! ObjectUtils.equals(sortOrder, oldOrder)) {
-      firePropertyChange(PROP_DEFAULT_SORT_ORDER, oldOrder, sortOrder);
-    }
-
     SortOrder newEffectiveOrder = getEffectiveSortOrder();
-    if (! ObjectUtils.equals(newEffectiveOrder, oldEffectiveOrder)) {
-      firePropertyChange(PROP_EFFECTIVE_SORT_ORDER, oldEffectiveOrder, newEffectiveOrder);
-    }
+    firePropertyChange(PROP_EFFECTIVE_SORT_ORDER, oldEffectiveOrder, newEffectiveOrder);
   }
 
   @Override
@@ -53,19 +49,12 @@ public class QueryImpl extends PropertyChangeSupportedBase implements Query {
 
   @Override
   public void setDefaultSortOrder(SortOrder defaultSortOrder) {
-    SortOrder oldDefaultOrder = this.defaultSortOrder;
     SortOrder oldEffectiveOrder = getEffectiveSortOrder();
 
     this.defaultSortOrder = defaultSortOrder;
 
-    if (! ObjectUtils.equals(defaultSortOrder, oldDefaultOrder)) {
-      firePropertyChange(PROP_DEFAULT_SORT_ORDER, oldDefaultOrder, defaultSortOrder);
-    }
-
     SortOrder newEffectiveOrder = getEffectiveSortOrder();
-    if (! ObjectUtils.equals(newEffectiveOrder, oldEffectiveOrder)) {
-      firePropertyChange(PROP_EFFECTIVE_SORT_ORDER, oldEffectiveOrder, newEffectiveOrder);
-    }
+    firePropertyChange(PROP_EFFECTIVE_SORT_ORDER, oldEffectiveOrder, newEffectiveOrder);
   }
 
   @Override
@@ -85,14 +74,24 @@ public class QueryImpl extends PropertyChangeSupportedBase implements Query {
     FilterExpression old = this.filterExpression;
     this.filterExpression = predicate;
 
-    if (! ObjectUtils.equals(old, predicate)) {
-      firePropertyChange(PROP_EFFECTIVE_FILTER, old, predicate);
-    }
+    firePropertyChange(PROP_EFFECTIVE_FILTER, old, predicate);
   }
 
   @Override
   public FilterExpression getFilterExpression() {
     return filterExpression;
+  }
+
+  @Override
+  public Object getBaseQueryParam(String name) {
+    return baseQueryParams.get(name);
+  }
+
+  @Override
+  public void setBaseQueryParam(String name, Object baseQueryParam) {
+    Object oldBaseQueryParam = this.baseQueryParams.get(name);
+    this.baseQueryParams.put(name, baseQueryParam);
+    firePropertyChange(PROP_EFFECTIVE_FILTER, oldBaseQueryParam, baseQueryParam);
   }
 
 }

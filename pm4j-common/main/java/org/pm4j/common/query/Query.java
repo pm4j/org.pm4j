@@ -15,13 +15,11 @@ import org.pm4j.common.util.beanproperty.PropertyChangeSupported;
  */
 public interface Query extends PropertyChangeSupported, Cloneable, Serializable {
 
+  /** Identifier of the property change event that gets fired if the effective sort order gets changed. */
   public static final String PROP_EFFECTIVE_SORT_ORDER = "effectiveSortOrder";
-  public static final String PROP_DEFAULT_SORT_ORDER = "defaultSortOrder";
-  public static final String PROP_SORT_ORDER = "sortOrder";
 
+  /** Identifier of the property change event that gets fired if the effective query filter gets changed. */
   public static final String PROP_EFFECTIVE_FILTER = "effectiveFilter";
-  public static final String PROP_FIX_FILTER = "fixFilter";
-  public static final String PROP_DYN_FILTER = "dynFilter";
 
 
   /**
@@ -71,8 +69,40 @@ public interface Query extends PropertyChangeSupported, Cloneable, Serializable 
    */
   SortOrder getEffectiveSortOrder();
 
+  /**
+   * Defines a new filter expression to be used.
+   *
+   * @param expr the new expression. May be <code>null</code> if filtering should be switched off.
+   */
   void setFilterExpression(FilterExpression expr);
 
+  /**
+   * Provides the current filter expression.
+   *
+   * @return the current filter expression. May be <code>null</code>.
+   */
   FilterExpression getFilterExpression();
 
+  /**
+   * Provides the (optional) parameter object for a query the filter is based on.
+   *
+   * @return the value set by {@link #setBaseQueryParam(Object)}.
+   */
+  Object getBaseQueryParam(String name);
+
+  /**
+   * Sets an optional parameter object.
+   * <p>
+   * This parameter may contain a simple DTO that contains parameters to be used
+   * within the query service. This way the query implementation may combine a
+   * manual query implementation with generic code that evaluates the filter
+   * conditions.
+   * <p>
+   * If the query needs to be serialized, the query parameter should be
+   * serializeable too.
+   *
+   * @param baseQueryParam
+   *          the new parameter. May be <code>null</code>.
+   */
+  void setBaseQueryParam(String name, Object baseQueryParam);
 }

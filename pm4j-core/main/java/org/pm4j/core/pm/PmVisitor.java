@@ -7,6 +7,7 @@ public interface PmVisitor {
   void visit(PmCommand command);
   void visit(PmLabel label);
   void visit(PmTable table);
+  void visit(PmTable2<?> table);
   void visit(PmTableCol tableCol);
   /**
    * Fallback-callback for other PM types.

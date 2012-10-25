@@ -17,6 +17,7 @@ import org.pm4j.core.pm.PmEvent.ValueChangeKind;
 import org.pm4j.core.pm.PmMessage.Severity;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmTable;
+import org.pm4j.core.pm.PmTable2;
 import org.pm4j.core.pm.annotation.PmBeanCfg;
 import org.pm4j.core.pm.annotation.PmBoolean;
 import org.pm4j.core.pm.annotation.PmValidationCfg;
@@ -25,6 +26,7 @@ import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmExpressionApi;
 import org.pm4j.core.pm.api.PmFactoryApi;
 import org.pm4j.core.pm.api.PmMessageUtil;
+import org.pm4j.core.pm.impl.changehandler.ChangeSetHandler.ChangeKind;
 import org.pm4j.core.util.reflection.BeanAttrAccessor;
 import org.pm4j.core.util.reflection.BeanAttrAccessorImpl;
 
@@ -239,6 +241,24 @@ public abstract class PmBeanBase<T_BEAN>
         if (row instanceof PmObject) {
           onVisit((PmObject) row);
         }
+      }
+    }
+
+    @Override
+    public void visit(PmTable2<?> table) {
+      List<Object> changedRows = new ArrayList<Object>(table.getPmChangeSetHandler().getChangedItems(ChangeKind.ADD, ChangeKind.UPDATE));
+      onVisit(table);
+      table.updatePmTable();
+
+      // Changed rows get informed to make sure that all invalid PM states get cleared.
+      // Informs the ChangedChildStateRegistry of the table.
+      // TODO olaf: check if the PMs of the current page need to be informed individually too.
+      //            I suspect not, since the all-change-event causes a re-binding of all table rows PMs.
+      PmEventApi.firePmEvent(table, eventMask);
+
+      // Inform the changed rows to make sure that all invalid PM states get cleared.
+      for (Object row : changedRows) {
+        onVisit((PmObject) row);
       }
     }
 

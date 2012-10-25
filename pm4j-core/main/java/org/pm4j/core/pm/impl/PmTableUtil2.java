@@ -84,7 +84,7 @@ public final class PmTableUtil2 {
    */
   public static <T extends MasterPmHandler> T addMasterDetailsPmHandler(PmTable2<?> pmTable, T handler) {
     PmTableImpl2<?, ?> pmTableImpl = (PmTableImpl2<?, ?>) pmTable;
-    pmTableImpl.changedStateRegistry.addDetailsPmHandler(handler);
+    pmTableImpl.getPmChangeSetHandler().addDetailsPmHandler(handler);
     handler.startObservers();
     return handler;
   }

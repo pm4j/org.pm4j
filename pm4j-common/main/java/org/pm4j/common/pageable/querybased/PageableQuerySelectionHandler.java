@@ -131,7 +131,7 @@ public class PageableQuerySelectionHandler<T_ITEM, T_ID extends Serializable> ex
   }
 
   /** A selection base class that supports serializable selections. */
-  static abstract class SerializeableSelectionBase<T_ITEM, T_ID extends Serializable> implements Selection<T_ITEM>, Serializable {
+  public static abstract class SerializeableSelectionBase<T_ITEM, T_ID extends Serializable> implements Selection<T_ITEM>, Serializable {
     private static final long serialVersionUID = 1L;
 
     /** The service provider may be <code>null</code> in case of non-serializeable selections. */
@@ -158,6 +158,8 @@ public class PageableQuerySelectionHandler<T_ITEM, T_ID extends Serializable> ex
       }
       return service;
     }
+
+    public abstract ClickedIds<T_ID> getClickedIds();
   }
 
   static class ItemIdSelection<T_ITEM, T_ID extends Serializable> extends SerializeableSelectionBase<T_ITEM, T_ID> {
@@ -196,6 +198,11 @@ public class PageableQuerySelectionHandler<T_ITEM, T_ID extends Serializable> ex
       return ids;
     }
 
+    @Override
+    public ClickedIds<T_ID> getClickedIds() {
+      return new ClickedIds<T_ID>(ids, false);
+    }
+
     class ItemIterator implements Iterator<T_ITEM> {
       private final Iterator<T_ID> idIterator = ids.iterator();
 
@@ -221,10 +228,10 @@ public class PageableQuerySelectionHandler<T_ITEM, T_ID extends Serializable> ex
 
     private static final long serialVersionUID = 1L;
     private final Query query;
-    private final Selection<T_ITEM> baseSelection;
+    private final SerializeableSelectionBase<T_ITEM, T_ID> baseSelection;
     transient private Long size;
 
-    public InvertedSelection(PageableQueryService<T_ITEM, T_ID> service, Query query, Selection<T_ITEM> baseSelection) {
+    public InvertedSelection(PageableQueryService<T_ITEM, T_ID> service, Query query, SerializeableSelectionBase<T_ITEM, T_ID> baseSelection) {
       super(service);
       assert query != null;
       assert baseSelection != null;
@@ -251,6 +258,11 @@ public class PageableQuerySelectionHandler<T_ITEM, T_ID extends Serializable> ex
     @Override
     public Iterator<T_ITEM> iterator() {
       return new ItemIterator();
+    }
+
+    @Override
+    public ClickedIds<T_ID> getClickedIds() {
+      return new ClickedIds<T_ID>(baseSelection.getClickedIds().getIds(), true);
     }
 
     @SuppressWarnings("unchecked")
