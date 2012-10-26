@@ -649,7 +649,12 @@ public abstract class PmObjectBase implements PmObject {
                                 : StringUtils.uncapitalize(getClass().getSimpleName());
             pmMetaData.isPmField = isPmField;
             pmMetaData.isSubPm = isSubPm;
-            pmMetaData.init(getPmConversation().getPmDefaults());
+
+            PmConversation conversation = getPmConversation();
+            if (conversation == null) {
+              throw new PmRuntimeException(this, "PM without pmConversation found. Please make sure that a conversation exists within the PM parent hierarchy.");
+            }
+            pmMetaData.init(conversation.getPmDefaults());
 
             if (pmParent == null &&
                 ! (this instanceof PmConversation)) {
