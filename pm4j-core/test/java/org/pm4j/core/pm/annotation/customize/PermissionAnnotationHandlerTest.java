@@ -1,4 +1,4 @@
-package org.pm4j.core.pm.api.customize;
+package org.pm4j.core.pm.annotation.customize;
 
 import static org.junit.Assert.assertEquals;
 
