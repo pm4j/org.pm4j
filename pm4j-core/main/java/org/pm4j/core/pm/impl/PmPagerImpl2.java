@@ -189,17 +189,26 @@ public class PmPagerImpl2
 
   @Override
   public int getPageSize() {
-    return getPmBean().getPageSize();
+    PageableCollection2<?> pc = getPmBean();
+    return pc != null
+        ? getPmBean().getPageSize()
+        : 0;
   }
 
   @Override
   public int getNumOfItems() {
-      return (int)getPmBean().getNumOfItems();
+    PageableCollection2<?> pc = getPmBean();
+    return pc != null
+        ? (int)getPmBean().getNumOfItems()
+        : 0;
   }
 
   @Override
   public int getNumOfPages() {
-      return PageableCollectionUtil2.getNumOfPages(getPmBean());
+    PageableCollection2<?> pc = getPmBean();
+    return pc != null
+        ? PageableCollectionUtil2.getNumOfPages(getPmBean())
+        : 0;
   }
 
   /**
