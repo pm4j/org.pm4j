@@ -91,7 +91,8 @@ public interface Query extends PropertyChangeSupported, Cloneable, Serializable 
   Object getBaseQueryParam(String name);
 
   /**
-   * Sets an optional parameter object.
+   * Sets an optional parameter object and fires a property change event for
+   * {@link #PROP_EFFECTIVE_FILTER}.
    * <p>
    * This parameter may contain a simple DTO that contains parameters to be used
    * within the query service. This way the query implementation may combine a

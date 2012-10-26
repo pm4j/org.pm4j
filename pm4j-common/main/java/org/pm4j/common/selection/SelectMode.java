@@ -10,6 +10,6 @@ public enum SelectMode {
   MULTI,
   /** No item can be marked as selected. */
   NO_SELECTION,
-  /** This value defines no specific mode. The default should be applied. */
+  /** This value defines no specific mode. A context specific default should be applied. */
   DEFAULT
 }

@@ -93,6 +93,7 @@ public class PageableQueryCollection<T_ITEM, T_ID extends Serializable> extends 
       }
 
       protected boolean readNext() {
+        // TODO olaf: Needs to be optimized. Blockwise ...
         next = ListUtil.listToItemOrNull(service.getItems(getQuery(), currentIdx++, 1));
         return next != null;
       }

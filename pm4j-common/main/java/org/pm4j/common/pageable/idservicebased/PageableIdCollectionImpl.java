@@ -193,6 +193,7 @@ public class PageableIdCollectionImpl<T_ITEM, T_ID> extends PageableCollectionBa
     public T_ITEM next() {
       T_ID id = ids.get(nextIdx);
       @SuppressWarnings("unchecked")
+      // TODO olaf: not optimized:
       T_ITEM item = ListUtil.listToItemOrNull(service.getItems(Arrays.asList(id)));
       if (item == null) {
         throwMissingItemException(id);

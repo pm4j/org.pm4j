@@ -35,6 +35,8 @@ public interface Selection<T_ITEM> extends Iterable<T_ITEM>, Serializable {
    * <p>
    * Please consider this iterater may have some performance impact in case
    * of lazy load scenarios.
+   * <p>
+   * Please check if you can use {@link #contains(Object)}, which is much faster.
    */
   @Override
   Iterator<T_ITEM> iterator();
