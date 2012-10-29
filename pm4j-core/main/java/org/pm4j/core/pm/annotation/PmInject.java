@@ -30,6 +30,8 @@ public @interface PmInject {
    */
   String value() default "";
 
+  boolean parentByType() default false;
+
   /**
    * Defines if <code>null</code> is an accepted value for the injected field.
    * <p>

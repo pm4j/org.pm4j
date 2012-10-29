@@ -3,10 +3,15 @@ package org.pm4j.core.pm;
 import org.pm4j.common.exception.CheckedExceptionWrapper;
 import org.pm4j.core.pm.annotation.PmCommandCfg;
 import org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO;
+import org.pm4j.core.pm.annotation.PmInject;
 import org.pm4j.core.pm.filter.FilterByDefinition;
 import org.pm4j.core.pm.filter.impl.FilterByPmAttrValueLocalized;
 import org.pm4j.core.pm.impl.PmObjectBase.NameBuilder;
 import org.pm4j.core.pm.impl.PmObjectBase.NameBuilderAbsoluteName;
+import org.pm4j.core.pm.impl.inject.DiResolverFactory;
+import org.pm4j.core.pm.impl.inject.DiResolverFactoryPmInjectField;
+import org.pm4j.core.pm.impl.inject.DiResolverFactoryPmInjectSetter;
+import org.pm4j.core.pm.impl.inject.DiResolverFactoryPmParentByType;
 import org.pm4j.core.pm.impl.title.AsteriskAttrTitleProvider;
 import org.pm4j.core.pm.impl.title.PmTitleProvider;
 import org.pm4j.core.pm.impl.title.TitleProviderPmResBased;
@@ -109,6 +114,17 @@ public class PmDefaults implements Cloneable {
    */
   public boolean supportFactoryHierarchy = true;
 
+  /**
+   * The set of dependency injection resolvers used for the application.
+   * <p>
+   * The default implementation supports {@link PmInject}.
+   */
+  private DiResolverFactory[] diResolverFactories = {
+      new DiResolverFactoryPmInjectField(),
+      new DiResolverFactoryPmInjectSetter(),
+      new DiResolverFactoryPmParentByType()
+  };
+
   // TODO olaf: add something to the command that allows to configure that. - An application default may also be useful...
 //  /**
 //   * Defines if the application supports commands that can be undone.
@@ -151,6 +167,23 @@ public class PmDefaults implements Cloneable {
   }
 
   // -- getter / setter --
+
+  /**
+   * @return the set of dependency injection resolvers used for the application.
+   */
+  public DiResolverFactory[] getDiResolverFactories() {
+    return diResolverFactories;
+  }
+
+  /**
+   * Allows to configure the application specific set of dependency injection mechanisms.
+   *
+   * @param diResolverFactories the set of dependency injection resolvers used for the application.
+   */
+  public void setDiResolverFactories(DiResolverFactory[] diResolverFactories) {
+    this.diResolverFactories = diResolverFactories;
+  }
+
 
   public PmTitleProvider getPmTitleProvider() {
     return pmTitleProvider;

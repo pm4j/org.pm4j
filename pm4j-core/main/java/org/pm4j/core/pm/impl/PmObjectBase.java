@@ -3,7 +3,6 @@ package org.pm4j.core.pm.impl;
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -41,10 +40,9 @@ import org.pm4j.core.pm.PmVisitor;
 import org.pm4j.core.pm.annotation.PmCacheCfg;
 import org.pm4j.core.pm.annotation.PmCacheCfg.CacheMode;
 import org.pm4j.core.pm.annotation.PmFactoryCfg;
-import org.pm4j.core.pm.annotation.PmInject;
 import org.pm4j.core.pm.annotation.PmTitleCfg;
-import org.pm4j.core.pm.annotation.customize.PmAnnotationApi;
 import org.pm4j.core.pm.annotation.customize.CustomizedAnnotationUtil;
+import org.pm4j.core.pm.annotation.customize.PmAnnotationApi;
 import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmMessageUtil;
@@ -54,8 +52,8 @@ import org.pm4j.core.pm.impl.cache.PmCacheStrategy;
 import org.pm4j.core.pm.impl.cache.PmCacheStrategyBase;
 import org.pm4j.core.pm.impl.cache.PmCacheStrategyNoCache;
 import org.pm4j.core.pm.impl.cache.PmCacheStrategyRequest;
-import org.pm4j.core.pm.impl.pathresolver.PathResolver;
-import org.pm4j.core.pm.impl.pathresolver.PmExpressionPathResolver;
+import org.pm4j.core.pm.impl.inject.DiResolver;
+import org.pm4j.core.pm.impl.inject.DiResolverUtil;
 import org.pm4j.core.pm.impl.title.PmTitleProvider;
 import org.pm4j.core.pm.impl.title.PmTitleProviderValuebased;
 import org.pm4j.core.pm.impl.title.TitleProviderAttrValueBased;
@@ -739,56 +737,6 @@ public abstract class PmObjectBase implements PmObject {
     }
   }
 
-  private void initPmResourceAnnotatedFields() {
-    for (Map.Entry<Field, PathResolver> e : pmMetaData.fieldInjectionMap.entrySet()) {
-      Field f = e.getKey();
-      PathResolver r = e.getValue();
-      Object value = r.getValue(this);
-
-      if (value == null && ! r.isNullAllowed()) {
-        throw new PmRuntimeException(this, "Found value for dependency injection of field '" + f +
-            "' was null. But null value is not allowed. " +
-            "You may configure null-value handling using @PmInject(nullAllowed=...).");
-      }
-
-      try {
-        // TODO olaf: Check if there is a public setter to prevent some trouble
-        //            in case of enabled security manager...
-        if (! f.isAccessible()) {
-          f.setAccessible(true);
-        }
-        f.set(this, value);
-      } catch (Exception ex) {
-        throw new PmRuntimeException(this, "Can't initialize field '" + f.getName() + "' in class '"
-            + getClass().getName() + "'.", ex);
-      }
-    }
-
-    for (Map.Entry<Method, PathResolver> e : pmMetaData.methodInjectionMap.entrySet()) {
-      Method m = e.getKey();
-      PathResolver r = e.getValue();
-      Object value = r.getValue(this);
-
-      if (value == null && ! r.isNullAllowed()) {
-        throw new PmRuntimeException(this, "Found value for dependency injection of method '" + m +
-            "' was null. But null value is not allowed. " +
-            "You may configure null-value handling using @PmInject(nullAllowed=...).");
-      }
-
-      try {
-        // TODO olaf: Check if there is a public setter to prevent some trouble
-        //            in case of enabled security manager...
-        if (! m.isAccessible()) {
-          m.setAccessible(true);
-        }
-        m.invoke(this, value);
-      } catch (Exception ex) {
-        throw new PmRuntimeException(this, "Can't initialize field '" + m.getName() + "' in class '"
-            + getClass().getName() + "' with value '" + value + "'.", ex);
-      }
-    }
-  }
-
   /**
    * Gets called when the meta data part of this PM is initialized and assigned
    * to this instance.
@@ -815,7 +763,9 @@ public abstract class PmObjectBase implements PmObject {
           }
 
           if (pmInitState.ordinal() < PmInitState.BEFORE_ON_PM_INIT.ordinal()) {
-            initPmResourceAnnotatedFields();
+            for (DiResolver d : pmMetaData.diResolvers) {
+              d.resolveDi(this);
+            }
             pmInitState = PmInitState.BEFORE_ON_PM_INIT;
             try {
               onPmInit();
@@ -939,44 +889,7 @@ public abstract class PmObjectBase implements PmObject {
     metaData.permissionAnnotations = AnnotationUtil.findAnnotations(this, PmAnnotationApi.getPermissionAnnotations()).toArray(new Annotation[0]);
 
     // -- Dependency injection configuration --
-    metaData.fieldInjectionMap = new HashMap<Field, PathResolver>();
-    for (Field f : ClassUtil.getAllFields(getClass())) {
-      PmInject a = f.getAnnotation(PmInject.class);
-      if (a != null) {
-        String propName = StringUtils.isNotBlank(a.value())
-                            ? a.value()
-                            : f.getName();
-
-        PathResolver r = PmExpressionPathResolver.parse(propName, false);
-        r.setNullAllowed(a.nullAllowed());
-
-        metaData.fieldInjectionMap.put(f, r);
-      }
-    }
-
-    metaData.methodInjectionMap = new HashMap<Method, PathResolver>();
-    for (Method m : ClassUtil.findMethods(getClass(), "set.*")) {
-      PmInject a = m.getAnnotation(PmInject.class);
-      if (a != null) {
-        String propName = StringUtils.isNotBlank(a.value())
-                            ? a.value()
-                            : StringUtils.uncapitalize(m.getName().substring(3));
-
-        PathResolver r = PmExpressionPathResolver.parse(propName, false);
-        r.setNullAllowed(a.nullAllowed());
-
-        metaData.methodInjectionMap.put(m, r);
-      }
-    }
-
-
-    // don't keep unused empty map instances:
-    if (metaData.fieldInjectionMap.isEmpty()) {
-      metaData.fieldInjectionMap = Collections.emptyMap();
-    }
-    if (metaData.methodInjectionMap.isEmpty()) {
-      metaData.methodInjectionMap = Collections.emptyMap();
-    }
+    metaData.diResolvers = DiResolverUtil.getDiResolvers(getClass());
   }
 
   /**
@@ -1030,8 +943,7 @@ public abstract class PmObjectBase implements PmObject {
     /** An optional factory that is responsible for creating PMs for beans. */
     private BeanPmFactory pmElementFactory;
 
-    private Map<Field, PathResolver> fieldInjectionMap;
-    private Map<Method, PathResolver> methodInjectionMap;
+    private DiResolver[] diResolvers;
 
     /**
      * An array that allows faster initialization of child PM's. After
