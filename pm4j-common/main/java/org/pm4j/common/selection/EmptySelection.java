@@ -37,6 +37,11 @@ public class EmptySelection<T> implements Selection<T> {
 		};
 	}
 
+	/** Block size has no effect on this iterator implementation. */
+	@Override
+	public void setIteratorBlockSizeHint(int readBlockSize) {
+	}
+
 	@Override
 	public long getSize() {
 		return 0;

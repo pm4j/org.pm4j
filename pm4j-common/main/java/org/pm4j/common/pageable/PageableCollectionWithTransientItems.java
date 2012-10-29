@@ -345,6 +345,11 @@ public class PageableCollectionWithTransientItems<T_ITEM> implements PageableCol
       return new IteratorWithAdditionalItems<T_ITEM>(baseSelection.iterator(), selectedTransientItems.iterator());
     }
 
+    /** Block size has no effect on this iterator implementation. */
+    @Override
+    public void setIteratorBlockSizeHint(int readBlockSize) {
+    }
+
     @Override
     public <T_BEAN> Selection<T_BEAN> getBeanSelection() {
       if (!selectedTransientItems.isEmpty()) {

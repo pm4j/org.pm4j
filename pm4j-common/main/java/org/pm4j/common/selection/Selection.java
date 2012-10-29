@@ -42,6 +42,18 @@ public interface Selection<T_ITEM> extends Iterable<T_ITEM>, Serializable {
   Iterator<T_ITEM> iterator();
 
   /**
+   * Provides a hint for block wise optimized iterator read operation.
+   * <p>
+   * Some service based iterator implementations may use the block size hint to prevent
+   * too frequent query executions.
+   * <p>
+   * The block size parameter will have no effect for other iterators.
+   *
+   * @param readBlockSize a hint for the optimal query block size.
+   */
+  void setIteratorBlockSizeHint(int readBlockSize);
+
+  /**
    * In case of a stacked selection implementation a {@link Selection} of PMs
    * is usually backed by a {@link Selection} of beans.
    * <p>

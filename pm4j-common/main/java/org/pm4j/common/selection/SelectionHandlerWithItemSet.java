@@ -150,6 +150,10 @@ public class SelectionHandlerWithItemSet<T_ITEM> extends SelectionHandlerBase<T_
       return selectedItems.iterator();
     }
 
+    /** Block size has no effect on this iterator implementation. */
+    @Override
+    public void setIteratorBlockSizeHint(int readBlockSize) {
+    }
     @Override
     public boolean contains(T_ITEM item) {
       return selectedItems.contains(item);

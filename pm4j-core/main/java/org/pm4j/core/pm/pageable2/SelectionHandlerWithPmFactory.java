@@ -142,6 +142,11 @@ public class SelectionHandlerWithPmFactory<T_PM extends PmBean<T_BEAN>, T_BEAN> 
     }
 
     @Override
+    public void setIteratorBlockSizeHint(int readBlockSize) {
+      beanSelection.setIteratorBlockSizeHint(readBlockSize);
+    }
+
+    @Override
     public boolean contains(T_PM item) {
       return item != null
           ? beanSelection.contains(item.getPmBean())

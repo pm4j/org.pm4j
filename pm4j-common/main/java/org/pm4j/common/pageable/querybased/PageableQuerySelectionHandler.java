@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
@@ -14,7 +15,6 @@ import org.pm4j.common.query.Query;
 import org.pm4j.common.selection.SelectMode;
 import org.pm4j.common.selection.Selection;
 import org.pm4j.common.selection.SelectionHandlerBase;
-import org.pm4j.common.util.collection.ListUtil;
 import org.pm4j.core.util.lang.CloneUtil;
 
 public class PageableQuerySelectionHandler<T_ITEM, T_ID extends Serializable> extends SelectionHandlerBase<T_ITEM> {
@@ -188,6 +188,11 @@ public class PageableQuerySelectionHandler<T_ITEM, T_ID extends Serializable> ex
       return new ItemIterator();
     }
 
+    /** Block size has currently no effect on this iterator implementation. This may be changed in the future. */
+    @Override
+    public void setIteratorBlockSizeHint(int readBlockSize) {
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public <T_BEAN> Selection<T_BEAN> getBeanSelection() {
@@ -230,6 +235,8 @@ public class PageableQuerySelectionHandler<T_ITEM, T_ID extends Serializable> ex
     private final Query query;
     private final SerializeableSelectionBase<T_ITEM, T_ID> baseSelection;
     transient private Long size;
+    /** The query fetch block size. */
+    private int iteratorBlockSizeHint = 20;
 
     public InvertedSelection(PageableQueryService<T_ITEM, T_ID> service, Query query, SerializeableSelectionBase<T_ITEM, T_ID> baseSelection) {
       super(service);
@@ -257,7 +264,12 @@ public class PageableQuerySelectionHandler<T_ITEM, T_ID extends Serializable> ex
 
     @Override
     public Iterator<T_ITEM> iterator() {
-      return new ItemIterator();
+      return new ItemIteratorPaged();
+    }
+
+    @Override
+    public void setIteratorBlockSizeHint(int iteratorBlockSizeHint) {
+      this.iteratorBlockSizeHint = iteratorBlockSizeHint;
     }
 
     @Override
@@ -271,12 +283,14 @@ public class PageableQuerySelectionHandler<T_ITEM, T_ID extends Serializable> ex
       return (Selection<T_BEAN>)this;
     }
 
-    class ItemIterator implements Iterator<T_ITEM> {
+    class ItemIteratorPaged implements Iterator<T_ITEM> {
 
-      private long idx;
+      private long idx = 0;
+      private List<T_ITEM> pageItems;
       private T_ITEM item;
+      private int pagePos = -1;
 
-      public ItemIterator() {
+      public ItemIteratorPaged() {
         doNext();
       }
 
@@ -287,7 +301,7 @@ public class PageableQuerySelectionHandler<T_ITEM, T_ID extends Serializable> ex
 
       @Override
       public T_ITEM next() {
-        T_ITEM result = item;
+        T_ITEM result = pageItems.get(pagePos);
         doNext();
         return result;
       }
@@ -300,20 +314,28 @@ public class PageableQuerySelectionHandler<T_ITEM, T_ID extends Serializable> ex
       private void doNext() {
         boolean nextFound = false;
         do {
-          item = ListUtil.listToItemOrNull(getService().getItems(query, idx, 1));
-          if (item == null) {
-            idx = -1;
-            item = null;
-            return;
+          boolean doQuery = (pagePos == -1) || (pagePos == iteratorBlockSizeHint-1);
+          if (doQuery) {
+            pagePos = 0;
+            pageItems = getService().getItems(query, idx, iteratorBlockSizeHint);
+            if (pageItems == null || pageItems.isEmpty()) {
+              item = null;
+              idx = -1;
+              return;
+            }
+          }
+          else {
+            ++pagePos;
           }
 
           ++idx;
+          item = pageItems.get(pagePos);
           nextFound = !baseSelection.contains(item);
         }
         while(!nextFound);
       }
 
     }
-  }
+}
 
 }

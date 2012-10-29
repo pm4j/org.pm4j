@@ -54,6 +54,11 @@ public class ItemIdBasedSelection<T_ITEM, T_ID> implements Selection<T_ITEM>, Se
     return new ItemIdBasedIterator(ids);
   }
 
+  /** Block size has no effect on this iterator implementation. */
+  @Override
+  public void setIteratorBlockSizeHint(int readBlockSize) {
+  }
+
   class ItemIdBasedIterator implements Iterator<T_ITEM> {
     private final Iterator<T_ID> idIterator;
 
