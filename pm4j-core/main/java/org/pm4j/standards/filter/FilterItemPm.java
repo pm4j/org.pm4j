@@ -1,5 +1,6 @@
 package org.pm4j.standards.filter;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
@@ -16,6 +17,8 @@ import org.pm4j.core.pm.annotation.PmOptionCfg;
 import org.pm4j.core.pm.annotation.PmOptionCfg.NullOption;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmLocalizeApi;
+import org.pm4j.core.pm.impl.PmAttrBigDecimalImpl;
+import org.pm4j.core.pm.impl.PmAttrBooleanImpl;
 import org.pm4j.core.pm.impl.PmAttrDateImpl;
 import org.pm4j.core.pm.impl.PmAttrDoubleImpl;
 import org.pm4j.core.pm.impl.PmAttrEnumImpl;
@@ -178,6 +181,20 @@ public abstract class FilterItemPm<T_ITEM extends FilterItem> extends PmBeanBase
     filterByValue.setDelegate(null);
   }
 
+  /**
+   * Creates a filter attribute type specific PM for entering the attribute value.
+   * <p>
+   * The concrete attribute PM provides:
+   * <ul>
+   *  <li>the type specific attribute provides the string conversion</li>
+   *  <li>validations and</li>
+   *  <li>options</li>
+   * </ul>
+   *
+   * @param fd the filter-by field definition.
+   * @param co the selected compare operator.
+   * @return the corresponding attribute PM.
+   */
   @SuppressWarnings({ "rawtypes", "unchecked" })
   protected PmAttr<?> makeValueAttrPm(FilterCompareDefinition fd, CompOp co) {
     Class<?> attrType = fd.getAttr().getType();
@@ -189,6 +206,12 @@ public abstract class FilterItemPm<T_ITEM extends FilterItem> extends PmBeanBase
     }
     if (Long.class.equals(attrType)) {
       return new PmAttrLongImpl(this);
+    }
+    if (Boolean.class.equals(attrType)) {
+      return new PmAttrBooleanImpl(this);
+    }
+    if (BigDecimal.class.equals(attrType)) {
+        return new PmAttrBigDecimalImpl(this);
     }
     if (Double.class.equals(attrType)) {
       return new PmAttrDoubleImpl(this);
