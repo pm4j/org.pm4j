@@ -7,10 +7,16 @@ import java.util.Map;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmInject;
+import org.pm4j.core.pm.annotation.PmInject.Mode;
 import org.pm4j.core.pm.impl.PmUtil;
 import org.pm4j.core.util.reflection.ClassUtil;
 
-public class DiResolverFactoryPmParentByType implements DiResolverFactory {
+/**
+ * DI resolver for fields annotated with {@link PmInject} using {@link PmInject#mode()} PARENT_OF_TYPE.
+ *
+ * @author olaf boede
+ */
+public class DiResolverFactoryPmInjectFieldByParentOfType implements DiResolverFactory {
 
   @Override
   public DiResolver makeDiResolver(Class<?> classToInspect) {
@@ -19,8 +25,9 @@ public class DiResolverFactoryPmParentByType implements DiResolverFactory {
     for (Field f : ClassUtil.getAllFields(classToInspect)) {
       PmInject a = f.getAnnotation(PmInject.class);
 
-      if (a != null && a.parentByType()) {
+      if (a != null && (a.mode() == Mode.PARENT_OF_TYPE)) {
         fieldsWithParentByTypeInjectionsToNullAllowedFlag.put(f, a.nullAllowed());
+        DiResolverUtil.ensureAccessibility(f);
       }
     }
 

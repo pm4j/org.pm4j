@@ -6,9 +6,16 @@ import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmInject;
+import org.pm4j.core.pm.annotation.PmInject.Mode;
 import org.pm4j.core.pm.impl.PmElementImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
 
+/**
+ * Tests some PmInject variants.
+ *
+ * @author OBOEDE
+ *
+ */
 public class PmInjectTest extends TestCase {
 
   public final class MyPm extends PmElementImpl {
@@ -26,6 +33,16 @@ public class PmInjectTest extends TestCase {
     @PmInject(nullAllowed=true)
     private String injectedNullProp;
 
+    @PmInject(mode=Mode.PARENT_OF_TYPE)
+    private PmDataInput injectedParentOfType;
+
+    private String setterInjectedProp;
+
+    @PmInject("myProp")
+    public void setSetterInjectedProp(String s) {
+      this.setterInjectedProp = s;
+    }
+
   }
 
   public void testInjection() {
@@ -39,11 +56,8 @@ public class PmInjectTest extends TestCase {
     assertEquals("abc", myPm.myInjectedProp);
     assertEquals("prop2", myPm.myInjectedProp2);
     assertEquals(null, myPm.injectedNullProp);
-  }
-
-  public final class InvalidPm extends PmConversationImpl {
-    @SuppressWarnings("unused")
-    @PmInject private String nullNotAllowedProperty;
+    assertEquals("The immediate parent is the first one that implements the requested interface.", pmConversation, myPm.injectedParentOfType);
+    assertEquals("abc", myPm.setterInjectedProp);
   }
 
   public void testNullNotAllowedInjectionFailsForNullValue() {
@@ -52,7 +66,14 @@ public class PmInjectTest extends TestCase {
       fail("Usage of an invalid injection configuration should throw an exception.");
     }
     catch (PmRuntimeException e) {
-      e.printStackTrace();
+      // ok. That should be thrown.
     }
   }
+
+  public final class InvalidPm extends PmConversationImpl {
+    @SuppressWarnings("unused")
+    @PmInject private String nullNotAllowedProperty;
+  }
+
+
 }

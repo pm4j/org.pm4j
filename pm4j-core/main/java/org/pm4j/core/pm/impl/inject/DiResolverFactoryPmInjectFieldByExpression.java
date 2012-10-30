@@ -8,11 +8,17 @@ import org.apache.commons.lang.StringUtils;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmInject;
+import org.pm4j.core.pm.annotation.PmInject.Mode;
 import org.pm4j.core.pm.impl.pathresolver.PathResolver;
 import org.pm4j.core.pm.impl.pathresolver.PmExpressionPathResolver;
 import org.pm4j.core.util.reflection.ClassUtil;
 
-public class DiResolverFactoryPmInjectField implements DiResolverFactory {
+/**
+ * DI resolver for fields annotated with {@link PmInject} using {@link PmInject.Mode#EXPRESSION}.
+ *
+ * @author olaf boede
+ */
+public class DiResolverFactoryPmInjectFieldByExpression implements DiResolverFactory {
 
   @Override
   public DiResolver makeDiResolver(Class<?> classToInspect) {
@@ -21,21 +27,16 @@ public class DiResolverFactoryPmInjectField implements DiResolverFactory {
     for (Field f : ClassUtil.getAllFields(classToInspect)) {
       PmInject a = f.getAnnotation(PmInject.class);
 
-      if (a != null && !a.parentByType()) {
+      if ((a != null) && (a.mode() == Mode.EXPRESSION)) {
         String propName = StringUtils.isNotBlank(a.value())
                             ? a.value()
-                            : f.getName();
+                            : "#" + f.getName();
 
         PathResolver r = PmExpressionPathResolver.parse(propName, false);
         r.setNullAllowed(a.nullAllowed());
 
         fieldInjectionMap.put(f, r);
-
-        // TODO olaf: Check if there is a public setter to prevent some trouble
-        //            in case of enabled security manager...
-        if (! f.isAccessible()) {
-          f.setAccessible(true);
-        }
+        DiResolverUtil.ensureAccessibility(f);
       }
     }
 

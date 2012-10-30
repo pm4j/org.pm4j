@@ -9,9 +9,9 @@ import org.pm4j.core.pm.filter.impl.FilterByPmAttrValueLocalized;
 import org.pm4j.core.pm.impl.PmObjectBase.NameBuilder;
 import org.pm4j.core.pm.impl.PmObjectBase.NameBuilderAbsoluteName;
 import org.pm4j.core.pm.impl.inject.DiResolverFactory;
-import org.pm4j.core.pm.impl.inject.DiResolverFactoryPmInjectField;
-import org.pm4j.core.pm.impl.inject.DiResolverFactoryPmInjectSetter;
-import org.pm4j.core.pm.impl.inject.DiResolverFactoryPmParentByType;
+import org.pm4j.core.pm.impl.inject.DiResolverFactoryPmInjectFieldByExpression;
+import org.pm4j.core.pm.impl.inject.DiResolverFactoryPmInjectSetterByExpression;
+import org.pm4j.core.pm.impl.inject.DiResolverFactoryPmInjectFieldByParentOfType;
 import org.pm4j.core.pm.impl.title.AsteriskAttrTitleProvider;
 import org.pm4j.core.pm.impl.title.PmTitleProvider;
 import org.pm4j.core.pm.impl.title.TitleProviderPmResBased;
@@ -120,9 +120,9 @@ public class PmDefaults implements Cloneable {
    * The default implementation supports {@link PmInject}.
    */
   private DiResolverFactory[] diResolverFactories = {
-      new DiResolverFactoryPmInjectField(),
-      new DiResolverFactoryPmInjectSetter(),
-      new DiResolverFactoryPmParentByType()
+      new DiResolverFactoryPmInjectFieldByExpression(),
+      new DiResolverFactoryPmInjectSetterByExpression(),
+      new DiResolverFactoryPmInjectFieldByParentOfType()
   };
 
   // TODO olaf: add something to the command that allows to configure that. - An application default may also be useful...

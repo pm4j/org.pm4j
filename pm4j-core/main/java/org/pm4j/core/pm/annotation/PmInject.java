@@ -19,6 +19,27 @@ import org.pm4j.core.pm.PmObject;
 public @interface PmInject {
 
   /**
+   * The set of supported injection modes.
+   */
+  public enum Mode {
+    /**
+     * The expression within the attriute 'value' gets used. If that's not
+     * configured the name of the annotate property will be used as the name
+     * of a named object to find.
+     */
+    EXPRESSION,
+    /**
+     * A parent PM that has the field type (interface or class) will be serched.
+     */
+    PARENT_OF_TYPE
+  }
+
+  /**
+   * @return the injection mode.
+   */
+  Mode mode() default Mode.EXPRESSION;
+
+  /**
    * A PM-EL expression that provides the content for the annotated field.<br>
    * If the name is not specified, the name of the annotated field will be used
    * to provide the PM-EL expression.
@@ -29,8 +50,6 @@ public @interface PmInject {
    * same name as a variable that provides the injection content.
    */
   String value() default "";
-
-  boolean parentByType() default false;
 
   /**
    * Defines if <code>null</code> is an accepted value for the injected field.
