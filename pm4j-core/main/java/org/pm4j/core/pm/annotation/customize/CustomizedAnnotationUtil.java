@@ -6,6 +6,11 @@ import java.util.Map;
 
 import org.pm4j.core.pm.PmObject;
 
+/**
+ * An pm4j internal utility with some custom annotation related implementations.
+ * 
+ * @author olaf boede
+ */
 public class CustomizedAnnotationUtil {
 
   static final Map<Class<? extends Annotation>, PermissionAnnotationHandler<?>> annotationClassToPermissionHandlerMap = new HashMap<Class<? extends Annotation>, PermissionAnnotationHandler<?>>();
