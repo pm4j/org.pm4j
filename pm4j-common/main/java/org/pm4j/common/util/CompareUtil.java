@@ -161,6 +161,18 @@ public class CompareUtil {
     }
   }
 
+  /**
+   * @param s
+   *          the string to find the pattern in.
+   * @param pattern
+   *          the pattern to find within s.
+   * @param ignoreSpaces
+   *          <code>true</code> trims the pattern before applying the search.
+   * @param ignoreCase
+   *          <code>true</code> makes the match case insensitive.
+   * @return the start position of the pattern within the given string <i>s</i>.<br>
+   *         <code>-1</code> if the pattern was not found.
+   */
   public static int indexOf(String s, String pattern, boolean ignoreSpaces, boolean ignoreCase) {
     if (ignoreSpaces) {
       s = StringUtils.trim(s);

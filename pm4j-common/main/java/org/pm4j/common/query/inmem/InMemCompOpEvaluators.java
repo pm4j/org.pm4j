@@ -7,7 +7,9 @@ import org.pm4j.common.query.CompOpGt;
 import org.pm4j.common.query.CompOpIsNull;
 import org.pm4j.common.query.CompOpLt;
 import org.pm4j.common.query.CompOpNotEquals;
+import org.pm4j.common.query.CompOpStringContains;
 import org.pm4j.common.query.CompOpStringIsEmpty;
+import org.pm4j.common.query.CompOpStringNotContains;
 import org.pm4j.common.query.CompOpStringNotIsEmpty;
 import org.pm4j.common.query.CompOpStringStartsWith;
 import org.pm4j.common.util.CompareUtil;
@@ -67,6 +69,20 @@ public class InMemCompOpEvaluators {
     @Override
     protected boolean evalImpl(InMemQueryEvaluator<?> ctxt, CompOpStringStartsWith compOp, String o1, String o2) {
       return CompareUtil.indexOf(o1, o2, compOp.isIgnoreCase(), compOp.isIgnoreSpaces()) == 0;
+    }
+  };
+
+  public static final InMemCompOpEvaluator STRING_CONTAINS = new InMemCompOpEvaluatorBase<CompOpStringContains, String>() {
+    @Override
+    protected boolean evalImpl(InMemQueryEvaluator<?> ctxt, CompOpStringContains compOp, String o1, String o2) {
+      return CompareUtil.indexOf(o1, o2, compOp.isIgnoreCase(), compOp.isIgnoreSpaces()) != -1;
+    }
+  };
+
+  public static final InMemCompOpEvaluator STRING_NOT_CONTAINS = new InMemCompOpEvaluatorBase<CompOpStringNotContains, String>() {
+    @Override
+    protected boolean evalImpl(InMemQueryEvaluator<?> ctxt, CompOpStringNotContains compOp, String o1, String o2) {
+      return CompareUtil.indexOf(o1, o2, compOp.isIgnoreCase(), compOp.isIgnoreSpaces()) == -1;
     }
   };
 }
