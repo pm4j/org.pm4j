@@ -84,37 +84,6 @@ public abstract class PmElementBase
     }
   }
 
-  /**
-   * Defines if the attribute validation should be executed on each attribute value set
-   * operation. - That's that default setting.
-   * <p>
-   * It may be useful to switch that behavior off and to postpone validation till
-   * command execution.
-   * <p>
-   * The default implementation returns <code>false</code>.
-   *
-   * @return <code>true</code> when attribute validation should be done on each set operation.
-   */
-  protected boolean isValidatingOnSetPmValue() {
-    return false;
-  }
-
-  @Override
-  Serializable getPmContentAspect(PmAspect aspect) {
-    switch (aspect) {
-
-      default:  return super.getPmContentAspect(aspect);
-    }
-  }
-
-  @Override
-  void setPmContentAspect(PmAspect aspect, Serializable value) throws PmConverterException {
-    PmEventApi.ensureThreadEventSource(this);
-    switch (aspect) {
-      default: super.setPmContentAspect(aspect, value);
-    }
-  }
-
   // ==== PmTreeNode implementation ==== //
 
   @Override

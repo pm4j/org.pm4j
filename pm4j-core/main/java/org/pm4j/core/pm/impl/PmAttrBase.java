@@ -962,7 +962,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
    * Alternatively validation is usually triggered by a command.
    */
   protected boolean isValidatingOnSetPmValue() {
-    return ((PmElementBase) getPmParentElement()).isValidatingOnSetPmValue();
+    return false;
   }
 
   /**
