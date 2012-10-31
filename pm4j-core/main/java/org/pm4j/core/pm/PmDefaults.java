@@ -1,5 +1,7 @@
 package org.pm4j.core.pm;
 
+import java.util.Arrays;
+
 import org.pm4j.common.exception.CheckedExceptionWrapper;
 import org.pm4j.core.pm.annotation.PmCommandCfg;
 import org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO;
@@ -182,6 +184,20 @@ public class PmDefaults implements Cloneable {
    */
   public void setDiResolverFactories(DiResolverFactory[] diResolverFactories) {
     this.diResolverFactories = diResolverFactories;
+  }
+
+
+  /**
+   * Adds a dependency injection resolver factory.
+   *
+   * @param diResolverFactory the new factory to add.
+   */
+  public void addDiResolverFactory(DiResolverFactory diResolverFactory) {
+    assert diResolverFactory != null;
+
+    int oldSize = diResolverFactories.length;
+    diResolverFactories = Arrays.copyOf(diResolverFactories, oldSize + 1);
+    diResolverFactories[oldSize] = diResolverFactory;
   }
 
 
