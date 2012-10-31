@@ -49,9 +49,8 @@ public class FilterSetUtil {
    *          The set of filter-by options.
    * @param numOfFilterConditionLines
    *          The number of filter items to be generated.
-   * @return A new {@link FilterSet}.
    */
-  public static FilterSet makeFilterSetStartingWithDefaultConditions(Collection<? extends FilterCompareDefinition> filterByDefinitions, int numOfFilterConditionLines) {
+  public static void initializeFilterSetStartingWithDefaultConditions(FilterSet fs, Collection<? extends FilterCompareDefinition> filterByDefinitions, int numOfFilterConditionLines) {
     List<FilterCompareDefinition> fbdWithDefaults = new ArrayList<FilterCompareDefinition>();
     for (FilterCompareDefinition fbd : filterByDefinitions) {
       if (fbd.getDefaultCompOp() != null || fbd.getDefaultFilterByValue() != null) {
@@ -59,7 +58,6 @@ public class FilterSetUtil {
       }
     }
 
-    FilterSet fs = new FilterSet();
     for (int i=0; i<numOfFilterConditionLines; ++i) {
       FilterItem item = new FilterItem();
       item.setFilterByOptions(filterByDefinitions);
@@ -71,7 +69,36 @@ public class FilterSetUtil {
       }
       fs.addFilterItem(item);
     }
+  }
 
-    return fs;
+  /**
+   * Fills the givent filter set to have finally the requested
+   * <code>numOfFilterConditionLines</code>. It uses the order of the given list
+   * of filterByDefinition to generate the various filter items.
+   * <p>
+   * If the list is shorter than the requested number of lines, the set of
+   * definitions will be applied again until the number of lines is filled.
+   *
+   *
+   * @param fs
+   *          the filter set to add filters to.
+   * @param filterByDefinitions
+   *          the set of available user filter definitions.
+   * @param numOfFilterConditionLines
+   *          the number of filters that should finally exist within the given
+   *          filter set.
+   */
+  public static void fillFilterItems(FilterSet fs, List<FilterCompareDefinition> filterByDefinitions, int numOfFilterConditionLines) {
+    int initialFilterSize = fs.getFilterItems().size();
+    for (int i=initialFilterSize; i<numOfFilterConditionLines; ++i) {
+
+      FilterItem item = new FilterItem();
+      item.setFilterByOptions(filterByDefinitions);
+
+      int fbdIdx = i % filterByDefinitions.size();
+      FilterCompareDefinition fbd = filterByDefinitions.get(fbdIdx);
+      item.setFilterBy(fbd);
+      fs.addFilterItem(item);
+    }
   }
 }

@@ -13,7 +13,6 @@ import org.pm4j.core.pm.filter.CombinedBy;
 public class FilterSet {
 
   private List<FilterItem> filterItems = new ArrayList<FilterItem>();
-  private CombinedBy combinedBy = CombinedBy.AND;
 
   public boolean isEmpty() {
     return filterItems.isEmpty();
@@ -24,13 +23,6 @@ public class FilterSet {
   }
   public void addFilterItem(FilterItem fi) {
     filterItems.add(fi);
-  }
-
-  public CombinedBy getCombinedBy() {
-    return combinedBy;
-  }
-  public void setCombinedBy(CombinedBy conditionLogOp) {
-    this.combinedBy = conditionLogOp;
   }
 
 }

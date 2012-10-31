@@ -11,7 +11,7 @@ import org.pm4j.common.query.FilterCompareDefinition;
  *
  * @author olaf boede
  */
-public interface FilterSetProvider {
+public interface FilterSetProvider<T_FILTERSET_BEAN extends FilterSet> {
 
   /**
    * Provides the set of filter compare definitions that can be
@@ -28,13 +28,13 @@ public interface FilterSetProvider {
    *
    * @return the current filter set.
    */
-  FilterSet getActivePmFilterSet();
+  T_FILTERSET_BEAN getActivePmFilterSet();
 
   /**
    * Defines a new filter set to apply.
    *
    * @param filterSet the new filter set.
    */
-  void setActivePmFilterSet(FilterSet filterSet);
+  void setActivePmFilterSet(T_FILTERSET_BEAN filterSet);
 
 }

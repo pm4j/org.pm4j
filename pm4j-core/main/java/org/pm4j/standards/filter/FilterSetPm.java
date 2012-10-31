@@ -1,27 +1,19 @@
 package org.pm4j.standards.filter;
 
-import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmAttrPmList;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmObject;
-import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.annotation.PmBeanCfg;
 import org.pm4j.core.pm.annotation.PmFactoryCfg;
-import org.pm4j.core.pm.filter.CombinedBy;
-import org.pm4j.core.pm.impl.PmAttrEnumImpl;
 import org.pm4j.core.pm.impl.PmAttrPmListImpl;
 import org.pm4j.core.pm.impl.PmBeanBase;
 import org.pm4j.core.pm.impl.PmCommandImpl;
 
 @PmBeanCfg(beanClass=FilterSet.class)
-public class FilterSetPm extends PmBeanBase<FilterSet> {
+public class FilterSetPm<T_FILTERSET_BEAN extends FilterSet> extends PmBeanBase<T_FILTERSET_BEAN> {
 
   @PmFactoryCfg(beanPmClasses=FilterItemPm.class)
   public final PmAttrPmList<FilterItemPm<FilterItem>> filterItems = new PmAttrPmListImpl<FilterItemPm<FilterItem>, FilterItem>(this);
-
-  // XXX olaf: use a simple boolean. Add a simplified api for defining custom resource strings.
-  @PmAttrCfg(required=true)
-  public final PmAttr<CombinedBy> combinedBy = new PmAttrEnumImpl<CombinedBy>(this, CombinedBy.class);
 
   /** Applies the filter definition to the {@link FilterSetProvider}. */
   public final PmCommand cmdApply = new PmCommandImpl(this) {
@@ -43,7 +35,7 @@ public class FilterSetPm extends PmBeanBase<FilterSet> {
 
 
   private int numOfFilterConditionLines = 5;
-  private FilterSetProvider filterSetProvider;
+  private FilterSetProvider<T_FILTERSET_BEAN> filterSetProvider;
 
 
   public FilterSetPm(PmObject pmParent) {
@@ -66,6 +58,11 @@ public class FilterSetPm extends PmBeanBase<FilterSet> {
     filterSetProvider.setActivePmFilterSet(getPmBean());
   }
 
+  @SuppressWarnings("unchecked")
+  protected T_FILTERSET_BEAN createFilterSetBean() {
+    return (T_FILTERSET_BEAN)new FilterSet();
+  }
+
   /**
    * Provides an initial, clear filter for entering a completely new filter definition.
    * <p>
@@ -73,17 +70,19 @@ public class FilterSetPm extends PmBeanBase<FilterSet> {
    *
    * @return An initial filter set instance.
    */
-  protected FilterSet getDefaultFilterSet() {
-    return FilterSetUtil.makeFilterSetStartingWithDefaultConditions(filterSetProvider.getAvailablePmFilterCompareDefinitions(), numOfFilterConditionLines);
+  protected T_FILTERSET_BEAN getDefaultFilterSet() {
+    T_FILTERSET_BEAN fs = createFilterSetBean();
+    FilterSetUtil.initializeFilterSetStartingWithDefaultConditions(fs, filterSetProvider.getAvailablePmFilterCompareDefinitions(), numOfFilterConditionLines);
+    return fs;
   }
 
   /**
    * Creates a default {@link FilterSet}.
    */
   @Override
-  protected FilterSet getPmBeanImpl() {
+  protected T_FILTERSET_BEAN getPmBeanImpl() {
     // 1. Get the already existing filter to display.
-    FilterSet fs = filterSetProvider.getActivePmFilterSet();
+    T_FILTERSET_BEAN fs = filterSetProvider.getActivePmFilterSet();
     if (!fs.isEmpty()) {
       return fs;
     }
@@ -91,7 +90,7 @@ public class FilterSetPm extends PmBeanBase<FilterSet> {
     // 2. No existing filter set: Create a new one based on the filter definitions.
     return filterSetProvider != null
         ? getDefaultFilterSet()
-        : new FilterSet();
+        : createFilterSetBean();
   }
 
   // -- getter --
@@ -99,8 +98,8 @@ public class FilterSetPm extends PmBeanBase<FilterSet> {
   public int getNumOfFilterConditionLines() { return numOfFilterConditionLines; }
   public void setNumOfFilterConditionLines(int numOfFilterConditionLines) { this.numOfFilterConditionLines = numOfFilterConditionLines; }
 
-  public FilterSetProvider getFilterSetProvider() { return filterSetProvider; }
-  public void setFilterSetProvider(FilterSetProvider filterSetProvider) {
+  public FilterSetProvider<T_FILTERSET_BEAN> getFilterSetProvider() { return filterSetProvider; }
+  public void setFilterSetProvider(FilterSetProvider<T_FILTERSET_BEAN> filterSetProvider) {
     // resets the current bean. The next getPmBean call will regenerate a default instance.
     setPmBean(null);
     this.filterSetProvider = filterSetProvider;
