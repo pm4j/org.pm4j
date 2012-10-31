@@ -210,10 +210,26 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     return NullOption.FOR_OPTIONAL_ATTR;
   }
 
+  /**
+   * 
+   */
   @Override
   public boolean isRequired() {
-    return getOwnMetaData().required &&
+    return isRequiredImpl() &&
            isPmEnabled();
+  }
+  
+  /**
+   * Subclasses may implement here specific logic.
+   * <p>
+   * Please notice that the result of the external {@link #isRequired()} method
+   * is influenced by the {@link #isPmEnabled()} result: A disabled attribute is
+   * automatically NOT required.
+   * 
+   * @return <code>true</code> if the attribute is required.
+   */
+  protected boolean isRequiredImpl() {
+    return getOwnMetaData().required;
   }
 
   @Override
