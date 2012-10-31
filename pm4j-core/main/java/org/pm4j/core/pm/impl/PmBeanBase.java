@@ -213,6 +213,10 @@ public abstract class PmBeanBase<T_BEAN>
     protected void onVisit(PmObject pm) {
       PmEventApi.firePmEvent(pm, eventMask, changeKind);
       for (PmObject child : PmUtil.getPmChildren(pm)) {
+        // The children may have relevant event handling code. Thus we make
+        // sure that each child receives the call.
+        PmInitApi.ensurePmInitialization(child);
+
         // Switch for each child to an event that is related to the child.
         // Registered listeners for the child will expect that the event contains a
         // reference to the PM it was registered for.
