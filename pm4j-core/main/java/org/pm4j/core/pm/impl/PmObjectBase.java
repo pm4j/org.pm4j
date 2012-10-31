@@ -428,7 +428,7 @@ public abstract class PmObjectBase implements PmObject {
   }
 
   /* package */ List<PmObject> getPmChildren() {
-    return BeanAttrArrayList.makeList(this, getPmMetaData().childFieldAccessorArray, pmDynamicSubPms.all);
+    return BeanAttrArrayList.makeList(this, getPmMetaDataWithoutPmInitCall().childFieldAccessorArray, pmDynamicSubPms.all);
   }
 
   /* package */ PmObject findChildPm(String localChildName) {
