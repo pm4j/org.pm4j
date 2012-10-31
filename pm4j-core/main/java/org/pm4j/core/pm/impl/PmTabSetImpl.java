@@ -26,7 +26,7 @@ public class PmTabSetImpl extends PmElementImpl implements PmTabSet {
   private static final Log LOG = LogFactory.getLog(PmTabSetImpl.class);
 
   /** The set of tab switch command decorator definitions. */
-  private List<CmdDecoratorDefintion> pmCmdDecoratorDefinitions = new ArrayList<CmdDecoratorDefintion>();
+  private List<TabSwitchDecoratorDefintion> pmCmdDecoratorDefinitions = new ArrayList<TabSwitchDecoratorDefintion>();
 
   /** PM of the currently active tab. */
   private PmElement currentTabPm;
@@ -51,7 +51,7 @@ public class PmTabSetImpl extends PmElementImpl implements PmTabSet {
    * @param decorator The decorator logic to be executed before the tab switch.
    */
   public void addTabSwitchCommandDecorator(PmElement fromTab, PmElement toTab, PmCommandDecorator decorator) {
-    pmCmdDecoratorDefinitions.add(new CmdDecoratorDefintion(fromTab, toTab, decorator));
+    pmCmdDecoratorDefinitions.add(new TabSwitchDecoratorDefintion(fromTab, toTab, decorator));
   }
 
   @Override
@@ -68,7 +68,7 @@ public class PmTabSetImpl extends PmElementImpl implements PmTabSet {
 
     // Delegate to an undoable command.
     PmTabChangeCommand tabChangeCommand = new PmTabChangeCommand(this, _fromTab, toTab);
-    for (CmdDecoratorDefintion d : pmCmdDecoratorDefinitions) {
+    for (TabSwitchDecoratorDefintion d : pmCmdDecoratorDefinitions) {
       if (d.isDecoratorForSwitch(_fromTab, toTab)) {
         tabChangeCommand.addCommandDecorator(d.getDecorator());
       }
@@ -152,20 +152,20 @@ public class PmTabSetImpl extends PmElementImpl implements PmTabSet {
   }
 
   /**
-   * Container for a tab navigation specific command decorator definition.
+   * Container for a tab switch specific command decorator definition.
    */
-  class CmdDecoratorDefintion {
+  class TabSwitchDecoratorDefintion {
     private String fromName;
     private String toName;
     private PmCommandDecorator decorator;
 
-    public CmdDecoratorDefintion(PmObject fromTab, PmObject toTab, PmCommandDecorator decorator) {
+    public TabSwitchDecoratorDefintion(PmObject fromTab, PmObject toTab, PmCommandDecorator decorator) {
       this(fromTab != null ? fromTab.getPmRelativeName() : null,
            toTab != null ? toTab.getPmRelativeName() : null,
            decorator);
     }
 
-    public CmdDecoratorDefintion(String fromTabName, String toTabName, PmCommandDecorator decorator) {
+    public TabSwitchDecoratorDefintion(String fromTabName, String toTabName, PmCommandDecorator decorator) {
       this.fromName = fromTabName;
       this.toName = toTabName;
       this.decorator = decorator;
