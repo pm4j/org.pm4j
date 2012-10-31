@@ -35,6 +35,7 @@ public class DiResolverFactoryPmInjectSetterByExpression implements DiResolverFa
         r.setNullAllowed(a.nullAllowed());
 
         methodInjectionMap.put(m, r);
+        DiResolverUtil.ensureAccessibility(m);
       }
     }
 
@@ -66,8 +67,7 @@ public class DiResolverFactoryPmInjectSetterByExpression implements DiResolverFa
         try {
           m.invoke(pm, value);
         } catch (Exception ex) {
-          throw new PmRuntimeException(pm, "Can't invoke method '" + m.getName() + "' in class '"
-              + getClass().getName() + "'.", ex);
+          throw new PmRuntimeException(pm, "Can't invoke method '" + m + "'.", ex);
         }
       }
     }
