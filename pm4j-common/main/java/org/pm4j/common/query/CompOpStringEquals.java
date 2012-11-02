@@ -1,5 +1,7 @@
 package org.pm4j.common.query;
 
+import org.apache.commons.lang.StringUtils;
+
 
 public class CompOpStringEquals extends CompOpStringBase {
 
@@ -11,7 +13,7 @@ public class CompOpStringEquals extends CompOpStringBase {
 
   @Override
   protected boolean isEffectiveFilterValueImpl(String filterValue) {
-    return true;
+    return ! StringUtils.isBlank(filterValue);
   }
 
 }
