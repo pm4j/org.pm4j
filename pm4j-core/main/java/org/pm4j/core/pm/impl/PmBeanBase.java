@@ -45,6 +45,16 @@ public abstract class PmBeanBase<T_BEAN>
   }
 
   /**
+   * Creates a PM with an initial <code>null</code>-bean.
+   *
+   * @param pmParent
+   *          the PM hierarchy parent.
+   */
+  public PmBeanBase(PmObject pmParent) {
+    this(pmParent, null);
+  }
+
+  /**
    * Initializing constructor. Allows to access the bean behind this PM at
    * construction time.
    *

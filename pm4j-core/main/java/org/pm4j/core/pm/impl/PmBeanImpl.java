@@ -30,7 +30,7 @@ public class PmBeanImpl<T_BEAN> extends PmBeanBase<T_BEAN> {
    *          the PM hierarchy parent.
    */
   public PmBeanImpl(PmObject pmParent) {
-    super(pmParent, null);
+    super(pmParent);
   }
 
   /**
