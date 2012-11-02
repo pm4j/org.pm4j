@@ -211,21 +211,21 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   }
 
   /**
-   * 
+   *
    */
   @Override
   public boolean isRequired() {
     return isRequiredImpl() &&
            isPmEnabled();
   }
-  
+
   /**
    * Subclasses may implement here specific logic.
    * <p>
    * Please notice that the result of the external {@link #isRequired()} method
    * is influenced by the {@link #isPmEnabled()} result: A disabled attribute is
    * automatically NOT required.
-   * 
+   *
    * @return <code>true</code> if the attribute is required.
    */
   protected boolean isRequiredImpl() {
@@ -325,9 +325,6 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
 
   // ======== Attribute value access ======== //
 
-  // TODO: Gegenwärtig liefert nur getValueAsString den 'invalidValue'.
-  // Bei erfolgreicher Typkonvertierung sollte auch diese Methode
-  // den nicht validierten Inhalt liefern. (spätestens für Rich-GUIs).
   @SuppressWarnings("unchecked")
   @Override
   public final T_PM_VALUE getValue() {
@@ -344,13 +341,6 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
 
         if (isInvalidValue() &&
             dataContainer.invalidValue.isPmValueSet()) {
-// The exception on getting an unconverted value made a lot of trouble.
-// It seems to be a better idea to return the current value in this case.
-//          if (!dataContainer.invalidValue.isPmValueSet()) {
-//            throw new PmRuntimeException(this,
-//                "Unable to get a value that was not convertible to the presentation model type.\n" +
-//                "Hint: Use getValueAsString when the value was set by getValueAsString.");
-//          }
           v = dataContainer.invalidValue.getPmValue();
         }
         else {
