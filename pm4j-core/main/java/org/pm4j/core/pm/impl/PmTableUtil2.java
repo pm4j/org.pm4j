@@ -45,8 +45,8 @@ public final class PmTableUtil2 {
    */
   public static void setScrollableTableProperties(PmTableImpl2<?, ?> table) {
     table.setNumOfPageRows(Integer.MAX_VALUE);
-    if (table.getPager() != null) {
-      table.getPager().setPagerVisibility(PagerVisibility.WHEN_SECOND_PAGE_EXISTS);
+    if (table.getPmPager() != null) {
+      table.getPmPager().setPagerVisibility(PagerVisibility.WHEN_SECOND_PAGE_EXISTS);
     }
   }
 

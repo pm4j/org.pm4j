@@ -40,7 +40,7 @@ public class PageablePmBeanCollectionTest extends PageableCollectionTestBase<Pag
 
     qo.addSortOrder("name", new InMemSortOrder(attrNameValue));
 
-    beanTablePm.setPageableCollection(new PageablePmBeanCollection<BeanRowPm, Bean>(beanTablePm, beans, qo));
+    beanTablePm.setPmPageableCollection(new PageablePmBeanCollection<BeanRowPm, Bean>(beanTablePm, beans, qo));
 
     return beanTablePm.getPmPageableCollection();
   }

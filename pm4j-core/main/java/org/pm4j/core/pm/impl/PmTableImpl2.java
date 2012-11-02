@@ -96,7 +96,7 @@ public class PmTableImpl2
   /**
    * Creates an empty table.
    * <p>
-   * The table may be connected to some data source by calling {@link #setPageableCollection(PageableCollection)}.
+   * The table may be connected to some data source by calling {@link #setPmPageableCollection(PageableCollection)}.
    *
    * @param pmParent The presentation model context for this table.
    */
@@ -250,8 +250,8 @@ public class PmTableImpl2
       set.addDecorator(decorator);
 
       // XXX olaf: check for a better solution:
-      if (c == TableChange.PAGE && getPager() != null) {
-        getPager().addPageChangeDecorator(decorator);
+      if (c == TableChange.PAGE && getPmPager() != null) {
+        getPmPager().addPageChangeDecorator(decorator);
       }
     }
   }
@@ -367,7 +367,7 @@ public class PmTableImpl2
    * Gets called whenever a new {@link #pageableCollection} gets assigned:
    * <ul>
    *  <li>by calling {@link #getPmPageableCollectionImpl()} or </li>
-   *  <li>by a call to {@link #setPageableCollection(PageableCollection, boolean, ValueChangeKind)}.</li>
+   *  <li>by a call to {@link #setPmPageableCollection(PageableCollection, boolean, ValueChangeKind)}.</li>
    * </ul>
    * The default settings applied in this base implementation are:
    * <ul>
@@ -378,13 +378,13 @@ public class PmTableImpl2
    *
    * @param pageableCollection the collection to initialize.
    */
-  protected void initPageableCollection(PageableCollection2<T_ROW_PM> pageableCollection) {
+  protected void initPmPageableCollection(PageableCollection2<T_ROW_PM> pageableCollection) {
     pageableCollection.getSelectionHandler().setSelectMode(getRowSelectMode());
     pageableCollection.setPageSize(getNumOfPageRows());
 
     // XXX olaf: Check - is redundant to the change listener within Pager!
-    if (getPager() != null) {
-      getPager().setPageableCollection(pageableCollection);
+    if (getPmPager() != null) {
+      getPmPager().setPageableCollection(pageableCollection);
     }
   }
 
@@ -395,8 +395,8 @@ public class PmTableImpl2
    *          the data set to present. If it is <code>null</code> an empty
    *          collection will be created internally by the next {@link #getPmPageableCollection()} call.
    */
-  public void setPageableCollection(PageableCollection2<T_ROW_PM> pageable) {
-    setPageableCollection(pageable, true, ValueChangeKind.VALUE);
+  public void setPmPageableCollection(PageableCollection2<T_ROW_PM> pageable) {
+    setPmPageableCollection(pageable, true, ValueChangeKind.VALUE);
   }
 
   /**
@@ -406,7 +406,7 @@ public class PmTableImpl2
    * @param preserveSettings Defines if the currently selected items and filter definition should be preserved.
    * @return <code>true</code> if the data set was new.
    */
-  public void setPageableCollection(PageableCollection2<T_ROW_PM> pageable, boolean preserveSettings, ValueChangeKind valueChangeKind) {
+  public void setPmPageableCollection(PageableCollection2<T_ROW_PM> pageable, boolean preserveSettings, ValueChangeKind valueChangeKind) {
     Selection<T_ROW_PM> selection = null;
 
     if (preserveSettings) {
@@ -449,7 +449,7 @@ public class PmTableImpl2
    *         May return <code>null</code> if there is no pager defined for this
    *         table.
    */
-  public PmPager2 getPager() {
+  public PmPager2 getPmPager() {
     return null;
   }
 
@@ -468,7 +468,7 @@ public class PmTableImpl2
 
     this.pageableCollection = pc;
     if (pageableCollection != null) {
-      initPageableCollection(pageableCollection);
+      initPmPageableCollection(pageableCollection);
     }
   }
 

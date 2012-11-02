@@ -1,17 +1,14 @@
 package org.pm4j.core.pm;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.pm4j.common.query.QueryOptionsImpl;
-import org.pm4j.core.pm.PmAttrInteger;
-import org.pm4j.core.pm.PmAttrString;
-import org.pm4j.core.pm.PmObject;
-import org.pm4j.core.pm.PmTableCol2;
 import org.pm4j.core.pm.annotation.PmBeanCfg;
 import org.pm4j.core.pm.annotation.PmFactoryCfg;
 import org.pm4j.core.pm.impl.PmAttrIntegerImpl;
@@ -43,15 +40,21 @@ public class PmTable2Test {
 
     PageablePmBeanCollection<RowPm, RowBean> pc = new PageablePmBeanCollection<RowPm, RowBean>(myTablePm, editedRowBeanList);
 
-    myTablePm.setPageableCollection(pc);
+    myTablePm.setPmPageableCollection(pc);
   }
 
   @Test
   public void testTable() {
-    Assert.assertEquals(3, myTablePm.getTotalNumOfRows());
+    assertEquals(3, myTablePm.getTotalNumOfRows());
   }
 
+  @Test
+  public void testEmptyTable() {
+    myTablePm.setPmPageableCollection(new PageablePmBeanCollection<RowPm, RowBean>(myTablePm, new ArrayList<RowBean>()));
 
+    assertEquals(0, myTablePm.getTotalNumOfRows());
+    assertEquals(0, myTablePm.getRows().size());
+  }
 
   @PmFactoryCfg(beanPmClasses=RowPm.class)
   public static class TablePm extends PmTableImpl2<RowPm, RowBean> {
