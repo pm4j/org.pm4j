@@ -5,8 +5,6 @@ import static org.junit.Assert.assertEquals;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.Assert;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.pm4j.common.query.CompOpStringStartsWith;
@@ -69,13 +67,6 @@ public abstract class PageableCollectionTestBase<T> {
     assertEquals("[]", collection.getItemsOnPage().toString());
     collection.setCurrentPageIdx(4);
     assertEquals("[]", collection.getItemsOnPage().toString());
-
-    try {
-      collection.setCurrentPageIdx(0);
-      Assert.fail("An exception should be thrown if the selected page is before the first one.");
-    } catch (RuntimeException e) {
-      // as expected
-    }
   }
 
 

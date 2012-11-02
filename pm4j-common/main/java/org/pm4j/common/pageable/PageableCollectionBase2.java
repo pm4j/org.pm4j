@@ -55,10 +55,7 @@ public abstract class PageableCollectionBase2<T_ITEM> implements PageableCollect
 
   @Override
   public void setCurrentPageIdx(int pageIdx) {
-    if (pageIdx < 1) {
-      throw new ArrayIndexOutOfBoundsException(pageIdx);
-    }
-    this.currentPageIdx = pageIdx;
+    this.currentPageIdx = (pageIdx < 1) ? 1 : pageIdx;
   }
 
 }
