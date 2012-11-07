@@ -108,7 +108,7 @@ public class PmFilterSetBase extends PmBeanBase<FilterSet> implements PmFilterSe
     }
 
     @Override
-    public boolean isRequired() {
+    protected boolean isRequiredImpl() {
       return true;
     }
 
