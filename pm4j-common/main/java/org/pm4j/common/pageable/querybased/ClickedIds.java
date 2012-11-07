@@ -1,5 +1,6 @@
 package org.pm4j.common.pageable.querybased;
 
+import java.io.Serializable;
 import java.util.Collection;
 
 /**
@@ -13,7 +14,9 @@ import java.util.Collection;
  *
  * @param <T_ID>
  */
-public class ClickedIds<T_ID> {
+public class ClickedIds<T_ID> implements Serializable {
+
+  private static final long serialVersionUID = 1L;
 
   private final Collection<T_ID> ids;
   private final boolean invertedSelection;
