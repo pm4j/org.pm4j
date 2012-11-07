@@ -20,6 +20,16 @@ public interface PmDataInput extends PmObject {
   boolean isPmValueChanged();
 
   /**
+   * Marks the PM manually a changed or unchanged.
+   * <p>
+   * Setting the PM to unchanged will be propagated recursively to all child PMs.
+   *
+   * @param changed the new changed state.
+   */
+  void setPmValueChanged(boolean changed);
+
+
+  /**
    * Resets the values of editable attributes to their default value.
    */
   void resetPmValues();
