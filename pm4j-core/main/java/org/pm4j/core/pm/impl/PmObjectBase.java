@@ -295,6 +295,7 @@ public abstract class PmObjectBase implements PmObject {
    */
   @Override
   public final boolean isPmReadonly() {
+    zz_ensurePmInitialization();
     boolean readonly  = isPmReadonlyImpl() ||
                         CustomizedAnnotationUtil.isReadonly(this, getPmMetaData().permissionAnnotations);
     return readonly;
