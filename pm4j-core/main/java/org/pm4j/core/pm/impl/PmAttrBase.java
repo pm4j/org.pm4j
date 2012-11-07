@@ -44,6 +44,7 @@ import org.pm4j.core.pm.PmOptionSet;
 import org.pm4j.core.pm.PmVisitor;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.annotation.PmAttrCfg.AttrAccessKind;
+import org.pm4j.core.pm.annotation.PmAttrCfg.Restriction;
 import org.pm4j.core.pm.annotation.PmCacheCfg;
 import org.pm4j.core.pm.annotation.PmCacheCfg.CacheMode;
 import org.pm4j.core.pm.annotation.PmCommandCfg;
@@ -94,7 +95,7 @@ import org.pm4j.navi.NaviLink;
  * @author olaf boede
  */
 public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
-        extends PmObjectBase
+        extends PmDataInputBase
         implements PmAttr<T_PM_VALUE> {
 
   private static final Log LOG = LogFactory.getLog(PmAttrBase.class);
@@ -211,12 +212,14 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   }
 
   /**
-   *
+   * Checks first if the PM is enabled.<br>
+   * Only if that's the case the logic provided by {@link #isPmReadonlyImpl()}
+   * will be used.
    */
   @Override
-  public boolean isRequired() {
-    return isRequiredImpl() &&
-           isPmEnabled();
+  public final boolean isRequired() {
+    return isPmEnabled() &&
+           isRequiredImpl();
   }
 
   /**
@@ -229,7 +232,15 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
    * @return <code>true</code> if the attribute is required.
    */
   protected boolean isRequiredImpl() {
-    return getOwnMetaData().required;
+    MetaData md = getOwnMetaData();
+
+    switch (md.valueRestriction) {
+      case REQUIRED:            return true;
+      case REQUIRED_IF_VISIBLE: return isPmVisible();
+      case READ_ONLY:           return false;
+      case NONE:                return md.required; // fall back for old annotation attribute
+      default:         throw new PmRuntimeException(this, "Unknown enum value found.");
+    }
   }
 
   @Override
@@ -734,17 +745,21 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   }
 
   @Override
-  public boolean isPmValueChanged() {
-    return  dataContainer != null &&
-            dataContainer.originalValue != UNCHANGED_VALUE_INDICATOR;
+  protected boolean isPmValueChangedImpl() {
+    return  (dataContainer != null &&
+             dataContainer.originalValue != UNCHANGED_VALUE_INDICATOR) ||
+             super.isPmValueChangedImpl();
   }
 
+
+  // TODO olaf: distinguish explicite changed flag and value change.
   @Override
-  public void setPmValueChanged(boolean newChangedState) {
+  protected void setPmValueChangedImpl(boolean newChangedState) {
     PmEventApi.ensureThreadEventSource(this);
     setValueChanged(UNKNOWN_VALUE_INDICATOR, newChangedState
             ? CHANGED_VALUE_INDICATOR
-        : UNCHANGED_VALUE_INDICATOR);
+            : UNCHANGED_VALUE_INDICATOR);
+    super.setPmValueChangedImpl(newChangedState);
   }
 
   static final String UNCHANGED_VALUE_INDICATOR = "### the attribute value is not marked as changed ###";
@@ -1245,12 +1260,18 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     boolean useReflection = true;
     if (fieldAnnotation != null) {
       myMetaData.hideWhenEmpty = fieldAnnotation.hideWhenEmpty();
-      myMetaData.setReadOnly(fieldAnnotation.readOnly());
+      myMetaData.setReadOnly((fieldAnnotation.valueRestriction() == Restriction.READ_ONLY) || fieldAnnotation.readOnly());
+
       // The pm can force more constraints. It should not define less constraints as
       // the bean validation definition:
       if (fieldAnnotation.required()) {
         myMetaData.required = true;
       }
+      // TODO: replace 'required' and 'readOnly'.
+      if (fieldAnnotation.valueRestriction() != Restriction.NONE) {
+        myMetaData.valueRestriction = fieldAnnotation.valueRestriction();
+      }
+
       myMetaData.accessKind = fieldAnnotation.accessKind();
       myMetaData.formatResKey = StringUtils.defaultIfEmpty(fieldAnnotation.formatResKey(), null);
       if (StringUtils.isNotEmpty(fieldAnnotation.defaultValue())) {
@@ -1390,7 +1411,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   protected void initMetaDataBeanConstraint(ConstraintDescriptor<?> cd) {
     MetaData metaData = getOwnMetaDataWithoutPmInitCall();
     if (cd.getAnnotation() instanceof NotNull) {
-      metaData.required = true;
+      metaData.valueRestriction = Restriction.REQUIRED;
     }
     else if (cd.getAnnotation() instanceof Size) {
       Size annotation = (Size)cd.getAnnotation();
@@ -1416,6 +1437,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     private PmOptionCfg.NullOption          nullOption              = NullOption.DEFAULT;
     private boolean                         hideWhenEmpty;
     private boolean                         required;
+    private Restriction                valueRestriction        = Restriction.NONE;
     private boolean                         primitiveType;
     private PathResolver                    valuePathResolver;
     private PathResolver                    valueContainingObjPathResolver = PassThroughPathResolver.INSTANCE;

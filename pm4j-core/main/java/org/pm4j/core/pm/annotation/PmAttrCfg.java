@@ -19,6 +19,31 @@ import org.pm4j.core.pm.PmObject;
 @Target({ElementType.TYPE, ElementType.FIELD})
 public @interface PmAttrCfg {
 
+  /** Attribute value restrictions. */
+  public static enum Restriction {
+    /**
+     * The value is required.<br>
+     * Has only effect if the attribute is Enabled !
+     */
+    REQUIRED,
+    /**
+     * The value is only required if the attribute is visible.<br>
+     * Is a useful configuration for form attributes are made visible based on
+     * data scenarios.
+     */
+    REQUIRED_IF_VISIBLE,
+    /**
+     * The value can't be updated.
+     */
+    READ_ONLY,
+    /**
+     * No required or read-only declard by this annotation.<br>
+     * But: The result of the methods isRequiredImpl, isPmEnabledImpl, isPmReadOnly etc. may
+     * dynamically define specific attribute restrictions.
+     */
+    NONE
+  }
+
   /**
    * @return An optional expression that describes how to access the attribute value.
    *         <p>
@@ -32,6 +57,15 @@ public @interface PmAttrCfg {
    *         Default value is <code>false</code>.
    */
   boolean hideWhenEmpty() default false;
+
+  /**
+   * Defines which condition makes the attribute value required.
+   * <p>
+   * Will replace {@link #required()} and {@link #readOnly()} in future.
+   *
+   * @return
+   */
+  Restriction valueRestriction() default Restriction.NONE;
 
   /**
    * @return <code>true</code> when the field has to be filled on each data entry form.

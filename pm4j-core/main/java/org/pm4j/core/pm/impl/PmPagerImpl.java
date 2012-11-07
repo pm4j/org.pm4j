@@ -125,7 +125,7 @@ public class PmPagerImpl
 
     /** Is not required. Even if the bound value is an 'int' scalar. */
     @Override
-    public boolean isRequired() {
+    protected boolean isRequiredImpl() {
       return false;
     }
 
@@ -218,9 +218,9 @@ public class PmPagerImpl
    * {@link #propagateChangedStateToParent} to <code>true</code>.
    */
   @Override
-  public boolean isPmValueChanged() {
+  protected boolean isPmValueChangedImpl() {
     return  propagateChangedStateToParent &&
-            super.isPmValueChanged();
+            super.isPmValueChangedImpl();
   }
 
   @Override

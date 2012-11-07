@@ -13,6 +13,7 @@ import org.pm4j.core.pm.PmAttrProxy;
 import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmOptionSet;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
+import org.pm4j.core.pm.annotation.PmAttrCfg.Restriction;
 import org.pm4j.core.pm.annotation.PmOptionCfg;
 import org.pm4j.core.pm.annotation.PmOptionCfg.NullOption;
 import org.pm4j.core.pm.api.PmEventApi;
@@ -75,7 +76,7 @@ public abstract class FilterItemPm<T_ITEM extends FilterItem> extends PmBeanBase
    * Allows to select the compare operations that correspond to the selected
    * filter-by criterium.
    */
-  @PmAttrCfg(required=true)
+  @PmAttrCfg(required=true, valueRestriction=Restriction.REQUIRED)
   public final PmAttr<CompOp> compOp = new PmAttrImpl<CompOp>(this) {
     @Override
     protected void onPmInit() {
@@ -113,10 +114,6 @@ public abstract class FilterItemPm<T_ITEM extends FilterItem> extends PmBeanBase
       return iter.hasNext()
               ? iter.next()
               : null;
-    }
-
-    public boolean isRequired() {
-      return isPmEnabled();
     }
 
     @Override
