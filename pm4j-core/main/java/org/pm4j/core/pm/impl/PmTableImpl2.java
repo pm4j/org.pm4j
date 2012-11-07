@@ -317,7 +317,7 @@ public class PmTableImpl2
   }
 
   @Override
-  public boolean isPmValueChanged() {
+  protected boolean isPmValueChangedImpl() {
     return changeSetRegistry.isChanged();
   }
 

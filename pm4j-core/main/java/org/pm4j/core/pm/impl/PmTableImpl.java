@@ -493,12 +493,14 @@ public class PmTableImpl
   }
 
   @Override
-  public boolean isPmValueChanged() {
-    return changedStateRegistry.isAChangeRegistered();
+  protected boolean isPmValueChangedImpl() {
+    return changedStateRegistry.isAChangeRegistered() ||
+           super.isPmValueChangedImpl();
   }
 
-  // TODO olaf: move two methode to a value change util: set individual and sub-tree changed states
-  void setPmValueChanged(boolean newChangedState) {
+  @Override
+  protected void setPmValueChangedImpl(boolean newChangedState) {
+    super.setPmValueChangedImpl(newChangedState);
     if (newChangedState == false) {
       changedStateRegistry.clearChangedItems();
     }
@@ -772,31 +774,4 @@ public class PmTableImpl
   protected PmObjectBase.MetaData makeMetaData() {
     return new MetaData();
   }
-
-// TODO olaf: Not yet implemented.
-
-//  @Override
-//  protected void initMetaData(PmObjectBase.MetaData metaData) {
-//    super.initMetaData(metaData);
-//    MetaData myMetaData = (MetaData) metaData;
-
-//    PmTableCfg annotation = AnnotationUtil.findAnnotation(this, PmTableCfg.class);
-//    if (annotation != null) {
-//      if (annotation.rowSelectMode() != RowSelectMode.DEFAULT) {
-//        myMetaData.rowSelectMode = annotation.rowSelectMode();
-//      }
-//      if (annotation.numOfPageRows() > 0) {
-//        myMetaData.numOfPageRows = annotation.numOfPageRows();
-//      }
-//    }
-//  }
-
-//  protected static class MetaData extends PmObjectBase.MetaData {
-//    private RowSelectMode rowSelectMode = RowSelectMode.SINGLE;
-//    private int numOfPageRows = 10;
-//  }
-//
-//  private final MetaData getOwnMetaDataWithoutPmInitCall() {
-//    return (MetaData) getPmMetaDataWithoutPmInitCall();
-//  };
 }
