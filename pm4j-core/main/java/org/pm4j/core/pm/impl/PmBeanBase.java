@@ -344,6 +344,15 @@ public abstract class PmBeanBase<T_BEAN>
   }
 
   /**
+   * The default implementation assumes that the PM is unchanged if there is no bean behind it.
+   */
+  @Override
+  protected boolean isPmValueChangedImpl() {
+    return (getPmBean() != null) &&
+           super.isPmValueChangedImpl();
+  }
+
+  /**
    * Validates all sub-PMs.<br>
    * It the validation of all sub-PM's did not provide an error it performs a bean-validation on
    * the bean provided by {@link #getPmBean()}.
