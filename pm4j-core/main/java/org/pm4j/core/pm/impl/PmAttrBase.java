@@ -255,12 +255,8 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     return super.isPmEnabled() && !isPmReadonly();
   }
 
-  @Override
-  protected boolean isPmEnabledImpl() {
-    return super.isPmEnabledImpl() &&
-           !isPmReadonly();
-  }
-
+  // TODO olaf: move common logic to isPmVisible. Additional effort: ensure that isPmVisible stays final
+  // for all PM sub classes.
   @Override
   protected boolean isPmVisibleImpl() {
     boolean visible = super.isPmVisibleImpl();
@@ -915,7 +911,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
 
   /**
    * Sets the invalid value and notifies listeners
-   * 
+   *
    * @param invValue
    *          The invalid value.
    */

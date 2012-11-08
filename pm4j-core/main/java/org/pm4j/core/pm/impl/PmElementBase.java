@@ -9,8 +9,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang.ObjectUtils;
-import org.pm4j.core.exception.PmConverterException;
-import org.pm4j.core.pm.PmAspect;
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.PmElement;
@@ -18,7 +16,6 @@ import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmTreeNode;
 import org.pm4j.core.pm.PmVisitor;
 import org.pm4j.core.pm.api.PmCacheApi;
-import org.pm4j.core.pm.api.PmEventApi;
 
 public abstract class PmElementBase
         extends PmDataInputBase
@@ -49,6 +46,15 @@ public abstract class PmElementBase
    */
   public PmElementBase(PmObject pmParent) {
     super(pmParent);
+  }
+
+  /**
+   * Base functionality (includes initialization etc.) is finalized here.<p>
+   * Subclasses may place their logic in {@link #isPmEnabledImpl()}.
+   */
+  @Override
+  public final boolean isPmEnabled() {
+    return super.isPmEnabled();
   }
 
   /**

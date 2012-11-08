@@ -112,6 +112,15 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
   }
 
   /**
+   * Base functionality (includes initialization etc.) is finalized here.<p>
+   * Subclasses may place their logic in {@link #isPmEnabledImpl()}.
+   */
+  @Override
+  public final boolean isPmEnabled() {
+	return super.isPmEnabled();
+  }
+
+  /**
    * @param commandDecorator The decorator to add to the command execution logic.
    */
   @Override
