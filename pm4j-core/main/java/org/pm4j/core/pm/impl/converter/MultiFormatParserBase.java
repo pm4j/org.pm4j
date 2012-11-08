@@ -117,7 +117,7 @@ public abstract class MultiFormatParserBase<T extends Serializable> {
    * @param pmAttr The pmAttr.
    * @return Format strings.
    */
-  public String[] getParseFormats(PmAttr<?> pmAttr) {
+  private String[] getParseFormats(PmAttr<?> pmAttr) {
     String formatString = StringUtils.defaultIfEmpty(pmAttr != null ? pmAttr.getFormatString() : null, getDefaultFormatPattern());
     String[] formats = StringUtils.split(formatString, getFormatSplitString(pmAttr));
     return formats;

@@ -1,6 +1,13 @@
 package org.pm4j.core.pm.impl.converter;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
+import java.util.Locale;
+
+import org.pm4j.core.pm.PmAttr;
+import org.pm4j.core.pm.PmAttrBigDecimal;
 
 public class PmConverterBigDecimal extends PmConverterNumber<BigDecimal> {
 
@@ -11,15 +18,13 @@ public class PmConverterBigDecimal extends PmConverterNumber<BigDecimal> {
     setDefaultPattern("#0.00");
   }
 
-// TODO: Implement multi format for numbers.
-//  @Override
-//  public BigDecimal stringToValue(PmAttr<?> pmAttr, String s) {
-//    return super.stringToValue2(pmAttr, s);
-//  }
-//
-//  @Override
-//  public String valueToString(PmAttr<?> pmAttr, BigDecimal v) {
-//    return super.valueToString2(pmAttr, v);
-//  }
+  @Override
+  protected NumberFormat getNumberFormat(Locale locale, String formatString, PmAttr<?> pmAttr) {
+    PmAttrBigDecimal pmAttrBigDecimal = (PmAttrBigDecimal) pmAttr;
+    DecimalFormat decimalFormat = new DecimalFormat(formatString, new DecimalFormatSymbols(locale));
+    decimalFormat.setRoundingMode(pmAttrBigDecimal.getStringConversionRoundingMode());
+    decimalFormat.setParseBigDecimal(true);
+    return decimalFormat;
+  }
 
 }

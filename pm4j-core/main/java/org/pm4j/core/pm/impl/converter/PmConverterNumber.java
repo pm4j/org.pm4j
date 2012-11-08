@@ -5,8 +5,7 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.text.ParsePosition;
 import java.util.Locale;
 
 import org.apache.commons.lang.StringUtils;
@@ -34,19 +33,11 @@ public class PmConverterNumber<T extends Number> extends PmConverterSerializeabl
           throw new PmRuntimeException("Number class without string constructor is not supported. Class: " + numberClass);
     }
 
-
   }
 
+  
   @Override
   public T stringToValue(PmAttr<?> pmAttr, String s) {
-      try {
-        return numberCtor.newInstance(s.trim());
-      } catch (Exception e) {
-        throw new PmResourceRuntimeException(pmAttr, PmConstants.MSGKEY_VALIDATION_NUMBER_CONVERSION_FROM_STRING_FAILED, s);
-      }
-  }
-
-  T stringToValue2(PmAttr<?> pmAttr, String s) {
     try {
       T value = multiFormatParser.parseString(pmAttr, s);
       if (value != null && value.getClass() != numberCtor.getDeclaringClass()) {
@@ -57,13 +48,14 @@ public class PmConverterNumber<T extends Number> extends PmConverterSerializeabl
       }
 
     } catch (Exception e) {
-      throw new PmResourceRuntimeException(pmAttr, PmConstants.MSGKEY_VALIDATION_NUMBER_CONVERSION_FROM_STRING_FAILED, s);
+      throw new PmResourceRuntimeException(pmAttr, PmConstants.MSGKEY_VALIDATION_NUMBER_CONVERSION_FROM_STRING_FAILED, pmAttr.getPmTitle());
     }
   }
-
-  String valueToString2(org.pm4j.core.pm.PmAttr<?> pmAttr, T v) {
+  
+  @Override
+  public String valueToString(PmAttr<?> pmAttr, T v) {
     String outputFormatString = multiFormatParser.getOutputFormat(pmAttr);
-    NumberFormat format = getNumberFormat(pmAttr.getPmConversation().getPmLocale(), outputFormatString);
+    NumberFormat format = getNumberFormat(pmAttr.getPmConversation().getPmLocale(), outputFormatString, pmAttr);
     return format.format(v);
   };
 
@@ -85,7 +77,7 @@ public class PmConverterNumber<T extends Number> extends PmConverterSerializeabl
             : new DecimalFormat(formatString, new DecimalFormatSymbols(locale));
   }
 
-  protected NumberFormat getNumberFormat(Locale locale, String formatString) {
+  protected NumberFormat getNumberFormat(Locale locale, String formatString, PmAttr<?> pmAttr) {
     return (StringUtils.isBlank(formatString))
         ? NumberFormat.getNumberInstance(locale)
         : new DecimalFormat(formatString, new DecimalFormatSymbols(locale));
@@ -100,9 +92,27 @@ public class PmConverterNumber<T extends Number> extends PmConverterSerializeabl
     @SuppressWarnings("unchecked")
     @Override
     protected T parseValue(String s, String format, Locale locale, PmAttr<?> pmAttr) throws ParseException {
-      NumberFormat nf = getNumberFormat(locale, format);
-
-      return (T) nf.parse(s);
+      NumberFormat nf = getNumberFormat(locale, format, pmAttr);
+      if(nf instanceof DecimalFormat) {
+        DecimalFormat decimalFormat = (DecimalFormat) nf;
+        ParsePosition parsePosition = new ParsePosition(0);
+        Object object = decimalFormat.parse(s, parsePosition);
+        // make sure that the whole string matches
+        if( parsePosition.getIndex() < s.length() ) {
+          throw new ParseException("input string does only match in parts", parsePosition.getIndex());
+        }
+        // make sure that max and min fraction match
+        try {
+          nf.format(object);
+        } catch (ArithmeticException e) {
+          throw new ParseException(e.getMessage(), 0);
+        }
+        
+        return (T) object;
+      } else {
+        return (T) nf.parse(s);
+      }
+      
     }
 
     @Override

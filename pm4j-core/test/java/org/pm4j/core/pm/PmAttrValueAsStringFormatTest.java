@@ -39,7 +39,6 @@ public class PmAttrValueAsStringFormatTest {
 
 
   @Test
-  @Ignore("TODO olaf: Make it compatible with current big decimal behavior. - See BigDecimal unit tests.")
   public void testBigDecimalWithDefaultFormat() {
     assertEquals("Initial null value.", null, myPm.bigDecimalWithDefaultFormat.getValueAsString());
 
@@ -57,7 +56,6 @@ public class PmAttrValueAsStringFormatTest {
   }
 
   @Test
-  @Ignore("TODO olaf: Make it compatible with current big decimal behavior. - See BigDecimal unit tests.")
   public void testBigDecimalWithEmbracedNegativeFormat() {
     assertEquals("Initial null value.", null, myPm.bigDecimalWithEmbracedNegativeFormat.getValueAsString());
 
@@ -75,7 +73,7 @@ public class PmAttrValueAsStringFormatTest {
 
     myPm.bigDecimalWithEmbracedNegativeFormat.setValueAsString("(1000.23)");
     assertTrue("The attribute should not report a conversion error.", myPm.bigDecimalWithEmbracedNegativeFormat.isPmValid());
-    assertEquals("Bigger positive value.", "(1,000.23)", myPm.bigDecimalWithEmbracedNegativeFormat.getValueAsString());
+    assertEquals("Bigger negative value.", "(1,000.23)", myPm.bigDecimalWithEmbracedNegativeFormat.getValueAsString());
 
     myPm.bigDecimalWithEmbracedNegativeFormat.setValueAsString("-0.23");
     assertFalse("The attribute is not configured to process the usual '-' prefixed format.", myPm.bigDecimalWithEmbracedNegativeFormat.isPmValid());
@@ -84,7 +82,6 @@ public class PmAttrValueAsStringFormatTest {
   }
 
   @Test
-  @Ignore("TODO olaf: complete multi format support.")
   public void testBigDecimalWithMultiFormat() {
     assertEquals("Initial null value.", null, myPm.bigDecimalWithMultiFormat.getValueAsString());
 
@@ -100,14 +97,26 @@ public class PmAttrValueAsStringFormatTest {
     assertTrue("The comma is optional. The attribute should not report a conversion error.", myPm.bigDecimalWithMultiFormat.isPmValid());
     assertEquals("Bigger positive value.", "1,000.23", myPm.bigDecimalWithMultiFormat.getValueAsString());
 
-    myPm.bigDecimalWithMultiFormat.setValueAsString("(1000.23)");
-    assertTrue("The attribute should not report a conversion error.", myPm.bigDecimalWithMultiFormat.isPmValid());
-    assertEquals("Bigger positive value.", "(1,000.23)", myPm.bigDecimalWithMultiFormat.getValueAsString());
+    myPm.bigDecimalWithMultiFormat.setValueAsString("-1000.23");
+    assertTrue("The attribute is configured to process the usual '-' prefixed format too (default decimal format behaviour).", myPm.bigDecimalWithMultiFormat.isPmValid());
+    assertEquals("The big decimal value must fit.", new BigDecimal("-1000.23"), myPm.bigDecimalWithMultiFormat.getValue());
+    assertEquals("Bigger positive value.", "-1,000.23", myPm.bigDecimalWithMultiFormat.getValueAsString());
 
-    myPm.bigDecimalWithMultiFormat.setValueAsString("-0.23");
-    assertTrue("The attribute is configured to process the usual '-' prefixed format too.", myPm.bigDecimalWithMultiFormat.isPmValid());
-    assertEquals("The string value now shows the invalid value.", "-0.23", myPm.bigDecimalWithMultiFormat.getValueAsString());
-    assertEquals("The real value is still the old one.", new BigDecimal("-1000.23"), myPm.bigDecimalWithMultiFormat.getValue());
+    myPm.bigDecimalWithMultiFormat.setValueAsString("8.9000,2356");
+    assertFalse("Parsing must fail, german decimal characters", myPm.bigDecimalWithMultiFormat.isPmValid());
+    assertEquals("The string value now shows the invalid value.", "8.9000,2356", myPm.bigDecimalWithMultiFormat.getValueAsString());
+    assertEquals("The big decimal value is still the old value.", new BigDecimal("-1000.23"), myPm.bigDecimalWithMultiFormat.getValue());
+    
+    myPm.bigDecimalWithMultiFormat.setValueAsString("80.235");
+    assertFalse("Parsing must fail, to much fragtion digits", myPm.bigDecimalWithMultiFormat.isPmValid());
+    assertEquals("The big decimal value is still the old value.", new BigDecimal("-1000.23"), myPm.bigDecimalWithMultiFormat.getValue());
+    assertEquals("The string value now shows the invalid value.", "80.235", myPm.bigDecimalWithMultiFormat.getValueAsString());
+
+    // DecimalFormat does evaluate max integer 
+//    myPm.bigDecimalWithMultiFormat.setValueAsString("88880.25");
+//    assertEquals("The big decimal value is still the old value.", new BigDecimal("-1000.23"), myPm.bigDecimalWithMultiFormat.getValue());
+//    assertFalse("Parsing must fail, to much integer digits", myPm.bigDecimalWithMultiFormat.isPmValid());
+//    
   }
 
 
