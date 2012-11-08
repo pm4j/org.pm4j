@@ -76,7 +76,7 @@ public abstract class FilterItemPm<T_ITEM extends FilterItem> extends PmBeanBase
    * Allows to select the compare operations that correspond to the selected
    * filter-by criterium.
    */
-  @PmAttrCfg(required=true, valueRestriction=Restriction.REQUIRED)
+  @PmAttrCfg(required=true)
   public final PmAttr<CompOp> compOp = new PmAttrImpl<CompOp>(this) {
     @Override
     protected void onPmInit() {
