@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.pm4j.common.query.Query;
 import org.pm4j.common.query.QueryOptions;
-import org.pm4j.common.selection.SelectionHandler;
 import org.pm4j.core.pm.impl.changehandler.ChangeSetHandler;
 
 
@@ -15,9 +14,9 @@ import org.pm4j.core.pm.impl.changehandler.ChangeSetHandler;
  *
  * @author OBOEDE
  *
- * @param <T_ROW_OBJ> The type used for row objects.
+ * @param <T_ROW_PM> The type used for rows.
  */
-public interface PmTable2<T_ROW_OBJ> extends PmObject, PmDataInput {
+public interface PmTable2<T_ROW_PM> extends PmObject, PmDataInput, PmSelectable<T_ROW_PM> {
 
   /** Identifer for things that may be cleared by calling {@link PmTable2#updatePmTable(UpdateAspect...)} */
   public enum UpdateAspect {
@@ -42,7 +41,7 @@ public interface PmTable2<T_ROW_OBJ> extends PmObject, PmDataInput {
    *
    * @return The set of table rows to display.
    */
-  List<T_ROW_OBJ> getRows();
+  List<T_ROW_PM> getRows();
 
   /**
    * Provides a row representation that may be used by generic a renderer.
@@ -50,7 +49,7 @@ public interface PmTable2<T_ROW_OBJ> extends PmObject, PmDataInput {
    * @return The set of rows as provides by {@link #getRows()}.<br>
    *         Each row is encapsulated in a {@link PmTableGenericRow} instance.
    */
-  List<PmTableGenericRow2<T_ROW_OBJ>> getGenericRows();
+  List<PmTableGenericRow2<T_ROW_PM>> getPmGenericRows();
 
   /**
    * @return The number of rows per table page.
@@ -61,13 +60,6 @@ public interface PmTable2<T_ROW_OBJ> extends PmObject, PmDataInput {
    * @return The total size of the un-filtered row set.
    */
   int getTotalNumOfRows();
-
-  /**
-   * Provides all selection related operations.
-   *
-   * @return the {@link SelectionHandler}.
-   */
-  SelectionHandler<T_ROW_OBJ> getPmSelectionHandler();
 
   /**
    * @return the query behind this table.
@@ -94,7 +86,7 @@ public interface PmTable2<T_ROW_OBJ> extends PmObject, PmDataInput {
    *          is passed, the decorator will be used for all table change
    *          aspects.
    */
-  void addDecorator(PmCommandDecorator decorator, TableChange... changes);
+  void addPmDecorator(PmCommandDecorator decorator, TableChange... changes);
 
   /**
    * Provides the decorators to consider for a given change kind.
@@ -102,7 +94,7 @@ public interface PmTable2<T_ROW_OBJ> extends PmObject, PmDataInput {
    * @param change The change kind.
    * @return The decorators, defined for the given change kind.
    */
-  Collection<PmCommandDecorator> getDecorators(TableChange change);
+  Collection<PmCommandDecorator> getPmDecorators(TableChange change);
 
   /**
    * Provides the change set handler.<br>
@@ -110,7 +102,7 @@ public interface PmTable2<T_ROW_OBJ> extends PmObject, PmDataInput {
    *
    * @return the table change registry.
    */
-  ChangeSetHandler<T_ROW_OBJ> getPmChangeSetHandler();
+  ChangeSetHandler<T_ROW_PM> getPmChangeSetHandler();
 
   /**
    * Clears a defined set of table state aspects.
@@ -122,7 +114,7 @@ public interface PmTable2<T_ROW_OBJ> extends PmObject, PmDataInput {
   /**
    * PM for table with a pager.
    *
-   * @param <T_ROW_OBJ> The type used for row objects.
+   * @param <T_ROW_PM> The type used for row objects.
    */
   public static interface WithPager<T_ROW_ELEMENT> extends PmTable2<T_ROW_ELEMENT>{
 

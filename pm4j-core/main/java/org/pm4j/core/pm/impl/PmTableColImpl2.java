@@ -220,7 +220,7 @@ public class PmTableColImpl2 extends PmObjectBase implements PmTableCol2 {
 
     @Override
     protected Collection<PmCommandDecorator> getValueChangeDecorators() {
-      ArrayList<PmCommandDecorator> list = new ArrayList<PmCommandDecorator>(getPmTableImpl().getDecorators(PmTable2.TableChange.SORT));
+      ArrayList<PmCommandDecorator> list = new ArrayList<PmCommandDecorator>(getPmTableImpl().getPmDecorators(PmTable2.TableChange.SORT));
       list.addAll(super.getValueChangeDecorators());
       return list;
     }

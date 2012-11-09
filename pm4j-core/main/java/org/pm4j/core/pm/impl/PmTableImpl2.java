@@ -71,7 +71,7 @@ public class PmTableImpl2
   private static final Log LOG = LogFactory.getLog(PmTableImpl2.class);
 
   /** The content this table is based on. */
-  private PageableCollection2<T_ROW_PM> pageableCollection;
+  private PageableCollection2<T_ROW_PM> pmPageableCollection;
 
  /** Defines the row-selection behavior. */
   private SelectMode rowSelectMode;
@@ -82,10 +82,10 @@ public class PmTableImpl2
   private Integer numOfPageRows;
 
   /** Handles the changed state of the table. */
-  private final ChangeSetHandlerImpl<T_ROW_PM> changeSetRegistry = new ChangeSetHandlerImpl<T_ROW_PM>(this);
+  private final ChangeSetHandlerImpl<T_ROW_PM> pmChangeSetHandler = new ChangeSetHandlerImpl<T_ROW_PM>(this);
 
   /** The set of decorators for various table change kinds. */
-  private Map<TableChange, PmCommandDecoratorSetImpl> changeDecoratorMap = Collections.emptyMap();
+  private Map<TableChange, PmCommandDecoratorSetImpl> pmChangeDecoratorMap = Collections.emptyMap();
 
   /** Listens for selection changes and handles the table relates logic. */
   private TableSelectionChangeListener pmTableSelectionChangeListener = new TableSelectionChangeListener();
@@ -110,7 +110,7 @@ public class PmTableImpl2
   }
 
   @Override
-  public List<PmTableGenericRow2<T_ROW_PM>> getGenericRows() {
+  public List<PmTableGenericRow2<T_ROW_PM>> getPmGenericRows() {
     List<PmTableGenericRow2<T_ROW_PM>> genericRows = null;
 
     // XXX olaf: The optimized version will have an event synchronized attribute.
@@ -137,7 +137,7 @@ public class PmTableImpl2
    * @param newRowPm The new row.
    */
   protected void onAddNewRow(T_ROW_PM newRowPm) {
-    changeSetRegistry.registerChange(ChangeKind.ADD, newRowPm);
+    pmChangeSetHandler.registerChange(ChangeKind.ADD, newRowPm);
   }
 
   /**
@@ -149,7 +149,7 @@ public class PmTableImpl2
   protected void onDeleteRow(T_ROW_PM deletedRow) {
     PmMessageUtil.clearSubTreeMessages(deletedRow);
     getPmPageableCollection().getSelectionHandler().select(false, deletedRow);
-    changeSetRegistry.registerChange(ChangeKind.DELETE, deletedRow);
+    pmChangeSetHandler.registerChange(ChangeKind.DELETE, deletedRow);
     if (deletedRow instanceof PmBean) {
       BeanPmCacheUtil.removeBeanPm(this, (PmBean<?>)deletedRow);
     }
@@ -183,8 +183,8 @@ public class PmTableImpl2
    */
   public void setRowSelectMode(SelectMode rowSelectMode) {
     this.rowSelectMode = rowSelectMode;
-    if (pageableCollection != null) {
-      pageableCollection.getSelectionHandler().setSelectMode(rowSelectMode);
+    if (pmPageableCollection != null) {
+      pmPageableCollection.getSelectionHandler().setSelectMode(rowSelectMode);
     }
   }
 
@@ -209,8 +209,8 @@ public class PmTableImpl2
    */
   public void setNumOfPageRows(Integer numOfPageRows) {
     this.numOfPageRows = numOfPageRows;
-    if (pageableCollection != null) {
-      pageableCollection.setPageSize(numOfPageRows);
+    if (pmPageableCollection != null) {
+      pmPageableCollection.setPageSize(numOfPageRows);
     }
   }
 
@@ -235,17 +235,17 @@ public class PmTableImpl2
   }
 
   @Override
-  public void addDecorator(PmCommandDecorator decorator, TableChange... changes) {
-    if (changeDecoratorMap.isEmpty()) {
-      changeDecoratorMap = new HashMap<PmTable2.TableChange, PmCommandDecoratorSetImpl>();
+  public void addPmDecorator(PmCommandDecorator decorator, TableChange... changes) {
+    if (pmChangeDecoratorMap.isEmpty()) {
+      pmChangeDecoratorMap = new HashMap<PmTable2.TableChange, PmCommandDecoratorSetImpl>();
     }
 
     TableChange[] changesToConsider = changes.length == 0 ? TableChange.values() : changes;
     for (TableChange c : changesToConsider) {
-      PmCommandDecoratorSetImpl set = changeDecoratorMap.get(c);
+      PmCommandDecoratorSetImpl set = pmChangeDecoratorMap.get(c);
       if (set == null) {
         set = new PmCommandDecoratorSetImpl();
-        changeDecoratorMap.put(c, set);
+        pmChangeDecoratorMap.put(c, set);
       }
       set.addDecorator(decorator);
 
@@ -258,14 +258,14 @@ public class PmTableImpl2
 
   @SuppressWarnings("unchecked")
   @Override
-  public Collection<PmCommandDecorator> getDecorators(TableChange change) {
-    PmCommandDecoratorSetImpl set = changeDecoratorMap.get(change);
+  public Collection<PmCommandDecorator> getPmDecorators(TableChange change) {
+    PmCommandDecoratorSetImpl set = pmChangeDecoratorMap.get(change);
     return (set != null) ? set.getDecorators() : Collections.EMPTY_LIST;
   }
 
   @Override
   public ChangeSetHandler<T_ROW_PM> getPmChangeSetHandler() {
-    return changeSetRegistry;
+    return pmChangeSetHandler;
   }
 
   @Override
@@ -299,7 +299,7 @@ public class PmTableImpl2
         break;
       case CLEAR_CHANGES:
         PmValidationApi.clearInvalidValuesOfSubtree(this);
-        changeSetRegistry.clearChanges();
+        pmChangeSetHandler.clearChanges();
         break;
       case CLEAR_USER_FILTER:
         // User filters can't be cleared on this level. More detailed implementations
@@ -318,7 +318,7 @@ public class PmTableImpl2
 
   @Override
   protected boolean isPmValueChangedImpl() {
-    return changeSetRegistry.isChanged();
+    return pmChangeSetHandler.isChanged();
   }
 
   /**
@@ -326,7 +326,7 @@ public class PmTableImpl2
    */
   @Override
   public void pmValidate() {
-    for (PmObject itemPm : new ArrayList<PmObject>(changeSetRegistry.getChangedItems(ChangeKind.ADD, ChangeKind.UPDATE))) {
+    for (PmObject itemPm : new ArrayList<PmObject>(pmChangeSetHandler.getChangedItems(ChangeKind.ADD, ChangeKind.UPDATE))) {
       if (itemPm instanceof PmDataInput) {
         PmValidationApi.validateSubTree((PmDataInput)itemPm);
       }
@@ -339,10 +339,10 @@ public class PmTableImpl2
    */
   public final PageableCollection2<T_ROW_PM> getPmPageableCollection() {
     zz_ensurePmInitialization();
-    if (pageableCollection == null) {
+    if (pmPageableCollection == null) {
       _setPageableCollection(getPmPageableCollectionImpl());
     }
-    return pageableCollection;
+    return pmPageableCollection;
   }
 
   /**
@@ -364,7 +364,7 @@ public class PmTableImpl2
   /**
    * A post processing method that allow to apply some default settings to a new pageable collection.
    * <p>
-   * Gets called whenever a new {@link #pageableCollection} gets assigned:
+   * Gets called whenever a new {@link #pmPageableCollection} gets assigned:
    * <ul>
    *  <li>by calling {@link #getPmPageableCollectionImpl()} or </li>
    *  <li>by a call to {@link #setPmPageableCollection(PageableCollection, boolean, ValueChangeKind)}.</li>
@@ -410,8 +410,8 @@ public class PmTableImpl2
     Selection<T_ROW_PM> selection = null;
 
     if (preserveSettings) {
-      if (pageableCollection != null) {
-        selection = pageableCollection.getSelectionHandler().getSelection();
+      if (pmPageableCollection != null) {
+        selection = pmPageableCollection.getSelectionHandler().getSelection();
       }
     }
     else {
@@ -425,7 +425,7 @@ public class PmTableImpl2
     if (preserveSettings && selection != null) {
       // ensure that the internal field is set, even it was just reset to null.
       getPmPageableCollection();
-      pageableCollection.getSelectionHandler().setSelection(selection);
+      pmPageableCollection.getSelectionHandler().setSelection(selection);
     }
   }
 
@@ -455,20 +455,20 @@ public class PmTableImpl2
 
   // XXX olaf: combine with init method.
   private void _setPageableCollection(PageableCollection2<T_ROW_PM> pc) {
-    if (this.pageableCollection != pc) {
+    if (this.pmPageableCollection != pc) {
       SelectionHandler<T_ROW_PM> selectionHandler = pc.getSelectionHandler();
       selectionHandler.addPropertyAndVetoableListener(SelectionHandler.PROP_SELECTION, pmTableSelectionChangeListener);
       pc.getQuery().addPropertyAndVetoableListener(Query.PROP_EFFECTIVE_FILTER, pmTableFilterChangeListener);
 
-      if (pageableCollection != null) {
-        pageableCollection.getSelectionHandler().removePropertyAndVetoableListener(SelectionHandler.PROP_SELECTION, pmTableSelectionChangeListener);
-        pageableCollection.getQuery().removePropertyAndVetoableListener(Query.PROP_EFFECTIVE_FILTER, pmTableFilterChangeListener);
+      if (pmPageableCollection != null) {
+        pmPageableCollection.getSelectionHandler().removePropertyAndVetoableListener(SelectionHandler.PROP_SELECTION, pmTableSelectionChangeListener);
+        pmPageableCollection.getQuery().removePropertyAndVetoableListener(Query.PROP_EFFECTIVE_FILTER, pmTableFilterChangeListener);
       }
     }
 
-    this.pageableCollection = pc;
-    if (pageableCollection != null) {
-      initPmPageableCollection(pageableCollection);
+    this.pmPageableCollection = pc;
+    if (pmPageableCollection != null) {
+      initPmPageableCollection(pmPageableCollection);
     }
   }
 
@@ -506,7 +506,7 @@ public class PmTableImpl2
 
     @Override
     public void vetoableChange(PropertyChangeEvent evt) throws PropertyVetoException {
-      for (PmCommandDecorator d : getDecorators(TableChange.SELECTION)) {
+      for (PmCommandDecorator d : getPmDecorators(TableChange.SELECTION)) {
         if (!d.beforeDo(null)) {
           String msg = "Decorator prevents selection change: " + d;
           LOG.debug(msg);
@@ -517,7 +517,7 @@ public class PmTableImpl2
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-      for (PmCommandDecorator d : getDecorators(TableChange.SELECTION)) {
+      for (PmCommandDecorator d : getPmDecorators(TableChange.SELECTION)) {
         d.afterDo(null);
       }
     }
@@ -527,7 +527,7 @@ public class PmTableImpl2
 
     @Override
     public void vetoableChange(PropertyChangeEvent evt) throws PropertyVetoException {
-      for (PmCommandDecorator d : getDecorators(TableChange.FILTER)) {
+      for (PmCommandDecorator d : getPmDecorators(TableChange.FILTER)) {
         if (!d.beforeDo(null)) {
           String msg = "Decorator prevents filter change: " + d;
           LOG.debug(msg);
@@ -540,7 +540,7 @@ public class PmTableImpl2
     public void propertyChange(PropertyChangeEvent evt) {
       PageableCollectionUtil2.ensureCurrentPageInRange(getPmPageableCollection());
 
-      for (PmCommandDecorator d : getDecorators(TableChange.FILTER)) {
+      for (PmCommandDecorator d : getPmDecorators(TableChange.FILTER)) {
         d.afterDo(null);
       }
     }
