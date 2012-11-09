@@ -1,5 +1,6 @@
 package org.pm4j.common.selection;
 
+import java.beans.PropertyChangeEvent;
 import java.beans.VetoableChangeListener;
 
 import org.pm4j.common.util.beanproperty.PropertyChangeSupported;
@@ -20,7 +21,11 @@ import org.pm4j.common.util.beanproperty.PropertyChangeSupported;
  */
 public interface SelectionHandler<T_ITEM> extends PropertyChangeSupported {
 
-  /** Property change event identifier. */
+  /**
+   * The selection property change event identifier.<br>
+   * The type of the old- and new value provided by the fired {@link PropertyChangeEvent}
+   * is {@link Selection}.
+   */
   static final String PROP_SELECTION = "selection";
 
   /**
