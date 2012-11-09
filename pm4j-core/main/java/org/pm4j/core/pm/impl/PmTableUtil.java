@@ -5,6 +5,7 @@ import java.util.List;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmElement;
 import org.pm4j.core.pm.PmObject;
+import org.pm4j.core.pm.PmTable2;
 import org.pm4j.core.pm.PmPager.PagerVisibility;
 import org.pm4j.core.pm.PmTable;
 import org.pm4j.core.pm.PmTableCol;
@@ -87,6 +88,12 @@ public final class PmTableUtil {
     pmTableImpl.changedStateRegistry.addDetailsPmHandler(handler);
     handler.startObservers();
     return handler;
+  }
+
+  // TODO: remove asap. is still here to keep a delivery alive.
+  @Deprecated
+  public static <T extends MasterPmHandler> T addMasterDetailsPmHandler(PmTable2<?> pmTable, T handler) {
+    return PmTableUtil2.addMasterDetailsPmHandler(pmTable, handler);
   }
 
 }
