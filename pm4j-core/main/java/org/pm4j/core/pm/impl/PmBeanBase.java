@@ -12,6 +12,7 @@ import org.apache.commons.lang.StringUtils;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmBean;
+import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmEvent.ValueChangeKind;
 import org.pm4j.core.pm.PmMessage.Severity;
@@ -209,6 +210,9 @@ public abstract class PmBeanBase<T_BEAN>
     return true;
   }
 
+  /**
+   * Informs sub-PMs about a backing bean exchange event.
+   */
   public class SetPmBeanEventVisitor extends PmVisitorAdapter {
 
     private final int eventMask;
@@ -223,6 +227,12 @@ public abstract class PmBeanBase<T_BEAN>
     protected void onVisit(PmObject pm) {
       PmEventApi.firePmEvent(pm, eventMask, changeKind);
       for (PmObject child : PmUtil.getPmChildren(pm)) {
+        // Don't iterate over closed sub conversations.
+        // This will only generate overhead an trouble.
+        if ((child instanceof PmConversation) && !pm.isPmVisible()) {
+          continue;
+        }
+
         // The children may have relevant event handling code. Thus we make
         // sure that each child receives the call.
         PmInitApi.ensurePmInitialization(child);
