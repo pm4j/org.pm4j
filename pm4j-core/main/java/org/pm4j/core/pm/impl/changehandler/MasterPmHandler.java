@@ -74,4 +74,22 @@ public interface MasterPmHandler {
    */
   Collection<DetailsPmHandler<?>> getDetailsPmHandlers();
 
+  /**
+   * Gets called before a master record selection change is done.
+   *
+   * @return <code>true</code> allows the change. <code>false</code> prevents it.
+   */
+  boolean canSwitch();
+
+  /**
+   * Gets called after a master record selection change.
+   * <p>
+   * Sets the handler to an 'unchanged' state by clearing the set of {@link #changedMasterBeans}.
+   * Re-adjusts the details area by calling {@link DetailsPmHandler#afterMasterRecordChange(Object)}
+   * with the new selected table row.
+   *
+   * @param event the master PM value change event.
+   */
+  void onMasterTableValueChange(PmEvent event);
+
 }

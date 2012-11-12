@@ -101,6 +101,14 @@ public class MasterPmSelectionHandlerImpl<T_MASTER_BEAN> implements MasterPmReco
         makeTableSelectionChangeDecorator()
         );
     PmEventApi.addPmEventListener(masterPm, PmEvent.VALUE_CHANGE, makeTableValueChangeListener());
+
+    // adjust the details areas by informing them about the initial master bean.
+    T_MASTER_BEAN selectedMasterBean = getSelectedMasterBean();
+    if (selectedMasterBean != null) {
+      for (DetailsPmHandler<?> dh : detailsHandlers) {
+        dh.afterMasterRecordChange(selectedMasterBean);
+      }
+    }
   }
 
   /**
@@ -164,7 +172,7 @@ public class MasterPmSelectionHandlerImpl<T_MASTER_BEAN> implements MasterPmReco
    *
    * @param event the master PM value change event.
    */
-  protected void onMasterTableValueChange(PmEvent event) {
+  public void onMasterTableValueChange(PmEvent event) {
     if (LOG.isDebugEnabled() && isChangeRegistered()) {
       LOG.debug("Reset master-details changed state for " + PmUtil.getPmLogString(masterPm));
     }
@@ -217,7 +225,7 @@ public class MasterPmSelectionHandlerImpl<T_MASTER_BEAN> implements MasterPmReco
    *
    * @return <code>true</code> if the switch can be performed.
    */
-  protected boolean canSwitch() {
+  public boolean canSwitch() {
     return (selectionHandler.getSelection().getSize() != 1)
         ? true
         : validateDetails();

@@ -159,7 +159,7 @@ public class MasterPmTableHandlerImpl<T_MASTER_BEAN> implements MasterPmRecordHa
    *
    * @param event the master PM value change event.
    */
-  protected void onMasterTableValueChange(PmEvent event) {
+  public void onMasterTableValueChange(PmEvent event) {
     if (LOG.isDebugEnabled() && isChangeRegistered()) {
       LOG.debug("Reset master-details changed state for " + PmUtil.getPmLogString(masterTablePm));
     }
@@ -208,11 +208,11 @@ public class MasterPmTableHandlerImpl<T_MASTER_BEAN> implements MasterPmRecordHa
    * <p>
    * The default implementation allows the switch if there is no currently selected master
    * record.<br>
-   * If that's tha case it checks if the details area is valid.
+   * If that's the case it checks if the details area is valid.
    *
    * @return <code>true</code> if the switch can be performed.
    */
-  protected boolean canSwitch() {
+  public boolean canSwitch() {
     return (masterTablePm.getSelectedRow() == null)
         ? true
         : validateDetails();
@@ -295,6 +295,5 @@ public class MasterPmTableHandlerImpl<T_MASTER_BEAN> implements MasterPmRecordHa
         ? getSelectedMasterBean()
         : null;
   }
-
 
 }
