@@ -3,7 +3,7 @@ package org.pm4j.common.pageable;
 import java.util.Iterator;
 import java.util.List;
 
-import org.pm4j.common.query.Query;
+import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.selection.SelectionHandler;
 
@@ -20,11 +20,11 @@ import org.pm4j.common.selection.SelectionHandler;
 public interface PageableCollection2<T_ITEM> extends Iterable<T_ITEM> {
 
   /**
-   * Provides the {@link Query} that defines filter constraints and sort order.
+   * Provides the {@link QueryParams} that defines filter constraints and sort order.
    *
-   * @return the {@link Query}. Never <code>null</code>.
+   * @return the {@link QueryParams}. Never <code>null</code>.
    */
-  Query getQuery();
+  QueryParams getQuery();
 
   QueryOptions getQueryOptions();
 

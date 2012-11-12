@@ -11,7 +11,7 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.pm4j.common.query.Query;
+import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.selection.SelectMode;
 import org.pm4j.common.selection.Selection;
 import org.pm4j.common.selection.SelectionHandlerBase;
@@ -22,14 +22,14 @@ public class PageableQuerySelectionHandler<T_ITEM, T_ID extends Serializable> ex
   private static final Log LOG = LogFactory.getLog(PageableQuerySelectionHandler.class);
 
   private final PageableQueryService<T_ITEM, T_ID> service;
-  private final Query query;
+  private final QueryParams query;
   private final ItemIdSelection<T_ITEM, T_ID> emptySelection;
   private ItemIdSelection<T_ITEM, T_ID> idSelection;
   private Selection<T_ITEM> currentSelection;
   private boolean inverse;
 
   @SuppressWarnings("unchecked")
-  public PageableQuerySelectionHandler(PageableQueryService<T_ITEM, T_ID> service, Query query) {
+  public PageableQuerySelectionHandler(PageableQueryService<T_ITEM, T_ID> service, QueryParams query) {
     assert service != null;
     assert query != null;
 
@@ -232,13 +232,13 @@ public class PageableQuerySelectionHandler<T_ITEM, T_ID extends Serializable> ex
   static class InvertedSelection<T_ITEM, T_ID extends Serializable> extends SerializeableSelectionBase<T_ITEM, T_ID> {
 
     private static final long serialVersionUID = 1L;
-    private final Query query;
+    private final QueryParams query;
     private final SerializeableSelectionBase<T_ITEM, T_ID> baseSelection;
     transient private Long size;
     /** The query fetch block size. */
     private int iteratorBlockSizeHint = 20;
 
-    public InvertedSelection(PageableQueryService<T_ITEM, T_ID> service, Query query, SerializeableSelectionBase<T_ITEM, T_ID> baseSelection) {
+    public InvertedSelection(PageableQueryService<T_ITEM, T_ID> service, QueryParams query, SerializeableSelectionBase<T_ITEM, T_ID> baseSelection) {
       super(service);
       assert query != null;
       assert baseSelection != null;

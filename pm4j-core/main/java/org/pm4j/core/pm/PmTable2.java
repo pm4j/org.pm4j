@@ -3,8 +3,10 @@ package org.pm4j.core.pm;
 import java.util.Collection;
 import java.util.List;
 
-import org.pm4j.common.query.Query;
+import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.query.QueryOptions;
+import org.pm4j.common.selection.SelectionHandler;
+import org.pm4j.core.pm.PmTable.RowSelectMode;
 import org.pm4j.core.pm.impl.changehandler.ChangeSetHandler;
 
 
@@ -16,7 +18,7 @@ import org.pm4j.core.pm.impl.changehandler.ChangeSetHandler;
  *
  * @param <T_ROW_PM> The type used for rows.
  */
-public interface PmTable2<T_ROW_PM> extends PmObject, PmDataInput, PmSelectable<T_ROW_PM> {
+public interface PmTable2<T_ROW_PM> extends PmObject, PmDataInput {
 
   /** Identifer for things that may be cleared by calling {@link PmTable2#updatePmTable(UpdateAspect...)} */
   public enum UpdateAspect {
@@ -33,6 +35,9 @@ public interface PmTable2<T_ROW_PM> extends PmObject, PmDataInput, PmSelectable<
   /**
    * @return The set of columns.
    */
+  List<PmTableCol> getColumnPms();
+
+  /** @deprecated Please use {@link #getColumnPms()} */
   List<PmTableCol> getColumns();
 
   /**
@@ -41,6 +46,9 @@ public interface PmTable2<T_ROW_PM> extends PmObject, PmDataInput, PmSelectable<
    *
    * @return The set of table rows to display.
    */
+  List<T_ROW_PM> getRowPms();
+
+  /** @deprecated Please use {@link #getRowPms()} */
   List<T_ROW_PM> getRows();
 
   /**
@@ -49,22 +57,47 @@ public interface PmTable2<T_ROW_PM> extends PmObject, PmDataInput, PmSelectable<
    * @return The set of rows as provides by {@link #getRows()}.<br>
    *         Each row is encapsulated in a {@link PmTableGenericRow} instance.
    */
-  List<PmTableGenericRow2<T_ROW_PM>> getPmGenericRows();
+  List<PmTableGenericRow2<T_ROW_PM>> getGenericRowPms();
 
   /**
    * @return The number of rows per table page.
    */
+  int getNumOfPageRowPms();
+
+  /** @deprecated Please use {@link #getNumOfPageRowPms()} */
   int getNumOfPageRows();
 
   /**
    * @return The total size of the un-filtered row set.
    */
+  long getTotalNumOfRowPms();
+
+  /** @deprecated Please use {@link #getNumOfPageRowPms()} */
   int getTotalNumOfRows();
+
+  /**
+   * Provides all selection related operations.
+   *
+   * @return the {@link SelectionHandler}.
+   */
+  SelectionHandler<T_ROW_PM> getPmSelectionHandler();
+
+  /**
+   * Provides the currently selected row PM. Is a useful interface for
+   * master-details scenarios, where a details PM may ask its related master
+   * table for the currently active row context.
+   * <p>
+   * The default implementation provides in case of {@link RowSelectMode#SINGLE}
+   * the selected row. In other select modes always <code>null</code>.
+   *
+   * @return the currently active row PM. May be <code>null</code>.
+   */
+  T_ROW_PM getCurrentRowPm();
 
   /**
    * @return the query behind this table.
    */
-  Query getPmQuery();
+  QueryParams getPmQuery();
 
   /**
    * @return the query options that can be offered to the user to define query constraints.
@@ -121,6 +154,9 @@ public interface PmTable2<T_ROW_PM> extends PmObject, PmDataInput, PmSelectable<
     /**
      * @return The pager used for the table.
      */
+    PmPager getPmPager();
+
+    /** @deprecated Please use {@link #getPmPager()} */
     PmPager getPager();
   }
 

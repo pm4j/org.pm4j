@@ -15,4 +15,8 @@ public class CompOpStringNotContains extends CompOpStringBase {
     return ! StringUtils.isBlank(filterValue);
   }
 
+  @Override
+  public String toString() {
+    return "not contains";
+  }
 }

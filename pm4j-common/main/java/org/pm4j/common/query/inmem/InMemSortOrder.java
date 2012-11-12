@@ -1,9 +1,7 @@
 package org.pm4j.common.query.inmem;
 
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.Comparator;
-import java.util.List;
 
 import org.pm4j.common.query.AttrDefinition;
 import org.pm4j.common.query.SortOrder;
@@ -16,12 +14,10 @@ import org.pm4j.common.util.InvertingComparator;
  *
  * @author olaf boede
  */
-public class InMemSortOrder implements SortOrder {
+public class InMemSortOrder extends SortOrder {
   private static final long        serialVersionUID = 1L;
 
-  private final Comparator<Object> comparator;
-  private final AttrDefinition     attrDefinition;
-  private boolean                  ascending = true;
+  private Comparator<Object> comparator;
 
   public InMemSortOrder(AttrDefinition attrDefinition) {
     this(attrDefinition, new ComparableComparator());
@@ -37,20 +33,12 @@ public class InMemSortOrder implements SortOrder {
    */
   @SuppressWarnings("unchecked")
   public InMemSortOrder(AttrDefinition attrDefinition, Comparator<?> comparator) {
-    assert attrDefinition != null;
-    assert comparator != null;
-
-    this.attrDefinition = attrDefinition;
+    super(attrDefinition, true);
     this.comparator = (Comparator<Object>) comparator;
   }
 
   public InMemSortOrder(Comparator<?> comparator) {
     this(new AttrDefinition("this", Object.class), comparator);
-  }
-
-  @Override
-  public List<AttrSortSpec> getAttrSortSpecs() {
-    return Arrays.asList(new AttrSortSpec(attrDefinition, ascending));
   }
 
   public Comparator<Object> getComparator() {
@@ -59,13 +47,14 @@ public class InMemSortOrder implements SortOrder {
 
   @Override
   public SortOrder getReverseSortOrder() {
-    InMemSortOrder so = new InMemSortOrder(attrDefinition, new InvertingComparator<Object>(comparator));
-    so.ascending = !this.ascending;
-    return so;
-  }
+    InMemSortOrder reverse = (InMemSortOrder) super.getReverseSortOrder();
+    if (comparator.getClass() == InvertingComparator.class) {
+      reverse.comparator = ((InvertingComparator<Object>)comparator).getBaseComparator();
+    } else {
+      reverse.comparator = new InvertingComparator<Object>(comparator);
+    }
 
-  public AttrDefinition getAttrDefinition() {
-    return attrDefinition;
+    return reverse;
   }
 
   static class ComparableComparator implements Comparator<Object>, Serializable {

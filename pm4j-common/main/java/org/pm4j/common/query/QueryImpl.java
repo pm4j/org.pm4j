@@ -6,7 +6,7 @@ import java.util.Map;
 import org.pm4j.common.exception.CheckedExceptionWrapper;
 import org.pm4j.common.util.beanproperty.PropertyChangeSupportedBase;
 
-public class QueryImpl extends PropertyChangeSupportedBase implements Query {
+public class QueryImpl extends PropertyChangeSupportedBase implements QueryParams {
 
   private static final long serialVersionUID = 1L;
 

@@ -123,7 +123,7 @@ public class InMemQueryEvaluator<T_ITEM> extends QueryEvaluatorBase {
 
     @Override
     public int compare(T o1, T o2) {
-      AttrDefinition d = sortOrder.getAttrDefinition();
+      AttrDefinition d = sortOrder.getAttribute();
       Object v1 = evaluatorCtxt.getAttrValue(o1, d);
       Object v2 = evaluatorCtxt.getAttrValue(o2, d);
 

@@ -15,7 +15,7 @@ import org.apache.commons.logging.LogFactory;
 import org.pm4j.common.pageable.PageableCollection2;
 import org.pm4j.common.pageable.PageableCollectionUtil2;
 import org.pm4j.common.pageable.inmem.PageableInMemCollectionImpl;
-import org.pm4j.common.query.Query;
+import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.selection.SelectMode;
 import org.pm4j.common.selection.Selection;
@@ -105,17 +105,23 @@ public class PmTableImpl2
   }
 
   @Override
-  public List<PmTableCol> getColumns() {
+  public List<PmTableCol> getColumnPms() {
     return PmUtil.getPmChildrenOfType(this, PmTableCol.class);
   }
 
+  @Deprecated
   @Override
-  public List<PmTableGenericRow2<T_ROW_PM>> getPmGenericRows() {
+  public List<PmTableCol> getColumns() {
+    return getColumnPms();
+  }
+
+  @Override
+  public List<PmTableGenericRow2<T_ROW_PM>> getGenericRowPms() {
     List<PmTableGenericRow2<T_ROW_PM>> genericRows = null;
 
     // XXX olaf: The optimized version will have an event synchronized attribute.
     if (genericRows == null) {
-      List<T_ROW_PM> rows = getRows();
+      List<T_ROW_PM> rows = getRowPms();
       genericRows = new ArrayList<PmTableGenericRow2<T_ROW_PM>>(rows.size());
       for (T_ROW_PM r : rows) {
         genericRows.add(new PmTableGenericRowImpl2<T_ROW_PM>(this, r));
@@ -125,6 +131,12 @@ public class PmTableImpl2
     return genericRows;
   }
 
+  @Override
+  public List<T_ROW_PM> getRowPms() {
+    return getPmPageableCollection().getItemsOnPage();
+  }
+
+  @Deprecated
   @Override
   public List<T_ROW_PM> getRows() {
     return getPmPageableCollection().getItemsOnPage();
@@ -156,11 +168,17 @@ public class PmTableImpl2
   }
 
   @Override
-  public int getTotalNumOfRows() {
-    return (int)getPmPageableCollection().getNumOfItems();
+  public long getTotalNumOfRowPms() {
+    return getPmPageableCollection().getNumOfItems();
   }
 
-  public SelectMode getRowSelectMode() {
+  @Deprecated
+  @Override
+  public int getTotalNumOfRows() {
+    return (int)getTotalNumOfRowPms();
+  }
+
+  public SelectMode getPmRowSelectMode() {
     if (rowSelectMode == null) {
       PmTableCfg2 cfg = AnnotationUtil.findAnnotation(this, PmTableCfg2.class);
       rowSelectMode = (cfg != null &&
@@ -173,6 +191,11 @@ public class PmTableImpl2
     return rowSelectMode;
   }
 
+  /** @deprecated Please use {@link #getPmRowSelectMode()} */
+  public SelectMode getRowSelectMode() {
+    return getPmRowSelectMode();
+  }
+
   /**
    * Adjusts the row selection mode.<br>
    * Should be called very early within the livecycle of the table.
@@ -181,15 +204,21 @@ public class PmTableImpl2
    *
    * @param rowSelectMode The {@link RowSelectMode} to be used by this table.
    */
-  public void setRowSelectMode(SelectMode rowSelectMode) {
+  public void setPmRowSelectMode(SelectMode rowSelectMode) {
     this.rowSelectMode = rowSelectMode;
     if (pmPageableCollection != null) {
       pmPageableCollection.getSelectionHandler().setSelectMode(rowSelectMode);
     }
   }
 
+  /** @deprecated Please use {@link #setPmRowSelectMode(SelectMode)} */
+  public void setRowSelectMode(SelectMode rowSelectMode) {
+    setPmRowSelectMode(rowSelectMode);
+  }
+
+
   @Override
-  public int getNumOfPageRows() {
+  public int getNumOfPageRowPms() {
     if (numOfPageRows == null) {
       PmTableCfg cfg = AnnotationUtil.findAnnotation(this, PmTableCfg.class);
       numOfPageRows = (cfg != null &&
@@ -201,17 +230,28 @@ public class PmTableImpl2
     return numOfPageRows;
   }
 
+  @Deprecated
+  @Override
+  public int getNumOfPageRows() {
+    return getNumOfPageRowPms();
+  }
+
   /**
    * @param numOfPageRows
    *          The number of rows per page. <br>
    *          If it is <code>null</code> the statically defined number of rows
    *          will be used.
    */
-  public void setNumOfPageRows(Integer numOfPageRows) {
+  public void setPmNumOfPageRows(Integer numOfPageRows) {
     this.numOfPageRows = numOfPageRows;
     if (pmPageableCollection != null) {
       pmPageableCollection.setPageSize(numOfPageRows);
     }
+  }
+
+  /** @deprecated Please use {@link #setPmNumOfPageRows(Integer)} */
+  public void setNumOfPageRows(Integer numOfPageRows) {
+    setPmNumOfPageRows(numOfPageRows);
   }
 
   @Override
@@ -225,7 +265,32 @@ public class PmTableImpl2
   }
 
   @Override
-  public Query getPmQuery() {
+  public T_ROW_PM getCurrentRowPm() {
+    if (getPmRowSelectMode() == SelectMode.SINGLE) {
+      Selection<T_ROW_PM> selection = getPmSelectionHandler().getSelection();
+      if (selection.getSize() == 1) {
+        return selection.iterator().next();
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Provides the bean behind the current row PM.<br>
+   * See {@link #getCurrentRowPm()}.
+   *
+   * @return the bean behind the currently active row PM or <code>null</code>.
+   */
+  public T_ROW_BEAN getCurrentRowPmBean() {
+    T_ROW_PM rowPm = getCurrentRowPm();
+    return (rowPm != null)
+        ? rowPm.getPmBean()
+        : null;
+  }
+
+  @Override
+  public QueryParams getPmQuery() {
     return getPmPageableCollection().getQuery();
   }
 
@@ -318,7 +383,7 @@ public class PmTableImpl2
 
   @Override
   protected boolean isPmValueChangedImpl() {
-    return pmChangeSetHandler.isChanged();
+    return pmChangeSetHandler.isChanged() || super.isPmValueChangedImpl();
   }
 
   /**
@@ -379,8 +444,8 @@ public class PmTableImpl2
    * @param pageableCollection the collection to initialize.
    */
   protected void initPmPageableCollection(PageableCollection2<T_ROW_PM> pageableCollection) {
-    pageableCollection.getSelectionHandler().setSelectMode(getRowSelectMode());
-    pageableCollection.setPageSize(getNumOfPageRows());
+    pageableCollection.getSelectionHandler().setSelectMode(getPmRowSelectMode());
+    pageableCollection.setPageSize(getNumOfPageRowPms());
 
     // XXX olaf: Check - is redundant to the change listener within Pager!
     if (getPmPager() != null) {
@@ -458,11 +523,11 @@ public class PmTableImpl2
     if (this.pmPageableCollection != pc) {
       SelectionHandler<T_ROW_PM> selectionHandler = pc.getSelectionHandler();
       selectionHandler.addPropertyAndVetoableListener(SelectionHandler.PROP_SELECTION, pmTableSelectionChangeListener);
-      pc.getQuery().addPropertyAndVetoableListener(Query.PROP_EFFECTIVE_FILTER, pmTableFilterChangeListener);
+      pc.getQuery().addPropertyAndVetoableListener(QueryParams.PROP_EFFECTIVE_FILTER, pmTableFilterChangeListener);
 
       if (pmPageableCollection != null) {
         pmPageableCollection.getSelectionHandler().removePropertyAndVetoableListener(SelectionHandler.PROP_SELECTION, pmTableSelectionChangeListener);
-        pmPageableCollection.getQuery().removePropertyAndVetoableListener(Query.PROP_EFFECTIVE_FILTER, pmTableFilterChangeListener);
+        pmPageableCollection.getQuery().removePropertyAndVetoableListener(QueryParams.PROP_EFFECTIVE_FILTER, pmTableFilterChangeListener);
       }
     }
 

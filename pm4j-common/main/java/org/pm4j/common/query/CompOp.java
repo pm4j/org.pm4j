@@ -1,5 +1,6 @@
 package org.pm4j.common.query;
 
+import java.io.Serializable;
 import java.util.Collection;
 
 import org.pm4j.common.exception.CheckedExceptionWrapper;
@@ -9,7 +10,7 @@ import org.pm4j.common.exception.CheckedExceptionWrapper;
  *
  * @author olaf boede
  */
-public interface CompOp extends Cloneable {
+public interface CompOp extends Cloneable, Serializable {
 
   enum ValueNeeded { REQUIRED, OPTIONAL, NO }
 

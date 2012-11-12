@@ -9,7 +9,7 @@ import org.pm4j.common.pageable.PageableCollection2;
 import org.pm4j.common.pageable.inmem.PageableInMemCollectionImpl;
 import org.pm4j.common.pageable.querybased.PageableQueryCollection;
 import org.pm4j.common.pageable.querybased.PageableQueryService;
-import org.pm4j.common.query.Query;
+import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.QueryOptionsImpl;
 import org.pm4j.common.selection.SelectionHandler;
@@ -84,7 +84,7 @@ public class PageablePmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> imple
    * @param query
    *          the used query. Is optional.
    */
-  public PageablePmBeanCollection(PmObject pmCtxt, Collection<T_BEAN> beans, QueryOptions queryOptions, Query query) {
+  public PageablePmBeanCollection(PmObject pmCtxt, Collection<T_BEAN> beans, QueryOptions queryOptions, QueryParams query) {
     this(pmCtxt,
          new PageableInMemCollectionImpl<T_BEAN>(
              new InMemPmQueryEvaluator<T_BEAN>(pmCtxt),
@@ -104,7 +104,7 @@ public class PageablePmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> imple
    * @param query
    *          the optional query to use.
    */
-  public <T_ID extends Serializable> PageablePmBeanCollection(PmObject pmCtxt, PageableQueryService<T_BEAN, T_ID> service, Query query) {
+  public <T_ID extends Serializable> PageablePmBeanCollection(PmObject pmCtxt, PageableQueryService<T_BEAN, T_ID> service, QueryParams query) {
     this(pmCtxt, new PageableQueryCollection<T_BEAN, T_ID>(service, query));
   }
 
@@ -125,7 +125,7 @@ public class PageablePmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> imple
   }
 
   @Override
-  public Query getQuery() {
+  public QueryParams getQuery() {
     return beans.getQuery();
   }
 

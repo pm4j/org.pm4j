@@ -4,7 +4,7 @@ import java.util.List;
 
 
 /**
- * Provides the set of query restrictions that can be used to configure a {@link Query}.
+ * Provides the set of query restrictions that can be used to configure a {@link QueryParams}.
  *
  * @author olaf boede
  */

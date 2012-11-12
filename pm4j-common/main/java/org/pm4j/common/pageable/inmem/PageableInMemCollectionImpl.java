@@ -12,7 +12,7 @@ import java.util.List;
 import org.pm4j.common.pageable.PageableCollectionBase2;
 import org.pm4j.common.pageable.PageableCollectionUtil2;
 import org.pm4j.common.query.FilterExpression;
-import org.pm4j.common.query.Query;
+import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.inmem.InMemQueryEvaluator;
 import org.pm4j.common.selection.SelectionHandler;
@@ -62,7 +62,7 @@ public class PageableInMemCollectionImpl<T_ITEM> extends PageableCollectionBase2
    * @param query
    *          defines the current sort order and filter restricions.
    */
-  public PageableInMemCollectionImpl(InMemQueryEvaluator<T_ITEM> inMemQueryEvaluator, Collection<T_ITEM> objects, QueryOptions queryOptions, Query query) {
+  public PageableInMemCollectionImpl(InMemQueryEvaluator<T_ITEM> inMemQueryEvaluator, Collection<T_ITEM> objects, QueryOptions queryOptions, QueryParams query) {
     super(queryOptions, query);
     this.inMemQueryEvaluator = inMemQueryEvaluator;
     this.selectionHandler = new SelectionHandlerWithItemSet<T_ITEM>(this);
@@ -71,8 +71,8 @@ public class PageableInMemCollectionImpl<T_ITEM> extends PageableCollectionBase2
         : new ArrayList<T_ITEM>();
 
     // getQuery is used because the super ctor may have created it on the fly (in case of a null parameter)
-    getQuery().addPropertyChangeListener(Query.PROP_EFFECTIVE_FILTER, changeFilterListener);
-    getQuery().addPropertyChangeListener(Query.PROP_EFFECTIVE_SORT_ORDER, changeSortOrderListener);
+    getQuery().addPropertyChangeListener(QueryParams.PROP_EFFECTIVE_FILTER, changeFilterListener);
+    getQuery().addPropertyChangeListener(QueryParams.PROP_EFFECTIVE_SORT_ORDER, changeSortOrderListener);
   }
 
   @Override

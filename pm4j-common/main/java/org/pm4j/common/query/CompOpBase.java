@@ -9,6 +9,8 @@ import org.pm4j.core.util.lang.CloneUtil;
 
 public abstract class CompOpBase<T_VALUE> implements CompOp {
 
+  private boolean ignoreCase = true;
+  private boolean ignoreSpaces = true;
   private String name;
   private ValueNeeded valueNeeded = ValueNeeded.OPTIONAL;
   private List<ValueOption> valueOptions = new ArrayList<ValueOption>();
@@ -70,5 +72,21 @@ public abstract class CompOpBase<T_VALUE> implements CompOp {
    *         given value leads to a valid filter definition.
    */
   protected abstract boolean isEffectiveFilterValueImpl(T_VALUE filterValue);
+
+  public boolean isIgnoreCase() {
+    return ignoreCase;
+  }
+
+  public void setIgnoreCase(boolean ignoreCase) {
+    this.ignoreCase = ignoreCase;
+  }
+
+  public boolean isIgnoreSpaces() {
+    return ignoreSpaces;
+  }
+
+  public void setIgnoreSpaces(boolean ignoreSpaces) {
+    this.ignoreSpaces = ignoreSpaces;
+  }
 
 }

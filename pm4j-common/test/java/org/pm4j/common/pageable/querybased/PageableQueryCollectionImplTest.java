@@ -11,7 +11,7 @@ import org.pm4j.common.pageable.PageableCollectionTestBase;
 import org.pm4j.common.query.AttrDefinition;
 import org.pm4j.common.query.CompOpStringStartsWith;
 import org.pm4j.common.query.FilterCompareDefinition;
-import org.pm4j.common.query.Query;
+import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.QueryOptionsImpl;
 import org.pm4j.common.query.SortOrder;
@@ -55,7 +55,7 @@ public class PageableQueryCollectionImplTest extends PageableCollectionTestBase<
     }
 
     @Override
-    public List<Bean> getItems(Query query, long startIdx, int pageSize) {
+    public List<Bean> getItems(QueryParams query, long startIdx, int pageSize) {
       if (startIdx >= idToBeanMap.size()) {
         return Collections.emptyList();
       }
@@ -68,12 +68,12 @@ public class PageableQueryCollectionImplTest extends PageableCollectionTestBase<
     }
 
     @Override
-    public long getItemCount(Query query) {
+    public long getItemCount(QueryParams query) {
       return getQueryResult(query).size();
     }
 
     @Override
-    public long getUnfilteredItemCount(Query query) {
+    public long getUnfilteredItemCount(QueryParams query) {
       return idToBeanMap.size();
     }
 
@@ -100,7 +100,7 @@ public class PageableQueryCollectionImplTest extends PageableCollectionTestBase<
       return options;
     }
 
-    private List<Bean> getQueryResult(Query query) {
+    private List<Bean> getQueryResult(QueryParams query) {
       InMemQueryEvaluator<Bean> evalCtxt = new InMemQueryEvaluator<Bean>();
       List<Bean> beans = evalCtxt.sort(idToBeanMap.values(), query.getEffectiveSortOrder());
 

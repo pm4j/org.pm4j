@@ -16,4 +16,8 @@ public class CompOpStringNotEquals extends CompOpStringBase {
     return ! StringUtils.isBlank(filterValue);
   }
 
+  @Override
+  public String toString() {
+    return "!=";
+  }
 }

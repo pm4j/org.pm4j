@@ -15,4 +15,8 @@ public class CompOpStringNotIsEmpty extends CompOpStringBase {
     return true;
   }
 
+  @Override
+  public String toString() {
+    return "not empty";
+  }
 }

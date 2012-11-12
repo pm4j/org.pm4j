@@ -3,6 +3,7 @@ package org.pm4j.common.query;
 
 public class FilterNot implements FilterExpression {
 
+  private static final long serialVersionUID = 1L;
   private FilterExpression baseExpression;
 
   public FilterNot(FilterExpression baseExpression) {
@@ -17,5 +18,9 @@ public class FilterNot implements FilterExpression {
     this.baseExpression = baseExpression;
   }
 
+  @Override
+  public String toString() {
+    return "NOT(" + baseExpression + ")";
+  }
 
 }

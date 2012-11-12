@@ -9,7 +9,7 @@ import java.util.List;
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.pm4j.common.query.Query;
+import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.selection.EmptySelection;
 import org.pm4j.common.selection.SelectMode;
@@ -91,7 +91,7 @@ public class PageableCollectionWithTransientItems<T_ITEM> implements PageableCol
    * {@inheritDoc}
    */
   @Override
-  public Query getQuery() {
+  public QueryParams getQuery() {
     return baseCollection.getQuery();
   }
 

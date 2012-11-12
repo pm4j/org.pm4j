@@ -2,18 +2,24 @@ package org.pm4j.common.query;
 
 import java.io.Serializable;
 
+import org.pm4j.common.pageable.querybased.PageableQueryService;
+import org.pm4j.common.query.inmem.InMemQueryEvaluator;
 import org.pm4j.common.util.beanproperty.PropertyChangeSupported;
 
 /**
  * Interface for query specifications.
  * <p>
- * This interface is limited to support only some basic filter and sort order defintions.<br>
- * Because of that it can be used for various implementations. E.g. for in-memory or db-based
- * queries.
+ * It support the definition of {@link FilterExpression}s, {@link SortOrder} and
+ * additional application specific base query parameters.
+ * <p>
+ * Technology specific query evaluators read these definitions for their specific
+ * query evaluation.
+ * <p>
+ * See {@link InMemQueryEvaluator} and {@link PageableQueryService} for usage examples.
  *
  * @author olaf boede
  */
-public interface Query extends PropertyChangeSupported, Cloneable, Serializable {
+public interface QueryParams extends PropertyChangeSupported, Cloneable, Serializable {
 
   /** Identifier of the property change event that gets fired if the effective sort order gets changed. */
   public static final String PROP_EFFECTIVE_SORT_ORDER = "effectiveSortOrder";

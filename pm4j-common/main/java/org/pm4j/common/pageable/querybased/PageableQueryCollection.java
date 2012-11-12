@@ -9,7 +9,7 @@ import java.util.List;
 
 import org.pm4j.common.pageable.PageableCollectionBase2;
 import org.pm4j.common.pageable.PageableCollectionUtil2;
-import org.pm4j.common.query.Query;
+import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.selection.SelectionHandler;
 import org.pm4j.common.util.collection.ListUtil;
 
@@ -32,14 +32,14 @@ public class PageableQueryCollection<T_ITEM, T_ID extends Serializable> extends 
     this(service, null);
   }
 
-  public PageableQueryCollection(PageableQueryService<T_ITEM, T_ID> service, Query query) {
+  public PageableQueryCollection(PageableQueryService<T_ITEM, T_ID> service, QueryParams query) {
     super(service.getQueryOptions(), query);
 
     this.service = service;
     this.selectionHandler = new PageableQuerySelectionHandler<T_ITEM, T_ID>(service, getQuery());
 
     // uses getQuery() because the super ctor may have created it.
-    getQuery().addPropertyChangeListener(Query.PROP_EFFECTIVE_FILTER, resetItemCountOnQueryChangeListener);
+    getQuery().addPropertyChangeListener(QueryParams.PROP_EFFECTIVE_FILTER, resetItemCountOnQueryChangeListener);
   }
 
   @SuppressWarnings("unchecked")

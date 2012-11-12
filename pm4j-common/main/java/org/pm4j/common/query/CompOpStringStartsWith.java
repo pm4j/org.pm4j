@@ -14,4 +14,9 @@ public class CompOpStringStartsWith extends CompOpStringBase {
   protected boolean isEffectiveFilterValueImpl(String filterValue) {
     return ! StringUtils.isBlank(filterValue);
   }
+
+  @Override
+  public String toString() {
+    return "startsWith";
+  }
 }

@@ -3,7 +3,7 @@ package org.pm4j.common.pageable.querybased;
 import java.io.Serializable;
 import java.util.List;
 
-import org.pm4j.common.query.Query;
+import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.selection.ItemIdConverter;
 
@@ -31,7 +31,7 @@ public interface PageableQueryService<T_BEAN, T_ID> extends ItemIdConverter<T_BE
    * @return the set of found items. The last page may be contain less items
    *         than <code>pageSize</code>.
    */
-  List<T_BEAN> getItems(Query query, long startIdx, int pageSize);
+  List<T_BEAN> getItems(QueryParams query, long startIdx, int pageSize);
 
   /**
    * Provides the number of items that match the given query filter criteria.
@@ -39,7 +39,7 @@ public interface PageableQueryService<T_BEAN, T_ID> extends ItemIdConverter<T_BE
    * @param query
    * @return
    */
-  long getItemCount(Query query);
+  long getItemCount(QueryParams query);
 
   /**
    * Provides the total number of unfiltered items.
@@ -49,7 +49,7 @@ public interface PageableQueryService<T_BEAN, T_ID> extends ItemIdConverter<T_BE
    * @param query
    * @return
    */
-  long getUnfilteredItemCount(Query query);
+  long getUnfilteredItemCount(QueryParams query);
 
   /**
    * Provides the set of filter definitions and attribute sort orders that can be

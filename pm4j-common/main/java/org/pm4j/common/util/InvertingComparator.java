@@ -22,5 +22,9 @@ public final class InvertingComparator<T> implements Comparator<T> {
     return -baseComparator.compare(o1, o2);
   }
 
+  public Comparator<T> getBaseComparator() {
+    return baseComparator;
+  }
+
 
 }

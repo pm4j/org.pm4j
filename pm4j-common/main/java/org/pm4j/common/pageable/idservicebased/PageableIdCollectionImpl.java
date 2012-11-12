@@ -10,7 +10,7 @@ import java.util.List;
 
 import org.pm4j.common.pageable.PageableCollectionBase2;
 import org.pm4j.common.pageable.PageableCollectionUtil2;
-import org.pm4j.common.query.Query;
+import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.selection.SelectionHandler;
 import org.pm4j.common.selection.SelectionHandlerWithIdSet;
 import org.pm4j.common.util.collection.ListUtil;
@@ -31,7 +31,7 @@ public class PageableIdCollectionImpl<T_ITEM, T_ID> extends PageableCollectionBa
     }
   };
 
-  public PageableIdCollectionImpl(PageableIdService<T_ITEM, T_ID> service, Query query) {
+  public PageableIdCollectionImpl(PageableIdService<T_ITEM, T_ID> service, QueryParams query) {
     super(null, query);
     assert service != null;
 
@@ -43,8 +43,8 @@ public class PageableIdCollectionImpl<T_ITEM, T_ID> extends PageableCollectionBa
       }
     };
 
-    getQuery().addPropertyChangeListener(Query.PROP_EFFECTIVE_SORT_ORDER, resetItemsOnQueryChangeListener);
-    getQuery().addPropertyChangeListener(Query.PROP_EFFECTIVE_FILTER, resetItemsOnQueryChangeListener);
+    getQuery().addPropertyChangeListener(QueryParams.PROP_EFFECTIVE_SORT_ORDER, resetItemsOnQueryChangeListener);
+    getQuery().addPropertyChangeListener(QueryParams.PROP_EFFECTIVE_FILTER, resetItemsOnQueryChangeListener);
   }
 
   @Override

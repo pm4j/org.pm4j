@@ -25,11 +25,11 @@ public class InMemEvaluationTest {
 
   @Test
   public void testIt() {
-    assertTrue(ctxt.evaluate(bean, new FilterCompare(attrS, new CompOpLt(), "x")));
-    assertFalse(ctxt.evaluate(bean, new FilterCompare(attrS, new CompOpLt(), "a")));
+    assertTrue(ctxt.evaluate(bean, new FilterCompare(attrS, CompOpLt.class, "x")));
+    assertFalse(ctxt.evaluate(bean, new FilterCompare(attrS, CompOpLt.class, "a")));
     assertTrue(ctxt.evaluate(bean,
-        new FilterAnd(new FilterCompare(attrI, new CompOpEquals(), 3),
-                      new FilterCompare(attrS, new CompOpNotEquals(), "y")) ));
+        new FilterAnd(new FilterCompare(attrI, CompOpEquals.class, 3),
+                      new FilterCompare(attrS, CompOpNotEquals.class, "y")) ));
   }
 
   @Test
@@ -80,7 +80,7 @@ public class InMemEvaluationTest {
 
 
   private FilterExpression trueCond() {
-    return new FilterCompare(attrS, new CompOpEquals(), "hi");
+    return new FilterCompare(attrS, CompOpEquals.class, "hi");
   }
 
   private FilterExpression falseCond() {

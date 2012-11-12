@@ -1,6 +1,6 @@
 package org.pm4j.common.pageable;
 
-import org.pm4j.common.query.Query;
+import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.query.QueryImpl;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.QueryOptionsImpl;
@@ -10,7 +10,7 @@ public abstract class PageableCollectionBase2<T_ITEM> implements PageableCollect
 
   private int                pageSize = 10;
   private int                currentPageIdx;
-  private final Query        query;
+  private final QueryParams        query;
   private final QueryOptions queryOptions;
 
 
@@ -18,7 +18,7 @@ public abstract class PageableCollectionBase2<T_ITEM> implements PageableCollect
    * @param query
    *          defines the current sort order and filter restricions.
    */
-  public PageableCollectionBase2(QueryOptions queryOptions, Query query) {
+  public PageableCollectionBase2(QueryOptions queryOptions, QueryParams query) {
     this.queryOptions = (queryOptions != null)
         ? queryOptions
         : new QueryOptionsImpl();
@@ -29,7 +29,7 @@ public abstract class PageableCollectionBase2<T_ITEM> implements PageableCollect
   }
 
   @Override
-  public final Query getQuery() {
+  public final QueryParams getQuery() {
     return query;
   }
 

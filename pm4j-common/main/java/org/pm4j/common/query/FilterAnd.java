@@ -8,6 +8,7 @@ import java.util.List;
 
 public class FilterAnd implements FilterExpression {
 
+  private static final long serialVersionUID = 1L;
   private List<FilterExpression> expressions;
 
   public FilterAnd(FilterExpression... expressions) {
@@ -25,4 +26,18 @@ public class FilterAnd implements FilterExpression {
   public List<FilterExpression> getExpressions() {
     return expressions;
   }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    for (FilterExpression e : expressions) {
+      if (sb.length() > 0) {
+        sb.append(", ");
+      }
+      sb.append(e);
+    }
+    sb.append(")");
+    return "AND(" + sb;
+  }
+
 }
