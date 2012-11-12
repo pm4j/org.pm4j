@@ -183,17 +183,19 @@ public interface PmObject extends Comparable<PmObject> {
   Set<String> getPmStyleClasses();
 
   /**
-   * Returns a application specific property that may have been defined using
+   * Returns an application specific property that may have been defined using
    * {@link #setPmProperty(String, Object)}.
    *
-   * @return The property value or <code>null</code> if the property is not defined.
+   * @param propName the property identifier.
+   * @return the property value or <code>null</code> if the property is not defined.
    */
   Object getPmProperty(String propName);
 
   /**
-   * TODO
-   * @param propName
-   * @param value
+   * Assigns an application specific property to this PM.
+   *
+   * @param propName the property identifier.
+   * @param value the property value.
    */
   void setPmProperty(String propName, Object value);
 
