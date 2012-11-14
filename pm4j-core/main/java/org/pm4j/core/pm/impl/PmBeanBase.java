@@ -229,7 +229,7 @@ public abstract class PmBeanBase<T_BEAN>
       for (PmObject child : PmUtil.getPmChildren(pm)) {
         // Don't iterate over closed sub conversations.
         // This will only generate overhead an trouble.
-        if ((child instanceof PmConversation) && !pm.isPmVisible()) {
+        if ((child instanceof PmConversation) && !child.isPmVisible()) {
           continue;
         }
 
