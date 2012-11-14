@@ -168,14 +168,14 @@ public class PmTableImpl2
   }
 
   @Override
-  public long getTotalNumOfRowPms() {
+  public long getTotalNumOfPmRows() {
     return getPmPageableCollection().getNumOfItems();
   }
 
   @Deprecated
   @Override
   public int getTotalNumOfRows() {
-    return (int)getTotalNumOfRowPms();
+    return (int)getTotalNumOfPmRows();
   }
 
   public SelectMode getPmRowSelectMode() {
@@ -242,16 +242,16 @@ public class PmTableImpl2
    *          If it is <code>null</code> the statically defined number of rows
    *          will be used.
    */
-  public void setPmNumOfPageRows(Integer numOfPageRows) {
+  public void setNumOfPageRowPms(Integer numOfPageRows) {
     this.numOfPageRows = numOfPageRows;
     if (pmPageableCollection != null) {
       pmPageableCollection.setPageSize(numOfPageRows);
     }
   }
 
-  /** @deprecated Please use {@link #setPmNumOfPageRows(Integer)} */
+  /** @deprecated Please use {@link #setNumOfPageRowPms(Integer)} */
   public void setNumOfPageRows(Integer numOfPageRows) {
-    setPmNumOfPageRows(numOfPageRows);
+    setNumOfPageRowPms(numOfPageRows);
   }
 
   @Override
@@ -290,8 +290,8 @@ public class PmTableImpl2
   }
 
   @Override
-  public QueryParams getPmQuery() {
-    return getPmPageableCollection().getQuery();
+  public QueryParams getPmQueryParams() {
+    return getPmPageableCollection().getQueryParams();
   }
 
   @Override
@@ -360,7 +360,7 @@ public class PmTableImpl2
         getPmSelectionHandler().selectAll(false);
         break;
       case CLEAR_SORT_ORDER:
-        getPmQuery().setSortOrder(getPmQueryOptions().getDefaultSortOrder());
+        getPmQueryParams().setSortOrder(getPmQueryOptions().getDefaultSortOrder());
         break;
       case CLEAR_CHANGES:
         PmValidationApi.clearInvalidValuesOfSubtree(this);
@@ -523,11 +523,11 @@ public class PmTableImpl2
     if (this.pmPageableCollection != pc) {
       SelectionHandler<T_ROW_PM> selectionHandler = pc.getSelectionHandler();
       selectionHandler.addPropertyAndVetoableListener(SelectionHandler.PROP_SELECTION, pmTableSelectionChangeListener);
-      pc.getQuery().addPropertyAndVetoableListener(QueryParams.PROP_EFFECTIVE_FILTER, pmTableFilterChangeListener);
+      pc.getQueryParams().addPropertyAndVetoableListener(QueryParams.PROP_EFFECTIVE_FILTER, pmTableFilterChangeListener);
 
       if (pmPageableCollection != null) {
         pmPageableCollection.getSelectionHandler().removePropertyAndVetoableListener(SelectionHandler.PROP_SELECTION, pmTableSelectionChangeListener);
-        pmPageableCollection.getQuery().removePropertyAndVetoableListener(QueryParams.PROP_EFFECTIVE_FILTER, pmTableFilterChangeListener);
+        pmPageableCollection.getQueryParams().removePropertyAndVetoableListener(QueryParams.PROP_EFFECTIVE_FILTER, pmTableFilterChangeListener);
       }
     }
 

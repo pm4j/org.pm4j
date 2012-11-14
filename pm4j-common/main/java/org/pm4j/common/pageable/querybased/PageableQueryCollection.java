@@ -36,18 +36,19 @@ public class PageableQueryCollection<T_ITEM, T_ID extends Serializable> extends 
     super(service.getQueryOptions(), query);
 
     this.service = service;
-    this.selectionHandler = new PageableQuerySelectionHandler<T_ITEM, T_ID>(service, getQuery());
+    this.selectionHandler = new PageableQuerySelectionHandler<T_ITEM, T_ID>(service, getQueryParams());
 
     // uses getQuery() because the super ctor may have created it.
-    getQuery().addPropertyChangeListener(QueryParams.PROP_EFFECTIVE_FILTER, resetItemCountOnQueryChangeListener);
+    getQueryParams().addPropertyChangeListener(QueryParams.PROP_EFFECTIVE_FILTER, resetItemCountOnQueryChangeListener);
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public List<T_ITEM> getItemsOnPage() {
     long startIdx = PageableCollectionUtil2.getIdxOfFirstItemOnPage(this)-1;
-    return (startIdx > -1)
-    		? service.getItems(getQuery(), startIdx, getPageSize())
+    QueryParams queryParams = getQueryParams();
+    return (startIdx > -1 && queryParams.isExecQuery())
+    		? service.getItems(getQueryParams(), startIdx, getPageSize())
     		: Collections.EMPTY_LIST;
   }
 
@@ -55,19 +56,26 @@ public class PageableQueryCollection<T_ITEM, T_ID extends Serializable> extends 
   public long getNumOfItems() {
     return (itemCount != -1)
         ? itemCount
-        : (itemCount = service.getItemCount(getQuery()));
+        : (itemCount = getQueryParams().isExecQuery()
+          ? service.getItemCount(getQueryParams())
+          : 0);
   }
 
   @Override
   public long getUnfilteredItemCount() {
     return (unfilteredItemCount != -1)
         ? unfilteredItemCount
-        : (unfilteredItemCount = service.getUnfilteredItemCount(getQuery()));
+        : (unfilteredItemCount = getQueryParams().isExecQuery()
+          ? service.getUnfilteredItemCount(getQueryParams())
+          : 0);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public Iterator<T_ITEM> iterator() {
-    return new Iterator<T_ITEM>() {
+    return !getQueryParams().isExecQuery()
+        ? Collections.EMPTY_LIST.iterator()
+        : new Iterator<T_ITEM>() {
       int currentIdx;
       T_ITEM next;
 
@@ -94,7 +102,7 @@ public class PageableQueryCollection<T_ITEM, T_ID extends Serializable> extends 
 
       protected boolean readNext() {
         // TODO olaf: Needs to be optimized. Blockwise ...
-        next = ListUtil.listToItemOrNull(service.getItems(getQuery(), currentIdx++, 1));
+        next = ListUtil.listToItemOrNull(service.getItems(getQueryParams(), currentIdx++, 1));
         return next != null;
       }
     };

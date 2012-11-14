@@ -4,7 +4,6 @@ import java.util.Comparator;
 
 import org.apache.commons.lang.StringUtils;
 import org.pm4j.common.query.QueryOptions;
-import org.pm4j.common.query.QueryOptionsImpl;
 import org.pm4j.common.query.SortOrder;
 import org.pm4j.common.query.inmem.InMemSortOrder;
 import org.pm4j.core.exception.PmRuntimeException;
@@ -30,7 +29,7 @@ public class PmTable2Util {
    */
   public static QueryOptions makeQueryOptionsForInMemoryTable(PmTable2<?> pmTable) {
     assert pmTable != null;
-    QueryOptionsImpl options = new QueryOptionsImpl();
+    QueryOptions options = new QueryOptions();
 
     PmTableCfg2 tblCfg = pmTable.getClass().getAnnotation(PmTableCfg2.class);
     boolean tableSortable = false;

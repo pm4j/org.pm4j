@@ -11,9 +11,8 @@ import org.pm4j.common.pageable.PageableCollectionTestBase;
 import org.pm4j.common.query.AttrDefinition;
 import org.pm4j.common.query.CompOpStringStartsWith;
 import org.pm4j.common.query.FilterCompareDefinition;
-import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.query.QueryOptions;
-import org.pm4j.common.query.QueryOptionsImpl;
+import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.query.SortOrder;
 import org.pm4j.common.query.inmem.InMemQueryEvaluator;
 import org.pm4j.common.query.inmem.InMemSortOrder;
@@ -85,7 +84,7 @@ public class PageableQueryCollectionImplTest extends PageableCollectionTestBase<
     // some in memory fakes ...
     @Override
     public QueryOptions getQueryOptions() {
-      QueryOptionsImpl options = new QueryOptionsImpl();
+      QueryOptions options = new QueryOptions();
       AttrDefinition nameAttr = new AttrDefinition("name", String.class);
 
       options.addSortOrder("name", new InMemSortOrder(new Comparator<Bean>() {

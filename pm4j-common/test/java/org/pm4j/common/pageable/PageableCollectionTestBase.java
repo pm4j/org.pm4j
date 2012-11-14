@@ -49,6 +49,19 @@ public abstract class PageableCollectionTestBase<T> {
   }
 
   @Test
+  public void testSwitchQueryExecOffAndOn() {
+    assertEquals("[a, b, c, d, e, f]", IterableUtil.shallowCopy(collection).toString());
+
+    collection.getQueryParams().setExecQuery(false);
+    assertEquals(0, collection.getNumOfItems());
+    assertEquals("[]", IterableUtil.shallowCopy(collection).toString());
+
+    collection.getQueryParams().setExecQuery(true);
+    assertEquals(6, collection.getNumOfItems());
+    assertEquals("[a, b, c, d, e, f]", IterableUtil.shallowCopy(collection).toString());
+  }
+
+  @Test
   public void testItemsOnPage() {
     assertEquals(1, collection.getCurrentPageIdx());
     assertEquals("[a, b]", collection.getItemsOnPage().toString());
@@ -75,13 +88,13 @@ public abstract class PageableCollectionTestBase<T> {
   public void testSortItems() {
     assertEquals("Initial (unsorted) sort order", "[a, b, c, d, e, f]", IterableUtil.shallowCopy(collection).toString());
 
-    collection.getQuery().setSortOrder(nameSortOrder);
+    collection.getQueryParams().setSortOrder(nameSortOrder);
     assertEquals("Ascending sort order", "[a, b, c, d, e, f]", IterableUtil.shallowCopy(collection).toString());
 
-    collection.getQuery().setSortOrder(nameSortOrder.getReverseSortOrder());
+    collection.getQueryParams().setSortOrder(nameSortOrder.getReverseSortOrder());
     assertEquals("Descending sort order", "[f, e, d, c, b, a]", IterableUtil.shallowCopy(collection).toString());
 
-    collection.getQuery().setSortOrder(null);
+    collection.getQueryParams().setSortOrder(null);
     assertEquals("Initial (unsorted) sort order again", "[a, b, c, d, e, f]", IterableUtil.shallowCopy(collection).toString());
   }
 
@@ -91,29 +104,29 @@ public abstract class PageableCollectionTestBase<T> {
     assertEquals("Initial (unsorted) sort order", "[a, b, c, d, e, f]", IterableUtil.shallowCopy(collection).toString());
     assertEquals("[e, f]", collection.getItemsOnPage().toString());
 
-    collection.getQuery().setDefaultSortOrder(nameSortOrder.getReverseSortOrder());
+    collection.getQueryParams().setDefaultSortOrder(nameSortOrder.getReverseSortOrder());
     assertEquals("New default: Descending sort order", "[f, e, d, c, b, a]", IterableUtil.shallowCopy(collection).toString());
     assertEquals("[b, a]", collection.getItemsOnPage().toString());
 
-    collection.getQuery().setSortOrder(nameSortOrder);
+    collection.getQueryParams().setSortOrder(nameSortOrder);
     assertEquals("Sort in ascending order", "[a, b, c, d, e, f]", IterableUtil.shallowCopy(collection).toString());
     assertEquals("[e, f]", collection.getItemsOnPage().toString());
 
-    collection.getQuery().setSortOrder(null);
+    collection.getQueryParams().setSortOrder(null);
     assertEquals("Sorted in descending default sort order again.", "[f, e, d, c, b, a]", IterableUtil.shallowCopy(collection).toString());
     assertEquals("[b, a]", collection.getItemsOnPage().toString());
 
-    collection.getQuery().setDefaultSortOrder(null);
+    collection.getQueryParams().setDefaultSortOrder(null);
     assertEquals("Initial (unsorted) sort order again.", "[a, b, c, d, e, f]", IterableUtil.shallowCopy(collection).toString());
     assertEquals("[e, f]", collection.getItemsOnPage().toString());
   }
 
   @Test
   public void testFilterItems() {
-    collection.getQuery().setFilterExpression(getFilterNameStartsWith("b"));
+    collection.getQueryParams().setFilterExpression(getFilterNameStartsWith("b"));
     assertEquals("Filtered item set.", "[b]", IterableUtil.shallowCopy(collection).toString());
 
-    collection.getQuery().setFilterExpression(null);
+    collection.getQueryParams().setFilterExpression(null);
     assertEquals("We get all items after resetting the filter.", "[a, b, c, d, e, f]", IterableUtil.shallowCopy(collection).toString());
   }
 

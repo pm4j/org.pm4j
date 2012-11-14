@@ -7,7 +7,7 @@ import org.pm4j.common.pageable.PageableCollectionTestBase;
 import org.pm4j.common.query.AttrDefinition;
 import org.pm4j.common.query.CompOpStringStartsWith;
 import org.pm4j.common.query.FilterCompareDefinition;
-import org.pm4j.common.query.QueryOptionsImpl;
+import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.SortOrder;
 import org.pm4j.common.query.inmem.InMemQueryEvaluator;
 import org.pm4j.common.query.inmem.InMemSortOrder;
@@ -18,7 +18,7 @@ public class InMemoryPageableCollectionTest extends PageableCollectionTestBase<P
   @Override
   public PageableCollection2<Bean> makePageableCollection(String... strings) {
     InMemQueryEvaluator<Bean> ctxt = new InMemQueryEvaluator<Bean>();
-    QueryOptionsImpl qo = new QueryOptionsImpl();
+    QueryOptions qo = new QueryOptions();
     qo.addFilterCompareDefinition(new FilterCompareDefinition(new AttrDefinition("name", String.class), new CompOpStringStartsWith()));
     return new PageableInMemCollectionImpl<Bean>(ctxt, makeBeans(strings), qo, null);
   }

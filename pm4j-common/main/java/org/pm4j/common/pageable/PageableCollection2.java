@@ -24,8 +24,13 @@ public interface PageableCollection2<T_ITEM> extends Iterable<T_ITEM> {
    *
    * @return the {@link QueryParams}. Never <code>null</code>.
    */
-  QueryParams getQuery();
+  QueryParams getQueryParams();
 
+  /**
+   * The set of query parameters that usually may be configured by the end user.
+   *
+   * @return the {@link QueryOptions}. Never <code>null</code>.
+   */
   QueryOptions getQueryOptions();
 
   /**

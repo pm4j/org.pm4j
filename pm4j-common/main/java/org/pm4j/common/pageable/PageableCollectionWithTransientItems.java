@@ -91,8 +91,8 @@ public class PageableCollectionWithTransientItems<T_ITEM> implements PageableCol
    * {@inheritDoc}
    */
   @Override
-  public QueryParams getQuery() {
-    return baseCollection.getQuery();
+  public QueryParams getQueryParams() {
+    return baseCollection.getQueryParams();
   }
 
   /**

@@ -71,8 +71,8 @@ public class PageableInMemCollectionImpl<T_ITEM> extends PageableCollectionBase2
         : new ArrayList<T_ITEM>();
 
     // getQuery is used because the super ctor may have created it on the fly (in case of a null parameter)
-    getQuery().addPropertyChangeListener(QueryParams.PROP_EFFECTIVE_FILTER, changeFilterListener);
-    getQuery().addPropertyChangeListener(QueryParams.PROP_EFFECTIVE_SORT_ORDER, changeSortOrderListener);
+    getQueryParams().addPropertyChangeListener(QueryParams.PROP_EFFECTIVE_FILTER, changeFilterListener);
+    getQueryParams().addPropertyChangeListener(QueryParams.PROP_EFFECTIVE_SORT_ORDER, changeSortOrderListener);
   }
 
   @Override
@@ -128,14 +128,14 @@ public class PageableInMemCollectionImpl<T_ITEM> extends PageableCollectionBase2
 
   private Comparator<T_ITEM> _getSortOrderComparator() {
     if (sortOrderComparator == null) {
-      sortOrderComparator = inMemQueryEvaluator.getComparator(getQuery().getEffectiveSortOrder());
+      sortOrderComparator = inMemQueryEvaluator.getComparator(getQueryParams().getEffectiveSortOrder());
     }
     return sortOrderComparator;
   }
 
   private List<T_ITEM> _getObjects() {
     if (objects == null) {
-      if (originalObjects.isEmpty()) {
+      if (originalObjects.isEmpty() || !getQueryParams().isExecQuery()) {
         objects = Collections.emptyList();
       }
       else {
@@ -169,7 +169,7 @@ public class PageableInMemCollectionImpl<T_ITEM> extends PageableCollectionBase2
 
   /** Generates a list of filtered items based on the given list. */
   private List<T_ITEM> _filter(List<T_ITEM> unfilteredList) {
-    FilterExpression filterExpression = getQuery().getFilterExpression();
+    FilterExpression filterExpression = getQueryParams().getFilterExpression();
     if (filterExpression == null) {
       return unfilteredList;
     }

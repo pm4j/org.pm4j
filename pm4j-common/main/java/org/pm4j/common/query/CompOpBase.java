@@ -7,10 +7,22 @@ import java.util.List;
 import org.pm4j.common.exception.CheckedExceptionWrapper;
 import org.pm4j.core.util.lang.CloneUtil;
 
+/**
+ * A basic compare operator implementation.
+ *
+ * @param <T_VALUE>
+ *
+ * @author olaf boede
+ */
 public abstract class CompOpBase<T_VALUE> implements CompOp {
 
-  private boolean ignoreCase = true;
-  private boolean ignoreSpaces = true;
+  private static final long serialVersionUID = 1L;
+
+  /** Relevant for string attribues only. */
+  private boolean ignoreCase = false;
+  /** Relevant for string attribues only. */
+  private boolean ignoreSpaces = false;
+
   private String name;
   private ValueNeeded valueNeeded = ValueNeeded.OPTIONAL;
   private List<ValueOption> valueOptions = new ArrayList<ValueOption>();

@@ -68,9 +68,9 @@ public interface PmTable2<T_ROW_PM> extends PmObject, PmDataInput {
   int getNumOfPageRows();
 
   /**
-   * @return The total size of the un-filtered row set.
+   * @return The total size of the un-filtered row set behind this table PM.
    */
-  long getTotalNumOfRowPms();
+  long getTotalNumOfPmRows();
 
   /** @deprecated Please use {@link #getNumOfPageRowPms()} */
   int getTotalNumOfRows();
@@ -97,7 +97,7 @@ public interface PmTable2<T_ROW_PM> extends PmObject, PmDataInput {
   /**
    * @return the query behind this table.
    */
-  QueryParams getPmQuery();
+  QueryParams getPmQueryParams();
 
   /**
    * @return the query options that can be offered to the user to define query constraints.

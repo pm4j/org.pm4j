@@ -235,7 +235,7 @@ public class PmTableColImpl2 extends PmObjectBase implements PmTableCol2 {
         }
       }
       PmTableImpl2<?, ?> pmTable = getPmTableImpl();
-      pmTable.getPmPageableCollection().getQuery().setSortOrder(sortOrder);
+      pmTable.getPmPageableCollection().getQueryParams().setSortOrder(sortOrder);
 
       // TODO: move to a listerner within the table implementation.
       // fire a value change event.

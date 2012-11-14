@@ -9,9 +9,8 @@ import org.pm4j.common.pageable.PageableCollection2;
 import org.pm4j.common.pageable.inmem.PageableInMemCollectionImpl;
 import org.pm4j.common.pageable.querybased.PageableQueryCollection;
 import org.pm4j.common.pageable.querybased.PageableQueryService;
-import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.query.QueryOptions;
-import org.pm4j.common.query.QueryOptionsImpl;
+import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.selection.SelectionHandler;
 import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmObject;
@@ -121,12 +120,12 @@ public class PageablePmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> imple
    *          The set of beans to handle.
    */
   public PageablePmBeanCollection(PmObject pmCtxt, Collection<T_BEAN> beans) {
-    this(pmCtxt, beans, new QueryOptionsImpl(), null);
+    this(pmCtxt, beans, new QueryOptions(), null);
   }
 
   @Override
-  public QueryParams getQuery() {
-    return beans.getQuery();
+  public QueryParams getQueryParams() {
+    return beans.getQueryParams();
   }
 
   @Override

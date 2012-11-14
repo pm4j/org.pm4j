@@ -1,6 +1,10 @@
 package org.pm4j.common.query;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -8,7 +12,11 @@ import java.util.List;
  *
  * @author olaf boede
  */
-public interface QueryOptions {
+public class QueryOptions {
+
+  private Map<String, SortOrder> nameToSortOrderMap = new HashMap<String, SortOrder>();
+  private SortOrder defaultSortOrder;
+  private List<FilterCompareDefinition> filterCompareDefinitions = new ArrayList<FilterCompareDefinition>();
 
   /**
    * Provides the sort order for the given attribute.
@@ -18,14 +26,26 @@ public interface QueryOptions {
    * @param attrName name
    * @return the corresponding sort order definition or <code>null</code>.
    */
-  SortOrder getSortOrder(String attrName);
+  public SortOrder getSortOrder(String attrName) {
+    return nameToSortOrderMap.get(attrName);
+  }
+
+  public void addSortOrder(String name, SortOrder sortOrder) {
+    nameToSortOrderMap.put(name, sortOrder);
+  }
 
   /**
    * Provides the default sort order.
    *
    * @return the default sort order or <code>null</code> is none is defined.
    */
-  SortOrder getDefaultSortOrder();
+  public SortOrder getDefaultSortOrder() {
+    return defaultSortOrder;
+  }
+
+  public void setDefaultSortOrder(SortOrder defaultSortOrder) {
+    this.defaultSortOrder = defaultSortOrder;
+  }
 
   /**
    * Provides the set of available compare definitions.
@@ -34,6 +54,12 @@ public interface QueryOptions {
    *
    * @return the filter definition. Returns never <code>null</code>.
    */
-  List<FilterCompareDefinition> getCompareDefinitions();
+  public List<FilterCompareDefinition> getCompareDefinitions() {
+    return filterCompareDefinitions;
+  }
+
+  public void addFilterCompareDefinition(FilterCompareDefinition... definitions) {
+    this.filterCompareDefinitions.addAll(Arrays.asList(definitions));
+  }
 
 }

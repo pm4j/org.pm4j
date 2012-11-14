@@ -8,7 +8,7 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.pm4j.common.query.QueryOptionsImpl;
+import org.pm4j.common.query.QueryOptions;
 import org.pm4j.core.pm.annotation.PmBeanCfg;
 import org.pm4j.core.pm.annotation.PmFactoryCfg;
 import org.pm4j.core.pm.impl.PmAttrIntegerImpl;
@@ -34,7 +34,7 @@ public class PmTable2Test {
 
     myTablePm = new TablePm(new PmConversationImpl());
 
-    QueryOptionsImpl qo = new QueryOptionsImpl();
+    QueryOptions qo = new QueryOptions();
 //    qo.addSortOrder("name.valueLocalized", new InMemSortOrder<Comparable<?>>(false));
 //    qo.setDefaultSortOrder(defaultSortOrder)
 

@@ -1,10 +1,13 @@
 package org.pm4j.common.query;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
+import org.pm4j.common.exception.CheckedExceptionWrapper;
 import org.pm4j.common.pageable.querybased.PageableQueryService;
 import org.pm4j.common.query.inmem.InMemQueryEvaluator;
-import org.pm4j.common.util.beanproperty.PropertyChangeSupported;
+import org.pm4j.common.util.beanproperty.PropertyChangeSupportedBase;
 
 /**
  * Interface for query specifications.
@@ -19,13 +22,36 @@ import org.pm4j.common.util.beanproperty.PropertyChangeSupported;
  *
  * @author olaf boede
  */
-public interface QueryParams extends PropertyChangeSupported, Cloneable, Serializable {
+public class QueryParams extends PropertyChangeSupportedBase implements Cloneable, Serializable {
 
   /** Identifier of the property change event that gets fired if the effective sort order gets changed. */
   public static final String PROP_EFFECTIVE_SORT_ORDER = "effectiveSortOrder";
 
   /** Identifier of the property change event that gets fired if the effective query filter gets changed. */
   public static final String PROP_EFFECTIVE_FILTER = "effectiveFilter";
+
+  private static final long serialVersionUID = 1L;
+
+  private SortOrder sortOrder;
+  private SortOrder defaultSortOrder;
+  private FilterExpression filterExpression;
+  private Map<String, Object> baseQueryParams = new HashMap<String, Object>();
+  /** A switch to allow/prevent query execution. */
+  private boolean execQuery = true;
+
+  /**
+   * Creates a new instance.
+   */
+  public QueryParams() {
+    this(null);
+  }
+
+  /**
+   * @param defaultSortOrder the default sort order.
+   */
+  public QueryParams(SortOrder defaultSortOrder) {
+    this.defaultSortOrder = defaultSortOrder;
+  }
 
 
   /**
@@ -36,14 +62,23 @@ public interface QueryParams extends PropertyChangeSupported, Cloneable, Seriali
    * @param sortOrder
    *          the sort order to use.
    */
-  void setSortOrder(SortOrder sortOrder);
+  public void setSortOrder(SortOrder sortOrder) {
+    SortOrder oldEffectiveOrder = getEffectiveSortOrder();
+
+    this.sortOrder = sortOrder;
+
+    SortOrder newEffectiveOrder = getEffectiveSortOrder();
+    firePropertyChange(PROP_EFFECTIVE_SORT_ORDER, oldEffectiveOrder, newEffectiveOrder);
+  }
 
   /**
    * Provides the value that was set with {@link #setSortOrder(SortOrder)}.
    *
    * @return the value.
    */
-  SortOrder getSortOrder();
+  public SortOrder getSortOrder() {
+    return sortOrder;
+  }
 
   /**
    * Defines the (optional) initial sort order.
@@ -53,7 +88,14 @@ public interface QueryParams extends PropertyChangeSupported, Cloneable, Seriali
    * @param sortOrder
    *          the initial sort order to use.
    */
-  void setDefaultSortOrder(SortOrder sortOrder);
+  public void setDefaultSortOrder(SortOrder sortOrder) {
+    SortOrder oldEffectiveOrder = getEffectiveSortOrder();
+
+    this.defaultSortOrder = sortOrder;
+
+    SortOrder newEffectiveOrder = getEffectiveSortOrder();
+    firePropertyChange(PROP_EFFECTIVE_SORT_ORDER, oldEffectiveOrder, newEffectiveOrder);
+  }
 
   /**
    * Provides the default sort order definition that is usually used if no other sort order was
@@ -63,7 +105,9 @@ public interface QueryParams extends PropertyChangeSupported, Cloneable, Seriali
    *
    * @return the default sort order.
    */
-  SortOrder getDefaultSortOrder();
+  public SortOrder getDefaultSortOrder() {
+    return defaultSortOrder;
+  }
 
   /**
    * Provides the currently applied sort order.<br>
@@ -73,28 +117,41 @@ public interface QueryParams extends PropertyChangeSupported, Cloneable, Seriali
    *
    * @return the current sort order.
    */
-  SortOrder getEffectiveSortOrder();
+  public SortOrder getEffectiveSortOrder() {
+    return sortOrder != null
+        ? sortOrder
+        : defaultSortOrder;
+  }
 
   /**
    * Defines a new filter expression to be used.
    *
    * @param expr the new expression. May be <code>null</code> if filtering should be switched off.
    */
-  void setFilterExpression(FilterExpression expr);
+  public void setFilterExpression(FilterExpression expr) {
+    FilterExpression old = this.filterExpression;
+    this.filterExpression = expr;
+
+    firePropertyChange(PROP_EFFECTIVE_FILTER, old, expr);
+  }
 
   /**
    * Provides the current filter expression.
    *
    * @return the current filter expression. May be <code>null</code>.
    */
-  FilterExpression getFilterExpression();
+  public FilterExpression getFilterExpression() {
+    return filterExpression;
+  }
 
   /**
    * Provides the (optional) parameter object for a query the filter is based on.
    *
    * @return the value set by {@link #setBaseQueryParam(Object)}.
    */
-  Object getBaseQueryParam(String name);
+  public Object getBaseQueryParam(String name) {
+    return baseQueryParams.get(name);
+  }
 
   /**
    * Sets an optional parameter object and fires a property change event for
@@ -111,5 +168,45 @@ public interface QueryParams extends PropertyChangeSupported, Cloneable, Seriali
    * @param baseQueryParam
    *          the new parameter. May be <code>null</code>.
    */
-  void setBaseQueryParam(String name, Object baseQueryParam);
+  public void setBaseQueryParam(String name, Object baseQueryParam) {
+    Object oldBaseQueryParam = this.baseQueryParams.get(name);
+    this.baseQueryParams.put(name, baseQueryParam);
+    firePropertyChange(PROP_EFFECTIVE_FILTER, oldBaseQueryParam, baseQueryParam);
+  }
+
+  /**
+   * Allows to switch the query execution on or off.
+   * <p>
+   * The default value is <code>true</code>.
+   *
+   * @param execQuery
+   *          <code>false</code> causes an empty result set.<br>
+   *          <code>true</code> switched usual query execution on.
+   */
+  public void setExecQuery(boolean execQuery) {
+    boolean oldValue = this.execQuery;
+    this.execQuery = execQuery;
+    firePropertyChange(PROP_EFFECTIVE_FILTER, oldValue, execQuery);
+  }
+
+  /**
+   * Provides the current query execution switch state.
+   *
+   * @return <code>true</code> if the query should be executed to find results.
+   */
+  public boolean isExecQuery() {
+    return execQuery;
+  }
+
+  @Override
+  public QueryParams clone() {
+    try {
+      QueryParams clone = (QueryParams)super.clone();
+      return clone;
+    } catch (CloneNotSupportedException e) {
+      throw new CheckedExceptionWrapper(e);
+    }
+  }
+
+
 }

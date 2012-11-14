@@ -43,8 +43,8 @@ public class PageableIdCollectionImpl<T_ITEM, T_ID> extends PageableCollectionBa
       }
     };
 
-    getQuery().addPropertyChangeListener(QueryParams.PROP_EFFECTIVE_SORT_ORDER, resetItemsOnQueryChangeListener);
-    getQuery().addPropertyChangeListener(QueryParams.PROP_EFFECTIVE_FILTER, resetItemsOnQueryChangeListener);
+    getQueryParams().addPropertyChangeListener(QueryParams.PROP_EFFECTIVE_SORT_ORDER, resetItemsOnQueryChangeListener);
+    getQueryParams().addPropertyChangeListener(QueryParams.PROP_EFFECTIVE_FILTER, resetItemsOnQueryChangeListener);
   }
 
   @Override
@@ -85,9 +85,9 @@ public class PageableIdCollectionImpl<T_ITEM, T_ID> extends PageableCollectionBa
   @Override
   public long getUnfilteredItemCount() {
     if (unfilteredItemCount == -1) {
-      unfilteredItemCount = (getQuery().getFilterExpression() == null)
+      unfilteredItemCount = (getQueryParams().getFilterExpression() == null)
           ? getNumOfItems()
-          : service.getUnfilteredItemCount(getQuery());
+          : service.getUnfilteredItemCount(getQueryParams());
     }
     return unfilteredItemCount;
   }
@@ -135,6 +135,7 @@ public class PageableIdCollectionImpl<T_ITEM, T_ID> extends PageableCollectionBa
    *
    * @return the ID set according to the current query configuration.
    */
+  @SuppressWarnings("unchecked")
   protected List<T_ID> getIds() {
     if (ids != null) {
       return ids;
@@ -144,7 +145,11 @@ public class PageableIdCollectionImpl<T_ITEM, T_ID> extends PageableCollectionBa
     synchronized (this) {
       if (ids == null) {
         currentPageItems = null;
-        ids = service.findIds(getQuery());
+        QueryParams queryParams = getQueryParams();
+        ids = queryParams.isExecQuery()
+            ? service.findIds(queryParams)
+            // In no-exec case: an unmodifyable collection.
+            : Collections.EMPTY_LIST;
       }
       return ids;
     }
