@@ -3,6 +3,7 @@ package org.pm4j.core.pm.impl.changehandler;
 import java.util.Collection;
 import java.util.Set;
 
+import org.pm4j.core.pm.PmCommandDecorator;
 import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmTable;
 import org.pm4j.core.pm.impl.PmTableUtil;
@@ -20,7 +21,7 @@ import org.pm4j.core.pm.impl.PmTableUtil;
  *
  * @author olaf boede
  */
-public interface MasterPmHandler {
+public interface MasterPmHandler extends PmCommandDecorator {
 
   /**
    * Indicates if changes occurred within the handled details area.
@@ -73,23 +74,5 @@ public interface MasterPmHandler {
    * @return The configured {@link DetailsPmHandler} set.
    */
   Collection<DetailsPmHandler<?>> getDetailsPmHandlers();
-
-  /**
-   * Gets called before a master record selection change is done.
-   *
-   * @return <code>true</code> allows the change. <code>false</code> prevents it.
-   */
-  boolean canSwitch();
-
-  /**
-   * Gets called after a master record selection change.
-   * <p>
-   * Sets the handler to an 'unchanged' state by clearing the set of {@link #changedMasterBeans}.
-   * Re-adjusts the details area by calling {@link DetailsPmHandler#afterMasterRecordChange(Object)}
-   * with the new selected table row.
-   *
-   * @param event the master PM value change event.
-   */
-  void onMasterTableValueChange(PmEvent event);
 
 }

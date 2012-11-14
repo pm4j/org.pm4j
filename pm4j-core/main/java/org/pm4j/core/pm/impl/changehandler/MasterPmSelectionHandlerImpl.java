@@ -14,6 +14,7 @@ import org.apache.commons.logging.LogFactory;
 import org.pm4j.common.selection.Selection;
 import org.pm4j.common.selection.SelectionHandler;
 import org.pm4j.common.util.beanproperty.PropertyAndVetoableChangeListener;
+import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmDataInput;
 import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmEventListener;
@@ -46,6 +47,7 @@ public class MasterPmSelectionHandlerImpl<T_MASTER_BEAN> implements MasterPmReco
   private final SelectionHandler<?> selectionHandler;
   private Set<T_MASTER_BEAN>  changedMasterBeans = new HashSet<T_MASTER_BEAN>();
   private List<DetailsPmHandler<?>> detailsHandlers = new ArrayList<DetailsPmHandler<?>>();
+  private PropertyAndVetoableChangeListener masterSelectionChangeListener;
 
   /**
    * Creates an instance uing a {@link DetailsPmHandler} that is responsible
@@ -98,7 +100,7 @@ public class MasterPmSelectionHandlerImpl<T_MASTER_BEAN> implements MasterPmReco
   public void startObservers() {
     selectionHandler.addPropertyAndVetoableListener(
         SelectionHandler.PROP_SELECTION,
-        makeTableSelectionChangeDecorator()
+        makeTableSelectionChangeListener()
         );
     PmEventApi.addPmEventListener(masterPm, PmEvent.VALUE_CHANGE, makeTableValueChangeListener());
 
@@ -212,7 +214,7 @@ public class MasterPmSelectionHandlerImpl<T_MASTER_BEAN> implements MasterPmReco
    *
    * @return The decorator.
    */
-  protected PropertyAndVetoableChangeListener makeTableSelectionChangeDecorator() {
+  protected PropertyAndVetoableChangeListener makeTableSelectionChangeListener() {
     return new MasterSelectionChangeListener();
   }
 
@@ -250,6 +252,36 @@ public class MasterPmSelectionHandlerImpl<T_MASTER_BEAN> implements MasterPmReco
     }
 
     return allDetailsValid;
+  }
+
+  // XXX olaf: translates to a property change event as it would be thrown by the selection handler.
+  @Override
+  public boolean beforeDo(PmCommand cmd) {
+	PropertyAndVetoableChangeListener l = getMasterSelectionChangeListener();
+	try {
+	  l.vetoableChange(new PropertyChangeEvent(getMasterPm(), SelectionHandler.PROP_SELECTION, null, null));
+      return true;
+    } catch (PropertyVetoException e) {
+      if (LOG.isDebugEnabled()) {
+		LOG.debug("Selection change for " + getMasterPm().getPmRelativeName()
+						+ " was prevented by a veto: " + e.getMessage());
+	  }
+	  return false;
+	}
+  }
+
+  // XXX olaf: translates to a property change event as it would be thrown by the selection handler.
+  @Override
+  public void afterDo(PmCommand cmd) {
+	PropertyAndVetoableChangeListener l = getMasterSelectionChangeListener();
+	l.propertyChange(new PropertyChangeEvent(getMasterPm(), SelectionHandler.PROP_SELECTION, null,	null));
+  }
+
+  private PropertyAndVetoableChangeListener getMasterSelectionChangeListener() {
+    if (masterSelectionChangeListener == null) {
+      masterSelectionChangeListener = makeTableSelectionChangeListener();
+    }
+    return masterSelectionChangeListener;
   }
 
   /**
@@ -304,6 +336,5 @@ public class MasterPmSelectionHandlerImpl<T_MASTER_BEAN> implements MasterPmReco
         ? getSelectedMasterBean()
         : null;
   }
-
 
 }

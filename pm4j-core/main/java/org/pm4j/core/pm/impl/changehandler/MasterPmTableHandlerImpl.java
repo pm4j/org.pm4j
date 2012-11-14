@@ -45,6 +45,7 @@ public class MasterPmTableHandlerImpl<T_MASTER_BEAN> implements MasterPmRecordHa
   private final PmTable<?>    masterTablePm;
   private Set<T_MASTER_BEAN>  changedMasterBeans = new HashSet<T_MASTER_BEAN>();
   private List<DetailsPmHandler<?>> detailsHandlers = new ArrayList<DetailsPmHandler<?>>();
+  private PmCommandDecorator masterSelectionChangeDecorator;
 
   /**
    * Creates an instance uing a {@link DetailsPmHandler} that is responsible
@@ -93,7 +94,7 @@ public class MasterPmTableHandlerImpl<T_MASTER_BEAN> implements MasterPmRecordHa
 
   @Override
   public void startObservers() {
-    masterTablePm.addDecorator(makeTableSelectionChangeDecorator(), TableChange.SELECTION);
+    masterTablePm.addDecorator(this, TableChange.SELECTION);
     PmEventApi.addPmEventListener(masterTablePm, PmEvent.VALUE_CHANGE, makeTableValueChangeListener());
   }
 
@@ -117,7 +118,7 @@ public class MasterPmTableHandlerImpl<T_MASTER_BEAN> implements MasterPmRecordHa
    *
    * @return <code>true</code> if one details area returns <code>true</code> for the call <code>isPmValueChanged()</code>.
    */
-  protected boolean isCurrentDetailsAreaChanged() {
+  public boolean isCurrentDetailsAreaChanged() {
     for (DetailsPmHandler<?> dh : detailsHandlers) {
       Object detail = dh.getDetailsPm();
       if ((detail instanceof PmDataInput) &&
@@ -129,7 +130,7 @@ public class MasterPmTableHandlerImpl<T_MASTER_BEAN> implements MasterPmRecordHa
     return false;
   }
 
-  protected T_MASTER_BEAN getSelectedMasterBean() {
+  public T_MASTER_BEAN getSelectedMasterBean() {
     @SuppressWarnings("unchecked")
     PmBean<T_MASTER_BEAN> selectedRow = (PmBean<T_MASTER_BEAN>) masterTablePm.getSelectedRow();
     return selectedRow != null
@@ -159,7 +160,7 @@ public class MasterPmTableHandlerImpl<T_MASTER_BEAN> implements MasterPmRecordHa
    *
    * @param event the master PM value change event.
    */
-  public void onMasterTableValueChange(PmEvent event) {
+  protected void onMasterTableValueChange(PmEvent event) {
     if (LOG.isDebugEnabled() && isChangeRegistered()) {
       LOG.debug("Reset master-details changed state for " + PmUtil.getPmLogString(masterTablePm));
     }
@@ -199,7 +200,7 @@ public class MasterPmTableHandlerImpl<T_MASTER_BEAN> implements MasterPmRecordHa
    *
    * @return The decorator.
    */
-  protected PmCommandDecorator makeTableSelectionChangeDecorator() {
+  public PmCommandDecorator makeTableSelectionChangeDecorator() {
     return new MasterSelectionChangeListener();
   }
 
@@ -212,7 +213,7 @@ public class MasterPmTableHandlerImpl<T_MASTER_BEAN> implements MasterPmRecordHa
    *
    * @return <code>true</code> if the switch can be performed.
    */
-  public boolean canSwitch() {
+  protected boolean canSwitch() {
     return (masterTablePm.getSelectedRow() == null)
         ? true
         : validateDetails();
@@ -239,6 +240,27 @@ public class MasterPmTableHandlerImpl<T_MASTER_BEAN> implements MasterPmRecordHa
     return allDetailsValid;
   }
 
+  protected PmTable<?> getMasterTablePm() {
+    return masterTablePm;
+  }
+
+  @Override
+  public boolean beforeDo(PmCommand cmd) {
+    return getMasterSelectionChangeDecorator().beforeDo(cmd);
+  }
+
+  @Override
+  public void afterDo(PmCommand cmd) {
+    getMasterSelectionChangeDecorator().afterDo(cmd);
+  }
+
+  private PmCommandDecorator getMasterSelectionChangeDecorator() {
+    if (masterSelectionChangeDecorator == null) {
+      masterSelectionChangeDecorator = makeTableSelectionChangeDecorator();
+    }
+    return masterSelectionChangeDecorator;
+  }
+
   /**
    * A decorator that prevents a value change if the details area is not valid
    * and sets the new details area if the change was executed.<br>
@@ -253,7 +275,7 @@ public class MasterPmTableHandlerImpl<T_MASTER_BEAN> implements MasterPmRecordHa
         T_MASTER_BEAN masterBean = getSelectedMasterBean();
         changedMasterBean =
             (masterBean != null) && isCurrentDetailsAreaChanged()
-            ? getCurrentModifiedMasterRecord()
+            ? masterBean
             : null;
 
         return true;
@@ -280,20 +302,6 @@ public class MasterPmTableHandlerImpl<T_MASTER_BEAN> implements MasterPmRecordHa
       }
       changedMasterBean = null;
     }
-
-  }
-
-  protected PmTable<?> getMasterTablePm() {
-    return masterTablePm;
-  }
-
-  /**
-   * @return The currently selected master record in case it is marked a actually changed within the details area. May be <code>null</code>.
-   */
-  private T_MASTER_BEAN getCurrentModifiedMasterRecord() {
-    return isCurrentDetailsAreaChanged()
-        ? getSelectedMasterBean()
-        : null;
   }
 
 }
