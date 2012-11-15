@@ -20,7 +20,6 @@ import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmEventListener;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.api.PmEventApi;
-import org.pm4j.core.pm.api.PmValidationApi;
 import org.pm4j.core.pm.impl.PmUtil;
 
 /**
@@ -73,11 +72,11 @@ public class MasterPmSelectionHandlerImpl<T_MASTER_BEAN> implements MasterPmReco
    *          The table to observe.
    * @param detailsPms The details PM's to observe.
    */
-  public MasterPmSelectionHandlerImpl(PmObject masterPm, SelectionHandler<?> selectionHandler, PmObject... detailsPms) {
+  public MasterPmSelectionHandlerImpl(PmObject masterPm, SelectionHandler<?> selectionHandler, PmDataInput... detailsPms) {
     this.masterPm = masterPm;
     this.selectionHandler = selectionHandler;
-    for (PmObject pm : detailsPms) {
-      addDetailsHander(new DetailsPmObjectHandlerImpl<PmObject, T_MASTER_BEAN>(pm));
+    for (PmDataInput pm : detailsPms) {
+      addDetailsHander(new DetailsPmObjectHandlerImpl<PmDataInput, T_MASTER_BEAN>(pm));
     }
   }
 
@@ -221,60 +220,48 @@ public class MasterPmSelectionHandlerImpl<T_MASTER_BEAN> implements MasterPmReco
   /**
    * Checks if it is allowed to swich to another master record.
    * <p>
-   * The default implementation allows the switch if there is no currently selected master
-   * record.<br>
-   * If that's tha case it checks if the details area is valid.
+   * Validates all registered detail areas by calling {@link DetailsPmHandler#canSwitchMasterRecord()}.
+   * <p>
+   * All details areas get processed, even if the first one is already invalid.
+   * This way the user gets all relevant validation messages for the user operation.
    *
    * @return <code>true</code> if the switch can be performed.
    */
   public boolean canSwitch() {
-    return (selectionHandler.getSelection().getSize() != 1)
-        ? true
-        : validateDetails();
-  }
+    if (selectionHandler.getSelection().getSize() != 1) {
+      return true;
+    }
 
-  /**
-   * Validates all registered details PMs.
-   * <p>
-   * Validates all details areas, even if the first one is already invalid.
-   * This way the user gets all relevant validation messages for the user operation.
-   *
-   * @return <code>true</code> if all details areas are valid.
-   */
-  protected boolean validateDetails() {
     boolean allDetailsValid = true;
     for (DetailsPmHandler<?> dh : detailsHandlers) {
-      Object d = dh.getDetailsPm();
-      if ((d instanceof PmDataInput) &&
-          !PmValidationApi.validateSubTree((PmDataInput)d)) {
+      if (!dh.canSwitchMasterRecord()) {
         allDetailsValid = false;
       }
     }
-
     return allDetailsValid;
   }
 
-  // XXX olaf: translates to a property change event as it would be thrown by the selection handler.
+  // TODO olaf: check if we can simply call canSwitch...
   @Override
   public boolean beforeDo(PmCommand cmd) {
-	PropertyAndVetoableChangeListener l = getMasterSelectionChangeListener();
-	try {
-	  l.vetoableChange(new PropertyChangeEvent(getMasterPm(), SelectionHandler.PROP_SELECTION, null, null));
+	  PropertyAndVetoableChangeListener l = getMasterSelectionChangeListener();
+	  try {
+	    l.vetoableChange(new PropertyChangeEvent(getMasterPm(), SelectionHandler.PROP_SELECTION, null, null));
       return true;
     } catch (PropertyVetoException e) {
       if (LOG.isDebugEnabled()) {
-		LOG.debug("Selection change for " + getMasterPm().getPmRelativeName()
+		    LOG.debug("Selection change for " + getMasterPm().getPmRelativeName()
 						+ " was prevented by a veto: " + e.getMessage());
+	    }
+	    return false;
 	  }
-	  return false;
-	}
   }
 
   // XXX olaf: translates to a property change event as it would be thrown by the selection handler.
   @Override
   public void afterDo(PmCommand cmd) {
-	PropertyAndVetoableChangeListener l = getMasterSelectionChangeListener();
-	l.propertyChange(new PropertyChangeEvent(getMasterPm(), SelectionHandler.PROP_SELECTION, null,	null));
+	  PropertyAndVetoableChangeListener l = getMasterSelectionChangeListener();
+	  l.propertyChange(new PropertyChangeEvent(getMasterPm(), SelectionHandler.PROP_SELECTION, null,	null));
   }
 
   private PropertyAndVetoableChangeListener getMasterSelectionChangeListener() {

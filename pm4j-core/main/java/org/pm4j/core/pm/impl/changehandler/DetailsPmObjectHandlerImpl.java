@@ -1,23 +1,34 @@
 package org.pm4j.core.pm.impl.changehandler;
 
-import org.pm4j.core.pm.PmObject;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.pm4j.core.pm.PmCommandDecorator;
+import org.pm4j.core.pm.PmDataInput;
 import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
 import org.pm4j.core.pm.api.PmMessageUtil;
+import org.pm4j.core.pm.api.PmValidationApi;
 
 /**
  * Default details handler implementation.
  * <p>
- * Just clears all messages after a master record selection change.
+ * It allows a master record switch only if the details area is valid.
+ * <p>
+ * It clears all messages after a master record selection change.
  *
  * @author olaf boede
  *
  * @param <T_DETAILS_PM>
  *          Type of the supported details PM.
  */
-public class DetailsPmObjectHandlerImpl<T_DETAILS_PM extends PmObject, T_MASTER_RECORD> implements DetailsPmHandler<T_DETAILS_PM> {
+public class DetailsPmObjectHandlerImpl<T_DETAILS_PM extends PmDataInput, T_MASTER_RECORD> implements DetailsPmHandler<T_DETAILS_PM> {
 
+  /** The details area PM. */
   private final T_DETAILS_PM detailsPm;
+
+  /** Additional decorators to apply. */
+  private List<PmCommandDecorator> decorators = new ArrayList<PmCommandDecorator>();
 
   /**
    * @param detailsPm The details PM to handle.
@@ -31,6 +42,27 @@ public class DetailsPmObjectHandlerImpl<T_DETAILS_PM extends PmObject, T_MASTER_
     return detailsPm;
   }
 
+  @Override
+  public void addDecorator(PmCommandDecorator decorator) {
+    decorators.add(decorator);
+  }
+
+  @Override
+  public boolean canSwitchMasterRecord() {
+    if (!PmValidationApi.validateSubTree((PmDataInput)detailsPm)) {
+      for (PmCommandDecorator d : decorators) {
+        // TODO olaf: change canSwitch to beforeDo to preserve the original command.
+        if (!d.beforeDo(null)) {
+          return false;
+        }
+      }
+
+      return false;
+    }
+
+    return true;
+  }
+
   /**
    * Just calls the type safe method {@link #afterMasterRecordChangeImpl(Object)}.
    */
@@ -38,6 +70,10 @@ public class DetailsPmObjectHandlerImpl<T_DETAILS_PM extends PmObject, T_MASTER_
   @Override
   public final void afterMasterRecordChange(Object newMasterBean) {
     afterMasterRecordChangeImpl((T_MASTER_RECORD) newMasterBean);
+    for (PmCommandDecorator d : decorators) {
+      // TODO olaf: change canSwitch to afterDo to preserve the original command.
+      d.afterDo(null);
+    }
   }
 
   /**
