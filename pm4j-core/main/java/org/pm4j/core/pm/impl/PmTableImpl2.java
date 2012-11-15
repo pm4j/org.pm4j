@@ -386,6 +386,17 @@ public class PmTableImpl2
     return pmChangeSetHandler.isChanged() || super.isPmValueChangedImpl();
   }
 
+  @Override
+  protected void setPmValueChangedImpl(boolean changed) {
+    super.setPmValueChangedImpl(changed);
+    if (changed == false) {
+      for (PmDataInput p : pmChangeSetHandler.getChangedItems(ChangeKind.ADD, ChangeKind.UPDATE)) {
+        p.setPmValueChanged(false);
+      }
+      pmChangeSetHandler.clearChanges();
+    }
+  }
+
   /**
    * Validates the changed row items only.
    */
