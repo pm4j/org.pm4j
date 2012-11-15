@@ -213,7 +213,7 @@ public abstract class PmBeanBase<T_BEAN>
   /**
    * Informs sub-PMs about a backing bean exchange event.
    */
-  public class SetPmBeanEventVisitor extends PmVisitorAdapter {
+  public static class SetPmBeanEventVisitor extends PmVisitorAdapter {
 
     private final int eventMask;
     private ValueChangeKind changeKind;
