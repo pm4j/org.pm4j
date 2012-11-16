@@ -64,22 +64,6 @@ public class MasterPmSelectionHandlerImpl<T_MASTER_BEAN> implements MasterPmReco
     }
   }
 
-  /**
-   * Creates for each passed details PM a details-default handler ({@link DetailsPmObjectHandlerImpl})
-   * that just clears the details area on master record change.
-   *
-   * @param masterTablePm
-   *          The table to observe.
-   * @param detailsPms The details PM's to observe.
-   */
-  public MasterPmSelectionHandlerImpl(PmObject masterPm, SelectionHandler<?> selectionHandler, PmDataInput... detailsPms) {
-    this.masterPm = masterPm;
-    this.selectionHandler = selectionHandler;
-    for (PmDataInput pm : detailsPms) {
-      addDetailsHander(new DetailsPmObjectHandlerImpl<PmDataInput, T_MASTER_BEAN>(pm));
-    }
-  }
-
   @Override
   public final void addDetailsHander(DetailsPmHandler<?> detailsHandler) {
     this.detailsHandlers.add(detailsHandler);

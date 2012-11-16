@@ -50,14 +50,14 @@ public class DetailsPmObjectHandlerImpl<T_DETAILS_PM extends PmDataInput, T_MAST
   @Override
   public boolean canSwitchMasterRecord() {
     if (!PmValidationApi.validateSubTree((PmDataInput)detailsPm)) {
-      for (PmCommandDecorator d : decorators) {
-        // TODO olaf: change canSwitch to beforeDo to preserve the original command.
-        if (!d.beforeDo(null)) {
-          return false;
-        }
-      }
-
       return false;
+    }
+
+    for (PmCommandDecorator d : decorators) {
+      // TODO olaf: change canSwitch to beforeDo to preserve the original command.
+      if (!d.beforeDo(null)) {
+        return false;
+      }
     }
 
     return true;
