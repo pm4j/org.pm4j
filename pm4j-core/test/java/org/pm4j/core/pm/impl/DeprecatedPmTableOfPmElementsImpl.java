@@ -297,7 +297,7 @@ public class DeprecatedPmTableOfPmElementsImpl<T_ROW_ELEMENT_PM extends PmElemen
   }
 
   @Override
-  public T_ROW_ELEMENT_PM getSelectedRow() {
+  public T_ROW_ELEMENT_PM getCurrentRowPm() {
     // TODO Auto-generated method stub
     return null;
   }

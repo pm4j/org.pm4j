@@ -93,12 +93,20 @@ public interface PmTable<T_ROW_OBJ> extends PmObject, PmDataInput, Filterable, F
   RowSelectMode getRowSelectMode();
 
   /**
-   * Supports {@link RowSelectMode#SINGLE}.
-   * For other select modes it just provides the first selected item.
+   * Provides the single currently active row. This information is usually used
+   * in master-details scenarios.
+   * <p>
+   * In case or {@link RowSelectMode#SINGLE} this is usually the selected row.<br>
+   * In case of {@link RowSelectMode#MULTI} the default implementation returns
+   * <code>null</code>.
+   * <p>
+   * Sub classes with a different 'current row' definition logic
+   * may provide alternate implementations by overriding this method.
    *
-   * @return The selected row or <code>null</code> if none is selected.
+   * @return The currently active (selected) row or <code>null</code> if none is
+   *         active.
    */
-  T_ROW_OBJ getSelectedRow();
+  T_ROW_OBJ getCurrentRowPm();
 
   /**
    * @return The set of all selected rows.

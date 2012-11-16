@@ -131,7 +131,7 @@ public class MasterPmTableHandlerImpl<T_MASTER_BEAN> implements MasterPmRecordHa
 
   public T_MASTER_BEAN getSelectedMasterBean() {
     @SuppressWarnings("unchecked")
-    PmBean<T_MASTER_BEAN> selectedRow = (PmBean<T_MASTER_BEAN>) masterTablePm.getSelectedRow();
+    PmBean<T_MASTER_BEAN> selectedRow = (PmBean<T_MASTER_BEAN>) masterTablePm.getCurrentRowPm();
     return selectedRow != null
         ? selectedRow.getPmBean()
         : null;
@@ -213,7 +213,7 @@ public class MasterPmTableHandlerImpl<T_MASTER_BEAN> implements MasterPmRecordHa
    * @return <code>true</code> if the switch can be performed.
    */
   protected boolean canSwitch() {
-    return (masterTablePm.getSelectedRow() == null)
+    return (masterTablePm.getCurrentRowPm() == null)
         ? true
         : validateDetails();
   }

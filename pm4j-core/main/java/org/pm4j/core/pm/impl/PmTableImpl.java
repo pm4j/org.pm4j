@@ -301,7 +301,7 @@ public class PmTableImpl
   }
 
   @Override
-  public T_ROW_ELEMENT_PM getSelectedRow() {
+  public T_ROW_ELEMENT_PM getCurrentRowPm() {
     Collection<T_ROW_ELEMENT_PM> items = getSelectedRows();
     return (!items.isEmpty())
             ? items.iterator().next()
