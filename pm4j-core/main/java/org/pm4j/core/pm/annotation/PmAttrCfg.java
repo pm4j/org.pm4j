@@ -7,7 +7,6 @@ import java.lang.annotation.Target;
 
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmBean;
-import org.pm4j.core.pm.PmObject;
 
 
 /**
@@ -118,20 +117,6 @@ public @interface PmAttrCfg {
    * @return The name of the related bean field to read JSR-303 information from.
    */
   String beanInfoField() default "";
-
-  /**
-   * May be specified alternatively to {@link #defaultValue()}.
-   * <p>
-   * Denotes a path expression that points to the default value.
-   * <p>
-   * If used together with {@link #defaultValue()}, first this path will be
-   * evaluated. If that results to <code>null</code>, the specified default
-   * value will be used.
-   *
-   * @return A path that will be evaluated using the method
-   *         {@link PmObject#findPmProperty(String)}.
-   */
-  String defaultPath() default "";
 
   /**
    * @return Key of a format definition used for string conversions.

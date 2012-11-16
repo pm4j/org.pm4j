@@ -54,7 +54,6 @@ import org.pm4j.core.pm.annotation.PmOptionCfg.NullOption;
 import org.pm4j.core.pm.annotation.PmTitleCfg;
 import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.api.PmEventApi;
-import org.pm4j.core.pm.api.PmExpressionApi;
 import org.pm4j.core.pm.api.PmLocalizeApi;
 import org.pm4j.core.pm.api.PmMessageUtil;
 import org.pm4j.core.pm.impl.cache.PmCacheStrategy;
@@ -820,21 +819,21 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
    * annotation {@link PmAttrCfg#defaultValue()}.
    * <p>
    * Subclasses may override the method {@link #getDefaultValueImpl()} to provide
-   * some special implementation.<br>
-   * For example an internationalized value...
+   * some special implementation.
    *
    * @return The default value for this attribute.
    */
   protected final T_PM_VALUE getDefaultValue() {
     return getDefaultValueImpl();
   }
-
+  
   /**
    * Reads a PM request attribute with the name of the attribute.
    *
    * @return The read request attribute, converted to the attribute specific
    *         type. <code>null</code> if there is no default value attribute
    *         within the given request.
+   * @deprecated remove as soon as a customer scenario is cleaned.
    */
   private T_PM_VALUE getDefaultValueFromRequest() {
     String reqValue = getPmConversationImpl().getPmToViewTechnologyConnector().readRequestValue(getPmName());
@@ -848,49 +847,30 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   }
 
   /**
-   * The default implementation provides the default value provided by the
-   * annotation {@link PmAttrCfg#defaultPath()} and (if that was
-   * <code>null</code>) the value provided by {@link PmAttrCfg#defaultValue()}.
+   * The default implementation provides the value provided by {@link PmAttrCfg#defaultValue()}.
    * <p>
    * Subclasses may override this method to provide some special implementation.
-   * <br>
-   * For example an internationalized value...
-   * <p>
-   * The default implemenation internally handles the injection of request values to the
-   * attributes.
    *
    * @return The default value for this attribute.
    */
   // FIXME olaf: shouldn't that method return T_BEAN_VALUE ?
   //             not yet changed because of the effort to change the meta data handling code...
   // alternatively: add a second method getDefaultBackingValue()...
-  @SuppressWarnings("unchecked")
   protected T_PM_VALUE getDefaultValueImpl() {
     MetaData md = getOwnMetaData();
-    if (md.defaultPath != null) {
-      // TODO: store a precompiled path
-      // TODO: add local navigation within the element (like @valuePath}
-      T_BEAN_VALUE bv = (T_BEAN_VALUE) PmExpressionApi.findByExpression(this, md.defaultPath);
-      if (bv != null) {
-        return convertBackingValueToPmValue(bv);
-      }
-    }
+    T_PM_VALUE defaultValue = null;
 
-    // Lazy static default value initialization.
-    // Reason: The converter does not yet work a PM initialization time.
-    if (md.defaultValue == MetaData.NOT_INITIALIZED) {
+    if (StringUtils.isNotBlank(md.defaultValueString)) {
       try {
-        md.defaultValue = StringUtils.isNotBlank(md.defaultValueString)
-                ? stringToValueImpl(md.defaultValueString)
-                : null;
+        defaultValue = stringToValueImpl(md.defaultValueString);
       } catch (PmConverterException e) {
         throw new PmRuntimeException(this, e);
       }
     }
 
-    return (T_PM_VALUE) (md.defaultValue != null
-                ? md.defaultValue
-                : getDefaultValueFromRequest());
+    return (T_PM_VALUE) (defaultValue != null
+            ? defaultValue
+            : getDefaultValueFromRequest());
   }
 
   /**
@@ -1273,7 +1253,6 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
       if (StringUtils.isNotEmpty(fieldAnnotation.defaultValue())) {
         myMetaData.defaultValueString = fieldAnnotation.defaultValue();
       }
-      myMetaData.defaultPath = StringUtils.defaultIfEmpty(fieldAnnotation.defaultPath(), null);
 
       myMetaData.maxLen = fieldAnnotation.maxLen();
       myMetaData.minLen = fieldAnnotation.minLen();
@@ -1440,9 +1419,6 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     private PmAttrCfg.AttrAccessKind        accessKind              = PmAttrCfg.AttrAccessKind.DEFAULT;
     private String                          formatResKey;
     private String                          defaultValueString;
-    /** The default provided by the annotation, converted to T_PM_VALUE. */
-    private Object                          defaultValue            = NOT_INITIALIZED;
-    private String                          defaultPath;
     private PmCacheStrategy                 cacheStrategyForOptions = PmCacheStrategyNoCache.INSTANCE;
     private PmCacheStrategy                 cacheStrategyForValue   = PmCacheStrategyNoCache.INSTANCE;
     private Converter<?>                    converter;
