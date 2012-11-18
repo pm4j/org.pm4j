@@ -43,7 +43,6 @@ import org.pm4j.core.pm.PmOption;
 import org.pm4j.core.pm.PmOptionSet;
 import org.pm4j.core.pm.PmVisitor;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
-import org.pm4j.core.pm.annotation.PmAttrCfg.AttrAccessKind;
 import org.pm4j.core.pm.annotation.PmAttrCfg.Restriction;
 import org.pm4j.core.pm.annotation.PmCacheCfg;
 import org.pm4j.core.pm.annotation.PmCacheCfg.CacheMode;
@@ -70,6 +69,8 @@ import org.pm4j.core.pm.impl.pathresolver.PathResolver;
 import org.pm4j.core.pm.impl.pathresolver.PmExpressionPathResolver;
 import org.pm4j.core.util.reflection.BeanAttrAccessor;
 import org.pm4j.core.util.reflection.BeanAttrAccessorImpl;
+import org.pm4j.core.util.reflection.ClassUtil;
+import org.pm4j.core.util.reflection.ReflectionException;
 import org.pm4j.navi.NaviLink;
 
 /**
@@ -1226,7 +1227,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     }
 
 
-
+    PmAttrCfg.AttrAccessKind accessKindCfgValue = PmAttrCfg.AttrAccessKind.DEFAULT;
     boolean useReflection = true;
     if (fieldAnnotation != null) {
       myMetaData.hideWhenEmpty = fieldAnnotation.hideWhenEmpty();
@@ -1242,7 +1243,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
         myMetaData.valueRestriction = fieldAnnotation.valueRestriction();
       }
 
-      myMetaData.accessKind = fieldAnnotation.accessKind();
+      accessKindCfgValue = fieldAnnotation.accessKind();
       myMetaData.formatResKey = StringUtils.defaultIfEmpty(fieldAnnotation.formatResKey(), null);
       if (StringUtils.isNotEmpty(fieldAnnotation.defaultValue())) {
         myMetaData.defaultValueString = fieldAnnotation.defaultValue();
@@ -1256,7 +1257,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
                                            ") > maxLen(" + myMetaData.maxLen + ")");
       }
 
-      switch (myMetaData.accessKind) {
+      switch (accessKindCfgValue) {
         case DEFAULT:
           if (StringUtils.isNotBlank(fieldAnnotation.valuePath())) {
             myMetaData.valuePathResolver = PmExpressionPathResolver.parse(fieldAnnotation.valuePath(), true);
@@ -1287,41 +1288,29 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
       }
     }
 
-    if (myMetaData.accessKind == AttrAccessKind.DEFAULT) {
-      try {
-        // FIXME: shouldn't be required. overriding should make internal strategies obsolete.
-        Method m = getClass().getDeclaredMethod("getBackingValueImpl");
-        if (!m.getDeclaringClass().equals(PmAttrBase.class)) {
-          myMetaData.accessKind = AttrAccessKind.OVERRIDE;
-          myMetaData.valueAccessStrategy = ValueAccessOverride.INSTANCE;
-          useReflection = false;
-        }
-      } catch (SecurityException e) {
-        throw new PmRuntimeException(this, "Reflection base class analysis failed for PM class '" + getClass() + "'.", e);
-      } catch (NoSuchMethodException e) {
-        // ok. the method is not overridden locally.
-      }
-    }
-
     // Automatic reflection access is only supported for fix PmAttr fields in a PmBean container:
     if (useReflection  &&
         myMetaData.isPmField &&
         beanClass != null) {
       try {
         myMetaData.beanAttrAccessor = new BeanAttrAccessorImpl(beanClass, getPmName());
-      }
-      catch (RuntimeException e) {
-        PmObjectUtil.throwAsPmRuntimeException(this, e);
-      }
 
-      if (myMetaData.beanAttrAccessor.getFieldClass().isPrimitive()) {
-        myMetaData.primitiveType = true;
-        if (fieldAnnotation == null) {
-          myMetaData.required = true;
+        if (myMetaData.beanAttrAccessor.getFieldClass().isPrimitive()) {
+          myMetaData.primitiveType = true;
+          if (fieldAnnotation == null) {
+            myMetaData.required = true;
+          }
+        }
+
+        myMetaData.valueAccessStrategy = ValueAccessReflection.INSTANCE;
+      }
+      catch (ReflectionException e) {
+        if (ClassUtil.isMethodOverridden(PmAttrBase.class, getClass(), "getBackingValueImpl")) {
+          myMetaData.valueAccessStrategy = ValueAccessOverride.INSTANCE;
+        } else {
+          PmObjectUtil.throwAsPmRuntimeException(this, e);
         }
       }
-
-      myMetaData.valueAccessStrategy = ValueAccessReflection.INSTANCE;
     }
 
     // Use default attribute title provider if no specific provider was configured.
@@ -1337,6 +1326,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     myMetaData.cacheStrategyForValue = readCacheStrategy(PmCacheCfg.ATTR_VALUE, cacheAnnotations, CACHE_STRATEGIES_FOR_VALUE);
 
   }
+
 
   private void zz_readBeanValidationRestrictions(Class<?> beanClass, PmAttrCfg fieldAnnotation, MetaData myMetaData) {
     if (PmImplUtil.getBeanValidator() == null)
@@ -1410,7 +1400,6 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     private boolean                         primitiveType;
     private PathResolver                    valuePathResolver;
     private PathResolver                    valueContainingObjPathResolver = PassThroughPathResolver.INSTANCE;
-    private PmAttrCfg.AttrAccessKind        accessKind              = PmAttrCfg.AttrAccessKind.DEFAULT;
     private String                          formatResKey;
     private String                          defaultValueString;
     private PmCacheStrategy                 cacheStrategyForOptions = PmCacheStrategyNoCache.INSTANCE;

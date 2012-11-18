@@ -426,6 +426,38 @@ public class ClassUtil {
     return null;
   }
 
+  /**
+   * Checks if the given subclass (or one of its intermediate subclasses) has an
+   * overridden implementation of the base class implementation.
+   *
+   * @param baseClass
+   *          the base class that provides a default implementation for the
+   *          method.
+   * @param subClass
+   *          the sub class to check.
+   * @param methodName
+   *          name of the method to check.
+   * @return <code>true</code> if it's overridden.<br>
+   *         <code>false</code> if the given baseClass provides the method
+   *         implementation.
+   */
+  public static boolean isMethodOverridden(Class<?> baseClass, Class<?> subClass, String methodName) {
+    try {
+      Method m = subClass.getDeclaredMethod(methodName);
+      if (!m.getDeclaringClass().equals(baseClass)) {
+        return true;
+      }
+    } catch (SecurityException e) {
+      throw new RuntimeException("Reflection analysis failed for PM class '" + subClass + "'.", e);
+    } catch (NoSuchMethodException e) {
+      // ok. the method is not overridden locally.
+    }
+
+    // no overridden method found.
+    return false;
+  }
+
+
   // TODO olaf: finds currently only annotations, placed in interfaces
   //            directly attached to the concrete class declaration.
   /**
