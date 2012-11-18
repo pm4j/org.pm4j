@@ -200,7 +200,7 @@ public class PmTableColImpl2 extends PmObjectBase implements PmTableCol2 {
     @Override
     protected boolean isPmEnabledImpl() {
       return  (getSortOrderQueryOption() != null) &&
-              (getPmTableImpl().getTotalNumOfRows() > 1);
+              (getPmTableImpl().getTotalNumOfPmRows() > 1);
     }
 
     /**
