@@ -880,7 +880,7 @@ public abstract class PmObjectBase implements PmObject {
 
     // -- Cache configuration --
     List<PmCacheCfg> cacheAnnotations = new ArrayList<PmCacheCfg>();
-    findAnnotationsInPmHierarchy(PmCacheCfg.class, cacheAnnotations);
+    AnnotationUtil.findAnnotationsInPmHierarchy(this, PmCacheCfg.class, cacheAnnotations);
 
     metaData.cacheStrategyForTitle = readCacheStrategy(PmCacheCfg.ATTR_TITLE, cacheAnnotations, CACHE_STRATEGIES_FOR_TITLE);
     metaData.cacheStrategyForVisibility = readCacheStrategy(PmCacheCfg.ATTR_VISIBILITY, cacheAnnotations, CACHE_STRATEGIES_FOR_VISIBILITY);
@@ -986,33 +986,6 @@ public abstract class PmObjectBase implements PmObject {
 
     public boolean isReadOnly() { return readOnly; }
     public void setReadOnly(boolean readOnly) { this.readOnly = readOnly; }
-  }
-
-  // ======== Annotation support ======== //
-
-  /**
-   * Searches an annotation within the attribute-element-session hierarchy. Adds
-   * all found annotations to the given collection. Adds nothing when no
-   * annotation was found in the hierarchy.
-   *
-   * @param annotationClass
-   *          The annotation to find.
-   * @param foundAnnotations
-   *          The set to add the found annotations to. The lowest level
-   *          annotation (e.g. bound to an attribute) is at the first position.
-   *          The highest level annotation (e.g. bound to the root session) is
-   *          at the last position.
-   */
-  protected <T extends Annotation> void findAnnotationsInPmHierarchy(Class<T> annotationClass, Collection<T> foundAnnotations) {
-    T cfg = AnnotationUtil.findAnnotation(this, annotationClass);
-    if (cfg != null) {
-      foundAnnotations.add(cfg);
-    }
-
-    if (pmParent != null &&
-        ! (this instanceof PmConversation)) {
-      pmParent.findAnnotationsInPmHierarchy(annotationClass, foundAnnotations);
-    }
   }
 
   @Override
@@ -1385,5 +1358,6 @@ final class PmObjectUtil {
       throw new PmRuntimeException(pm, e);
     }
   }
+
 }
 

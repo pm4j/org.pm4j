@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.pm4j.common.exception.CheckedExceptionWrapper;
+import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.annotation.PmCacheCfg;
 import org.pm4j.core.pm.annotation.PmCacheCfg.CacheMode;
 
@@ -160,4 +161,41 @@ public class AnnotationUtil {
 
     return value;
   }
+
+  /**
+   * Searches an annotation within the PM hierarchy. Adds
+   * all found annotations to the given collection. Adds nothing when no
+   * annotation was found in the hierarchy.
+   *
+   * @param annotationClass
+   *          The annotation to find.
+   * @param foundAnnotations
+   *          The set to add the found annotations to. The lowest level
+   *          annotation (e.g. bound to an attribute) is at the first position.
+   *          The highest level annotation (e.g. bound to the root session) is
+   *          at the last position.
+   */
+  static <T extends Annotation> void findAnnotationsInPmHierarchy(PmObjectBase pm, Class<T> annotationClass, Collection<T> foundAnnotations) {
+    T cfg = AnnotationUtil.findAnnotation(pm, annotationClass);
+    if (cfg != null) {
+      foundAnnotations.add(cfg);
+    }
+
+    // the first case will be removed as soon as on project will be ported to the current implementation state.
+    if (pm.getPmConversation().getPmDefaults().isElementsInheritAnnotationsOnlyFromSession() &&
+        pm instanceof PmElementBase) {
+      PmConversationImpl c = pm.getPmConversationImpl();
+      if (c != pm) {
+        findAnnotationsInPmHierarchy(c, annotationClass, foundAnnotations);
+      }
+    }
+    else {
+      PmObjectBase pmParent = (PmObjectBase) pm.getPmParent();
+      if (pmParent != null &&
+          ! (pm instanceof PmConversation)) {
+        findAnnotationsInPmHierarchy(pmParent, annotationClass, foundAnnotations);
+      }
+    }
+  }
+
 }

@@ -161,23 +161,4 @@ public abstract class PmElementBase
     return new MetaData();
   }
 
-  // XXX olaf: a workaround that keeps the old annotation logic of the first
-  //           pm4j project unchanged.
-  @Override
-  protected <T extends Annotation> void findAnnotationsInPmHierarchy(Class<T> annotationClass, Collection<T> foundAnnotations) {
-    if (getPmConversation().getPmDefaults().isElementsInheritAnnotationsOnlyFromSession()) {
-      T cfg = AnnotationUtil.findAnnotation(this, annotationClass);
-      if (cfg != null) {
-        foundAnnotations.add(cfg);
-      }
-
-      if (getPmConversation() != this) {
-        getPmConversationImpl().findAnnotationsInPmHierarchy(annotationClass, foundAnnotations);
-      }
-    }
-    else {
-      super.findAnnotationsInPmHierarchy(annotationClass, foundAnnotations);
-    }
-  }
-
 }

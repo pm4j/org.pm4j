@@ -826,7 +826,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   protected final T_PM_VALUE getDefaultValue() {
     return getDefaultValueImpl();
   }
-  
+
   /**
    * Reads a PM request attribute with the name of the attribute.
    *
@@ -1337,7 +1337,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
 
     // -- Cache configuration --
     List<PmCacheCfg> cacheAnnotations = new ArrayList<PmCacheCfg>();
-    findAnnotationsInPmHierarchy(PmCacheCfg.class, cacheAnnotations);
+    AnnotationUtil.findAnnotationsInPmHierarchy(this, PmCacheCfg.class, cacheAnnotations);
 
     myMetaData.cacheStrategyForOptions = readCacheStrategy(PmCacheCfg.ATTR_OPTIONS, cacheAnnotations, CACHE_STRATEGIES_FOR_OPTIONS);
     myMetaData.cacheStrategyForValue = readCacheStrategy(PmCacheCfg.ATTR_VALUE, cacheAnnotations, CACHE_STRATEGIES_FOR_VALUE);
