@@ -88,9 +88,8 @@ public class PmAttrStringImpl extends PmAttrBase<String, String> implements PmAt
     private boolean multiLine = false;
     private boolean trim = true;
 
-    @Override
-    protected int getMaxLenDefault() {
-      return PmAttrStringCfg.DEFAULT_MAXLEN;
+    public MetaData() {
+      super(PmAttrStringCfg.DEFAULT_MAXLEN);
     }
   }
 

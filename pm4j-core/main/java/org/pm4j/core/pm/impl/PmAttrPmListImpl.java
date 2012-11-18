@@ -260,14 +260,12 @@ public class PmAttrPmListImpl<T_ITEM_PM extends PmBean<T_BEAN>, T_BEAN> extends 
     private Converter<?> itemConverter;
     private boolean provideInvisibleItems = false;
 
+    public MetaData() {
+      super(Integer.MAX_VALUE); // maximum valueAsString characters.
+    }
+
     @Override public Converter<?> getItemConverter()                   {    return itemConverter;    }
     @Override public void setItemConverter(Converter<?> itemConverter) {    this.itemConverter = itemConverter;    }
-
-    @Override
-    protected int getMaxLenDefault() {
-      // XXX olaf: check for a real restriction...
-      return Short.MAX_VALUE;
-    }
   }
 
   private final MetaData getOwnMetaData() {

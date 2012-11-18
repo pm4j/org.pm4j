@@ -63,7 +63,8 @@ public class PmAttrEnumImpl<T_ENUM extends Enum<T_ENUM>> extends PmAttrBase<T_EN
 
   @Override
   protected PmObjectBase.MetaData makeMetaData() {
-    return new MetaData();
+    // the default max length.
+    return new MetaData(30);
   }
 
   @Override
@@ -72,14 +73,6 @@ public class PmAttrEnumImpl<T_ENUM extends Enum<T_ENUM>> extends PmAttrBase<T_EN
     MetaData myMetaData = (MetaData) metaData;
 
     myMetaData.setConverter(new PmConverterEnum());
-  }
-
-  protected static class MetaData extends PmAttrBase.MetaData {
-    @Override
-    protected int getMaxLenDefault() {
-      // XXX olaf: check how to get a real language specific output without performance issues.
-      return 30;
-    }
   }
 
   private MetaData getOwnMetaData() {

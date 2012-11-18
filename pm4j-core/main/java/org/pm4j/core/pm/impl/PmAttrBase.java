@@ -1176,12 +1176,6 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
               : OptionSetDefNoOption.INSTANCE;
   }
 
-  /**
-   * It's abstract because specific attribute types have to create their specific meta data.
-   */
-  @Override
-  protected abstract PmObjectBase.MetaData makeMetaData();
-
   @SuppressWarnings({ "unchecked", "rawtypes", "deprecation" })
   @Override
   protected void initMetaData(PmObjectBase.MetaData metaData) {
@@ -1404,7 +1398,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
    * Shared meta data for all attributes of the same kind.
    * E.g. for all 'myapp.User.name' attributes.
    */
-  protected abstract static class MetaData extends PmObjectBase.MetaData {
+  protected static class MetaData extends PmObjectBase.MetaData {
     static final Object                     NOT_INITIALIZED         = "NOT_INITIALIZED";
 
     private BeanAttrAccessor                beanAttrAccessor;
@@ -1412,7 +1406,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     private PmOptionCfg.NullOption          nullOption              = NullOption.DEFAULT;
     private boolean                         hideWhenEmpty;
     private boolean                         required;
-    private Restriction                valueRestriction        = Restriction.NONE;
+    private Restriction                     valueRestriction        = Restriction.NONE;
     private boolean                         primitiveType;
     private PathResolver                    valuePathResolver;
     private PathResolver                    valueContainingObjPathResolver = PassThroughPathResolver.INSTANCE;
@@ -1428,6 +1422,14 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     private String                          validationFieldName;
     private int                             maxLen                  = -1;
     private int                             minLen                  = 0;
+    private int                             maxLenDefault;
+
+    /**
+     * @param maxDefaultLen the attribute type specific maximum number of characters.
+     */
+    public MetaData(int maxDefaultLen) {
+      this.maxLenDefault = maxDefaultLen;
+    }
 
     /** @return The statically defined option set algorithm. */
     public PmOptionSetDef<PmAttr<?>> getOptionSetDef() { return optionSetDef; }
@@ -1481,8 +1483,19 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
      *
      * @return The maximal number of characters default.
      */
-    protected abstract int getMaxLenDefault();
+    protected int getMaxLenDefault() {
+      return maxLenDefault;
+    }
   }
+
+  /**
+   * The default implementation defines meta data for an attribute with unlimited length.
+   */
+  @Override
+  protected PmObjectBase.MetaData makeMetaData() {
+    return new MetaData(Integer.MAX_VALUE);
+  }
+
 
   private final MetaData getOwnMetaData() {
     return (MetaData) getPmMetaData();

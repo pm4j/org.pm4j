@@ -15,20 +15,4 @@ public class PmAttrImpl<T_VALUE> extends PmAttrBase<T_VALUE, T_VALUE> {
     super(pmParent);
   }
 
-  // ======== meta data ======== //
-
-  @Override
-  protected PmObjectBase.MetaData makeMetaData() {
-    return new MetaData();
-  }
-
-  protected static class MetaData extends PmAttrBase.MetaData {
-    /**
-     * The default for this type is 100.
-     */
-    @Override
-    protected int getMaxLenDefault() {
-      return 100;
-    }
-  }
 }

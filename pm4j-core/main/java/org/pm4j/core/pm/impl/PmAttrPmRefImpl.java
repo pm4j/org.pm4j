@@ -103,21 +103,6 @@ public class PmAttrPmRefImpl<T_REFED_PM extends PmBean<?>, T_BEAN>
 
   // ======== meta data ======== //
 
-  /**
-   * Gets called when the meta data instance for this presentation model
-   * is not yet available (first call within the VM live time).
-   * <p>
-   * Subclasses that provide more specific meta data should override this method
-   * to provide their meta data information container.
-   *
-   * @param attrName The name of the attribute. Unique within the parent element scope.
-   * @return A meta data container for this presentation model.
-   */
-  @Override
-  protected PmObjectBase.MetaData makeMetaData() {
-    return new MetaData();
-  }
-
   @Override
   protected void initMetaData(PmObjectBase.MetaData metaData) {
     super.initMetaData(metaData);
@@ -126,14 +111,6 @@ public class PmAttrPmRefImpl<T_REFED_PM extends PmBean<?>, T_BEAN>
     // XXX olaf: assumes a that the default identifier of domain objects
     //           is named 'id'.
     myMetaData.setConverterDefault(new PmConverterOptionBased("id"));
-  }
-
-  protected static class MetaData extends PmAttrBase.MetaData {
-    @Override
-    protected int getMaxLenDefault() {
-      // XXX olaf: check for a real restriction...
-      return 100;
-    }
   }
 
 }

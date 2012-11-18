@@ -44,15 +44,12 @@ public abstract class PmAttrNumBase<T extends Number> extends PmAttrBase<T, T> i
         : new DecimalFormat(formatString, new DecimalFormatSymbols(locale));
   }
 
-  /**
-   * The default implementation calculates the number of digits required for
-   * the maximal value as provided by {@link #getMax()}.
-   */
-  protected int getMaxLenDefault() {
-    return new Double(Math.ceil(Math.log10(getMax().longValue()))).intValue();
-  }
-
   protected abstract static class MetaData extends PmAttrBase.MetaData {
+    public MetaData() {
+      // the max length needs to be evaluated dynamically by calling getMaxLenDefault().
+      super(-1);
+    }
+
     /**
      * @return The configured maximum value limit.
      */

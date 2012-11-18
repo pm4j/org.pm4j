@@ -167,14 +167,12 @@ public class PmAttrListImpl<T> extends PmAttrBase<List<T>, Collection<T>> implem
   protected static class MetaData extends PmAttrBase.MetaData {
     private Converter<?> itemConverter;
 
+    public MetaData() {
+      super(Integer.MAX_VALUE); // maximum valueAsString characters.
+    }
+
     @Override public Converter<?> getItemConverter()                   {  return itemConverter;   }
     @Override public void setItemConverter(Converter<?> itemConverter) {  this.itemConverter = itemConverter;    }
-
-    @Override
-    protected int getMaxLenDefault() {
-      // XXX olaf: check for a real restriction...
-      return Short.MAX_VALUE;
-    }
 }
 
   private final MetaData getOwnMetaData() {

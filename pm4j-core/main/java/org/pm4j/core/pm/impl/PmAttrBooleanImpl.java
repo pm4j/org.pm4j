@@ -38,7 +38,7 @@ public class PmAttrBooleanImpl extends PmAttrBase<Boolean, Boolean> implements P
 
   @Override
   protected PmObjectBase.MetaData makeMetaData() {
-    return new MetaData();
+    return new PmAttrBase.MetaData(10);
   }
 
   @Override
@@ -46,14 +46,6 @@ public class PmAttrBooleanImpl extends PmAttrBase<Boolean, Boolean> implements P
     super.initMetaData(metaData);
 
     ((MetaData) metaData).setConverterDefault(PmConverterBoolean.INSTANCE);
-  }
-
-  protected static class MetaData extends PmAttrBase.MetaData {
-    @Override
-    protected int getMaxLenDefault() {
-      // XXX olaf: check how to get a real language specific output without performance issues.
-      return 10;
-    }
   }
 
 }

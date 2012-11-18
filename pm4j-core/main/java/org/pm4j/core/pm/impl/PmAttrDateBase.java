@@ -72,7 +72,8 @@ public class PmAttrDateBase<T_BACKING_DATE> extends PmAttrBase<Date, T_BACKING_D
 
   @Override
   protected PmObjectBase.MetaData makeMetaData() {
-    return new MetaData();
+    // The default max length is the length of the date format pattern.
+    return new MetaData(20);
   }
 
   @Override
@@ -81,17 +82,5 @@ public class PmAttrDateBase<T_BACKING_DATE> extends PmAttrBase<Date, T_BACKING_D
 
     ((MetaData) metaData).setConverterDefault(PmConverterDate.INSTANCE);
   }
-
-  protected static class MetaData extends PmAttrBase.MetaData {
-    /**
-     * The default max length is the length of the date format pattern.
-     */
-    @Override
-    protected int getMaxLenDefault() {
-      // XXX olaf: just a fix default.
-      return 20;
-    }
-  }
-
 
 }

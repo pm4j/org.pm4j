@@ -789,9 +789,12 @@ public abstract class PmObjectBase implements PmObject {
    * Subclasses that provide more specific meta data should override this
    * method to provide their meta data information container.
    *
-   * @return A static data container for this presentation model.
+   * @return A PM type specific static data container for this presentation model.
    */
-  protected abstract MetaData makeMetaData();
+  protected MetaData makeMetaData() {
+    return new MetaData();
+  }
+
 
   @SuppressWarnings("rawtypes")
   protected void initMetaData(MetaData metaData) {

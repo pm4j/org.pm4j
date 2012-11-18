@@ -143,7 +143,7 @@ public abstract class PmElementBase
   }
 
   /**
-   * Optimization: Cached session navigation.
+   * Optimization: Cached conversation navigation.
    */
   @Override
   public PmConversation getPmConversation() {

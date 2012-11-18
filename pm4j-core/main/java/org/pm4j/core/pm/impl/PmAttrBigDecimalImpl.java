@@ -27,6 +27,12 @@ public class PmAttrBigDecimalImpl extends PmAttrNumBase<BigDecimal> implements P
     return getOwnMetaDataWithoutPmInitCall().getMinValue();
   }
 
+  @Override
+  public int getMaxLen() {
+    // TODO Auto-generated method stub
+    return super.getMaxLen();
+  }
+
   // ======== Value handling ======== //
 
 
@@ -78,18 +84,23 @@ public class PmAttrBigDecimalImpl extends PmAttrNumBase<BigDecimal> implements P
 
   protected static class MetaData extends PmAttrBase.MetaData {
 
+    private BigDecimal maxValue = null;
+    private BigDecimal minValue = null;
     public RoundingMode stringConversionRoundingMode;
+
+    public MetaData() {
+      // the max length needs to be evaluated dynamically by calling getMaxLenDefault().
+      super(-1);
+    }
 
     protected BigDecimal getMaxValue() {
       return maxValue;
     }
-    
+
     public BigDecimal getMinValue() {
       return minValue;
     }
-    private BigDecimal maxValue = null;
-    private BigDecimal minValue = null;
-    
+
     @Override
     protected int getMaxLenDefault() {
       BigDecimal value = getMaxValue();
