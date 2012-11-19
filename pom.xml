@@ -20,6 +20,9 @@
 		<module>pm4j-core</module>
 		<module>pm4j-common</module>
 		<module>pm4j-swing</module>
+		<module>pm4j-swt</module>
+		<module>pm4j-facelets</module>
+		
 	</modules>
 
 	<dependencies>
