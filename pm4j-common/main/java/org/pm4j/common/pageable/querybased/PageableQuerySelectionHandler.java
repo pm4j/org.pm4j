@@ -130,39 +130,19 @@ public class PageableQuerySelectionHandler<T_ITEM, T_ID extends Serializable> ex
                   : idSelection);
   }
 
-  /** A selection base class that supports serializable selections. */
-  public static abstract class SerializeableSelectionBase<T_ITEM, T_ID extends Serializable> implements Selection<T_ITEM>, Serializable {
+  public static abstract class SelectionBase<T_ITEM, T_ID extends Serializable> extends PageableQuerySelectionBase<T_ITEM, T_ID> {
+
     private static final long serialVersionUID = 1L;
 
-    /** The service provider may be <code>null</code> in case of non-serializeable selections. */
-    private PageableQueryService.SerializeableServiceProvider<T_ITEM, T_ID> serviceProvider;
-    transient private PageableQueryService<T_ITEM, T_ID> service;
-
-    public SerializeableSelectionBase(PageableQueryService<T_ITEM, T_ID> service) {
-      assert service != null;
-
-      this.service = service;
-      this.serviceProvider = service.getSerializeableServiceProvider();
-    }
-
-    protected PageableQueryService<T_ITEM, T_ID> getService() {
-      if (service == null) {
-        if (serviceProvider != null) {
-          service = serviceProvider.getQueryService();
-        }
-
-        if (service == null) {
-          throw new RuntimeException("Your PageableQueryService does not support serialization of selections.\n" +
-              "Please implement PageableQueryService.getSerializeableServiceProvider() to get serializeable selections.");
-        }
-      }
-      return service;
+    public SelectionBase(PageableQueryService<T_ITEM, T_ID> service) {
+      super(service);
     }
 
     public abstract ClickedIds<T_ID> getClickedIds();
   }
 
-  static class ItemIdSelection<T_ITEM, T_ID extends Serializable> extends SerializeableSelectionBase<T_ITEM, T_ID> {
+
+  static class ItemIdSelection<T_ITEM, T_ID extends Serializable> extends SelectionBase<T_ITEM, T_ID> {
     private static final long serialVersionUID = 1L;
 
     private Collection<T_ID> ids;
@@ -229,16 +209,16 @@ public class PageableQuerySelectionHandler<T_ITEM, T_ID extends Serializable> ex
     }
   }
 
-  static class InvertedSelection<T_ITEM, T_ID extends Serializable> extends SerializeableSelectionBase<T_ITEM, T_ID> {
+  static class InvertedSelection<T_ITEM, T_ID extends Serializable> extends SelectionBase<T_ITEM, T_ID> {
 
     private static final long serialVersionUID = 1L;
     private final QueryParams query;
-    private final SerializeableSelectionBase<T_ITEM, T_ID> baseSelection;
+    private final SelectionBase<T_ITEM, T_ID> baseSelection;
     transient private Long size;
     /** The query fetch block size. */
     private int iteratorBlockSizeHint = 20;
 
-    public InvertedSelection(PageableQueryService<T_ITEM, T_ID> service, QueryParams query, SerializeableSelectionBase<T_ITEM, T_ID> baseSelection) {
+    public InvertedSelection(PageableQueryService<T_ITEM, T_ID> service, QueryParams query, SelectionBase<T_ITEM, T_ID> baseSelection) {
       super(service);
       assert query != null;
       assert baseSelection != null;
@@ -264,7 +244,17 @@ public class PageableQuerySelectionHandler<T_ITEM, T_ID extends Serializable> ex
 
     @Override
     public Iterator<T_ITEM> iterator() {
-      return new ItemIteratorPaged();
+      return new PageableItemIteratorBase<T_ITEM>(iteratorBlockSizeHint) {
+        @Override
+        protected boolean isItemSelected(T_ITEM item) {
+          return !baseSelection.contains(item);
+        }
+
+        @Override
+        protected List<T_ITEM> getItems(long startIdx, int blockSize) {
+          return getService().getItems(query, startIdx, blockSize);
+        }
+      };
     }
 
     @Override
@@ -272,7 +262,6 @@ public class PageableQuerySelectionHandler<T_ITEM, T_ID extends Serializable> ex
       this.iteratorBlockSizeHint = iteratorBlockSizeHint;
     }
 
-    @Override
     public ClickedIds<T_ID> getClickedIds() {
       return new ClickedIds<T_ID>(baseSelection.getClickedIds().getIds(), true);
     }
@@ -282,60 +271,6 @@ public class PageableQuerySelectionHandler<T_ITEM, T_ID extends Serializable> ex
     public <T_BEAN> Selection<T_BEAN> getBeanSelection() {
       return (Selection<T_BEAN>)this;
     }
-
-    class ItemIteratorPaged implements Iterator<T_ITEM> {
-
-      private long idx = 0;
-      private List<T_ITEM> pageItems;
-      private T_ITEM item;
-      private int pagePos = -1;
-
-      public ItemIteratorPaged() {
-        doNext();
-      }
-
-      @Override
-      public boolean hasNext() {
-        return item != null;
-      }
-
-      @Override
-      public T_ITEM next() {
-        T_ITEM result = pageItems.get(pagePos);
-        doNext();
-        return result;
-      }
-
-      @Override
-      public void remove() {
-        throw new UnsupportedOperationException();
-      }
-
-      private void doNext() {
-        boolean nextFound = false;
-        do {
-          boolean doQuery = (pagePos == -1) || (pagePos == iteratorBlockSizeHint-1);
-          if (doQuery) {
-            pagePos = 0;
-            pageItems = getService().getItems(query, idx, iteratorBlockSizeHint);
-            if (pageItems == null || pageItems.isEmpty()) {
-              item = null;
-              idx = -1;
-              return;
-            }
-          }
-          else {
-            ++pagePos;
-          }
-
-          ++idx;
-          item = pageItems.get(pagePos);
-          nextFound = !baseSelection.contains(item);
-        }
-        while(!nextFound);
-      }
-
-    }
-}
+  }
 
 }

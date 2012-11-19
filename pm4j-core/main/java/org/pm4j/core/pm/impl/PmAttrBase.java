@@ -1478,11 +1478,12 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   }
 
   /**
-   * The default implementation defines meta data for an attribute with unlimited length.
+   * The default implementation defines meta data for an attribute with
+   * 'unlimited' length ({@link Short#MAX_VALUE}).
    */
   @Override
   protected PmObjectBase.MetaData makeMetaData() {
-    return new MetaData(Integer.MAX_VALUE);
+    return new MetaData(Short.MAX_VALUE);
   }
 
 
