@@ -7,7 +7,6 @@
 	<version>1.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
-
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
@@ -22,7 +21,12 @@
 	</modules>
 
 	<dependencies>
-	
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.6</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -53,7 +57,7 @@
 					</additionalConfig>
 				</configuration>
 			</plugin>
-		
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -70,4 +74,10 @@
 		</plugins>
 	</build>
 
+	<repositories>
+		<repository>
+			<id>mvnrepo1</id>
+			<url>http://mvnrepository.com/artifact/</url>
+		</repository>
+	</repositories>
 </project>
