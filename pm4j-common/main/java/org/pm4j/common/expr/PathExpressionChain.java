@@ -135,9 +135,25 @@ public class PathExpressionChain extends ExprBase<ExprExecCtxt> {
    *         string to parse.
    */
   public static Expression parse(ParseCtxt ctxt, boolean isStartAttrAllowed) {
-    Expression scalarExpr = ScalarExpr.parse(ctxt);
-    if (scalarExpr != null) {
-      return scalarExpr;
+    Expression e = parseOneExpr(ctxt, isStartAttrAllowed);
+    if (e == null || ctxt.isDone()) {
+      return e;
+    }
+
+    List<Expression> eList = new ArrayList<Expression>();
+    eList.add(e);
+    while (ctxt.skipBlanks().readOptionalChar('+')) {
+      e = parseOneExpr(ctxt, isStartAttrAllowed);
+      eList.add(e);
+    }
+    return new ConcatExpr(eList);
+  }
+
+
+  private static Expression parseOneExpr(ParseCtxt ctxt, boolean isStartAttrAllowed) {
+    Expression basicExpr = ScalarExpr.parse(ctxt);
+    if (basicExpr != null) {
+      return basicExpr;
     }
 
     // allow expressions to start with 'this'.

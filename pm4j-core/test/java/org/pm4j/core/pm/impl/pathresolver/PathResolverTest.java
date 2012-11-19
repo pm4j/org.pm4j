@@ -94,4 +94,12 @@ public class PathResolverTest extends TestCase {
     assertEquals("myName+", expr.exec(new ExprExecCtxt(new Pojo("myName"))));
   }
 
+  public void testConcatStrings() {
+    Expression expr = PathExpressionChain.parse(
+        "'Name of head instance: ' + name + '. Name of sub instance: ' + sub.name + '.'", true);
+    assertEquals(
+        "Name of head instance: head. Name of sub instance: sub.",
+        expr.exec(new ExprExecCtxt(Pojo.make("head", "sub"))));
+  }
+
 }
