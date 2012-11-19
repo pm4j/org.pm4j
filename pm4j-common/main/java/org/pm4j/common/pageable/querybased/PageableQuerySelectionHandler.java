@@ -11,12 +11,28 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.pm4j.common.query.AttrDefinition;
+import org.pm4j.common.query.CompOpIn;
+import org.pm4j.common.query.FilterAnd;
+import org.pm4j.common.query.FilterCompare;
+import org.pm4j.common.query.FilterExpression;
+import org.pm4j.common.query.FilterNot;
 import org.pm4j.common.query.QueryParams;
+import org.pm4j.common.query.SortOrder;
 import org.pm4j.common.selection.SelectMode;
 import org.pm4j.common.selection.Selection;
 import org.pm4j.common.selection.SelectionHandlerBase;
 import org.pm4j.core.util.lang.CloneUtil;
 
+/**
+ * Handler for
+ *
+ *
+ * @author olaf boede
+ *
+ * @param <T_ITEM> the handled item type.
+ * @param <T_ID> type of the related item identifier.
+ */
 public class PageableQuerySelectionHandler<T_ITEM, T_ID extends Serializable> extends SelectionHandlerBase<T_ITEM> {
 
   private static final Log LOG = LogFactory.getLog(PageableQuerySelectionHandler.class);
@@ -35,7 +51,7 @@ public class PageableQuerySelectionHandler<T_ITEM, T_ID extends Serializable> ex
 
     this.service = service;
     this.query = query;
-    this.emptySelection = new ItemIdSelection<T_ITEM, T_ID>(service, Collections.EMPTY_LIST);
+    this.emptySelection = new ItemIdSelection<T_ITEM, T_ID>(service, Collections.EMPTY_LIST, null);
     this.idSelection = emptySelection;
     this.currentSelection = idSelection;
   }
@@ -123,7 +139,7 @@ public class PageableQuerySelectionHandler<T_ITEM, T_ID extends Serializable> ex
   private boolean setSelection(Set<T_ID> selectedIds) {
     idSelection = selectedIds.isEmpty()
                   ? emptySelection
-                  : new ItemIdSelection<T_ITEM, T_ID>(service, selectedIds);
+                  : new ItemIdSelection<T_ITEM, T_ID>(service, selectedIds, query.getSortOrder());
 
     return setSelection(inverse
                   ? new InvertedSelection<T_ITEM, T_ID>(service, query, idSelection)
@@ -138,19 +154,37 @@ public class PageableQuerySelectionHandler<T_ITEM, T_ID extends Serializable> ex
       super(service);
     }
 
+    /**
+     * Provides the manually clicked id's. Depending on the selection type (normal or inverted)
+     * these are the selected or de-selected item id's.
+     *
+     * @return the set of clicked id's.
+     */
     public abstract ClickedIds<T_ID> getClickedIds();
+
+    /**
+     * Provides a {@link QueryParams} representation of the selection.
+     * <br>
+     * Is a useful operation to get the query constraints for an update statement.
+     *
+     * @param the ID attribute to generate filter conditions for.
+     * @return the {@link QueryParams} restrictions for this selection.
+     */
+    public abstract QueryParams asQueryParams(AttrDefinition idAttr);
   }
 
 
   static class ItemIdSelection<T_ITEM, T_ID extends Serializable> extends SelectionBase<T_ITEM, T_ID> {
     private static final long serialVersionUID = 1L;
 
-    private Collection<T_ID> ids;
+    private final Collection<T_ID> ids;
+    private final SortOrder sortOrder;
 
     @SuppressWarnings("unchecked")
-    public ItemIdSelection(PageableQueryService<T_ITEM, T_ID> service, Collection<T_ID> ids) {
+    public ItemIdSelection(PageableQueryService<T_ITEM, T_ID> service, Collection<T_ID> ids, SortOrder sortOrder) {
       super(service);
       this.ids = (ids != null) ? Collections.unmodifiableCollection(ids) : Collections.EMPTY_LIST;
+      this.sortOrder = sortOrder;
     }
 
     @Override
@@ -188,6 +222,14 @@ public class PageableQuerySelectionHandler<T_ITEM, T_ID extends Serializable> ex
       return new ClickedIds<T_ID>(ids, false);
     }
 
+    @Override
+    public QueryParams asQueryParams(AttrDefinition idAttr) {
+      QueryParams qp = new QueryParams();
+      qp.setFilterExpression(new FilterCompare(idAttr, new CompOpIn(), ids));
+      qp.setSortOrder(sortOrder);
+      return qp;
+    }
+
     class ItemIterator implements Iterator<T_ITEM> {
       private final Iterator<T_ID> idIterator = ids.iterator();
 
@@ -199,6 +241,7 @@ public class PageableQuerySelectionHandler<T_ITEM, T_ID extends Serializable> ex
       @Override
       public T_ITEM next() {
         T_ID id = idIterator.next();
+        // TODO olaf: not yet optimized to read in blocks
         return getService().getItemForId(id);
       }
 
@@ -264,6 +307,19 @@ public class PageableQuerySelectionHandler<T_ITEM, T_ID extends Serializable> ex
 
     public ClickedIds<T_ID> getClickedIds() {
       return new ClickedIds<T_ID>(baseSelection.getClickedIds().getIds(), true);
+    }
+
+    @Override
+    public QueryParams asQueryParams(AttrDefinition idAttr) {
+      QueryParams qp = query.clone();
+      Collection<T_ID> ids = baseSelection.getClickedIds().getIds();
+      if (!ids.isEmpty()) {
+        FilterExpression qexpr = query.getFilterExpression();
+        qp.setFilterExpression(qexpr != null
+                ? new FilterAnd(qexpr, new FilterNot(new FilterCompare(idAttr, new CompOpIn(), ids)))
+                : new FilterNot(new FilterCompare(idAttr, new CompOpIn(), ids)));
+      }
+      return qp;
     }
 
     @SuppressWarnings("unchecked")
