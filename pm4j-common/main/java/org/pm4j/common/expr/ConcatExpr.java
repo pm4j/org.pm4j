@@ -3,7 +3,9 @@ package org.pm4j.common.expr;
 import java.util.List;
 
 import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang.StringUtils;
 import org.pm4j.common.expr.parser.ParseCtxt;
+import org.pm4j.common.util.collection.ListUtil;
 
 /**
  * A string concatination expression.
@@ -33,6 +35,11 @@ public class ConcatExpr extends ExprBase<ExprExecCtxt>{
       sb.append(ObjectUtils.toString(v));
     }
     return sb.toString();
+  }
+
+  @Override
+  public String toString() {
+    return StringUtils.join(argList, "+");
   }
 
 }

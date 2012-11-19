@@ -140,13 +140,17 @@ public class PathExpressionChain extends ExprBase<ExprExecCtxt> {
       return e;
     }
 
+    // checks for '+' combined expressions
     List<Expression> eList = new ArrayList<Expression>();
     eList.add(e);
     while (ctxt.skipBlanks().readOptionalChar('+')) {
       e = parseOneExpr(ctxt, isStartAttrAllowed);
       eList.add(e);
     }
-    return new ConcatExpr(eList);
+
+    return (eList.size() == 1)
+        ? eList.get(0)
+        : new ConcatExpr(eList);
   }
 
 
