@@ -18,9 +18,12 @@
 
 	<modules>
 		<module>pm4j-core</module>
+		<module>pm4j-common</module>
+		<module>pm4j-swing</module>
 	</modules>
 
 	<dependencies>
+
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
