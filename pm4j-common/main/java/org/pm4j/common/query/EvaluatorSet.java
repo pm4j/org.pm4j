@@ -43,7 +43,8 @@ public class EvaluatorSet {
   public Object getCompOpEvaluator(CompOp compOp) {
     Object ev = compOpEvaluatorMap.get(compOp.getClass());
     if (ev == null) {
-      throw new RuntimeException("Missing compare operator evaluator for operator type: " + compOp.getClass());
+      throw new RuntimeException("Missing compare operator evaluator for operator type: '" + compOp.getClass() +
+          "' evaluator set: " + this);
     }
     return ev;
   }

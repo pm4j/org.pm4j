@@ -1,9 +1,12 @@
 package org.pm4j.common.query.inmem;
 
+import java.util.Collection;
+
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.pm4j.common.query.CompOpEquals;
 import org.pm4j.common.query.CompOpGt;
+import org.pm4j.common.query.CompOpIn;
 import org.pm4j.common.query.CompOpIsNull;
 import org.pm4j.common.query.CompOpLt;
 import org.pm4j.common.query.CompOpNotEquals;
@@ -69,4 +72,16 @@ public class InMemCompOpEvaluators {
       return CompareUtil.indexOf(o1, o2, compOp.isIgnoreCase(), compOp.isIgnoreSpaces()) == -1;
     }
   };
+
+  public static final InMemCompOpEvaluator IN = new InMemCompOpEvaluatorBase<CompOpIn, Object>() {
+    @Override
+    protected boolean evalImpl(InMemQueryEvaluator<?> ctxt, CompOpIn compOp, Object o1, Object o2) {
+      if (! (o2 instanceof Collection)) {
+        throw new IllegalArgumentException("The IN operator expects a Collection as parameter.");
+      }
+      return ((Collection<?>)o2).contains(o1);
+    }
+  };
+
+
 }

@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.pm4j.common.query.CompOpEquals;
 import org.pm4j.common.query.CompOpGt;
+import org.pm4j.common.query.CompOpIn;
 import org.pm4j.common.query.CompOpIsNull;
 import org.pm4j.common.query.CompOpLt;
 import org.pm4j.common.query.CompOpNotEquals;
@@ -42,7 +43,8 @@ public class InMemEvaluatorSet extends EvaluatorSet {
             CompOpNotEquals.class, InMemCompOpEvaluators.NE,
             CompOpStringStartsWith.class, InMemCompOpEvaluators.STRING_STARTS_WITH,
             CompOpStringContains.class, InMemCompOpEvaluators.STRING_CONTAINS,
-            CompOpStringNotContains.class, InMemCompOpEvaluators.STRING_NOT_CONTAINS
+            CompOpStringNotContains.class, InMemCompOpEvaluators.STRING_NOT_CONTAINS,
+            CompOpIn.class, InMemCompOpEvaluators.IN
         ));
   }
 
