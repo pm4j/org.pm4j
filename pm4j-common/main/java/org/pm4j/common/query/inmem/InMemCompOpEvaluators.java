@@ -1,16 +1,17 @@
 package org.pm4j.common.query.inmem;
 
+import java.util.Collection;
+
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.pm4j.common.query.CompOpEquals;
 import org.pm4j.common.query.CompOpGt;
+import org.pm4j.common.query.CompOpIn;
 import org.pm4j.common.query.CompOpIsNull;
 import org.pm4j.common.query.CompOpLt;
 import org.pm4j.common.query.CompOpNotEquals;
 import org.pm4j.common.query.CompOpStringContains;
-import org.pm4j.common.query.CompOpStringIsEmpty;
 import org.pm4j.common.query.CompOpStringNotContains;
-import org.pm4j.common.query.CompOpStringNotIsEmpty;
 import org.pm4j.common.query.CompOpStringStartsWith;
 import org.pm4j.common.util.CompareUtil;
 
@@ -33,7 +34,7 @@ public class InMemCompOpEvaluators {
   public static final InMemCompOpEvaluator IS_NULL = new InMemCompOpEvaluatorBase<CompOpIsNull, Object>() {
     @Override
     protected boolean evalImpl(InMemQueryEvaluator<?> ctxt, CompOpIsNull compOp, Object o1, Object o2) {
-      return o1 == null;
+      return o1 == null || (o1 instanceof String && StringUtils.isEmpty((String)o1));
     }
   };
 
@@ -48,20 +49,6 @@ public class InMemCompOpEvaluators {
     @Override
     protected boolean evalImpl(InMemQueryEvaluator<?> ctxt, CompOpNotEquals compOp, Object o1, Object o2) {
       return !ObjectUtils.equals(o1, o2);
-    }
-  };
-
-  public static final InMemCompOpEvaluator STRING_IS_EMPTY = new InMemCompOpEvaluatorBase<CompOpStringIsEmpty, String>() {
-    @Override
-    protected boolean evalImpl(InMemQueryEvaluator<?> ctxt, CompOpStringIsEmpty compOp, String o1, String o2) {
-      return StringUtils.isEmpty(o1);
-    }
-  };
-
-  public static final InMemCompOpEvaluator STRING_IS_NOT_EMPTY = new InMemCompOpEvaluatorBase<CompOpStringNotIsEmpty, String>() {
-    @Override
-    protected boolean evalImpl(InMemQueryEvaluator<?> ctxt, CompOpStringNotIsEmpty compOp, String o1, String o2) {
-      return ! StringUtils.isEmpty(o1);
     }
   };
 
@@ -85,4 +72,16 @@ public class InMemCompOpEvaluators {
       return CompareUtil.indexOf(o1, o2, compOp.isIgnoreCase(), compOp.isIgnoreSpaces()) == -1;
     }
   };
+
+  public static final InMemCompOpEvaluator IN = new InMemCompOpEvaluatorBase<CompOpIn, Object>() {
+    @Override
+    protected boolean evalImpl(InMemQueryEvaluator<?> ctxt, CompOpIn compOp, Object o1, Object o2) {
+      if (! (o2 instanceof Collection)) {
+        throw new IllegalArgumentException("The IN operator expects a Collection as parameter.");
+      }
+      return ((Collection<?>)o2).contains(o1);
+    }
+  };
+
+
 }

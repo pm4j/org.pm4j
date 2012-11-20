@@ -3,6 +3,14 @@ package org.pm4j.common.pageable;
 import java.awt.print.Pageable;
 import java.util.List;
 
+import org.pm4j.common.pageable.querybased.ClickedIds;
+import org.pm4j.common.query.AttrDefinition;
+import org.pm4j.common.query.CompOpIn;
+import org.pm4j.common.query.FilterAnd;
+import org.pm4j.common.query.FilterCompare;
+import org.pm4j.common.query.FilterExpression;
+import org.pm4j.common.query.FilterNot;
+import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.selection.SelectionHandler;
 
 
@@ -234,5 +242,40 @@ public final class PageableCollectionUtil2 {
     if (pageItems.size() > 0) {
       pageable.getSelectionHandler().select(true, pageItems.get(0));
     }
+  }
+
+  /**
+   * Generates a query based on query restrictions and a set of
+   * {@link ClickedIds}.<br>
+   * The generated query selects the set of selected objects.
+   *
+   * @param idAttr
+   *          the ID attribute that is related to the clicked id's.
+   * @param queryParams
+   *          the query params for the base query.
+   * @param clickedIds
+   *          the set of individually selected/deselected item ids.
+   * @return the generated filter restriction that represents the selection.
+   */
+  public static <T_ID> QueryParams makeSelectionQueryParams(AttrDefinition idAttr, QueryParams queryParams, ClickedIds<T_ID> clickedIds) {
+    QueryParams qp = queryParams.clone();
+
+    FilterExpression idFilterExpr = new FilterCompare(idAttr, new CompOpIn(), clickedIds.getIds());
+    if (clickedIds.isInvertedSelection()) {
+      // Negative filter: use the query and de-select the clicked id's
+      // No additional restriction if there are no clicked id's.
+      if (!clickedIds.getIds().isEmpty()) {
+        idFilterExpr = new FilterNot(idFilterExpr);
+        FilterExpression qf = queryParams.getFilterExpression();
+        qp.setFilterExpression((qf != null)
+            ? new FilterAnd(qf, idFilterExpr)
+            : idFilterExpr);
+      }
+    } else {
+      // Positive filter: select only the clicked id's.
+      qp.setFilterExpression(idFilterExpr);
+    }
+
+    return qp;
   }
 }

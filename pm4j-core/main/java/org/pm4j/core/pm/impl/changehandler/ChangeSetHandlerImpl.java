@@ -67,6 +67,7 @@ public class ChangeSetHandlerImpl<T_ITEM extends PmDataInput> implements ChangeS
    * @return <code>true</code> if the result of {@link #isChanged()} was also
    *         changed by this operation.
    */
+  @Override
   public boolean registerChange(ChangeKind changeKind, T_ITEM item) {
     boolean oldIsChanged = isChanged();
     switch(changeKind) {

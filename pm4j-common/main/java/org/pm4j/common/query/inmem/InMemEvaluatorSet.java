@@ -4,13 +4,12 @@ import java.util.Map;
 
 import org.pm4j.common.query.CompOpEquals;
 import org.pm4j.common.query.CompOpGt;
+import org.pm4j.common.query.CompOpIn;
 import org.pm4j.common.query.CompOpIsNull;
 import org.pm4j.common.query.CompOpLt;
 import org.pm4j.common.query.CompOpNotEquals;
 import org.pm4j.common.query.CompOpStringContains;
-import org.pm4j.common.query.CompOpStringIsEmpty;
 import org.pm4j.common.query.CompOpStringNotContains;
-import org.pm4j.common.query.CompOpStringNotIsEmpty;
 import org.pm4j.common.query.CompOpStringStartsWith;
 import org.pm4j.common.query.EvaluatorSet;
 import org.pm4j.common.query.FilterAnd;
@@ -42,11 +41,10 @@ public class InMemEvaluatorSet extends EvaluatorSet {
             CompOpIsNull.class, InMemCompOpEvaluators.IS_NULL,
             CompOpLt.class, InMemCompOpEvaluators.LT,
             CompOpNotEquals.class, InMemCompOpEvaluators.NE,
-            CompOpStringIsEmpty.class, InMemCompOpEvaluators.STRING_IS_EMPTY,
-            CompOpStringNotIsEmpty.class, InMemCompOpEvaluators.STRING_IS_NOT_EMPTY,
             CompOpStringStartsWith.class, InMemCompOpEvaluators.STRING_STARTS_WITH,
             CompOpStringContains.class, InMemCompOpEvaluators.STRING_CONTAINS,
-            CompOpStringNotContains.class, InMemCompOpEvaluators.STRING_NOT_CONTAINS
+            CompOpStringNotContains.class, InMemCompOpEvaluators.STRING_NOT_CONTAINS,
+            CompOpIn.class, InMemCompOpEvaluators.IN
         ));
   }
 

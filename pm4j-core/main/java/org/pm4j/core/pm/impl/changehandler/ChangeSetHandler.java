@@ -36,6 +36,18 @@ public interface ChangeSetHandler<T_ITEM> {
   Collection<T_ITEM> getChangedItems(ChangeKind... changeKinds);
 
   /**
+   * Registers an observed change.
+   *
+   * @param changeKind
+   *          the observed change kind.
+   * @param item
+   *          the changed item.
+   * @return <code>true</code> if the result of {@link #isChanged()} was also
+   *         changed by this operation.
+   */
+  boolean registerChange(ChangeKind changeKind, T_ITEM item);
+
+  /**
    * Adds a {@link MasterPmHandler} to consider for changed state information.
    *
    * @param detailsPmHandler

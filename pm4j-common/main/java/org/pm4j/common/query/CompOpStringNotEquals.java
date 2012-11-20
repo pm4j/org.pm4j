@@ -3,7 +3,9 @@ package org.pm4j.common.query;
 import org.apache.commons.lang.StringUtils;
 
 
-public class CompOpStringNotEquals extends CompOpStringBase {
+public class CompOpStringNotEquals extends CompOpBase<String> {
+
+  private static final long serialVersionUID = 1L;
 
   public static final String NAME = "compOpStringNotEquals";
 

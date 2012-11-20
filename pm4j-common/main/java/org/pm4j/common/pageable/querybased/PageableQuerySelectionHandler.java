@@ -17,6 +17,26 @@ import org.pm4j.common.selection.Selection;
 import org.pm4j.common.selection.SelectionHandlerBase;
 import org.pm4j.core.util.lang.CloneUtil;
 
+/**
+ * Handler for a {@link PageableQueryCollection} based selection.
+ * <p>
+ * Because of the unlimited nature of the query the selection can't reference
+ * all selected items directly.
+ * <p>
+ * Two basic selection types are implemented:
+ * <ul>
+ * <li>{@link ItemIdSelection}: contains the id's of the selected items.</li>
+ * <li>{@link InvertedSelection}: contains the {@link QueryParams} to represent
+ * the 'ALL' selection and a set of de-selected id's.
+ * </ul>
+ *
+ * @author olaf boede
+ *
+ * @param <T_ITEM>
+ *          the handled item type.
+ * @param <T_ID>
+ *          type of the related item identifier.
+ */
 public class PageableQuerySelectionHandler<T_ITEM, T_ID extends Serializable> extends SelectionHandlerBase<T_ITEM> {
 
   private static final Log LOG = LogFactory.getLog(PageableQuerySelectionHandler.class);
@@ -138,14 +158,21 @@ public class PageableQuerySelectionHandler<T_ITEM, T_ID extends Serializable> ex
       super(service);
     }
 
+    /**
+     * Provides the manually clicked id's. Depending on the selection type (normal or inverted)
+     * these are the selected or de-selected item id's.
+     *
+     * @return the set of clicked id's.
+     */
     public abstract ClickedIds<T_ID> getClickedIds();
+
   }
 
 
   static class ItemIdSelection<T_ITEM, T_ID extends Serializable> extends SelectionBase<T_ITEM, T_ID> {
     private static final long serialVersionUID = 1L;
 
-    private Collection<T_ID> ids;
+    private final Collection<T_ID> ids;
 
     @SuppressWarnings("unchecked")
     public ItemIdSelection(PageableQueryService<T_ITEM, T_ID> service, Collection<T_ID> ids) {
@@ -199,6 +226,7 @@ public class PageableQuerySelectionHandler<T_ITEM, T_ID extends Serializable> ex
       @Override
       public T_ITEM next() {
         T_ID id = idIterator.next();
+        // TODO olaf: not yet optimized to read in blocks
         return getService().getItemForId(id);
       }
 

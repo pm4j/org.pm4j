@@ -2,7 +2,9 @@ package org.pm4j.common.query;
 
 import org.apache.commons.lang.StringUtils;
 
-public class CompOpStringNotContains extends CompOpStringBase {
+public class CompOpStringNotContains extends CompOpBase<String> {
+
+  private static final long serialVersionUID = 1L;
 
   public static final String NAME = "compOpStringNotContains";
 
