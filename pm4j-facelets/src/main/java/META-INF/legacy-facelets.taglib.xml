@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<!DOCTYPE facelet-taglib PUBLIC "-//Sun Microsystems, Inc.//DTD Facelet Taglib 1.0//EN" "http://java.sun.com/dtd/facelet-taglib_1_0.dtd">
+<facelet-taglib>
+	<namespace>http://pm4j.org/facelets/legacy</namespace>
+
+	<tag><tag-name>text1</tag-name><source>org/pm4j/facelets/std/text1.xhtml</source></tag>
+	<tag><tag-name>text2</tag-name><source>org/pm4j/facelets/std/text2.xhtml</source></tag>
+	<tag><tag-name>textInP</tag-name><source>org/pm4j/facelets/std/textInP.xhtml</source></tag>
+	<tag><tag-name>tr</tag-name><source>org/pm4j/facelets/std/tr.xhtml</source></tag>
+	<function>
+		<!-- DEPRECATED! -->
+		<function-name>getPmProperty</function-name>
+		<function-class>org.pm4j.jsf.util.PmJsfUtilLegacy</function-class>
+		<function-signature>java.lang.Object getPmProperty(org.pm4j.core.pm.PmObject, java.lang.String)</function-signature>
+	</function>
+	<function>
+		<!-- DEPRECATED! -->
+		<function-name>findPmProperty</function-name>
+		<function-class>org.pm4j.jsf.util.PmJsfUtilLegacy</function-class>
+		<function-signature>java.lang.Object findPmProperty(org.pm4j.core.pm.PmObject, java.lang.String)</function-signature>
+	</function>
+	<function>
+		<!-- DEPRECATED! -->
+	    <function-name>setPmProperty</function-name>
+	    <function-class>org.pm4j.jsf.util.PmJsfUtilLegacy</function-class>
+	    <function-signature>java.lang.Object setPmProperty(org.pm4j.core.pm.PmConversation, java.lang.String, java.lang.Object)</function-signature>
+	</function>
+
+	<function>
+		<function-name>text1</function-name>
+		<function-class>org.pm4j.jsf.TagFn</function-class>
+		<function-signature>java.lang.String localizeWithFixArgSet(org.pm4j.core.pm.impl.PmObjectBase, java.lang.String, java.lang.Object)</function-signature>
+	</function>
+	<function>
+		<function-name>text2</function-name>
+		<function-class>org.pm4j.jsf.TagFn</function-class>
+		<function-signature>java.lang.String localizeWithFixArgSet(org.pm4j.core.pm.impl.PmObjectBase, java.lang.String, java.lang.Object, java.lang.Object)</function-signature>
+	</function>
+</facelet-taglib>

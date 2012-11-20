@@ -1,0 +1,27 @@
+<!--
+  Filters the list according to the specified includeNames and excludeNames
+  parameter set.
+  Skips PMs that are not visible.
+
+  Required parameter set:
+    pmList - A collection of PM instances or a PmAttrPmList attribute.
+    
+  Optional parameter set:
+    includeNames - Names of PMs (see: pm.pmRelativeName) to include from the given list.
+    		       The exclude parameter will be ignored when 'include' is specified.
+    excludeNames - Names of PMs (see: pm.pmRelativeName) to exclude.
+-->
+<ui:composition
+    xmlns="http://pm4j.org/facelets"
+    xmlns:t="http://myfaces.apache.org/tomahawk"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+
+><t:dataList id="#{listId}"
+             value="#{filterPmList(pmList,includeNames,excludeNames)}" 
+             var="itemPm" 
+             rowIndexVar="#{rowIndexVar}"
+  ><ui:fragment rendered="#{itemPm.pmVisible}"
+    ><ui:insert 
+  /></ui:fragment
+></t:dataList
+></ui:composition>

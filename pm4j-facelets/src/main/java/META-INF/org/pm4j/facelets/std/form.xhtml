@@ -1,0 +1,13 @@
+<ui:composition 
+    xmlns="http://pm4j.org/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	
+ ><h:form id="#{formId}" 
+          rendered="#{rendered ne 'false'}"
+          styleClass="#{formStyleClass}" 
+ 	><ui:insert 
+ 	/><h:outputText value="#{hiddenFieldsForRequestParams()}" escape="false" 
+ /></h:form
+></ui:composition>
+

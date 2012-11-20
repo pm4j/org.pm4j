@@ -23,6 +23,9 @@
 		<module>pm4j-swt</module>
 		<module>pm4j-facelets</module>
 		
+		<module>pm4j-core-sample</module>
+		<module>pm4j-swing-sample</module>
+		<module>pm4j-swt-sample</module>
 	</modules>
 
 	<dependencies>

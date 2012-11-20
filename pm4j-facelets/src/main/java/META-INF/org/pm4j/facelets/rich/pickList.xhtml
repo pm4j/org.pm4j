@@ -1,0 +1,24 @@
+<!-- 
+    Defines a pick-list as defined by rich:pickList.
+    
+    Parameter:
+      pm - An instance of PmAttrList or PmAttrPmList
+ -->
+<ui:composition 
+  xmlns="http://pm4j.org/facelets/rich"
+  xmlns:ui="http://java.sun.com/jsf/facelets"
+  xmlns:rich="http://richfaces.org/rich"
+
+><rich:pickList 
+        id="#{pm.pmRelativeName}"
+        value="#{pm.valueAsStringList}" 
+        disabled="#{not pm.pmEnabled}" 
+        rendered="#{(rendered ne 'false') and pm.pmVisible}" 
+        sourceListWidth="#{sourceListWidth ne null ? sourceListWidth : 'inherit'}" 
+        targetListWidth="#{targetListWidth ne null ? targetListWidth : 'inherit'}"
+        showButtonsLabel="#{showButtonsLabel eq 'true'}"
+        styleClass="#{styleClassForPm(pmViewMapper, pm, styleClass)}" >
+  <selectItems pm="#{pm}" xmlns="http://pm4j.org/facelets" />
+  <ui:insert/>
+</rich:pickList
+></ui:composition>

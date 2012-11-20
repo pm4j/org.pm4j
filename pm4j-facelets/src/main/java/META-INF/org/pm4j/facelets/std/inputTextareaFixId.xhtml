@@ -1,0 +1,40 @@
+<!-- FIXME: the javascript code is included once for each time the component is included on a page
+	we use onkeyup for checking the size, i.e. if the user sets his own onkeyup code the size validation will
+	probably not work anymore -->
+<ui:composition
+  xmlns="http://pm4j.org/facelets"
+  xmlns:h="http://java.sun.com/jsf/html"
+  xmlns:ui="http://java.sun.com/jsf/facelets"
+
+	><h:inputTextarea
+    	id="#{id}"
+		value="#{pm.valueAsString}"
+		rendered="#{(rendered ne 'false') and pm.pmVisible}"
+		disabled="#{(disabled ne 'true') and not pm.pmEnabled}"
+		readonly="#{pm.pmReadonly}"
+		rows="#{condVal(rows ne null, rows, 2)}"
+		cols="#{condVal(cols ne null, cols, 40)}"
+		type="#{condVal(type ne null, type, 'text')}"
+		styleClass="#{styleClassForPm(pmViewMapper, pm, styleClass)}"
+		title="#{pm.pmTooltip}"
+        immediate="true"
+		><ui:insert
+	/><ui:fragment rendered="#{pm.pmEnabled and not pm.pmReadonly}"
+        ></ui:fragment>
+  </h:inputTextarea
+></ui:composition>
+<!--
+	onkeyup="__inputTextareaValidateLength#{id}(this,#{pm.maxLen});"
+
+	<script xmlns="http://www.w3.org/1999/xhtml">
+        //<![CDATA[
+        function __inputTextareaValidateLength#{id}(elem, maxLen) {
+            if (elem != null && elem.value.length > maxLen) {
+                elem.value = elem.value.substring(0, maxLen);
+                elem.scrollTop = elem.scrollHeight;
+            }
+        }
+        //]]>
+        </script
+    >
+ -->

@@ -1,0 +1,94 @@
+<?xml version="1.0"?>
+<!DOCTYPE facelet-taglib PUBLIC "-//Sun Microsystems, Inc.//DTD Facelet Taglib 1.0//EN" "http://java.sun.com/dtd/facelet-taglib_1_0.dtd">
+<facelet-taglib>
+	<namespace>http://pm4j.org/facelets/a4j</namespace>
+
+	<tag><tag-name>commandButton</tag-name>         <source>org/pm4j/facelets/a4j/commandButton.xhtml</source></tag>
+	<tag><tag-name>commandButtonFixId</tag-name>    <source>org/pm4j/facelets/a4j/commandButtonFixId.xhtml</source></tag>
+	<tag><tag-name>commandButtonNoId</tag-name>     <source>org/pm4j/facelets/a4j/commandButtonNoId.xhtml</source></tag>
+	<tag><tag-name>commandLink</tag-name>           <source>org/pm4j/facelets/a4j/commandLink.xhtml</source></tag>
+	<tag><tag-name>commandLinkReturnString</tag-name>           <source>org/pm4j/facelets/a4j/commandLinkReturnString.xhtml</source></tag>
+	<tag><tag-name>commandLinkFixId</tag-name>      <source>org/pm4j/facelets/a4j/commandLinkFixId.xhtml</source></tag>
+	<tag><tag-name>commandLinkNoId</tag-name>       <source>org/pm4j/facelets/a4j/commandLinkNoId.xhtml</source></tag>
+	<tag><tag-name>commandLinkImg</tag-name>        <source>org/pm4j/facelets/a4j/commandLinkImg.xhtml</source></tag>
+	<tag><tag-name>commandLinkImgFixId</tag-name>   <source>org/pm4j/facelets/a4j/commandLinkImgFixId.xhtml</source></tag>
+	<tag><tag-name>commandLinkImgNoId</tag-name>    <source>org/pm4j/facelets/a4j/commandLinkImgNoId.xhtml</source></tag>
+	<tag><tag-name>form</tag-name>                  <source>org/pm4j/facelets/a4j/form.xhtml</source></tag>
+    <tag><tag-name>formNoId</tag-name>              <source>org/pm4j/facelets/a4j/formNoId.xhtml</source></tag>
+    <tag><tag-name>keyCommandButtonFixId</tag-name> <source>org/pm4j/facelets/a4j/keyCommandButtonFixId.xhtml</source></tag>
+    <tag><tag-name>keyCommandLinkFixId</tag-name>   <source>org/pm4j/facelets/a4j/keyCommandLinkFixId.xhtml</source></tag>
+    <tag><tag-name>keyCommandLinkNoId</tag-name>    <source>org/pm4j/facelets/a4j/keyCommandLinkNoId.xhtml</source></tag>
+	<tag><tag-name>naviCommandButton</tag-name>     <source>org/pm4j/facelets/a4j/naviCommandButton.xhtml</source></tag>
+	<tag><tag-name>naviCommandButtonFixId</tag-name><source>org/pm4j/facelets/a4j/naviCommandButtonFixId.xhtml</source></tag>
+	<tag><tag-name>naviCommandButtonNoId</tag-name> <source>org/pm4j/facelets/a4j/naviCommandButtonNoId.xhtml</source></tag>
+	<tag><tag-name>naviCommandLink</tag-name>       <source>org/pm4j/facelets/a4j/naviCommandLink.xhtml</source></tag>
+	<tag><tag-name>naviCommandLinkFixId</tag-name>  <source>org/pm4j/facelets/a4j/naviCommandLinkFixId.xhtml</source></tag>
+	<tag><tag-name>naviCommandLinkNoId</tag-name>   <source>org/pm4j/facelets/a4j/naviCommandLinkNoId.xhtml</source></tag>
+	<tag><tag-name>poll</tag-name>                  <source>org/pm4j/facelets/a4j/poll.xhtml</source></tag>
+    <tag><tag-name>repeat</tag-name>                <source>org/pm4j/facelets/a4j/repeat.xhtml</source></tag>
+
+  <!-- Replicated standard function declaration. Having the declaration in several namespaces
+       prevents the usage of fix namespace shortcuts in tag definitions of related namespaces.
+   -->
+    <function>
+        <function-name>hiddenFieldsForRequestParams</function-name>
+        <function-class>org.pm4j.jsf.util.PmJsfUtil</function-class>
+        <function-signature>java.lang.String hiddenFieldsForRequestParams()</function-signature>
+    </function>
+    <function>
+        <function-name>getPmReqestParamKey</function-name>
+        <function-class>org.pm4j.jsf.util.PmJsfUtil</function-class>
+        <function-signature>java.lang.String getPmReqestParamKey()</function-signature>
+    </function>
+    <function>
+        <function-name>getPmReqestParamValue</function-name>
+        <function-class>org.pm4j.jsf.util.PmJsfUtil</function-class>
+        <function-signature>java.lang.String getPmReqestParamValue()</function-signature>
+    </function>
+    <function>
+        <function-name>uriForNaviLink</function-name>
+        <function-class>org.pm4j.jsf.util.PmJsfUtil</function-class>
+        <function-signature>java.lang.String uriForNaviLink(org.pm4j.core.pm.PmObject, org.pm4j.navi.NaviLink)</function-signature>
+    </function>
+
+    <function>
+        <function-name>makeSelectItems</function-name>
+        <function-class>org.pm4j.jsf.util.PmJsfUtil</function-class>
+        <function-signature>javax.faces.model.SelectItem[] makeSelectItems(org.pm4j.core.pm.PmAttr)</function-signature>
+    </function>
+
+    <function>
+        <function-name>styleClassForPm</function-name>
+        <function-class>org.pm4j.web.PmViewUtil</function-class>
+        <function-signature>java.lang.String styleClassForPm(org.pm4j.web.PmViewMapper, org.pm4j.core.pm.PmObject, java.lang.String)</function-signature>
+    </function>
+    <function>
+        <function-name>filterPmList</function-name>
+        <function-class>org.pm4j.jsf.TagFn</function-class>
+        <function-signature>java.util.List filterPmList(java.util.List, java.lang.String, java.lang.String)</function-signature>
+    </function>
+
+    <function>
+        <function-name>text</function-name>
+        <function-class>org.pm4j.jsf.TagFn</function-class>
+        <function-signature>java.lang.String localizeWithFixArgSet(org.pm4j.core.pm.impl.PmObjectBase, java.lang.String)</function-signature>
+    </function>
+    <function>
+        <function-name>text3</function-name>
+        <function-class>org.pm4j.jsf.TagFn</function-class>
+        <function-signature>java.lang.String localizeWithFixArgSet(org.pm4j.core.pm.impl.PmObjectBase, java.lang.String, java.lang.Object, java.lang.Object, java.lang.Object)</function-signature>
+    </function>
+
+    <function>
+        <function-name>condVal</function-name>
+        <function-class>org.pm4j.jsf.TagFn</function-class>
+        <function-signature>java.lang.Object conditionalValue(boolean, java.lang.Object, java.lang.Object)</function-signature>
+    </function>
+
+    <function>
+        <function-name>registerPmMessagesForCleanup</function-name>
+        <function-class>org.pm4j.jsf.util.PmJsfUtil</function-class>
+        <function-signature>java.util.List registerPmMessagesForCleanup(org.pm4j.core.pm.PmConversation)</function-signature>
+    </function>
+
+</facelet-taglib>

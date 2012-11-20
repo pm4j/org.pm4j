@@ -1,0 +1,13 @@
+<ui:composition
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+
+><popupCalendar
+		xmlns="http://www.jenia.org/jsf/popup"
+		for="#{pm.pmRelativeName}"
+		format="#{pm.outputFormat}"
+		disabled="#{not pm.pmEnabled}"
+		noneDisabled="#{pm.required}"
+	><ui:insert
+/></popupCalendar
+
+></ui:composition>

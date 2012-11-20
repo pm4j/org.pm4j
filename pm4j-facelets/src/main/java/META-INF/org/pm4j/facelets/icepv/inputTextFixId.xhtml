@@ -1,0 +1,21 @@
+<ui:composition
+    xmlns="http://pm4j.org/facelets/icefaces"
+    xmlns:pv="http://pm4j.org/facelets"
+    xmlns:ice="http://www.icesoft.com/icefaces/component"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+
+><ice:inputText
+    id="#{id}"
+	value="#{pm.valueAsString}"
+	rendered="#{(rendered ne 'false') and pm.pmVisible}"
+	disabled="#{not pm.pmEnabled}"
+	required="#{pm.required}"
+	styleClass="#{pv:styleClassForPm(pmViewMapper, pm, styleClass)}"
+	title="#{pm.pmTooltip}"
+	maxlength="#{pm.maxLen}"
+    ><ui:insert
+ /><debugInput
+ /></ice:inputText
+
+></ui:composition>
+

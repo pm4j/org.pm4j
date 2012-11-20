@@ -21,5 +21,10 @@
 			<groupId>org.pm4j</groupId>
 			<version>1.0-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+			<artifactId>pm4j-common</artifactId>
+			<groupId>org.pm4j</groupId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 </project>

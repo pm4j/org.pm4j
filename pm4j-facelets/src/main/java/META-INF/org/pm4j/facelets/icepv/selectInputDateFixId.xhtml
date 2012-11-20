@@ -1,0 +1,25 @@
+<ui:composition
+    xmlns="http://pm4j.org/facelets/icefaces"
+    xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:ice="http://www.icesoft.com/icefaces/component"
+	xmlns:pv="http://pm4j.org/facelets"
+
+><ice:selectInputDate
+	id="#{id}"
+	value="#{pm.value}"
+	rendered="#{(rendered ne 'false') and pm.pmVisible}"
+	disabled="#{not pm.pmEnabled}"
+	required="#{pm.required}"
+	styleClass="#{pv:styleClassForPm(pmViewMapper, pm, styleClass)}"
+	title="#{pm.pmTooltip}"
+	renderAsPopup="#{pv:condVal(renderAsPopup ne null, renderAsPopup, 'false')}"
+	popupDateFormat="#{pm.formatString}"
+
+	><f:convertDateTime pattern="#{pm.formatString}" timeZone="GMT+1"
+	/><!--
+	FIXME olaf: get the timezone to use from the PM.
+--><ui:insert
+/></ice:selectInputDate
+
+><debugInput /></ui:composition>

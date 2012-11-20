@@ -1,0 +1,171 @@
+<?xml version="1.0"?>
+<!DOCTYPE facelet-taglib PUBLIC "-//Sun Microsystems, Inc.//DTD Facelet Taglib 1.0//EN" "http://java.sun.com/dtd/facelet-taglib_1_0.dtd">
+<facelet-taglib>
+	<namespace>http://pm4j.org/facelets</namespace>
+
+	<!-- Standard control tags -->
+	<tag><tag-name>commandButton</tag-name><source>org/pm4j/facelets/std/commandButton.xhtml</source></tag>
+	<tag><tag-name>commandButtonFixId</tag-name><source>org/pm4j/facelets/std/commandButtonFixId.xhtml</source></tag>
+	<tag><tag-name>commandButtonNoId</tag-name><source>org/pm4j/facelets/std/commandButtonNoId.xhtml</source></tag>
+	<tag><tag-name>commandLink</tag-name><source>org/pm4j/facelets/std/commandLink.xhtml</source></tag>
+	<tag><tag-name>commandLinkFixId</tag-name><source>org/pm4j/facelets/std/commandLinkFixId.xhtml</source></tag>
+	<tag><tag-name>commandLinkNoId</tag-name><source>org/pm4j/facelets/std/commandLinkNoId.xhtml</source></tag>
+	<tag><tag-name>commandLinkImg</tag-name><source>org/pm4j/facelets/std/commandLinkImg.xhtml</source></tag>
+	<tag><tag-name>commandLinkImgFixId</tag-name><source>org/pm4j/facelets/std/commandLinkImgFixId.xhtml</source></tag>
+	<tag><tag-name>commandLinkImgNoId</tag-name><source>org/pm4j/facelets/std/commandLinkImgNoId.xhtml</source></tag>
+	<tag><tag-name>form</tag-name><source>org/pm4j/facelets/std/form.xhtml</source></tag>
+    <tag><tag-name>formNoId</tag-name><source>org/pm4j/facelets/std/formNoId.xhtml</source></tag>
+	<tag><tag-name>graphicImage</tag-name><source>org/pm4j/facelets/std/graphicImage.xhtml</source></tag>
+	<tag><tag-name>graphicImageFixId</tag-name><source>org/pm4j/facelets/std/graphicImageFixId.xhtml</source></tag>
+	<tag><tag-name>graphicImageNoId</tag-name><source>org/pm4j/facelets/std/graphicImageNoId.xhtml</source></tag>
+	<tag><tag-name>inputSecret</tag-name><source>org/pm4j/facelets/std/inputSecret.xhtml</source></tag>
+    <tag><tag-name>inputSecretFixId</tag-name><source>org/pm4j/facelets/std/inputSecretFixId.xhtml</source></tag>
+	<tag><tag-name>inputText</tag-name><source>org/pm4j/facelets/std/inputText.xhtml</source></tag>
+	<tag><tag-name>inputTextFixId</tag-name><source>org/pm4j/facelets/std/inputTextFixId.xhtml</source></tag>
+	<tag><tag-name>inputTextNoId</tag-name><source>org/pm4j/facelets/std/inputTextNoId.xhtml</source></tag>
+	<tag><tag-name>inputTextWithLabel</tag-name><source>org/pm4j/facelets/std/inputTextWithLabel.xhtml</source></tag>
+	<tag><tag-name>inputTextWithLabelNoId</tag-name><source>org/pm4j/facelets/std/inputTextWithLabelNoId.xhtml</source></tag>
+	<tag><tag-name>inputTextarea</tag-name><source>org/pm4j/facelets/std/inputTextarea.xhtml</source></tag>
+	<tag><tag-name>inputTextareaFixId</tag-name><source>org/pm4j/facelets/std/inputTextareaFixId.xhtml</source></tag>
+	<tag><tag-name>inputTextareaWithLabel</tag-name><source>org/pm4j/facelets/std/inputTextareaWithLabel.xhtml</source></tag>
+    <tag><tag-name>label</tag-name><source>org/pm4j/facelets/std/label.xhtml</source></tag>
+	<tag><tag-name>outputLink</tag-name><source>org/pm4j/facelets/std/outputLink.xhtml</source></tag>
+	<tag><tag-name>outputLinkFixId</tag-name><source>org/pm4j/facelets/std/outputLinkFixId.xhtml</source></tag>
+	<tag><tag-name>outputLinkNoId</tag-name><source>org/pm4j/facelets/std/outputLinkNoId.xhtml</source></tag>
+	<tag><tag-name>outputLinkImg</tag-name><source>org/pm4j/facelets/std/outputLinkImg.xhtml</source></tag>
+	<tag><tag-name>outputLinkImgFixId</tag-name><source>org/pm4j/facelets/std/outputLinkImgFixId.xhtml</source></tag>
+	<tag><tag-name>outputLinkImgNoId</tag-name><source>org/pm4j/facelets/std/outputLinkImgNoId.xhtml</source></tag>
+	<tag><tag-name>outputText</tag-name><source>org/pm4j/facelets/std/outputText.xhtml</source></tag>
+	<tag><tag-name>outputTextNoId</tag-name><source>org/pm4j/facelets/std/outputTextNoId.xhtml</source></tag>
+	<tag><tag-name>outputLabel</tag-name><source>org/pm4j/facelets/std/outputLabel.xhtml</source></tag>
+	<tag><tag-name>outputTitle</tag-name><source>org/pm4j/facelets/std/outputTitle.xhtml</source></tag>
+    <tag><tag-name>p</tag-name><source>org/pm4j/facelets/std/p.xhtml</source></tag>
+	<tag><tag-name>selectBooleanCheckbox</tag-name><source>org/pm4j/facelets/std/selectBooleanCheckbox.xhtml</source></tag>
+	<tag><tag-name>selectBooleanCheckboxFixId</tag-name><source>org/pm4j/facelets/std/selectBooleanCheckboxFixId.xhtml</source></tag>
+	<tag><tag-name>selectBooleanCheckboxNoId</tag-name><source>org/pm4j/facelets/std/selectBooleanCheckboxNoId.xhtml</source></tag>
+	<tag><tag-name>selectManyCheckbox</tag-name><source>org/pm4j/facelets/std/selectManyCheckbox.xhtml</source></tag>
+	<tag><tag-name>selectOneMenu</tag-name><source>org/pm4j/facelets/std/selectOneMenu.xhtml</source></tag>
+	<tag><tag-name>selectOneMenuNoId</tag-name><source>org/pm4j/facelets/std/selectOneMenuNoId.xhtml</source></tag>
+	<tag><tag-name>selectOneListbox</tag-name><source>org/pm4j/facelets/std/selectOneListbox.xhtml</source></tag>
+    <tag><tag-name>selectOneListboxNoId</tag-name><source>org/pm4j/facelets/std/selectOneListboxNoId.xhtml</source></tag>
+	<tag><tag-name>selectOneRadio</tag-name><source>org/pm4j/facelets/std/selectOneRadio.xhtml</source></tag>
+	<tag><tag-name>selectItems</tag-name><source>org/pm4j/facelets/std/selectItems.xhtml</source></tag>
+
+	<!-- Localization support tags -->
+	<tag><tag-name>text</tag-name><source>org/pm4j/facelets/std/text.xhtml</source></tag>
+
+    <!-- Message tags -->
+    <tag><tag-name>messages</tag-name><source>org/pm4j/facelets/std/messages.xhtml</source></tag>
+
+	<!-- Debug tags
+		TODO: move to separate taglib
+	-->
+	<tag><tag-name>dbgOptionsTable</tag-name><source>org/pm4j/facelets/debug/dbgOptionsTable.xhtml</source></tag>
+	<tag><tag-name>dbgSelectItemsTable</tag-name><source>org/pm4j/facelets/debug/dbgSelectItemsTable.xhtml</source></tag>
+	<tag><tag-name>dbgSelectItemsTable</tag-name><source>org/pm4j/facelets/debug/dbgSelectItemsTable.xhtml</source></tag>
+	<tag><tag-name>dbgTableFrame</tag-name><source>org/pm4j/facelets/debug/dbgTableFrame.xhtml</source></tag>
+
+
+	<!--          === Taglib functions ===          -->
+
+	<function>
+		<function-name>hiddenFieldsForRequestParams</function-name>
+		<function-class>org.pm4j.jsf.util.PmJsfUtil</function-class>
+		<function-signature>java.lang.String hiddenFieldsForRequestParams()</function-signature>
+	</function>
+	<function>
+		<function-name>getPmReqestParamKey</function-name>
+		<function-class>org.pm4j.jsf.util.PmJsfUtil</function-class>
+		<function-signature>java.lang.String getPmReqestParamKey()</function-signature>
+	</function>
+	<function>
+		<function-name>getPmReqestParamValue</function-name>
+		<function-class>org.pm4j.jsf.util.PmJsfUtil</function-class>
+		<function-signature>java.lang.String getPmReqestParamValue()</function-signature>
+	</function>
+	<function>
+		<function-name>uriForNaviLink</function-name>
+		<function-class>org.pm4j.jsf.util.PmJsfUtil</function-class>
+		<function-signature>java.lang.String uriForNaviLink(org.pm4j.core.pm.PmObject, org.pm4j.navi.NaviLink)</function-signature>
+	</function>
+    <function>
+        <function-name>urlForPopupNaviLink</function-name>
+        <function-class>org.pm4j.jsf.util.PmJsfUtil</function-class>
+        <function-signature>java.lang.String urlForPopupNaviLink(org.pm4j.core.pm.PmObject, org.pm4j.navi.NaviLink)</function-signature>
+    </function>
+    <function>
+        <function-name>urlWithHistoryVersion</function-name>
+        <function-class>org.pm4j.jsf.util.NaviJsfUtil</function-class>
+        <function-signature>java.lang.String urlWithHistoryVersion(java.lang.String)</function-signature>
+    </function>
+    <function>
+        <function-name>getHistoryParamKey</function-name>
+        <function-class>org.pm4j.jsf.util.NaviJsfUtil</function-class>
+        <function-signature>java.lang.String getHistoryParamKey()</function-signature>
+    </function>
+    <function>
+        <function-name>getHistoryParamValue</function-name>
+        <function-class>org.pm4j.jsf.util.NaviJsfUtil</function-class>
+        <function-signature>java.lang.String getHistoryParamValue()</function-signature>
+    </function>
+    <function>
+        <function-name>getPopupNaviParam</function-name>
+        <function-class>org.pm4j.jsf.util.NaviJsfUtil</function-class>
+        <function-signature>java.lang.String getPopupNaviParam()</function-signature>
+    </function>
+
+	<function>
+		<function-name>makeSelectItems</function-name>
+		<function-class>org.pm4j.jsf.util.PmJsfUtil</function-class>
+		<function-signature>javax.faces.model.SelectItem[] makeSelectItems(org.pm4j.core.pm.PmAttr)</function-signature>
+	</function>
+	<function>
+		<!-- Provides a user defined property by name. See: PmObject.getPmProperty(). -->
+		<function-name>property</function-name>
+		<function-class>org.pm4j.jsf.util.PmJsfUtil</function-class>
+		<function-signature>java.lang.Object getProperty(org.pm4j.core.pm.PmObject, java.lang.String)</function-signature>
+	</function>
+
+
+	<function>
+		<function-name>pmStyleClasses</function-name>
+        <function-class>org.pm4j.core.pm.impl.PmUtil</function-class>
+		<function-signature>java.lang.String getStyleClassesString(org.pm4j.core.pm.PmObject, java.lang.String)</function-signature>
+	</function>
+	<function>
+		<!-- Deprecated! -->
+		<function-name>styleClassForPm</function-name>
+        <function-class>org.pm4j.web.PmViewUtil</function-class>
+		<function-signature>java.lang.String styleClassForPm(org.pm4j.web.PmViewMapper, org.pm4j.core.pm.PmObject, java.lang.String)</function-signature>
+	</function>
+    <function>
+		<!-- Deprecated! -->
+        <function-name>styleClassForPmMsg</function-name>
+        <function-class>org.pm4j.web.PmViewUtil</function-class>
+        <function-signature>java.lang.String styleClassForPmMsg(org.pm4j.web.PmViewMapper, org.pm4j.core.pm.PmMessage)</function-signature>
+    </function>
+	<function>
+		<function-name>filterPmList</function-name>
+		<function-class>org.pm4j.jsf.TagFn</function-class>
+		<function-signature>java.util.List filterPmList(java.util.List, java.lang.String, java.lang.String)</function-signature>
+	</function>
+
+	<function>
+		<function-name>text3</function-name>
+		<function-class>org.pm4j.jsf.TagFn</function-class>
+		<function-signature>java.lang.String localizeWithFixArgSet(org.pm4j.core.pm.impl.PmObjectBase, java.lang.String, java.lang.Object, java.lang.Object, java.lang.Object)</function-signature>
+	</function>
+
+	<function>
+	    <function-name>condVal</function-name>
+	    <function-class>org.pm4j.jsf.TagFn</function-class>
+	    <function-signature>java.lang.Object conditionalValue(boolean, java.lang.Object, java.lang.Object)</function-signature>
+	</function>
+
+	<function>
+	    <function-name>registerPmMessagesForCleanup</function-name>
+	    <function-class>org.pm4j.jsf.util.PmJsfUtil</function-class>
+	    <function-signature>java.util.List registerPmMessagesForCleanup(org.pm4j.core.pm.PmConversation)</function-signature>
+	</function>
+
+</facelet-taglib>

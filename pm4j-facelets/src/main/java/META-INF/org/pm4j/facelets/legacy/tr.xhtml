@@ -1,0 +1,11 @@
+<ui:composition 
+  xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:ui="http://java.sun.com/jsf/facelets"
+
+><ui:fragment rendered="#{pm.pmVisible}">
+	<tr class="#{rowStyleClass}" >
+		<td class="#{firstTdClass}" ><outputLabel xmlns="http://pm4j.org/facelets" pm="#{pm}" styleClass="#{labelStyleClass}" /></td>
+		<td class="#{secondTdClass}"><ui:insert /></td>
+	</tr>
+</ui:fragment
+></ui:composition>

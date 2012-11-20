@@ -1,0 +1,21 @@
+<!--
+ -->
+<ui:composition
+	xmlns="http://pm4j.org/facelets/icefaces"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:pv="http://pm4j.org/facelets"
+    xmlns:ice="http://www.icesoft.com/icefaces/component"
+
+><ice:commandButton
+    id="#{id}"
+    type="#{pv:condVal(type ne null, type, 'submit')}"
+	rendered="#{(rendered ne 'false') and pm.pmVisible}"
+	disabled="#{not pm.pmEnabled}"
+	value="#{pv:condVal(pmTitle ne null, pmTitle, pm.pmTitle)}"
+	action="#{pm.doItReturnString}"
+	title="#{pm.pmTooltip}"
+	styleClass="#{pv:styleClassForPm(pmViewMapper, pm, styleClass)}"
+	><ui:insert
+/></ice:commandButton
+
+></ui:composition>
