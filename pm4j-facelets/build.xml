@@ -1,6 +1,6 @@
 <project name="pm4j-facelets" basedir="." default="all" >
 
-	<property name="dir.src" location="main/java"/>
+	<property name="dir.src" location="src/main/java"/>
 	<property name="repository.dir" location="../pm4j-libs-temp-solution/lib" />
 	<property name="dir.classes" location="target/classes"/>
 	<property name="dir.dist" location="target/dist"/>
