@@ -22,12 +22,22 @@
 			<version>3.3.3</version>
 		</dependency>
 		<dependency>
+			<groupId>org.floggy.3rd.org.eclipse</groupId>
+			<artifactId>jface</artifactId>
+			<version>3.3.2.M20080207-0800</version>
+		</dependency>
+		<dependency>
 			<artifactId>pm4j-core</artifactId>
 			<groupId>org.pm4j</groupId>
 			<version>1.0-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+			<artifactId>pm4j-core-sample</artifactId>
+			<groupId>org.pm4j</groupId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
-	
+
 	<repositories>
 		<repository>
 			<id>swtrepo</id>
