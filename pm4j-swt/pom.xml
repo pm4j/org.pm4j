@@ -36,6 +36,18 @@
 			<groupId>org.pm4j</groupId>
 			<version>1.0-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+			<artifactId>pm4j-core</artifactId>
+			<groupId>org.pm4j</groupId>
+			<version>1.0-SNAPSHOT</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<artifactId>pm4j-core-sample</artifactId>
+			<groupId>org.pm4j</groupId>
+			<version>1.0-SNAPSHOT</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<repositories>
