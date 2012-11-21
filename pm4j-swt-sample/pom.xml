@@ -21,15 +21,31 @@
 			<groupId>org.pm4j</groupId>
 			<version>1.0-SNAPSHOT</version>
 		</dependency>
-			<dependency>
+		<dependency>
 			<artifactId>pm4j-swt</artifactId>
 			<groupId>org.pm4j</groupId>
 			<version>1.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
+			<artifactId>pm4j-swt</artifactId>
+			<groupId>org.pm4j</groupId>
+			<version>1.0-SNAPSHOT</version>
+			<classifier>tests</classifier>
+			
+		</dependency>
+
+		<dependency>
 			<artifactId>pm4j-core</artifactId>
 			<groupId>org.pm4j</groupId>
 			<version>1.0-SNAPSHOT</version>
+		</dependency>
+		
+		<dependency>
+			<artifactId>pm4j-core</artifactId>
+			<groupId>org.pm4j</groupId>
+			<version>1.0-SNAPSHOT</version>
+			<classifier>tests</classifier>
+			
 		</dependency>
 	</dependencies>
 </project>
