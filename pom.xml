@@ -27,8 +27,8 @@
 		
 		<module>pm4j-facelets</module>
 		
-		<!--  module>pm4j-swt</module -->
-		<!--  module>pm4j-swt-sample</module -->
+		<module>pm4j-swt</module>
+		<module>pm4j-swt-sample</module>
 
 	</modules>
 
