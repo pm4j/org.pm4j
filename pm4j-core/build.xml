@@ -15,7 +15,7 @@
 			<classpath>
 				<fileset file="${repository.dir}/commons-lang/jars/commons-lang-2.4.jar" />
 				<fileset file="${repository.dir}/commons-logging/jars/commons-logging-1.1.1.jar" />
-				<fileset file="${repository.dir}/junit/jars/junit-4.10.jar" />
+				<fileset file="${repository.dir}/junit/jars/junit-4.6.jar" />
 				<fileset file="${repository.dir}/log4j/jars/log4j-1.2.15.jar" />
 				<fileset file="${repository.dir}/javax.validation/jars/validation-api-1.0.0.GA.jar" />
 				<fileset file="${dir.pm4j-common}/target/dist/pm4j-common.jar" />
