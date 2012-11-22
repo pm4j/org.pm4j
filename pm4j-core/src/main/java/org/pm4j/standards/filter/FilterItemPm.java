@@ -13,7 +13,6 @@ import org.pm4j.core.pm.PmAttrProxy;
 import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmOptionSet;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
-import org.pm4j.core.pm.annotation.PmAttrCfg.Restriction;
 import org.pm4j.core.pm.annotation.PmOptionCfg;
 import org.pm4j.core.pm.annotation.PmOptionCfg.NullOption;
 import org.pm4j.core.pm.api.PmEventApi;
@@ -140,7 +139,15 @@ public abstract class FilterItemPm<T_ITEM extends FilterItem> extends PmBeanBase
   };
 
   /** A proxy attribute in front of the value type specific value attribute. */
-  public final PmAttrProxy<Object> filterByValue = new PmAttrProxyImpl<Object>(this);
+  public final PmAttrProxy<Object> filterByValue = new PmAttrProxyImpl<Object>(this) {
+	    @Override
+	    protected void onPmInit() {
+	      super.onPmInit();
+	      if (getPmBean() != null) {
+	        reGenerateFilterByValueAttr();
+	      }
+	    }
+  };
 
   /** The entered filter values have to be transferred to the filter value. */
   protected PmAttrValueChangeDecorator<?> filterValueChangeDecorator = new PmAttrValueChangeDecorator<Object>() {
@@ -158,15 +165,18 @@ public abstract class FilterItemPm<T_ITEM extends FilterItem> extends PmBeanBase
   }
 
   protected void reGenerateFilterByValueAttr() {
-    FilterCompareDefinition fd = filterBy.getValue();
+	T_ITEM bean = getPmBean();
+    FilterCompareDefinition fd = bean.getFilterBy();
     if (fd != null) {
+      // TODO olaf: the getValue method is called within pmInit. should not happen...
       CompOp co = compOp.getValue();
+      // CompOp co = bean.getCompOp();
       if (co != null) {
         @SuppressWarnings("unchecked")
         PmAttr<Object> a = (PmAttr<Object>)makeValueAttrPm(fd, co);
         if (a != null) {
           a =  PmInitApi.initDynamicPmAttr(a, "filterBy");
-          a.setValue(getPmBean().getFilterByValue());
+          a.setValue(bean.getFilterByValue());
           // XXX olaf: should be done on proxy level...
           PmEventApi.addValueChangeDecorator(a, filterValueChangeDecorator);
           filterByValue.setDelegate(a);
