@@ -14,7 +14,9 @@ import org.pm4j.common.expr.parser.ParseException;
  * <pre>
  *   expression without modifier:         myVar
  *   expression for a variable:           #myVar
- *   expression for something optional:   (o)myVar
+ *   expression for something optional (may be null):   (o)myVar
+ *   expression for a field or getter that may exist: (x)myVar
+ *   expression for a field or getter that may exist or may be null: (x,o)myVar.x
  *   expression for an optional variable: (o)#myVar
  * </pre>
  *
