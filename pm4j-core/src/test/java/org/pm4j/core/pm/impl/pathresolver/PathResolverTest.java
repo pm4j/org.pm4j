@@ -70,7 +70,7 @@ public class PathResolverTest extends TestCase {
     PmConversation pmConversation = new PmConversationImpl();
     pmConversation.setPmNamedObject("myProp", Pojo.make("head", "sub", "subSub"));
 
-    Expression expr = PathExpressionChain.parse("myProp.sub.sub.name", true);
+    Expression expr = PathExpressionChain.parse("#myProp.sub.sub.name", true);
     assertEquals("subSub", expr.exec(new PmExprExecCtxt(pmConversation)));
   }
 
