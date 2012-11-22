@@ -5,7 +5,6 @@ import java.util.List;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.pm4j.common.expr.parser.ParseCtxt;
-import org.pm4j.common.util.collection.ListUtil;
 
 /**
  * A string concatination expression.
