@@ -222,6 +222,9 @@ public class PathResolverTest extends TestCase {
     assertEquals("myName+", expr.exec(new ExprExecCtxt(new Pojo("myName"))));
   }
 
+  /**
+   * Test for concatenating Strings with the result of evaluated expressions.
+   */
   public void testConcatStrings() {
     Expression expr = PathExpressionChain.parse(
         "'Name of head instance: ' + name + '. Name of sub instance: ' + sub.name + '.'", true);
