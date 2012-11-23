@@ -8,6 +8,12 @@
 **/.hgignore
 **/.svn/**
 **/.settings/org.eclipse.wst.*
+**/.settings/org.eclipse.jdt.core.prefs
+**/.settings/org.eclipse.core.resources.prefs
+**/.classpath
+**/.project
+
+
 **/build-for*.xml
 Servers/*
 org.eclipse.swt/*
