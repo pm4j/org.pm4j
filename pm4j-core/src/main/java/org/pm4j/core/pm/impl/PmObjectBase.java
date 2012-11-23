@@ -5,7 +5,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -1050,7 +1049,11 @@ public abstract class PmObjectBase implements PmObject {
     if (pmProperties.isEmpty()) {
       pmProperties = new ConcurrentHashMap<String, Object>();
     }
-    pmProperties.put(propName, value);
+    if (value == null) {
+    	pmProperties.remove(propName);
+    } else {
+    	pmProperties.put(propName, value);
+    }
   }
 
   // ====== Cache strategies ====== //
