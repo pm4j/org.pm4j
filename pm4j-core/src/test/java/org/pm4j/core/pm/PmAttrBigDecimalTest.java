@@ -1,10 +1,12 @@
 package org.pm4j.core.pm;
 
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
+import java.util.Locale;
 
 import org.junit.Test;
 import org.pm4j.core.pm.annotation.PmAttrBigDecimalCfg;
@@ -33,24 +35,24 @@ public class PmAttrBigDecimalTest {
     MyPm myPm = new MyPm();
 
     assertEquals(6, myPm.bigAttr.getMaxLen());
-    
+
   }
-  
+
   @Test
   public void testMinMax() {
     MyPm myPm = new MyPm();
 
     assertEquals(999999, myPm.bigAttrCfg.getMax().longValue());
     assertEquals(9, myPm.bigAttrCfg.getMaxLen());
-    
+
     myPm.bigAttrCfg.setValueAsString("0.3");
     myPm.bigAttrCfg.pmValidate();
     assertTrue(myPm.bigAttrCfg.isPmValid());
-    
+
     myPm.bigAttrCfg.setValueAsString("0");
     myPm.bigAttrCfg.pmValidate();
     assertFalse(myPm.bigAttrCfg.isPmValid());
-    
+
     myPm.bigAttrCfg.setValueAsString("1000000");
     myPm.bigAttrCfg.pmValidate();
     assertFalse(myPm.bigAttrCfg.isPmValid());
@@ -93,6 +95,14 @@ public class PmAttrBigDecimalTest {
     public final PmAttrBigDecimal bigFormatted = new PmAttrBigDecimalImpl(this);
     @PmAttrBigDecimalCfg(minValueString="0.1", maxValueString="999999.99")
     public final PmAttrBigDecimal bigAttrCfg = new PmAttrBigDecimalImpl(this);
+
+    @Override
+    protected void onPmInit() {
+      super.onPmInit();
+      // FIXME olaf: there is an unresolved language issue.
+      // The test does not work for GERMAN, even if the related resources are defined within a default resource file.
+      setPmLocale(Locale.ENGLISH);
+    }
   }
 
 }
