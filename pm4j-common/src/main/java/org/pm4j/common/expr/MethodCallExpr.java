@@ -180,13 +180,18 @@ public class MethodCallExpr
       } catch (SecurityException e) {
         throw new ExprExecExeption(ctxt, "Unable to access method.", e);
       } catch (NoSuchMethodException e) {
-        // No compatibility mode, methods are a new feature. 
-        if(hasNameModifier(Modifier.EXISTS_OPTIONALLY)){
+      	// Property does not exist. Check if that's ok.
+      	// Consider the old meaning of 'o' which also worked like an 'x'.
+    	  if(ParseCtxt.getSyntaxVersion() == SyntaxVersion.VERSION_1) {
+              if (!(hasNameModifier(Modifier.OPTIONAL) || hasNameModifier(Modifier.EXISTS_OPTIONALLY))) {
+                  throw new ExprExecExeption(ctxt, "Method '" + nameWithModifier.getName() + "' not found in class: " + objClass.getName());
+                }
+          } else {
+              if (!hasNameModifier(Modifier.EXISTS_OPTIONALLY)) {
+                  throw new ExprExecExeption(ctxt, "Method '" + nameWithModifier.getName() + "' not found in class: " + objClass.getName());
+                }        	
+          }
           return null;
-        }
-        else {
-          throw new ExprExecExeption(ctxt, "Method '" + nameWithModifier.getName() + "' not found in class: " + objClass.getName());
-        }
       }
     }
 

@@ -4,8 +4,7 @@ import org.apache.commons.lang.StringUtils;
 import org.pm4j.common.expr.Expression.SyntaxVersion;
 
 /**
- * Implementiert technischen Hilfsfunktionen zum Parsen der XML-ähnlichen
- * Struktur der Medientexte.
+ * Parse context for expression context. 
  */
 public class ParseCtxt {
   
@@ -35,7 +34,7 @@ public class ParseCtxt {
 	}
 
   /**
-   * @param ch Das zu prüfende Zeichen.
+   * @param ch Das zu pruefende Zeichen.
    * @return <code>true</code> wenn es ein Leezeichen, Tab, Newline o.Ä. war.
    */
   public static boolean isSpace(char ch) {
@@ -43,7 +42,7 @@ public class ParseCtxt {
   }
 
 	/**
-	 * Überspringt alle Leerzeichen ab aktueller Position.
+	 * �berspringt alle Leerzeichen ab aktueller Position.
 	 */
 	public final ParseCtxt skipBlanks() {
 		while (!isDone()) {

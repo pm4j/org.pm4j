@@ -1,28 +1,16 @@
 package org.pm4j.core.pm.impl.pathresolver;
 
-import java.lang.reflect.InvocationTargetException;
-
 import junit.framework.TestCase;
 
 import org.pm4j.common.expr.ExprExecCtxt;
 import org.pm4j.common.expr.ExprExecExeption;
 import org.pm4j.common.expr.Expression;
-import org.pm4j.common.expr.Expression.SyntaxVersion;
-import org.pm4j.common.expr.parser.ParseCtxt;
 import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.impl.PmConversationImpl;
 import org.pm4j.core.pm.impl.expr.PathExpressionChain;
 import org.pm4j.core.pm.impl.expr.PmExprExecCtxt;
 
-public class PathResolverTest extends TestCase {
-
-  /**
-   * There is Version flag which needs always be reset to compatibility mode,
-   * because the test modify the value.
-   */
-  public void setUp() {
-    ParseCtxt.syntaxVersion = SyntaxVersion.VERSION_1;
-  }
+public abstract class PathResolverTest extends TestCase {
 
   /**
    * Reading the name Attribute without navigation.
@@ -97,17 +85,6 @@ public class PathResolverTest extends TestCase {
     PmConversation pmConversation = new PmConversationImpl();
     pmConversation.setPmNamedObject("myProp", Pojo.make("head", "subName", "subSubName"));
     Expression expr = PathExpressionChain.parse("#myProp.sub.sub.name", true);
-    assertEquals("subSubName", expr.exec(new PmExprExecCtxt(pmConversation)));
-  }
-
-  /**
-   * Reading a named object from PmConversation. Notice the MISSING '#' sign.
-   * The default is the compatibility mode.
-   */
-  public void testCompatiblityStyleReadFromPmConversationObject() {
-    PmConversation pmConversation = new PmConversationImpl();
-    pmConversation.setPmNamedObject("myProp", Pojo.make("head", "subName", "subSubName"));
-    Expression expr = PathExpressionChain.parse("myProp.sub.sub.name", true);
     assertEquals("subSubName", expr.exec(new PmExprExecCtxt(pmConversation)));
   }
 
@@ -337,22 +314,6 @@ public class PathResolverTest extends TestCase {
   }
 
   /**
-   * Calling an optional but not existing method should throw an
-   * ExprExecExeption.
-   */
-  public void testCallOptionalMethodReturnValueButMethodDoesNotExist() {
-    Pojo p = Pojo.make("head");
-    Expression expr = PathExpressionChain.parse("(o)nonExistingMethod().notExistingField", true);
-    try {
-      expr.exec(new ExprExecCtxt(p));
-      fail();
-    } catch (ExprExecExeption e) {
-      assertTrue(e.getMessage().startsWith(
-          "Method 'nonExistingMethod' not found in class: org.pm4j.core.pm.impl.pathresolver.Pojo"));
-    }
-  }
-
-  /**
    * Calling an optional existing method which does not exist,
    */
   public void testCallOptionalExistingMethod() {
@@ -398,63 +359,6 @@ public class PathResolverTest extends TestCase {
         "'Name of head instance: ' + name + '. Name of sub instance: ' + sub.name + '.'", true);
     assertEquals("Name of head instance: head. Name of sub instance: sub.",
         expr.exec(new ExprExecCtxt(Pojo.make("head", "sub"))));
-  }
-
-  /**
-   * VERSION_2 (Strict) does not try to resolve myProp with the PmConversation
-   * if the hash sign in front of the expression path is missing.
-   */
-  public void testStrictStyleReadFromPmConversationObject() {
-    PmConversation pmConversation = new PmConversationImpl();
-    pmConversation.setPmNamedObject("myProp", Pojo.make("head"));
-    ParseCtxt.syntaxVersion = SyntaxVersion.VERSION_2;
-    Expression expr = PathExpressionChain.parse("myProp.name", true);
-    try {
-      expr.exec(new PmExprExecCtxt(pmConversation));
-      fail();
-    } catch (ExprExecExeption e) {
-      assertTrue(e.getMessage().startsWith("Unable to resolve expression part 'myProp'"));
-    }
-  }
-
-  /**
-   * Checks if in strict mode the optional field breaks
-   */
-  public void testStrictStyleOptionalField() {
-    Pojo p = Pojo.make("head", "subName");
-    ParseCtxt.syntaxVersion = SyntaxVersion.VERSION_2;
-    Expression expr = PathExpressionChain.parse("sub.(o)notExistingField", true);
-    try {
-      expr.exec(new ExprExecCtxt(p));
-      fail();
-    } catch (ExprExecExeption e) {
-      assertTrue(e.getMessage().startsWith("Unable to resolve expression part '(o)notExistingField'."));
-    }
-  }
-
-  /**
-   * Checks if in strict mode the optional method breaks
-   */
-  public void testStrictStyleOptionalMethod() {
-    Pojo p = Pojo.make("head", "subName");
-    ParseCtxt.syntaxVersion = SyntaxVersion.VERSION_2;
-    Expression expr = PathExpressionChain.parse("sub.(o)notExistingMethod()", true);
-    try {
-      expr.exec(new ExprExecCtxt(p));
-      fail();
-    } catch (ExprExecExeption e) {
-      assertTrue(e.getMessage().startsWith(
-          "Method 'notExistingMethod' not found in class: org.pm4j.core.pm.impl.pathresolver.Pojo"));
-    }
-  }
-
-  /**
-   * Check optional not existing field access in compatibility mode.
-   */
-  public void testCompatibleStyleOptionalField() {
-    Pojo p = Pojo.make("head", "subName");
-    Expression expr = PathExpressionChain.parse("sub.(o)notExistingField", true);
-    assertNull(expr.exec(new ExprExecCtxt(p)));
   }
 
 }

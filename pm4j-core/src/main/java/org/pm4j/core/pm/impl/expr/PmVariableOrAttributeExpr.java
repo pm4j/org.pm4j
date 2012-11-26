@@ -88,28 +88,16 @@ public class PmVariableOrAttributeExpr implements OptionalExpression {
       return null;
     }
 
-    return getOptionalExpression(n);
-  }
-
-  /**
-   * Decides if its a variable or Attribut Expression. 
-   * @param nameWithModifier
-   * @return
-   */
-  private static OptionalExpression getOptionalExpression(NameWithModifier nameWithModifier)
-  {
-    if(nameWithModifier.isVariable())
-    {
-      return new PmVariableExpr(nameWithModifier);
+    // Decides if its a variable or Attribut Expression.
+    if(n.isVariable()) {
+      return new PmVariableExpr(n);
     }
     else {
-      if(ParseCtxt.getSyntaxVersion() == SyntaxVersion.VERSION_2) {
+      return (ParseCtxt.getSyntaxVersion() == SyntaxVersion.VERSION_2)
         // Strict mode. 
-        return new AttributeExpr(nameWithModifier);
-      }else {
+        ? new AttributeExpr(n)
         // Compatibility mode.
-        return new PmVariableOrAttributeExpr(nameWithModifier);
-      }
+        : new PmVariableOrAttributeExpr(n);
     }
   }
   

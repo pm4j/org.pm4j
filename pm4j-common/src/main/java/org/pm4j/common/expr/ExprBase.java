@@ -1,6 +1,5 @@
 package org.pm4j.common.expr;
 
-import org.pm4j.common.expr.parser.ParseCtxt;
 
 
 public abstract class ExprBase<CTXT extends ExprExecCtxt> implements Expression {

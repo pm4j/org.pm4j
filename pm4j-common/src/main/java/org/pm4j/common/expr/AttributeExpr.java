@@ -61,17 +61,16 @@ public class AttributeExpr extends ExprBase<ExprExecCtxt> implements OptionalExp
       try {
         accessor = new BeanAttrAccessorImpl(ctxt.getCurrentValue().getClass(), name.getName());
       } catch (ReflectionException e) {
-        boolean hasExistsModifier = hasNameModifier(Modifier.EXISTS_OPTIONALLY);
-        boolean hasOptionalModifier = hasNameModifier(Modifier.OPTIONAL);
-        boolean isCompatibleVersion = ParseCtxt.getSyntaxVersion().equals(SyntaxVersion.VERSION_1);
-        boolean isStrictVersion = ParseCtxt.getSyntaxVersion().equals(SyntaxVersion.VERSION_2);
-
-        if (isStrictVersion && !hasExistsModifier) {
-          throw new ExprExecExeption(ctxt, "Unable to resolve expression part '" + name + "'.", e);
-        }
-
-        if (isCompatibleVersion && (!(hasOptionalModifier || hasExistsModifier))) {
-          throw new ExprExecExeption(ctxt, "Unable to resolve expression part '" + name + "'.", e);
+    	// Property does not exist. Check if that's ok.
+    	// Consider the old meaning of 'o' which also worked like an 'x'.
+        if(ParseCtxt.getSyntaxVersion() == SyntaxVersion.VERSION_1) {
+            if (!(hasNameModifier(Modifier.OPTIONAL) || hasNameModifier(Modifier.EXISTS_OPTIONALLY))) {
+                throw new ExprExecExeption(ctxt, "Unable to resolve expression part '" + name + "'.", e);
+              }
+        } else {
+            if (!hasNameModifier(Modifier.EXISTS_OPTIONALLY)) {
+                throw new ExprExecExeption(ctxt, "Unable to resolve expression part '" + name + "'.", e);
+              }        	
         }
         return null;
       }
