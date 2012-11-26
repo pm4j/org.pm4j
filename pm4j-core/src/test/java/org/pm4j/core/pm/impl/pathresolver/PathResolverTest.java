@@ -1,16 +1,28 @@
 package org.pm4j.core.pm.impl.pathresolver;
 
+import java.lang.reflect.InvocationTargetException;
+
 import junit.framework.TestCase;
 
 import org.pm4j.common.expr.ExprExecCtxt;
 import org.pm4j.common.expr.ExprExecExeption;
 import org.pm4j.common.expr.Expression;
+import org.pm4j.common.expr.Expression.SyntaxVersion;
+import org.pm4j.common.expr.parser.ParseCtxt;
 import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.impl.PmConversationImpl;
 import org.pm4j.core.pm.impl.expr.PathExpressionChain;
 import org.pm4j.core.pm.impl.expr.PmExprExecCtxt;
 
 public class PathResolverTest extends TestCase {
+
+  /**
+   * There is Version flag which needs always be reset to compatibility mode,
+   * because the test modify the value.
+   */
+  public void setUp() {
+    ParseCtxt.syntaxVersion = SyntaxVersion.VERSION_1;
+  }
 
   /**
    * Reading the name Attribute without navigation.
@@ -38,7 +50,7 @@ public class PathResolverTest extends TestCase {
     Pojo p = Pojo.make("head", "sub", "subSub");
     Expression expr = PathExpressionChain.parse("sub.sub.name", true);
     assertEquals("subSub", expr.exec(new ExprExecCtxt(p)));
-    }
+  }
 
   /**
    * Writing hierarchical field sub.sub.name for Pojo
@@ -48,18 +60,151 @@ public class PathResolverTest extends TestCase {
     Expression expr = PathExpressionChain.parse("sub.sub.name", true);
     expr.execAssign(new ExprExecCtxt(p), "newValue");
     assertEquals("newValue", p.sub.sub.name);
+  }
+
+  /**
+   * Trying to write hierarchical field sub.sub.name for Pojo. But there is only
+   * sub.name
+   */
+  public void testWriteHierarchicalToPojoPathWithMissingElement() {
+    Pojo p = Pojo.make("head", "subName");
+    Expression expr = PathExpressionChain.parse("sub.sub.name", true);
+    try {
+      expr.execAssign(new ExprExecCtxt(p), "newValue");
+      fail();
+    } catch (ExprExecExeption e) {
+      assertTrue(e.getMessage().startsWith("Mandatory expression returns 'null'."));
     }
+  }
+
+  /**
+   * Writing hierarchical field sub.(o)sub.name for Pojo. The optional part is
+   * not existing an should not end in an exception.
+   */
+  public void testWriteHierarchicalToOptionalNotExistingPojoPath() {
+    Pojo p = Pojo.make("head", "subName");
+    Expression expr = PathExpressionChain.parse("sub.(o)sub.name", true);
+    expr.execAssign(new ExprExecCtxt(p), "newValue");
+    assertEquals("subName", p.sub.name);
+  }
 
   /**
    * Reading a named object from PmConversation. Notice the '#' sign at the
-   * navigation expression and the PmExprExecCtxt which is a sub class of ExprExecCtxt.
+   * navigation expression and the PmExprExecCtxt which is a sub class of
+   * ExprExecCtxt.
    */
   public void testReadFromPmConversationObject() {
     PmConversation pmConversation = new PmConversationImpl();
     pmConversation.setPmNamedObject("myProp", Pojo.make("head", "subName", "subSubName"));
     Expression expr = PathExpressionChain.parse("#myProp.sub.sub.name", true);
     assertEquals("subSubName", expr.exec(new PmExprExecCtxt(pmConversation)));
+  }
+
+  /**
+   * Reading a named object from PmConversation. Notice the MISSING '#' sign.
+   * The default is the compatibility mode.
+   */
+  public void testCompatiblityStyleReadFromPmConversationObject() {
+    PmConversation pmConversation = new PmConversationImpl();
+    pmConversation.setPmNamedObject("myProp", Pojo.make("head", "subName", "subSubName"));
+    Expression expr = PathExpressionChain.parse("myProp.sub.sub.name", true);
+    assertEquals("subSubName", expr.exec(new PmExprExecCtxt(pmConversation)));
+  }
+
+  /**
+   * Reading named Object with optional field, but the object does not exist.
+   */
+  public void testReadFromPmConversationObjectWithOptionalFieldNegativ() {
+    Pojo p = Pojo.make("head");
+    PmConversation pmConversation = new PmConversationImpl();
+    pmConversation.setPmNamedObject("myProp", p);
+    Expression expr = PathExpressionChain.parse("#myProp.(o)sub.name", true);
+    assertNull(expr.exec(new PmExprExecCtxt(pmConversation)));
+  }
+
+  /**
+   * Reading named Object with optional field. But the object exists.
+   */
+  public void testReadFromPmConversationObjectWithOptionalFieldPositv() {
+    Pojo p = Pojo.make("head", "subName");
+    PmConversation pmConversation = new PmConversationImpl();
+    pmConversation.setPmNamedObject("myProp", p);
+    Expression expr = PathExpressionChain.parse("#myProp.(o)sub.name", true);
+    assertEquals("subName", expr.exec(new PmExprExecCtxt(pmConversation)));
+  }
+
+  /**
+   * Reading named Object with optional method. But the object does not exist.
+   */
+  public void testReadFromPmConversationObjectWithOptionalMethodNegativ() {
+    Pojo p = Pojo.make("head");
+    PmConversation pmConversation = new PmConversationImpl();
+    pmConversation.setPmNamedObject("myProp", p);
+    Expression expr = PathExpressionChain.parse("#myProp.(o)getSubMethod().name", true);
+    assertNull(expr.exec(new PmExprExecCtxt(pmConversation)));
+  }
+
+  /**
+   * Reading named Object with optional method. But the object exists.
+   */
+  public void testReadFromPmConversationObjectWithOptionalMethodPositv() {
+    Pojo p = Pojo.make("head", "subName");
+    PmConversation pmConversation = new PmConversationImpl();
+    pmConversation.setPmNamedObject("myProp", p);
+    Expression expr = PathExpressionChain.parse("#myProp.(o)getSubMethod().name", true);
+    assertEquals("subName", expr.exec(new PmExprExecCtxt(pmConversation)));
+  }
+
+  /**
+   * Reading named Object with existing optional method. But the object exists.
+   */
+  public void testReadFromPmConversationObjectWithExistingOptionalMethodPositv() {
+    Pojo p = Pojo.make("head", "subName");
+    PmConversation pmConversation = new PmConversationImpl();
+    pmConversation.setPmNamedObject("myProp", p);
+    Expression expr = PathExpressionChain.parse("#myProp.(x)getSubMethod().name", true);
+    assertEquals("subName", expr.exec(new PmExprExecCtxt(pmConversation)));
+  }
+
+  /**
+   * Reading named Object with not existing optional method. But the method does
+   * not exist.
+   */
+  public void testReadFromPmConversationObjectWithExistingOptionalMethodNegativ() {
+    Pojo p = Pojo.make("head", "subName");
+    PmConversation pmConversation = new PmConversationImpl();
+    pmConversation.setPmNamedObject("myProp", p);
+    Expression expr = PathExpressionChain.parse("#myProp.(x)getNotExistingMethod().notExistingField", true);
+    assertNull(expr.exec(new PmExprExecCtxt(pmConversation)));
+  }
+
+  /**
+   * Reading named Object with not existing method. The method does not exist.
+   */
+  public void testReadFromPmConversationObjectWithNotExistingOptionalMethodNegativ() {
+    Pojo p = Pojo.make("head", "subName");
+    PmConversation pmConversation = new PmConversationImpl();
+    pmConversation.setPmNamedObject("myProp", p);
+    Expression expr = PathExpressionChain.parse("#myProp.getNotExistingMethod()", true);
+    try {
+      expr.exec(new PmExprExecCtxt(pmConversation));
+      fail();
+    } catch (ExprExecExeption e) {
+      assertTrue(e.getMessage().startsWith(
+          "Method 'getNotExistingMethod' not found in class: org.pm4j.core.pm.impl.pathresolver.Pojo"));
     }
+  }
+
+  /**
+   * Reading named Object with optional method.
+   */
+  public void testReadFromPmConversationObjectWithNotExistingOptionalMethod() {
+    Pojo p = Pojo.make("head");
+    PmConversation pmConversation = new PmConversationImpl();
+    pmConversation.setPmNamedObject("myProp", p);
+    Expression expr = PathExpressionChain.parse("#myProp.(o)getSubMethod().name", true);
+    assertNull(expr.exec(new PmExprExecCtxt(pmConversation)));
+  }
 
   /**
    * Reads a not filled optional field from Pojo. The optional is unnecessary,
@@ -70,7 +215,7 @@ public class PathResolverTest extends TestCase {
     Pojo p = new Pojo(null);
     Expression expr = PathExpressionChain.parse("(o)name", true);
     assertNull(expr.exec(new ExprExecCtxt(p)));
-        }
+  }
 
   /**
    * Reads an existing optional field. The optional is unnecessary but allowed.
@@ -79,31 +224,16 @@ public class PathResolverTest extends TestCase {
     Pojo p = Pojo.make("head", "subName");
     Expression expr = PathExpressionChain.parse("sub.(o)name", true);
     assertEquals("subName", expr.exec(new ExprExecCtxt(p)));
-        }
+  }
 
   /**
-   * Reads the optional sub element of
+   * Reads the optional, not existing sub element of subName.
    */
   public void testReadOptionalHierarchicalUnsetField() {
     Pojo p = Pojo.make("head", "subName");
     Expression expr = PathExpressionChain.parse("sub.(o)sub.name", true);
     assertNull(expr.exec(new ExprExecCtxt(p)));
-      }
-
-  // /**
-  // * An optional but not existing field throws an Exception.
-  // */
-  // public void testReadOptionalButNotExistingField() {
-  // Pojo p = Pojo.make("head", "subName");
-  // Expression expr= PathExpressionChain.parse("sub.(o)notExistingField",
-  // true);
-  // try {
-  // expr.exec(new ExprExecCtxt(p));
-  // fail();
-  // } catch (ExprExecExeption e) {
-  // // TODO: assert e values.
-  // }
-  // }
+  }
 
   /**
    * Reading a optional existing field, which does not exist, leads to a null
@@ -113,6 +243,45 @@ public class PathResolverTest extends TestCase {
     Pojo p = Pojo.make("head", "subName");
     Expression expr = PathExpressionChain.parse("sub.(x)notExistingField", true);
     assertNull(expr.exec(new ExprExecCtxt(p)));
+  }
+
+  /**
+   * Reading a optional existing field, which does not exist, leads to a null
+   * value.
+   */
+  public void testReadOptionalExistingWhichIsNotExistingFieldWithMethodCall() {
+    Pojo p = Pojo.make("head", "subName");
+    Expression expr = PathExpressionChain.parse("sub.(x)notExistingField.getNotExisting()", true);
+    assertNull(expr.exec(new ExprExecCtxt(p)));
+  }
+
+  /**
+   * Reading a optional existing field, which does not exist, leads not to a
+   * NullPointerException.
+   */
+  public void testReadOptionalExistingOptionalFieldWhichIsNotExistingField() {
+    Pojo p = Pojo.make("head", "subName");
+    Expression expr = PathExpressionChain.parse("sub.(x,o)sub.name", true);
+    assertNull(expr.exec(new ExprExecCtxt(p)));
+  }
+
+  /**
+   * Different Order
+   */
+  public void testReadOptionalWithDifferentOrder() {
+    Pojo p = Pojo.make("head", "subName");
+    Expression expr = PathExpressionChain.parse("sub.(o,x)sub.name", true);
+    assertNull(expr.exec(new ExprExecCtxt(p)));
+  }
+
+  /**
+   * Reading a optional existing field, which exists, leads not to a
+   * NullPointerException.
+   */
+  public void testReadOptionalExistingOptionalFieldWhichIsExistingField() {
+    Pojo p = Pojo.make("head", "subName", "subSubName");
+    Expression expr = PathExpressionChain.parse("sub.(x,o)sub.name", true);
+    assertEquals("subSubName", expr.exec(new ExprExecCtxt(p)));
   }
 
   /**
@@ -167,35 +336,34 @@ public class PathResolverTest extends TestCase {
     assertNull(expr.exec(new ExprExecCtxt(p)));
   }
 
-  // /**
-  // * Calling an optional but not existing method should throw an
-  // ExprExecExeption.
-  // */
-  // public void testCallOptionalMethodReturnValueButMethodDoesNotExist() {
-  // Pojo p = Pojo.make("head");
-  // Expression expr = PathExpressionChain.parse("(o)nonExistingMethod().name",
-  // true);
-  // try {
-  // expr.exec(new ExprExecCtxt(p));
-  // fail();
-  // } catch (ExprExecExeption e) {
-  // // TODO: Read assert exception properties.
-  // }
-  // }
-  //
-  // /**
-  // * Calling an optional existing method which does not exist,
-  // */
-  // public void testCallExistingOptionalMethod() {
-  // Pojo p = Pojo.make("head");
-  // Expression expr = PathExpressionChain.parse("(x)nonExistingMethod().name",
-  // true);
-  // assertNull(expr.exec(new ExprExecCtxt(p)));
-  // }
+  /**
+   * Calling an optional but not existing method should throw an
+   * ExprExecExeption.
+   */
+  public void testCallOptionalMethodReturnValueButMethodDoesNotExist() {
+    Pojo p = Pojo.make("head");
+    Expression expr = PathExpressionChain.parse("(o)nonExistingMethod().notExistingField", true);
+    try {
+      expr.exec(new ExprExecCtxt(p));
+      fail();
+    } catch (ExprExecExeption e) {
+      assertTrue(e.getMessage().startsWith(
+          "Method 'nonExistingMethod' not found in class: org.pm4j.core.pm.impl.pathresolver.Pojo"));
+    }
+  }
 
   /**
-   * Calling an optional or optional existing method which does not exist, should 
-   * result in a null value.
+   * Calling an optional existing method which does not exist,
+   */
+  public void testCallOptionalExistingMethod() {
+    Pojo p = Pojo.make("head");
+    Expression expr = PathExpressionChain.parse("(x)nonExistingMethod().name", true);
+    assertNull(expr.exec(new ExprExecCtxt(p)));
+  }
+
+  /**
+   * Calling an optional or optional existing method which does not exist,
+   * should result in a null value.
    */
   public void testCallNotExistingOptionalOrOptionalExistingMethod() {
     Pojo p = Pojo.make("head");
@@ -204,8 +372,8 @@ public class PathResolverTest extends TestCase {
   }
 
   /**
-   * Calling an optional or optional existing method which exists, but the method return value
-   * is null and should not throw a NullPointerException.
+   * Calling an optional or optional existing method which exists, but the
+   * method return value is null and should not throw a NullPointerException.
    */
   public void testCallExistingOptionalMethod() {
     Pojo p = Pojo.make("head");
@@ -213,9 +381,9 @@ public class PathResolverTest extends TestCase {
     assertNull(expr.exec(new ExprExecCtxt(p)));
   }
 
-  
   /**
-   * It is possible to pass arguments but the scope is fixed to this, the same object.
+   * It is possible to pass arguments but the scope is fixed to this, the same
+   * object.
    */
   public void testCallMethodWithParam() {
     Expression expr = PathExpressionChain.parse("addAPlus(this.name)", true);
@@ -230,6 +398,63 @@ public class PathResolverTest extends TestCase {
         "'Name of head instance: ' + name + '. Name of sub instance: ' + sub.name + '.'", true);
     assertEquals("Name of head instance: head. Name of sub instance: sub.",
         expr.exec(new ExprExecCtxt(Pojo.make("head", "sub"))));
+  }
+
+  /**
+   * VERSION_2 (Strict) does not try to resolve myProp with the PmConversation
+   * if the hash sign in front of the expression path is missing.
+   */
+  public void testStrictStyleReadFromPmConversationObject() {
+    PmConversation pmConversation = new PmConversationImpl();
+    pmConversation.setPmNamedObject("myProp", Pojo.make("head"));
+    ParseCtxt.syntaxVersion = SyntaxVersion.VERSION_2;
+    Expression expr = PathExpressionChain.parse("myProp.name", true);
+    try {
+      expr.exec(new PmExprExecCtxt(pmConversation));
+      fail();
+    } catch (ExprExecExeption e) {
+      assertTrue(e.getMessage().startsWith("Unable to resolve expression part 'myProp'"));
+    }
+  }
+
+  /**
+   * Checks if in strict mode the optional field breaks
+   */
+  public void testStrictStyleOptionalField() {
+    Pojo p = Pojo.make("head", "subName");
+    ParseCtxt.syntaxVersion = SyntaxVersion.VERSION_2;
+    Expression expr = PathExpressionChain.parse("sub.(o)notExistingField", true);
+    try {
+      expr.exec(new ExprExecCtxt(p));
+      fail();
+    } catch (ExprExecExeption e) {
+      assertTrue(e.getMessage().startsWith("Unable to resolve expression part '(o)notExistingField'."));
+    }
+  }
+
+  /**
+   * Checks if in strict mode the optional method breaks
+   */
+  public void testStrictStyleOptionalMethod() {
+    Pojo p = Pojo.make("head", "subName");
+    ParseCtxt.syntaxVersion = SyntaxVersion.VERSION_2;
+    Expression expr = PathExpressionChain.parse("sub.(o)notExistingMethod()", true);
+    try {
+      expr.exec(new ExprExecCtxt(p));
+      fail();
+    } catch (ExprExecExeption e) {
+      assertTrue(e.getMessage().startsWith(
+          "Method 'notExistingMethod' not found in class: org.pm4j.core.pm.impl.pathresolver.Pojo"));
+    }
+  }
+
+  /**
+   * Check optional not existing field access in compatibility mode.
+   */
+  public void testCompatibleStyleOptionalField() {
+    Pojo p = Pojo.make("head", "subName");
+    Expression expr = PathExpressionChain.parse("sub.(o)notExistingField", true);
+    assertNull(expr.exec(new ExprExecCtxt(p)));
   }
 
 }

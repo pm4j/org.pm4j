@@ -1,12 +1,15 @@
 package org.pm4j.common.expr.parser;
 
 import org.apache.commons.lang.StringUtils;
+import org.pm4j.common.expr.Expression.SyntaxVersion;
 
 /**
  * Implementiert technischen Hilfsfunktionen zum Parsen der XML-ähnlichen
  * Struktur der Medientexte.
  */
 public class ParseCtxt {
+  
+  public static SyntaxVersion syntaxVersion = SyntaxVersion.VERSION_1;
 
 	/** The text to parse. */
 	private String text;
@@ -252,4 +255,13 @@ public class ParseCtxt {
 	public String getText() {
 		return text;
 	}
+	
+	/**
+	 * @return Die Syntax version.
+	 */
+	public static SyntaxVersion getSyntaxVersion()
+	{
+	  return syntaxVersion;
+	}
+	
 }

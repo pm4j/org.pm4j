@@ -180,7 +180,11 @@ public class MethodCallExpr
       } catch (SecurityException e) {
         throw new ExprExecExeption(ctxt, "Unable to access method.", e);
       } catch (NoSuchMethodException e) {
-        if (! hasNameModifier(Modifier.OPTIONAL)) {
+        // No compatibility mode, methods are a new feature. 
+        if(hasNameModifier(Modifier.EXISTS_OPTIONALLY)){
+          return null;
+        }
+        else {
           throw new ExprExecExeption(ctxt, "Method '" + nameWithModifier.getName() + "' not found in class: " + objClass.getName());
         }
       }

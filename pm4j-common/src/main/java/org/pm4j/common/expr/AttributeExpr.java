@@ -8,12 +8,10 @@ import org.pm4j.core.util.reflection.ReflectionException;
 
 /**
  * A path that uses a public field or getter/setter to resolve the path string.
- *
+ * 
  * @author olaf boede
  */
-public class AttributeExpr
-    extends ExprBase<ExprExecCtxt>
-    implements OptionalExpression {
+public class AttributeExpr extends ExprBase<ExprExecCtxt> implements OptionalExpression {
 
   private NameWithModifier name;
   private BeanAttrAccessor accessor;
@@ -39,8 +37,7 @@ public class AttributeExpr
     if (currentObj == null) {
       if (!hasNameModifier(Modifier.OPTIONAL)) {
         throw new ExprExecExeption(ctxt, "Unable to resolve expression part '" + name + "' on a 'null' value.");
-      }
-      else {
+      } else {
         return null;
       }
     }
@@ -63,10 +60,17 @@ public class AttributeExpr
     if (accessor == null) {
       try {
         accessor = new BeanAttrAccessorImpl(ctxt.getCurrentValue().getClass(), name.getName());
-      }
-      catch (ReflectionException e) {
-        // TODO olaf: isExistsOptionally() should be used here...
-        if (! (hasNameModifier(Modifier.OPTIONAL) || hasNameModifier(Modifier.EXISTS_OPTIONALLY))) {
+      } catch (ReflectionException e) {
+        boolean hasExistsModifier = hasNameModifier(Modifier.EXISTS_OPTIONALLY);
+        boolean hasOptionalModifier = hasNameModifier(Modifier.OPTIONAL);
+        boolean isCompatibleVersion = ParseCtxt.getSyntaxVersion().equals(SyntaxVersion.VERSION_1);
+        boolean isStrictVersion = ParseCtxt.getSyntaxVersion().equals(SyntaxVersion.VERSION_2);
+
+        if (isStrictVersion && !hasExistsModifier) {
+          throw new ExprExecExeption(ctxt, "Unable to resolve expression part '" + name + "'.", e);
+        }
+
+        if (isCompatibleVersion && (!(hasOptionalModifier || hasExistsModifier))) {
           throw new ExprExecExeption(ctxt, "Unable to resolve expression part '" + name + "'.", e);
         }
         return null;
@@ -82,9 +86,7 @@ public class AttributeExpr
 
   public static AttributeExpr parse(ParseCtxt ctxt) {
     NameWithModifier n = NameWithModifier.parseNameAndModifier(ctxt);
-    return (n != null)
-              ? new AttributeExpr(n)
-              : null;
+    return (n != null) ? new AttributeExpr(n) : null;
   }
 
 }

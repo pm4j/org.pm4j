@@ -1,8 +1,11 @@
 package org.pm4j.common.expr;
 
+import org.pm4j.common.expr.parser.ParseCtxt;
+
 
 public abstract class ExprBase<CTXT extends ExprExecCtxt> implements Expression {
 
+  
   protected String getPathName() {
     return toString();
   }
@@ -30,5 +33,5 @@ public abstract class ExprBase<CTXT extends ExprExecCtxt> implements Expression 
   public final void execAssign(ExprExecCtxt ctxt, Object value) {
     execAssignImpl((CTXT)ctxt, value);
   }
-
+  
 }

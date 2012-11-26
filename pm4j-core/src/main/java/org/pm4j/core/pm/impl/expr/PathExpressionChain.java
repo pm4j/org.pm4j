@@ -38,7 +38,7 @@ public class PathExpressionChain extends ExprBase<ExprExecCtxt> {
       r.exec(ctxt);
       if (ctxt.getCurrentValue() == null) {
         if (i != chain.length-1 &&
-            ! r.hasNameModifier(Modifier.OPTIONAL)) {
+            ! (r.hasNameModifier(Modifier.OPTIONAL) || r.hasNameModifier(Modifier.EXISTS_OPTIONALLY))) {
           throw new ExprExecExeption(ctxt, "Mandatory expression returns 'null'.");
         }
         break;
