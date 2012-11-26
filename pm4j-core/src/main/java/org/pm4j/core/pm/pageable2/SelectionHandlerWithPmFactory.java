@@ -153,7 +153,8 @@ public class SelectionHandlerWithPmFactory<T_PM extends PmBean<T_BEAN>, T_BEAN> 
           : false;
     }
 
-    public Selection<T_BEAN> getBeanSelection() {
+    @SuppressWarnings("unchecked")
+	public Selection<T_BEAN> getBeanSelection() {
       return beanSelection;
     }
   }
