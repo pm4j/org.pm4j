@@ -18,7 +18,7 @@ import org.pm4j.common.query.inmem.InMemQueryEvaluator;
 import org.pm4j.common.query.inmem.InMemSortOrder;
 import org.pm4j.common.util.CompareUtil;
 
-public class PageableQueryCollectionImplTest extends PageableCollectionTestBase<PageableCollectionTestBase.Bean> {
+public class PageableQueryCollectionTest extends PageableCollectionTestBase<PageableCollectionTestBase.Bean> {
 
   TestService service = new TestService();
 
@@ -39,7 +39,7 @@ public class PageableQueryCollectionImplTest extends PageableCollectionTestBase<
 
   // --- A fake service implementation that does the job just in memory. ---
 
-  class TestService implements PageableQueryService<Bean, Integer> {
+  static class TestService implements PageableQueryService<Bean, Integer> {
 
     private Map<Integer, Bean> idToBeanMap = new LinkedHashMap<Integer, Bean>();
 

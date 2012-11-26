@@ -7,65 +7,108 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import org.pm4j.common.pageable.PageableCollection2;
 import org.pm4j.common.pageable.PageableCollectionBase2;
 import org.pm4j.common.pageable.PageableCollectionUtil2;
 import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.selection.SelectionHandler;
 import org.pm4j.common.util.collection.ListUtil;
 
+/**
+ * A {@link PageableCollection2} that uses a {@link PageableQueryService} and {@link QueryParams}
+ * to get the data to provide.
+ *
+ * @param <T_ITEM> type of handled items.
+ * @param <T_ID> the item identifier type.
+ *
+ * @author olaf boede
+ */
 public class PageableQueryCollection<T_ITEM, T_ID extends Serializable> extends PageableCollectionBase2<T_ITEM> {
 
   private final PageableQueryService<T_ITEM, T_ID> service;
-  private long                                     itemCount                           = -1;
-  private long                                     unfilteredItemCount                 = -1;
+  private long                                     itemCountCache                           = -1;
+  private long                                     unfilteredItemCountCache                 = -1;
+  private List<T_ITEM>                             pageItemsCache;
   private SelectionHandler<T_ITEM>                 selectionHandler;
 
-  private PropertyChangeListener                   resetItemCountOnQueryChangeListener = new PropertyChangeListener() {
-    @Override
-    public void propertyChange(PropertyChangeEvent evt) {
-      itemCount = -1;
-      unfilteredItemCount = -1;
-    }
-  };
-
+  /**
+   * Creates a sercie based collection without query restrictions.
+   *
+   * @param service
+   *          the service used to get the data.
+   */
   public PageableQueryCollection(PageableQueryService<T_ITEM, T_ID> service) {
     this(service, null);
   }
 
-  public PageableQueryCollection(PageableQueryService<T_ITEM, T_ID> service, QueryParams query) {
-    super(service.getQueryOptions(), query);
+  /**
+   * @param service
+   *          the service used to get the data.
+   * @param queryParams
+   *          the set of query parameters that provides data restrictions and
+   *          sort order.<br>
+   *          May be <code>null</code> if there are no query restrictions.
+   */
+  public PageableQueryCollection(PageableQueryService<T_ITEM, T_ID> service, QueryParams queryParams) {
+    super(service.getQueryOptions(), queryParams);
 
     this.service = service;
     this.selectionHandler = new PageableQuerySelectionHandler<T_ITEM, T_ID>(service, getQueryParams());
 
-    // uses getQuery() because the super ctor may have created it.
-    getQueryParams().addPropertyChangeListener(QueryParams.PROP_EFFECTIVE_FILTER, resetItemCountOnQueryChangeListener);
+    // Uses getQueryParams() because the super ctor may have created it.
+    QueryParams myQueryParams = getQueryParams();
+
+    // Reset all caches on each query filter criteria change.
+    myQueryParams.addPropertyChangeListener(QueryParams.PROP_EFFECTIVE_FILTER, new PropertyChangeListener() {
+      @Override
+      public void propertyChange(PropertyChangeEvent evt) {
+        clearCaches();
+      }
+    });
+    // In addition: reset the page item cache on sort order change.
+    myQueryParams.addPropertyChangeListener(QueryParams.PROP_EFFECTIVE_SORT_ORDER, new PropertyChangeListener() {
+      @Override
+      public void propertyChange(PropertyChangeEvent evt) {
+        pageItemsCache = null;
+      }
+    });
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public List<T_ITEM> getItemsOnPage() {
-    long startIdx = PageableCollectionUtil2.getIdxOfFirstItemOnPage(this)-1;
-    QueryParams queryParams = getQueryParams();
-    return (startIdx > -1 && queryParams.isExecQuery())
-    		? service.getItems(getQueryParams(), startIdx, getPageSize())
-    		: Collections.EMPTY_LIST;
+    if (pageItemsCache == null) {
+      long startIdx = PageableCollectionUtil2.getIdxOfFirstItemOnPage(this)-1;
+      QueryParams queryParams = getQueryParams();
+      pageItemsCache = (startIdx > -1 && queryParams.isExecQuery())
+      		? service.getItems(getQueryParams(), startIdx, getPageSize())
+      		: Collections.EMPTY_LIST;
+    }
+    return pageItemsCache;
+  }
+
+  @Override
+  public void setCurrentPageIdx(int pageIdx) {
+    if (pageIdx != getCurrentPageIdx()) {
+      pageItemsCache = null;
+    }
+    super.setCurrentPageIdx(pageIdx);
   }
 
   @Override
   public long getNumOfItems() {
-    return (itemCount != -1)
-        ? itemCount
-        : (itemCount = getQueryParams().isExecQuery()
+    return (itemCountCache != -1)
+        ? itemCountCache
+        : (itemCountCache = getQueryParams().isExecQuery()
           ? service.getItemCount(getQueryParams())
           : 0);
   }
 
   @Override
   public long getUnfilteredItemCount() {
-    return (unfilteredItemCount != -1)
-        ? unfilteredItemCount
-        : (unfilteredItemCount = getQueryParams().isExecQuery()
+    return (unfilteredItemCountCache != -1)
+        ? unfilteredItemCountCache
+        : (unfilteredItemCountCache = getQueryParams().isExecQuery()
           ? service.getUnfilteredItemCount(getQueryParams())
           : 0);
   }
@@ -115,8 +158,9 @@ public class PageableQueryCollection<T_ITEM, T_ID extends Serializable> extends 
 
   @Override
   public void clearCaches() {
-    itemCount = -1;
-    unfilteredItemCount = -1;
+    itemCountCache = -1;
+    unfilteredItemCountCache = -1;
+    pageItemsCache = null;
   }
 
 }
