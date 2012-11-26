@@ -111,7 +111,7 @@ public class PmTableImpl2
 
   @Deprecated
   @Override
-  public List<PmTableCol> getColumns() {
+  public final List<PmTableCol> getColumns() {
     return getColumnPms();
   }
 
@@ -138,8 +138,8 @@ public class PmTableImpl2
 
   @Deprecated
   @Override
-  public List<T_ROW_PM> getRows() {
-    return getPmPageableCollection().getItemsOnPage();
+  public final List<T_ROW_PM> getRows() {
+    return getRowPms();
   }
 
   /**
@@ -174,7 +174,7 @@ public class PmTableImpl2
 
   @Deprecated
   @Override
-  public int getTotalNumOfRows() {
+  public final int getTotalNumOfRows() {
     return (int)getTotalNumOfPmRows();
   }
 
@@ -192,7 +192,7 @@ public class PmTableImpl2
   }
 
   /** @deprecated Please use {@link #getPmRowSelectMode()} */
-  public SelectMode getRowSelectMode() {
+  public final SelectMode getRowSelectMode() {
     return getPmRowSelectMode();
   }
 
@@ -212,7 +212,7 @@ public class PmTableImpl2
   }
 
   /** @deprecated Please use {@link #setPmRowSelectMode(SelectMode)} */
-  public void setRowSelectMode(SelectMode rowSelectMode) {
+  public final void setRowSelectMode(SelectMode rowSelectMode) {
     setPmRowSelectMode(rowSelectMode);
   }
 
@@ -232,7 +232,7 @@ public class PmTableImpl2
 
   @Deprecated
   @Override
-  public int getNumOfPageRows() {
+  public final int getNumOfPageRows() {
     return getNumOfPageRowPms();
   }
 
@@ -250,7 +250,7 @@ public class PmTableImpl2
   }
 
   /** @deprecated Please use {@link #setNumOfPageRowPms(Integer)} */
-  public void setNumOfPageRows(Integer numOfPageRows) {
+  public final void setNumOfPageRows(Integer numOfPageRows) {
     setNumOfPageRowPms(numOfPageRows);
   }
 
@@ -505,21 +505,6 @@ public class PmTableImpl2
     }
   }
 
-  protected T_ROW_PM getSelectedTableRowPm() {
-    Selection<T_ROW_PM> selection = getPmSelectionHandler().getSelection();
-    return (selection.getSize() == 1)
-            ? selection.iterator().next()
-            : null;
-  }
-
-  protected T_ROW_BEAN getSelectedTableRowPmBean() {
-    Selection<T_ROW_BEAN> selection = getPmSelectionHandler().getSelection().getBeanSelection();
-    return (selection.getSize() == 1)
-            ? selection.iterator().next()
-            : null;
-  }
-
-
   /**
    * @return A pager that may be used to navigate through the table.<br>
    *         May return <code>null</code> if there is no pager defined for this
@@ -548,14 +533,6 @@ public class PmTableImpl2
     }
   }
 
-
-  // -- metadata handling --
-
-  @Override
-  protected PmObjectBase.MetaData makeMetaData() {
-    return new MetaData();
-  }
-
   // -- support classes --
 
   /**
@@ -578,6 +555,11 @@ public class PmTableImpl2
     }
   }
 
+  /**
+   * A property change listener that forwards event calls to registered {@link TableChange#SELECTION} decorators.
+   * <p>
+   * TODO olaf: should use an intermediate command to allow the standard logic for confirmed changes...
+   */
   class TableSelectionChangeListener implements PropertyAndVetoableChangeListener {
 
     @Override
@@ -599,6 +581,11 @@ public class PmTableImpl2
     }
   }
 
+  /**
+   * A property change listener that forwards event calls to registered {@link TableChange#FILTER} decorators.
+   * <p>
+   * TODO olaf: should use an intermediate command to allow the standard logic for confirmed changes...
+   */
   class TableFilterChangeListener implements PropertyAndVetoableChangeListener {
 
     @Override
