@@ -19,13 +19,13 @@ import org.pm4j.common.selection.SelectionHandlerBase;
 import org.pm4j.common.selection.SelectionHandlerWithItemSet;
 
 /**
- * TODO OBOEDE Comment me!
+ * A pageable collection that combines items provided by a backing base
+ * {@link PageableCollection2} with a list of transient items.
  *
  * @param <T_ITEM>
+ *          the type of handled items.
  *
- * @author OBOEDE
- * @since GLOBE 1.4
- *
+ * @author olaf boede
  */
 public class PageableCollectionWithTransientItems<T_ITEM> implements PageableCollection2<T_ITEM> {
   private static final Log                   LOG              = LogFactory.getLog(SelectionHandlerWithItemSet.class);
