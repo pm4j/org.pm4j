@@ -13,10 +13,31 @@
 	</parent>
 
 	<build>
-
+          <resources>
+			<resource>
+				<directory>${basedir}/src/main/java</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>**</include>
+				</includes>
+				<excludes>
+					<exclude>**/*.java</exclude>
+				</excludes>
+			</resource>
+			<resource>
+				<directory>${basedir}/src/test/java</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>**</include>
+				</includes>
+				<excludes>
+					<exclude>**/*.java</exclude>
+				</excludes>
+			</resource>
+		</resources>
 	</build>
 	<dependencies>
-	
+
 		<dependency>
 			<groupId>javax.validation</groupId>
 			<artifactId>validation-api</artifactId>
@@ -52,6 +73,6 @@
 			<artifactId>slf4j-log4j12</artifactId>
 			<version>1.6.1</version>
 		</dependency>
-		
+
 	</dependencies>
 </project>
