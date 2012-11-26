@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.pm4j.common.util.collection.IterableUtil;
@@ -85,7 +86,7 @@ public class SelectionHandlerWithItemSet<T_ITEM> extends SelectionHandlerBase<T_
   public boolean selectAll(boolean select) {
     if (select) {
       if (getSelectMode() != SelectMode.MULTI) {
-        throw new RuntimeException("Select all for current select mode is not supported: " + getSelectMode());
+        throw new RuntimeException("Select all is not supported for select mode: " + getSelectMode());
       }
 
       return select(select, IterableUtil.shallowCopy(collection));
@@ -93,6 +94,16 @@ public class SelectionHandlerWithItemSet<T_ITEM> extends SelectionHandlerBase<T_
     else {
       return setSelection(Collections.EMPTY_SET);
     }
+  }
+
+  @Override
+  public boolean invertSelection() {
+    if (getSelectMode() != SelectMode.MULTI) {
+      throw new RuntimeException("Invert selection is not supported for select mode: " + getSelectMode());
+    }
+
+    // TODO olaf: not yet implemented
+    throw new NotImplementedException();
   }
 
   @Override

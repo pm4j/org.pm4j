@@ -93,6 +93,17 @@ public interface SelectionHandler<T_ITEM> extends PropertyChangeSupported {
   boolean selectAll(boolean select);
 
   /**
+   * Inverts the current selection.
+   * <p>
+   * Should only be called in selection mode {@link SelectMode#MULTI}.
+   *
+   * @return <code>true</code> if the change was done.<br>
+   *         <code>false</code> if the change was rejected by a
+   *         {@link VetoableChangeListener}.
+   */
+  boolean invertSelection();
+
+  /**
    * @return The set of selected items.
    */
   Selection<T_ITEM> getSelection();

@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.pm4j.common.query.QueryParams;
@@ -108,6 +109,16 @@ public class PageableQuerySelectionHandler<T_ITEM, T_ID extends Serializable> ex
     }
 
     return true;
+  }
+
+  @Override
+  public boolean invertSelection() {
+    if (getSelectMode() != SelectMode.MULTI) {
+      throw new RuntimeException("Invert selection is not supported for select mode: " + getSelectMode());
+    }
+
+    // TODO olaf: not yet implemented
+    throw new NotImplementedException();
   }
 
   @Override

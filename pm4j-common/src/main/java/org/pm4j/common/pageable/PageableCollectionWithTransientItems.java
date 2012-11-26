@@ -281,6 +281,16 @@ public class PageableCollectionWithTransientItems<T_ITEM> implements PageableCol
       return setSelection(newSelection);
     }
 
+    @Override
+    public boolean invertSelection() {
+      if (getSelectMode() != SelectMode.MULTI) {
+        throw new RuntimeException("Invert selection is not supported for select mode: " + getSelectMode());
+      }
+
+      // TODO olaf: not yet implemented
+      throw new NotImplementedException();
+    }
+
     /**
      * {@inheritDoc}
      */

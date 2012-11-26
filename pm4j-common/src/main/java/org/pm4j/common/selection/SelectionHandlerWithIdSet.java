@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -88,6 +89,16 @@ public abstract class SelectionHandlerWithIdSet<T_ITEM, T_ID> extends SelectionH
     else {
       return setSelection(Collections.EMPTY_SET);
     }
+  }
+
+  @Override
+  public boolean invertSelection() {
+    if (getSelectMode() != SelectMode.MULTI) {
+      throw new RuntimeException("Invert selection is not supported for select mode: " + getSelectMode());
+    }
+
+    // TODO olaf: not yet implemented
+    throw new NotImplementedException();
   }
 
   @Override

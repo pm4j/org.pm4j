@@ -82,6 +82,11 @@ public class SelectionHandlerWithPmFactory<T_PM extends PmBean<T_BEAN>, T_BEAN> 
   }
 
   @Override
+  public boolean invertSelection() {
+    return baseSelectionHandler.invertSelection();
+  }
+
+  @Override
   public Selection<T_PM> getSelection() {
     return new PmSelection(baseSelectionHandler.getSelection());
   }
