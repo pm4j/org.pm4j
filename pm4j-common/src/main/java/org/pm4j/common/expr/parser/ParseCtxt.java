@@ -4,10 +4,10 @@ import org.apache.commons.lang.StringUtils;
 import org.pm4j.common.expr.Expression.SyntaxVersion;
 
 /**
- * Parse context for expression context. 
+ * Parse context for expression context.
  */
 public class ParseCtxt {
-  
+
   public static SyntaxVersion syntaxVersion = SyntaxVersion.VERSION_1;
 
 	/** The text to parse. */
@@ -17,7 +17,7 @@ public class ParseCtxt {
 	private int pos;
 
 	/**
-	 * @param text The text to parse.
+	 * @param text the text to parse.
 	 */
 	public ParseCtxt(String text) {
 		this.text = StringUtils.defaultString(text);
@@ -25,24 +25,22 @@ public class ParseCtxt {
 	}
 
 	/**
-	 *
-	 * @return <code>true</code> wenn der Parse-Zeiger ({link {@link #pos})
-	 *         am Ende des Textes angelangt ist.
+	 * @return <code>true</code> if ({link {@link #pos}) reached the end of the text.
 	 */
 	public final boolean isDone() {
 		return pos >= text.length();
 	}
 
   /**
-   * @param ch Das zu pruefende Zeichen.
-   * @return <code>true</code> wenn es ein Leezeichen, Tab, Newline o.Ã„. war.
+   * @param ch the character to skip.
+   * @return <code>true</code> if it is a space character, tab, newline ect.
    */
   public static boolean isSpace(char ch) {
     return Character.isSpaceChar(ch) || (ch == '\n');
   }
 
 	/**
-	 * Überspringt alle Leerzeichen ab aktueller Position.
+	 * Skip all space characters starting from the current position.
 	 */
 	public final ParseCtxt skipBlanks() {
 		while (!isDone()) {
@@ -63,22 +61,19 @@ public class ParseCtxt {
 	}
 
 	/**
-	 * Darf nur aufgerufen werden wenn {@link #isDone()} <code>false</code>
-	 * liefert.
+	 * My only be called if {@link #isDone()} returns <code>false</code>.
 	 *
-	 * @return Das aktuelle Zeichen.
+	 * @return the character at the current position.
 	 */
 	public final char currentChar() {
 		return text.charAt(pos);
 	}
 
 	/**
-	 * Liest ein definiertes Zeichen.
+	 * Reads an expected character.
 	 *
-	 * @param ch
-	 *            Das zu lesende Zeichen.
-	 * @throws ParseException
-	 *             wenn das Zeichen nicht auf der aktuellen Position ist.
+	 * @param ch the character to read.
+	 * @throws ParseException if the current character was not the expected one.
 	 */
 	public final void readChar(char ch) {
 		if (text.charAt(pos) != ch) {
@@ -254,7 +249,7 @@ public class ParseCtxt {
 	public String getText() {
 		return text;
 	}
-	
+
 	/**
 	 * @return Die Syntax version.
 	 */
@@ -262,5 +257,5 @@ public class ParseCtxt {
 	{
 	  return syntaxVersion;
 	}
-	
+
 }
