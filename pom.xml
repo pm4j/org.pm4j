@@ -18,7 +18,13 @@
 		<name>pm4j</name>
 		<url>http://www.pm4j.org</url>
 	</organization>
-
+	<developers>
+		<developer>
+			<id>oboede</id>
+			<name>Boede Olaf</name>
+			
+		</developer>
+	</developers>
 	<scm>
 		<url>git://github.com/pm4j/org.pm4j.git</url>
 	</scm>
