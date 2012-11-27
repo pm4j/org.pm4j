@@ -7,7 +7,9 @@
 	<version>0.4-SNAPSHOT</version>
 	<name>MAIN of PM4J</name>
 	<packaging>pom</packaging>
-
+	
+	<url>http://www.pm4j.org</url>
+	
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
@@ -17,6 +19,9 @@
 		<url>http://www.pm4j.org</url>
 	</organization>
 
+	<scm>
+		<url>git://github.com/pm4j/org.pm4j.git</url>
+	</scm>
 	<modules>
 		<module>pm4j-core</module>
 		<module>pm4j-core-sample</module>
