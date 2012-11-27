@@ -12,7 +12,6 @@
 		<version>0.4-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
-
 	
 	<dependencies>
 		<dependency>
