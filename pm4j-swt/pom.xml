@@ -4,7 +4,7 @@
 
 	<artifactId>pm4j-swt</artifactId>
 	<packaging>jar</packaging>
-
+	<name>PM4J SWT</name>
 	<parent>
 		<groupId>org.pm4j</groupId>
 		<artifactId>main</artifactId>

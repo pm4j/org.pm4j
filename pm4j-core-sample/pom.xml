@@ -4,7 +4,8 @@
 
 	<artifactId>pm4j-core-sample</artifactId>
 	<packaging>jar</packaging>
-
+	<name>PM4J CORE SAMPLE</name>
+	
 	<parent>
 		<groupId>org.pm4j</groupId>
 		<artifactId>main</artifactId>

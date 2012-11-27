@@ -5,6 +5,7 @@
 	<groupId>org.pm4j</groupId>
 	<artifactId>main</artifactId>
 	<version>0.4-SNAPSHOT</version>
+	<name>MAIN of PM4J</name>
 	<packaging>pom</packaging>
 
 	<properties>
