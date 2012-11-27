@@ -8,7 +8,7 @@
 	<parent>
 		<groupId>org.pm4j</groupId>
 		<artifactId>main</artifactId>
-		<version>1.0-SNAPSHOT</version>
+		<version>0.4-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
@@ -44,12 +44,12 @@
 		<dependency>
 			<artifactId>pm4j-core</artifactId>
 			<groupId>org.pm4j</groupId>
-			<version>1.0-SNAPSHOT</version>
+			<version>0.4-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<artifactId>pm4j-common</artifactId>
 			<groupId>org.pm4j</groupId>
-			<version>1.0-SNAPSHOT</version>
+			<version>0.4-SNAPSHOT</version>
 		</dependency>
 
 	</dependencies>
