@@ -19,14 +19,14 @@
 	<modules>
 		<module>pm4j-core</module>
 		<module>pm4j-core-sample</module>
-		
+
 		<module>pm4j-common</module>
-		
+
 		<module>pm4j-swing</module>
 		<module>pm4j-swing-sample</module>
-		
+
 		<module>pm4j-facelets</module>
-		
+
 		<module>pm4j-swt</module>
 		<module>pm4j-swt-sample</module>
 
@@ -43,6 +43,38 @@
 	</dependencies>
 
 	<build>
+		<resources>
+			<resource>
+				<filtering>false</filtering>
+				<directory>src/main/resources</directory>
+			</resource>
+			<resource>
+				<filtering>false</filtering>
+				<directory>src/main/java</directory>
+				<includes>
+					<include>**</include>
+				</includes>
+				<excludes>
+					<exclude>**/*.java</exclude>
+				</excludes>
+			</resource>
+		</resources>
+		<testResources>
+			<testResource>
+				<filtering>false</filtering>
+				<directory>src/test/resources</directory>
+			</testResource>
+			<testResource>
+				<filtering>false</filtering>
+				<directory>src/test/java</directory>
+				<includes>
+					<include>**</include>
+				</includes>
+				<excludes>
+					<exclude>**/*.java</exclude>
+				</excludes>
+			</testResource>
+		</testResources>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
