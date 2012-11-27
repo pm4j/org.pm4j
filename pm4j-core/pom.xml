@@ -12,30 +12,7 @@
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
-	<build>
-          <resources>
-			<resource>
-				<directory>${basedir}/src/main/java</directory>
-				<filtering>true</filtering>
-				<includes>
-					<include>**</include>
-				</includes>
-				<excludes>
-					<exclude>**/*.java</exclude>
-				</excludes>
-			</resource>
-			<resource>
-				<directory>${basedir}/src/test/java</directory>
-				<filtering>true</filtering>
-				<includes>
-					<include>**</include>
-				</includes>
-				<excludes>
-					<exclude>**/*.java</exclude>
-				</excludes>
-			</resource>
-		</resources>
-	</build>
+	
 	<dependencies>
 		<dependency>
 			<groupId>org.pm4j</groupId>
