@@ -1,6 +1,7 @@
 package org.pm4j.common.util.collection;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -48,6 +49,19 @@ public class IterableUtil {
     }
 
     return copy;
+  }
+
+  /**
+   * Casts the {@link Iterable} to a {@link Collection} if it is one.
+   * Otherwise it makes a shallow copy.
+   *
+   * @param iterable
+   * @return the content as a collection.
+   */
+  public static <T> Collection<T> asCollection(Iterable<T> iterable) {
+    return (iterable instanceof Collection)
+        ? (Collection<T>) iterable
+        : shallowCopy(iterable);
   }
 
   /**

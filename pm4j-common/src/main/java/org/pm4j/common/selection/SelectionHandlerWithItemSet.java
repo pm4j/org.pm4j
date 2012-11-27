@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.pm4j.common.util.collection.IterableUtil;
@@ -102,8 +101,10 @@ public class SelectionHandlerWithItemSet<T_ITEM> extends SelectionHandlerBase<T_
       throw new RuntimeException("Invert selection is not supported for select mode: " + getSelectMode());
     }
 
-    // TODO olaf: not yet implemented
-    throw new NotImplementedException();
+    Set<T_ITEM> newSelectedItems = new HashSet<T_ITEM>(IterableUtil.asCollection(collection));
+    newSelectedItems.removeAll(selection.selectedItems);
+
+    return setSelection(newSelectedItems);
   }
 
   @Override

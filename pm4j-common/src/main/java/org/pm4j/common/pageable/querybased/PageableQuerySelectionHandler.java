@@ -9,7 +9,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.pm4j.common.query.QueryParams;
@@ -46,7 +45,7 @@ public class PageableQuerySelectionHandler<T_ITEM, T_ID extends Serializable> ex
   private final QueryParams query;
   private final ItemIdSelection<T_ITEM, T_ID> emptySelection;
   private ItemIdSelection<T_ITEM, T_ID> idSelection;
-  private Selection<T_ITEM> currentSelection;
+  private SelectionBase<T_ITEM, T_ID> currentSelection;
   private boolean inverse;
 
   @SuppressWarnings("unchecked")
@@ -117,8 +116,9 @@ public class PageableQuerySelectionHandler<T_ITEM, T_ID extends Serializable> ex
       throw new RuntimeException("Invert selection is not supported for select mode: " + getSelectMode());
     }
 
-    // TODO olaf: not yet implemented
-    throw new NotImplementedException();
+    return setSelection(inverse
+        ? new ItemIdSelection<T_ITEM, T_ID>(service, currentSelection.getClickedIds().getIds())
+        : new InvertedSelection<T_ITEM, T_ID>(service, query, currentSelection));
   }
 
   @Override
@@ -126,6 +126,7 @@ public class PageableQuerySelectionHandler<T_ITEM, T_ID extends Serializable> ex
     return currentSelection;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public boolean setSelection(Selection<T_ITEM> selection) {
     Selection<T_ITEM> oldSelection = this.currentSelection;
@@ -133,7 +134,8 @@ public class PageableQuerySelectionHandler<T_ITEM, T_ID extends Serializable> ex
 
     try {
       fireVetoableChange(PROP_SELECTION, oldSelection, newSelection);
-      this.currentSelection = newSelection;
+      // XXX olaf: check of that can be doene safely...
+      this.currentSelection = (SelectionBase<T_ITEM, T_ID>) newSelection;
       firePropertyChange(PROP_SELECTION, oldSelection, newSelection);
       return true;
     } catch (PropertyVetoException e) {

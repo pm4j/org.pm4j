@@ -1,9 +1,12 @@
 package org.pm4j.common.pageable;
 
+import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import junit.framework.Assert;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -11,6 +14,7 @@ import org.pm4j.common.query.CompOpStringStartsWith;
 import org.pm4j.common.query.FilterExpression;
 import org.pm4j.common.query.QueryUtil;
 import org.pm4j.common.query.SortOrder;
+import org.pm4j.common.selection.SelectMode;
 import org.pm4j.common.util.collection.IterableUtil;
 
 /**
@@ -128,6 +132,19 @@ public abstract class PageableCollectionTestBase<T> {
 
     collection.getQueryParams().setFilterExpression(null);
     assertEquals("We get all items after resetting the filter.", "[a, b, c, d, e, f]", IterableUtil.shallowCopy(collection).toString());
+  }
+
+  @Test
+  public void testSelectItems() {
+    collection.getSelectionHandler().setSelectMode(SelectMode.MULTI);
+    assertEquals(SelectMode.MULTI, collection.getSelectionHandler().getSelectMode());
+    assertEquals(0, collection.getSelectionHandler().getSelection().getSize());
+    assertTrue(collection.getSelectionHandler().selectAll(true));
+    assertEquals(6, collection.getSelectionHandler().getSelection().getSize());
+    assertTrue(collection.getSelectionHandler().select(false, collection.getItemsOnPage().get(0)));
+    assertEquals(5, collection.getSelectionHandler().getSelection().getSize());
+    assertTrue(collection.getSelectionHandler().invertSelection());
+    assertEquals(1, collection.getSelectionHandler().getSelection().getSize());
   }
 
   protected List<Bean> makeBeans(String... strings) {

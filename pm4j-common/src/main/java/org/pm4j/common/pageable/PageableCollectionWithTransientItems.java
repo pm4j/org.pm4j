@@ -9,8 +9,8 @@ import java.util.List;
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.query.QueryOptions;
+import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.selection.EmptySelection;
 import org.pm4j.common.selection.SelectMode;
 import org.pm4j.common.selection.Selection;
@@ -87,25 +87,16 @@ public class PageableCollectionWithTransientItems<T_ITEM> implements PageableCol
     return baseCollection.getSelectionHandler().getSelection();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public QueryParams getQueryParams() {
     return baseCollection.getQueryParams();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public QueryOptions getQueryOptions() {
     return baseCollection.getQueryOptions();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public List<T_ITEM> getItemsOnPage() {
     if (transientItems.isEmpty()) {
@@ -117,65 +108,41 @@ public class PageableCollectionWithTransientItems<T_ITEM> implements PageableCol
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public int getPageSize() {
     return baseCollection.getPageSize();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void setPageSize(int newSize) {
     baseCollection.setPageSize(newSize);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public int getCurrentPageIdx() {
     return baseCollection.getCurrentPageIdx();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void setCurrentPageIdx(int pageIdx) {
     baseCollection.setCurrentPageIdx(pageIdx);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public long getNumOfItems() {
     return baseCollection.getNumOfItems() + transientItems.size();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public long getUnfilteredItemCount() {
     return baseCollection.getUnfilteredItemCount() + transientItems.size();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Iterator<T_ITEM> iterator() {
     return new IteratorWithAdditionalItems<T_ITEM>(baseCollection.iterator(), transientItems.iterator());
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public SelectionHandler<T_ITEM> getSelectionHandler() {
     return selectionHandler;
@@ -200,9 +167,6 @@ public class PageableCollectionWithTransientItems<T_ITEM> implements PageableCol
       baseCollection.getSelectionHandler().setSelectMode(selectMode);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean select(boolean select, T_ITEM item) {
       if (transientItems.contains(item)) {
@@ -227,9 +191,6 @@ public class PageableCollectionWithTransientItems<T_ITEM> implements PageableCol
       }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean select(boolean select, Iterable<T_ITEM> items) {
       List<T_ITEM> newTransientItems = new ArrayList<T_ITEM>();
@@ -264,9 +225,6 @@ public class PageableCollectionWithTransientItems<T_ITEM> implements PageableCol
       return setSelection(newSelection);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @SuppressWarnings("unchecked")
     @Override
     public boolean selectAll(boolean select) {
@@ -287,21 +245,27 @@ public class PageableCollectionWithTransientItems<T_ITEM> implements PageableCol
         throw new RuntimeException("Invert selection is not supported for select mode: " + getSelectMode());
       }
 
-      // TODO olaf: not yet implemented
-      throw new NotImplementedException();
+      if (!baseCollection.getSelectionHandler().invertSelection()) {
+        return false;
+      }
+
+      SelectionWithTransientItems<T_ITEM> newSel = new SelectionWithTransientItems<T_ITEM>(baseCollection.getSelectionHandler().getSelection());
+      newSel.selectedTransientItems = new ArrayList<T_ITEM>(transientItems);
+      newSel.selectedTransientItems.removeAll(selection.selectedTransientItems);
+
+      if (!setSelection(newSel)) {
+        baseCollection.getSelectionHandler().invertSelection();
+        return false;
+      } else {
+        return true;
+      }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Selection<T_ITEM> getSelection() {
       return selection;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean setSelection(Selection<T_ITEM> selection) {
       Selection<T_ITEM> oldSelection = this.selection;
@@ -331,25 +295,16 @@ public class PageableCollectionWithTransientItems<T_ITEM> implements PageableCol
       this.baseSelection = baseSelection;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public long getSize() {
       return baseSelection.getSize() + selectedTransientItems.size();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean contains(T_ITEM item) {
       return baseSelection.contains(item) || selectedTransientItems.contains(item);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Iterator<T_ITEM> iterator() {
       return new IteratorWithAdditionalItems<T_ITEM>(baseSelection.iterator(), selectedTransientItems.iterator());
@@ -383,25 +338,16 @@ public class PageableCollectionWithTransientItems<T_ITEM> implements PageableCol
       this.secondIterator = secondIterator;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean hasNext() {
       return baseIterator.hasNext() || secondIterator.hasNext();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public T_ITEM next() {
       return baseIterator.hasNext() ? baseIterator.next() : secondIterator.next();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void remove() {
       throw new UnsupportedOperationException();
