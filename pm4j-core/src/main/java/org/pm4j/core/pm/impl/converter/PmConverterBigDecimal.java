@@ -20,9 +20,11 @@ public class PmConverterBigDecimal extends PmConverterNumber<BigDecimal> {
 
   @Override
   protected NumberFormat getNumberFormat(Locale locale, String formatString, PmAttr<?> pmAttr) {
-    PmAttrBigDecimal pmAttrBigDecimal = (PmAttrBigDecimal) pmAttr;
     DecimalFormat decimalFormat = new DecimalFormat(formatString, new DecimalFormatSymbols(locale));
-    decimalFormat.setRoundingMode(pmAttrBigDecimal.getStringConversionRoundingMode());
+    if(pmAttr instanceof PmAttrBigDecimal) {
+      PmAttrBigDecimal pmAttrBigDecimal = (PmAttrBigDecimal) pmAttr;
+      decimalFormat.setRoundingMode(pmAttrBigDecimal.getStringConversionRoundingMode());
+    }
     decimalFormat.setParseBigDecimal(true);
     return decimalFormat;
   }
