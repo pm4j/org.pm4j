@@ -22,18 +22,18 @@ import org.pm4j.core.pm.api.PmValidationApi;
  * @param <T_DETAILS_PM>
  *          Type of the supported details PM.
  */
-public class DetailsPmObjectHandlerImpl<T_DETAILS_PM extends PmDataInput, T_MASTER_RECORD> implements DetailsPmHandler<T_DETAILS_PM> {
+public class DetailsPmHandlerImpl<T_DETAILS_PM extends PmDataInput, T_MASTER_RECORD> implements DetailsPmHandler<T_DETAILS_PM> {
 
   /** The details area PM. */
   private final T_DETAILS_PM detailsPm;
 
-  /** Additional decorators to apply. */
+  /** Additional decorators to apply on {@link #canSwitchMasterRecord()} and {@link #afterMasterRecordChange(Object)}. */
   private List<PmCommandDecorator> decorators = new ArrayList<PmCommandDecorator>();
 
   /**
    * @param detailsPm The details PM to handle.
    */
-  public DetailsPmObjectHandlerImpl(T_DETAILS_PM detailsPm) {
+  public DetailsPmHandlerImpl(T_DETAILS_PM detailsPm) {
     this.detailsPm = detailsPm;
   }
 
@@ -54,7 +54,7 @@ public class DetailsPmObjectHandlerImpl<T_DETAILS_PM extends PmDataInput, T_MAST
     }
 
     for (PmCommandDecorator d : decorators) {
-      // TODO olaf: change canSwitch to beforeDo to preserve the original command.
+      // TODO olaf: preserve the original command to allow deferred execution.
       if (!d.beforeDo(null)) {
         return false;
       }
@@ -71,9 +71,13 @@ public class DetailsPmObjectHandlerImpl<T_DETAILS_PM extends PmDataInput, T_MAST
   public final void afterMasterRecordChange(Object newMasterBean) {
     afterMasterRecordChangeImpl((T_MASTER_RECORD) newMasterBean);
     for (PmCommandDecorator d : decorators) {
-      // TODO olaf: change canSwitch to afterDo to preserve the original command.
       d.afterDo(null);
     }
+  }
+
+  @Override
+  public void afterMasterRecordDelete(Object deletedMasterBean) {
+    // no logic by default.
   }
 
   /**

@@ -46,10 +46,29 @@ public interface DetailsPmHandler<T_DETAILS_PM extends PmObject> {
   void afterMasterRecordChange(Object newMasterBean);
 
   /**
+   * Some {@link MasterPmHandler} call this method to inform the details areas
+   * about a master record delete operation.
+   * <p>
+   * This allows detail handlers to handle the details changes that where
+   * recorded in relation to the given master record.
+   *
+   * @param deletedMasterBean
+   */
+  void afterMasterRecordDelete(Object deletedMasterBean);
+
+  /**
    * Adds a decorator to consider in {@link #canSwitchMasterRecord()} and {@link #afterMasterRecordChange(Object)}.
    *
    * @param decorator
    */
   void addDecorator(PmCommandDecorator decorator);
+
+  /**
+   * Provides all detail bean changes grouped by their master beans.
+   *
+   * @return a map to a {@link ChangeSetHandler} that provides
+   */
+  // TODO olaf: check.
+  // Map<T_MASTER_BEAN, ChangeSetHandler<T_DETAILS_BEAN>> getChangeSetHandler();
 
 }

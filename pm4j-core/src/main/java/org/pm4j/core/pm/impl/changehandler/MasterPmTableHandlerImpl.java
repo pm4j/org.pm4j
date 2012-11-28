@@ -62,7 +62,7 @@ public class MasterPmTableHandlerImpl<T_MASTER_BEAN> implements MasterPmRecordHa
   }
 
   /**
-   * Creates for each passed details PM a details-default handler ({@link DetailsPmObjectHandlerImpl})
+   * Creates for each passed details PM a details-default handler ({@link DetailsPmHandlerImpl})
    * that just clears the details area on master record change.
    *
    * @param masterTablePm
@@ -72,7 +72,7 @@ public class MasterPmTableHandlerImpl<T_MASTER_BEAN> implements MasterPmRecordHa
   public MasterPmTableHandlerImpl(PmTable<?> masterTablePm, PmDataInput... detailsPms) {
     this.masterTablePm = masterTablePm;
     for (PmDataInput pm : detailsPms) {
-      addDetailsHander(new DetailsPmObjectHandlerImpl<PmDataInput, T_MASTER_BEAN>(pm));
+      addDetailsHander(new DetailsPmHandlerImpl<PmDataInput, T_MASTER_BEAN>(pm));
     }
   }
 

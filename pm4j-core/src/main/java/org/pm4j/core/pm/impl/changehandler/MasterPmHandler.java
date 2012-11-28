@@ -32,6 +32,7 @@ public interface MasterPmHandler extends PmCommandDecorator {
    *
    * @return <code>true</code> .
    */
+  // TODO olaf: change to ChangeSet(Handler) interface
   boolean isChangeRegistered();
 
   /**
@@ -46,7 +47,17 @@ public interface MasterPmHandler extends PmCommandDecorator {
    *         <code>null</code> if that detailed information level is not
    *         supported.
    */
+  // TODO olaf: change to ChangeSet(Handler) interface
   Set<?> getChangedMasterBeans();
+
+  /**
+   * Provides all detail bean changes grouped by their master beans.
+   *
+   * @return a map to a {@link ChangeSetHandler} that provides
+   */
+  // alternative: getDetailsHandler().getChangeSets()
+//  Map<T_MASTER_BEAN, ChangeSet<T_DETAILS_BEAN>> getDetailsChangeSets();
+
 
   /**
    * This method needs to be called once before the handler gets active.

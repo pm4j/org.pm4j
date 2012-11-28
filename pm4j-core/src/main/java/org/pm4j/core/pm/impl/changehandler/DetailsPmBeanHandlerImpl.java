@@ -10,7 +10,7 @@ import org.pm4j.core.pm.PmBean;
  * @author olaf boede
  */
 public class DetailsPmBeanHandlerImpl<T_MASTER_RECORD> extends
-    DetailsPmObjectHandlerImpl<PmBean<T_MASTER_RECORD>, T_MASTER_RECORD> {
+    DetailsPmHandlerImpl<PmBean<T_MASTER_RECORD>, T_MASTER_RECORD> {
 
   /**
    * @param detailsPm The details PM to handle.

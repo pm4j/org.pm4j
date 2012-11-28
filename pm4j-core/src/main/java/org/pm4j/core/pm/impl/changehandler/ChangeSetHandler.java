@@ -48,6 +48,8 @@ public interface ChangeSetHandler<T_ITEM> {
   boolean registerChange(ChangeKind changeKind, T_ITEM item);
 
   /**
+   * TODO olaf: move to implementation level interface.
+   *
    * Adds a {@link MasterPmHandler} to consider for changed state information.
    *
    * @param detailsPmHandler
