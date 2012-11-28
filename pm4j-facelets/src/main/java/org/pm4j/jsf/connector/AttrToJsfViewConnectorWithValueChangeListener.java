@@ -1,5 +1,7 @@
 package org.pm4j.jsf.connector;
 
+import javax.faces.component.UIComponent;
+import javax.faces.context.FacesContext;
 import javax.faces.event.ValueChangeEvent;
 
 import org.apache.commons.lang.StringUtils;
@@ -19,6 +21,12 @@ import org.pm4j.core.pm.PmAttr;
 public class AttrToJsfViewConnectorWithValueChangeListener {
 
   private final PmAttr<?> pmAttr;
+
+  /**
+   * The component binding is done only for a single request.<br>
+   * This prevents live time/memory leak issues between the PM- and the JSF component trees.
+   */
+  private ThreadLocal<UIComponent> uiComponent = new ThreadLocal<UIComponent>();
 
   public AttrToJsfViewConnectorWithValueChangeListener(PmAttr<?> pmAttr) {
     this.pmAttr = pmAttr;
@@ -97,5 +105,37 @@ public class AttrToJsfViewConnectorWithValueChangeListener {
    */
   public void setValue(Object value) {
     // ignore
+  }
+
+  /**
+   * @return the (optionally) bound JSF component.
+   */
+  public UIComponent getUiComponent() {
+    return uiComponent.get();
+  }
+
+  /**
+   * Binds a component reference for the time of this request.
+   *
+   * @param uiComponent the component to bind.
+   */
+  public void setUiComponent(UIComponent uiComponent) {
+    this.uiComponent.set(uiComponent);
+  }
+
+  /**
+   * Gets the client ID of the bound {@link UIComponent}.
+   * <p>
+   * Provides only a result if the component was bound. See {@link #setUiComponent(UIComponent)}.
+   *
+   * @return the complete component id.
+   */
+  public String getEscapedClientId() {
+    UIComponent c = getUiComponent();
+    FacesContext ctxt = FacesContext.getCurrentInstance();
+
+    return c != null
+        ? StringUtils.replace(c.getClientId(ctxt), ":", "\\\\:")
+        : null;
   }
 }
