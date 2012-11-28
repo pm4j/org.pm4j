@@ -13,7 +13,7 @@ import org.pm4j.common.query.QueryParams;
 public class ItemNavigatorPageableQueryBased<T> implements ItemNavigator<T> {
 
   /** Current navigator position. RecordNavigatorPageableQueryBased */
-  private int positionIdx = 0;
+  private int currentItemIdx = 0;
 
   private PageableQueryCollectionCache<T> pagedCollectionCache;
 
@@ -42,25 +42,25 @@ public class ItemNavigatorPageableQueryBased<T> implements ItemNavigator<T> {
 
   @Override
   public T getCurrentItem() {
-    return pagedCollectionCache != null ? pagedCollectionCache.getAt(positionIdx) : null;
+    return pagedCollectionCache != null ? pagedCollectionCache.getAt(currentItemIdx) : null;
   }
 
   @Override
   public T navigateTo(int itemPos) {
-    positionIdx = Math.min(itemPos, getNumOfItems());
-    positionIdx = Math.max(positionIdx, 0);
+    currentItemIdx = Math.min(itemPos, getNumOfItems());
+    currentItemIdx = Math.max(currentItemIdx, 0);
 
     return getCurrentItem();
   }
 
   @Override
   public int getNumOfItems() {
-    return (int) pagedCollectionCache.getQueryResultSetSize();
+    return pagedCollectionCache != null ? (int) pagedCollectionCache.getQueryResultSetSize() : 0;
   }
 
   @Override
   public int getCurrentItemIdx() {
-    return positionIdx;
+    return currentItemIdx;
   }
 
 }
