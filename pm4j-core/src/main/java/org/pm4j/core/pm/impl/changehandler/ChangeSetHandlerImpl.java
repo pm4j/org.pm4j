@@ -32,9 +32,10 @@ public class ChangeSetHandlerImpl<T_ITEM extends PmDataInput> implements ChangeS
   /** The set of modified rows. */
   private Map<PmObject, ChangeKind> changedItemPms = new IdentityHashMap<PmObject, ChangeKind>();
 
-  /** Listens for changed state changes in the subtree and updates the changedRows accordingly. */
+  /** Listens for changed state changes in the subtree and updates the changed items accordingly. */
   private PmChangeListener itemHierarchyChangeListener = new PmChangeListener();
 
+  /** A collection of details handlers that report changes in relation to the master handled by this instance. */
   private Collection<MasterPmHandler> detailsPmHandlers = new ArrayList<MasterPmHandler>();
 
   /**
