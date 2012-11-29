@@ -97,13 +97,12 @@ public class SelectionHandlerWithPmFactory<T_PM extends PmBean<T_BEAN>, T_BEAN> 
   }
 
   /**
-   * In difference to {@link #getSelection()} this method provides the selection as a set of
-   * beans.
+   * Provides the selection handler for the beans behind the item PM's.
    *
-   * @return
+   * @return the bean selection handler.
    */
-  public Selection<T_BEAN> getBeanSelection() {
-    return baseSelectionHandler.getSelection();
+  public SelectionHandler<T_BEAN> getBeanSelectionHandler() {
+    return baseSelectionHandler;
   }
 
   /**

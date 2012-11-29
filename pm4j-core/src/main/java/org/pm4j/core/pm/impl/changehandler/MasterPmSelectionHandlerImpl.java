@@ -43,7 +43,7 @@ public class MasterPmSelectionHandlerImpl<T_MASTER_BEAN> implements MasterPmReco
   private static final Log    LOG                = LogFactory.getLog(MasterPmSelectionHandlerImpl.class);
 
   private final PmObject masterPm;
-  private final SelectionHandler<?> selectionHandler;
+  private final SelectionHandler<T_MASTER_BEAN> selectionHandler;
   private Set<T_MASTER_BEAN>  changedMasterBeans = new HashSet<T_MASTER_BEAN>();
   private List<DetailsPmHandler<?>> detailsHandlers = new ArrayList<DetailsPmHandler<?>>();
   private PropertyAndVetoableChangeListener masterSelectionChangeListener;
@@ -56,7 +56,10 @@ public class MasterPmSelectionHandlerImpl<T_MASTER_BEAN> implements MasterPmReco
    *          The table PM to observe.
    * @param detailsHandler A handler for the details PM
    */
-  public MasterPmSelectionHandlerImpl(PmObject masterPm, SelectionHandler<?> selectionHandler, DetailsPmHandler<?>... detailsHandlers) {
+  public MasterPmSelectionHandlerImpl(PmObject masterPm, SelectionHandler<T_MASTER_BEAN> selectionHandler, DetailsPmHandler<?>... detailsHandlers) {
+    assert masterPm != null;
+    assert selectionHandler != null;
+
     this.masterPm = masterPm;
     this.selectionHandler = selectionHandler;
     for (DetailsPmHandler<?> dh : detailsHandlers) {
@@ -129,7 +132,7 @@ public class MasterPmSelectionHandlerImpl<T_MASTER_BEAN> implements MasterPmReco
   }
 
   protected T_MASTER_BEAN getSelectedMasterBean() {
-    Selection<T_MASTER_BEAN> beanSelection = selectionHandler.getSelection().getBeanSelection();
+    Selection<T_MASTER_BEAN> beanSelection = selectionHandler.getSelection();
     return beanSelection.getSize() == 1
         ? beanSelection.iterator().next()
         : null;

@@ -115,6 +115,20 @@ public interface PageableCollection2<T_ITEM> extends Iterable<T_ITEM> {
   SelectionHandler<T_ITEM> getSelectionHandler();
 
   /**
+   * If this is an collection of PMs in front of a collection of beans, this
+   * method provides access to a selection handler that uses the beans behind
+   * the PMs.
+   * <p>
+   * This allows to select/deselect rows based on a set of beans.
+   *
+   * @return the corresponding bean selection handler.
+   *         <p>
+   *         This instance if this collection already handles the bean
+   *         selection.
+   */
+  <T> SelectionHandler<T> getBeanSelectionHandler();
+
+  /**
    * Clears all cached information.<br>
    * Gets called if everything needs to be re-evalueated.
    */

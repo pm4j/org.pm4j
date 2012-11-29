@@ -2,6 +2,7 @@ package org.pm4j.common.pageable;
 
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.QueryParams;
+import org.pm4j.common.selection.SelectionHandler;
 
 
 /**
@@ -63,6 +64,19 @@ public abstract class PageableCollectionBase2<T_ITEM> implements PageableCollect
   @Override
   public void setCurrentPageIdx(int pageIdx) {
     this.currentPageIdx = (pageIdx < 1) ? 1 : pageIdx;
+  }
+
+  /**
+   * The default implementation just passes the result of
+   * {@link #getSelectionHandler()}.
+   * <p>
+   * Only implementations that handle PM's in front of bean items will provide
+   * here a different handler.
+   */
+  @SuppressWarnings("unchecked")
+  @Override
+  public <T> SelectionHandler<T> getBeanSelectionHandler() {
+    return (SelectionHandler<T>)getSelectionHandler();
   }
 
 }

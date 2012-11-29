@@ -35,10 +35,10 @@ import org.pm4j.core.pm.pageable.PageableListImpl;
 public class PageablePmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> implements PageableCollection2<T_PM> {
 
   /** The collection type specific selection handler. */
-  private final SelectionHandler<T_PM> selectionHandler;
+  private final SelectionHandlerWithPmFactory<T_PM, T_BEAN> selectionHandler;
 
   private PmObject                     pmCtxt;
-  private PageableCollection2<T_BEAN>  beans;
+  private PageableCollection2<T_BEAN>  beanCollection;
 
   /**
    * Creates a collection backed by the given {@link PageableCollection} of beans.
@@ -53,7 +53,7 @@ public class PageablePmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> imple
     assert pageableBeanCollection != null;
 
     this.pmCtxt = pmCtxt;
-    this.beans = pageableBeanCollection;
+    this.beanCollection = pageableBeanCollection;
     this.selectionHandler = new SelectionHandlerWithPmFactory<T_PM, T_BEAN>(pmCtxt, pageableBeanCollection.getSelectionHandler());
   }
 
@@ -125,53 +125,53 @@ public class PageablePmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> imple
 
   @Override
   public QueryParams getQueryParams() {
-    return beans.getQueryParams();
+    return beanCollection.getQueryParams();
   }
 
   @Override
   public QueryOptions getQueryOptions() {
-    return beans.getQueryOptions();
+    return beanCollection.getQueryOptions();
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public List<T_PM> getItemsOnPage() {
-    return (List<T_PM>) PmFactoryApi.getPmListForBeans(pmCtxt, beans.getItemsOnPage(), false);
+    return (List<T_PM>) PmFactoryApi.getPmListForBeans(pmCtxt, beanCollection.getItemsOnPage(), false);
   }
 
   @Override
   public int getPageSize() {
-    return beans.getPageSize();
+    return beanCollection.getPageSize();
   }
 
   @Override
   public void setPageSize(int newSize) {
-    beans.setPageSize(newSize);
+    beanCollection.setPageSize(newSize);
   }
 
   @Override
   public int getCurrentPageIdx() {
-    return beans.getCurrentPageIdx();
+    return beanCollection.getCurrentPageIdx();
   }
 
   @Override
   public void setCurrentPageIdx(int pageIdx) {
-    beans.setCurrentPageIdx(pageIdx);
+    beanCollection.setCurrentPageIdx(pageIdx);
   }
 
   @Override
   public long getNumOfItems() {
-    return beans.getNumOfItems();
+    return beanCollection.getNumOfItems();
   }
 
   @Override
   public long getUnfilteredItemCount() {
-    return beans.getUnfilteredItemCount();
+    return beanCollection.getUnfilteredItemCount();
   }
 
   @Override
   public Iterator<T_PM> iterator() {
-    final Iterator<T_BEAN> beanIter = beans.iterator();
+    final Iterator<T_BEAN> beanIter = beanCollection.iterator();
     return new Iterator<T_PM>() {
       @Override
       public boolean hasNext() {
@@ -196,9 +196,15 @@ public class PageablePmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> imple
     return selectionHandler;
   }
 
+  @SuppressWarnings("unchecked")
+  @Override
+  public SelectionHandler<T_BEAN> getBeanSelectionHandler() {
+    return selectionHandler.getBeanSelectionHandler();
+  }
+
   @Override
   public void clearCaches() {
-    beans.clearCaches();
+    beanCollection.clearCaches();
   }
 
 }

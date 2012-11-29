@@ -42,7 +42,7 @@ public class PmTable2Util {
       defaultSortColName = tblCfg.defaultSortCol();
     }
 
-    for (PmTableCol col : pmTable.getColumns()) {
+    for (PmTableCol col : pmTable.getColumnPms()) {
       PmTableColCfg colCfg = col.getClass().getAnnotation(PmTableColCfg.class);
       if ((colCfg.sortable() == PmBoolean.TRUE) ||
           (tableSortable && colCfg.sortable() == PmBoolean.UNDEFINED)) {

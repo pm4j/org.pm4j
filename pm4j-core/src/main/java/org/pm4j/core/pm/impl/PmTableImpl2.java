@@ -15,8 +15,8 @@ import org.apache.commons.logging.LogFactory;
 import org.pm4j.common.pageable.PageableCollection2;
 import org.pm4j.common.pageable.PageableCollectionUtil2;
 import org.pm4j.common.pageable.inmem.PageableInMemCollectionImpl;
-import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.query.QueryOptions;
+import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.selection.SelectMode;
 import org.pm4j.common.selection.Selection;
 import org.pm4j.common.selection.SelectionHandler;
@@ -262,6 +262,18 @@ public class PmTableImpl2
   @Override
   public SelectionHandler<T_ROW_PM> getPmSelectionHandler() {
     return getPmPageableCollection().getSelectionHandler();
+  }
+
+  /**
+   * This method provides access to a selection handler that uses the beans behind
+   * the row PMs.
+   * <p>
+   * This allows to select/deselect rows based on a set of beans.
+   *
+   * @return the bean selection handler.
+   */
+  public SelectionHandler<T_ROW_BEAN> getPmBeanSelectionHandler() {
+    return getPmPageableCollection().getBeanSelectionHandler();
   }
 
   @Override
