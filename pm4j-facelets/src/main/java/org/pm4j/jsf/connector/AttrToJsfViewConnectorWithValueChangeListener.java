@@ -137,19 +137,4 @@ public class AttrToJsfViewConnectorWithValueChangeListener {
           : "";
   }
 
-  /**
-   * Gets the client ID of the bound {@link UIComponent}. Escaped for javascript usage. XXX olaf: still needed?
-   * <p>
-   * Provides only a result if the component was bound. See {@link #setUiComponent(UIComponent)}.
-   *
-   * @return the complete component id.
-   */
-  public String getEscapedClientId() {
-    UIComponent c = getUiComponent();
-    FacesContext ctxt = FacesContext.getCurrentInstance();
-
-    return c != null
-        ? StringUtils.replace(c.getClientId(ctxt), ":", "\\\\:")
-        : null;
-  }
 }
