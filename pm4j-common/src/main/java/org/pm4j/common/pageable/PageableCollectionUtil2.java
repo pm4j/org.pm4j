@@ -229,7 +229,7 @@ public final class PageableCollectionUtil2 {
     }
 
     for (T i : itemsOnPage) {
-      if (!handler.getSelection().contains(i)) {
+      if (!handler.getSelection().isSelected(i)) {
         return false;
       }
     }

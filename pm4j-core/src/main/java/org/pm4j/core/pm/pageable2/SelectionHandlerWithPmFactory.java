@@ -151,15 +151,10 @@ public class SelectionHandlerWithPmFactory<T_PM extends PmBean<T_BEAN>, T_BEAN> 
     }
 
     @Override
-    public boolean contains(T_PM item) {
+    public boolean isSelected(T_PM item) {
       return item != null
-          ? beanSelection.contains(item.getPmBean())
+          ? beanSelection.isSelected(item.getPmBean())
           : false;
-    }
-
-    @SuppressWarnings("unchecked")
-	public Selection<T_BEAN> getBeanSelection() {
-      return beanSelection;
     }
   }
 

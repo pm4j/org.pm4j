@@ -42,7 +42,7 @@ public class PageableQueryAllItemsSelection<T_ITEM, T_ID extends Serializable> e
   }
 
   @Override
-  public boolean contains(T_ITEM item) {
+  public boolean isSelected(T_ITEM item) {
     return true;
   }
 
@@ -61,10 +61,5 @@ public class PageableQueryAllItemsSelection<T_ITEM, T_ID extends Serializable> e
     assert readBlockSize > 0;
     pageSize = readBlockSize;
   }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public <T_BEAN> Selection<T_BEAN> getBeanSelection() {
-    return (Selection<T_BEAN>) this;  }
 
 }

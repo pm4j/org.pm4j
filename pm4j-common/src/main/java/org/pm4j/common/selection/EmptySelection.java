@@ -48,13 +48,7 @@ public class EmptySelection<T> implements Selection<T> {
 	}
 
 	@Override
-	public boolean contains(Object item) {
+	public boolean isSelected(T item) {
 		return false;
-	}
-
-	@SuppressWarnings("unchecked")
-  @Override
-	public <T_BEAN> Selection<T_BEAN> getBeanSelection() {
-	  return (Selection<T_BEAN>)this;
 	}
 }
