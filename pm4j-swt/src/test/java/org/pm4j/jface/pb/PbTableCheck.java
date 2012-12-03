@@ -2,16 +2,16 @@ package org.pm4j.jface.pb;
 
 import java.util.Collection;
 
-import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmConversation;
+import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmTable;
 import org.pm4j.core.pm.PmTableCol;
 import org.pm4j.core.pm.annotation.PmBoolean;
 import org.pm4j.core.pm.annotation.PmTableCfg;
 import org.pm4j.core.pm.annotation.PmTableColCfg;
+import org.pm4j.core.pm.impl.DeprecatedPmTableOfPmElementsImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
 import org.pm4j.core.pm.impl.PmTableColImpl;
-import org.pm4j.core.pm.impl.DeprecatedPmTableOfPmElementsImpl;
 import org.pm4j.demo.basic.BasicDemoElementPm;
 import org.pm4j.swt.pb.PbTable;
 import org.pm4j.swt.testtools.DemoData;

@@ -44,6 +44,12 @@
 			<groupId>org.pm4j</groupId>
 			<version>0.4-SNAPSHOT</version>
 		</dependency>
+			<dependency>
+			<artifactId>pm4j-core</artifactId>
+			<groupId>org.pm4j</groupId>
+			<version>0.4-SNAPSHOT</version>
+			<classifier>tests</classifier>
+		</dependency>
 	</dependencies>
 
 	<repositories>

@@ -3,8 +3,8 @@ package org.pm4j.swt.testtools;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmConversation;
+import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.impl.PmConversationImpl;
 import org.pm4j.demo.basic.BasicDemoElementPm;
 

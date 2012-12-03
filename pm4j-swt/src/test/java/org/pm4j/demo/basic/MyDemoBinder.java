@@ -1,8 +1,7 @@
-package org.pm4j.swt.demo.basic;
+package org.pm4j.demo.basic;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
-import org.pm4j.demo.basic.BasicDemoElementPm;
 import org.pm4j.swt.pb.composite.PbCompositeBase;
 
 public class MyDemoBinder extends PbCompositeBase<MyDemoView, BasicDemoElementPm> {

@@ -1,4 +1,4 @@
-package org.pm4j.swt.demo.basic;
+package org.pm4j.demo.basic;
 
 import org.pm4j.swt.testtools.DemoData;
 import org.pm4j.swt.testtools.SwtTestShell;

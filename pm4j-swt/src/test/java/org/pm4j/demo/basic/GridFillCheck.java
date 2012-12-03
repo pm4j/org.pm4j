@@ -1,4 +1,4 @@
-package org.pm4j.swt.demo.basic;
+package org.pm4j.demo.basic;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
