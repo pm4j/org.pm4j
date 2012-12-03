@@ -9,7 +9,7 @@ import java.io.Serializable;
  *
  * @author olaf boede
  */
-public interface PmElement extends PmObject, PmDataInput, PmTreeNode {
+public interface PmElement extends PmDataInput, PmTreeNode {
 
   /**
    * @return A key that identifies the element within the session.
