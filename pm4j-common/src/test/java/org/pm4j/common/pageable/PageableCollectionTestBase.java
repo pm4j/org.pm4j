@@ -6,10 +6,9 @@ import static org.junit.Assert.assertEquals;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.Assert;
-
 import org.junit.Before;
 import org.junit.Test;
+import org.pm4j.common.pageable.inmem.ItemNavigatorInMem;
 import org.pm4j.common.query.CompOpStringStartsWith;
 import org.pm4j.common.query.FilterExpression;
 import org.pm4j.common.query.QueryUtil;
@@ -50,6 +49,42 @@ public abstract class PageableCollectionTestBase<T> {
   @Test
   public void testFullCollectionIterationResult() {
     assertEquals("[a, b, c, d, e, f]", IterableUtil.shallowCopy(collection).toString());
+  }
+
+  protected ItemNavigator<T> getItemNavigator() {
+    return new ItemNavigatorInMem<T>(collection.getSelectionHandler().getSelection());
+  }
+
+  @Test
+  public void testItemNavigator() {
+    // multi selection for this test
+    collection.getSelectionHandler().setSelectMode(SelectMode.MULTI);
+
+    // no item selected
+    ItemNavigator<T> n = getItemNavigator();
+    assertEquals(0, n.getNumOfItems());
+
+    // first item selected
+    collection.getSelectionHandler().select(true, collection.getItemsOnPage().get(0));
+    n = getItemNavigator();
+    assertEquals(1, n.getNumOfItems());
+    assertEquals("a", n.navigateTo(0).toString());
+
+    // first two items selected
+    collection.getSelectionHandler().select(true, collection.getItemsOnPage().get(1));
+    n = getItemNavigator();
+    assertEquals(2, n.getNumOfItems());
+    // FIXME olaf: the selection sort order is not yet predictable.
+//    assertEquals("a", n.navigateTo(0).toString());
+//    assertEquals("b", n.navigateTo(1).toString());
+
+    // all items selected
+    collection.getSelectionHandler().selectAll(true);
+    n = getItemNavigator();
+    assertEquals(6, n.getNumOfItems());
+    // FIXME olaf: the selection sort order is not yet predictable.
+//    assertEquals("a", n.navigateTo(0).toString());
+//    assertEquals("b", n.navigateTo(1).toString());
   }
 
   @Test
