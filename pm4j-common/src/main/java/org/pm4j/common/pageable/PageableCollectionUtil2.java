@@ -237,11 +237,33 @@ public final class PageableCollectionUtil2 {
     return true;
   }
 
+  /**
+   * Selects the first item on the current page.<br>
+   * Does nothing if there is no item on the current page.
+   *
+   * @param pageable the {@link PageableCollection2} to handle.
+   */
   public static <T> void selectFirstOnPage(PageableCollection2<T> pageable) {
-    List<T> pageItems = pageable.getItemsOnPage();
-    if (pageItems.size() > 0) {
-      pageable.getSelectionHandler().select(true, pageItems.get(0));
+    T first = getFirstOnPage(pageable);
+    if (first != null) {
+      pageable.getSelectionHandler().select(true, first);
     }
+  }
+
+  /**
+   * Provides the first item on the currently opened page.
+   *
+   * @param pageable
+   *          the {@link PageableCollection2} to get the item from.
+   * @return the first item on the current page.
+   *         <p>
+   *         <code>null</code> if there is no item on the current page.
+   */
+  public static <T> T getFirstOnPage(PageableCollection2<T> pageable) {
+    List<T> pageItems = pageable.getItemsOnPage();
+    return (pageItems.size() > 0)
+        ? pageItems.get(0)
+        : null;
   }
 
   /**
