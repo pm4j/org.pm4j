@@ -8,6 +8,11 @@ import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmAttrStringCfg;
 import org.pm4j.core.pm.impl.converter.PmConverterString;
 
+/**
+ * Implements a PM attribute for {@link String} values.
+ *
+ * @author olaf boede
+ */
 public class PmAttrStringImpl extends PmAttrBase<String, String> implements PmAttrString {
 
   public PmAttrStringImpl(PmObject pmParent) {

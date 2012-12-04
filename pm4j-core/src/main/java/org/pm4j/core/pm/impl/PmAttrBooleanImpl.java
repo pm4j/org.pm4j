@@ -8,6 +8,11 @@ import org.pm4j.core.pm.impl.converter.PmConverterBoolean;
 import org.pm4j.core.pm.impl.options.PmOptionSetImpl;
 import org.pm4j.core.pm.impl.options.PmOptionSetUtil;
 
+/**
+ * Implements a PM attribute for {@link Boolean} values.
+ *
+ * @author olaf boede
+ */
 public class PmAttrBooleanImpl extends PmAttrBase<Boolean, Boolean> implements PmAttrBoolean {
 
   public PmAttrBooleanImpl(PmObject pmParent) {

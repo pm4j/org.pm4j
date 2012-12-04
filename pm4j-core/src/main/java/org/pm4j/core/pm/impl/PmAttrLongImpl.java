@@ -8,6 +8,11 @@ import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmAttrLongCfg;
 import org.pm4j.core.pm.impl.converter.PmConverterLong;
 
+/**
+ * Implements a PM attribute for {@link Long} values.
+ *
+ * @author olaf boede
+ */
 public class PmAttrLongImpl extends PmAttrNumBase<Long> implements PmAttrLong {
 
   public PmAttrLongImpl(PmObject pmParent) {
