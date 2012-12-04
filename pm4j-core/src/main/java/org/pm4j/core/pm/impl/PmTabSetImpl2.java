@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmCommand.CommandState;
 import org.pm4j.core.pm.PmCommandDecorator;
@@ -94,7 +95,7 @@ public class PmTabSetImpl2 extends PmElementImpl implements PmTabSet2 {
    * <p>
    * Internally this method gets called by the {@link PmTabChangeCommand}.
    */
-  protected boolean switchToTabPmImpl(PmTab fromTab, PmTab toTab) {
+  protected boolean switchToTabPmImpl(PmCommand tabChangeCmd, PmTab fromTab, PmTab toTab) {
     return true;
   }
 
@@ -118,6 +119,20 @@ public class PmTabSetImpl2 extends PmElementImpl implements PmTabSet2 {
   @Override
   public List<PmTab> getTabPms() {
     return PmUtil.getPmChildrenOfType(this, PmTab.class);
+  }
+
+  @Override
+  public int getTabIndex(PmTab pmTab) {
+    List<PmTab> list = getTabPms();
+    for (int i=0; i<list.size(); ++i) {
+      PmTab t = list.get(i);
+      if (t.equals(pmTab)) {
+        return i;
+      }
+    }
+
+    // not found
+    throw new PmRuntimeException(this, "The given tab does not belong to the tab set: " + pmTab);
   }
 
   /**
@@ -207,7 +222,7 @@ public class PmTabSetImpl2 extends PmElementImpl implements PmTabSet2 {
     protected boolean beforeDo() {
       boolean canDo = super.beforeDo();
       if (canDo) {
-        canDo = tabSet.switchToTabPmImpl(fromTab, toTab);
+        canDo = tabSet.switchToTabPmImpl(this, fromTab, toTab);
       }
       return canDo;
     }

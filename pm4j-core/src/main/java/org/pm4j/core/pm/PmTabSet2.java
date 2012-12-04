@@ -2,6 +2,8 @@ package org.pm4j.core.pm;
 
 import java.util.List;
 
+import org.pm4j.core.exception.PmRuntimeException;
+
 
 /**
  * A PM for a tab set.
@@ -30,6 +32,15 @@ public interface PmTabSet2 extends PmDataInput {
    * @return The set of tabs.
    */
   List<PmTab> getTabPms();
+
+  /**
+   * Provides the index position of the given {@link PmTab}.
+   *
+   * @param tabPm a {@link PmTab} that belongs to this tab set.
+   * @return the tab index position. Starts with zero.
+   * @throws PmRuntimeException if the given tab is not part of the tab set.
+   */
+  int getTabIndex(PmTab pmTab);
 
 
 }
