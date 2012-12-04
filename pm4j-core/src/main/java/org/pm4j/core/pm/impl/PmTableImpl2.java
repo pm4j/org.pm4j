@@ -131,9 +131,12 @@ public class PmTableImpl2
     return genericRows;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public List<T_ROW_PM> getRowPms() {
-    return getPmPageableCollection().getItemsOnPage();
+    return isPmVisible()
+        ? getPmPageableCollection().getItemsOnPage()
+        : Collections.EMPTY_LIST;
   }
 
   @Deprecated
