@@ -63,4 +63,8 @@ public class ItemNavigatorPageableQueryBased<T> implements ItemNavigator<T> {
     return currentItemIdx;
   }
 
+  @Override
+  public void clearCaches() {
+    pagedCollectionCache.clear();
+  }
 }

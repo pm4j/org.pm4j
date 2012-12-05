@@ -49,6 +49,8 @@ public class ItemNavigatorInMem<T> implements ItemNavigator<T> {
     return currentItemIdx;
   }
 
-
-
+  @Override
+  public void clearCaches() {
+    // nothing to do.
+  }
 }

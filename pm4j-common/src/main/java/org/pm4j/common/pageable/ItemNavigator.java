@@ -36,4 +36,9 @@ public interface ItemNavigator<T> {
    */
   int getCurrentItemIdx();
 
+  /**
+   * Clears all cached information.
+   */
+  void clearCaches();
+
 }

@@ -13,7 +13,7 @@ import java.util.List;
  *
  * @author olaf boede
  */
-public class ItemNavigatorWithTransientItem<T> implements ItemNavigator<T> {
+public class ItemNavigatorWithAdditionalItems<T> implements ItemNavigator<T> {
 
   private final ItemNavigator<T> baseNavigator;
   private List<T> transientItems = new ArrayList<T>();
@@ -26,7 +26,7 @@ public class ItemNavigatorWithTransientItem<T> implements ItemNavigator<T> {
    * @param transientItems
    *          the transient items to handle.
    */
-  public ItemNavigatorWithTransientItem(ItemNavigator<T> baseNavigator, T... transientItems) {
+  public ItemNavigatorWithAdditionalItems(ItemNavigator<T> baseNavigator, T... transientItems) {
     assert baseNavigator != null;
     this.baseNavigator = baseNavigator;
     for (T t : transientItems) {
@@ -39,7 +39,7 @@ public class ItemNavigatorWithTransientItem<T> implements ItemNavigator<T> {
    *          a navigator that usually provides the persistent items to navigate
    *          over.
    */
-  public ItemNavigatorWithTransientItem(ItemNavigator<T> baseNavigator) {
+  public ItemNavigatorWithAdditionalItems(ItemNavigator<T> baseNavigator) {
     assert baseNavigator != null;
     this.baseNavigator = baseNavigator;
   }
@@ -68,6 +68,11 @@ public class ItemNavigatorWithTransientItem<T> implements ItemNavigator<T> {
   @Override
   public int getCurrentItemIdx() {
     return currentPos;
+  }
+
+  @Override
+  public void clearCaches() {
+    baseNavigator.clearCaches();
   }
 
   /**
