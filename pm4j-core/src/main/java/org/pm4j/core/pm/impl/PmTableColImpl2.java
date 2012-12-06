@@ -11,7 +11,6 @@ import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmAttrEnum;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmCommandDecorator;
-import org.pm4j.core.pm.PmElement;
 import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmEvent.ValueChangeKind;
 import org.pm4j.core.pm.PmMessage;
@@ -21,7 +20,6 @@ import org.pm4j.core.pm.PmTable;
 import org.pm4j.core.pm.PmTable2;
 import org.pm4j.core.pm.PmTableCol2;
 import org.pm4j.core.pm.PmVisitor;
-import org.pm4j.core.pm.annotation.PmBoolean;
 import org.pm4j.core.pm.annotation.PmCommandCfg;
 import org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO;
 import org.pm4j.core.pm.annotation.PmTableColCfg;
@@ -141,7 +139,7 @@ public class PmTableColImpl2 extends PmObjectBase implements PmTableCol2 {
    * @param rowPm PM of the row that contains
    * @return The found cell PM. <code>null</code> if there is no corresponding item.
    */
-  protected PmObject findCorrespondingRowCell(PmElement rowPm) {
+  public PmObject findCorrespondingRowCell(PmObject rowPm) {
     return PmUtil.findChildPm(rowPm, this.getPmName());
   }
 
@@ -270,13 +268,13 @@ public class PmTableColImpl2 extends PmObjectBase implements PmTableCol2 {
       myMetaData.colSizeSpec = new ColSizeSpec(
           annotation.prefSize(), annotation.minSize(), annotation.maxSize());
 
-      if (annotation.sortable() != PmBoolean.UNDEFINED) {
-        throw new PmRuntimeException(this, "The sortable annotation is not supported by PmTableColImpl2. Please use the table query options.");
-      }
-
-      if (annotation.filterBy().length > 0) {
-        throw new PmRuntimeException(this, "The filterBy annotation is not supported by PmTableColImpl2. Please use the table query options.");
-      }
+//      if (annotation.sortable() != PmBoolean.UNDEFINED) {
+//        throw new PmRuntimeException(this, "The sortable annotation is not supported by PmTableColImpl2. Please use the table query options.");
+//      }
+//
+//      if (annotation.filterBy().length > 0) {
+//        throw new PmRuntimeException(this, "The filterBy annotation is not supported by PmTableColImpl2. Please use the table query options.");
+//      }
     }
   }
 

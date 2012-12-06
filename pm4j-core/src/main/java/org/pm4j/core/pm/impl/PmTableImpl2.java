@@ -15,6 +15,7 @@ import org.apache.commons.logging.LogFactory;
 import org.pm4j.common.pageable.PageableCollection2;
 import org.pm4j.common.pageable.PageableCollectionUtil2;
 import org.pm4j.common.pageable.inmem.PageableInMemCollectionImpl;
+import org.pm4j.common.query.FilterCompareDefinitionFactory;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.selection.SelectMode;
@@ -33,7 +34,7 @@ import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmPager2;
 import org.pm4j.core.pm.PmTable.RowSelectMode;
 import org.pm4j.core.pm.PmTable2;
-import org.pm4j.core.pm.PmTableCol;
+import org.pm4j.core.pm.PmTableCol2;
 import org.pm4j.core.pm.PmTableGenericRow2;
 import org.pm4j.core.pm.PmVisitor;
 import org.pm4j.core.pm.annotation.PmTableCfg;
@@ -46,6 +47,7 @@ import org.pm4j.core.pm.impl.changehandler.ChangeSetHandler.ChangeKind;
 import org.pm4j.core.pm.impl.changehandler.ChangeSetHandlerImpl;
 import org.pm4j.core.pm.pageable.PageableCollection;
 import org.pm4j.core.pm.pageable2.InMemPmQueryEvaluator;
+import org.pm4j.core.pm.pageable2.PageablePmBeanCollection;
 import org.pm4j.core.pm.pageable2.PmTable2Util;
 
 /**
@@ -105,13 +107,13 @@ public class PmTableImpl2
   }
 
   @Override
-  public List<PmTableCol> getColumnPms() {
-    return PmUtil.getPmChildrenOfType(this, PmTableCol.class);
+  public List<PmTableCol2> getColumnPms() {
+    return PmUtil.getPmChildrenOfType(this, PmTableCol2.class);
   }
 
   @Deprecated
   @Override
-  public final List<PmTableCol> getColumns() {
+  public final List<PmTableCol2> getColumns() {
     return getColumnPms();
   }
 
@@ -314,6 +316,15 @@ public class PmTableImpl2
     return getPmPageableCollection().getQueryOptions();
   }
 
+  /**
+   * Provides the filter compare definition factory used for this table.
+   *
+   * @return the factory.
+   */
+  public FilterCompareDefinitionFactory getPmFilterCompareDefinitionFactory() {
+    return getPmConversation().getPmDefaults().getFilterCompareDefinitionFactory();
+  }
+
   @Override
   public void addPmDecorator(PmCommandDecorator decorator, TableChange... changes) {
     if (pmChangeDecoratorMap.isEmpty()) {
@@ -448,14 +459,21 @@ public class PmTableImpl2
    *
    * @return The collection to use. Never <code>null</code>.
    */
-  @SuppressWarnings("unchecked")
   protected PageableCollection2<T_ROW_PM> getPmPageableCollectionImpl() {
     QueryOptions qoptions = PmTable2Util.makeQueryOptionsForInMemoryTable(this);
-    return new PageableInMemCollectionImpl<T_ROW_PM>(
-        new InMemPmQueryEvaluator<T_ROW_PM>(this),
-        (Collection<T_ROW_PM>)Collections.EMPTY_LIST,
+    // @formatter:off
+    PageableCollection2<T_ROW_BEAN> cities = new PageableInMemCollectionImpl<T_ROW_BEAN>(
+        new InMemPmQueryEvaluator<T_ROW_BEAN>(this),
+        getPmInMemoryCollectionImpl(),
         qoptions,
         null);
+    // @formatter:on
+    return new PageablePmBeanCollection<T_ROW_PM, T_ROW_BEAN>(this, cities);
+  }
+
+  @SuppressWarnings("unchecked")
+  protected Collection<T_ROW_BEAN> getPmInMemoryCollectionImpl() {
+    return (Collection<T_ROW_BEAN>)Collections.EMPTY_LIST;
   }
 
   /**
