@@ -974,7 +974,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   @Override
   public void pmValidate() {
     if (isPmVisible() &&
-        !isPmReadonly()) {
+        isPmEnabled()) {
       // A validation can only be performed if the last setValue() did not generate a converter exception.
       // Otherwise the attribute will simply stay in its value converter error state.
       if (!hasPmConverterErrors()) {
