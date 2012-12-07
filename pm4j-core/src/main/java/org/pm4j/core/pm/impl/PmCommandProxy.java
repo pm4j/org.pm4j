@@ -93,14 +93,16 @@ public class PmCommandProxy extends PmCommandImpl {
     }
 
     /**
-     * Returns the clone of the delegate that has been executed.
+     * Returns the clone of the delegate that has been executed.<br>
+     * If the command proxy itself was stopped by a before-do veto, the
+     * executeded proxy instance will be returned.
      */
     @Override
     public PmCommand doIt(boolean changeCommandHistory) {
       PmCommandProxy proxyCmdClone = (PmCommandProxy) super.doIt(changeCommandHistory);
-      return proxyCmdClone != null
-                ? proxyCmdClone.executedDelegateCmdClone
-                : executedDelegateCmdClone;
+      return proxyCmdClone.executedDelegateCmdClone != null
+          ? proxyCmdClone.executedDelegateCmdClone
+          : proxyCmdClone;
     }
 
     /**
