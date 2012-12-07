@@ -16,7 +16,7 @@ import java.util.List;
 public class ItemNavigatorWithAdditionalItems<T> implements ItemNavigator<T> {
 
   private final ItemNavigator<T> baseNavigator;
-  private List<T> transientItems = new ArrayList<T>();
+  private List<T> additionalItems = new ArrayList<T>();
   private int currentPos;
 
   /**
@@ -30,7 +30,7 @@ public class ItemNavigatorWithAdditionalItems<T> implements ItemNavigator<T> {
     assert baseNavigator != null;
     this.baseNavigator = baseNavigator;
     for (T t : transientItems) {
-      this.transientItems.add(t);
+      this.additionalItems.add(t);
     }
   }
 
@@ -57,12 +57,16 @@ public class ItemNavigatorWithAdditionalItems<T> implements ItemNavigator<T> {
   @Override
   public T getCurrentItem() {
     int n = baseNavigator.getNumOfItems();
-    return (currentPos < n) ? baseNavigator.navigateTo(currentPos) : transientItems.get(currentPos - n);
+    return (currentPos < n)
+        ? baseNavigator.navigateTo(currentPos)
+        : additionalItems.isEmpty()
+            ? null
+            : additionalItems.get(currentPos - n);
   }
 
   @Override
   public int getNumOfItems() {
-    return baseNavigator.getNumOfItems() + transientItems.size();
+    return baseNavigator.getNumOfItems() + additionalItems.size();
   }
 
   @Override
@@ -86,8 +90,8 @@ public class ItemNavigatorWithAdditionalItems<T> implements ItemNavigator<T> {
    * @return the set of transient items.<br>
    *         Never <code>null</code>.
    */
-  public List<T> getTransientItems() {
-    return transientItems;
+  public List<T> getAdditionalItems() {
+    return additionalItems;
   }
 
   /**
@@ -97,10 +101,10 @@ public class ItemNavigatorWithAdditionalItems<T> implements ItemNavigator<T> {
    * Should not be <code>null</code>.
    * @return the position of the added item.
    */
-  public int addTransientItem(T item) {
+  public int addAdditionalItem(T item) {
       assert item != null;
 
-      transientItems.add(item);
+      additionalItems.add(item);
       return getNumOfItems() - 1;
   }
 

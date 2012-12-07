@@ -27,7 +27,11 @@ public class PmAssert {
   }
 
   public static void assertNoMessages(PmObject pm) {
-    assertNoMessages("Error messages found.", pm);
+    assertNoMessages("Unexpected error messages found.", pm);
+  }
+
+  public static void assertNoMessages(PmObject pm, Severity minSeverity) {
+    assertNoMessages("Unexpected messages found.", pm, minSeverity);
   }
 
   public static void assertNoMessages(String msg, PmObject pm) {
@@ -71,15 +75,15 @@ public class PmAssert {
     assertEquals(value, attr.getValueAsString());
   }
 
-  public static void exec(PmCommand cmd) {
+  public static void doIt(PmCommand cmd) {
     exec(cmd.getPmRelativeName(), cmd, CommandState.EXECUTED);
   }
 
-  public static void exec(String msg, PmCommand cmd) {
+  public static void doIt(String msg, PmCommand cmd) {
     exec(msg, cmd, CommandState.EXECUTED);
   }
 
-  public static void exec(PmCommand cmd, CommandState expectedState) {
+  public static void doIt(PmCommand cmd, CommandState expectedState) {
     exec(cmd.getPmRelativeName(), cmd, expectedState);
   }
 
