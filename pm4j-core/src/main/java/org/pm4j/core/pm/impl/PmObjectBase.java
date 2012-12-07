@@ -231,12 +231,6 @@ public abstract class PmObjectBase implements PmObject {
       return (Boolean) v;
     }
     else {
-      // Transitive definition: a child of an invisible PM is also invisible.
-      PmObject parentPm = getPmParent();
-      if ((parentPm != null) && !parentPm.isPmVisible()) {
-        return (Boolean) metaData.cacheStrategyForVisibility.setAndReturnCachedValue(this, false);
-      }
-
       boolean visible = isPmVisibleImpl() &&
                         CustomizedAnnotationUtil.isVisible(this, metaData.permissionAnnotations);
       return (Boolean) metaData.cacheStrategyForVisibility.setAndReturnCachedValue(this, visible);
