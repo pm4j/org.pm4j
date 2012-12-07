@@ -29,18 +29,19 @@
 		<url>git://github.com/pm4j/org.pm4j.git</url>
 	</scm>
 	<modules>
+	
+		<module>pm4j-common</module>
+	
 		<module>pm4j-core</module>
 		<module>pm4j-core-sample</module>
 
-		<module>pm4j-common</module>
-
-		<module>pm4j-swing</module>
-		<module>pm4j-swing-sample</module>
-
 		<module>pm4j-facelets</module>
 
-		<module>pm4j-swt</module>
-		<module>pm4j-swt-sample</module>
+		<module>pm4j-swing</module>
+		<!-- module>pm4j-swing-sample</module -->
+
+		<!-- module>pm4j-swt</module>
+		<!-- module>pm4j-swt-sample</module -->
 
 	</modules>
 
