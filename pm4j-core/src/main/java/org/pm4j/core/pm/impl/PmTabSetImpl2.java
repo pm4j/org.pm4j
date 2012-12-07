@@ -58,10 +58,16 @@ public class PmTabSetImpl2 extends PmElementImpl implements PmTabSet2 {
 
   @Override
   public boolean switchToTabPm(PmTab toTab) {
-   PmTab _fromTab = getCurrentTabPm();
+    PmTab _fromTab = getCurrentTabPm();
 
-    // ensure that the to-tab is initialized (was an issue in domain specific unit tests):
-    toTab.getPmTooltip();
+    if (_fromTab == toTab) {
+      // nothing to do. 'successfully' done.
+      return true;
+    }
+
+    // ensure that the to-tab is initialized (was an issue in domain specific
+    // unit tests):
+    PmInitApi.ensurePmInitialization(toTab);
 
     // Delegate to an undoable command.
     PmTabChangeCommand tabChangeCommand = new PmTabChangeCommand(this, _fromTab, toTab);
@@ -74,8 +80,8 @@ public class PmTabSetImpl2 extends PmElementImpl implements PmTabSet2 {
     PmTabChangeCommand executedCommand = (PmTabChangeCommand) tabChangeCommand.doIt();
 
     if (LOG.isDebugEnabled() && executedCommand.getCommandState() != CommandState.EXECUTED) {
-      String msg = "The UI logic prevented a switch from tab " + PmUtil.getPmLogString(_fromTab) + " to " +
-          PmUtil.getPmLogString(toTab) + ".";
+      String msg = "The UI logic prevented a switch from tab " + PmUtil.getPmLogString(_fromTab) + " to "
+          + PmUtil.getPmLogString(toTab) + ".";
 
       if (executedCommand.getVetoCommandDecorator() != null) {
         msg += " It has been prevented by the command decorator: " + executedCommand.getVetoCommandDecorator();
