@@ -20,6 +20,9 @@ import org.pm4j.navi.NaviLink;
 
 /**
  * Basic implementation of a {@link PmTabSet}.
+ * <p>
+ * Each {@link PmTab} child will be considered as a tab of this set.
+ * The tabs are sorted as they are declared here.
  *
  * @author olaf boede
  */
