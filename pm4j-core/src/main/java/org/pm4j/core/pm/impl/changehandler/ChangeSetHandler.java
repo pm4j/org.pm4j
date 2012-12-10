@@ -36,7 +36,7 @@ public interface ChangeSetHandler<T_ITEM> {
   Collection<T_ITEM> getChangedItems(ChangeKind... changeKinds);
   
   /**
-   * Resets the handler to an unchanged state by clearing the Collection of changed items.
+   * Resets the handler to an unchanged state by clearing the collection of changed items.
    */
   public void clearChanges();
 
