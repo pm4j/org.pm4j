@@ -3,7 +3,6 @@ package org.pm4j.common.selection;
 import java.beans.PropertyVetoException;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
@@ -26,14 +25,14 @@ public class SelectionHandlerWithItemSet<T_ITEM> extends SelectionHandlerBase<T_
   private static final Log LOG = LogFactory.getLog(SelectionHandlerWithItemSet.class);
 
   @SuppressWarnings("unchecked")
-  private static final ItemSelection<?> EMPTY_SELECTION = new ItemSelection<Object>(Collections.EMPTY_SET);
+  private static final ItemSetSelection<?> EMPTY_SELECTION = new ItemSetSelection<Object>(Collections.EMPTY_SET);
 
   /** The collection to handle selected items for. */
   private Iterable<T_ITEM> collection;
 
   /** The set of currently selected items. */
   @SuppressWarnings("unchecked")
-  private ItemSelection<T_ITEM> selection = new ItemSelection<T_ITEM>(Collections.EMPTY_SET);
+  private ItemSetSelection<T_ITEM> selection = new ItemSetSelection<T_ITEM>(Collections.EMPTY_SET);
 
   /**
    * @param collection the collection to handle selected items for.
@@ -119,7 +118,7 @@ public class SelectionHandlerWithItemSet<T_ITEM> extends SelectionHandlerBase<T_
 
     try {
       fireVetoableChange(PROP_SELECTION, oldSelection, newSelection);
-      this.selection = (ItemSelection<T_ITEM>)newSelection;
+      this.selection = (ItemSetSelection<T_ITEM>)newSelection;
       firePropertyChange(PROP_SELECTION, oldSelection, newSelection);
       return true;
     } catch (PropertyVetoException e) {
@@ -132,45 +131,12 @@ public class SelectionHandlerWithItemSet<T_ITEM> extends SelectionHandlerBase<T_
   @SuppressWarnings("unchecked")
   private boolean setSelection(Set<T_ITEM> selectedItems) {
     return setSelection(selectedItems.isEmpty()
-                    ? selection = (ItemSelection<T_ITEM>) EMPTY_SELECTION
-                    : new ItemSelection<T_ITEM>(selectedItems));
+                    ? selection = (ItemSetSelection<T_ITEM>) EMPTY_SELECTION
+                    : new ItemSetSelection<T_ITEM>(selectedItems));
   }
 
   private Set<T_ITEM> getModifyableItemSet() {
     return new HashSet<T_ITEM>(selection.selectedItems);
-  }
-
-  public static class ItemSelection<T_ITEM> implements Selection<T_ITEM> {
-    private static final long serialVersionUID = 1L;
-
-    private final Set<T_ITEM> selectedItems;
-
-    @SuppressWarnings("unchecked")
-    public ItemSelection(Set<T_ITEM> selectedItems) {
-      this.selectedItems = (selectedItems.isEmpty())
-          ? Collections.EMPTY_SET
-          : Collections.unmodifiableSet(selectedItems);
-    }
-
-    @Override
-    public long getSize() {
-      return selectedItems.size();
-    }
-
-    @Override
-    public Iterator<T_ITEM> iterator() {
-      return selectedItems.iterator();
-    }
-
-    /** Block size has no effect on this iterator implementation. */
-    @Override
-    public void setIteratorBlockSizeHint(int readBlockSize) {
-    }
-    @Override
-    public boolean isSelected(T_ITEM item) {
-      return selectedItems.contains(item);
-    }
-
   }
 
 }
