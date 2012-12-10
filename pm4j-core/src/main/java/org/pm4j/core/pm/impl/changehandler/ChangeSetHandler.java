@@ -34,6 +34,11 @@ public interface ChangeSetHandler<T_ITEM> {
    * @return the items that have been registered for the given change kind.
    */
   Collection<T_ITEM> getChangedItems(ChangeKind... changeKinds);
+  
+  /**
+   * Resets the handler to an unchanged state by clearing the Collection of changed items.
+   */
+  public void clearChanges();
 
   /**
    * Registers an observed change.
