@@ -60,21 +60,37 @@ public class PmAttrListOfEnumsImpl<T_ENUM extends Enum<?>> extends PmAttrListImp
    * Provides the set of enums that is not yet part of the list.
    * <p>
    * The set can be filtered by defining some filter logic within {@link #isAnOption(Enum)}.
+   * <p>
+   * By overriding isExcludeSelectedItemsFromOptionSet() (Standard: true) it's possible to 
+   * include already selected items in the list. 
    *
    * @return The set of enums that can be selected by the user.
    */
   protected List<T_ENUM> getEnumOptionValues() {
-    List<T_ENUM> optionEnums = new ArrayList<T_ENUM>();
-    HashSet<T_ENUM> valueSet = new HashSet<T_ENUM>(getValue());
+      List<T_ENUM> optionEnums = new ArrayList<T_ENUM>();
+      HashSet<T_ENUM> valueSet = new HashSet<T_ENUM>(getValue());
+      boolean excludeSelectedItemsFromOptionSet = isExcludeSelectedItemsFromOptionSet();
 
-    for (T_ENUM e : enumClass.getEnumConstants()) {
-      if ( (! valueSet.contains(e)) &&
-           isAnOption(e) ) {
-        optionEnums.add(e);
+      for (T_ENUM e : enumClass.getEnumConstants()) {
+          if (isAnOption(e) && !(excludeSelectedItemsFromOptionSet && valueSet.contains(e))) {
+              optionEnums.add(e);
+          }
       }
-    }
 
-    return optionEnums;
+      return optionEnums;
+  }
+  
+  /**
+   * Configures, whether already selected items should be excluded from the option set.
+   * <p>
+   * Override and set to false to include.
+   * <p>
+   * (Standard: true)
+   * 
+   * @return whether to exclude already selected items from the option set
+   */
+  protected boolean isExcludeSelectedItemsFromOptionSet() {
+      return true;
   }
 
   /**
