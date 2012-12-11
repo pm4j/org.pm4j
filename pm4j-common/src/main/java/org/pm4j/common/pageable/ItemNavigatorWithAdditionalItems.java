@@ -3,6 +3,8 @@ package org.pm4j.common.pageable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.pm4j.common.pageable.inmem.ItemNavigatorInMem;
+
 /**
  * A navigator over a set of persistent and transient items.
  * <p>
@@ -38,10 +40,15 @@ public class ItemNavigatorWithAdditionalItems<T> implements ItemNavigator<T> {
    * @param baseNavigator
    *          a navigator that usually provides the persistent items to navigate
    *          over.
+   *          <p>
+   *          May be <code>null</code>. This creates a navigator having only
+   *          additional items.
    */
   public ItemNavigatorWithAdditionalItems(ItemNavigator<T> baseNavigator) {
     assert baseNavigator != null;
-    this.baseNavigator = baseNavigator;
+    this.baseNavigator = baseNavigator != null
+        ? baseNavigator
+        : new ItemNavigatorInMem<T>(null);
   }
 
   @Override
