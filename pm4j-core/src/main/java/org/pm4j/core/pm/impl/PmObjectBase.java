@@ -394,7 +394,7 @@ public abstract class PmObjectBase implements PmObject {
       sd.cacheStrategyForTitle.clear(this);
 
     for (PmObject p : getPmChildren()) {
-      PmCacheApi.clearCachedPmValues(p, cacheSet);
+      PmCacheApi.clearPmCache(p, cacheSet);
     }
   }
 

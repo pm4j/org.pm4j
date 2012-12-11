@@ -625,11 +625,11 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
     if (md.clearCachesSet.size() > 0) {
       PmObject pmToClear = this;
       do {
-        PmCacheApi.clearCachedPmValues(pmToClear, md.clearCachesSet);
+        PmCacheApi.clearPmCache(pmToClear, md.clearCachesSet);
         pmToClear = pmToClear.getPmParent();
       } while (! (pmToClear instanceof PmElement));
       // Don't forget the enclosing element:
-      PmCacheApi.clearCachedPmValues(pmToClear, md.clearCachesSet);
+      PmCacheApi.clearPmCache(pmToClear, md.clearCachesSet);
     }
 
 
