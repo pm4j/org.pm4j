@@ -529,7 +529,11 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
 
   @Override
   protected void clearCachedPmValues(Set<PmCacheApi.CacheKind> cacheSet) {
+    if (pmInitState != PmInitState.INITIALIZED)
+      return;
+
     super.clearCachedPmValues(cacheSet);
+
     MetaData sd = getOwnMetaData();
 
     if (cacheSet.contains(PmCacheApi.CacheKind.VALUE))
