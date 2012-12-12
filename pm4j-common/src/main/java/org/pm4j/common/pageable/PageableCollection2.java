@@ -133,4 +133,14 @@ public interface PageableCollection2<T_ITEM> extends Iterable<T_ITEM> {
    * Gets called if everything needs to be re-evalueated.
    */
   void clearCaches();
+
+  /**
+   * Adds an item to this collection.
+   * <p>
+   * Usually the new item will be added as the last collection item.
+   *
+   * @param item the item to add.
+   * @throws UnsupportedOperationException if the collection does not support additional items.
+   */
+  void addItem(T_ITEM item);
 }
