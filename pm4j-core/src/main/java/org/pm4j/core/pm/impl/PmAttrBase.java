@@ -518,7 +518,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   public void resetPmValues() {
     boolean isWritable = !isPmReadonly();
     if (isWritable) {
-      PmCacheApi.clearCachedPmValues(this);
+      PmCacheApi.clearPmCache(this);
       this.valueWasSet = false;
     }
     clearPmInvalidValues();

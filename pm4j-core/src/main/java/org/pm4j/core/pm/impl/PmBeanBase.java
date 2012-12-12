@@ -193,7 +193,7 @@ public abstract class PmBeanBase<T_BEAN>
 
     // Old cache values are related to the old bean.
     PmMessageUtil.clearSubTreeMessages(this);
-    PmCacheApi.clearCachedPmValues(this);
+    PmCacheApi.clearPmCache(this);
 
     if (bean != null) {
       checkBeanClass(bean);

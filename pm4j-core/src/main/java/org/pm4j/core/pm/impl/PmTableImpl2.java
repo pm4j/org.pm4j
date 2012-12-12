@@ -121,7 +121,6 @@ public class PmTableImpl2
   public List<PmTableGenericRow2<T_ROW_PM>> getGenericRowPms() {
     List<PmTableGenericRow2<T_ROW_PM>> genericRows = null;
 
-    // XXX olaf: The optimized version will have an event synchronized attribute.
     if (genericRows == null) {
       List<T_ROW_PM> rows = getRowPms();
       genericRows = new ArrayList<PmTableGenericRow2<T_ROW_PM>>(rows.size());
