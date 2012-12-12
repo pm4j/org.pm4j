@@ -1,6 +1,9 @@
 package org.pm4j.core.pm.impl;
 
+import java.util.Collection;
+
 import org.pm4j.core.pm.PmBean;
+import org.pm4j.core.pm.PmObject;
 
 interface BeanPmCache {
 
@@ -35,5 +38,11 @@ interface BeanPmCache {
    * Clears all items.
    */
   void clear();
+
+  /** @return <code>true</code> if there is no entry. */
+  boolean isEmpty();
+
+  /** @return the set of items. */
+  Collection<PmObject> getItems();
 
 }

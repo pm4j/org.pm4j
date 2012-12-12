@@ -20,6 +20,7 @@ import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.pm4j.common.util.collection.ListUtil;
 import org.pm4j.common.util.collection.MapUtil;
 import org.pm4j.core.exception.PmConverterException;
 import org.pm4j.core.exception.PmRuntimeException;
@@ -377,7 +378,7 @@ public abstract class PmObjectBase implements PmObject {
    *          The set of caches to be cleared. If no cacheKind is specified, all
    *          cache kinds will be cleared.
    */
-  protected void clearCachedPmValues(Set<PmCacheApi.CacheKind> cacheSet) {
+  protected void clearCachedPmValues(final Set<PmCacheApi.CacheKind> cacheSet) {
     // Has no effect for fresh instances.
     if (pmInitState != PmInitState.INITIALIZED)
       return;
@@ -433,7 +434,12 @@ public abstract class PmObjectBase implements PmObject {
   }
 
   /* package */ List<PmObject> getPmChildren() {
-    return BeanAttrArrayList.makeList(this, getPmMetaDataWithoutPmInitCall().childFieldAccessorArray, pmDynamicSubPms.all);
+    List<PmObject> subPms = BeanAttrArrayList.makeList(this, getPmMetaDataWithoutPmInitCall().childFieldAccessorArray, pmDynamicSubPms.all);
+    if (pmBeanFactoryCache != null && !pmBeanFactoryCache.isEmpty()) {
+      return ListUtil.collectionsToList(subPms, pmBeanFactoryCache.getItems());
+    } else {
+      return subPms;
+    }
   }
 
   /* package */ PmObject findChildPm(String localChildName) {

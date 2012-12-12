@@ -181,12 +181,21 @@ public class BeanAttrArrayList<T> implements List<T> {
 
   @Override
   public Object[] toArray() {
-    return new ArrayList<T>(this).toArray();
+    return toArray(new Object[size()]);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public <T2> T2[] toArray(T2[] a) {
-    return new ArrayList<T>(this).toArray(a);
+    int size = size();
+    T2[] arr = (a.length == size)
+        ? a
+        : (T2[])new Object[size];
+
+    for (int i=0; i<size; ++i) {
+      arr[i] = (T2)get(i);
+    }
+    return arr;
   }
 
   public static class WithArrayExtension<T> extends BeanAttrArrayList<T> {
