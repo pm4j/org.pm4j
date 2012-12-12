@@ -394,7 +394,7 @@ public abstract class PmObjectBase implements PmObject {
     if (cacheSet.contains(PmCacheApi.CacheKind.TITLE))
       sd.cacheStrategyForTitle.clear(this);
 
-    for (PmObject p : getPmChildren()) {
+    for (PmObject p : getPmChildrenAndFactoryPms()) {
       PmCacheApi.clearPmCache(p, cacheSet);
     }
   }
@@ -434,6 +434,15 @@ public abstract class PmObjectBase implements PmObject {
   }
 
   /* package */ List<PmObject> getPmChildren() {
+    return BeanAttrArrayList.makeList(this, getPmMetaDataWithoutPmInitCall().childFieldAccessorArray, pmDynamicSubPms.all);
+  }
+
+  /**
+   * TODO olaf: provides not only the fix structure children.
+   * Use that when we the new PM structure visitor will be implemented.
+   * @return
+   */
+  /* package */ List<PmObject> getPmChildrenAndFactoryPms() {
     List<PmObject> subPms = BeanAttrArrayList.makeList(this, getPmMetaDataWithoutPmInitCall().childFieldAccessorArray, pmDynamicSubPms.all);
     if (pmBeanFactoryCache != null && !pmBeanFactoryCache.isEmpty()) {
       return ListUtil.collectionsToList(subPms, pmBeanFactoryCache.getItems());
