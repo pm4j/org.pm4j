@@ -207,4 +207,13 @@ public class PageablePmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> imple
     beanCollection.clearCaches();
   }
 
+  /**
+   * Provides the pageable collection of beans behind this collection of bean-PMs.
+   *
+   * @return the bean collection.
+   */
+  public PageableCollection2<T_BEAN> getBeanCollection() {
+    return beanCollection;
+  }
+
 }
