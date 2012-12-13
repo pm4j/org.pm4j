@@ -322,7 +322,15 @@ public abstract class PmObjectBase implements PmObject {
     return getPmMetaDataWithoutPmInitCall().resKey;
   }
 
-  // TODO: doku!
+  /**
+   * Provides a resource key prefix that is used for sub-PM's resource key generation.
+   * <p>
+   * It may be defined by {@link PmTitleCfg#resKeyBase()} or by overriding this method.
+   * <p>
+   * If nothing special is defined this method provides the resource key of this instance.
+   *
+   * @return the resource key base.
+   */
   public String getPmResKeyBase() {
     return getPmMetaDataWithoutPmInitCall().resKeyBase;
   }
