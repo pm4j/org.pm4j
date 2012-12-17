@@ -221,7 +221,7 @@ public class PmTabSetImpl extends PmElementImpl implements PmTabSet {
     protected void doItImpl() {
       PmTabSetConnector viewConnector = tabSet.getPmToTabSetViewConnector();
       if (viewConnector != null) {
-        viewConnector._switchToTab(toTab);
+        viewConnector.switchToTab(toTab);
       }
       // Only successfully executed tab switches need to be undone.
       setUndoCommand(new PmTabChangeCommand(tabSet, toTab, fromTab));

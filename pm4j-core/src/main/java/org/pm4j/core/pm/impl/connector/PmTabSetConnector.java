@@ -10,6 +10,12 @@ import org.pm4j.core.pm.PmDataInput;
  */
 public interface PmTabSetConnector {
 
-  void _switchToTab(PmDataInput pmTab);
+  /**
+   * A call back method that is called when the PM has switched to another tab.
+   * The view should arrange its state here.
+   *
+   * @param pmTab the tab to switch to.
+   */
+  void switchToTab(PmDataInput pmTab);
 
 }
