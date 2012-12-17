@@ -2,6 +2,14 @@ package org.pm4j.common.util.collection;
 
 import java.util.Iterator;
 
+/**
+ * An iterator that combines the content of two underlying iterators to provide
+ * the complete iteration result.
+ *
+ * @param <T_ITEM> type of handled items.
+ *
+ * @author olaf boede
+ */
 public class CombinedIterator<T_ITEM> implements Iterator<T_ITEM> {
 
   private final Iterator<T_ITEM> baseIterator;
