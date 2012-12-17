@@ -55,7 +55,7 @@ public class ItemNavigatorPageableQueryBased<T> implements ItemNavigator<T> {
 
   @Override
   public int getNumOfItems() {
-    return pagedCollectionCache != null ? (int) pagedCollectionCache.getQueryResultSetSize() : 0;
+    return pagedCollectionCache != null ? (int) pagedCollectionCache.getCollectionSize() : 0;
   }
 
   @Override
