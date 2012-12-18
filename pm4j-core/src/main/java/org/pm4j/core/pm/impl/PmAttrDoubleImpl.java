@@ -8,6 +8,11 @@ import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmAttrDoubleCfg;
 import org.pm4j.core.pm.impl.converter.PmConverterDouble;
 
+/**
+ * Implements a PM attribute for {@link Double} values.
+ *
+ * @author olaf boede
+ */
 public class PmAttrDoubleImpl extends PmAttrNumBase<Double> implements PmAttrDouble {
 
   public PmAttrDoubleImpl(PmObject pmParent) {

@@ -9,7 +9,7 @@ import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmElement;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmTable2;
-import org.pm4j.core.pm.PmTableCol;
+import org.pm4j.core.pm.PmTableCol2;
 import org.pm4j.core.pm.PmTableGenericRow2;
 
 /**
@@ -48,7 +48,7 @@ public class PmTableGenericRowImpl2<T_ROW_ELEMENT extends PmElement> implements 
   public List<PmObject> getCells() {
     if (items == null) {
       List<PmObject> items = new ArrayList<PmObject>();
-      for (PmTableCol c : pmTable.getColumns()) {
+      for (PmTableCol2 c : pmTable.getColumnPms()) {
         String colName = c.getPmName();
         PmObject pm = PmUtil.findChildPm(rowElement, colName);
         if (pm != null) {

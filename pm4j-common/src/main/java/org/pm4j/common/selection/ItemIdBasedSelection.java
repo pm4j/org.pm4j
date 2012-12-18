@@ -35,14 +35,8 @@ public class ItemIdBasedSelection<T_ITEM, T_ID> implements Selection<T_ITEM>, Se
   }
 
   @Override
-  public boolean contains(T_ITEM item) {
+  public boolean isSelected(T_ITEM item) {
     return ids.contains(itemIdConverter.getIdForItem(item));
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public <T_BEAN> Selection<T_BEAN> getBeanSelection() {
-    return (Selection<T_BEAN>)this;
   }
 
   public Set<T_ID> getIds() {

@@ -8,6 +8,11 @@ import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmAttrIntegerCfg;
 import org.pm4j.core.pm.impl.converter.PmConverterInteger;
 
+/**
+ * Implements a PM attribute for {@link Integer} values.
+ *
+ * @author olaf boede
+ */
 public class PmAttrIntegerImpl extends PmAttrNumBase<Integer> implements PmAttrInteger {
 
   public PmAttrIntegerImpl(PmObject pmParent) {

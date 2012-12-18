@@ -11,6 +11,11 @@ import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmAttrBigDecimalCfg;
 import org.pm4j.core.pm.impl.converter.PmConverterBigDecimal;
 
+/**
+ * Implements a PM attribute for {@link BigDecimal} values.
+ *
+ * @author olaf boede
+ */
 public class PmAttrBigDecimalImpl extends PmAttrNumBase<BigDecimal> implements PmAttrBigDecimal {
 
   public PmAttrBigDecimalImpl(PmObject pmParent) {

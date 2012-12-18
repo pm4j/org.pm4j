@@ -32,6 +32,8 @@ public abstract class PageableItemIteratorBase<T_ITEM> implements Iterator<T_ITE
 
   protected abstract List<T_ITEM> getItems(long startIdx, int blockSize);
 
+//  protected abstract int getItemCount();
+
   /**
    * Gets called for all results of {@link #getItems(long, int)}. If this method
    * returns <code>false</code>, this item will not be used by this iterator.
@@ -66,7 +68,9 @@ public abstract class PageableItemIteratorBase<T_ITEM> implements Iterator<T_ITE
   private void doNext() {
     boolean nextFound = false;
     do {
-      boolean doQuery = (pagePos == -1) || (pagePos == iteratorBlockSize-1);
+      boolean doQuery = (pagePos == -1) ||
+                        (pagePos == pageItems.size()-1);
+
       if (doQuery) {
         pagePos = 0;
         pageItems = getItems(idx, iteratorBlockSize);

@@ -3,8 +3,8 @@ package org.pm4j.core.pm;
 import java.util.Collection;
 import java.util.List;
 
-import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.query.QueryOptions;
+import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.selection.SelectionHandler;
 import org.pm4j.core.pm.PmTable.RowSelectMode;
 import org.pm4j.core.pm.impl.changehandler.ChangeSetHandler;
@@ -35,14 +35,16 @@ public interface PmTable2<T_ROW_PM> extends PmObject, PmDataInput {
   /**
    * @return The set of columns.
    */
-  List<PmTableCol> getColumnPms();
+  List<PmTableCol2> getColumnPms();
 
   /** @deprecated Please use {@link #getColumnPms()} */
-  List<PmTableCol> getColumns();
+  List<PmTableCol2> getColumns();
 
   /**
    * Provides only the visible rows.<br>
    * The provided set may be influenced by filter criteria and paging logic.
+   * <p>
+   * Does not provide any items if the table is not visible.
    *
    * @return The set of table rows to display.
    */
@@ -53,6 +55,8 @@ public interface PmTable2<T_ROW_PM> extends PmObject, PmDataInput {
 
   /**
    * Provides a row representation that may be used by generic a renderer.
+   * <p>
+   * Does not provide any items if the table is not visible.
    *
    * @return The set of rows as provides by {@link #getRows()}.<br>
    *         Each row is encapsulated in a {@link PmTableGenericRow} instance.

@@ -35,8 +35,8 @@ public class SelectionWithAdditionalItems <T_ITEM> implements Selection<T_ITEM> 
   }
 
   @Override
-  public boolean contains(T_ITEM item) {
-    return baseSelection.contains(item) || additionalSelectedItems.contains(item);
+  public boolean isSelected(T_ITEM item) {
+    return baseSelection.isSelected(item) || additionalSelectedItems.contains(item);
   }
 
   @Override
@@ -49,29 +49,6 @@ public class SelectionWithAdditionalItems <T_ITEM> implements Selection<T_ITEM> 
     baseSelection.setIteratorBlockSizeHint(readBlockSize);
   }
 
-  @SuppressWarnings("unchecked")
-  @Override
-  public <T_BEAN> Selection<T_BEAN> getBeanSelection() {
-    // TODO:
-//    Selection<T_BEAN> baseBeanSelection = baseSelection.getBeanSelection();
-//    // If this selection is already the bean selection then we have nothing to do.
-//    if (baseBeanSelection == baseSelection) {
-//      return (Selection<T_BEAN>) this;
-//    }
-//
-//    if (selectedTransientItems.isEmpty()) {
-//      return baseBeanSelection;
-//    }
-//
-//    Collection<T_BEAN> beans = new ArrayList<T_BEAN>();
-//    for (T_ITEM i : this.selectedTransientItems) {
-//      beans.add((T_BEAN)itemToBeanConverter.toBean(i));
-//    }
-//
-//    return new SelectionWithTransientItems<T_BEAN>(baseBeanSelection, beans, new NotImplementedItemToBeanConverter<T_BEAN, T_BEAN>());
-    return null;
-  }
-
   public List<T_ITEM> getAdditionalSelectedItems() {
     return additionalSelectedItems;
   }
@@ -79,6 +56,4 @@ public class SelectionWithAdditionalItems <T_ITEM> implements Selection<T_ITEM> 
   public Selection<T_ITEM> getBaseSelection() {
     return baseSelection;
   }
-
-
 }

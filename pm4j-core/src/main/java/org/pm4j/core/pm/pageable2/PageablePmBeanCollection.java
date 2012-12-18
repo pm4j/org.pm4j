@@ -1,14 +1,11 @@
 package org.pm4j.core.pm.pageable2;
 
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
 import org.pm4j.common.pageable.PageableCollection2;
 import org.pm4j.common.pageable.inmem.PageableInMemCollectionImpl;
-import org.pm4j.common.pageable.querybased.PageableQueryCollection;
-import org.pm4j.common.pageable.querybased.PageableQueryService;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.selection.SelectionHandler;
@@ -91,24 +88,6 @@ public class PageablePmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> imple
              queryOptions,
              query)
         );
-  }
-
-  /**
-   * Creates a collection backed by a {@link PageableQueryService}.
-   *
-   * @param pmCtxt
-   *          the PM context used to create the PM's for the bean items.
-   * @param service
-   *          provides the beans and query options.
-   * @param query
-   *          the optional query to use.
-   */
-  public <T_ID extends Serializable> PageablePmBeanCollection(PmObject pmCtxt, PageableQueryService<T_BEAN, T_ID> service, QueryParams query) {
-    this(pmCtxt, new PageableQueryCollection<T_BEAN, T_ID>(service, query));
-  }
-
-  public <T_ID extends Serializable> PageablePmBeanCollection(PmObject pmCtxt, PageableQueryService<T_BEAN, T_ID> service) {
-    this(pmCtxt, service, null);
   }
 
   /**
@@ -207,4 +186,17 @@ public class PageablePmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> imple
     beanCollection.clearCaches();
   }
 
+  @Override
+  public void addItem(T_PM item) {
+    beanCollection.addItem(item.getPmBean());
+  }
+
+  /**
+   * Provides the pageable collection of beans behind this collection of bean-PMs.
+   *
+   * @return the bean collection.
+   */
+  public PageableCollection2<T_BEAN> getBeanCollection() {
+    return beanCollection;
+  }
 }

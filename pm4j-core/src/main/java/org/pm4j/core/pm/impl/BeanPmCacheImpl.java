@@ -1,6 +1,7 @@
 package org.pm4j.core.pm.impl;
 
 import java.lang.ref.WeakReference;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -143,6 +144,17 @@ class BeanPmCacheImpl implements BeanPmCache {
     pmToBeanIdentityMap.clear();
     beanEqualToPmMap.clear();
     beanIdentityToPmMap.clear();
+  }
+
+  @Override
+  public boolean isEmpty() {
+    return pmToBeanIdentityMap.isEmpty();
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public Collection<PmObject> getItems() {
+    return (Collection<PmObject>)(Object)pmToBeanIdentityMap.keySet();
   }
 
   private String logString(PmObject pm) {

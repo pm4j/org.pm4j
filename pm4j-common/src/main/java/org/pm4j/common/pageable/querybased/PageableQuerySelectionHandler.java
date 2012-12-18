@@ -199,7 +199,7 @@ public class PageableQuerySelectionHandler<T_ITEM, T_ID extends Serializable> ex
     }
 
     @Override
-    public boolean contains(T_ITEM item) {
+    public boolean isSelected(T_ITEM item) {
       return ids.contains(getService().getIdForItem(item));
     }
 
@@ -211,12 +211,6 @@ public class PageableQuerySelectionHandler<T_ITEM, T_ID extends Serializable> ex
     /** Block size has currently no effect on this iterator implementation. This may be changed in the future. */
     @Override
     public void setIteratorBlockSizeHint(int readBlockSize) {
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public <T_BEAN> Selection<T_BEAN> getBeanSelection() {
-      return (Selection<T_BEAN>)this;
     }
 
     protected Collection<T_ID> getSelectedOrDeselectedIds() {
@@ -279,8 +273,8 @@ public class PageableQuerySelectionHandler<T_ITEM, T_ID extends Serializable> ex
     }
 
     @Override
-    public boolean contains(T_ITEM item) {
-      return ! baseSelection.contains(item);
+    public boolean isSelected(T_ITEM item) {
+      return ! baseSelection.isSelected(item);
     }
 
     @Override
@@ -288,7 +282,7 @@ public class PageableQuerySelectionHandler<T_ITEM, T_ID extends Serializable> ex
       return new PageableItemIteratorBase<T_ITEM>(iteratorBlockSizeHint) {
         @Override
         protected boolean isItemSelected(T_ITEM item) {
-          return !baseSelection.contains(item);
+          return !baseSelection.isSelected(item);
         }
 
         @Override
@@ -305,12 +299,6 @@ public class PageableQuerySelectionHandler<T_ITEM, T_ID extends Serializable> ex
 
     public ClickedIds<T_ID> getClickedIds() {
       return new ClickedIds<T_ID>(baseSelection.getClickedIds().getIds(), true);
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public <T_BEAN> Selection<T_BEAN> getBeanSelection() {
-      return (Selection<T_BEAN>)this;
     }
   }
 

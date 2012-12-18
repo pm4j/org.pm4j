@@ -92,7 +92,7 @@ public class DetailsPmHandlerImpl<T_DETAILS_PM extends PmDataInput, T_MASTER_REC
     // that area where related to the record that is no longer active.
     PmMessageUtil.clearSubTreeMessages(detailsPm);
     // All cached information within the details area should be refreshed.
-    PmCacheApi.clearCachedPmValues(detailsPm, CacheKind.ALL);
+    PmCacheApi.clearPmCache(detailsPm, CacheKind.ALL);
   }
 
 }

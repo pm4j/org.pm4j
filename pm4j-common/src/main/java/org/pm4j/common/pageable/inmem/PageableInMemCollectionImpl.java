@@ -9,6 +9,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
+import org.pm4j.common.pageable.PageableCollection2;
 import org.pm4j.common.pageable.PageableCollectionBase2;
 import org.pm4j.common.pageable.PageableCollectionUtil2;
 import org.pm4j.common.query.FilterExpression;
@@ -27,7 +28,9 @@ import org.pm4j.common.selection.SelectionHandlerWithItemSet;
  * @param <T_ITEM>
  *          The type of items handled by this set.
  */
-public class PageableInMemCollectionImpl<T_ITEM> extends PageableCollectionBase2<T_ITEM> implements PageableInMemCollection<T_ITEM> {
+public class PageableInMemCollectionImpl<T_ITEM>
+  extends PageableCollectionBase2<T_ITEM>
+  implements PageableInMemCollection<T_ITEM>, PageableCollection2<T_ITEM> {
 
   /** The collection type specific selection handler. */
   private final SelectionHandler<T_ITEM> selectionHandler;
@@ -117,6 +120,17 @@ public class PageableInMemCollectionImpl<T_ITEM> extends PageableCollectionBase2
     sortOrderComparator = null;
     objects = null;
   }
+
+  /**
+   * Adds the item as the last one.
+   */
+  @Override
+  public void addItem(T_ITEM item) {
+    originalObjects.add(item);
+    if (objects != null) {
+      objects.add(item);
+    }
+  };
 
   @Override
   public void setSortOrderComparator(Comparator<T_ITEM> comparator) {

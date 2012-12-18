@@ -518,7 +518,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   public void resetPmValues() {
     boolean isWritable = !isPmReadonly();
     if (isWritable) {
-      PmCacheApi.clearCachedPmValues(this);
+      PmCacheApi.clearPmCache(this);
       this.valueWasSet = false;
     }
     clearPmInvalidValues();
@@ -529,7 +529,11 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
 
   @Override
   protected void clearCachedPmValues(Set<PmCacheApi.CacheKind> cacheSet) {
+    if (pmInitState != PmInitState.INITIALIZED)
+      return;
+
     super.clearCachedPmValues(cacheSet);
+
     MetaData sd = getOwnMetaData();
 
     if (cacheSet.contains(PmCacheApi.CacheKind.VALUE))
@@ -974,7 +978,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   @Override
   public void pmValidate() {
     if (isPmVisible() &&
-        !isPmReadonly()) {
+        isPmEnabled()) {
       // A validation can only be performed if the last setValue() did not generate a converter exception.
       // Otherwise the attribute will simply stay in its value converter error state.
       if (!hasPmConverterErrors()) {

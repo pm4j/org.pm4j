@@ -3,6 +3,8 @@ package org.pm4j.common.pageable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.pm4j.common.pageable.inmem.ItemNavigatorInMem;
+
 /**
  * A navigator over a set of persistent and transient items.
  * <p>
@@ -13,10 +15,10 @@ import java.util.List;
  *
  * @author olaf boede
  */
-public class ItemNavigatorWithTransientItem<T> implements ItemNavigator<T> {
+public class ItemNavigatorWithAdditionalItems<T> implements ItemNavigator<T> {
 
   private final ItemNavigator<T> baseNavigator;
-  private List<T> transientItems = new ArrayList<T>();
+  private List<T> additionalItems = new ArrayList<T>();
   private int currentPos;
 
   /**
@@ -26,11 +28,11 @@ public class ItemNavigatorWithTransientItem<T> implements ItemNavigator<T> {
    * @param transientItems
    *          the transient items to handle.
    */
-  public ItemNavigatorWithTransientItem(ItemNavigator<T> baseNavigator, T... transientItems) {
+  public ItemNavigatorWithAdditionalItems(ItemNavigator<T> baseNavigator, T... transientItems) {
     assert baseNavigator != null;
     this.baseNavigator = baseNavigator;
     for (T t : transientItems) {
-      this.transientItems.add(t);
+      this.additionalItems.add(t);
     }
   }
 
@@ -38,10 +40,15 @@ public class ItemNavigatorWithTransientItem<T> implements ItemNavigator<T> {
    * @param baseNavigator
    *          a navigator that usually provides the persistent items to navigate
    *          over.
+   *          <p>
+   *          May be <code>null</code>. This creates a navigator having only
+   *          additional items.
    */
-  public ItemNavigatorWithTransientItem(ItemNavigator<T> baseNavigator) {
+  public ItemNavigatorWithAdditionalItems(ItemNavigator<T> baseNavigator) {
     assert baseNavigator != null;
-    this.baseNavigator = baseNavigator;
+    this.baseNavigator = baseNavigator != null
+        ? baseNavigator
+        : new ItemNavigatorInMem<T>(null);
   }
 
   @Override
@@ -57,17 +64,26 @@ public class ItemNavigatorWithTransientItem<T> implements ItemNavigator<T> {
   @Override
   public T getCurrentItem() {
     int n = baseNavigator.getNumOfItems();
-    return (currentPos < n) ? baseNavigator.navigateTo(currentPos) : transientItems.get(currentPos - n);
+    return (currentPos < n)
+        ? baseNavigator.navigateTo(currentPos)
+        : additionalItems.isEmpty()
+            ? null
+            : additionalItems.get(currentPos - n);
   }
 
   @Override
   public int getNumOfItems() {
-    return baseNavigator.getNumOfItems() + transientItems.size();
+    return baseNavigator.getNumOfItems() + additionalItems.size();
   }
 
   @Override
   public int getCurrentItemIdx() {
     return currentPos;
+  }
+
+  @Override
+  public void clearCaches() {
+    baseNavigator.clearCaches();
   }
 
   /**
@@ -81,8 +97,8 @@ public class ItemNavigatorWithTransientItem<T> implements ItemNavigator<T> {
    * @return the set of transient items.<br>
    *         Never <code>null</code>.
    */
-  public List<T> getTransientItems() {
-    return transientItems;
+  public List<T> getAdditionalItems() {
+    return additionalItems;
   }
 
   /**
@@ -92,10 +108,10 @@ public class ItemNavigatorWithTransientItem<T> implements ItemNavigator<T> {
    * Should not be <code>null</code>.
    * @return the position of the added item.
    */
-  public int addTransientItem(T item) {
+  public int addAdditionalItem(T item) {
       assert item != null;
 
-      transientItems.add(item);
+      additionalItems.add(item);
       return getNumOfItems() - 1;
   }
 

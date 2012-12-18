@@ -163,4 +163,8 @@ public class PageableQueryCollection<T_ITEM, T_ID extends Serializable> extends 
     pageItemsCache = null;
   }
 
+  @Override
+  public void addItem(T_ITEM item) {
+    throw new UnsupportedOperationException();
+  }
 }

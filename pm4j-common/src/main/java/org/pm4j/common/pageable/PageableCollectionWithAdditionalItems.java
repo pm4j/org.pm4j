@@ -37,15 +37,10 @@ public class PageableCollectionWithAdditionalItems<T_ITEM> implements PageableCo
     this.selectionHandler = new SelectionHandlerWithAdditionalItems<T_ITEM>(baseCollection, additionalItems);
   }
 
-  /**
-   * Adds a transient item to handle.
-   *
-   * @param items
-   *          the new item.
-   */
-  public void addAdditionalItem(T_ITEM item) {
+  @Override
+  public void addItem(T_ITEM item) {
     additionalItems.add(item);
-  }
+  };
 
   /**
    * Removes the given transient item.

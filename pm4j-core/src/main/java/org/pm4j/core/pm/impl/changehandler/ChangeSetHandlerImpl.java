@@ -122,9 +122,7 @@ public class ChangeSetHandlerImpl<T_ITEM extends PmDataInput> implements ChangeS
     return resultSet;
   }
 
-  /**
-   * Resets the handler to an unchanged state.
-   */
+  @Override
   public void clearChanges() {
     changedItemPms.clear();
   }

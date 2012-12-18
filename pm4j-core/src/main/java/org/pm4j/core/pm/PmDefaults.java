@@ -3,6 +3,8 @@ package org.pm4j.core.pm;
 import java.util.Arrays;
 
 import org.pm4j.common.exception.CheckedExceptionWrapper;
+import org.pm4j.common.query.FilterCompareDefinitionFactory;
+import org.pm4j.common.query.FilterCompareDefinitionFactoryImpl;
 import org.pm4j.core.pm.annotation.PmCommandCfg;
 import org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO;
 import org.pm4j.core.pm.annotation.PmInject;
@@ -58,6 +60,11 @@ public class PmDefaults implements Cloneable {
    * filter by the value string that is visible for the user.
    */
   private Class<? extends FilterByDefinition> defaultFilterByDefintionClass = FilterByPmAttrValueLocalized.class;
+
+  /**
+   * The application specific filter compare definition factory. Used for table filters.
+   */
+  private FilterCompareDefinitionFactory filterCompareDefinitionFactory = null;
 
   /**
    * The delimiter that is used to terminate multiple format strings in resource string definitions.
@@ -267,6 +274,14 @@ public class PmDefaults implements Cloneable {
 
   public void setMultiFormatPatternDelimiter(String multiFormatPatternDelimiter) {
     this.multiFormatPatternDelimiter = multiFormatPatternDelimiter;
+  }
+
+  public FilterCompareDefinitionFactory getFilterCompareDefinitionFactory() {
+    return filterCompareDefinitionFactory;
+  }
+
+  public void setFilterCompareDefinitionFactory(FilterCompareDefinitionFactory filterCompareDefinitionFactory) {
+    this.filterCompareDefinitionFactory = filterCompareDefinitionFactory;
   }
 
 }

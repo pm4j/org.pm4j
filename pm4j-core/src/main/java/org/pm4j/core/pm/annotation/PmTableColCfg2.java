@@ -5,31 +5,18 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.pm4j.core.pm.PmTableCol;
+import org.pm4j.core.pm.PmTableCol2;
 
 /**
- * Annotation configuration for {@link PmTableCol} instances.
+ * Annotation configuration for {@link PmTableCol2} instances.
+ * It has only effect for in-memory tables! Service base tables configure their
+ * sort and filter options within their service.
  *
  * @author olaf boede
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.TYPE, ElementType.FIELD })
-public @interface PmTableColCfg {
-
-  /**
-   * @return The preferred column size value.
-   */
-  String prefSize() default "";
-
-  /**
-   * @return The minimal column size value.
-   */
-  String minSize() default "";
-
-  /**
-   * @return The maximal column size value.
-   */
-  String maxSize() default "";
+public @interface PmTableColCfg2 {
 
   /**
    * @return <code>TRUE</code> if the column may be sorted.<br>
@@ -40,16 +27,10 @@ public @interface PmTableColCfg {
   PmBoolean sortable() default PmBoolean.UNDEFINED;
 
   /**
-   * The filter definition(s) used for this column.
-   * <p>
-   * The provided filter class(es) need to have a constructor signature with a single PM
-   * parameter. The column PM will be passed as constructor argument.
+   * The filter definition used for this column.
    *
    * @return The column filter definitions.
    */
-  FilterByCfg[] filterBy() default {};
-
   Class<?> filterType() default Void.class;
-
 
 }
