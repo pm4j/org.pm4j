@@ -7,9 +7,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import junit.framework.TestCase;
-
-import org.junit.Assert;
 import org.junit.Test;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.annotation.PmBeanCfg;
@@ -23,7 +20,6 @@ import org.pm4j.core.pm.impl.PmConversationImpl;
 import org.pm4j.core.pm.impl.PmElementBase;
 import org.pm4j.core.pm.impl.PmTableColImpl2;
 import org.pm4j.core.pm.impl.PmTableImpl2;
-import org.pm4j.tools.test.PmAssert;
 
 public class PmAttrCacheTest {
 
