@@ -4,12 +4,12 @@
 
 	<groupId>org.pm4j</groupId>
 	<artifactId>main</artifactId>
-	<version>0.4.001-SNAPSHOT</version>
+	<version>0.4.001</version>
 	<name>MAIN of PM4J</name>
 	<packaging>pom</packaging>
-	
+
 	<url>http://www.pm4j.org</url>
-	
+
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
@@ -22,16 +22,16 @@
 		<developer>
 			<id>oboede</id>
 			<name>Boede Olaf</name>
-			
+
 		</developer>
 	</developers>
 	<scm>
 		<url>git://github.com/pm4j/org.pm4j.git</url>
 	</scm>
 	<modules>
-	
+
 		<module>pm4j-common</module>
-	
+
 		<module>pm4j-core</module>
 		<module>pm4j-core-sample</module>
 
@@ -97,6 +97,8 @@
 				<version>2.2.1</version>
 				<executions>
 					<execution>
+					
+
 						<id>attach-sources</id>
 						<phase>verify</phase>
 						<goals>

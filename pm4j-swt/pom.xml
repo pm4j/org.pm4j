@@ -8,7 +8,7 @@
 	<parent>
 		<groupId>org.pm4j</groupId>
 		<artifactId>main</artifactId>
-		<version>0.4.001-SNAPSHOT</version>
+		<version>0.4.001</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
@@ -47,7 +47,7 @@
 			<dependency>
 			<artifactId>pm4j-core</artifactId>
 			<groupId>org.pm4j</groupId>
-			<version>0.4.001-SNAPSHOT</version>
+			<version>0.4.001</version>
 			<classifier>tests</classifier>
 		</dependency>
 	</dependencies>
