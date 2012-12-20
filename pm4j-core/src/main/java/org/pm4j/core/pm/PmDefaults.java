@@ -4,7 +4,6 @@ import java.util.Arrays;
 
 import org.pm4j.common.exception.CheckedExceptionWrapper;
 import org.pm4j.common.query.FilterCompareDefinitionFactory;
-import org.pm4j.common.query.FilterCompareDefinitionFactoryImpl;
 import org.pm4j.core.pm.annotation.PmCommandCfg;
 import org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO;
 import org.pm4j.core.pm.annotation.PmInject;
@@ -14,8 +13,8 @@ import org.pm4j.core.pm.impl.PmObjectBase.NameBuilder;
 import org.pm4j.core.pm.impl.PmObjectBase.NameBuilderAbsoluteName;
 import org.pm4j.core.pm.impl.inject.DiResolverFactory;
 import org.pm4j.core.pm.impl.inject.DiResolverFactoryPmInjectFieldByExpression;
-import org.pm4j.core.pm.impl.inject.DiResolverFactoryPmInjectSetterByExpression;
 import org.pm4j.core.pm.impl.inject.DiResolverFactoryPmInjectFieldByParentOfType;
+import org.pm4j.core.pm.impl.inject.DiResolverFactoryPmInjectSetterByExpression;
 import org.pm4j.core.pm.impl.title.AsteriskAttrTitleProvider;
 import org.pm4j.core.pm.impl.title.PmTitleProvider;
 import org.pm4j.core.pm.impl.title.TitleProviderPmResBased;
