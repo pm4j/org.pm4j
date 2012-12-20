@@ -9,6 +9,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
+import org.pm4j.common.pageable.ModificationHandler;
 import org.pm4j.common.pageable.PageableCollection2;
 import org.pm4j.common.pageable.PageableCollectionBase2;
 import org.pm4j.common.pageable.PageableCollectionUtil2;
@@ -16,6 +17,7 @@ import org.pm4j.common.query.FilterExpression;
 import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.inmem.InMemQueryEvaluator;
+import org.pm4j.common.selection.Selection;
 import org.pm4j.common.selection.SelectionHandler;
 import org.pm4j.common.selection.SelectionHandlerWithItemSet;
 
@@ -34,6 +36,7 @@ public class PageableInMemCollectionImpl<T_ITEM>
 
   /** The collection type specific selection handler. */
   private final SelectionHandler<T_ITEM> selectionHandler;
+
   /** Contains the not filtered set of items in their original sort order. */
   private Collection<T_ITEM>             originalObjects;
   /** The current set of filtered and sorted items. */
@@ -76,6 +79,8 @@ public class PageableInMemCollectionImpl<T_ITEM>
     // getQuery is used because the super ctor may have created it on the fly (in case of a null parameter)
     getQueryParams().addPropertyChangeListener(QueryParams.PROP_EFFECTIVE_FILTER, changeFilterListener);
     getQueryParams().addPropertyChangeListener(QueryParams.PROP_EFFECTIVE_SORT_ORDER, changeSortOrderListener);
+
+    setModificationHandler(new InMemModificationHandler());
   }
 
   @Override
@@ -116,21 +121,16 @@ public class PageableInMemCollectionImpl<T_ITEM>
   }
 
   @Override
+  public ModificationHandler<T_ITEM> getModificationHandler() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
   public void clearCaches() {
     sortOrderComparator = null;
     objects = null;
   }
-
-  /**
-   * Adds the item as the last one.
-   */
-  @Override
-  public void addItem(T_ITEM item) {
-    originalObjects.add(item);
-    if (objects != null) {
-      objects.add(item);
-    }
-  };
 
   @Override
   public void setSortOrderComparator(Comparator<T_ITEM> comparator) {
@@ -190,6 +190,31 @@ public class PageableInMemCollectionImpl<T_ITEM>
 
     List<T_ITEM> filteredList = inMemQueryEvaluator.evaluateSubSet(unfilteredList, filterExpression);
     return filteredList;
+  }
+
+
+  class InMemModificationHandler implements ModificationHandler<T_ITEM> {
+
+    /**
+     * Adds the item as the last one.
+     */
+    @Override
+    public void addItem(T_ITEM item) {
+      originalObjects.add(item);
+      if (objects != null) {
+        objects.add(item);
+      }
+    };
+
+    @Override
+    public void removeItems(Selection<T_ITEM> items) {
+      for (T_ITEM i : items) {
+        originalObjects.remove(i);
+        if (objects != null) {
+          objects.remove(i);
+        }
+      }
+    }
   }
 
 }

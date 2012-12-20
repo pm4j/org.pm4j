@@ -15,6 +15,7 @@ import org.pm4j.core.pm.PmCommandDecorator;
 import org.pm4j.core.pm.PmDataInput;
 import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmEventListener;
+import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmTable;
 import org.pm4j.core.pm.PmTable.TableChange;
 import org.pm4j.core.pm.api.PmEventApi;
@@ -150,6 +151,11 @@ public class MasterPmTableHandlerImpl<T_MASTER_BEAN> implements MasterPmRecordHa
     } else {
       return changedMasterBeans;
     }
+  }
+
+  @Override
+  public PmObject getMasterPm() {
+    return masterTablePm;
   }
 
   /**

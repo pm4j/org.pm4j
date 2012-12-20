@@ -156,6 +156,16 @@ public class SelectionHandlerWithPmFactory<T_PM extends PmBean<T_BEAN>, T_BEAN> 
           ? beanSelection.isSelected(item.getPmBean())
           : false;
     }
+
+    public Selection<T_BEAN> getBeanSelection() {
+      return beanSelection;
+    }
+
+    @Override
+    public String toString() {
+      return getClass().getSimpleName() + "(beanSelection=" + beanSelection.toString() + ")";
+    }
+
   }
 
 

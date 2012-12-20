@@ -5,6 +5,7 @@ import java.util.Set;
 
 import org.pm4j.core.pm.PmCommandDecorator;
 import org.pm4j.core.pm.PmEvent;
+import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmTable;
 import org.pm4j.core.pm.impl.PmTableUtil;
 
@@ -85,5 +86,10 @@ public interface MasterPmHandler extends PmCommandDecorator {
    * @return The configured {@link DetailsPmHandler} set.
    */
   Collection<DetailsPmHandler<?>> getDetailsPmHandlers();
+
+  /**
+   * @return the master PM.
+   */
+  PmObject getMasterPm();
 
 }

@@ -281,23 +281,39 @@ public final class PageableCollectionUtil2 {
    */
   public static <T_ID> QueryParams makeSelectionQueryParams(AttrDefinition idAttr, QueryParams queryParams, ClickedIds<T_ID> clickedIds) {
     QueryParams qp = queryParams.clone();
+    qp.setFilterExpression(makeSelectionQueryParams(idAttr, qp.getFilterExpression(), clickedIds));
+    return qp;
+  }
 
+  /**
+   * Generates a filter based on some predefined filter restrictions and a set of
+   * {@link ClickedIds}.
+   *
+   * @param idAttr
+   *          the ID attribute that is related to the clicked id's.
+   * @param baseFilterExpr
+   *          for inverse selections: a base filter selection expression to combine the de-selected item condition with.
+   * @param clickedIds
+   *          the set of individually selected/deselected item ids.
+   * @return the generated filter restriction that represents the selection.
+   */
+  public static <T_ID> FilterExpression makeSelectionQueryParams(AttrDefinition idAttr, FilterExpression baseFilterExpr, ClickedIds<T_ID> clickedIds) {
     FilterExpression idFilterExpr = new FilterCompare(idAttr, new CompOpIn(), clickedIds.getIds());
     if (clickedIds.isInvertedSelection()) {
+      // no de-select clicks: the original filter provides the complete inverse selection..
+      if (clickedIds.getIds().isEmpty()) {
+        return baseFilterExpr;
+      }
+
       // Negative filter: use the query and de-select the clicked id's
       // No additional restriction if there are no clicked id's.
-      if (!clickedIds.getIds().isEmpty()) {
-        idFilterExpr = new FilterNot(idFilterExpr);
-        FilterExpression qf = queryParams.getFilterExpression();
-        qp.setFilterExpression((qf != null)
-            ? new FilterAnd(qf, idFilterExpr)
-            : idFilterExpr);
-      }
+      return (baseFilterExpr != null)
+          ? new FilterAnd(baseFilterExpr, new FilterNot(idFilterExpr))
+          : new FilterNot(idFilterExpr);
+
     } else {
       // Positive filter: select only the clicked id's.
-      qp.setFilterExpression(idFilterExpr);
+      return idFilterExpr;
     }
-
-    return qp;
   }
 }

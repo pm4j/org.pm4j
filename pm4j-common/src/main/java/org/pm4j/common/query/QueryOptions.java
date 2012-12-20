@@ -14,9 +14,17 @@ import java.util.Map;
  */
 public class QueryOptions {
 
-  private Map<String, SortOrder> nameToSortOrderMap = new HashMap<String, SortOrder>();
-  private SortOrder defaultSortOrder;
+  private Map<String, SortOrder>        nameToSortOrderMap = new HashMap<String, SortOrder>();
+  private SortOrder                     defaultSortOrder;
   private List<FilterCompareDefinition> filterCompareDefinitions = new ArrayList<FilterCompareDefinition>();
+
+  /**
+   * An optional definition of the ID attribute used for filters related to item ID's.
+   * <p>
+   * Is in most cases irrelevant for in-memory queries.<br>
+   * Is used in query based collections that define constraints in relation to item ID's.
+   */
+  private AttrDefinition                idAttribute;
 
   /**
    * Provides the sort order for the given attribute.
@@ -60,6 +68,20 @@ public class QueryOptions {
 
   public void addFilterCompareDefinition(FilterCompareDefinition... definitions) {
     this.filterCompareDefinitions.addAll(Arrays.asList(definitions));
+  }
+
+  /**
+   * @return the definition of the ID attribute used for filters related to item ID's.
+   */
+  public AttrDefinition getIdAttribute() {
+    return idAttribute;
+  }
+
+  /**
+   * @param idAttribute the definition of the ID attribute used for filters related to item ID's.
+   */
+  public void setIdAttribute(AttrDefinition idAttribute) {
+    this.idAttribute = idAttribute;
   }
 
 }

@@ -53,42 +53,66 @@ public class PmAssert {
     assertNoMessages(msg, pm.getPmConversation());
   }
 
-  public static <T> void setValue(PmAttr<T> attr, T value) {
-    setValue(null, attr, value);
+  public static void assertEnabled(PmObject... pms) {
+    for (PmObject pm : pms) {
+      if (!pm.isPmEnabled()) {
+        fail(pm.getPmRelativeName() + " should be enabled.");
+      }
+    }
   }
 
-  public static <T> void setValue(String msg, PmAttr<T> attr, T value) {
-    assertTrue("The attribute should be editable.", attr.isPmEnabled());
+  public static void assertNotEnabled(PmObject... pms) {
+    for (PmObject pm : pms) {
+      if (pm.isPmEnabled()) {
+        fail(pm.getPmRelativeName() + " should not be enabled.");
+      }
+    }
+  }
+
+  public static void assertVisible(PmObject... pms) {
+    for (PmObject pm : pms) {
+      if (!pm.isPmVisible()) {
+        fail(pm.getPmRelativeName() + " should be visible.");
+      }
+    }
+  }
+
+  public static void assertNotVisible(PmObject... pms) {
+    for (PmObject pm : pms) {
+      if (pm.isPmVisible()) {
+        fail(pm.getPmRelativeName() + " should not be visible.");
+      }
+    }
+  }
+
+  public static <T> void setValue(PmAttr<T> attr, T value) {
+    assertEnabled(attr);
     attr.setValue(value);
     assertNoMessages(attr);
     assertEquals(value, attr.getValue());
   }
 
   public static void setValueAsString(PmAttr<?> attr, String value) {
-    setValueAsString(null, attr, value);
-  }
-
-  public static void setValueAsString(String msg, PmAttr<?> attr, String value) {
-    assertTrue("The attribute should be editable.", attr.isPmEnabled());
+    assertEnabled(attr);
     attr.setValueAsString(value);
     assertNoMessages(attr);
     assertEquals(value, attr.getValueAsString());
   }
 
   public static void doIt(PmCommand cmd) {
-    exec(cmd.getPmRelativeName(), cmd, CommandState.EXECUTED);
+    doIt(cmd.getPmRelativeName(), cmd, CommandState.EXECUTED);
   }
 
   public static void doIt(String msg, PmCommand cmd) {
-    exec(msg, cmd, CommandState.EXECUTED);
+    doIt(msg, cmd, CommandState.EXECUTED);
   }
 
   public static void doIt(PmCommand cmd, CommandState expectedState) {
-    exec(cmd.getPmRelativeName(), cmd, expectedState);
+    doIt(cmd.getPmRelativeName(), cmd, expectedState);
   }
 
-  public static void exec(String msg, PmCommand cmd, CommandState expectedState) {
-    assertTrue("command " + cmd.getPmRelativeName() + " should be enabled", cmd.isPmEnabled());
+  public static void doIt(String msg, PmCommand cmd, CommandState expectedState) {
+    assertEnabled(cmd);
     CommandState execState = cmd.doIt().getCommandState();
     if (execState != expectedState) {
       String msgPfx = StringUtils.isEmpty(msg) ? cmd.getPmRelativeName() : msg;

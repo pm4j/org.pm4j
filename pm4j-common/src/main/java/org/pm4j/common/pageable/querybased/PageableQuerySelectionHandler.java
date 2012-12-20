@@ -15,6 +15,7 @@ import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.selection.SelectMode;
 import org.pm4j.common.selection.Selection;
 import org.pm4j.common.selection.SelectionHandlerBase;
+import org.pm4j.common.util.collection.ListUtil;
 import org.pm4j.core.util.lang.CloneUtil;
 
 /**
@@ -37,24 +38,21 @@ import org.pm4j.core.util.lang.CloneUtil;
  * @param <T_ID>
  *          type of the related item identifier.
  */
-public class PageableQuerySelectionHandler<T_ITEM, T_ID extends Serializable> extends SelectionHandlerBase<T_ITEM> {
+public abstract class PageableQuerySelectionHandler<T_ITEM, T_ID extends Serializable> extends SelectionHandlerBase<T_ITEM> {
 
   private static final Log LOG = LogFactory.getLog(PageableQuerySelectionHandler.class);
 
   private final PageableQueryService<T_ITEM, T_ID> service;
-  private final QueryParams query;
   private final ItemIdSelection<T_ITEM, T_ID> emptySelection;
   private ItemIdSelection<T_ITEM, T_ID> idSelection;
-  private SelectionBase<T_ITEM, T_ID> currentSelection;
+  private QuerySelectionWithClickedIds<T_ITEM, T_ID> currentSelection;
   private boolean inverse;
 
   @SuppressWarnings("unchecked")
-  public PageableQuerySelectionHandler(PageableQueryService<T_ITEM, T_ID> service, QueryParams query) {
+  public PageableQuerySelectionHandler(PageableQueryService<T_ITEM, T_ID> service) {
     assert service != null;
-    assert query != null;
 
     this.service = service;
-    this.query = query;
     this.emptySelection = new ItemIdSelection<T_ITEM, T_ID>(service, Collections.EMPTY_LIST);
     this.idSelection = emptySelection;
     this.currentSelection = idSelection;
@@ -118,7 +116,7 @@ public class PageableQuerySelectionHandler<T_ITEM, T_ID extends Serializable> ex
 
     return setSelection(inverse
         ? new ItemIdSelection<T_ITEM, T_ID>(service, currentSelection.getClickedIds().getIds())
-        : new InvertedSelection<T_ITEM, T_ID>(service, query, currentSelection));
+        : new InvertedSelection<T_ITEM, T_ID>(service, getQueryParams(), currentSelection));
   }
 
   @Override
@@ -135,7 +133,7 @@ public class PageableQuerySelectionHandler<T_ITEM, T_ID extends Serializable> ex
     try {
       fireVetoableChange(PROP_SELECTION, oldSelection, newSelection);
       // XXX olaf: check of that can be doene safely...
-      this.currentSelection = (SelectionBase<T_ITEM, T_ID>) newSelection;
+      this.currentSelection = (QuerySelectionWithClickedIds<T_ITEM, T_ID>) newSelection;
       firePropertyChange(PROP_SELECTION, oldSelection, newSelection);
       return true;
     } catch (PropertyVetoException e) {
@@ -143,6 +141,8 @@ public class PageableQuerySelectionHandler<T_ITEM, T_ID extends Serializable> ex
       return false;
     }
   }
+
+  protected abstract QueryParams getQueryParams();
 
   private Set<T_ID> getModifyableIdSet() {
     return new HashSet<T_ID>(idSelection.getSelectedOrDeselectedIds());
@@ -159,15 +159,16 @@ public class PageableQuerySelectionHandler<T_ITEM, T_ID extends Serializable> ex
                   : new ItemIdSelection<T_ITEM, T_ID>(service, selectedIds);
 
     return setSelection(inverse
-                  ? new InvertedSelection<T_ITEM, T_ID>(service, query, idSelection)
+                  ? new InvertedSelection<T_ITEM, T_ID>(service, getQueryParams(), idSelection)
                   : idSelection);
   }
 
-  public static abstract class SelectionBase<T_ITEM, T_ID extends Serializable> extends PageableQuerySelectionBase<T_ITEM, T_ID> {
+  /** Base class for query based selections that consider a set of clicked ID's. */
+  public static abstract class QuerySelectionWithClickedIds<T_ITEM, T_ID extends Serializable> extends PageableQuerySelectionBase<T_ITEM, T_ID> {
 
     private static final long serialVersionUID = 1L;
 
-    public SelectionBase(PageableQueryService<T_ITEM, T_ID> service) {
+    public QuerySelectionWithClickedIds(PageableQueryService<T_ITEM, T_ID> service) {
       super(service);
     }
 
@@ -181,16 +182,37 @@ public class PageableQuerySelectionHandler<T_ITEM, T_ID extends Serializable> ex
 
   }
 
-
-  static class ItemIdSelection<T_ITEM, T_ID extends Serializable> extends SelectionBase<T_ITEM, T_ID> {
+  /**
+   * A selection that holds the ID's of selected items.
+   * <p>
+   * It uses a {@link PageableQueryService} instance to retrieve the selected instances from the service.
+   */
+  static class ItemIdSelection<T_ITEM, T_ID extends Serializable> extends QuerySelectionWithClickedIds<T_ITEM, T_ID> {
     private static final long serialVersionUID = 1L;
 
     private final Collection<T_ID> ids;
 
+    /**
+     * Creates a selection based on a set of selected id's.
+     *
+     * @param service the service used to retrieve items for the selected id's.
+     * @param ids the set of selected id's.
+     */
     @SuppressWarnings("unchecked")
     public ItemIdSelection(PageableQueryService<T_ITEM, T_ID> service, Collection<T_ID> ids) {
       super(service);
       this.ids = (ids != null) ? Collections.unmodifiableCollection(ids) : Collections.EMPTY_LIST;
+    }
+
+    /**
+     * Creates a selection based on another selection and some additional items.
+     *
+     * @param srcSelection the base selection.
+     * @param ids the set of additional items.
+     */
+    public ItemIdSelection(ItemIdSelection<T_ITEM, T_ID> srcSelection, Collection<T_ID> ids) {
+      super(srcSelection.getService());
+      this.ids = ListUtil.collectionsToList(srcSelection.getClickedIds().getIds(), ids);
     }
 
     @Override
@@ -244,16 +266,20 @@ public class PageableQuerySelectionHandler<T_ITEM, T_ID extends Serializable> ex
     }
   }
 
-  static class InvertedSelection<T_ITEM, T_ID extends Serializable> extends SelectionBase<T_ITEM, T_ID> {
+  /**
+   * A selection that is based on a query that identifies all items.<br>
+   * It may have also a set of de-selected item-identifiers.
+   */
+  static class InvertedSelection<T_ITEM, T_ID extends Serializable> extends QuerySelectionWithClickedIds<T_ITEM, T_ID> {
 
     private static final long serialVersionUID = 1L;
     private final QueryParams query;
-    private final SelectionBase<T_ITEM, T_ID> baseSelection;
+    private final QuerySelectionWithClickedIds<T_ITEM, T_ID> baseSelection;
     transient private Long size;
     /** The query fetch block size. */
     private int iteratorBlockSizeHint = 20;
 
-    public InvertedSelection(PageableQueryService<T_ITEM, T_ID> service, QueryParams query, SelectionBase<T_ITEM, T_ID> baseSelection) {
+    public InvertedSelection(PageableQueryService<T_ITEM, T_ID> service, QueryParams query, QuerySelectionWithClickedIds<T_ITEM, T_ID> baseSelection) {
       super(service);
       assert query != null;
       assert baseSelection != null;

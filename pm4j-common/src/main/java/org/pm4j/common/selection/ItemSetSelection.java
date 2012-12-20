@@ -43,9 +43,15 @@ public class ItemSetSelection<T_ITEM> implements Selection<T_ITEM> {
   @Override
   public void setIteratorBlockSizeHint(int readBlockSize) {
   }
+
   @Override
   public boolean isSelected(T_ITEM item) {
     return selectedItems.contains(item);
+  }
+
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + selectedItems;
   }
 
 }

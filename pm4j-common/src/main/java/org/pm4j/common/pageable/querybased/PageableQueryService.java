@@ -59,6 +59,7 @@ public interface PageableQueryService<T_BEAN, T_ID> extends ItemIdConverter<T_BE
    */
   QueryOptions getQueryOptions();
 
+  // TODO olaf: move to a specific sub-interface
   /**
    * Provides a serializable instance that is able to deliver a reference to this service.
    * <p>

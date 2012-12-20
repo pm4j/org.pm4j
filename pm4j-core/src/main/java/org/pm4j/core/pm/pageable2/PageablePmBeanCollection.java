@@ -4,16 +4,19 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import org.pm4j.common.pageable.ModificationHandler;
 import org.pm4j.common.pageable.PageableCollection2;
 import org.pm4j.common.pageable.inmem.PageableInMemCollectionImpl;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.QueryParams;
+import org.pm4j.common.selection.Selection;
 import org.pm4j.common.selection.SelectionHandler;
 import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.api.PmFactoryApi;
 import org.pm4j.core.pm.pageable.PageableCollection;
 import org.pm4j.core.pm.pageable.PageableListImpl;
+import org.pm4j.core.pm.pageable2.SelectionHandlerWithPmFactory.PmSelection;
 
 /**
  * A {@link PageableCollection2} instance that provides {@link PmBean} instances in
@@ -28,14 +31,15 @@ import org.pm4j.core.pm.pageable.PageableListImpl;
  *          The kind of corresponding bean, handled by the backing
  *          {@link PageableCollection} instance.
  */
-// TODO olaf: control/ensure that the PM factory releases the PMs for the beans that are no longer on the current page.
 public class PageablePmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> implements PageableCollection2<T_PM> {
 
   /** The collection type specific selection handler. */
   private final SelectionHandlerWithPmFactory<T_PM, T_BEAN> selectionHandler;
+  private final ModificationHandler<T_PM> modificationHandler;
 
   private PmObject                     pmCtxt;
   private PageableCollection2<T_BEAN>  beanCollection;
+
 
   /**
    * Creates a collection backed by the given {@link PageableCollection} of beans.
@@ -52,6 +56,7 @@ public class PageablePmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> imple
     this.pmCtxt = pmCtxt;
     this.beanCollection = pageableBeanCollection;
     this.selectionHandler = new SelectionHandlerWithPmFactory<T_PM, T_BEAN>(pmCtxt, pageableBeanCollection.getSelectionHandler());
+    this.modificationHandler = new PmBeanCollectionModificationHandler();
   }
 
   /**
@@ -187,8 +192,8 @@ public class PageablePmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> imple
   }
 
   @Override
-  public void addItem(T_PM item) {
-    beanCollection.addItem(item.getPmBean());
+  public ModificationHandler<T_PM> getModificationHandler() {
+    return modificationHandler;
   }
 
   /**
@@ -199,4 +204,34 @@ public class PageablePmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> imple
   public PageableCollection2<T_BEAN> getBeanCollection() {
     return beanCollection;
   }
+
+  /**
+   * Delegates modification handling to the backing pageable bean collection.
+   */
+  class PmBeanCollectionModificationHandler implements ModificationHandler<T_PM> {
+
+    @Override
+    public void addItem(T_PM item) {
+      getBeanCollectionModificationHandler().addItem(item.getPmBean());
+    }
+
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @Override
+    public void removeItems(Selection<T_PM> items) {
+      if (!(items instanceof PmSelection)) {
+        throw new IllegalArgumentException("A PageablePmBeanCollection can only handle a PmSelection. Found selection: " + items);
+      }
+
+      getBeanCollectionModificationHandler().removeItems(((PmSelection)items).getBeanSelection());
+    }
+
+    private ModificationHandler<T_BEAN> getBeanCollectionModificationHandler() {
+      ModificationHandler<T_BEAN> mh = beanCollection.getModificationHandler();
+      if (mh == null) {
+        throw new RuntimeException("Pageable bean collection without a modification handler can't handle modifications." + beanCollection);
+      }
+      return mh;
+    }
+  }
+
 }

@@ -109,11 +109,6 @@ public class PageableIdCollectionImpl<T_ITEM, T_ID> extends PageableCollectionBa
     unfilteredItemCount = -1;
   }
 
-  @Override
-  public void addItem(T_ITEM item) {
-    throw new UnsupportedOperationException();
-  }
-
   protected List<T_ID> getCurrentPageIds() {
     int first = (int)PageableCollectionUtil2.getIdxOfFirstItemOnPage(this) - 1;
     long last = PageableCollectionUtil2.getIdxOfLastItemOnPage(this);

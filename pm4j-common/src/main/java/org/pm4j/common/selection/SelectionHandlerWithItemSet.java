@@ -122,7 +122,9 @@ public class SelectionHandlerWithItemSet<T_ITEM> extends SelectionHandlerBase<T_
       firePropertyChange(PROP_SELECTION, oldSelection, newSelection);
       return true;
     } catch (PropertyVetoException e) {
-      LOG.debug("Selection change rejected because of a property change veto.", e);
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Selection change rejected because of a property change veto. " + e.getMessage());
+      }
       return false;
     }
   }

@@ -3,8 +3,8 @@ package org.pm4j.common.pageable;
 import java.util.Iterator;
 import java.util.List;
 
-import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.query.QueryOptions;
+import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.selection.SelectionHandler;
 
 /**
@@ -108,6 +108,12 @@ public interface PageableCollection2<T_ITEM> extends Iterable<T_ITEM> {
   Iterator<T_ITEM> iterator();
 
   /**
+   * Clears all cached information.<br>
+   * Gets called if everything needs to be re-evalueated.
+   */
+  void clearCaches();
+
+  /**
    * Provides a handler for item selection.
    *
    * @return the (collection type specific) selection handler.
@@ -129,18 +135,12 @@ public interface PageableCollection2<T_ITEM> extends Iterable<T_ITEM> {
   <T> SelectionHandler<T> getBeanSelectionHandler();
 
   /**
-   * Clears all cached information.<br>
-   * Gets called if everything needs to be re-evalueated.
-   */
-  void clearCaches();
-
-  /**
-   * Adds an item to this collection.
+   * Provides a handler that can handle collection modifications (add- and delete item operations).
    * <p>
-   * Usually the new item will be added as the last collection item.
+   * Returns a <code>null</code> if the collection does not support item set modifications.
    *
-   * @param item the item to add.
-   * @throws UnsupportedOperationException if the collection does not support additional items.
+   * @return the handler or <code>null</code>.
    */
-  void addItem(T_ITEM item);
+  ModificationHandler<T_ITEM> getModificationHandler();
+
 }

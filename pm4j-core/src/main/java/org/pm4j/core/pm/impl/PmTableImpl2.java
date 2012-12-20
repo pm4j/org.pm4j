@@ -24,6 +24,7 @@ import org.pm4j.common.selection.SelectionHandler;
 import org.pm4j.common.util.beanproperty.PropertyAndVetoableChangeListener;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmBean;
+import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmCommandDecorator;
 import org.pm4j.core.pm.PmDataInput;
 import org.pm4j.core.pm.PmElement;
@@ -602,8 +603,10 @@ public class PmTableImpl2
 
     @Override
     public void vetoableChange(PropertyChangeEvent evt) throws PropertyVetoException {
+      // a command used for value change reporting.
+      PmCommand cmd = new PmAspectChangeCommandImpl(PmTableImpl2.this, "selection", evt.getOldValue(), evt.getNewValue());
       for (PmCommandDecorator d : getPmDecorators(TableChange.SELECTION)) {
-        if (!d.beforeDo(null)) {
+        if (!d.beforeDo(cmd)) {
           String msg = "Decorator prevents selection change: " + d;
           LOG.debug(msg);
           throw new PropertyVetoException(msg, evt);
@@ -639,6 +642,7 @@ public class PmTableImpl2
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
+      // FIXME: may fire too often a DB query. What happen in case of a series of QueryParam changes?
       PageableCollectionUtil2.ensureCurrentPageInRange(getPmPageableCollection());
 
       for (PmCommandDecorator d : getPmDecorators(TableChange.FILTER)) {

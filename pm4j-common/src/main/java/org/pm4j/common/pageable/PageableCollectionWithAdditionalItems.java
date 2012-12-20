@@ -6,8 +6,10 @@ import java.util.List;
 
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.QueryParams;
+import org.pm4j.common.selection.Selection;
 import org.pm4j.common.selection.SelectionHandler;
 import org.pm4j.common.selection.SelectionHandlerWithAdditionalItems;
+import org.pm4j.common.selection.SelectionWithAdditionalItems;
 import org.pm4j.common.util.collection.CombinedIterator;
 
 /**
@@ -23,7 +25,8 @@ public class PageableCollectionWithAdditionalItems<T_ITEM> implements PageableCo
 
   private final PageableCollection2<T_ITEM>  baseCollection;
   private final List<T_ITEM>                 additionalItems;
-  private SelectionHandlerWithAdditionalItems<T_ITEM> selectionHandler;
+  private final SelectionHandlerWithAdditionalItems<T_ITEM> selectionHandler;
+  private final ModificationHandler<T_ITEM>  modificationHandler;
 
   /**
    * @param baseCollection the handled set of (persistent) items.
@@ -35,21 +38,12 @@ public class PageableCollectionWithAdditionalItems<T_ITEM> implements PageableCo
     this.baseCollection = baseCollection;
     this.additionalItems   = new ArrayList<T_ITEM>();
     this.selectionHandler = new SelectionHandlerWithAdditionalItems<T_ITEM>(baseCollection, additionalItems);
+    this.modificationHandler = new ModificationHandlerWithAdditionalItems();
   }
 
   @Override
-  public void addItem(T_ITEM item) {
-    additionalItems.add(item);
-  };
-
-  /**
-   * Removes the given transient item.
-   *
-   * @param items
-   *          the transient item to delete.
-   */
-  public void removeAdditionalItem(T_ITEM item) {
-    additionalItems.remove(item);
+  public ModificationHandler<T_ITEM> getModificationHandler() {
+    return modificationHandler;
   }
 
   /**
@@ -151,6 +145,33 @@ public class PageableCollectionWithAdditionalItems<T_ITEM> implements PageableCo
   @Override
   public void clearCaches() {
     baseCollection.clearCaches();
+  }
+
+  /**
+   * Adds/removes directly on the additionalItems collection.<br>
+   * Delegates modifications to other items to the backing collection.
+   */
+  class ModificationHandlerWithAdditionalItems implements ModificationHandler<T_ITEM> {
+
+    @Override
+    public void addItem(T_ITEM item) {
+      assert item != null;
+      additionalItems.add(item);
+    }
+
+    @Override
+    public void removeItems(Selection<T_ITEM> items) {
+      if (items instanceof SelectionWithAdditionalItems) {
+        SelectionWithAdditionalItems<T_ITEM> s = (SelectionWithAdditionalItems<T_ITEM>)items;
+
+        // first do the operation that can fail:
+        baseCollection.getModificationHandler().removeItems(s.getBaseSelection());
+        additionalItems.removeAll(s.getAdditionalSelectedItems());
+      }
+      else {
+        throw new IllegalArgumentException("Currenly only SelectionWithAdditionalItems may be used for PageableCollectionWithAdditionalItems. Found parameter: " + items);
+      }
+    }
   }
 
 }
