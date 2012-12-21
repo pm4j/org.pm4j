@@ -5,6 +5,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -455,10 +456,17 @@ public abstract class PmObjectBase implements PmObject {
   /* package */ List<PmObject> getPmChildrenAndFactoryPms() {
     List<PmObject> subPms = BeanAttrArrayList.makeList(this, getPmMetaDataWithoutPmInitCall().childFieldAccessorArray, pmDynamicSubPms.all);
     if (pmBeanFactoryCache != null && !pmBeanFactoryCache.isEmpty()) {
-      return ListUtil.collectionsToList(subPms, pmBeanFactoryCache.getItems());
+      return ListUtil.collectionsToList(subPms, getFactoryGeneratedChildPms());
     } else {
       return subPms;
     }
+  }
+
+  /* package */ @SuppressWarnings("unchecked")
+  Collection<PmObject> getFactoryGeneratedChildPms() {
+    return (Collection<PmObject>) ((pmBeanFactoryCache != null && !pmBeanFactoryCache.isEmpty()) 
+      ? pmBeanFactoryCache.getItems()
+      : Collections.EMPTY_LIST);
   }
 
   /* package */ PmObject findChildPm(String localChildName) {
