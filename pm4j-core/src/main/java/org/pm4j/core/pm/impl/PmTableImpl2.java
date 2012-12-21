@@ -43,6 +43,7 @@ import org.pm4j.core.pm.annotation.PmTableCfg2;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmMessageUtil;
 import org.pm4j.core.pm.api.PmValidationApi;
+import org.pm4j.core.pm.impl.changehandler.ChangeSet;
 import org.pm4j.core.pm.impl.changehandler.ChangeSetHandler;
 import org.pm4j.core.pm.impl.changehandler.ChangeSetHandler.ChangeKind;
 import org.pm4j.core.pm.impl.changehandler.ChangeSetHandlerImpl;
@@ -85,7 +86,7 @@ public class PmTableImpl2
   private Integer numOfPageRows;
 
   /** Handles the changed state of the table. */
-  private final ChangeSetHandlerImpl<T_ROW_PM> pmChangeSetHandler = new ChangeSetHandlerImpl<T_ROW_PM>(this);
+  private ChangeSetHandlerImpl<T_ROW_PM> pmChangeSetHandler;
 
   /** The set of decorators for various table change kinds. */
   private Map<TableChange, PmCommandDecoratorSetImpl> pmChangeDecoratorMap = Collections.emptyMap();
@@ -148,16 +149,6 @@ public class PmTableImpl2
   }
 
   /**
-   * Gets called whenever a new (transient) row gets added to the table.
-   * Maintains the corresponding changed state for this table.
-   *
-   * @param newRowPm The new row.
-   */
-  protected void onAddNewRow(T_ROW_PM newRowPm) {
-    pmChangeSetHandler.registerChange(ChangeKind.ADD, newRowPm);
-  }
-
-  /**
    * Gets called whenever a row gets deleted from the table.
    * Maintains the corresponding changed state for this table.
    *
@@ -166,7 +157,7 @@ public class PmTableImpl2
   protected void onDeleteRow(T_ROW_PM deletedRow) {
     PmMessageUtil.clearSubTreeMessages(deletedRow);
     getPmPageableCollection().getSelectionHandler().select(false, deletedRow);
-    pmChangeSetHandler.registerChange(ChangeKind.DELETE, deletedRow);
+    getPmChangeSetHandler().registerChange(ChangeKind.DELETE, deletedRow);
     if (deletedRow instanceof PmBean) {
       BeanPmCacheUtil.removeBeanPm(this, (PmBean<?>)deletedRow);
     }
@@ -356,7 +347,15 @@ public class PmTableImpl2
 
   @Override
   public ChangeSetHandler<T_ROW_PM> getPmChangeSetHandler() {
+    if (pmChangeSetHandler == null) {
+      pmChangeSetHandler = new ChangeSetHandlerImpl<T_ROW_PM>(this, getPmPageableCollection().getModificationHandler());
+    }
     return pmChangeSetHandler;
+  }
+
+  @Override
+  public ChangeSet<T_ROW_PM> getPmChangeSet() {
+    return null;
   }
 
   @Override
@@ -390,7 +389,7 @@ public class PmTableImpl2
         break;
       case CLEAR_CHANGES:
         PmValidationApi.clearInvalidValuesOfSubtree(this);
-        pmChangeSetHandler.clearChanges();
+        getPmChangeSetHandler().clearChanges();
         break;
       case CLEAR_USER_FILTER:
         // User filters can't be cleared on this level. More detailed implementations
@@ -415,17 +414,17 @@ public class PmTableImpl2
 
   @Override
   protected boolean isPmValueChangedImpl() {
-    return pmChangeSetHandler.isChanged() || super.isPmValueChangedImpl();
+    return getPmChangeSetHandler().isChanged() || super.isPmValueChangedImpl();
   }
 
   @Override
   protected void setPmValueChangedImpl(boolean changed) {
     super.setPmValueChangedImpl(changed);
     if (changed == false) {
-      for (PmDataInput p : pmChangeSetHandler.getChangedItems(ChangeKind.ADD, ChangeKind.UPDATE)) {
+      for (PmDataInput p : getPmChangeSetHandler().getChangedItems(ChangeKind.ADD, ChangeKind.UPDATE)) {
         p.setPmValueChanged(false);
       }
-      pmChangeSetHandler.clearChanges();
+      getPmChangeSetHandler().clearChanges();
     }
   }
 
@@ -434,7 +433,7 @@ public class PmTableImpl2
    */
   @Override
   public void pmValidate() {
-    for (PmObject itemPm : new ArrayList<PmObject>(pmChangeSetHandler.getChangedItems(ChangeKind.ADD, ChangeKind.UPDATE))) {
+    for (PmObject itemPm : new ArrayList<PmObject>(getPmChangeSetHandler().getChangedItems(ChangeKind.ADD, ChangeKind.UPDATE))) {
       if (itemPm instanceof PmDataInput) {
         PmValidationApi.validateSubTree((PmDataInput)itemPm);
       }

@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
+import org.pm4j.common.pageable.ItemSetModificationHandler;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmDataInput;
 import org.pm4j.core.pm.PmEvent;
@@ -32,6 +33,8 @@ public class ChangeSetHandlerImpl<T_ITEM extends PmDataInput> implements ChangeS
   /** The set of modified rows. */
   private Map<PmObject, ChangeKind> changedItemPms = new IdentityHashMap<PmObject, ChangeKind>();
 
+  private final ItemSetModificationHandler<T_ITEM> modificationHandler;
+
   /** Listens for changed state changes in the subtree and updates the changed items accordingly. */
   private PmChangeListener itemHierarchyChangeListener = new PmChangeListener();
 
@@ -42,8 +45,12 @@ public class ChangeSetHandlerImpl<T_ITEM extends PmDataInput> implements ChangeS
    * @param observedRootPm The PM to observe the child item change states for.
    * @param itemPmClass The class of the child items to observe.
    */
-  public ChangeSetHandlerImpl(PmObject observedRootPm) {
+  public ChangeSetHandlerImpl(PmObject observedRootPm, ItemSetModificationHandler<T_ITEM> modificationHandler) {
+    assert observedRootPm != null;
+    assert modificationHandler != null;
+
     this.observedRootPm = observedRootPm;
+    this.modificationHandler = modificationHandler;
 
     PmEventApi.addHierarchyListener(observedRootPm, PmEvent.VALUE_CHANGED_STATE_CHANGE, itemHierarchyChangeListener);
 

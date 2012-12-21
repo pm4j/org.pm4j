@@ -28,14 +28,19 @@ public final class ListUtil {
     return list;
   }
 
-  public static <T> List<T> toList(Collection<T> collection) {
-    if (collection == null) {
+  public static <T> List<T> toList(Iterable<T> iterable) {
+    if (iterable == null) {
       return null;
     }
-
-    return (collection instanceof List)
-        ? (List<T>) collection
-        : new ArrayList<T>(collection);
+    else if (iterable instanceof List) {
+      return (List<T>) iterable;
+    }
+    else if (iterable instanceof Collection) {
+      return new ArrayList<T>((Collection<T>)iterable);
+    }
+    else {
+      return IterableUtil.shallowCopy(iterable);
+    }
   }
 
   /**

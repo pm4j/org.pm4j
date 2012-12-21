@@ -6,20 +6,25 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
-import org.pm4j.common.pageable.ModificationHandler;
+import org.pm4j.common.pageable.ItemSetModificationHandler;
 import org.pm4j.common.pageable.PageableCollection2;
 import org.pm4j.common.pageable.PageableCollectionBase2;
 import org.pm4j.common.pageable.PageableCollectionUtil2;
 import org.pm4j.common.query.FilterExpression;
-import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.query.QueryOptions;
+import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.query.inmem.InMemQueryEvaluator;
+import org.pm4j.common.selection.EmptySelection;
+import org.pm4j.common.selection.ItemSetSelection;
 import org.pm4j.common.selection.Selection;
 import org.pm4j.common.selection.SelectionHandler;
 import org.pm4j.common.selection.SelectionHandlerWithItemSet;
+import org.pm4j.common.util.collection.IterableUtil;
 
 /**
  * Implements a {@link PageableCollection} based on an {@link List} of items to
@@ -121,7 +126,7 @@ public class PageableInMemCollectionImpl<T_ITEM>
   }
 
   @Override
-  public ModificationHandler<T_ITEM> getModificationHandler() {
+  public ItemSetModificationHandler<T_ITEM> getModificationHandler() {
     // TODO Auto-generated method stub
     return null;
   }
@@ -193,7 +198,10 @@ public class PageableInMemCollectionImpl<T_ITEM>
   }
 
 
-  class InMemModificationHandler implements ModificationHandler<T_ITEM> {
+  class InMemModificationHandler implements ItemSetModificationHandler<T_ITEM> {
+
+    private List<T_ITEM> addedItems = new ArrayList<T_ITEM>();
+    private Selection<T_ITEM> removedItemsSelection = new EmptySelection<T_ITEM>();
 
     /**
      * Adds the item as the last one.
@@ -204,16 +212,41 @@ public class PageableInMemCollectionImpl<T_ITEM>
       if (objects != null) {
         objects.add(item);
       }
+      addedItems.add(item);
     };
 
     @Override
     public void removeItems(Selection<T_ITEM> items) {
+      Set<T_ITEM> removedItems = new HashSet<T_ITEM>(IterableUtil.asCollection(removedItemsSelection));
       for (T_ITEM i : items) {
         originalObjects.remove(i);
         if (objects != null) {
           objects.remove(i);
         }
+        removedItems.add(i);
       }
+      removedItemsSelection = new ItemSetSelection<T_ITEM>(removedItems);
+    }
+
+    @Override
+    public boolean isModified() {
+      return !addedItems.isEmpty() || removedItemsSelection.getSize() > 0;
+    }
+
+    @Override
+    public Collection<T_ITEM> getAddedItems() {
+      return addedItems;
+    }
+
+    @Override
+    public Selection<T_ITEM> getRemovedItems() {
+      return removedItemsSelection;
+    }
+
+    @Override
+    public void clearRegisteredModifications() {
+      addedItems = new ArrayList<T_ITEM>();
+      removedItemsSelection = new EmptySelection<T_ITEM>();
     }
   }
 

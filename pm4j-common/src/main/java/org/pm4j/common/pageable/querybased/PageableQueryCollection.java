@@ -9,7 +9,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import org.pm4j.common.pageable.ModificationHandler;
+import org.pm4j.common.pageable.ItemSetModificationHandler;
 import org.pm4j.common.pageable.PageableCollection2;
 import org.pm4j.common.pageable.PageableCollectionBase2;
 import org.pm4j.common.pageable.PageableCollectionUtil2;
@@ -18,6 +18,7 @@ import org.pm4j.common.query.AttrDefinition;
 import org.pm4j.common.query.FilterAnd;
 import org.pm4j.common.query.FilterExpression;
 import org.pm4j.common.query.QueryParams;
+import org.pm4j.common.selection.EmptySelection;
 import org.pm4j.common.selection.Selection;
 import org.pm4j.common.selection.SelectionHandler;
 import org.pm4j.common.util.collection.ListUtil;
@@ -198,10 +199,8 @@ public class PageableQueryCollection<T_ITEM, T_ID extends Serializable> extends 
   /**
    * Handles transiend removed item information.
    */
-  class QueryCollectionModificationHandler implements ModificationHandler<T_ITEM> {
+  class QueryCollectionModificationHandler implements ItemSetModificationHandler<T_ITEM> {
 
-    //private List<T_ITEM> addedItems = new ArrayList<T_ITEM>();
-    //SelectionSet<T_ITEM> removedInvertedItemSelections = new SelectionSet<T_ITEM>();
     private ItemIdSelection<T_ITEM, T_ID> removedIdSelection;
 
     /**
@@ -258,8 +257,31 @@ public class PageableQueryCollection<T_ITEM, T_ID extends Serializable> extends 
       // collection with additional items.
       //addedItems.add(item);
       throw new UnsupportedOperationException("Please embed this collection in a PageableCollectionWithAdditionalItems to handle add operations.");
-    };
+    }
 
+    @Override
+    public boolean isModified() {
+      return removedIdSelection.getSize() > 0;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public Collection<T_ITEM> getAddedItems() {
+      return Collections.EMPTY_LIST;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public Selection<T_ITEM> getRemovedItems() {
+      return removedIdSelection != null
+          ? removedIdSelection
+          : (Selection<T_ITEM>) EmptySelection.EMPTY_OBJECT_SELECTION;
+    }
+
+    @Override
+    public void clearRegisteredModifications() {
+      removedIdSelection = null;
+    }
   }
 
 }

@@ -141,6 +141,6 @@ public interface PageableCollection2<T_ITEM> extends Iterable<T_ITEM> {
    *
    * @return the handler or <code>null</code>.
    */
-  ModificationHandler<T_ITEM> getModificationHandler();
+  ItemSetModificationHandler<T_ITEM> getModificationHandler();
 
 }

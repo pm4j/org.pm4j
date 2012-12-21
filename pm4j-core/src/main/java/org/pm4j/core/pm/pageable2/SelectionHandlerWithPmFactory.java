@@ -4,17 +4,14 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyVetoException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 
 import org.pm4j.common.selection.SelectMode;
 import org.pm4j.common.selection.Selection;
 import org.pm4j.common.selection.SelectionHandler;
 import org.pm4j.common.util.beanproperty.PropertyAndVetoableChangeListener;
 import org.pm4j.common.util.beanproperty.PropertyChangeSupportedBase;
-import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmObject;
-import org.pm4j.core.pm.api.PmFactoryApi;
 
 /**
  * A {@link SelectionHandler} for a set of {@link PmBean}s.
@@ -88,12 +85,13 @@ public class SelectionHandlerWithPmFactory<T_PM extends PmBean<T_BEAN>, T_BEAN> 
 
   @Override
   public Selection<T_PM> getSelection() {
-    return new PmSelection(baseSelectionHandler.getSelection());
+    return new PmSelection<T_PM, T_BEAN>(factoryCtxtPm, baseSelectionHandler.getSelection());
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public boolean setSelection(Selection<T_PM> selection) {
-    return baseSelectionHandler.setSelection(((PmSelection)selection).beanSelection);
+    return baseSelectionHandler.setSelection(((PmSelection<T_PM, T_BEAN>)selection).beanSelection);
   }
 
   /**
@@ -104,70 +102,6 @@ public class SelectionHandlerWithPmFactory<T_PM extends PmBean<T_BEAN>, T_BEAN> 
   public SelectionHandler<T_BEAN> getBeanSelectionHandler() {
     return baseSelectionHandler;
   }
-
-  /**
-   * A non serializeable selection that provides PMs.
-   */
-  @SuppressWarnings("serial")
-  public class PmSelection implements Selection<T_PM> {
-    private final Selection<T_BEAN> beanSelection;
-
-    public PmSelection(Selection<T_BEAN> selectedBeans) {
-      this.beanSelection = selectedBeans;
-    }
-
-    @Override
-    public long getSize() {
-      return beanSelection.getSize();
-    }
-
-    @Override
-    public Iterator<T_PM> iterator() {
-      return new Iterator<T_PM>() {
-        private Iterator<T_BEAN> beanIterator = beanSelection.iterator();
-
-        @Override
-        public boolean hasNext() {
-          return beanIterator.hasNext();
-        }
-
-        @Override
-        public T_PM next() {
-          T_BEAN b = beanIterator.next();
-          T_PM pm = PmFactoryApi.getPmForBean(factoryCtxtPm, b);
-          return pm;
-        }
-
-        @Override
-        public void remove() {
-          throw new PmRuntimeException("This operation is not supported. Please SelectionHander.select(false) instead.");
-        }
-      };
-    }
-
-    @Override
-    public void setIteratorBlockSizeHint(int readBlockSize) {
-      beanSelection.setIteratorBlockSizeHint(readBlockSize);
-    }
-
-    @Override
-    public boolean isSelected(T_PM item) {
-      return item != null
-          ? beanSelection.isSelected(item.getPmBean())
-          : false;
-    }
-
-    public Selection<T_BEAN> getBeanSelection() {
-      return beanSelection;
-    }
-
-    @Override
-    public String toString() {
-      return getClass().getSimpleName() + "(beanSelection=" + beanSelection.toString() + ")";
-    }
-
-  }
-
 
   /** Forwards the received events to own listeners. */
   private class ForwardAsPmSelectionChangeEventListener implements PropertyAndVetoableChangeListener {
@@ -187,8 +121,8 @@ public class SelectionHandlerWithPmFactory<T_PM extends PmBean<T_BEAN>, T_BEAN> 
       PropertyChangeEvent newEvent = new PropertyChangeEvent(
             this,
             baseSelectionEvent.getPropertyName(),
-            new PmSelection((Selection<T_BEAN>)baseSelectionEvent.getOldValue()),
-            new PmSelection((Selection<T_BEAN>)baseSelectionEvent.getNewValue()));
+            new PmSelection<T_PM, T_BEAN>(factoryCtxtPm, (Selection<T_BEAN>)baseSelectionEvent.getOldValue()),
+            new PmSelection<T_PM, T_BEAN>(factoryCtxtPm, (Selection<T_BEAN>)baseSelectionEvent.getNewValue()));
       newEvent.setPropagationId(baseSelectionEvent.getPropagationId());
       return newEvent;
     }

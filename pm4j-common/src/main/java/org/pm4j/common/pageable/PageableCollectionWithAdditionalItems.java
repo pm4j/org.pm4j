@@ -1,6 +1,7 @@
 package org.pm4j.common.pageable;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -26,7 +27,7 @@ public class PageableCollectionWithAdditionalItems<T_ITEM> implements PageableCo
   private final PageableCollection2<T_ITEM>  baseCollection;
   private final List<T_ITEM>                 additionalItems;
   private final SelectionHandlerWithAdditionalItems<T_ITEM> selectionHandler;
-  private final ModificationHandler<T_ITEM>  modificationHandler;
+  private final ItemSetModificationHandler<T_ITEM>  modificationHandler;
 
   /**
    * @param baseCollection the handled set of (persistent) items.
@@ -42,7 +43,7 @@ public class PageableCollectionWithAdditionalItems<T_ITEM> implements PageableCo
   }
 
   @Override
-  public ModificationHandler<T_ITEM> getModificationHandler() {
+  public ItemSetModificationHandler<T_ITEM> getModificationHandler() {
     return modificationHandler;
   }
 
@@ -151,7 +152,7 @@ public class PageableCollectionWithAdditionalItems<T_ITEM> implements PageableCo
    * Adds/removes directly on the additionalItems collection.<br>
    * Delegates modifications to other items to the backing collection.
    */
-  class ModificationHandlerWithAdditionalItems implements ModificationHandler<T_ITEM> {
+  class ModificationHandlerWithAdditionalItems implements ItemSetModificationHandler<T_ITEM> {
 
     @Override
     public void addItem(T_ITEM item) {
@@ -171,6 +172,27 @@ public class PageableCollectionWithAdditionalItems<T_ITEM> implements PageableCo
       else {
         throw new IllegalArgumentException("Currenly only SelectionWithAdditionalItems may be used for PageableCollectionWithAdditionalItems. Found parameter: " + items);
       }
+    }
+
+    @Override
+    public boolean isModified() {
+      return !additionalItems.isEmpty() || baseCollection.getModificationHandler().isModified();
+    }
+
+    @Override
+    public Collection<T_ITEM> getAddedItems() {
+      return additionalItems;
+    }
+
+    @Override
+    public Selection<T_ITEM> getRemovedItems() {
+      return baseCollection.getModificationHandler().getRemovedItems();
+    }
+
+    @Override
+    public void clearRegisteredModifications() {
+      baseCollection.getModificationHandler().clearRegisteredModifications();
+      additionalItems.clear();
     }
   }
 

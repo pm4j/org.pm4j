@@ -7,6 +7,7 @@ import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.selection.SelectionHandler;
 import org.pm4j.core.pm.PmTable.RowSelectMode;
+import org.pm4j.core.pm.impl.changehandler.ChangeSet;
 import org.pm4j.core.pm.impl.changehandler.ChangeSetHandler;
 
 
@@ -144,6 +145,13 @@ public interface PmTable2<T_ROW_PM> extends PmObject, PmDataInput {
    * @return the table change registry.
    */
   ChangeSetHandler<T_ROW_PM> getPmChangeSetHandler();
+
+  /**
+   * Provides information about table row changes.
+   *
+   * @return the table change set. Never <code>null</code>.
+   */
+  ChangeSet<T_ROW_PM> getPmChangeSet();
 
   /**
    * Clears a defined set of table state aspects.

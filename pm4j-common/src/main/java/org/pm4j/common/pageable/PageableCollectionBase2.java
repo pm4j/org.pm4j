@@ -15,7 +15,7 @@ import org.pm4j.common.selection.SelectionHandler;
 public abstract class PageableCollectionBase2<T_ITEM> implements PageableCollection2<T_ITEM> {
 
   /** The collection type specific selection handler. */
-  private ModificationHandler<T_ITEM> modificationHandler;
+  private ItemSetModificationHandler<T_ITEM> modificationHandler;
 
   private int                pageSize = 10;
   private int                currentPageIdx;
@@ -83,11 +83,11 @@ public abstract class PageableCollectionBase2<T_ITEM> implements PageableCollect
   }
 
   @Override
-  public ModificationHandler<T_ITEM> getModificationHandler() {
+  public ItemSetModificationHandler<T_ITEM> getModificationHandler() {
     return modificationHandler;
   }
 
-  public void setModificationHandler(ModificationHandler<T_ITEM> modificationHandler) {
+  public void setModificationHandler(ItemSetModificationHandler<T_ITEM> modificationHandler) {
     this.modificationHandler = modificationHandler;
   }
 }

@@ -11,8 +11,7 @@
 **/.settings/org.eclipse.wst.*
 **/.settings/org.eclipse.jdt.core.prefs
 **/.settings/org.eclipse.core.resources.prefs
-# TODO olaf: the maven configuration needs to be completed to generate valid eclipse classpath.
-# **/.classpath
+**/.classpath
 **/.project
 
 
