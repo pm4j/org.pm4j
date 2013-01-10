@@ -37,29 +37,40 @@ public class SelectionHandlerWithAdditionalItems<T_ITEM> extends SelectionHandle
     baseCollection.getSelectionHandler().setSelectMode(selectMode);
   }
 
+  // TODO olaf: will be simplified and reduced to a single selection change event when the 'addition item'
+  // case gets handled by the query modification/selection handler too.
   @Override
   public boolean select(boolean select, T_ITEM item) {
     if (additionalItems.contains(item)) {
       Collection<T_ITEM> transientItemSelection = new ArrayList<T_ITEM>(selection.getAdditionalSelectedItems());
+      Selection<T_ITEM> baseSelection = selection.getBaseSelection();
       if (select) {
+        if (getSelectMode() == SelectMode.SINGLE) {
+          // the selection switches to the transient item. All other selections need to be removed.
+          if (!baseCollection.getSelectionHandler().selectAll(false)) {
+            return false;
+          }
+          baseSelection = baseCollection.getSelectionHandler().getSelection();
+          transientItemSelection.clear();
+        }
         transientItemSelection.add(item);
       } else {
         transientItemSelection.remove(item);
       }
 
-      SelectionWithAdditionalItems<T_ITEM> newSelection = new SelectionWithAdditionalItems<T_ITEM>(
-            selection.getBaseSelection(),
+     SelectionWithAdditionalItems<T_ITEM> newSelection = new SelectionWithAdditionalItems<T_ITEM>(
+            baseSelection,
             transientItemSelection);
       return setSelection(newSelection);
     } else {
-      if (baseCollection.getSelectionHandler().select(select, item)) {
-        SelectionWithAdditionalItems<T_ITEM> newSelection = new SelectionWithAdditionalItems<T_ITEM>(
-            baseCollection.getSelectionHandler().getSelection(),
-            selection.getAdditionalSelectedItems());
-        return setSelection(newSelection);
-      } else {
+      if (!baseCollection.getSelectionHandler().select(select, item)) {
         return false;
       }
+
+      SelectionWithAdditionalItems<T_ITEM> newSelection = new SelectionWithAdditionalItems<T_ITEM>(
+          baseCollection.getSelectionHandler().getSelection(),
+          selection.getAdditionalSelectedItems());
+      return setSelection(newSelection);
     }
   }
 

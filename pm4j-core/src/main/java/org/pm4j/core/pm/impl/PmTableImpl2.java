@@ -12,6 +12,9 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.pm4j.common.pageable.ModificationHandler;
+import org.pm4j.common.pageable.Modifications;
+import org.pm4j.common.pageable.ModificationsImpl;
 import org.pm4j.common.pageable.PageableCollection2;
 import org.pm4j.common.pageable.PageableCollectionUtil2;
 import org.pm4j.common.pageable.inmem.PageableInMemCollectionImpl;
@@ -22,6 +25,7 @@ import org.pm4j.common.selection.SelectMode;
 import org.pm4j.common.selection.Selection;
 import org.pm4j.common.selection.SelectionHandler;
 import org.pm4j.common.util.beanproperty.PropertyAndVetoableChangeListener;
+import org.pm4j.common.util.collection.ListUtil;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmCommand;
@@ -41,12 +45,7 @@ import org.pm4j.core.pm.PmVisitor;
 import org.pm4j.core.pm.annotation.PmTableCfg;
 import org.pm4j.core.pm.annotation.PmTableCfg2;
 import org.pm4j.core.pm.api.PmEventApi;
-import org.pm4j.core.pm.api.PmMessageUtil;
 import org.pm4j.core.pm.api.PmValidationApi;
-import org.pm4j.core.pm.impl.changehandler.ChangeSet;
-import org.pm4j.core.pm.impl.changehandler.ChangeSetHandler;
-import org.pm4j.core.pm.impl.changehandler.ChangeSetHandler.ChangeKind;
-import org.pm4j.core.pm.impl.changehandler.ChangeSetHandlerImpl;
 import org.pm4j.core.pm.pageable.PageableCollection;
 import org.pm4j.core.pm.pageable2.InMemPmQueryEvaluator;
 import org.pm4j.core.pm.pageable2.PageablePmBeanCollection;
@@ -75,7 +74,7 @@ public class PmTableImpl2
   private static final Log LOG = LogFactory.getLog(PmTableImpl2.class);
 
   /** The content this table is based on. */
-  private PageableCollection2<T_ROW_PM> pmPageableCollection;
+  private PageablePmBeanCollection<T_ROW_PM, T_ROW_BEAN> pmPageableCollection;
 
  /** Defines the row-selection behavior. */
   private SelectMode rowSelectMode;
@@ -84,9 +83,6 @@ public class PmTableImpl2
    * The number of rows per page. If it is <code>null</code> the statically defined number of rows will be used.
    */
   private Integer numOfPageRows;
-
-  /** Handles the changed state of the table. */
-  private ChangeSetHandlerImpl<T_ROW_PM> pmChangeSetHandler;
 
   /** The set of decorators for various table change kinds. */
   private Map<TableChange, PmCommandDecoratorSetImpl> pmChangeDecoratorMap = Collections.emptyMap();
@@ -111,12 +107,6 @@ public class PmTableImpl2
   @Override
   public List<PmTableCol2> getColumnPms() {
     return PmUtil.getPmChildrenOfType(this, PmTableCol2.class);
-  }
-
-  @Deprecated
-  @Override
-  public final List<PmTableCol2> getColumns() {
-    return getColumnPms();
   }
 
   @Override
@@ -148,30 +138,9 @@ public class PmTableImpl2
     return getRowPms();
   }
 
-  /**
-   * Gets called whenever a row gets deleted from the table.
-   * Maintains the corresponding changed state for this table.
-   *
-   * @param newRowPm The new row.
-   */
-  protected void onDeleteRow(T_ROW_PM deletedRow) {
-    PmMessageUtil.clearSubTreeMessages(deletedRow);
-    getPmPageableCollection().getSelectionHandler().select(false, deletedRow);
-    getPmChangeSetHandler().registerChange(ChangeKind.DELETE, deletedRow);
-    if (deletedRow instanceof PmBean) {
-      BeanPmCacheUtil.removeBeanPm(this, (PmBean<?>)deletedRow);
-    }
-  }
-
   @Override
   public long getTotalNumOfPmRows() {
     return getPmPageableCollection().getNumOfItems();
-  }
-
-  @Deprecated
-  @Override
-  public final int getTotalNumOfRows() {
-    return (int)getTotalNumOfPmRows();
   }
 
   public SelectMode getPmRowSelectMode() {
@@ -185,11 +154,6 @@ public class PmTableImpl2
     }
 
     return rowSelectMode;
-  }
-
-  /** @deprecated Please use {@link #getPmRowSelectMode()} */
-  public final SelectMode getRowSelectMode() {
-    return getPmRowSelectMode();
   }
 
   /**
@@ -207,12 +171,6 @@ public class PmTableImpl2
     }
   }
 
-  /** @deprecated Please use {@link #setPmRowSelectMode(SelectMode)} */
-  public final void setRowSelectMode(SelectMode rowSelectMode) {
-    setPmRowSelectMode(rowSelectMode);
-  }
-
-
   @Override
   public int getNumOfPageRowPms() {
     if (numOfPageRows == null) {
@@ -224,12 +182,6 @@ public class PmTableImpl2
           : 10;
     }
     return numOfPageRows;
-  }
-
-  @Deprecated
-  @Override
-  public final int getNumOfPageRows() {
-    return getNumOfPageRowPms();
   }
 
   /**
@@ -245,11 +197,6 @@ public class PmTableImpl2
     }
   }
 
-  /** @deprecated Please use {@link #setNumOfPageRowPms(Integer)} */
-  public final void setNumOfPageRows(Integer numOfPageRows) {
-    setNumOfPageRowPms(numOfPageRows);
-  }
-
   @Override
   protected boolean isPmReadonlyImpl() {
     return super.isPmReadonlyImpl() || getPmParent().isPmReadonly();
@@ -258,18 +205,6 @@ public class PmTableImpl2
   @Override
   public SelectionHandler<T_ROW_PM> getPmSelectionHandler() {
     return getPmPageableCollection().getSelectionHandler();
-  }
-
-  /**
-   * This method provides access to a selection handler that uses the beans behind
-   * the row PMs.
-   * <p>
-   * This allows to select/deselect rows based on a set of beans.
-   *
-   * @return the bean selection handler.
-   */
-  public SelectionHandler<T_ROW_BEAN> getPmBeanSelectionHandler() {
-    return getPmPageableCollection().getBeanSelectionHandler();
   }
 
   @Override
@@ -346,16 +281,11 @@ public class PmTableImpl2
   }
 
   @Override
-  public ChangeSetHandler<T_ROW_PM> getPmChangeSetHandler() {
-    if (pmChangeSetHandler == null) {
-      pmChangeSetHandler = new ChangeSetHandlerImpl<T_ROW_PM>(this, getPmPageableCollection().getModificationHandler());
-    }
-    return pmChangeSetHandler;
-  }
-
-  @Override
-  public ChangeSet<T_ROW_PM> getPmChangeSet() {
-    return null;
+  public Modifications<T_ROW_PM> getPmRowModifications() {
+    ModificationHandler<T_ROW_PM> mh = getPmPageableCollection().getModificationHandler();
+    return (mh != null)
+        ? mh.getModifications()
+        : new ModificationsImpl<T_ROW_PM>();
   }
 
   @Override
@@ -389,7 +319,7 @@ public class PmTableImpl2
         break;
       case CLEAR_CHANGES:
         PmValidationApi.clearInvalidValuesOfSubtree(this);
-        getPmChangeSetHandler().clearChanges();
+        getPmPageableCollection().getModificationHandler().clearRegisteredModifications();
         break;
       case CLEAR_USER_FILTER:
         // User filters can't be cleared on this level. More detailed implementations
@@ -405,6 +335,39 @@ public class PmTableImpl2
     updatePmTable();
   }
 
+  /** @deprecated please use {@link #getColumnPms()} */
+  @Override
+  public final List<PmTableCol2> getColumns() {
+    return getColumnPms();
+  }
+
+  /** @deprecated please use {@link #getTotalNumOfPmRows()} */
+  @Override
+  public final int getTotalNumOfRows() {
+    return (int)getTotalNumOfPmRows();
+  }
+
+  /** @deprecated Please use {@link #getPmRowSelectMode()} */
+  public final SelectMode getRowSelectMode() {
+    return getPmRowSelectMode();
+  }
+
+  /** @deprecated Please use {@link #setPmRowSelectMode(SelectMode)} */
+  public final void setRowSelectMode(SelectMode rowSelectMode) {
+    setPmRowSelectMode(rowSelectMode);
+  }
+
+  /** @deprecated Please use {@link #getNumOfPageRowPms()} */
+  @Override
+  public final int getNumOfPageRows() {
+    return getNumOfPageRowPms();
+  }
+
+  /** @deprecated Please use {@link #setNumOfPageRowPms(Integer)} */
+  public final void setNumOfPageRows(Integer numOfPageRows) {
+    setNumOfPageRowPms(numOfPageRows);
+  }
+
   // -- helper methods --
 
   @Override
@@ -414,17 +377,17 @@ public class PmTableImpl2
 
   @Override
   protected boolean isPmValueChangedImpl() {
-    return getPmChangeSetHandler().isChanged() || super.isPmValueChangedImpl();
+    return getPmRowModifications().isModified() || super.isPmValueChangedImpl();
   }
 
   @Override
   protected void setPmValueChangedImpl(boolean changed) {
     super.setPmValueChangedImpl(changed);
     if (changed == false) {
-      for (PmDataInput p : getPmChangeSetHandler().getChangedItems(ChangeKind.ADD, ChangeKind.UPDATE)) {
+      for (PmDataInput p : getPmRowModifications().getUpdatedItems()) {
         p.setPmValueChanged(false);
       }
-      getPmChangeSetHandler().clearChanges();
+      getPmPageableCollection().getModificationHandler().clearRegisteredModifications();
     }
   }
 
@@ -433,16 +396,15 @@ public class PmTableImpl2
    */
   @Override
   public void pmValidate() {
-    for (PmObject itemPm : new ArrayList<PmObject>(getPmChangeSetHandler().getChangedItems(ChangeKind.ADD, ChangeKind.UPDATE))) {
-      if (itemPm instanceof PmDataInput) {
-        PmValidationApi.validateSubTree((PmDataInput)itemPm);
-      }
+    Modifications<T_ROW_PM> m = getPmRowModifications();
+    List<T_ROW_PM> changes = ListUtil.collectionsToList(m.getAddedItems(), m.getUpdatedItems());
+    for (T_ROW_PM itemPm : changes) {
+      PmValidationApi.validateSubTree(itemPm);
     }
   }
 
-
   /**
-   * @return The {@link PageableCollection} that handles the table data to display.
+   * @return The {@link PageableCollection} that handles the table row PM's to display.
    */
   public final PageableCollection2<T_ROW_PM> getPmPageableCollection() {
     zz_ensurePmInitialization();
@@ -453,12 +415,23 @@ public class PmTableImpl2
   }
 
   /**
+   * This method provides access to a collection that handles the beans behind
+   * the row PMs.
+   * <p>
+   * @return The {@link PageableCollection} that handles the table row beans to display.
+   */
+  @SuppressWarnings("unchecked")
+  public PageableCollection2<T_ROW_BEAN> getPmPageableBeanCollection() {
+    return ((PageablePmBeanCollection<T_ROW_PM, T_ROW_BEAN>)getPmPageableCollection()).getBeanCollection();
+  }
+
+  /**
    * Gets called whenever the internal collection is <code>null</code> and
    * {@link #getPmPageableCollection()} gets called.
    *
    * @return The collection to use. Never <code>null</code>.
    */
-  protected PageableCollection2<T_ROW_PM> getPmPageableCollectionImpl() {
+  protected PageablePmBeanCollection<T_ROW_PM, T_ROW_BEAN> getPmPageableCollectionImpl() {
     QueryOptions qoptions = PmTable2Util.makeQueryOptionsForInMemoryTable(this);
     // @formatter:off
     PageableCollection2<T_ROW_BEAN> cities = new PageableInMemCollectionImpl<T_ROW_BEAN>(
@@ -509,7 +482,7 @@ public class PmTableImpl2
    *          the data set to present. If it is <code>null</code> an empty
    *          collection will be created internally by the next {@link #getPmPageableCollection()} call.
    */
-  public void setPmPageableCollection(PageableCollection2<T_ROW_PM> pageable) {
+  public void setPmPageableCollection(PageablePmBeanCollection<T_ROW_PM, T_ROW_BEAN> pageable) {
     setPmPageableCollection(pageable, true, ValueChangeKind.VALUE);
   }
 
@@ -520,7 +493,7 @@ public class PmTableImpl2
    * @param preserveSettings Defines if the currently selected items and filter definition should be preserved.
    * @return <code>true</code> if the data set was new.
    */
-  public void setPmPageableCollection(PageableCollection2<T_ROW_PM> pageable, boolean preserveSettings, ValueChangeKind valueChangeKind) {
+  public void setPmPageableCollection(PageablePmBeanCollection<T_ROW_PM, T_ROW_BEAN> pageable, boolean preserveSettings, ValueChangeKind valueChangeKind) {
     Selection<T_ROW_PM> selection = null;
 
     if (preserveSettings) {
@@ -553,7 +526,7 @@ public class PmTableImpl2
   }
 
   // XXX olaf: combine with init method.
-  private void _setPageableCollection(PageableCollection2<T_ROW_PM> pc) {
+  private void _setPageableCollection(PageablePmBeanCollection<T_ROW_PM, T_ROW_BEAN> pc) {
     if (this.pmPageableCollection != pc) {
       SelectionHandler<T_ROW_PM> selectionHandler = pc.getSelectionHandler();
       selectionHandler.addPropertyAndVetoableListener(SelectionHandler.PROP_SELECTION, pmTableSelectionChangeListener);

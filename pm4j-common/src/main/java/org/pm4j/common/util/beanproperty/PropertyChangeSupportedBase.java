@@ -7,7 +7,9 @@ import java.beans.PropertyVetoException;
 import java.beans.VetoableChangeListener;
 import java.beans.VetoableChangeSupport;
 
-public class PropertyChangeSupportedBase implements PropertyChangeSupported {
+import org.pm4j.common.exception.CheckedExceptionWrapper;
+
+public class PropertyChangeSupportedBase implements PropertyChangeSupported, Cloneable {
 
   private PropertyChangeSupport pcs;
   private VetoableChangeSupport vpcs;
@@ -60,6 +62,20 @@ public class PropertyChangeSupportedBase implements PropertyChangeSupported {
     getVpcs().fireVetoableChange(event);
   }
 
+  /**
+   * Does not clone the observer references. These observers are only registered for the original.
+   */
+  @Override
+  protected PropertyChangeSupportedBase clone() {
+	try {
+		PropertyChangeSupportedBase clone = (PropertyChangeSupportedBase) super.clone();
+		clone.pcs = null;
+		clone.vpcs = null;
+		return clone;
+	} catch (CloneNotSupportedException e) {
+		throw new CheckedExceptionWrapper(e);
+	}
+  }
 
   private PropertyChangeSupport getPcs() {
     if (pcs == null) {

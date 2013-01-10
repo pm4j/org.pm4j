@@ -15,11 +15,11 @@ import org.pm4j.core.pm.annotation.PmCacheCfg.CacheMode;
 import org.pm4j.core.pm.annotation.PmFactoryCfg;
 import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
-import org.pm4j.core.pm.impl.PmBeanImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
 import org.pm4j.core.pm.impl.PmElementBase;
 import org.pm4j.core.pm.impl.PmTableColImpl2;
 import org.pm4j.core.pm.impl.PmTableImpl2;
+import org.pm4j.core.pm.impl.PmTableRowImpl;
 
 public class PmAttrCacheTest {
 
@@ -83,7 +83,7 @@ public class PmAttrCacheTest {
   // -- Presentation models --
 
   @PmBeanCfg(beanClass=MyPojo.class)
-  public static class MyPojoPm extends PmBeanImpl<MyPojo> {
+  public static class MyPojoPm extends PmTableRowImpl<MyPojo> {
     public final PmAttrString s = new PmAttrStringImpl(this);
 
     @PmCacheCfg(value=CacheMode.ON) @PmAttrCfg(valuePath="pmBean.s")

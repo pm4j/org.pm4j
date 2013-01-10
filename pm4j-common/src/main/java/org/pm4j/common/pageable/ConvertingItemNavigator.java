@@ -48,7 +48,10 @@ public class ConvertingItemNavigator<T_EXTERNAL, T_INTERNAL> implements ItemNavi
   @Override
   public T_EXTERNAL getCurrentItem() {
     if (currentItem == null) {
-      currentItem = converter.toNavigatorItemType(queryNavigator.getCurrentItem());
+      T_INTERNAL internalItem = queryNavigator.getCurrentItem();
+      if (internalItem != null) {
+        currentItem = converter.toNavigatorItemType(internalItem);
+      }
     }
     return currentItem;
   }

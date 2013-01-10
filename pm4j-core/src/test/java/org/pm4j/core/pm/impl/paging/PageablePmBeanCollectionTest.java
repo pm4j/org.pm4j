@@ -11,6 +11,7 @@ import org.pm4j.common.query.FilterCompareDefinition;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.SortOrder;
 import org.pm4j.common.query.inmem.InMemSortOrder;
+import org.pm4j.common.selection.SelectMode;
 import org.pm4j.common.util.CompareUtil;
 import org.pm4j.core.pm.PmAttrString;
 import org.pm4j.core.pm.PmObject;
@@ -18,10 +19,10 @@ import org.pm4j.core.pm.PmTableCol2;
 import org.pm4j.core.pm.annotation.PmBeanCfg;
 import org.pm4j.core.pm.annotation.PmFactoryCfg;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
-import org.pm4j.core.pm.impl.PmBeanImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
 import org.pm4j.core.pm.impl.PmTableColImpl2;
 import org.pm4j.core.pm.impl.PmTableImpl2;
+import org.pm4j.core.pm.impl.PmTableRowImpl;
 import org.pm4j.core.pm.pageable2.PageablePmBeanCollection;
 
 public class PageablePmBeanCollectionTest extends PageableCollectionTestBase<PageablePmBeanCollectionTest.BeanRowPm> {
@@ -41,13 +42,13 @@ public class PageablePmBeanCollectionTest extends PageableCollectionTestBase<Pag
     qo.addSortOrder("name", new InMemSortOrder(attrNameValue));
 
     beanTablePm.setPmPageableCollection(new PageablePmBeanCollection<BeanRowPm, Bean>(beanTablePm, beans, qo));
+    beanTablePm.setPmRowSelectMode(SelectMode.SINGLE);
 
     return beanTablePm.getPmPageableCollection();
   }
 
   @Override
   protected SortOrder getOrderByName() {
-//    beanTablePm.getpm
     return new InMemSortOrder(new Comparator<BeanRowPm>() {
       @Override
       public int compare(BeanRowPm o1, BeanRowPm o2) {
@@ -58,7 +59,7 @@ public class PageablePmBeanCollectionTest extends PageableCollectionTestBase<Pag
 
 
   @PmBeanCfg(beanClass=Bean.class)
-  public static class BeanRowPm extends PmBeanImpl<PageableCollectionTestBase.Bean> {
+  public static class BeanRowPm extends PmTableRowImpl<PageableCollectionTestBase.Bean> {
     public final PmAttrString name = new PmAttrStringImpl(this);
 
     @Override

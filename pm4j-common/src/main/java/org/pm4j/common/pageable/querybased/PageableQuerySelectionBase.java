@@ -21,6 +21,11 @@ public abstract class PageableQuerySelectionBase<T_ITEM, T_ID extends Serializab
     this.serviceProvider = service.getSerializeableServiceProvider();
   }
 
+  @Override
+  public boolean isEmpty() {
+    return getSize() == 0L;
+  }
+
   protected PageableQueryService<T_ITEM, T_ID> getService() {
     if (service == null) {
       if (serviceProvider != null) {

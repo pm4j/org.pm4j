@@ -35,6 +35,11 @@ public class SelectionWithAdditionalItems <T_ITEM> implements Selection<T_ITEM> 
   }
 
   @Override
+  public boolean isEmpty() {
+    return getSize() == 0L;
+  }
+
+  @Override
   public boolean isSelected(T_ITEM item) {
     return baseSelection.isSelected(item) || additionalSelectedItems.contains(item);
   }

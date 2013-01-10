@@ -1,5 +1,7 @@
 package org.pm4j.common.pageable;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -12,6 +14,7 @@ import org.pm4j.common.selection.SelectionHandler;
 import org.pm4j.common.selection.SelectionHandlerWithAdditionalItems;
 import org.pm4j.common.selection.SelectionWithAdditionalItems;
 import org.pm4j.common.util.collection.CombinedIterator;
+import org.pm4j.common.util.collection.ListUtil;
 
 /**
  * A pageable collection that combines items provided by a backing base
@@ -26,8 +29,10 @@ public class PageableCollectionWithAdditionalItems<T_ITEM> implements PageableCo
 
   private final PageableCollection2<T_ITEM>  baseCollection;
   private final List<T_ITEM>                 additionalItems;
+  private int                                currentPageIdx = 1;
   private final SelectionHandlerWithAdditionalItems<T_ITEM> selectionHandler;
-  private final ItemSetModificationHandler<T_ITEM>  modificationHandler;
+  private final ModificationHandler<T_ITEM>  modificationHandler;
+  private List<T_ITEM>                       itemsOnPage;
 
   /**
    * @param baseCollection the handled set of (persistent) items.
@@ -40,11 +45,26 @@ public class PageableCollectionWithAdditionalItems<T_ITEM> implements PageableCo
     this.additionalItems   = new ArrayList<T_ITEM>();
     this.selectionHandler = new SelectionHandlerWithAdditionalItems<T_ITEM>(baseCollection, additionalItems);
     this.modificationHandler = new ModificationHandlerWithAdditionalItems();
+
+    // On each query parameter change the locally cached current page needs to be cleared.
+    PropertyChangeListener resetItemsOnPageListener = new PropertyChangeListener() {
+      @Override
+      public void propertyChange(PropertyChangeEvent evt) {
+        itemsOnPage = null;
+      }
+    };
+    getQueryParams().addPropertyChangeListener(QueryParams.PROP_EFFECTIVE_FILTER, resetItemsOnPageListener);
+    getQueryParams().addPropertyChangeListener(QueryParams.PROP_EFFECTIVE_SORT_ORDER, resetItemsOnPageListener);
   }
 
   @Override
-  public ItemSetModificationHandler<T_ITEM> getModificationHandler() {
+  public ModificationHandler<T_ITEM> getModificationHandler() {
     return modificationHandler;
+  }
+
+  @Override
+  public Modifications<T_ITEM> getModifications() {
+    return modificationHandler.getModifications();
   }
 
   /**
@@ -61,6 +81,7 @@ public class PageableCollectionWithAdditionalItems<T_ITEM> implements PageableCo
    */
   public void clearAdditionalItems() {
     additionalItems.clear();
+    itemsOnPage = null;
   }
 
   /**
@@ -82,15 +103,37 @@ public class PageableCollectionWithAdditionalItems<T_ITEM> implements PageableCo
     return baseCollection.getQueryOptions();
   }
 
+  //
   @Override
   public List<T_ITEM> getItemsOnPage() {
-    if (additionalItems.isEmpty()) {
-      return baseCollection.getItemsOnPage();
-    } else {
-      List<T_ITEM> list = new ArrayList<T_ITEM>(baseCollection.getItemsOnPage());
-      list.addAll(additionalItems);
-      return list;
+    if (itemsOnPage == null) {
+      int pageSize = getPageSize();
+      int numOfPagesFilledByBaseCollectionPages = (int)baseCollection.getNumOfItems() / pageSize;
+
+      if (additionalItems.isEmpty() ||
+          (currentPageIdx <= numOfPagesFilledByBaseCollectionPages)) {
+        itemsOnPage = baseCollection.getItemsOnPage();
+      } else {
+        boolean mixedPage = (currentPageIdx == numOfPagesFilledByBaseCollectionPages+1) &&
+                            (baseCollection.getNumOfItems() % pageSize) != 0;
+        if (mixedPage) {
+          List<T_ITEM> list = new ArrayList<T_ITEM>(baseCollection.getItemsOnPage());
+          for (T_ITEM i : additionalItems) {
+            if (list.size() >= pageSize) {
+              break;
+            }
+            list.add(i);
+          }
+          itemsOnPage = list;
+        } else {
+          long firstItemIdx = (currentPageIdx-1) * pageSize;
+          int offset = (int)(firstItemIdx - baseCollection.getNumOfItems());
+          itemsOnPage = new ArrayList<T_ITEM>(ListUtil.subListPage(additionalItems, offset, pageSize));
+        }
+      }
     }
+
+    return itemsOnPage;
   }
 
   @Override
@@ -101,16 +144,19 @@ public class PageableCollectionWithAdditionalItems<T_ITEM> implements PageableCo
   @Override
   public void setPageSize(int newSize) {
     baseCollection.setPageSize(newSize);
+    itemsOnPage = null;
   }
 
   @Override
   public int getCurrentPageIdx() {
-    return baseCollection.getCurrentPageIdx();
+    return currentPageIdx;
   }
 
   @Override
   public void setCurrentPageIdx(int pageIdx) {
+    currentPageIdx = pageIdx;
     baseCollection.setCurrentPageIdx(pageIdx);
+    itemsOnPage = null;
   }
 
   @Override
@@ -133,67 +179,95 @@ public class PageableCollectionWithAdditionalItems<T_ITEM> implements PageableCo
     return selectionHandler;
   }
 
-  /**
-   * Returns this instance.
-   * Sub classes that support PM's in front of beans should provide an alternate implementation.
-   */
-  @SuppressWarnings("unchecked")
   @Override
-  public <T> SelectionHandler<T> getBeanSelectionHandler() {
-    return (SelectionHandler<T>) this;
+  public Selection<T_ITEM> getSelection() {
+    return selectionHandler.getSelection();
   }
 
   @Override
   public void clearCaches() {
     baseCollection.clearCaches();
+    itemsOnPage = null;
   }
 
   /**
    * Adds/removes directly on the additionalItems collection.<br>
    * Delegates modifications to other items to the backing collection.
    */
-  class ModificationHandlerWithAdditionalItems implements ItemSetModificationHandler<T_ITEM> {
+  class ModificationHandlerWithAdditionalItems implements ModificationHandler<T_ITEM> {
+
+    private CollectionWithAdditionalItemsModifications modifications = new CollectionWithAdditionalItemsModifications();
 
     @Override
     public void addItem(T_ITEM item) {
       assert item != null;
       additionalItems.add(item);
-    }
-
-    @Override
-    public void removeItems(Selection<T_ITEM> items) {
-      if (items instanceof SelectionWithAdditionalItems) {
-        SelectionWithAdditionalItems<T_ITEM> s = (SelectionWithAdditionalItems<T_ITEM>)items;
-
-        // first do the operation that can fail:
-        baseCollection.getModificationHandler().removeItems(s.getBaseSelection());
-        additionalItems.removeAll(s.getAdditionalSelectedItems());
-      }
-      else {
-        throw new IllegalArgumentException("Currenly only SelectionWithAdditionalItems may be used for PageableCollectionWithAdditionalItems. Found parameter: " + items);
+      // the page item cache needs to be updated if the current is the last page.
+      if (getCurrentPageIdx() == PageableCollectionUtil2.getNumOfPages(PageableCollectionWithAdditionalItems.this)) {
+        itemsOnPage = null;
       }
     }
 
     @Override
-    public boolean isModified() {
-      return !additionalItems.isEmpty() || baseCollection.getModificationHandler().isModified();
-    }
+    public void updateItem(T_ITEM item) {
+      assert item != null;
+      if (!additionalItems.contains(item)) {
+        baseCollection.getModificationHandler().updateItem(item);
+      }
+    };
 
     @Override
-    public Collection<T_ITEM> getAddedItems() {
-      return additionalItems;
-    }
+    public boolean removeSelectedItems() {
+      SelectionWithAdditionalItems<T_ITEM> items = (SelectionWithAdditionalItems<T_ITEM>) selectionHandler.getSelection();
 
-    @Override
-    public Selection<T_ITEM> getRemovedItems() {
-      return baseCollection.getModificationHandler().getRemovedItems();
+      // first do the operation that can fail:
+      if (!baseCollection.getModificationHandler().removeSelectedItems()) {
+        return false;
+      }
+      additionalItems.removeAll(items.getAdditionalSelectedItems());
+      selectionHandler.selectAll(false);
+      clearCaches();
+      return true;
     }
 
     @Override
     public void clearRegisteredModifications() {
       baseCollection.getModificationHandler().clearRegisteredModifications();
       additionalItems.clear();
+      modifications = new CollectionWithAdditionalItemsModifications();
     }
+
+    @Override
+    public Modifications<T_ITEM> getModifications() {
+      return modifications;
+    }
+
+    /**
+     * Represents the modifications of the base collection and of the set of additional items.
+     */
+    class CollectionWithAdditionalItemsModifications implements Modifications<T_ITEM> {
+
+      @Override
+      public boolean isModified() {
+        return !additionalItems.isEmpty() ||
+               baseCollection.getModificationHandler().getModifications().isModified();
+      }
+
+      @Override
+      public Collection<T_ITEM> getAddedItems() {
+        return additionalItems;
+      }
+
+      @Override
+      public Collection<T_ITEM> getUpdatedItems() {
+        return baseCollection.getModificationHandler().getModifications().getUpdatedItems();
+      }
+
+      @Override
+      public Selection<T_ITEM> getRemovedItems() {
+        return baseCollection.getModificationHandler().getModifications().getRemovedItems();
+      }
+    };
   }
 
 }

@@ -27,7 +27,6 @@ import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmExpressionApi;
 import org.pm4j.core.pm.api.PmFactoryApi;
 import org.pm4j.core.pm.api.PmMessageUtil;
-import org.pm4j.core.pm.impl.changehandler.ChangeSetHandler.ChangeKind;
 import org.pm4j.core.util.reflection.BeanAttrAccessor;
 import org.pm4j.core.util.reflection.BeanAttrAccessorImpl;
 
@@ -270,7 +269,9 @@ public abstract class PmBeanBase<T_BEAN>
 
     @Override
     public void visit(PmTable2<?> table) {
-      List<Object> changedRows = new ArrayList<Object>(table.getPmChangeSetHandler().getChangedItems(ChangeKind.ADD, ChangeKind.UPDATE));
+      table.getPmRowModifications().getAddedItems();
+      List<Object> changedRows = new ArrayList<Object>(table.getPmRowModifications().getAddedItems());
+      changedRows.addAll(table.getPmRowModifications().getUpdatedItems());
       onVisit(table);
       table.updatePmTable();
 

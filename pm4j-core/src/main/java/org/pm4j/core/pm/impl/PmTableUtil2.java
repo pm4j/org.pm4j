@@ -26,7 +26,7 @@ public final class PmTableUtil2 {
    */
   public static int findIndexOfRowOnCurrentPage(PmElement rowPm) {
     PmTable2<?> tablePm = PmUtil.getPmParentOfType(rowPm, PmTable2.class);
-    List<?> rows = tablePm.getRows();
+    List<?> rows = tablePm.getRowPms();
     for (int i = 0; i < rows.size(); ++i) {
       if (rows.get(i) == rowPm) {
         return i;
@@ -44,7 +44,7 @@ public final class PmTableUtil2 {
    *          The table to adjust.
    */
   public static void setScrollableTableProperties(PmTableImpl2<?, ?> table) {
-    table.setNumOfPageRows(Integer.MAX_VALUE);
+    table.setNumOfPageRowPms(Integer.MAX_VALUE);
     if (table.getPmPager() != null) {
       table.getPmPager().setPagerVisibility(PagerVisibility.WHEN_SECOND_PAGE_EXISTS);
     }
@@ -83,7 +83,8 @@ public final class PmTableUtil2 {
    * @return The passed handler (for inline code style support).
    */
   public static <T extends MasterPmHandler> T addMasterDetailsPmHandler(PmTable2<?> pmTable, T handler) {
-    pmTable.getPmChangeSetHandler().addDetailsPmHandler(handler);
+//  TODO: check for missing functionality!
+//    pmTable.getPmChangeSetHandler().addDetailsPmHandler(handler);
     handler.startObservers();
     return handler;
   }

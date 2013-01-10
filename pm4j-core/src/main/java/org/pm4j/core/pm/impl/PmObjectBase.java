@@ -464,7 +464,7 @@ public abstract class PmObjectBase implements PmObject {
 
   /* package */ @SuppressWarnings("unchecked")
   Collection<PmObject> getFactoryGeneratedChildPms() {
-    return (Collection<PmObject>) ((pmBeanFactoryCache != null && !pmBeanFactoryCache.isEmpty()) 
+    return (Collection<PmObject>) ((pmBeanFactoryCache != null && !pmBeanFactoryCache.isEmpty())
       ? pmBeanFactoryCache.getItems()
       : Collections.EMPTY_LIST);
   }
@@ -530,6 +530,15 @@ public abstract class PmObjectBase implements PmObject {
       pmToViewConnector = getPmConversationImpl().getPmToViewTechnologyConnector().createPmToViewConnector(this);
     }
     return pmToViewConnector;
+  }
+
+  /**
+   * Defines an optional view specific connector.
+   *
+   * @param pmToViewConnector the connector to use.
+   */
+  public void setPmToViewConnector(Object pmToViewConnector) {
+    this.pmToViewConnector = pmToViewConnector;
   }
 
   @Override

@@ -3,7 +3,12 @@ package org.pm4j.core.pm.impl;
 import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmObject;
 
-class BeanPmCacheUtil {
+/**
+ * Provides INTERNAL methods for bean factory cache handling.
+ *
+ * @author olaf boede
+ */
+public class BeanPmCacheUtil {
 
   public static final void clearBeanPmCache(PmObject factoryOwningPm) {
     if (((PmObjectBase)factoryOwningPm).pmBeanFactoryCache != null) {

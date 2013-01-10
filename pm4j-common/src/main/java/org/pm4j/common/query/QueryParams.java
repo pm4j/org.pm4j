@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.pm4j.common.exception.CheckedExceptionWrapper;
 import org.pm4j.common.pageable.querybased.PageableQueryService;
 import org.pm4j.common.query.inmem.InMemQueryEvaluator;
 import org.pm4j.common.util.beanproperty.PropertyChangeSupportedBase;
@@ -200,12 +199,8 @@ public class QueryParams extends PropertyChangeSupportedBase implements Cloneabl
 
   @Override
   public QueryParams clone() {
-    try {
-      QueryParams clone = (QueryParams)super.clone();
-      return clone;
-    } catch (CloneNotSupportedException e) {
-      throw new CheckedExceptionWrapper(e);
-    }
+    QueryParams clone = (QueryParams) super.clone();
+    return clone;
   }
 
 

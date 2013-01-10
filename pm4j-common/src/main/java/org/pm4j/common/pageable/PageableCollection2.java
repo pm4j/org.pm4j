@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.QueryParams;
+import org.pm4j.common.selection.Selection;
 import org.pm4j.common.selection.SelectionHandler;
 
 /**
@@ -121,26 +122,29 @@ public interface PageableCollection2<T_ITEM> extends Iterable<T_ITEM> {
   SelectionHandler<T_ITEM> getSelectionHandler();
 
   /**
-   * If this is an collection of PMs in front of a collection of beans, this
-   * method provides access to a selection handler that uses the beans behind
-   * the PMs.
-   * <p>
-   * This allows to select/deselect rows based on a set of beans.
+   * Provides the current selection.
    *
-   * @return the corresponding bean selection handler.
-   *         <p>
-   *         This instance if this collection already handles the bean
-   *         selection.
+   * @return the current selection state. Never <code>null</code>.
    */
-  <T> SelectionHandler<T> getBeanSelectionHandler();
+  Selection<T_ITEM> getSelection();
 
   /**
    * Provides a handler that can handle collection modifications (add- and delete item operations).
    * <p>
-   * Returns a <code>null</code> if the collection does not support item set modifications.
+   * Returns a <code>null</code> if the collection does not support modifications.
    *
    * @return the handler or <code>null</code>.
    */
-  ItemSetModificationHandler<T_ITEM> getModificationHandler();
+  ModificationHandler<T_ITEM> getModificationHandler();
+
+  /**
+   * Provides the registered modifications.
+   *
+   * @return the modification set. Never <code>null</code>.
+   */
+  Modifications<T_ITEM> getModifications();
+
+
+
 
 }

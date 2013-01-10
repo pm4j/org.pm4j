@@ -23,6 +23,11 @@ public interface Selection<T_ITEM> extends Iterable<T_ITEM>, Serializable {
   long getSize();
 
   /**
+   * @return <code>true</code> if no item is selected.
+   */
+  boolean isEmpty();
+
+  /**
    * Checks if the item is selected.
    *
    * @param item the item to check.

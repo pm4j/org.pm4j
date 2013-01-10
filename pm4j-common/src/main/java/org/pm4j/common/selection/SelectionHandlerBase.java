@@ -21,7 +21,7 @@ public abstract class SelectionHandlerBase<T_ITEM> extends PropertyChangeSupport
     switch (selectMode) {
       case SINGLE: currentSelection.clear(); break;
       case MULTI: break;
-      default: throw new RuntimeException("Selection for current select mode is not supported: " + selectMode);
+      default: throw new RuntimeException("Selection for select mode '" + selectMode + "' is not supported.");
     }
   }
 

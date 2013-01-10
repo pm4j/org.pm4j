@@ -2,6 +2,9 @@ package org.pm4j.core.pm.impl;
 
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmObject;
+import org.pm4j.core.pm.api.PmVisitorApi;
+import org.pm4j.core.pm.api.PmVisitorApi.VisitCallBack;
+import org.pm4j.core.pm.api.PmVisitorApi.VisitResult;
 import org.pm4j.core.pm.impl.PmObjectBase.PmInitState;
 
 /**
@@ -18,6 +21,21 @@ public class PmInitApi {
    */
   public static void ensurePmInitialization(PmObject pm) {
     ((PmObjectBase)pm).zz_ensurePmInitialization();
+  }
+
+  /**
+   * Ensures that the passed PM and all of it's PM childer are initialized.
+   *
+   * @param rootPm the root PM of the PM tree part to initialize.
+   */
+  public static void ensurePmSubTreeInitialization(PmObject rootPm) {
+    PmVisitorApi.visit(rootPm, new VisitCallBack() {
+      @Override
+      public VisitResult visit(PmObject pm) {
+        ensurePmInitialization(pm);
+        return VisitResult.CONTINUE;
+      }
+    });
   }
 
   /**

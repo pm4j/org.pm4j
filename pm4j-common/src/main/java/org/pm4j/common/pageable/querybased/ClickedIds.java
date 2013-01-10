@@ -2,6 +2,7 @@ package org.pm4j.common.pageable.querybased;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Collections;
 
 /**
  * An quite internal collection of individually selected or unselected items.
@@ -10,7 +11,7 @@ import java.util.Collection;
  * <p>
  * Inverted selection is a synonym for 'select all'.
  *
- * @author OBOEDE
+ * @author olaf boede
  *
  * @param <T_ID>
  */
@@ -29,6 +30,12 @@ public class ClickedIds<T_ID> implements Serializable {
   public ClickedIds(Collection<T_ID> ids, boolean invertedSelection) {
     this.ids = ids;
     this.invertedSelection = invertedSelection;
+  }
+
+  /** Creates an empty clicked id set. */
+  @SuppressWarnings("unchecked")
+  public ClickedIds() {
+    this(Collections.EMPTY_LIST, false);
   }
 
   /**

@@ -8,15 +8,14 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.pm4j.common.query.QueryOptions;
 import org.pm4j.core.pm.annotation.PmBeanCfg;
 import org.pm4j.core.pm.annotation.PmFactoryCfg;
 import org.pm4j.core.pm.impl.PmAttrIntegerImpl;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
-import org.pm4j.core.pm.impl.PmBeanBase;
 import org.pm4j.core.pm.impl.PmConversationImpl;
 import org.pm4j.core.pm.impl.PmTableColImpl2;
 import org.pm4j.core.pm.impl.PmTableImpl2;
+import org.pm4j.core.pm.impl.PmTableRowImpl;
 import org.pm4j.core.pm.pageable2.PageablePmBeanCollection;
 
 public class PmTable2Test {
@@ -34,7 +33,7 @@ public class PmTable2Test {
 
     myTablePm = new TablePm(new PmConversationImpl());
 
-    QueryOptions qo = new QueryOptions();
+//    QueryOptions qo = new QueryOptions();
 //    qo.addSortOrder("name.valueLocalized", new InMemSortOrder<Comparable<?>>(false));
 //    qo.setDefaultSortOrder(defaultSortOrder)
 
@@ -45,15 +44,15 @@ public class PmTable2Test {
 
   @Test
   public void testTable() {
-    assertEquals(3, myTablePm.getTotalNumOfRows());
+    assertEquals(3, myTablePm.getTotalNumOfPmRows());
   }
 
   @Test
   public void testEmptyTable() {
     myTablePm.setPmPageableCollection(new PageablePmBeanCollection<RowPm, RowBean>(myTablePm, new ArrayList<RowBean>()));
 
-    assertEquals(0, myTablePm.getTotalNumOfRows());
-    assertEquals(0, myTablePm.getRows().size());
+    assertEquals(0, myTablePm.getTotalNumOfPmRows());
+    assertEquals(0, myTablePm.getRowPms().size());
   }
 
   @PmFactoryCfg(beanPmClasses=RowPm.class)
@@ -73,7 +72,7 @@ public class PmTable2Test {
   }
 
   @PmBeanCfg(beanClass=RowBean.class)
-  public static class RowPm extends PmBeanBase<RowBean> {
+  public static class RowPm extends PmTableRowImpl<RowBean> {
     public final PmAttrString name = new PmAttrStringImpl(this);
     public final PmAttrString description = new PmAttrStringImpl(this);
     public final PmAttrInteger counter = new PmAttrIntegerImpl(this);

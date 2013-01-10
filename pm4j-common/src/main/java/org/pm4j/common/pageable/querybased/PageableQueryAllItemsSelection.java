@@ -5,7 +5,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.pm4j.common.query.QueryParams;
-import org.pm4j.common.selection.Selection;
 
 /**
  * Provides a selection containing all items provided by the service.

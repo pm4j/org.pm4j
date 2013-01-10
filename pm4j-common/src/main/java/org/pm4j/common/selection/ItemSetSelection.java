@@ -35,6 +35,11 @@ public class ItemSetSelection<T_ITEM> implements Selection<T_ITEM> {
   }
 
   @Override
+  public boolean isEmpty() {
+    return selectedItems.isEmpty();
+  }
+
+  @Override
   public Iterator<T_ITEM> iterator() {
     return selectedItems.iterator();
   }

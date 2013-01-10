@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.pm4j.common.pageable.inmem.ItemNavigatorInMem;
 import org.pm4j.common.query.CompOpStringStartsWith;
@@ -41,14 +42,29 @@ public abstract class PageableCollectionTestBase<T> {
 
   @Before
   public void setUp() {
-    collection = makePageableCollection("a", "b", "c", "d", "e", "f");
+    collection = makePageableCollection(" ", "a", "b", "c", "d", "e", "f");
+
     collection.setPageSize(2);
     nameSortOrder = getOrderByName();
+
+    // to get more test coverage: perform all tests with a deleted item.
+    collection.getSelectionHandler().select(true, collection.getItemsOnPage().get(0));
+    assertTrue(collection.getModificationHandler().removeSelectedItems());
+    assertTrue(collection.getModificationHandler().getModifications().isModified());
+    assertEquals("[ ]", IterableUtil.shallowCopy(collection.getModificationHandler().getModifications().getRemovedItems()).toString());
   }
 
   @Test
-  public void testFullCollectionIterationResult() {
+  public void testFullCollectionItersationResult() {
     assertEquals("[a, b, c, d, e, f]", IterableUtil.shallowCopy(collection).toString());
+  }
+
+  @Test
+  @Ignore("needs to be fixed")
+  public void testGetUnfilteredItemCount() {
+    assertEquals(6, collection.getUnfilteredItemCount());
+    collection.getQueryParams().setFilterExpression(getFilterNameStartsWith("b"));
+    assertEquals(6, collection.getUnfilteredItemCount());
   }
 
   protected ItemNavigator<T> getItemNavigator() {
@@ -182,7 +198,7 @@ public abstract class PageableCollectionTestBase<T> {
     assertEquals(1, collection.getSelectionHandler().getSelection().getSize());
   }
 
-  protected List<Bean> makeBeans(String... strings) {
+  protected static List<Bean> makeBeans(String... strings) {
     List<Bean> list = new ArrayList<Bean>();
     for (String s : strings) {
       list.add(new Bean(s));

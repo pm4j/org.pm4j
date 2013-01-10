@@ -48,6 +48,11 @@ public class EmptySelection<T> implements Selection<T> {
 	}
 
 	@Override
+	public boolean isEmpty() {
+	  return true;
+	}
+
+	@Override
 	public boolean isSelected(T item) {
 		return false;
 	}

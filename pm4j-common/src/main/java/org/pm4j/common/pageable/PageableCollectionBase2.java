@@ -2,6 +2,7 @@ package org.pm4j.common.pageable;
 
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.QueryParams;
+import org.pm4j.common.selection.Selection;
 import org.pm4j.common.selection.SelectionHandler;
 
 
@@ -13,9 +14,6 @@ import org.pm4j.common.selection.SelectionHandler;
  * @author olaf boede
  */
 public abstract class PageableCollectionBase2<T_ITEM> implements PageableCollection2<T_ITEM> {
-
-  /** The collection type specific selection handler. */
-  private ItemSetModificationHandler<T_ITEM> modificationHandler;
 
   private int                pageSize = 10;
   private int                currentPageIdx;
@@ -69,25 +67,17 @@ public abstract class PageableCollectionBase2<T_ITEM> implements PageableCollect
     this.currentPageIdx = (pageIdx < 1) ? 1 : pageIdx;
   }
 
-  /**
-   * The default implementation just passes the result of
-   * {@link #getSelectionHandler()}.
-   * <p>
-   * Only implementations that handle PM's in front of bean items will provide
-   * here a different handler.
-   */
-  @SuppressWarnings("unchecked")
   @Override
-  public <T> SelectionHandler<T> getBeanSelectionHandler() {
-    return (SelectionHandler<T>)getSelectionHandler();
+  public Selection<T_ITEM> getSelection() {
+    return getSelectionHandler().getSelection();
   }
 
   @Override
-  public ItemSetModificationHandler<T_ITEM> getModificationHandler() {
-    return modificationHandler;
+  public Modifications<T_ITEM> getModifications() {
+    ModificationHandler<T_ITEM> mh = getModificationHandler();
+    return mh != null
+        ? mh.getModifications()
+        : new ModificationsImpl<T_ITEM>();
   }
 
-  public void setModificationHandler(ItemSetModificationHandler<T_ITEM> modificationHandler) {
-    this.modificationHandler = modificationHandler;
-  }
 }

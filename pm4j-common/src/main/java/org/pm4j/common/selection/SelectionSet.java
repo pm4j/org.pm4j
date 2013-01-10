@@ -30,6 +30,11 @@ public class SelectionSet<T> implements Selection<T> {
   }
 
   @Override
+  public boolean isEmpty() {
+    return getSize() == 0;
+  }
+
+  @Override
   public boolean isSelected(T item) {
     for (Selection<T> s : selections) {
       if (s.isSelected(item)) {

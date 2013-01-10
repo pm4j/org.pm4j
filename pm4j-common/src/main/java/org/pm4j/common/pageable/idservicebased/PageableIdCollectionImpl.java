@@ -8,9 +8,13 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import org.pm4j.common.pageable.ModificationHandler;
+import org.pm4j.common.pageable.Modifications;
+import org.pm4j.common.pageable.ModificationsImpl;
 import org.pm4j.common.pageable.PageableCollectionBase2;
 import org.pm4j.common.pageable.PageableCollectionUtil2;
 import org.pm4j.common.query.QueryParams;
+import org.pm4j.common.selection.Selection;
 import org.pm4j.common.selection.SelectionHandler;
 import org.pm4j.common.selection.SelectionHandlerWithIdSet;
 import org.pm4j.common.util.collection.ListUtil;
@@ -100,6 +104,12 @@ public class PageableIdCollectionImpl<T_ITEM, T_ID> extends PageableCollectionBa
   @Override
   public SelectionHandler<T_ITEM> getSelectionHandler() {
     return selectionHandler;
+  }
+
+  @Override
+  public ModificationHandler<T_ITEM> getModificationHandler() {
+    // TODO Auto-generated method stub
+    return null;
   }
 
   @Override

@@ -31,6 +31,11 @@ public class PmSelection<T_PM extends PmBean<T_BEAN>, T_BEAN> implements Selecti
   }
 
   @Override
+  public boolean isEmpty() {
+    return beanSelection.isEmpty();
+  }
+
+  @Override
   public Iterator<T_PM> iterator() {
     return new Iterator<T_PM>() {
       private Iterator<T_BEAN> beanIterator = beanSelection.iterator();

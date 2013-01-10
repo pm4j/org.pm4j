@@ -9,7 +9,9 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import org.pm4j.common.pageable.ItemSetModificationHandler;
+import org.pm4j.common.pageable.ModificationHandler;
+import org.pm4j.common.pageable.Modifications;
+import org.pm4j.common.pageable.ModificationsImpl;
 import org.pm4j.common.pageable.PageableCollection2;
 import org.pm4j.common.pageable.PageableCollectionBase2;
 import org.pm4j.common.pageable.PageableCollectionUtil2;
@@ -17,8 +19,8 @@ import org.pm4j.common.pageable.querybased.PageableQuerySelectionHandler.ItemIdS
 import org.pm4j.common.query.AttrDefinition;
 import org.pm4j.common.query.FilterAnd;
 import org.pm4j.common.query.FilterExpression;
+import org.pm4j.common.query.FilterNot;
 import org.pm4j.common.query.QueryParams;
-import org.pm4j.common.selection.EmptySelection;
 import org.pm4j.common.selection.Selection;
 import org.pm4j.common.selection.SelectionHandler;
 import org.pm4j.common.util.collection.ListUtil;
@@ -38,8 +40,8 @@ public class PageableQueryCollection<T_ITEM, T_ID extends Serializable> extends 
   private long                                     itemCountCache                           = -1;
   private long                                     unfilteredItemCountCache                 = -1;
   private List<T_ITEM>                             pageItemsCache;
-  private PageableQuerySelectionHandler<T_ITEM, T_ID> selectionHandler;
-  private QueryCollectionModificationHandler       modificationHandler;
+  private final PageableQuerySelectionHandler<T_ITEM, T_ID> selectionHandler;
+  private final QueryCollectionModificationHandler modificationHandler;
 
   /**
    * Creates a sercie based collection without query restrictions.
@@ -180,9 +182,13 @@ public class PageableQueryCollection<T_ITEM, T_ID extends Serializable> extends 
     pageItemsCache = null;
   }
 
+  @Override
+  public ModificationHandler<T_ITEM> getModificationHandler() {
+    return modificationHandler;
+  }
+
   QueryParams getQueryParamsWithRemovedItems() {
-    if ((modificationHandler != null) &&
-        !modificationHandler.hasRemovedItems()) {
+    if (modificationHandler.getModifications().getRemovedItems().isEmpty()) {
       return getQueryParams();
     }
 
@@ -195,44 +201,47 @@ public class PageableQueryCollection<T_ITEM, T_ID extends Serializable> extends 
     return qParams;
   }
 
-
   /**
    * Handles transiend removed item information.
    */
-  class QueryCollectionModificationHandler implements ItemSetModificationHandler<T_ITEM> {
+  class QueryCollectionModificationHandler implements ModificationHandler<T_ITEM> {
 
-    private ItemIdSelection<T_ITEM, T_ID> removedIdSelection;
-
-    /**
-     * @return <code>true</code> if there are removed items registered.
-     */
-    // @Override
-    public boolean hasRemovedItems() {
-      return (removedIdSelection != null) &&
-             (removedIdSelection.getSize() > 0);
-    }
+    private ModificationsImpl<T_ITEM> modifications = new ModificationsImpl<T_ITEM>();
 
     public FilterExpression getRemovedItemsFilterExpr(FilterExpression queryFilterExpr) {
       AttrDefinition idAttr = new AttrDefinition("id", Long.class);
-      return PageableCollectionUtil2.makeSelectionQueryParams(idAttr, queryFilterExpr, removedIdSelection.getClickedIds());
+      @SuppressWarnings("unchecked")
+      ClickedIds<T_ID> ids = modifications.getRemovedItems().isEmpty()
+          ? new ClickedIds<T_ID>()
+          : ((ItemIdSelection<T_ITEM, T_ID>)modifications.getRemovedItems()).getClickedIds();
+      return new FilterNot(PageableCollectionUtil2.makeSelectionQueryParams(idAttr, queryFilterExpr, ids));
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public void removeItems(Selection<T_ITEM> items) {
+    public boolean removeSelectedItems() {
+      Selection<T_ITEM> items = selectionHandler.getSelection();
+      if (!selectionHandler.selectAll(false)) {
+        return false;
+      }
+      if (items.getSize() == 0) {
+        return true;
+      }
+
+      Selection<T_ITEM> oldRemovedItemSelection = modifications.getRemovedItems();
       if (items instanceof ItemIdSelection) {
-        if (removedIdSelection == null) {
-          removedIdSelection = (ItemIdSelection<T_ITEM, T_ID>) items;
+        if (oldRemovedItemSelection.isEmpty()) {
+          modifications.setRemovedItems((ItemIdSelection<T_ITEM, T_ID>) items);
         } else {
           Collection<T_ID> ids = ((ItemIdSelection<T_ITEM, T_ID>) items).getClickedIds().getIds();
-          removedIdSelection = new ItemIdSelection<T_ITEM, T_ID>(removedIdSelection, ids);
+          modifications.setRemovedItems(new ItemIdSelection<T_ITEM, T_ID>((ItemIdSelection<T_ITEM, T_ID>)oldRemovedItemSelection, ids));
         }
 // TODO olaf: inverted selections are not yet handled by query
 //      } else if (items instanceof PageableQuerySelectionHandler.InvertedSelection) {
 //        removedInvertedItemSelections.addSelection(items);
       } else {
         // TODO: add exception interface signatur.
-        long newSize = items.getSize() + (removedIdSelection == null ? 0 : removedIdSelection.getSize());
+        long newSize = items.getSize() + oldRemovedItemSelection.getSize();
         if (newSize > 1000) {
           throw new IndexOutOfBoundsException("Maximum 1000 rows can be removed within a single save operation.");
         }
@@ -242,10 +251,13 @@ public class PageableQueryCollection<T_ITEM, T_ID extends Serializable> extends 
           ids.add(service.getIdForItem(i));
         }
 
-        removedIdSelection = (removedIdSelection == null)
+        modifications.setRemovedItems(oldRemovedItemSelection.isEmpty()
             ? new ItemIdSelection<T_ITEM, T_ID>(service, ids)
-            : new ItemIdSelection<T_ITEM, T_ID>(removedIdSelection, ids);
+            : new ItemIdSelection<T_ITEM, T_ID>((ItemIdSelection<T_ITEM, T_ID>)oldRemovedItemSelection, ids));
       }
+
+      clearCaches();
+      return true;
     }
 
     /**
@@ -255,33 +267,24 @@ public class PageableQueryCollection<T_ITEM, T_ID extends Serializable> extends 
     public void addItem(T_ITEM item) {
       // XXX olaf: check if this can be handled here. Currently it's handled in the wrapping
       // collection with additional items.
-      //addedItems.add(item);
+      // addedItems.add(item);
       throw new UnsupportedOperationException("Please embed this collection in a PageableCollectionWithAdditionalItems to handle add operations.");
     }
 
-    @Override
-    public boolean isModified() {
-      return removedIdSelection.getSize() > 0;
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public Collection<T_ITEM> getAddedItems() {
-      return Collections.EMPTY_LIST;
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public Selection<T_ITEM> getRemovedItems() {
-      return removedIdSelection != null
-          ? removedIdSelection
-          : (Selection<T_ITEM>) EmptySelection.EMPTY_OBJECT_SELECTION;
-    }
+    public void updateItem(T_ITEM item) {
+      modifications.registerUpdatedItem(item);
+    };
 
     @Override
     public void clearRegisteredModifications() {
-      removedIdSelection = null;
+      modifications = new ModificationsImpl<T_ITEM>();
     }
+
+    @Override
+    public Modifications<T_ITEM> getModifications() {
+      return modifications;
+    }
+
   }
 
 }

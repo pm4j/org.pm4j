@@ -3,12 +3,11 @@ package org.pm4j.core.pm;
 import java.util.Collection;
 import java.util.List;
 
+import org.pm4j.common.pageable.Modifications;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.selection.SelectionHandler;
 import org.pm4j.core.pm.PmTable.RowSelectMode;
-import org.pm4j.core.pm.impl.changehandler.ChangeSet;
-import org.pm4j.core.pm.impl.changehandler.ChangeSetHandler;
 
 
 /**
@@ -81,7 +80,7 @@ public interface PmTable2<T_ROW_PM> extends PmObject, PmDataInput {
   int getTotalNumOfRows();
 
   /**
-   * Provides all selection related operations.
+   * Provides a handler for all selection related operations.
    *
    * @return the {@link SelectionHandler}.
    */
@@ -139,19 +138,11 @@ public interface PmTable2<T_ROW_PM> extends PmObject, PmDataInput {
   Collection<PmCommandDecorator> getPmDecorators(TableChange change);
 
   /**
-   * Provides the change set handler.<br>
-   * It provides information about table changes.
+   * Provides the set of modified row PM's.
    *
-   * @return the table change registry.
+   * @return A container for the modification report. Never <code>null</code>.
    */
-  ChangeSetHandler<T_ROW_PM> getPmChangeSetHandler();
-
-  /**
-   * Provides information about table row changes.
-   *
-   * @return the table change set. Never <code>null</code>.
-   */
-  ChangeSet<T_ROW_PM> getPmChangeSet();
+  Modifications<T_ROW_PM> getPmRowModifications();
 
   /**
    * Clears a defined set of table state aspects.

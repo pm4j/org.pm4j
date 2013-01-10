@@ -43,6 +43,11 @@ public final class ListUtil {
     }
   }
 
+  public static <T> List<T> subListPage(List<T> baseList, int fromIndex, int maxPageSize) {
+    int toIndex = Math.min(baseList.size(), fromIndex + maxPageSize);
+    return baseList.subList(fromIndex, toIndex);
+  }
+
   /**
    * Small syntactical helper.
    * @param <T>
