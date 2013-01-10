@@ -81,22 +81,6 @@ public interface PageableCollection2<T_ITEM> extends Iterable<T_ITEM> {
   long getNumOfItems();
 
   /**
-   * In some filtering scenarios it may happen that it is needed to know the
-   * unfiltered total item size (e.g. for validation or display purposes).
-   * <p>
-   * This method provides this size.
-   * <p>
-   * Please make sure that the concrete implementation supports that functionality.<br>
-   * E.g. a collection that is based on DB queries may have some extra effort to support
-   * this functionality...
-   *
-   * @return The total number of object within this set.
-   *         <p>
-   *         A filter definition does <b>not</b> influence this number.
-   */
-  long getUnfilteredItemCount();
-
-  /**
    * Provides an iterator over the collection of items.<br>
    * The current filter and sort order settings are considered.
    * <p>

@@ -154,11 +154,6 @@ public class PageablePmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> imple
   }
 
   @Override
-  public long getUnfilteredItemCount() {
-    return beanCollection.getUnfilteredItemCount();
-  }
-
-  @Override
   public Iterator<T_PM> iterator() {
     final Iterator<T_BEAN> beanIter = beanCollection.iterator();
     return new Iterator<T_PM>() {

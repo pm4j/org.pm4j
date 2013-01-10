@@ -9,12 +9,9 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.pm4j.common.pageable.ModificationHandler;
-import org.pm4j.common.pageable.Modifications;
-import org.pm4j.common.pageable.ModificationsImpl;
 import org.pm4j.common.pageable.PageableCollectionBase2;
 import org.pm4j.common.pageable.PageableCollectionUtil2;
 import org.pm4j.common.query.QueryParams;
-import org.pm4j.common.selection.Selection;
 import org.pm4j.common.selection.SelectionHandler;
 import org.pm4j.common.selection.SelectionHandlerWithIdSet;
 import org.pm4j.common.util.collection.ListUtil;
@@ -26,7 +23,6 @@ public class PageableIdCollectionImpl<T_ITEM, T_ID> extends PageableCollectionBa
   private final SelectionHandler<T_ITEM>  selectionHandler;
   private List<T_ID>                      ids;
   private List<T_ITEM>                    currentPageItems;
-  private long                            unfilteredItemCount = -1;
 
   private PropertyChangeListener          resetItemsOnQueryChangeListener = new PropertyChangeListener() {
     @Override
@@ -87,16 +83,6 @@ public class PageableIdCollectionImpl<T_ITEM, T_ID> extends PageableCollectionBa
   }
 
   @Override
-  public long getUnfilteredItemCount() {
-    if (unfilteredItemCount == -1) {
-      unfilteredItemCount = (getQueryParams().getFilterExpression() == null)
-          ? getNumOfItems()
-          : service.getUnfilteredItemCount(getQueryParams());
-    }
-    return unfilteredItemCount;
-  }
-
-  @Override
   public Iterator<T_ITEM> iterator() {
     return new ItemIterator();
   }
@@ -116,7 +102,6 @@ public class PageableIdCollectionImpl<T_ITEM, T_ID> extends PageableCollectionBa
   public void clearCaches() {
     ids = null;
     currentPageItems = null;
-    unfilteredItemCount = -1;
   }
 
   protected List<T_ID> getCurrentPageIds() {

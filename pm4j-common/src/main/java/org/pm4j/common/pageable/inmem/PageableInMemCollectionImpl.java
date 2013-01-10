@@ -123,11 +123,6 @@ public class PageableInMemCollectionImpl<T_ITEM>
   }
 
   @Override
-  public long getUnfilteredItemCount() {
-    return originalObjects.size();
-  }
-
-  @Override
   public Iterator<T_ITEM> iterator() {
     return _getObjects().iterator();
   }

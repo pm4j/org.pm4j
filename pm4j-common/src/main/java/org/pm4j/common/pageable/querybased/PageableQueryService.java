@@ -42,16 +42,6 @@ public interface PageableQueryService<T_BEAN, T_ID> extends ItemIdConverter<T_BE
   long getItemCount(QueryParams query);
 
   /**
-   * Provides the total number of unfiltered items.
-   * <p>
-   * Is used for some UI's that display the total number of items beside the number of filterd items.
-   *
-   * @param query
-   * @return
-   */
-  long getUnfilteredItemCount(QueryParams query);
-
-  /**
    * Provides the set of filter definitions and attribute sort orders that can be
    * processed by this service.
    *

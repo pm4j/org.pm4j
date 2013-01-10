@@ -71,15 +71,9 @@ public class PageableQueryCollectionTest extends PageableCollectionTestBase<Page
       return getQueryResult(query).size();
     }
 
-    @Override
-    public long getUnfilteredItemCount(QueryParams query) {
-      return idToBeanMap.size();
-    }
-
     public void addBean(Bean b) {
       idToBeanMap.put(b.getId(), b);
     }
-
 
     // some in memory fakes ...
     @Override

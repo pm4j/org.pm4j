@@ -38,7 +38,6 @@ public class PageableQueryCollection<T_ITEM, T_ID extends Serializable> extends 
 
   private final PageableQueryService<T_ITEM, T_ID> service;
   private long                                     itemCountCache                           = -1;
-  private long                                     unfilteredItemCountCache                 = -1;
   private List<T_ITEM>                             pageItemsCache;
   private final PageableQuerySelectionHandler<T_ITEM, T_ID> selectionHandler;
   private final QueryCollectionModificationHandler modificationHandler;
@@ -123,15 +122,6 @@ public class PageableQueryCollection<T_ITEM, T_ID extends Serializable> extends 
           : 0);
   }
 
-  @Override
-  public long getUnfilteredItemCount() {
-    return (unfilteredItemCountCache != -1)
-        ? unfilteredItemCountCache
-        : (unfilteredItemCountCache = getQueryParams().isExecQuery()
-          ? service.getUnfilteredItemCount(getQueryParamsWithRemovedItems())
-          : 0);
-  }
-
   @SuppressWarnings("unchecked")
   @Override
   public Iterator<T_ITEM> iterator() {
@@ -178,7 +168,6 @@ public class PageableQueryCollection<T_ITEM, T_ID extends Serializable> extends 
   @Override
   public void clearCaches() {
     itemCountCache = -1;
-    unfilteredItemCountCache = -1;
     pageItemsCache = null;
   }
 

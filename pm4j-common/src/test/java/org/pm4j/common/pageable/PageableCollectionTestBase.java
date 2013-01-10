@@ -59,14 +59,6 @@ public abstract class PageableCollectionTestBase<T> {
     assertEquals("[a, b, c, d, e, f]", IterableUtil.shallowCopy(collection).toString());
   }
 
-  @Test
-  @Ignore("needs to be fixed")
-  public void testGetUnfilteredItemCount() {
-    assertEquals(6, collection.getUnfilteredItemCount());
-    collection.getQueryParams().setFilterExpression(getFilterNameStartsWith("b"));
-    assertEquals(6, collection.getUnfilteredItemCount());
-  }
-
   protected ItemNavigator<T> getItemNavigator() {
     return new ItemNavigatorInMem<T>(collection.getSelectionHandler().getSelection());
   }

@@ -165,11 +165,6 @@ public class PageableCollectionWithAdditionalItems<T_ITEM> implements PageableCo
   }
 
   @Override
-  public long getUnfilteredItemCount() {
-    return baseCollection.getUnfilteredItemCount() + additionalItems.size();
-  }
-
-  @Override
   public Iterator<T_ITEM> iterator() {
     return new CombinedIterator<T_ITEM>(baseCollection.iterator(), additionalItems.iterator());
   }
