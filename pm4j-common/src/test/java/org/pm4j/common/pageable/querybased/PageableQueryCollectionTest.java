@@ -103,14 +103,5 @@ public class PageableQueryCollectionTest extends PageableCollectionTestBase<Page
 
       return beans;
     }
-
-    /** Selection serialization is not yet implemented. */
-    @Override
-    public SerializeableServiceProvider<Bean, Integer> getSerializeableServiceProvider() {
-      return null;
-    }
   }
-
-
-
 }

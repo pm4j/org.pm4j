@@ -1,6 +1,5 @@
 package org.pm4j.common.pageable.querybased;
 
-import java.io.Serializable;
 import java.util.List;
 
 import org.pm4j.common.query.QueryParams;
@@ -48,33 +47,4 @@ public interface PageableQueryService<T_BEAN, T_ID> extends ItemIdConverter<T_BE
    * @return
    */
   QueryOptions getQueryOptions();
-
-  // TODO olaf: move to a specific sub-interface
-  /**
-   * Provides a serializable instance that is able to deliver a reference to this service.
-   * <p>
-   * This is needed to support serializeable selections.
-   * <p>
-   * If serialization of selections is not needed this method may simply return <code>null</code>.<br>
-   * In this case an attempt to serialize a selection will throw an exception that reports that
-   * you should implement this method to get that feature...
-   *
-   * @return
-   */
-  SerializeableServiceProvider<T_BEAN, T_ID> getSerializeableServiceProvider();
-
-  /**
-   * An interface for serializeable objects that can provide a {@link PageableQueryService}.
-   *
-   * @param <T_BEAN> see {@link PageableQueryService}.
-   * @param <T_ID>   see {@link PageableQueryService}.
-   */
-  static interface SerializeableServiceProvider<T_BEAN, T_ID> extends Serializable {
-
-    /**
-     * @return a reference to the service.
-     */
-    PageableQueryService<T_BEAN, T_ID> getQueryService();
-
-  }
 }

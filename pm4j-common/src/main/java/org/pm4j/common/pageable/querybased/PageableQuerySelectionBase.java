@@ -11,14 +11,16 @@ public abstract class PageableQuerySelectionBase<T_ITEM, T_ID extends Serializab
   private static final long serialVersionUID = 1L;
 
   /** The service provider may be <code>null</code> in case of non-serializeable selections. */
-  private PageableQueryService.SerializeableServiceProvider<T_ITEM, T_ID> serviceProvider;
+  private PageableQueryServiceWithSerialization.SerializeableServiceProvider<T_ITEM, T_ID> serviceProvider;
   transient private PageableQueryService<T_ITEM, T_ID> service;
 
   public PageableQuerySelectionBase(PageableQueryService<T_ITEM, T_ID> service) {
     assert service != null;
 
     this.service = service;
-    this.serviceProvider = service.getSerializeableServiceProvider();
+    if (service instanceof PageableQueryServiceWithSerialization) {
+      this.serviceProvider = ((PageableQueryServiceWithSerialization<T_ITEM, T_ID>)service).getSerializeableServiceProvider();
+    }
   }
 
   @Override
@@ -34,7 +36,7 @@ public abstract class PageableQuerySelectionBase<T_ITEM, T_ID extends Serializab
 
       if (service == null) {
         throw new RuntimeException("Your PageableQueryService does not support serialization of selections.\n" +
-            "Please implement PageableQueryService.getSerializeableServiceProvider() to get serializeable selections.");
+            "Please implement PageableQueryServiceWithSerialization.getSerializeableServiceProvider() to get serializeable selections.");
       }
     }
     return service;
