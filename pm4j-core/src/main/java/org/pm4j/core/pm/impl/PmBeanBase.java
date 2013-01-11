@@ -9,6 +9,8 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 
 import org.apache.commons.lang.StringUtils;
+import org.pm4j.common.pageable.Modifications;
+import org.pm4j.common.util.collection.ListUtil;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmBean;
@@ -269,9 +271,8 @@ public abstract class PmBeanBase<T_BEAN>
 
     @Override
     public void visit(PmTable2<?> table) {
-      table.getPmRowModifications().getAddedItems();
-      List<Object> changedRows = new ArrayList<Object>(table.getPmRowModifications().getAddedItems());
-      changedRows.addAll(table.getPmRowModifications().getUpdatedItems());
+      Modifications<?> m = table.getPmPageableCollection().getModifications();
+      List<Object> changedRows = ListUtil.collectionsToList(m.getAddedItems(), m.getUpdatedItems());
       onVisit(table);
       table.updatePmTable();
 

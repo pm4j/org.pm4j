@@ -3,11 +3,10 @@ package org.pm4j.core.pm;
 import java.util.Collection;
 import java.util.List;
 
-import org.pm4j.common.pageable.Modifications;
-import org.pm4j.common.query.QueryOptions;
-import org.pm4j.common.query.QueryParams;
+import org.pm4j.common.pageable.PageableCollection2;
 import org.pm4j.common.selection.SelectionHandler;
 import org.pm4j.core.pm.PmTable.RowSelectMode;
+import org.pm4j.core.pm.pageable.PageableCollection;
 
 
 /**
@@ -102,16 +101,6 @@ public interface PmTable2<T_ROW_PM> extends PmObject, PmDataInput {
    */
   T_ROW_PM getCurrentRowPm();
 
-  /**
-   * @return the query behind this table.
-   */
-  QueryParams getPmQueryParams();
-
-  /**
-   * @return the query options that can be offered to the user to define query constraints.
-   */
-  QueryOptions getPmQueryOptions();
-
   /** The set of table changes that can be considered. */
   enum TableChange { SELECTION, FILTER, PAGE, SORT }
 
@@ -138,11 +127,9 @@ public interface PmTable2<T_ROW_PM> extends PmObject, PmDataInput {
   Collection<PmCommandDecorator> getPmDecorators(TableChange change);
 
   /**
-   * Provides the set of modified row PM's.
-   *
-   * @return A container for the modification report. Never <code>null</code>.
+   * @return The {@link PageableCollection} that handles the table row PM's to display.
    */
-  Modifications<T_ROW_PM> getPmRowModifications();
+  PageableCollection2<T_ROW_PM> getPmPageableCollection();
 
   /**
    * Clears a defined set of table state aspects.

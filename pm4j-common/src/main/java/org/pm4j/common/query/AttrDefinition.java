@@ -3,6 +3,8 @@ package org.pm4j.common.query;
 import java.io.Serializable;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 
 /**
  * A data object that describes an attribute to filter or to sort by.
@@ -108,6 +110,23 @@ public class AttrDefinition implements Serializable {
   @Override
   public String toString() {
     return pathName;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj == this) {
+      return true;
+    }
+    if (! (obj instanceof AttrDefinition)) {
+      return false;
+    }
+    AttrDefinition other = (AttrDefinition)obj;
+    return new EqualsBuilder().append(name, other.name).append(pathName, other.pathName).append(type, other.type).isEquals();
+  }
+
+  @Override
+  public int hashCode() {
+    return new HashCodeBuilder(29, 17).append(name).append(pathName).append(type).toHashCode();
   }
 
 }

@@ -1,11 +1,12 @@
 package org.pm4j.core.pm.impl;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.SortOrder;
+import org.pm4j.common.util.collection.ListUtil;
 import org.pm4j.core.exception.PmResourceData;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmAttrEnum;
@@ -13,6 +14,7 @@ import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmCommandDecorator;
 import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmEvent.ValueChangeKind;
+import org.pm4j.core.pm.PmEventListener;
 import org.pm4j.core.pm.PmMessage;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmSortOrder;
@@ -188,6 +190,23 @@ public class PmTableColImpl2 extends PmObjectBase implements PmTableCol2 {
   public class SortOrderAttr extends PmAttrEnumImpl<PmSortOrder> {
     public SortOrderAttr(PmObject pmParent) {
       super(pmParent, PmSortOrder.class);
+
+      /** Adjusts the sort order whenever the table's sort order changes. */
+      PmEventListener tableSortOrderChangeListener = new PmEventListener() {
+        @Override
+        public void handleEvent(PmEvent event) {
+          if (event.getValueChangeKind() == ValueChangeKind.SORT_ORDER) {
+            SortOrder tableSortOrder = getPmTableImpl().getPmPageableCollection().getQueryParams().getSortOrder();
+            if (tableSortOrder != null &&
+                ObjectUtils.equals(tableSortOrder.getAttribute().getName(), PmTableColImpl2.this.getPmName())) {
+              PmTableColImpl2.this.sortOrder = tableSortOrder.isAscending() ? PmSortOrder.ASC : PmSortOrder.DESC;
+            } else {
+              PmTableColImpl2.this.sortOrder = PmSortOrder.NEUTRAL;
+            }
+          }
+        }
+      };
+      PmEventApi.addPmEventListener(getPmTableImpl(), PmEvent.VALUE_CHANGE, tableSortOrderChangeListener);
     }
 
     @Override
@@ -218,22 +237,28 @@ public class PmTableColImpl2 extends PmObjectBase implements PmTableCol2 {
 
     @Override
     protected Collection<PmCommandDecorator> getValueChangeDecorators() {
-      ArrayList<PmCommandDecorator> list = new ArrayList<PmCommandDecorator>(getPmTableImpl().getPmDecorators(PmTable2.TableChange.SORT));
-      list.addAll(super.getValueChangeDecorators());
-      return list;
+      return ListUtil.collectionsToList(
+          getPmTableImpl().getPmDecorators(PmTable2.TableChange.SORT),
+          super.getValueChangeDecorators());
+    }
+
+    private SortOrder getOwnQuerySortOrder() {
+      PmSortOrder sortDirection = getValue();
+      SortOrder querySortOrder = null;
+      if (sortDirection != PmSortOrder.NEUTRAL) {
+        querySortOrder = getSortOrderQueryOption();
+        if ((querySortOrder != null) && (sortDirection == PmSortOrder.DESC)) {
+          querySortOrder = querySortOrder.getReverseSortOrder();
+        }
+      }
+      return querySortOrder;
     }
 
     @Override
     protected void afterValueChange(PmSortOrder oldValue, PmSortOrder newValue) {
-      SortOrder sortOrder = null;
-      if (newValue != PmSortOrder.NEUTRAL) {
-        sortOrder = getSortOrderQueryOption();
-        if ((sortOrder != null) && (newValue == PmSortOrder.DESC)) {
-          sortOrder = sortOrder.getReverseSortOrder();
-        }
-      }
+      SortOrder querySortOrder = getOwnQuerySortOrder();
       PmTableImpl2<?, ?> pmTable = getPmTableImpl();
-      pmTable.getPmPageableCollection().getQueryParams().setSortOrder(sortOrder);
+      pmTable.getPmPageableCollection().getQueryParams().setSortOrder(querySortOrder);
 
       // TODO: move to a listerner within the table implementation.
       // fire a value change event.

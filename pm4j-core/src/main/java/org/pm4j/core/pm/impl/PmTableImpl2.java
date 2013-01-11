@@ -12,9 +12,7 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.pm4j.common.pageable.ModificationHandler;
 import org.pm4j.common.pageable.Modifications;
-import org.pm4j.common.pageable.ModificationsImpl;
 import org.pm4j.common.pageable.PageableCollection2;
 import org.pm4j.common.pageable.PageableCollectionUtil2;
 import org.pm4j.common.pageable.inmem.PageableInMemCollectionImpl;
@@ -30,7 +28,7 @@ import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmCommandDecorator;
-import org.pm4j.core.pm.PmDataInput;
+import org.pm4j.core.pm.PmDefaults;
 import org.pm4j.core.pm.PmElement;
 import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmEvent.ValueChangeKind;
@@ -49,7 +47,6 @@ import org.pm4j.core.pm.api.PmValidationApi;
 import org.pm4j.core.pm.pageable.PageableCollection;
 import org.pm4j.core.pm.pageable2.InMemPmQueryEvaluator;
 import org.pm4j.core.pm.pageable2.PageablePmBeanCollection;
-import org.pm4j.core.pm.pageable2.PmTable2Util;
 
 /**
  * A table that presents the content of a set of {@link PmElement}s.
@@ -232,18 +229,23 @@ public class PmTableImpl2
         : null;
   }
 
-  @Override
+  /**
+   * Short cut method to get the {@link QueryParams} of the pageable collection.
+   *
+   * @return the query behind this table.
+   */
   public QueryParams getPmQueryParams() {
     return getPmPageableCollection().getQueryParams();
   }
 
-  @Override
-  public QueryOptions getPmQueryOptions() {
-    return getPmPageableCollection().getQueryOptions();
-  }
-
   /**
-   * Provides the filter compare definition factory used for this table.
+   * Provides the filter compare definition factory used for this table.<br>
+   * It defines how the filter definitions for user defined filter dialogs will
+   * be created.
+   * <p>
+   * It may be adjusted by defining one in
+   * {@link PmDefaults#getFilterCompareDefinitionFactory()} or by overriding
+   * this method.
    *
    * @return the factory.
    */
@@ -281,14 +283,6 @@ public class PmTableImpl2
   }
 
   @Override
-  public Modifications<T_ROW_PM> getPmRowModifications() {
-    ModificationHandler<T_ROW_PM> mh = getPmPageableCollection().getModificationHandler();
-    return (mh != null)
-        ? mh.getModifications()
-        : new ModificationsImpl<T_ROW_PM>();
-  }
-
-  @Override
   public final void updatePmTable(UpdateAspect... clearOptions) {
     UpdateAspect[] toProcess = clearOptions.length == 0
                       ? UpdateAspect.values()
@@ -315,7 +309,7 @@ public class PmTableImpl2
         getPmSelectionHandler().selectAll(false);
         break;
       case CLEAR_SORT_ORDER:
-        getPmQueryParams().setSortOrder(getPmQueryOptions().getDefaultSortOrder());
+        getPmQueryParams().setSortOrder(getPmPageableBeanCollection().getQueryOptions().getDefaultSortOrder());
         break;
       case CLEAR_CHANGES:
         PmValidationApi.clearInvalidValuesOfSubtree(this);
@@ -377,14 +371,14 @@ public class PmTableImpl2
 
   @Override
   protected boolean isPmValueChangedImpl() {
-    return getPmRowModifications().isModified() || super.isPmValueChangedImpl();
+    return getPmPageableCollection().getModifications().isModified() || super.isPmValueChangedImpl();
   }
 
   @Override
   protected void setPmValueChangedImpl(boolean changed) {
     super.setPmValueChangedImpl(changed);
     if (changed == false) {
-      for (PmDataInput p : getPmRowModifications().getUpdatedItems()) {
+      for (T_ROW_PM p : getPmPageableCollection().getModifications().getUpdatedItems()) {
         p.setPmValueChanged(false);
       }
       getPmPageableCollection().getModificationHandler().clearRegisteredModifications();
@@ -396,7 +390,7 @@ public class PmTableImpl2
    */
   @Override
   public void pmValidate() {
-    Modifications<T_ROW_PM> m = getPmRowModifications();
+    Modifications<T_ROW_PM> m = getPmPageableCollection().getModifications();
     List<T_ROW_PM> changes = ListUtil.collectionsToList(m.getAddedItems(), m.getUpdatedItems());
     for (T_ROW_PM itemPm : changes) {
       PmValidationApi.validateSubTree(itemPm);
@@ -406,6 +400,7 @@ public class PmTableImpl2
   /**
    * @return The {@link PageableCollection} that handles the table row PM's to display.
    */
+  @Override
   public final PageableCollection2<T_ROW_PM> getPmPageableCollection() {
     zz_ensurePmInitialization();
     if (pmPageableCollection == null) {
@@ -432,7 +427,7 @@ public class PmTableImpl2
    * @return The collection to use. Never <code>null</code>.
    */
   protected PageablePmBeanCollection<T_ROW_PM, T_ROW_BEAN> getPmPageableCollectionImpl() {
-    QueryOptions qoptions = PmTable2Util.makeQueryOptionsForInMemoryTable(this);
+    QueryOptions qoptions = PmTableUtil2.makeQueryOptionsForInMemoryTable(this);
     // @formatter:off
     PageableCollection2<T_ROW_BEAN> cities = new PageableInMemCollectionImpl<T_ROW_BEAN>(
         new InMemPmQueryEvaluator<T_ROW_BEAN>(this),

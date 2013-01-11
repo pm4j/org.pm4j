@@ -2,6 +2,8 @@ package org.pm4j.common.query;
 
 import java.io.Serializable;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.pm4j.common.exception.CheckedExceptionWrapper;
 
 /**
@@ -13,9 +15,28 @@ public class SortOrder implements Serializable, Cloneable {
 
   private static final long serialVersionUID = 1L;
 
-  private boolean ascending = true;
+  private boolean ascending;
   private final AttrDefinition attribute;
   private final SortOrder nextSortOrder;
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj == this) {
+      return true;
+    }
+    if (! (obj instanceof SortOrder)) {
+      return false;
+    }
+    SortOrder other = (SortOrder)obj;
+    return new EqualsBuilder().append(attribute, other.attribute).append(ascending, other.ascending).append(nextSortOrder, other.nextSortOrder).isEquals();
+  }
+
+  @Override
+  public int hashCode() {
+    return new HashCodeBuilder(23, 47).append(attribute).append(ascending).append(nextSortOrder).toHashCode();
+  }
+
+
 
   /**
    * Creates a sort order for a single attribute in ascending order.

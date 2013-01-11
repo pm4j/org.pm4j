@@ -19,6 +19,13 @@ public final class ListUtil {
     }
   }
 
+  public static <T> T lastItemOrNull(List<T> list) {
+    return (list == null || list.isEmpty())
+        ? null
+        : list.get(list.size()-1);
+  }
+
+
   @SuppressWarnings({ "unchecked", "rawtypes" })
   public static <T> List<T> collectionsToList(Collection... collections) {
     List<T> list = new ArrayList<T>();

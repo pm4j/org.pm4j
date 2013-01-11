@@ -11,6 +11,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.pm4j.common.pageable.PageableCollection2;
 
+/**
+ * Handles selections for a {@link PageableCollection2} with transient additional items.
+ *
+ * @author olaf boede
+ *
+ * @param <T_ITEM>
+ */
 public class SelectionHandlerWithAdditionalItems<T_ITEM> extends SelectionHandlerBase<T_ITEM> {
   private static final Log                   LOG              = LogFactory.getLog(SelectionHandlerWithAdditionalItems.class);
 
@@ -23,7 +30,13 @@ public class SelectionHandlerWithAdditionalItems<T_ITEM> extends SelectionHandle
   /** The set of currently selected items. */
   private SelectionWithAdditionalItems<T_ITEM> selection      = emptySelection;
 
-  public SelectionHandlerWithAdditionalItems(PageableCollection2<T_ITEM>  baseCollection, List<T_ITEM> transientItems) {
+  /**
+   * @param baseCollection
+   *          the backing collection to handle selections for.
+   * @param transientItems
+   *          a reference to the set of additional transient items to consider.
+   */
+  public SelectionHandlerWithAdditionalItems(PageableCollection2<T_ITEM> baseCollection, List<T_ITEM> transientItems) {
     assert baseCollection != null;
     assert transientItems != null;
 
@@ -69,7 +82,9 @@ public class SelectionHandlerWithAdditionalItems<T_ITEM> extends SelectionHandle
 
       SelectionWithAdditionalItems<T_ITEM> newSelection = new SelectionWithAdditionalItems<T_ITEM>(
           baseCollection.getSelectionHandler().getSelection(),
-          selection.getAdditionalSelectedItems());
+          getSelectMode() == SelectMode.SINGLE
+              ? null
+              : selection.getAdditionalSelectedItems());
       return setSelection(newSelection);
     }
   }
@@ -117,7 +132,9 @@ public class SelectionHandlerWithAdditionalItems<T_ITEM> extends SelectionHandle
     }
     SelectionWithAdditionalItems<T_ITEM> newSelection = new SelectionWithAdditionalItems<T_ITEM>(
         baseCollection.getSelectionHandler().getSelection(),
-        select ? additionalItems : Collections.EMPTY_LIST);
+        select
+            ? additionalItems
+            : Collections.EMPTY_LIST);
 
     return setSelection(newSelection);
   }
