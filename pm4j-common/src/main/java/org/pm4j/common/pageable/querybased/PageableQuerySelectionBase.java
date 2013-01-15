@@ -16,10 +16,15 @@ public abstract class PageableQuerySelectionBase<T_ITEM, T_ID extends Serializab
 
   public PageableQuerySelectionBase(PageableQueryService<T_ITEM, T_ID> service) {
     assert service != null;
-
     this.service = service;
-    if (service instanceof PageableQueryServiceWithSerialization) {
-      this.serviceProvider = ((PageableQueryServiceWithSerialization<T_ITEM, T_ID>)service).getSerializeableServiceProvider();
+
+    // find the (optionally embedded) serializeable service provider.
+    PageableQueryService<T_ITEM, T_ID> s = service;
+    if (s instanceof CachingPageableQueryService) {
+    	s = ((CachingPageableQueryService<T_ITEM, T_ID>)service).getBaseService();
+    }
+    if (s instanceof PageableQueryServiceWithSerialization) {
+      this.serviceProvider = ((PageableQueryServiceWithSerialization<T_ITEM, T_ID>)s).getSerializeableServiceProvider();
     }
   }
 

@@ -90,6 +90,9 @@ public class PmTableImpl2
   /** Listens for filter changes and handles the table relates logic. */
   private TableFilterChangeListener pmTableFilterChangeListener = new TableFilterChangeListener();
 
+  /** A cached reference to the selected current row. */
+  private T_ROW_PM currentRowPm;
+
   /**
    * Creates an empty table.
    * <p>
@@ -205,15 +208,30 @@ public class PmTableImpl2
   }
 
   @Override
-  public T_ROW_PM getCurrentRowPm() {
-    if (getPmRowSelectMode() == SelectMode.SINGLE) {
-      Selection<T_ROW_PM> selection = getPmSelectionHandler().getSelection();
-      if (selection.getSize() == 1) {
-        return selection.iterator().next();
-      }
+  public final T_ROW_PM getCurrentRowPm() {
+    if (currentRowPm == null) {
+      currentRowPm = getCurrentRowPmImpl();
     }
+    return currentRowPm;
+  }
 
-    return null;
+  /**
+   * Provides the current row logic behind the (cached)
+   * {@link #getCurrentRowPm()} method.
+   * <p>
+   * The default implementation provides the selected item in case of single
+   * selection mode. For other modes it provides <code>null</code>.
+   *
+   * @return the current row. <code>null</code> if there is no 'current' row.
+   */
+  protected T_ROW_PM getCurrentRowPmImpl() {
+	if (getPmRowSelectMode() == SelectMode.SINGLE) {
+	  Selection<T_ROW_PM> selection = getPmSelectionHandler().getSelection();
+	  if (selection.getSize() == 1) {
+	    return selection.iterator().next();
+	  }
+	}
+	return null;
   }
 
   /**
@@ -227,6 +245,16 @@ public class PmTableImpl2
     return (rowPm != null)
         ? rowPm.getPmBean()
         : null;
+  }
+
+  /**
+   * INTERNAL method that manually clears the cached current row PM.
+   * <p>
+   * Is helpful for implementations that don't use the selection of the pageable collection
+   * to define the 'current' row.
+   */
+  public void clearCurrentRowPmCache() {
+    this.currentRowPm = null;
   }
 
   /**
@@ -306,16 +334,19 @@ public class PmTableImpl2
   protected void clearPmAspectImpl(UpdateAspect clearAspect) {
     switch (clearAspect) {
       case CLEAR_SELECTION:
+        currentRowPm = null;
         getPmSelectionHandler().selectAll(false);
         break;
       case CLEAR_SORT_ORDER:
         getPmQueryParams().setSortOrder(getPmPageableBeanCollection().getQueryOptions().getDefaultSortOrder());
         break;
       case CLEAR_CHANGES:
+        currentRowPm = null;
         PmValidationApi.clearInvalidValuesOfSubtree(this);
         getPmPageableCollection().getModificationHandler().clearRegisteredModifications();
         break;
       case CLEAR_USER_FILTER:
+        currentRowPm = null;
         // User filters can't be cleared on this level. More detailed implementations
         // may implement user defined filters that may be cleared.
         break;
@@ -429,13 +460,13 @@ public class PmTableImpl2
   protected PageablePmBeanCollection<T_ROW_PM, T_ROW_BEAN> getPmPageableCollectionImpl() {
     QueryOptions qoptions = PmTableUtil2.makeQueryOptionsForInMemoryTable(this);
     // @formatter:off
-    PageableCollection2<T_ROW_BEAN> cities = new PageableInMemCollectionImpl<T_ROW_BEAN>(
+    PageableCollection2<T_ROW_BEAN> inMemPageableCollection = new PageableInMemCollectionImpl<T_ROW_BEAN>(
         new InMemPmQueryEvaluator<T_ROW_BEAN>(this),
         getPmInMemoryCollectionImpl(),
         qoptions,
         null);
     // @formatter:on
-    return new PageablePmBeanCollection<T_ROW_PM, T_ROW_BEAN>(this, cities);
+    return new PageablePmBeanCollection<T_ROW_PM, T_ROW_BEAN>(this, inMemPageableCollection);
   }
 
   @SuppressWarnings("unchecked")
@@ -583,6 +614,7 @@ public class PmTableImpl2
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
+      currentRowPm = null;
       for (PmCommandDecorator d : getPmDecorators(TableChange.SELECTION)) {
         d.afterDo(null);
       }
@@ -609,6 +641,7 @@ public class PmTableImpl2
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
+      currentRowPm = null;
       // FIXME: may fire too often a DB query. What happen in case of a series of QueryParam changes?
       PageableCollectionUtil2.ensureCurrentPageInRange(getPmPageableCollection());
 

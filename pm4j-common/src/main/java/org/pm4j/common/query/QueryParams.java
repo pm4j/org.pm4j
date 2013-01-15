@@ -203,5 +203,4 @@ public class QueryParams extends PropertyChangeSupportedBase implements Cloneabl
     return clone;
   }
 
-
 }
