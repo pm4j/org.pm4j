@@ -74,9 +74,9 @@ class CachingPageableQueryService<T_ITEM, T_ID extends Serializable> implements 
   @Override
   public long getItemCount(QueryParams query) {
     if ((query != cache.itemCountCacheQuery.getRef()) ||
-  	  (cache.itemCountCache == -1)) {
- 		  cache.itemCountCache = baseService.getItemCount(query);
- 		  cache.itemCountCacheQuery.setRef(query);
+        (cache.itemCountCache == -1)) {
+      cache.itemCountCacheQuery.setRef(query);  // ref first to prevent effective clear calls on set
+      cache.itemCountCache = baseService.getItemCount(query);
     }
     return cache.itemCountCache;
   }
@@ -133,16 +133,16 @@ class CachingPageableQueryService<T_ITEM, T_ID extends Serializable> implements 
     }
 
     public void clearPageCache() {
+      pageCacheQuery.setRef(null);
       cachedPageStartIdx = -1;
       cachedPageSize = -1;
       idToPageItemsCache = Collections.emptyMap();
-      pageCacheQuery.setRef(null);
       pageItemsCache = null;
     }
 
     public void clearItemCountCache() {
-      itemCountCache = -1;
       itemCountCacheQuery.setRef(null);
+      itemCountCache = -1;
     }
 
     public void clear() {
@@ -156,7 +156,7 @@ class CachingPageableQueryService<T_ITEM, T_ID extends Serializable> implements 
         T_ID id = service.getIdForItem(i);
         id2Items.put(id, i);
       }
-      this.pageCacheQuery.setRef(forQuery);
+      this.pageCacheQuery.setRef(forQuery); // ref first to prevent effective clear calls on set
       this.cachedPageStartIdx = startIdx;
       this.cachedPageSize = pageSize;
       this.pageItemsCache = pageItemsCache;
