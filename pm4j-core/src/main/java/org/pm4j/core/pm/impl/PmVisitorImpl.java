@@ -1,5 +1,6 @@
 package org.pm4j.core.pm.impl;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -8,6 +9,7 @@ import java.util.Set;
 import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.api.PmVisitorApi.VisitCallBack;
+import org.pm4j.core.pm.api.PmVisitorApi.VisitHierarchyCallBack;
 import org.pm4j.core.pm.api.PmVisitorApi.VisitHint;
 import org.pm4j.core.pm.api.PmVisitorApi.VisitResult;
 
@@ -98,7 +100,18 @@ public class PmVisitorImpl {
     case SKIP_CHILDREN:
       return VisitResult.SKIP_CHILDREN;
     case CONTINUE:
-      visitChildren(pm);
+      Collection<PmObject> children = getChildren(pm);
+      if (!children.isEmpty()) {
+        if(callBack instanceof VisitHierarchyCallBack) {
+          VisitHierarchyCallBack vhcb = (VisitHierarchyCallBack)callBack;
+          vhcb.enterChildren(pm, children);
+          visitChildrenCollection(children);
+          vhcb.leaveChildren(pm, children);
+        }
+        else {
+          visitChildrenCollection(children);          
+        }
+      }
       if (stopOnPmObject != null) {
         return VisitResult.STOP_VISIT;
       }
@@ -106,13 +119,13 @@ public class PmVisitorImpl {
     return result;
   }
 
-  private void visitChildren(PmObject pm) {
-    Collection<PmObject> children = ((PmObjectBase) pm).getPmChildren();
-    visitChildrenCollection(children);
+  private Collection<PmObject> getChildren(PmObject pm) {
+    Collection<PmObject> allChildren = new ArrayList<PmObject>();
+    allChildren.addAll(((PmObjectBase) pm).getPmChildren());
     if (!hints.contains(VisitHint.SKIP_FACTORY_GENERATED_CHILD_PMS)) {
-      children = ((PmObjectBase) pm).getFactoryGeneratedChildPms();
-      visitChildrenCollection(children);
+      allChildren.addAll(((PmObjectBase) pm).getFactoryGeneratedChildPms());
     }
+    return allChildren;
   }
 
   private void visitChildrenCollection(Collection<PmObject> children) {

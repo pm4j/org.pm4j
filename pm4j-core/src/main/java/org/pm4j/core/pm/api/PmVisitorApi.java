@@ -1,5 +1,7 @@
 package org.pm4j.core.pm.api;
 
+import java.util.Collection;
+
 import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.impl.PmVisitorImpl;
@@ -10,6 +12,20 @@ import org.pm4j.core.pm.impl.PmVisitorImpl;
  * @author DZABEL
  */
 public class PmVisitorApi {
+
+  /**
+   * If the visitor client is just interested in visit a node, this is the
+   * right base class.
+   */
+  public static abstract class DefaultVisitCallBack implements VisitHierarchyCallBack {
+    @Override
+    public void enterChildren(PmObject parent, Collection<PmObject> pmChildren) {
+    }
+
+    @Override
+    public void leaveChildren(PmObject parent, Collection<PmObject> pmChildren) {
+    }
+  }
 
   /**
    * Visitor call back interface.
@@ -23,8 +39,26 @@ public class PmVisitorApi {
      * @return how the visiting should go on.
      */
     VisitResult visit(PmObject pm);
+
   }
 
+  /**
+   * Visitor call back interface considering children.
+   */
+  public interface VisitHierarchyCallBack extends VisitCallBack{
+    /**
+     * If parents children will be visited, this method is called before visiting all children.
+     * @param parent the parent.
+     */
+    void enterChildren(PmObject pmParent, Collection<PmObject> pmChildren);
+
+    /**
+     * If parents children will be visited, this method is called after visiting all children.
+     * @param parent the parent.
+     */
+    void leaveChildren(PmObject pmParent, Collection<PmObject> pmChildren);
+  }  
+  
   /**
    * Gives the user of the PmVisitCallBack the possibility to affect the PM tree
    * traverse.
@@ -32,8 +66,7 @@ public class PmVisitorApi {
   public enum VisitResult {
     /** Continue visiting current PM and children. */
     CONTINUE,
-    /** Continue visiting this node, but skip this nodes children. (But visit the
-     * siblings of this node.) */
+    /** Continue visiting this node, but skip this nodes children. (But visit all siblings of this node.) */
     SKIP_CHILDREN,
     /** Stop the tree traverse as fast as possible. */
     STOP_VISIT
@@ -58,20 +91,27 @@ public class PmVisitorApi {
 
   /**
    * See {@link PmVisitorApi#visit(PmObject, VisitCallBack, VisitHint...)}
-   * @param startPm the visit start point.
-   * @param visitCallBack defines what to be done when visiting the PM. 
-   * @return the object which explicit stopped the visiting. 
+   * 
+   * @param startPm
+   *          the visit start point.
+   * @param visitCallBack
+   *          defines what to be done when visiting the PM.
+   * @return the object which explicit stopped the visiting.
    */
   public static PmObject visit(PmObject startPm, VisitCallBack visitCallBack) {
     return visit(startPm, visitCallBack, new VisitHint[0]);
   }
-  
+
   /**
    * Visits {@code startPm} and corresponding children.
-   * @param startPm the visit start point.
-   * @param visitCallBack defines what to be done when visiting the PM. 
-   * @param hints static selection informations. See {@link VisitHint}
-   * @return the object which explicit stopped the visiting. 
+   * 
+   * @param startPm
+   *          the visit start point.
+   * @param visitCallBack
+   *          defines what to be done when visiting the PM.
+   * @param hints
+   *          static selection informations. See {@link VisitHint}
+   * @return the object which explicit stopped the visiting.
    */
   public static PmObject visit(PmObject startPm, VisitCallBack visitCallBack, VisitHint... hints) {
     PmVisitorImpl v = new PmVisitorImpl(visitCallBack, hints);

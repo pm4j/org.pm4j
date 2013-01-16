@@ -13,6 +13,7 @@ import org.pm4j.core.pm.annotation.PmBeanCfg;
 import org.pm4j.core.pm.annotation.PmFactoryCfg;
 import org.pm4j.core.pm.api.PmVisitorApi;
 import org.pm4j.core.pm.api.PmVisitorApi.VisitCallBack;
+import org.pm4j.core.pm.api.PmVisitorApi.DefaultVisitCallBack;
 import org.pm4j.core.pm.api.PmVisitorApi.VisitHint;
 import org.pm4j.core.pm.api.PmVisitorApi.VisitResult;
 import org.pm4j.core.pm.impl.PmAttrPmListImpl;
@@ -26,12 +27,14 @@ public class PmVisitorTest {
 
   private final MyRootPm pm = new MyRootPm(new PmConversationImpl());
 
-  private final VisitCallBack visitAllCallBack = new VisitCallBack() {
+  
+  private final VisitCallBack visitAllCallBack = new DefaultVisitCallBack() {
     @Override
     public VisitResult visit(PmObject pm) {
       storeVisit(pm);
       return VisitResult.CONTINUE;
     }
+
   };
 
   private final List<String> calls = new ArrayList<String>();
@@ -40,7 +43,7 @@ public class PmVisitorTest {
     calls.add(pm.getPmRelativeName());
   }
 
-  private final VisitCallBack visitAllStrings = new VisitCallBack() {
+  private final VisitCallBack visitAllStrings = new DefaultVisitCallBack() {
     @Override
     public VisitResult visit(PmObject pm) {
       if (pm instanceof PmAttrString) {
@@ -50,7 +53,7 @@ public class PmVisitorTest {
     }
   };
 
-  private final VisitCallBack visitChildByRelativeName = new VisitCallBack() {
+  private final VisitCallBack visitChildByRelativeName = new DefaultVisitCallBack() {
     @Override
     public VisitResult visit(PmObject pm) {
 
@@ -62,7 +65,7 @@ public class PmVisitorTest {
     }
   };
 
-  private final VisitCallBack visitSkipChildren = new VisitCallBack() {
+  private final VisitCallBack visitSkipChildren = new DefaultVisitCallBack() {
     @Override
     public VisitResult visit(PmObject pm) {
 

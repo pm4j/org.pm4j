@@ -34,11 +34,15 @@ public class PmContentContainer implements Serializable {
   public Serializable getAspect(PmAspect aspect) {
     return aspectMap.get(aspect);
   }
-
-  public PmContentContainer addNamedChildContent(String childName) {
+  
+  public void initNamedChildContentMap() {
     if (namedChildContentMap.size() == 0) {
       namedChildContentMap = new HashMap<String, PmContentContainer>();
     }
+  }
+
+  public PmContentContainer addNamedChildContent(String childName) {
+    initNamedChildContentMap();
     PmContentContainer c = new PmContentContainer();
     namedChildContentMap.put(childName, c);
     return c;

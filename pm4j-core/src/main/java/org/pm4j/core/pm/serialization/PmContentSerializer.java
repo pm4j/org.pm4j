@@ -18,6 +18,7 @@ import org.pm4j.core.pm.PmMessage;
 import org.pm4j.core.pm.PmMessage.Severity;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.api.PmExpressionApi;
+import org.pm4j.core.pm.api.PmVisitorApi;
 import org.pm4j.core.pm.impl.PmUtil;
 
 /**
@@ -56,10 +57,10 @@ public class PmContentSerializer {
     String pmPath = ThisExpr.THIS_KEYWORD;
     Object o = PmExpressionApi.getByExpression(pmCtxt, pmPath);
     if (o instanceof PmObject) {
-      PmContentGetVisitor v = new PmContentGetVisitor(pmContentCfg);
-      v.contentContainer.setPmPath(pmPath);
-      ((PmObject)o).accept(v);
-      SerializationUtils.serialize(v.contentContainer, os);
+      PmContentGetVisitorCallBack v = new PmContentGetVisitorCallBack(pmContentCfg);     
+      v.getContentContainer().setPmPath(pmPath);      
+      PmVisitorApi.visit((PmObject)o, v);
+      SerializationUtils.serialize(v.getContentContainer(), os);
     }
   }
 
@@ -83,14 +84,15 @@ public class PmContentSerializer {
   }
 
   public void serialize(OutputStream os, String remotePmPath, PmObject pm) {
-    PmContentGetVisitor v = new PmContentGetVisitor(pmContentCfg);
-    v.contentContainer.setPmPath(remotePmPath);
-    pm.accept(v);
+    PmContentGetVisitorCallBack v = new PmContentGetVisitorCallBack(pmContentCfg);
+    v.getContentContainer().setPmPath(remotePmPath);
+    PmVisitorApi.visit(pm, v);
+    
     if (LOG.isDebugEnabled()) {
-      LOG.debug("serialized path '" + remotePmPath + "'. Content:\n" + v.contentContainer.toString());
+      LOG.debug("serialized path '" + remotePmPath + "'. Content:\n" + v.getContentContainer().toString());
     }
 
-    SerializationUtils.serialize(v.contentContainer, os);
+    SerializationUtils.serialize(v.getContentContainer(), os);
   }
 
   public byte[] serialize(String remotePmPath, PmObject pm) {
