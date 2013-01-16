@@ -40,11 +40,12 @@ import org.pm4j.core.pm.pageable.PageableListImpl;
 public class PageablePmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> implements PageableCollection2<T_PM> {
 
   /** The collection type specific selection handler. */
-  private final SelectionHandlerWithPmFactory<T_PM, T_BEAN> selectionHandler;
+  private SelectionHandlerWithPmFactory<T_PM, T_BEAN> selectionHandler;
   private final PmBeanCollectionModificationHandler         modificationHandler;
 
   private PmObject                     pmCtxt;
   private PageableCollection2<T_BEAN>  beanCollection;
+
 
   /**
    * Creates a collection backed by the given {@link PageableCollection} of beans.
@@ -207,6 +208,15 @@ public class PageablePmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> imple
    */
   public PageableCollection2<T_BEAN> getBeanCollection() {
     return beanCollection;
+  }
+
+  /**
+   * Defines a use case specific selection handler.
+   *
+   * @param selectionHandler
+   */
+  protected void setSelectionHandler(SelectionHandlerWithPmFactory<T_PM, T_BEAN> selectionHandler) {
+    this.selectionHandler = selectionHandler;
   }
 
   /**

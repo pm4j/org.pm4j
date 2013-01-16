@@ -73,7 +73,7 @@ public class PmTableImpl2
   /** The content this table is based on. */
   private PageablePmBeanCollection<T_ROW_PM, T_ROW_BEAN> pmPageableCollection;
 
- /** Defines the row-selection behavior. */
+  /** Defines the row-selection behavior. */
   private SelectMode rowSelectMode;
 
   /**
@@ -492,7 +492,8 @@ public class PmTableImpl2
    * @param pageableCollection the collection to initialize.
    */
   protected void initPmPageableCollection(PageableCollection2<T_ROW_PM> pageableCollection) {
-    pageableCollection.getSelectionHandler().setSelectMode(getPmRowSelectMode());
+    SelectionHandler<T_ROW_PM> selectionHandler = pageableCollection.getSelectionHandler();
+    selectionHandler.setSelectMode(getPmRowSelectMode());
     pageableCollection.setPageSize(getNumOfPageRowPms());
 
     // XXX olaf: Check - is redundant to the change listener within Pager!

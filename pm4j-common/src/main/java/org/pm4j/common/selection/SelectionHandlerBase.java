@@ -1,20 +1,39 @@
 package org.pm4j.common.selection;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.pm4j.common.util.beanproperty.PropertyChangeSupportedBase;
 
 public abstract class SelectionHandlerBase<T_ITEM> extends PropertyChangeSupportedBase implements SelectionHandler<T_ITEM> {
 
   private SelectMode selectMode = SelectMode.SINGLE;
+  private List<SelectionHandlerCallback> selectionHandlerCallBacks = new ArrayList<SelectionHandlerCallback>();
+  /** A flag that helps to minimize the number of {@link #ensureSelectionState()} calls.  */
+  boolean ensureSelectionStateCalled;
 
   @Override
   public void setSelectMode(SelectMode selectMode) {
     this.selectMode = selectMode;
+    ensureSelectionStateCalled = false;
   }
 
   public SelectMode getSelectMode() {
     return selectMode;
+  }
+
+  @Override
+  public void addSelectionHandlerCallback(SelectionHandlerCallback callback) {
+    if (callback != null && !selectionHandlerCallBacks.contains(callback)) {
+      selectionHandlerCallBacks.add(callback);
+      ensureSelectionStateCalled = false;
+    }
+  }
+
+  @Override
+  public void ensureSelectionStateRequired() {
+    ensureSelectionStateCalled = false;
   }
 
   protected void beforeAddSingleItemSelection(Collection<?> currentSelection) {
@@ -37,6 +56,24 @@ public abstract class SelectionHandlerBase<T_ITEM> extends PropertyChangeSupport
         }
     }
 
+  }
+
+  /**
+   * Makes sure that the selection is initialized by using the registered {@link SelectionHandlerCallback}s.
+   */
+  protected void ensureSelectionState() {
+    if (!ensureSelectionStateCalled) {
+      try {
+        // prevent loops:
+        ensureSelectionStateCalled = true;
+        for (SelectionHandlerCallback c : selectionHandlerCallBacks) {
+          c.ensureSelectionState();
+        }
+      } catch (RuntimeException e) {
+        ensureSelectionStateCalled = false;
+        throw e;
+      }
+    }
   }
 
 }

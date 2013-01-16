@@ -94,6 +94,16 @@ public class SelectionHandlerWithPmFactory<T_PM extends PmBean<T_BEAN>, T_BEAN> 
     return baseSelectionHandler.setSelection(((PmSelection<T_PM, T_BEAN>)selection).beanSelection);
   }
 
+  @Override
+  public void addSelectionHandlerCallback(SelectionHandlerCallback callback) {
+    baseSelectionHandler.addSelectionHandlerCallback(callback);
+  }
+
+  @Override
+  public void ensureSelectionStateRequired() {
+    baseSelectionHandler.ensureSelectionStateRequired();
+  }
+
   /**
    * Provides the selection handler for the beans behind the item PM's.
    *

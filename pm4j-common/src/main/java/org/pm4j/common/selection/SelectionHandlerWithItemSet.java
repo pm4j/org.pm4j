@@ -108,6 +108,7 @@ public class SelectionHandlerWithItemSet<T_ITEM> extends SelectionHandlerBase<T_
 
   @Override
   public Selection<T_ITEM> getSelection() {
+    ensureSelectionState();
     return selection;
   }
 

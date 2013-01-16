@@ -116,4 +116,33 @@ public interface SelectionHandler<T_ITEM> extends PropertyChangeSupported {
    */
   boolean setSelection(Selection<T_ITEM> selection);
 
+  // --- support for domain specific initial selections ---
+
+  /**
+   * Registers a call back that may implement the logic for initial selections.
+   *
+   * @param callback the call back to add.
+   */
+  void addSelectionHandlerCallback(SelectionHandlerCallback callback);
+
+  /**
+   * Gets called after item set modification. It informs the handler to call
+   * {@link SelectionHandlerCallback#ensureSelectionState()} before delivering
+   * the next selection.
+   */
+  void ensureSelectionStateRequired();
+
+  /**
+   * A call back that allows to inject some initial selection handling.
+   */
+  public interface SelectionHandlerCallback {
+
+    /**
+     * Gets called whenever the collection was freshly loaded or an item was deleted.<br>
+     * It may ensure that some domain specific selection restrictions are applied.<br>
+     * E.g.: a table may require to have at least one item selected.
+     */
+    void ensureSelectionState();
+  }
+
 }

@@ -104,6 +104,7 @@ public abstract class SelectionHandlerWithIdSet<T_ITEM, T_ID> extends SelectionH
 
   @Override
   public Selection<T_ITEM> getSelection() {
+    ensureSelectionState();
     return selection;
   }
 

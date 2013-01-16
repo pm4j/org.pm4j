@@ -165,6 +165,7 @@ public class SelectionHandlerWithAdditionalItems<T_ITEM> extends SelectionHandle
 
   @Override
   public Selection<T_ITEM> getSelection() {
+    ensureSelectionState();
     return selection;
   }
 

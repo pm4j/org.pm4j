@@ -121,6 +121,7 @@ public abstract class PageableQuerySelectionHandler<T_ITEM, T_ID extends Seriali
 
   @Override
   public Selection<T_ITEM> getSelection() {
+    ensureSelectionState();
     return currentSelection;
   }
 

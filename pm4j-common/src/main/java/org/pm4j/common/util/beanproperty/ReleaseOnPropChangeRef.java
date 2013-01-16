@@ -4,13 +4,14 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 
+// TODO olaf: The setRef() and setRefQuietly() semantic is not intuitive. Check.
 public class ReleaseOnPropChangeRef<T extends PropertyChangeSupported> implements PropertyChangeListener {
   private T ref;
   private final String[] releaseOnChangeOf;
 
   public ReleaseOnPropChangeRef(T ref, String... releaseOnChangeOf) {
     this.releaseOnChangeOf = releaseOnChangeOf;
-    setRef(ref);
+    setRefQuietly(ref);
   }
 
   @Override
@@ -22,7 +23,7 @@ public class ReleaseOnPropChangeRef<T extends PropertyChangeSupported> implement
     return ref;
   }
 
-  public void setRef(T ref) {
+  public void setRefQuietly(T ref) {
 	if (this.ref == ref) {
 		return;
 	}
@@ -38,7 +39,10 @@ public class ReleaseOnPropChangeRef<T extends PropertyChangeSupported> implement
         ref.addPropertyChangeListener(p, this);
       }
     }
+  }
 
+  public void setRef(T ref) {
+	setRefQuietly(ref);
     onSetRef();
   }
 
