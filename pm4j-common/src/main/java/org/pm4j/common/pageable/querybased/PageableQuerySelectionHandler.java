@@ -131,6 +131,12 @@ public abstract class PageableQuerySelectionHandler<T_ITEM, T_ID extends Seriali
     Selection<T_ITEM> oldSelection = this.currentSelection;
     Selection<T_ITEM> newSelection = selection;
 
+    // check for noop:
+    if (oldSelection.getSize() == 0 &&
+        newSelection.getSize() == 0) {
+    	return true;
+    }
+
     try {
       fireVetoableChange(PROP_SELECTION, oldSelection, newSelection);
       // XXX olaf: check of that can be doene safely...

@@ -15,10 +15,10 @@ public class AttrDefinition implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
+  private final String   name;
+  private final String   pathName;
+  private final Class<?> type;
   private String   title;
-  private String   name;
-  private String   pathName;
-  private Class<?> type;
 
   /**
    * @param pathName
@@ -94,14 +94,14 @@ public class AttrDefinition implements Serializable {
   }
 
   /**
-   * @return a title string used to display the attribute to to the user.
+   * @return a title string used to display the attribute to the user.
    */
   public String getTitle() {
     return title;
   }
 
   /**
-   * @param title a title string used to display the attribute to to the user.
+   * @param title a title string used to display the attribute to the user.
    */
   public void setTitle(String title) {
     this.title = title;
@@ -112,6 +112,13 @@ public class AttrDefinition implements Serializable {
     return pathName;
   }
 
+  /**
+   * The compare mechanism just compares the query relevant fields. The
+   * {@link #title} is not considered.
+   * <p>
+   * It is done this way to support identification of identical query requests.<br>
+   * The UI-title is currently not relevant or this aspect.
+   */
   @Override
   public boolean equals(Object obj) {
     if (obj == this) {
@@ -126,7 +133,6 @@ public class AttrDefinition implements Serializable {
 
   @Override
   public int hashCode() {
-    return new HashCodeBuilder(29, 17).append(name).append(pathName).append(type).toHashCode();
+    return new HashCodeBuilder(11, 47).append(name).append(pathName).append(type).toHashCode();
   }
-
 }

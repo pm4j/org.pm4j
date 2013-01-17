@@ -316,8 +316,6 @@ public class PmTableImpl2
                       ? UpdateAspect.values()
                       : clearOptions;
 
-    getPmPageableCollection().clearCaches();
-
     for (UpdateAspect o : toProcess) {
       clearPmAspectImpl(o);
     }
@@ -343,6 +341,7 @@ public class PmTableImpl2
       case CLEAR_CHANGES:
         currentRowPm = null;
         PmValidationApi.clearInvalidValuesOfSubtree(this);
+        getPmPageableCollection().clearCaches();
         getPmPageableCollection().getModificationHandler().clearRegisteredModifications();
         break;
       case CLEAR_USER_FILTER:
@@ -643,8 +642,8 @@ public class PmTableImpl2
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
       currentRowPm = null;
-      // FIXME: may fire too often a DB query. What happen in case of a series of QueryParam changes?
-      PageableCollectionUtil2.ensureCurrentPageInRange(getPmPageableCollection());
+      // FIXME: may fire too often a DB query. What happens in case of a series of QueryParam changes?
+//      PageableCollectionUtil2.ensureCurrentPageInRange(getPmPageableCollection());
 
       for (PmCommandDecorator d : getPmDecorators(TableChange.FILTER)) {
         d.afterDo(null);

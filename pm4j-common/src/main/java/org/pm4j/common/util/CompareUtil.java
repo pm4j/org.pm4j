@@ -1,8 +1,10 @@
 package org.pm4j.common.util;
 
 import java.text.Collator;
+import java.util.List;
 import java.util.Locale;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 
 /**
@@ -194,5 +196,17 @@ public class CompareUtil {
       int expectedStartPos = s.length() - pattern.length();
       return expectedStartPos == patternIdx;
     }
+  }
+
+  public static <T> boolean equalLists(List<T> lhs, List<T> rhs) {
+    if (lhs.size() != rhs.size()) {
+      return false;
+    }
+    for (int i=0; i<lhs.size(); ++i) {
+      if (!ObjectUtils.equals(lhs.get(i), rhs.get(i))) {
+        return false;
+      }
+    }
+    return true;
   }
 }

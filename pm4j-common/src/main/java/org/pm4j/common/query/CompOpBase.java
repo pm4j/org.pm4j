@@ -4,11 +4,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
 import org.pm4j.common.exception.CheckedExceptionWrapper;
 import org.pm4j.core.util.lang.CloneUtil;
 
 /**
  * A basic compare operator implementation.
+ * <p>
+ * Limitation: It currently can't be used as a hash map key. Because it is mutable.
  *
  * @param <T_VALUE>
  *
@@ -84,6 +87,28 @@ public abstract class CompOpBase<T_VALUE> implements CompOp {
    *         given value leads to a valid filter definition.
    */
   protected abstract boolean isEffectiveFilterValueImpl(T_VALUE filterValue);
+
+  /**
+   * This class has currently no parallel {@link #hashCode()} implentation because it is not immutable.
+   */
+  @Override
+  public boolean equals(Object obj) {
+    if (obj == this) {
+      return true;
+    }
+    if ((obj == null) || (getClass() != obj.getClass())) {
+      return false;
+    }
+    @SuppressWarnings("unchecked")
+    CompOpBase<T_VALUE> rhs = (CompOpBase<T_VALUE>) obj;
+    return new EqualsBuilder()
+          .append(name, rhs.name)
+          .append(ignoreCase, rhs.ignoreCase)
+          .append(ignoreSpaces, rhs.ignoreSpaces)
+          .append(valueNeeded, rhs.valueNeeded)
+          .append(valueOptions, rhs.valueOptions)
+          .isEquals();
+  }
 
   public boolean isIgnoreCase() {
     return ignoreCase;

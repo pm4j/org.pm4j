@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.util.beanproperty.ReleaseOnPropChangeRef;
@@ -24,6 +26,8 @@ import org.pm4j.common.util.beanproperty.ReleaseOnPropChangeRef;
  * @param <T_ID> type of collection item id's.
  */
 class CachingPageableQueryService<T_ITEM, T_ID extends Serializable> implements PageableQueryService<T_ITEM, T_ID> {
+  private static final Log LOG = LogFactory.getLog(CachingPageableQueryService.class);
+
   private final PageableQueryService<T_ITEM, T_ID> baseService;
   private final CachingPageableQueryService.Cache<T_ITEM, T_ID> cache;
 
@@ -133,6 +137,10 @@ class CachingPageableQueryService<T_ITEM, T_ID extends Serializable> implements 
     }
 
     public void clearPageCache() {
+      if ((pageItemsCache != null) && LOG.isTraceEnabled()) {
+        LOG.trace("Clearing page cache for query service: " + service.getClass().getSimpleName());
+      }
+
       pageCacheQuery.setRefQuietly(null);
       cachedPageStartIdx = -1;
       cachedPageSize = -1;
@@ -141,6 +149,10 @@ class CachingPageableQueryService<T_ITEM, T_ID extends Serializable> implements 
     }
 
     public void clearItemCountCache() {
+      if ((itemCountCache != -1) && LOG.isTraceEnabled()) {
+        LOG.trace("Clearing item count cache for query service: " + service.getClass().getSimpleName());
+      }
+
       itemCountCacheQuery.setRefQuietly(null);
       itemCountCache = -1;
     }

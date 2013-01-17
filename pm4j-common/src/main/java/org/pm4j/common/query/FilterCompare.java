@@ -1,5 +1,6 @@
 package org.pm4j.common.query;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
 import org.pm4j.common.exception.CheckedExceptionWrapper;
 import org.pm4j.core.util.reflection.ClassUtil;
 
@@ -7,6 +8,8 @@ import org.pm4j.core.util.reflection.ClassUtil;
 /**
  * A filter condition that compares an attribute and a value using a
  * defined {@link CompOp}.
+ * <p>
+ * Limitation: It currently can't be used as a hash map key. Because it is mutable.
  *
  * @author olaf boede
  */
@@ -106,4 +109,18 @@ public class FilterCompare implements FilterExpression, Cloneable {
     return attr + " " + compOp + " " + value;
   }
 
+  /**
+   * This class has currently no parallel {@link #hashCode()} implentation because it is not immutable.
+   */
+  @Override
+  public boolean equals(Object obj) {
+    if (obj == this) {
+      return true;
+    }
+    if (!(obj instanceof FilterCompare)) {
+      return false;
+    }
+    FilterCompare rhs = (FilterCompare) obj;
+    return new EqualsBuilder().append(attr, rhs.attr).append(compOp, rhs.compOp).append(value, rhs.value).isEquals();
+  }
 }

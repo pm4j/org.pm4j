@@ -1,6 +1,15 @@
 package org.pm4j.common.query;
 
+import org.apache.commons.lang.ObjectUtils;
 
+
+/**
+ * A logical NOT condition.
+ * <p>
+ * Limitation: It currently can't be used as a hash map key. Because it is mutable.
+ *
+ * @author olaf boede
+ */
 public class FilterNot implements FilterExpression {
 
   private static final long serialVersionUID = 1L;
@@ -23,4 +32,11 @@ public class FilterNot implements FilterExpression {
     return "NOT(" + baseExpression + ")";
   }
 
+  @Override
+  public boolean equals(Object obj) {
+    if (!(obj instanceof FilterNot)) {
+      return false;
+    }
+    return ObjectUtils.equals(baseExpression, ((FilterNot)obj).baseExpression);
+  }
 }

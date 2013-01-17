@@ -174,6 +174,12 @@ public class SelectionHandlerWithAdditionalItems<T_ITEM> extends SelectionHandle
     Selection<T_ITEM> oldSelection = this.selection;
     Selection<T_ITEM> newSelection = selection;
 
+    // check for noop:
+    if (oldSelection.getSize() == 0 &&
+        newSelection.getSize() == 0) {
+    	return true;
+    }
+
     try {
       fireVetoableChange(PROP_SELECTION, oldSelection, newSelection);
       this.selection = (SelectionWithAdditionalItems<T_ITEM>) newSelection;

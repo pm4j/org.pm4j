@@ -114,6 +114,12 @@ public abstract class SelectionHandlerWithIdSet<T_ITEM, T_ID> extends SelectionH
     Selection<T_ITEM> oldSelection = this.selection;
     Selection<T_ITEM> newSelection = selection;
 
+    // check for noop:
+    if (oldSelection.getSize() == 0 &&
+        newSelection.getSize() == 0) {
+    	return true;
+    }
+
     try {
       fireVetoableChange(PROP_SELECTION, oldSelection, newSelection);
       this.selection = (ItemIdBasedSelection<T_ITEM, T_ID>) newSelection;

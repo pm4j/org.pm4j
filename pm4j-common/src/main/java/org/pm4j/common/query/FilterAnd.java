@@ -5,7 +5,16 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import org.pm4j.common.util.CompareUtil;
 
+
+/**
+ * A logical AND condition. It can combine any number of {@link FilterExpression}s.
+ * <p>
+ * Limitation: It currently can't be used as a hash map key. Because it is mutable.
+ *
+ * @author olaf boede
+ */
 public class FilterAnd implements FilterExpression {
 
   private static final long serialVersionUID = 1L;
@@ -38,6 +47,21 @@ public class FilterAnd implements FilterExpression {
     }
     sb.append(")");
     return "AND(" + sb;
+  }
+
+  /**
+   * This class has no parallel {@link #hashCode()} implentation because it is not immutable.
+   */
+  @Override
+  public boolean equals(Object obj) {
+    if (obj == this) {
+      return true;
+    }
+    if (!(obj instanceof FilterAnd)) {
+      return false;
+    }
+    FilterAnd rhs = (FilterAnd) obj;
+    return CompareUtil.equalLists(this.expressions, rhs.expressions);
   }
 
 }

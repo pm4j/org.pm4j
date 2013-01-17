@@ -5,7 +5,16 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import org.pm4j.common.util.CompareUtil;
 
+
+/**
+ * A logical OR condition. It can combine any number of {@link FilterExpression}s.
+ * <p>
+ * Limitation: It currently can't be used as a hash map key. Because it is mutable.
+ *
+ * @author olaf boede
+ */
 public class FilterOr implements FilterExpression {
 
   private static final long serialVersionUID = 1L;
@@ -39,4 +48,21 @@ public class FilterOr implements FilterExpression {
     sb.append(")");
     return "OR(" + sb;
   }
+
+  /**
+   * This class has currently no parallel {@link #hashCode()} implentation because it is not immutable.
+   */
+  @Override
+  public boolean equals(Object obj) {
+    if (obj == this) {
+      return true;
+    }
+    if (!(obj instanceof FilterOr)) {
+      return false;
+    }
+    FilterOr rhs = (FilterOr) obj;
+    return CompareUtil.equalLists(this.expressions, rhs.expressions);
+  }
+
+
 }

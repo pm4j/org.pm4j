@@ -67,7 +67,9 @@ public class QueryParams extends PropertyChangeSupportedBase implements Cloneabl
     this.sortOrder = sortOrder;
 
     SortOrder newEffectiveOrder = getEffectiveSortOrder();
-    firePropertyChange(PROP_EFFECTIVE_SORT_ORDER, oldEffectiveOrder, newEffectiveOrder);
+    if (oldEffectiveOrder != null || newEffectiveOrder != null) {
+    	firePropertyChange(PROP_EFFECTIVE_SORT_ORDER, oldEffectiveOrder, newEffectiveOrder);
+    }
   }
 
   /**
