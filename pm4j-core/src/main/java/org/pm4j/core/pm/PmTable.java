@@ -65,9 +65,14 @@ public interface PmTable<T_ROW_OBJ> extends PmObject, PmDataInput, Filterable, F
   List<FilterByDefinition> getFilterByDefinitions();
 
   /**
-   * @return The set of rows that contains changed data.
+   * @return The set of rows containing changed data.
    */
   List<T_ROW_OBJ> getRowsWithChanges();
+  
+  /**
+   * Clear set of rows containing changed data.
+   */
+  void clearRowsWithChanges();
 
   /**
    * Provides a row representation that may be used by generic a renderer.

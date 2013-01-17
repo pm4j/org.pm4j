@@ -202,6 +202,11 @@ public class PmTableImpl
   public List<T_ROW_ELEMENT_PM> getRowsWithChanges() {
     return new ArrayList<T_ROW_ELEMENT_PM>((Collection)changedStateRegistry.getChangedItems());
   }
+  
+  @Override
+  public void clearRowsWithChanges() {
+    changedStateRegistry.clearChangedItems();
+  }
 
   /**
    * Gets called whenever a new (transient) row gets added to the table.

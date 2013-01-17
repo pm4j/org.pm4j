@@ -295,6 +295,11 @@ public class DeprecatedPmTableOfPmElementsImpl<T_ROW_ELEMENT_PM extends PmElemen
     // TODO Auto-generated method stub
     return Collections.emptyList();
   }
+  
+  @Override
+  public void clearRowsWithChanges() {
+    // TODO Auto-generated method stub
+  }
 
   @Override
   public T_ROW_ELEMENT_PM getCurrentRowPm() {
