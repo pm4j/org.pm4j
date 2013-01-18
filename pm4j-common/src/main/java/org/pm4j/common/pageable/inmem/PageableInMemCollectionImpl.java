@@ -177,16 +177,7 @@ public class PageableInMemCollectionImpl<T_ITEM>
       // XXX olaf: just moves to the last possible page if necessary.
       // The user may want to stay on the page with his selected item.
       // We need to define strategies for application specific definitions.
-      if (getCurrentPageIdx() * getPageSize() >= objects.size()) {
-        setCurrentPageIdx(PageableCollectionUtil2.getNumOfPages(this));
-      }
-
-      // TODO olaf: if the filter gets changed to find items again, we need to do this to prevent
-      //            negative page item index identification...
-      // Check if it was really a good idea to have a 0-page index for empty collections.
-      if (objects.size() > 0 && getCurrentPageIdx() == 0) {
-        setCurrentPageIdx(1);
-      }
+      PageableCollectionUtil2.ensureCurrentPageInRange(this);
     }
 
     return objects;

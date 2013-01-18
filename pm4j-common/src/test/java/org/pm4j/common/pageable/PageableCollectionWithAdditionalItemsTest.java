@@ -36,12 +36,12 @@ public class PageableCollectionWithAdditionalItemsTest {
     assertEquals(5L, pc.getNumOfItems());
     assertEquals(3, PageableCollectionUtil2.getNumOfPages(pc));
     assertEquals("[a, b]", pc.getItemsOnPage().toString());
-    assertEquals(1, pc.getCurrentPageIdx());
+    assertEquals(0, pc.getPageIdx());
 
-    pc.setCurrentPageIdx(2);
+    pc.setPageIdx(1);
     assertEquals("[c, d]", pc.getItemsOnPage().toString());
 
-    pc.setCurrentPageIdx(3);
+    pc.setPageIdx(2);
     assertEquals("[e]", pc.getItemsOnPage().toString());
 
     pc.getModificationHandler().addItem(new Bean("f"));

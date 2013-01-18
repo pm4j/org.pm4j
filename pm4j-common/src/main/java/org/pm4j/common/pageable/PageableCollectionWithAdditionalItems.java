@@ -103,7 +103,6 @@ public class PageableCollectionWithAdditionalItems<T_ITEM> implements PageableCo
     return baseCollection.getQueryOptions();
   }
 
-  //
   @Override
   public List<T_ITEM> getItemsOnPage() {
     if (itemsOnPage == null) {
@@ -151,20 +150,12 @@ public class PageableCollectionWithAdditionalItems<T_ITEM> implements PageableCo
   public long getPageIdx() {
     return currentPageIdx;
   }
-  @Override
-  public int getCurrentPageIdx() {
-    return (int)getPageIdx()+1;
-  }
 
   @Override
   public void setPageIdx(long pageIdx) {
     currentPageIdx = pageIdx;
     baseCollection.setPageIdx(pageIdx);
     itemsOnPage = null;
-  }
-  @Override
-  public void setCurrentPageIdx(int pageIdx) {
-    setPageIdx(pageIdx-1);
   }
 
   @Override
@@ -205,8 +196,8 @@ public class PageableCollectionWithAdditionalItems<T_ITEM> implements PageableCo
     public void addItem(T_ITEM item) {
       assert item != null;
       additionalItems.add(item);
-      // the page item cache needs to be updated if the current is the last page.
-      if (getCurrentPageIdx() == PageableCollectionUtil2.getNumOfPages(PageableCollectionWithAdditionalItems.this)) {
+      // the page item cache needs to be updated if the current page is the last page.
+      if (getPageIdx() == PageableCollectionUtil2.getNumOfPages(PageableCollectionWithAdditionalItems.this)-1) {
         itemsOnPage = null;
       }
     }

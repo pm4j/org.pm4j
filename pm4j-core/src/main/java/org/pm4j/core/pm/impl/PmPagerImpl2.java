@@ -5,7 +5,7 @@ import static org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO.DO_NOTHING;
 import org.pm4j.common.pageable.PageableCollection2;
 import org.pm4j.common.pageable.PageableCollectionUtil2;
 import org.pm4j.core.exception.PmRuntimeException;
-import org.pm4j.core.pm.PmAttrInteger;
+import org.pm4j.core.pm.PmAttrLong;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmCommandDecorator;
 import org.pm4j.core.pm.PmLabel;
@@ -106,7 +106,16 @@ public class PmPagerImpl2
     }
   };
 
-  public final PmAttrInteger currentPageIdx = new PmAttrIntegerImpl(this) {
+  // TODO: change attribute name to pageIdx
+  public final PmAttrLong currentPageIdx = new PmAttrLongImpl(this) {
+    /**
+     * Refuses values out of range and considers the restrictions of registered page change decorators.
+     */
+    @Override
+    protected void onPmInit() {
+      addValueChangeDecorator(pageChangeDecorators);
+    }
+
     @Override
     protected boolean isPmReadonlyImpl() {
         return getNumOfPages() < 2;
@@ -115,7 +124,8 @@ public class PmPagerImpl2
     /**
      * Simply ignores invalid values.
      */
-    protected boolean beforeValueChange(Integer oldValue, Integer newValue) {
+    @Override
+    protected boolean beforeValueChange(Long oldValue, Long newValue) {
       return  (newValue != null) &&
               (newValue > 0) &&
               (newValue <= getNumOfPages());
@@ -127,12 +137,14 @@ public class PmPagerImpl2
       return false;
     }
 
-    /**
-     * Refuses values out of range and considers the restrictions of registered page change decorators.
-     */
     @Override
-    protected void onPmInit() {
-      addValueChangeDecorator(pageChangeDecorators);
+    protected Long getBackingValueImpl() {
+      return getPmBean().getPageIdx()+1;
+    }
+
+    @Override
+    protected void setBackingValueImpl(Long value) {
+      getPmBean().setPageIdx(value - 1);
     }
   };
 
@@ -204,7 +216,7 @@ public class PmPagerImpl2
   }
 
   @Override
-  public int getNumOfPages() {
+  public long getNumOfPages() {
     PageableCollection2<?> pc = getPmBean();
     return pc != null
         ? PageableCollectionUtil2.getNumOfPages(getPmBean())
@@ -248,7 +260,7 @@ public class PmPagerImpl2
   @Override
   public PmLabel getItemXtillYofZ() { return itemXtillYofZ; }
   @Override
-  public PmAttrInteger getCurrentPageIdx() { return currentPageIdx; }
+  public PmAttrLong getCurrentPageIdx() { return currentPageIdx; }
   @Override
   public PmCommand getCmdSelectAllOnPage() { return cmdSelectAllOnPage; }
   @Override

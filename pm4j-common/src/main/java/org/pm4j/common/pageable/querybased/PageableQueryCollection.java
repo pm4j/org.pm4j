@@ -114,7 +114,7 @@ public class PageableQueryCollection<T_ITEM, T_ID extends Serializable> extends 
 
   @Override
   public void setPageIdx(long pageIdx) {
-    if (pageIdx != getCurrentPageIdx()) {
+    if (pageIdx != getPageIdx()) {
       cachingService.getCache().clearPageCache();
     }
     super.setPageIdx(pageIdx);

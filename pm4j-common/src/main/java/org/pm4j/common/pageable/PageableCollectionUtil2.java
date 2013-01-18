@@ -33,7 +33,7 @@ public final class PageableCollectionUtil2 {
   public static long getIdxOfFirstItemOnPage(PageableCollection2<?> pageable) {
     int pageSize = pageable.getPageSize();
     long idx = (pageable.getNumOfItems() > 0)
-            ? (pageSize * (pageable.getCurrentPageIdx()-1)) + 1
+            ? (pageSize * pageable.getPageIdx()) + 1
             : 0;
 
     if (idx < 0) {
@@ -91,11 +91,11 @@ public final class PageableCollectionUtil2 {
    *          The set to get the result for.
    * @return The number of available pages.
    */
-  public static int getNumOfPages(PageableCollection2<?> pageable) {
+  public static long getNumOfPages(PageableCollection2<?> pageable) {
     long numOfItems = pageable.getNumOfItems();
     if (numOfItems > 0) {
       int pageSize = pageable.getPageSize();
-      int fullPages = (int)(numOfItems / pageSize);
+      long fullPages = numOfItems / pageSize;
       int remainder = (int)(numOfItems % pageSize);
       return fullPages + (remainder > 0 ? 1 : 0);
     } else {
@@ -112,9 +112,9 @@ public final class PageableCollectionUtil2 {
    *          The set to handle.
    */
   public static void navigateToPrevPage(PageableCollection2<?> pageable) {
-    int currentPageIdx = pageable.getCurrentPageIdx();
-    if (currentPageIdx > 1) {
-      pageable.setCurrentPageIdx(currentPageIdx - 1);
+    long currentPageIdx = pageable.getPageIdx();
+    if (currentPageIdx > 0) {
+      pageable.setPageIdx(currentPageIdx - 1);
     }
   }
 
@@ -127,9 +127,9 @@ public final class PageableCollectionUtil2 {
    *          The set to handle.
    */
   public static void navigateToNextPage(PageableCollection2<?> pageable) {
-    int currentPageIdx = pageable.getCurrentPageIdx();
-    if (currentPageIdx < getNumOfPages(pageable)) {
-      pageable.setCurrentPageIdx(currentPageIdx + 1);
+    long currentPageIdx = pageable.getPageIdx();
+    if (currentPageIdx < getNumOfPages(pageable)-1) {
+      pageable.setPageIdx(currentPageIdx + 1);
     }
   }
 
@@ -142,9 +142,9 @@ public final class PageableCollectionUtil2 {
    *          The set to handle.
    */
   public static void navigateToFirstPage(PageableCollection2<?> pageable) {
-    int currentPageIdx = pageable.getCurrentPageIdx();
-    if (currentPageIdx > 1) {
-      pageable.setCurrentPageIdx(1);
+    long currentPageIdx = pageable.getPageIdx();
+    if (currentPageIdx > 0) {
+      pageable.setPageIdx(0);
     }
   }
 
@@ -157,10 +157,10 @@ public final class PageableCollectionUtil2 {
    *          The set to handle.
    */
   public static void navigateToLastPage(PageableCollection2<?> pageable) {
-    int currentPageIdx = pageable.getCurrentPageIdx();
-    int lastPageIdx = getNumOfPages(pageable);
+    long currentPageIdx = pageable.getPageIdx();
+    long lastPageIdx = getNumOfPages(pageable)-1;
     if (currentPageIdx < lastPageIdx) {
-      pageable.setCurrentPageIdx(lastPageIdx);
+      pageable.setPageIdx(lastPageIdx);
     }
   }
 
@@ -170,8 +170,8 @@ public final class PageableCollectionUtil2 {
    * @return <code>true</code> if there is a following page to navigate to.
    */
   public static boolean hasNextPage(PageableCollection2<?> pageable) {
-    int currentPageIdx = pageable.getCurrentPageIdx();
-    return currentPageIdx < getNumOfPages(pageable);
+    long currentPageIdx = pageable.getPageIdx();
+    return currentPageIdx < getNumOfPages(pageable)-1;
   }
 
   /**
@@ -180,7 +180,7 @@ public final class PageableCollectionUtil2 {
    * @return <code>true</code> if there is a previous page to navigate to.
    */
   public static boolean hasPrevPage(PageableCollection2<?> pageable) {
-    return pageable.getCurrentPageIdx() > 1;
+    return pageable.getPageIdx() > 0;
   }
 
   /**
@@ -193,10 +193,10 @@ public final class PageableCollectionUtil2 {
    */
   public static void ensureCurrentPageInRange(PageableCollection2<?> pageable) {
     // ensure that the current page index is not behind the last page after filtering.
-    int numOfPages = getNumOfPages(pageable);
-    int currentPageIdx = pageable.getCurrentPageIdx();
-    if (currentPageIdx >= numOfPages) {
-      pageable.setCurrentPageIdx(numOfPages == 0 ? 1 : numOfPages);
+    long numOfPages = getNumOfPages(pageable);
+    long currentPageIdx = pageable.getPageIdx();
+    if (currentPageIdx >= numOfPages-1) {
+      pageable.setPageIdx(numOfPages == 0 ? 0 : numOfPages-1);
     }
 
   }

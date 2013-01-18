@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.pm4j.common.pageable.inmem.ItemNavigatorInMem;
 import org.pm4j.common.query.CompOpStringStartsWith;
@@ -110,22 +109,22 @@ public abstract class PageableCollectionTestBase<T> {
 
   @Test
   public void testItemsOnPage() {
-    assertEquals(1, collection.getCurrentPageIdx());
+    assertEquals(0, collection.getPageIdx());
     assertEquals("[a, b]", collection.getItemsOnPage().toString());
 
-    collection.setCurrentPageIdx(2);
+    collection.setPageIdx(1);
     assertEquals("[c, d]", collection.getItemsOnPage().toString());
 
-    collection.setCurrentPageIdx(3);
+    collection.setPageIdx(2);
     assertEquals("[e, f]", collection.getItemsOnPage().toString());
 
     collection.setPageSize(3);
-    collection.setCurrentPageIdx(1);
+    collection.setPageIdx(0);
     assertEquals("[a, b, c]", collection.getItemsOnPage().toString());
 
-    collection.setCurrentPageIdx(3);
+    collection.setPageIdx(2);
     assertEquals("[]", collection.getItemsOnPage().toString());
-    collection.setCurrentPageIdx(4);
+    collection.setPageIdx(3);
     assertEquals("[]", collection.getItemsOnPage().toString());
   }
 
@@ -147,7 +146,7 @@ public abstract class PageableCollectionTestBase<T> {
 
   @Test
   public void testDefaultSortOrder() {
-    collection.setCurrentPageIdx(3);
+    collection.setPageIdx(2);
     assertEquals("Initial (unsorted) sort order", "[a, b, c, d, e, f]", IterableUtil.shallowCopy(collection).toString());
     assertEquals("[e, f]", collection.getItemsOnPage().toString());
 

@@ -57,18 +57,10 @@ public abstract class PageableCollectionBase2<T_ITEM> implements PageableCollect
   }
 
   @Override
-  public final int getCurrentPageIdx() {
-    return (int)pageIdx+1;
-  }
-  @Override
   public long getPageIdx() {
     return pageIdx;
   }
 
-  @Override
-  public final void setCurrentPageIdx(int pageIdx) {
-    setPageIdx(pageIdx-1);
-  }
   @Override
   public void setPageIdx(long pageIdx) {
     this.pageIdx = (pageIdx < 0) ? 0 : pageIdx;

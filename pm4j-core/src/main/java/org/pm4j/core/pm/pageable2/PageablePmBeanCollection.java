@@ -147,15 +147,7 @@ public class PageablePmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> imple
   public long getPageIdx() {
     return beanCollection.getPageIdx();
   }
-  @Override
-  public int getCurrentPageIdx() {
-    return beanCollection.getCurrentPageIdx();
-  }
 
-  @Override
-  public void setCurrentPageIdx(int pageIdx) {
-    beanCollection.setCurrentPageIdx(pageIdx);
-  }
   @Override
   public void setPageIdx(long pageIdx) {
     beanCollection.setPageIdx(pageIdx);

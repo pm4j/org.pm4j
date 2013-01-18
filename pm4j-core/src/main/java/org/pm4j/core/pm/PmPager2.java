@@ -57,7 +57,7 @@ public interface PmPager2 {
   /**
    * @return An attribute that can be used to jump to an entered page number.
    */
-  PmAttrInteger getCurrentPageIdx();
+  PmAttrLong getCurrentPageIdx();
 
   /**
    * @return The maximal number of items on a single page.
@@ -67,7 +67,7 @@ public interface PmPager2 {
   /**
    * @return The total number of pages.
    */
-  int getNumOfPages();
+  long getNumOfPages();
 
   /**
    * @return A command that allows to select all items on the current page.

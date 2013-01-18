@@ -59,20 +59,16 @@ public interface PageableCollection2<T_ITEM> extends Iterable<T_ITEM> {
   void setPageSize(int newSize);
 
   /**
-   * @return The current page number. Starts with one.
+   * @return The current page number. Starts with zero.
    */
-  @Deprecated
-  int getCurrentPageIdx();
   long getPageIdx();
 
   /**
    * @param pageIdx
    *          Navigates to the specified page.
    *          <p>
-   *          Valid range: 1 .. {@link #getTotalPageNum()}.
+   *          Valid range: 0 .. {@link #getTotalPageNum()}-1.
    */
-  @Deprecated
-  void setCurrentPageIdx(int pageIdx);
   void setPageIdx(long pageIdx);
 
   /**
