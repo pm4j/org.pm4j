@@ -41,10 +41,12 @@ public class PageablePmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> imple
 
   /** The collection type specific selection handler. */
   private SelectionHandlerWithPmFactory<T_PM, T_BEAN> selectionHandler;
-  private final PmBeanCollectionModificationHandler         modificationHandler;
+  private final PmBeanCollectionModificationHandler   modificationHandler;
 
-  private PmObject                     pmCtxt;
-  private PageableCollection2<T_BEAN>  beanCollection;
+  private final PmObject                              pmCtxt;
+  private final PageableCollection2<T_BEAN>           beanCollection;
+  /** Type of item PM's the change handler should observe changes for. */
+  private final Class<?>                              itemPmClass;
 
 
   /**
@@ -55,12 +57,14 @@ public class PageablePmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> imple
    * @param pageableBeanCollection
    *          The collection of beans to represent by this collection of bean-PM's.
    */
-  public PageablePmBeanCollection(PmObject pmCtxt, PageableCollection2<T_BEAN> pageableBeanCollection) {
+  public PageablePmBeanCollection(PmObject pmCtxt, Class<?> itemPmClass, PageableCollection2<T_BEAN> pageableBeanCollection) {
     assert pmCtxt != null;
     assert pageableBeanCollection != null;
+    assert itemPmClass != null;
 
     this.pmCtxt = pmCtxt;
     this.beanCollection = pageableBeanCollection;
+    this.itemPmClass = itemPmClass;
     this.selectionHandler = new SelectionHandlerWithPmFactory<T_PM, T_BEAN>(pmCtxt, pageableBeanCollection.getSelectionHandler());
     this.modificationHandler = new PmBeanCollectionModificationHandler();
   }
@@ -75,8 +79,8 @@ public class PageablePmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> imple
    * @param queryOptions
    *          the optional query options.
    */
-  public PageablePmBeanCollection(PmObject pmCtxt, Collection<T_BEAN> beans, QueryOptions queryOptions) {
-	  this(pmCtxt, beans, queryOptions, null);
+  public PageablePmBeanCollection(PmObject pmCtxt, Class<?> itemPmClass, Collection<T_BEAN> beans, QueryOptions queryOptions) {
+	  this(pmCtxt, itemPmClass, beans, queryOptions, null);
   }
 
   /**
@@ -91,8 +95,8 @@ public class PageablePmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> imple
    * @param query
    *          the used query. Is optional.
    */
-  public PageablePmBeanCollection(PmObject pmCtxt, Collection<T_BEAN> beans, QueryOptions queryOptions, QueryParams query) {
-    this(pmCtxt,
+  public PageablePmBeanCollection(PmObject pmCtxt, Class<?> itemPmClass, Collection<T_BEAN> beans, QueryOptions queryOptions, QueryParams query) {
+    this(pmCtxt, itemPmClass,
          new PageableInMemCollectionImpl<T_BEAN>(
              new InMemPmQueryEvaluator<T_BEAN>(pmCtxt),
              beans,
@@ -109,8 +113,8 @@ public class PageablePmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> imple
    * @param beans
    *          The set of beans to handle.
    */
-  public PageablePmBeanCollection(PmObject pmCtxt, Collection<T_BEAN> beans) {
-    this(pmCtxt, beans, new QueryOptions(), null);
+  public PageablePmBeanCollection(PmObject pmCtxt, Class<?> itemPmClass, Collection<T_BEAN> beans) {
+    this(pmCtxt, itemPmClass, beans, new QueryOptions(), null);
   }
 
   @Override
@@ -140,6 +144,10 @@ public class PageablePmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> imple
   }
 
   @Override
+  public long getPageIdx() {
+    return beanCollection.getPageIdx();
+  }
+  @Override
   public int getCurrentPageIdx() {
     return beanCollection.getCurrentPageIdx();
   }
@@ -147,6 +155,10 @@ public class PageablePmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> imple
   @Override
   public void setCurrentPageIdx(int pageIdx) {
     beanCollection.setCurrentPageIdx(pageIdx);
+  }
+  @Override
+  public void setPageIdx(long pageIdx) {
+    beanCollection.setPageIdx(pageIdx);
   }
 
   @Override
@@ -240,8 +252,8 @@ public class PageablePmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> imple
     }
 
     @Override
-    public void updateItem(T_PM item) {
-      getBeanCollectionModificationHandler().updateItem(item.getPmBean());
+    public void updateItem(T_PM item, boolean isUpdated) {
+      getBeanCollectionModificationHandler().updateItem(item.getPmBean(), isUpdated);
     }
 
     // TODO olaf: ensure that the cleanup code also gets called when the bean modification handler gets used.
@@ -321,21 +333,7 @@ public class PageablePmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> imple
       public void handleEvent(PmEvent event) {
         PmDataInput itemPm = findChildItemToObserve(event.pm);
         if (itemPm != null) {
-          //Modifications<T_PM> modifications = getModifications();
-          if (modifications.getAddedItems().contains(itemPm)) {
-            return; // nothing to do. The row is already registered as a changed one.
-          }
-          if (modifications.getUpdatedItems().contains(itemPm)) {
-            if (!itemPm.isPmValueChanged()) {
-              // row is now unchanged -> switch the changed state back
-              // TODO
-            }
-            return; // nothing else to do. The row is already registered as a changed one.
-          }
-
-          if (itemPm.isPmValueChanged()) {
-            modificationHandler.updateItem((T_PM) itemPm);
-          }
+          modificationHandler.updateItem((T_PM) itemPm, itemPm.isPmValueChanged());
         }
       }
 
@@ -347,9 +345,8 @@ public class PageablePmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> imple
         PmObject p = changedItem;
         do {
           if (p.getPmParent() == pmCtxt) {
-            // FIXME olaf: this does not correctly identify the intended children
-            // (in case of tables we need to make sure that we only observe rows...)
-            if (p instanceof PmDataInput) {
+            // Only PM's of the considered type are considered (e.g. row-PM type in case of tables).
+            if (itemPmClass.isAssignableFrom(p.getClass())) {
               return (PmDataInput)p;
             }
             else {

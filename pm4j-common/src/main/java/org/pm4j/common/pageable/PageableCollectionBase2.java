@@ -3,7 +3,6 @@ package org.pm4j.common.pageable;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.selection.Selection;
-import org.pm4j.common.selection.SelectionHandler;
 
 
 /**
@@ -16,7 +15,7 @@ import org.pm4j.common.selection.SelectionHandler;
 public abstract class PageableCollectionBase2<T_ITEM> implements PageableCollection2<T_ITEM> {
 
   private int                pageSize = 10;
-  private int                currentPageIdx;
+  private long               pageIdx;
   private final QueryParams  queryParams;
   private final QueryOptions queryOptions;
 
@@ -34,7 +33,7 @@ public abstract class PageableCollectionBase2<T_ITEM> implements PageableCollect
     this.queryParams = (queryParams != null)
             ? queryParams
             : new QueryParams(this.queryOptions.getDefaultSortOrder());
-    this.currentPageIdx = 1;
+    this.pageIdx = 0;
   }
 
   @Override
@@ -58,13 +57,21 @@ public abstract class PageableCollectionBase2<T_ITEM> implements PageableCollect
   }
 
   @Override
-  public int getCurrentPageIdx() {
-    return currentPageIdx;
+  public final int getCurrentPageIdx() {
+    return (int)pageIdx+1;
+  }
+  @Override
+  public long getPageIdx() {
+    return pageIdx;
   }
 
   @Override
-  public void setCurrentPageIdx(int pageIdx) {
-    this.currentPageIdx = (pageIdx < 1) ? 1 : pageIdx;
+  public final void setCurrentPageIdx(int pageIdx) {
+    setPageIdx(pageIdx-1);
+  }
+  @Override
+  public void setPageIdx(long pageIdx) {
+    this.pageIdx = (pageIdx < 0) ? 0 : pageIdx;
   }
 
   @Override

@@ -16,6 +16,7 @@ import org.pm4j.common.util.CompareUtil;
 import org.pm4j.core.pm.PmAttrString;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmTableCol2;
+import org.pm4j.core.pm.PmTableRow;
 import org.pm4j.core.pm.annotation.PmBeanCfg;
 import org.pm4j.core.pm.annotation.PmFactoryCfg;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
@@ -41,7 +42,7 @@ public class PageablePmBeanCollectionTest extends PageableCollectionTestBase<Pag
 
     qo.addSortOrder("name", new InMemSortOrder(attrNameValue));
 
-    beanTablePm.setPmPageableCollection(new PageablePmBeanCollection<BeanRowPm, Bean>(beanTablePm, beans, qo));
+    beanTablePm.setPmPageableCollection(new PageablePmBeanCollection<BeanRowPm, Bean>(beanTablePm, PmTableRow.class, beans, qo));
     beanTablePm.setPmRowSelectMode(SelectMode.SINGLE);
 
     return beanTablePm.getPmPageableCollection();

@@ -26,9 +26,13 @@ public interface ModificationHandler<T_ITEM> {
   /**
    * Registers the passed item as an updated item.
    *
-   * @param the updated item. It should be part of the collection.
+   * @param the
+   *          updated item. It should be part of the collection.
+   * @param isUpdated
+   *          indicates if the item should be added or removed from the set of
+   *          updated items.
    */
-  void updateItem(T_ITEM item);
+  void updateItem(T_ITEM item, boolean isUpdated);
 
   /**
    * Removes all currently selected items from the collection.

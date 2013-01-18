@@ -221,8 +221,8 @@ public class PageableInMemCollectionImpl<T_ITEM>
     };
 
     @Override
-    public void updateItem(T_ITEM item) {
-      modifications.registerUpdatedItem(item);
+    public void updateItem(T_ITEM item, boolean isUpdated) {
+      modifications.registerUpdatedItem(item, isUpdated);
     };
 
     @Override

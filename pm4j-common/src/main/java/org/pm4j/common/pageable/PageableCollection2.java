@@ -61,7 +61,9 @@ public interface PageableCollection2<T_ITEM> extends Iterable<T_ITEM> {
   /**
    * @return The current page number. Starts with one.
    */
+  @Deprecated
   int getCurrentPageIdx();
+  long getPageIdx();
 
   /**
    * @param pageIdx
@@ -69,7 +71,9 @@ public interface PageableCollection2<T_ITEM> extends Iterable<T_ITEM> {
    *          <p>
    *          Valid range: 1 .. {@link #getTotalPageNum()}.
    */
+  @Deprecated
   void setCurrentPageIdx(int pageIdx);
+  void setPageIdx(long pageIdx);
 
   /**
    * Provides the total number of objects within this set.

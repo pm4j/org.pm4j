@@ -10,7 +10,7 @@ import org.pm4j.core.pm.annotation.PmInject;
 import org.pm4j.core.pm.filter.FilterByDefinition;
 import org.pm4j.core.pm.filter.impl.FilterByPmAttrValueLocalized;
 import org.pm4j.core.pm.impl.PmObjectBase.NameBuilder;
-import org.pm4j.core.pm.impl.PmObjectBase.NameBuilderAbsoluteName;
+import org.pm4j.core.pm.impl.PmObjectBase.NameBuilderRelNameWithHashCode;
 import org.pm4j.core.pm.impl.inject.DiResolverFactory;
 import org.pm4j.core.pm.impl.inject.DiResolverFactoryPmInjectFieldByExpression;
 import org.pm4j.core.pm.impl.inject.DiResolverFactoryPmInjectFieldByParentOfType;
@@ -79,13 +79,13 @@ public class PmDefaults implements Cloneable {
    * Defines the algorithm used for the toString() implementation of PMs.<br>
    * The default implementation provides a name that reflects the complete PM hierarchy.
    */
-  private NameBuilder toStringNameBuilder = NameBuilderAbsoluteName.INSTANCE;
+  private NameBuilder toStringNameBuilder = NameBuilderRelNameWithHashCode.INSTANCE;
 
   /**
    * Defines the algorithm used for building the name of PMs as it will appear in the logs.<br>
    * The default implementation provides a name that reflects the complete PM hierarchy.
    */
-  private NameBuilder logStringBuilder = NameBuilderAbsoluteName.INSTANCE;
+  private NameBuilder logStringBuilder = NameBuilderRelNameWithHashCode.INSTANCE;
 
   /**
    * Defines the default {@link PmCommandCfg#beforeDo()} setting for commands

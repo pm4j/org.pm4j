@@ -14,7 +14,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.pm4j.common.pageable.Modifications;
 import org.pm4j.common.pageable.PageableCollection2;
-import org.pm4j.common.pageable.PageableCollectionUtil2;
 import org.pm4j.common.pageable.inmem.PageableInMemCollectionImpl;
 import org.pm4j.common.query.FilterCompareDefinitionFactory;
 import org.pm4j.common.query.QueryOptions;
@@ -31,6 +30,7 @@ import org.pm4j.core.pm.PmCommandDecorator;
 import org.pm4j.core.pm.PmDefaults;
 import org.pm4j.core.pm.PmElement;
 import org.pm4j.core.pm.PmEvent;
+import org.pm4j.core.pm.PmTableRow;
 import org.pm4j.core.pm.PmEvent.ValueChangeKind;
 import org.pm4j.core.pm.PmEventListener;
 import org.pm4j.core.pm.PmObject;
@@ -341,6 +341,10 @@ public class PmTableImpl2
       case CLEAR_CHANGES:
         currentRowPm = null;
         PmValidationApi.clearInvalidValuesOfSubtree(this);
+        // This change aspect gets called within load and reload operations.
+        // The PM factory cache needs to be cleared to ensure that no outdated bean
+        // gets re-used.
+        BeanPmCacheUtil.clearBeanPmCachesOfSubtree(this);
         getPmPageableCollection().clearCaches();
         getPmPageableCollection().getModificationHandler().clearRegisteredModifications();
         break;
@@ -465,7 +469,7 @@ public class PmTableImpl2
         qoptions,
         null);
     // @formatter:on
-    return new PageablePmBeanCollection<T_ROW_PM, T_ROW_BEAN>(this, inMemPageableCollection);
+    return new PageablePmBeanCollection<T_ROW_PM, T_ROW_BEAN>(this, PmTableRow.class, inMemPageableCollection);
   }
 
   @SuppressWarnings("unchecked")

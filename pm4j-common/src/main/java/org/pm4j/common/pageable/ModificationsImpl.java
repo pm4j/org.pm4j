@@ -53,11 +53,16 @@ public class ModificationsImpl<T_ITEM> implements Modifications<T_ITEM> {
     addedItems.add(item);
   }
 
-  public void registerUpdatedItem(T_ITEM item) {
-    if (updatedItems.isEmpty()) {
-      updatedItems = new ArrayList<T_ITEM>();
+  public void registerUpdatedItem(T_ITEM item, boolean isUpdated) {
+    if (isUpdated) {
+      if (updatedItems.isEmpty()) {
+        updatedItems = new ArrayList<T_ITEM>();
+      }
+      updatedItems.add(item);
     }
-    updatedItems.add(item);
+    else {
+      updatedItems.remove(item);
+    }
   }
 
   public void setRemovedItems(Selection<T_ITEM> removedItems) {

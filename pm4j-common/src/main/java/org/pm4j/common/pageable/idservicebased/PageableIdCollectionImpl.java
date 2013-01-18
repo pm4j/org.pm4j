@@ -70,11 +70,11 @@ public class PageableIdCollectionImpl<T_ITEM, T_ID> extends PageableCollectionBa
   }
 
   @Override
-  public void setCurrentPageIdx(int pageIdx) {
-    if (pageIdx != getCurrentPageIdx()) {
+  public void setPageIdx(long pageIdx) {
+    if (pageIdx != getPageIdx()) {
       currentPageItems = null;
     }
-    super.setCurrentPageIdx(pageIdx);
+    super.setPageIdx(pageIdx);
   }
 
   @Override

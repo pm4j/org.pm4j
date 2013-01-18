@@ -113,11 +113,11 @@ public class PageableQueryCollection<T_ITEM, T_ID extends Serializable> extends 
   }
 
   @Override
-  public void setCurrentPageIdx(int pageIdx) {
+  public void setPageIdx(long pageIdx) {
     if (pageIdx != getCurrentPageIdx()) {
       cachingService.getCache().clearPageCache();
     }
-    super.setCurrentPageIdx(pageIdx);
+    super.setPageIdx(pageIdx);
   }
 
   @Override
@@ -270,8 +270,9 @@ public class PageableQueryCollection<T_ITEM, T_ID extends Serializable> extends 
       throw new UnsupportedOperationException("Please embed this collection in a PageableCollectionWithAdditionalItems to handle add operations.");
     }
 
-    public void updateItem(T_ITEM item) {
-      modifications.registerUpdatedItem(item);
+    @Override
+    public void updateItem(T_ITEM item, boolean isUpdated) {
+      modifications.registerUpdatedItem(item, isUpdated);
     };
 
     @Override

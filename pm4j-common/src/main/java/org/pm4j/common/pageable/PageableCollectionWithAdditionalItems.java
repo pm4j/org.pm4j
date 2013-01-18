@@ -29,7 +29,7 @@ public class PageableCollectionWithAdditionalItems<T_ITEM> implements PageableCo
 
   private final PageableCollection2<T_ITEM>  baseCollection;
   private final List<T_ITEM>                 additionalItems;
-  private int                                currentPageIdx = 1;
+  private long                               currentPageIdx = 0;
   private final SelectionHandlerWithAdditionalItems<T_ITEM> selectionHandler;
   private final ModificationHandler<T_ITEM>  modificationHandler;
   private List<T_ITEM>                       itemsOnPage;
@@ -108,13 +108,13 @@ public class PageableCollectionWithAdditionalItems<T_ITEM> implements PageableCo
   public List<T_ITEM> getItemsOnPage() {
     if (itemsOnPage == null) {
       int pageSize = getPageSize();
-      int numOfPagesFilledByBaseCollectionPages = (int)baseCollection.getNumOfItems() / pageSize;
+      long numOfPagesFilledByBaseCollectionPages = baseCollection.getNumOfItems() / pageSize;
 
       if (additionalItems.isEmpty() ||
-          (currentPageIdx <= numOfPagesFilledByBaseCollectionPages)) {
+          (currentPageIdx < numOfPagesFilledByBaseCollectionPages)) {
         itemsOnPage = baseCollection.getItemsOnPage();
       } else {
-        boolean mixedPage = (currentPageIdx == numOfPagesFilledByBaseCollectionPages+1) &&
+        boolean mixedPage = (currentPageIdx == numOfPagesFilledByBaseCollectionPages) &&
                             (baseCollection.getNumOfItems() % pageSize) != 0;
         if (mixedPage) {
           List<T_ITEM> list = new ArrayList<T_ITEM>(baseCollection.getItemsOnPage());
@@ -126,7 +126,7 @@ public class PageableCollectionWithAdditionalItems<T_ITEM> implements PageableCo
           }
           itemsOnPage = list;
         } else {
-          long firstItemIdx = (currentPageIdx-1) * pageSize;
+          long firstItemIdx = (currentPageIdx) * pageSize;
           int offset = (int)(firstItemIdx - baseCollection.getNumOfItems());
           itemsOnPage = new ArrayList<T_ITEM>(ListUtil.subListPage(additionalItems, offset, pageSize));
         }
@@ -148,15 +148,23 @@ public class PageableCollectionWithAdditionalItems<T_ITEM> implements PageableCo
   }
 
   @Override
-  public int getCurrentPageIdx() {
+  public long getPageIdx() {
     return currentPageIdx;
+  }
+  @Override
+  public int getCurrentPageIdx() {
+    return (int)getPageIdx()+1;
   }
 
   @Override
-  public void setCurrentPageIdx(int pageIdx) {
+  public void setPageIdx(long pageIdx) {
     currentPageIdx = pageIdx;
-    baseCollection.setCurrentPageIdx(pageIdx);
+    baseCollection.setPageIdx(pageIdx);
     itemsOnPage = null;
+  }
+  @Override
+  public void setCurrentPageIdx(int pageIdx) {
+    setPageIdx(pageIdx-1);
   }
 
   @Override
@@ -204,10 +212,10 @@ public class PageableCollectionWithAdditionalItems<T_ITEM> implements PageableCo
     }
 
     @Override
-    public void updateItem(T_ITEM item) {
+    public void updateItem(T_ITEM item, boolean isUpdated) {
       assert item != null;
       if (!additionalItems.contains(item)) {
-        baseCollection.getModificationHandler().updateItem(item);
+        baseCollection.getModificationHandler().updateItem(item, isUpdated);
       }
     };
 

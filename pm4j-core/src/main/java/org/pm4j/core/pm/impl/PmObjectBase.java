@@ -1270,6 +1270,15 @@ public abstract class PmObjectBase implements PmObject {
     }
   }
 
+  /** Logs the the relative PM name and a hash code. */
+  public static class NameBuilderRelNameWithHashCode implements NameBuilder {
+    public static final NameBuilder INSTANCE = new NameBuilderRelNameWithHashCode();
+     @Override
+      public String makeName(PmObjectBase pm) {
+          return pm.getPmRelativeName() + "(" + Integer.toHexString(pm.hashCode()) + ")";
+      }
+  }
+
   public static class NameBuilderTitle implements NameBuilder {
     public static final NameBuilder INSTANCE = new NameBuilderTitle();
     @Override
