@@ -32,13 +32,7 @@ public class PmTable2Test {
     ));
 
     myTablePm = new TablePm(new PmConversationImpl());
-
-//    QueryOptions qo = new QueryOptions();
-//    qo.addSortOrder("name.valueLocalized", new InMemSortOrder<Comparable<?>>(false));
-//    qo.setDefaultSortOrder(defaultSortOrder)
-
-    PageablePmBeanCollection<RowPm, RowBean> pc = new PageablePmBeanCollection<RowPm, RowBean>(myTablePm, PmTableRow.class, editedRowBeanList);
-
+    PageablePmBeanCollection<RowPm, RowBean> pc = new PageablePmBeanCollection<RowPm, RowBean>(myTablePm, RowPm.class, editedRowBeanList);
     myTablePm.setPmPageableCollection(pc);
   }
 
@@ -49,7 +43,7 @@ public class PmTable2Test {
 
   @Test
   public void testEmptyTable() {
-    myTablePm.setPmPageableCollection(new PageablePmBeanCollection<RowPm, RowBean>(myTablePm, PmTableRow.class, new ArrayList<RowBean>()));
+    myTablePm.setPmPageableCollection(new PageablePmBeanCollection<RowPm, RowBean>(myTablePm, RowPm.class, new ArrayList<RowBean>()));
 
     assertEquals(0, myTablePm.getTotalNumOfPmRows());
     assertEquals(0, myTablePm.getRowPms().size());

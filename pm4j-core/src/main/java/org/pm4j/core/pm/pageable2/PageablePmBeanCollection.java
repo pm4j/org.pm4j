@@ -79,7 +79,7 @@ public class PageablePmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> imple
    * @param queryOptions
    *          the optional query options.
    */
-  public PageablePmBeanCollection(PmObject pmCtxt, Class<?> itemPmClass, Collection<T_BEAN> beans, QueryOptions queryOptions) {
+  public PageablePmBeanCollection(PmObject pmCtxt, Class<T_PM> itemPmClass, Collection<T_BEAN> beans, QueryOptions queryOptions) {
 	  this(pmCtxt, itemPmClass, beans, queryOptions, null);
   }
 
@@ -95,7 +95,7 @@ public class PageablePmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> imple
    * @param query
    *          the used query. Is optional.
    */
-  public PageablePmBeanCollection(PmObject pmCtxt, Class<?> itemPmClass, Collection<T_BEAN> beans, QueryOptions queryOptions, QueryParams query) {
+  public PageablePmBeanCollection(PmObject pmCtxt, Class<T_PM> itemPmClass, Collection<T_BEAN> beans, QueryOptions queryOptions, QueryParams query) {
     this(pmCtxt, itemPmClass,
          new PageableInMemCollectionImpl<T_BEAN>(
              new InMemPmQueryEvaluator<T_BEAN>(pmCtxt),
@@ -113,7 +113,7 @@ public class PageablePmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> imple
    * @param beans
    *          The set of beans to handle.
    */
-  public PageablePmBeanCollection(PmObject pmCtxt, Class<?> itemPmClass, Collection<T_BEAN> beans) {
+  public PageablePmBeanCollection(PmObject pmCtxt, Class<T_PM> itemPmClass, Collection<T_BEAN> beans) {
     this(pmCtxt, itemPmClass, beans, new QueryOptions(), null);
   }
 
