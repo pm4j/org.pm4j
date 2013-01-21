@@ -24,13 +24,11 @@ import org.pm4j.common.selection.SelectionHandler;
 import org.pm4j.common.util.beanproperty.PropertyAndVetoableChangeListener;
 import org.pm4j.common.util.collection.ListUtil;
 import org.pm4j.core.exception.PmRuntimeException;
-import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmCommandDecorator;
 import org.pm4j.core.pm.PmDefaults;
 import org.pm4j.core.pm.PmElement;
 import org.pm4j.core.pm.PmEvent;
-import org.pm4j.core.pm.PmTableRow;
 import org.pm4j.core.pm.PmEvent.ValueChangeKind;
 import org.pm4j.core.pm.PmEventListener;
 import org.pm4j.core.pm.PmObject;
@@ -39,6 +37,7 @@ import org.pm4j.core.pm.PmTable.RowSelectMode;
 import org.pm4j.core.pm.PmTable2;
 import org.pm4j.core.pm.PmTableCol2;
 import org.pm4j.core.pm.PmTableGenericRow2;
+import org.pm4j.core.pm.PmTableRow;
 import org.pm4j.core.pm.PmVisitor;
 import org.pm4j.core.pm.annotation.PmTableCfg;
 import org.pm4j.core.pm.annotation.PmTableCfg2;
@@ -64,7 +63,7 @@ import org.pm4j.core.pm.pageable2.PageablePmBeanCollection;
  * @author olaf boede
  */
 public class PmTableImpl2
-        <T_ROW_PM extends PmBean<T_ROW_BEAN>, T_ROW_BEAN>
+        <T_ROW_PM extends PmTableRow<T_ROW_BEAN>, T_ROW_BEAN>
         extends PmDataInputBase
         implements PmTable2<T_ROW_PM> {
 

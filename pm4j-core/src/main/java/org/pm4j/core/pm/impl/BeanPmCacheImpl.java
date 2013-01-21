@@ -153,8 +153,8 @@ class BeanPmCacheImpl implements BeanPmCache {
 
   @SuppressWarnings("unchecked")
   @Override
-  public Collection<PmObject> getItems() {
-    return (Collection<PmObject>)(Object)pmToBeanIdentityMap.keySet();
+  public Collection<PmBean<?>> getItems() {
+    return (Collection<PmBean<?>>)(Object)pmToBeanIdentityMap.keySet();
   }
 
   private String logString(PmObject pm) {

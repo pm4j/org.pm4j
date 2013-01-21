@@ -1,5 +1,8 @@
 package org.pm4j.core.pm.impl;
 
+import java.util.Collection;
+import java.util.Collections;
+
 import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmObject;
 
@@ -8,9 +11,9 @@ import org.pm4j.core.pm.PmObject;
  *
  * @author olaf boede
  */
-public class BeanPmCacheUtil {
+public final class BeanPmCacheUtil {
 
-  public static final void clearBeanPmCache(PmObject factoryOwningPm) {
+  public static void clearBeanPmCache(PmObject factoryOwningPm) {
     if (((PmObjectBase)factoryOwningPm).pmBeanFactoryCache != null) {
       ((PmObjectBase)factoryOwningPm).pmBeanFactoryCache.clear();
     }
@@ -21,7 +24,7 @@ public class BeanPmCacheUtil {
    *
    * @param rootPm The root of the PM tree to handle.
    */
-  public static final void clearBeanPmCachesOfSubtree(PmObject rootPm) {
+  public static void clearBeanPmCachesOfSubtree(PmObject rootPm) {
     rootPm.accept(new PmVisitorAdapter() {
       @Override
       protected void onVisit(PmObject pm) {
@@ -36,16 +39,28 @@ public class BeanPmCacheUtil {
     });
   }
 
-  public static final void removeBeanPm(PmObject factoryOwningPm, PmBean<?> pmToRemove) {
+  public static void removeBeanPm(PmObject factoryOwningPm, PmBean<?> pmToRemove) {
     if (((PmObjectBase)factoryOwningPm).pmBeanFactoryCache != null) {
       ((PmObjectBase)factoryOwningPm).pmBeanFactoryCache.removePm(pmToRemove);
     }
   }
 
-  public static final void removeBean(PmObject factoryOwningPm, Object beanToRemove) {
+  public static void removeBean(PmObject factoryOwningPm, Object beanToRemove) {
     if (((PmObjectBase)factoryOwningPm).pmBeanFactoryCache != null) {
       ((PmObjectBase)factoryOwningPm).pmBeanFactoryCache.removeBean(beanToRemove);
     }
+  }
+
+  /**
+   * Provides the set of currenty cached PM instances.
+   * @param factoryOwningPm
+   * @return
+   */
+  @SuppressWarnings("unchecked")
+  public static Collection<PmBean<?>> getCachedPms(PmObject factoryOwningPm) {
+    return (((PmObjectBase)factoryOwningPm).pmBeanFactoryCache != null)
+        ? ((PmObjectBase)factoryOwningPm).pmBeanFactoryCache.getItems()
+        : Collections.EMPTY_LIST;
   }
 
 }

@@ -1,5 +1,6 @@
 package org.pm4j.core.pm.pageable2;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -46,8 +47,9 @@ public class PageablePmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> imple
   private final PmObject                              pmCtxt;
   private final PageableCollection2<T_BEAN>           beanCollection;
   /** Type of item PM's the change handler should observe changes for. */
-  private final Class<?>                              itemPmClass;
-
+  private final Class<T_PM>                           itemPmClass;
+  /** An internal helper that prevents to call the bean cache refresh operation to often. */
+  private long idxOfLastPmBeanCacheUpdate = -1;
 
   /**
    * Creates a collection backed by the given {@link PageableCollection} of beans.
@@ -57,6 +59,7 @@ public class PageablePmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> imple
    * @param pageableBeanCollection
    *          The collection of beans to represent by this collection of bean-PM's.
    */
+  @SuppressWarnings("unchecked")
   public PageablePmBeanCollection(PmObject pmCtxt, Class<?> itemPmClass, PageableCollection2<T_BEAN> pageableBeanCollection) {
     assert pmCtxt != null;
     assert pageableBeanCollection != null;
@@ -64,7 +67,7 @@ public class PageablePmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> imple
 
     this.pmCtxt = pmCtxt;
     this.beanCollection = pageableBeanCollection;
-    this.itemPmClass = itemPmClass;
+    this.itemPmClass = (Class<T_PM>) itemPmClass;
     this.selectionHandler = new SelectionHandlerWithPmFactory<T_PM, T_BEAN>(pmCtxt, pageableBeanCollection.getSelectionHandler());
     this.modificationHandler = new PmBeanCollectionModificationHandler();
   }
@@ -130,6 +133,15 @@ public class PageablePmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> imple
   @SuppressWarnings("unchecked")
   @Override
   public List<T_PM> getItemsOnPage() {
+    // On page switch: ensure that the PM's for un-modified beans are re-generated.
+    // Otherwise the UI could present PM's with outdated beans.
+    // XXX olaf: Shouldn't be necessary if the collection would observe page switches of the
+    // base collection.
+    if (idxOfLastPmBeanCacheUpdate != getPageIdx()) {
+      releaseUnModifiedPmBeanCacheItems();
+      idxOfLastPmBeanCacheUpdate = getPageIdx();
+    }
+
     return (List<T_PM>) PmFactoryApi.getPmListForBeans(pmCtxt, beanCollection.getItemsOnPage(), false);
   }
 
@@ -151,6 +163,12 @@ public class PageablePmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> imple
   @Override
   public void setPageIdx(long pageIdx) {
     beanCollection.setPageIdx(pageIdx);
+    // On page switch: ensure that the PM's for un-modified beans are re-generated.
+    // Otherwise the UI could present PM's with outdated beans.
+    if (idxOfLastPmBeanCacheUpdate != pageIdx) {
+      releaseUnModifiedPmBeanCacheItems();
+      idxOfLastPmBeanCacheUpdate = pageIdx;
+    }
   }
 
   @Override
@@ -221,6 +239,29 @@ public class PageablePmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> imple
    */
   protected void setSelectionHandler(SelectionHandlerWithPmFactory<T_PM, T_BEAN> selectionHandler) {
     this.selectionHandler = selectionHandler;
+  }
+
+  /** Ensures that all unmodified PM factory generated item PMs get released. */
+  private void releaseUnModifiedPmBeanCacheItems() {
+    Collection<PmBean<?>> cachedPms = BeanPmCacheUtil.getCachedPms(pmCtxt);
+    if (cachedPms.isEmpty()) {
+      return;
+    }
+
+    Modifications<T_BEAN> modifiedBeans = beanCollection.getModifications();
+    Collection<T_BEAN> addedBeans = modifiedBeans.getAddedItems();
+    Collection<T_BEAN> updatedBeans = modifiedBeans.getUpdatedItems();
+
+    for (PmBean<?> pm : new ArrayList<PmBean<?>>(cachedPms)) {
+      if (itemPmClass.isAssignableFrom(pm.getClass())) {
+        @SuppressWarnings("unchecked")
+        T_BEAN b = (T_BEAN) pm.getPmBean();
+        if (!addedBeans.contains(b) &&
+            !updatedBeans.contains(b)) {
+          BeanPmCacheUtil.removeBeanPm(pmCtxt, pm);
+        }
+      }
+    }
   }
 
   /**

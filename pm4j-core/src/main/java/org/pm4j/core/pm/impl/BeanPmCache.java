@@ -3,7 +3,6 @@ package org.pm4j.core.pm.impl;
 import java.util.Collection;
 
 import org.pm4j.core.pm.PmBean;
-import org.pm4j.core.pm.PmObject;
 
 interface BeanPmCache {
 
@@ -43,6 +42,6 @@ interface BeanPmCache {
   boolean isEmpty();
 
   /** @return the set of items. */
-  Collection<PmObject> getItems();
+  Collection<PmBean<?>> getItems();
 
 }
