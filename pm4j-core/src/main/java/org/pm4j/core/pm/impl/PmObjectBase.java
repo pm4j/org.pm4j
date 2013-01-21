@@ -392,16 +392,16 @@ public abstract class PmObjectBase implements PmObject {
     if (pmInitState != PmInitState.INITIALIZED)
       return;
 
-    MetaData sd = getPmMetaData();
+    MetaData md = getPmMetaData();
 
     if (cacheSet.contains(PmCacheApi.CacheKind.ENABLEMENT))
-      sd.cacheStrategyForEnablement.clear(this);
+      md.cacheStrategyForEnablement.clear(this);
 
     if (cacheSet.contains(PmCacheApi.CacheKind.VISIBILITY))
-      sd.cacheStrategyForVisibility.clear(this);
+      md.cacheStrategyForVisibility.clear(this);
 
     if (cacheSet.contains(PmCacheApi.CacheKind.TITLE))
-      sd.cacheStrategyForTitle.clear(this);
+      md.cacheStrategyForTitle.clear(this);
 
     for (PmObject p : getPmChildrenAndFactoryPms()) {
       if (p instanceof PmObjectBase) {

@@ -30,6 +30,7 @@ import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmLocalizeApi;
 import org.pm4j.core.pm.api.PmMessageUtil;
 import org.pm4j.core.pm.api.PmValidationApi;
+import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
 import org.pm4j.navi.NaviHistory;
 import org.pm4j.navi.NaviLink;
 import org.pm4j.navi.NaviRuleLink;
@@ -86,7 +87,7 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
    * A processed command (after starting {@link #doItImpl()}) was cloned from a
    * template. In this state this member identifies the clone source.
    */
-  private PmCommand templateCommand;
+  private PmCommandImpl templateCommand;
 
   /**
    * Constructor for fix commands that have an associated field in the parent
@@ -717,6 +718,15 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
    */
   public PmCommand getTemplateCommand() {
     return templateCommand;
+  }
+
+  /** Clears cached template instance values too. */
+  @Override
+  protected void clearCachedPmValues(Set<CacheKind> cacheSet) {
+    super.clearCachedPmValues(cacheSet);
+    if (templateCommand != null) {
+      templateCommand.clearCachedPmValues(cacheSet);
+    }
   }
 
   // ======== meta data ======== //
