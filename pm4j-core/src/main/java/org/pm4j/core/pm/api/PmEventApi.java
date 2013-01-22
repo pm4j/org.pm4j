@@ -7,6 +7,8 @@ import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmCommandDecorator;
 import org.pm4j.core.pm.PmEventListener;
 import org.pm4j.core.pm.PmObject;
+import org.pm4j.core.pm.api.PmVisitorApi.VisitCallBack;
+import org.pm4j.core.pm.api.PmVisitorApi.VisitResult;
 import org.pm4j.core.pm.impl.PmAttrValueChangeDecorator;
 import org.pm4j.core.pm.impl.PmEventApiHandler;
 
@@ -132,4 +134,24 @@ public class PmEventApi {
     apiHandler = newApiHandler;
   }
 
+  /**
+   * Propagates rootEvent to rootPm and its children. 
+   * @param rootPm start point.
+   * @param rootEvent the event.
+   */
+  public static void firePmEventRecursively(final PmObject rootPm, final PmEvent rootEvent) {
+    PmVisitorApi.visit(rootPm, new VisitCallBack() {
+      private  PmEvent event = rootEvent;
+      @Override
+      public VisitResult visit(PmObject pm) {
+        if(rootPm == pm) {
+          PmEventApi.firePmEvent(pm, event);      
+        }
+        else {
+          PmEventApi.firePmEvent(pm, new PmEvent(event.getSource(), pm, event.getChangeMask(), event.getValueChangeKind()));
+        }
+        return VisitResult.CONTINUE;
+      }
+    });
+  }
 }

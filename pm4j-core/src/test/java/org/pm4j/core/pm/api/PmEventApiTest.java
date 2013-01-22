@@ -56,6 +56,19 @@ public class PmEventApiTest {
     assertEquals(1, elemHierarchyListener.receivedEvents.size());
   }
 
+  @Test
+  public void testFireEventRecursively() {
+    PmEventApi.addWeakPmEventListener(myPm, VALUE_CHANGE, elementListener);
+    PmEventApi.addWeakPmEventListener(myPm.s, VALUE_CHANGE, attrListener);
+
+    PmEvent valueChange = new PmEvent(new Object(), myPm, VALUE_CHANGE);
+    PmEventApi.firePmEventRecursively(myPm, valueChange);
+
+    assertEquals(1, attrListener.receivedEvents.size());
+    assertEquals(1, elementListener.receivedEvents.size());
+    assertEquals(myPm, elementListener.receivedEvents.get(0).getPm());
+    assertEquals(myPm.s, attrListener.receivedEvents.get(0).getPm());
+  }  
 
   static class MyPm extends PmConversationImpl {
     public final PmAttrString s = new PmAttrStringImpl(this);
