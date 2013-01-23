@@ -17,11 +17,8 @@ import org.pm4j.common.selection.Selection;
  */
 public class ModificationsImpl<T_ITEM> implements Modifications<T_ITEM> {
 
-  @SuppressWarnings("unchecked")
-  private Collection<T_ITEM> addedItems = Collections.EMPTY_LIST;
-
-  @SuppressWarnings("unchecked")
-  private Collection<T_ITEM> updatedItems = Collections.EMPTY_LIST;
+  private Collection<T_ITEM> addedItems = Collections.emptyList();
+  private Collection<T_ITEM> updatedItems = Collections.emptyList();
 
   @SuppressWarnings("unchecked")
   private Selection<T_ITEM> removedItems = (Selection<T_ITEM>) EmptySelection.EMPTY_OBJECT_SELECTION;
@@ -50,7 +47,9 @@ public class ModificationsImpl<T_ITEM> implements Modifications<T_ITEM> {
     if (addedItems.isEmpty()) {
       addedItems = new ArrayList<T_ITEM>();
     }
-    addedItems.add(item);
+    if (!addedItems.contains(item)) {
+      addedItems.add(item);
+    }
   }
 
   public void registerUpdatedItem(T_ITEM item, boolean isUpdated) {
@@ -58,10 +57,14 @@ public class ModificationsImpl<T_ITEM> implements Modifications<T_ITEM> {
       if (updatedItems.isEmpty()) {
         updatedItems = new ArrayList<T_ITEM>();
       }
-      updatedItems.add(item);
+      if (!updatedItems.contains(item)) {
+        updatedItems.add(item);
+      }
     }
     else {
-      updatedItems.remove(item);
+      if (!updatedItems.isEmpty()) {
+        updatedItems.remove(item);
+      }
     }
   }
 
