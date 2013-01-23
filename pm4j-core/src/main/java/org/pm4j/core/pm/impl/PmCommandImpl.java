@@ -536,7 +536,7 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
 
   /**
    * Provides the object that defines the area (PM sub tree) that should not contain
-   * an error after command validation.
+   * an error before the command gets executed.
    * <p>
    * It will only be considered if the command validates before execution.
    * <p>
@@ -556,7 +556,7 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
    * <p>
    * The default implementation provides the next parent of type {@link PmDataInput}.
    *
-   * @return
+   * @return the PM tree root object to validate before execution.
    */
   protected PmDataInput getValidationExecRootPm() {
     return PmUtil.getPmParentOfType(this, PmDataInput.class);
@@ -712,9 +712,12 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
   }
 
   /**
-   * @return A processed command (after starting {@link #doItImpl()}) was cloned
-   *         from a template. In this state this member identifies the clone
-   *         source.
+   * A processed command (after starting {@link #doIt()}) gets cloned from the
+   * original command instance (the template).<br>
+   * In this state this member identifies the clone source.
+   *
+   * @return the template instance or <code>null</code> if it's the original
+   *         command instance.
    */
   public PmCommand getTemplateCommand() {
     return templateCommand;
