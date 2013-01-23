@@ -292,7 +292,7 @@ public abstract class PmObjectBase implements PmObject {
 
   @Override
   public boolean isPmValid() {
-    List<PmMessage> msgList = getPmConversationImpl().getPmMessages(this, Severity.ERROR);
+    List<PmMessage> msgList = PmMessageUtil.getSubTreeMessages(this, Severity.ERROR);
     return msgList.isEmpty();
   }
 
