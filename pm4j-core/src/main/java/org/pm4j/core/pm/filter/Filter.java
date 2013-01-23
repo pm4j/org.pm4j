@@ -7,6 +7,7 @@ package org.pm4j.core.pm.filter;
  * to beans behind the PM items.<br>
  * In this case the method {@link #isBeanFilter()} should provide the value <code>true</code>.
  */
+// TODO: @Deprecated - will be moved out with old PmTable
 public interface Filter {
 
   /**

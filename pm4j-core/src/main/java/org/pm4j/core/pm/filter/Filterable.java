@@ -1,10 +1,12 @@
 package org.pm4j.core.pm.filter;
 
 /**
- * Interfaces for classes that may use content filters.
+ * Interface for classes that may use dynamically defined filters.<br>
+ * E.g. for tables or lists with filters that may be specified by the user.
  *
  * @author olaf boede.
  */
+//TODO: @Deprecated - will be moved out with old PmTable
 public interface Filterable {
 
   /**

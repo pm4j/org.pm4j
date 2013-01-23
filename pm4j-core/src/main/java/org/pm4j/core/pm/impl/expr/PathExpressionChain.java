@@ -35,6 +35,7 @@ public class PathExpressionChain extends ExprBase<ExprExecCtxt> {
   protected Object execImpl(ExprExecCtxt ctxt) {
     for (int i=0; i<chain.length; ++i) {
       OptionalExpression r = chain[i];
+
       r.exec(ctxt);
       if (ctxt.getCurrentValue() == null) {
         if (i != chain.length-1 &&
@@ -56,6 +57,7 @@ public class PathExpressionChain extends ExprBase<ExprExecCtxt> {
     }
     return ctxt.getCurrentValue();
   }
+
 
   @Override
   protected void execAssignImpl(ExprExecCtxt ctxt, Object value) {
