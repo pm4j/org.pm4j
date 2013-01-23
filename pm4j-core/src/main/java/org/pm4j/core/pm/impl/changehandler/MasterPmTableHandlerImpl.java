@@ -219,9 +219,21 @@ public class MasterPmTableHandlerImpl<T_MASTER_BEAN> implements MasterPmRecordHa
    * @return <code>true</code> if the switch can be performed.
    */
   protected boolean canSwitch() {
-    return (masterTablePm.getCurrentRowPm() == null)
-        ? true
-        : validateDetails();
+    if (masterTablePm.getCurrentRowPm() == null) {
+      return true;
+    }
+
+    if (!validateDetails()) {
+      return false;
+    }
+
+    for (DetailsPmHandler<?> dh : detailsHandlers) {
+      if (!dh.canSwitchMasterRecord()) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   /**
