@@ -119,6 +119,7 @@ public interface PmAttr<T> extends PmObject, PmDataInput {
 	 *         time of the PM (or since the previous value or changed state
 	 *         reset).
 	 */
+    @Override
 	boolean isPmValueChanged();
 
 	/**
@@ -140,6 +141,7 @@ public interface PmAttr<T> extends PmObject, PmDataInput {
 	 * @param <code>true</code> marks the attribute as changed.<br>
 	 *        <code>false</code> marks the attribute as unchanged.
 	 */
+    @Override
 	void setPmValueChanged(boolean newChangedState);
 
 	/**
