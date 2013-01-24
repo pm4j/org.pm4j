@@ -13,6 +13,7 @@ import org.pm4j.common.selection.Selection;
 import org.pm4j.common.selection.SelectionHandler;
 import org.pm4j.common.selection.SelectionHandlerWithAdditionalItems;
 import org.pm4j.common.selection.SelectionWithAdditionalItems;
+import org.pm4j.common.util.beanproperty.PropertyChangeSupportedBase;
 import org.pm4j.common.util.collection.CombinedIterator;
 import org.pm4j.common.util.collection.ListUtil;
 
@@ -25,7 +26,7 @@ import org.pm4j.common.util.collection.ListUtil;
  *
  * @author olaf boede
  */
-public class PageableCollectionWithAdditionalItems<T_ITEM> implements PageableCollection2<T_ITEM> {
+public class PageableCollectionWithAdditionalItems<T_ITEM> extends PropertyChangeSupportedBase implements PageableCollection2<T_ITEM> {
 
   private final PageableCollection2<T_ITEM>  baseCollection;
   private final List<T_ITEM>                 additionalItems;
@@ -153,9 +154,13 @@ public class PageableCollectionWithAdditionalItems<T_ITEM> implements PageableCo
 
   @Override
   public void setPageIdx(long pageIdx) {
-    currentPageIdx = pageIdx;
-    baseCollection.setPageIdx(pageIdx);
-    itemsOnPage = null;
+    if (pageIdx != currentPageIdx) {
+      long oldPageIdx = this.currentPageIdx;
+      this.currentPageIdx = pageIdx;
+      baseCollection.setPageIdx(pageIdx);
+      itemsOnPage = null;
+      firePropertyChange(PROP_PAGE_IDX, oldPageIdx, pageIdx);
+    }
   }
 
   @Override
@@ -200,27 +205,32 @@ public class PageableCollectionWithAdditionalItems<T_ITEM> implements PageableCo
       if (getPageIdx() == PageableCollectionUtil2.getNumOfPages(PageableCollectionWithAdditionalItems.this)-1) {
         itemsOnPage = null;
       }
+      PageableCollectionWithAdditionalItems.this.firePropertyChange(PageableCollection2.PROP_ITEM_ADD, null, item);
     }
 
     @Override
     public void updateItem(T_ITEM item, boolean isUpdated) {
       assert item != null;
+      boolean wasUpdated = modifications.getUpdatedItems().contains(item);
       if (!additionalItems.contains(item)) {
         baseCollection.getModificationHandler().updateItem(item, isUpdated);
       }
+      PageableCollectionWithAdditionalItems.this.firePropertyChange(PageableCollection2.PROP_ITEM_UPDATE, wasUpdated, isUpdated);
     };
 
     @Override
     public boolean removeSelectedItems() {
       SelectionWithAdditionalItems<T_ITEM> items = (SelectionWithAdditionalItems<T_ITEM>) selectionHandler.getSelection();
-
-      // first do the operation that can fail:
-      if (!baseCollection.getModificationHandler().removeSelectedItems()) {
-        return false;
+      if (! items.isEmpty()) {
+        // first do the operation that can fail:
+        if (!baseCollection.getModificationHandler().removeSelectedItems()) {
+          return false;
+        }
+        additionalItems.removeAll(items.getAdditionalSelectedItems());
+        selectionHandler.selectAll(false);
+        clearCaches();
+        PageableCollectionWithAdditionalItems.this.firePropertyChange(PageableCollection2.PROP_ITEM_REMOVE, items, null);
       }
-      additionalItems.removeAll(items.getAdditionalSelectedItems());
-      selectionHandler.selectAll(false);
-      clearCaches();
       return true;
     }
 

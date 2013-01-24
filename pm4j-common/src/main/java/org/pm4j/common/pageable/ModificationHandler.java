@@ -1,5 +1,7 @@
 package org.pm4j.common.pageable;
 
+import java.beans.PropertyChangeEvent;
+
 
 /**
  * Handles add and delete-modifications for a {@link PageableCollection2}.
@@ -17,6 +19,8 @@ public interface ModificationHandler<T_ITEM> {
    * Adds an item to this collection.
    * <p>
    * Usually the new item will be added as the last collection item.
+   * <p>
+   * Fires a {@link PropertyChangeEvent} {@link PageableCollection2#PROP_ITEM_ADD}.
    *
    * @param item the item to add.
    * @throws UnsupportedOperationException if the collection does not support additional items.
@@ -25,6 +29,8 @@ public interface ModificationHandler<T_ITEM> {
 
   /**
    * Registers the passed item as an updated item.
+   * <p>
+   * Fires a {@link PropertyChangeEvent} {@link PageableCollection2#PROP_ITEM_UPDATE}.
    *
    * @param the
    *          updated item. It should be part of the collection.
@@ -36,6 +42,8 @@ public interface ModificationHandler<T_ITEM> {
 
   /**
    * Removes all currently selected items from the collection.
+   * <p>
+   * Fires a {@link PropertyChangeEvent} {@link PageableCollection2#PROP_ITEM_REMOVE}.
    *
    * @return <code>false</code> if the de-selection of the items to delete was prevented by a selection change decorator.
    * @throws UnsupportedOperationException if the collection does not support removed item handling.

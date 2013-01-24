@@ -256,8 +256,11 @@ public class PageableQueryCollection<T_ITEM, T_ID extends Serializable> extends 
       }
 
       clearCaches();
+      PageableQueryCollection.this.firePropertyChange(PageableCollection2.PROP_ITEM_REMOVE, null, null);
       return true;
     }
+
+
 
     /**
      * Adds the item as the last one.
@@ -272,7 +275,9 @@ public class PageableQueryCollection<T_ITEM, T_ID extends Serializable> extends 
 
     @Override
     public void updateItem(T_ITEM item, boolean isUpdated) {
+      boolean wasUpdated = modifications.getUpdatedItems().contains(item);
       modifications.registerUpdatedItem(item, isUpdated);
+      PageableQueryCollection.this.firePropertyChange(PageableCollection2.PROP_ITEM_UPDATE, wasUpdated, isUpdated);
     };
 
     @Override

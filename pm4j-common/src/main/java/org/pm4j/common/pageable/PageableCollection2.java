@@ -1,5 +1,6 @@
 package org.pm4j.common.pageable;
 
+import java.beans.PropertyChangeEvent;
 import java.util.Iterator;
 import java.util.List;
 
@@ -7,6 +8,7 @@ import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.selection.Selection;
 import org.pm4j.common.selection.SelectionHandler;
+import org.pm4j.common.util.beanproperty.PropertyChangeSupported;
 
 /**
  * Common interface for pageable object sets.
@@ -18,7 +20,46 @@ import org.pm4j.common.selection.SelectionHandler;
  * @param <T_ITEM>
  *          The type of items handled by this set.
  */
-public interface PageableCollection2<T_ITEM> extends Iterable<T_ITEM> {
+public interface PageableCollection2<T_ITEM> extends Iterable<T_ITEM>, PropertyChangeSupported {
+
+  /**
+   * Gets fired whenever the page size was modified.<br>
+   * The fired {@link PropertyChangeEvent} provides the old and the new page size.<br>
+   * See also: {@link #setPageSize(int)}.
+   */
+  public static final String PROP_PAGE_SIZE = "pageable.page.size";
+
+  /**
+   * Gets fired whenever the current page index was modified.<br>
+   * The fired {@link PropertyChangeEvent} provides the old and the new page index.<br>
+   * See also: {@link #setPageIdx(long)}.
+   */
+  public static final String PROP_PAGE_IDX = "pageable.page.idx";
+
+  /**
+   * Gets fired whenever an item gets added to the collection.<br>
+   * Provides the added item in {@link PropertyChangeEvent#getNewValue()}.<br>
+   * See also: {@link ModificationHandler#addItem(Object)}.
+   */
+  public static final String PROP_ITEM_ADD = "pageable.item.add";
+
+  /**
+   * Gets fired whenever the set of updated items was changed.<br>
+   * Provides the item modification change:
+   * <ul>
+   *  <li>{@link PropertyChangeEvent#getOldValue()} provides a boolean for the old item changed state .</li>
+   *  <li>{@link PropertyChangeEvent#getNewValue()} provides a boolean for the new item changed state .</li>
+   * </ul>
+   * See also: {@link ModificationHandler#updateItem(Object, boolean)}.
+   */
+  public static final String PROP_ITEM_UPDATE = "pageable.item.update";
+
+  /**
+   * Gets fired whenever a set of selected items was deleted.<br>
+   * Provides the set of deleted items in {@link PropertyChangeEvent#getOldValue()}.<br>
+   * See also: {@link ModificationHandler#removeSelectedItems()}.
+   */
+  public static final String PROP_ITEM_REMOVE = "pageable.item.remove";
 
   /**
    * Provides the {@link QueryParams} that defines filter constraints and sort order.
@@ -54,7 +95,11 @@ public interface PageableCollection2<T_ITEM> extends Iterable<T_ITEM> {
   int getPageSize();
 
   /**
-   * @param newSize The new page size. Should be greater than zero.
+   * Adjusts the new page size and fires a {@link PropertyChangeEvent}
+   * {@link #PROP_PAGE_SIZE} if it was changed.
+   *
+   * @param newSize
+   *          The new page size. Should be greater than zero.
    */
   void setPageSize(int newSize);
 
@@ -64,6 +109,9 @@ public interface PageableCollection2<T_ITEM> extends Iterable<T_ITEM> {
   long getPageIdx();
 
   /**
+   * Switches to the new page index and fires a {@link PropertyChangeEvent}
+   * {@link #PROP_PAGE_IDX} if it was changed.
+   *
    * @param pageIdx
    *          Navigates to the specified page.
    *          <p>

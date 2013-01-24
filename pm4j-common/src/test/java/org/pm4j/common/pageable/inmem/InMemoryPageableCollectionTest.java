@@ -34,4 +34,9 @@ public class InMemoryPageableCollectionTest extends PageableCollectionTestBase<P
     });
   }
 
+  @Override
+  protected Bean createItem(String name) {
+    return new Bean(name);
+  }
+
 }

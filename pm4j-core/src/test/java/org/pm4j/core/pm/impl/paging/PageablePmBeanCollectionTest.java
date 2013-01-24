@@ -18,6 +18,7 @@ import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmTableCol2;
 import org.pm4j.core.pm.annotation.PmBeanCfg;
 import org.pm4j.core.pm.annotation.PmFactoryCfg;
+import org.pm4j.core.pm.api.PmFactoryApi;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
 import org.pm4j.core.pm.impl.PmTableColImpl2;
@@ -55,6 +56,11 @@ public class PageablePmBeanCollectionTest extends PageableCollectionTestBase<Pag
         return CompareUtil.compare(o1.name, o2.name);
       }
     });
+  }
+
+  @Override
+  protected BeanRowPm createItem(String name) {
+    return PmFactoryApi.getPmForBean(beanTablePm, new Bean(name));
   }
 
 

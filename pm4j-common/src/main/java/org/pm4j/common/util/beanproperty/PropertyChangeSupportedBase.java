@@ -9,6 +9,11 @@ import java.beans.VetoableChangeSupport;
 
 import org.pm4j.common.exception.CheckedExceptionWrapper;
 
+/**
+ * Provides some property change support.
+ *
+ * @author olaf boede
+ */
 public class PropertyChangeSupportedBase implements PropertyChangeSupported, Cloneable {
 
   private PropertyChangeSupport pcs;

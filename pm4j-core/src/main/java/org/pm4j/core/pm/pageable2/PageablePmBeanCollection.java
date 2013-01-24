@@ -1,5 +1,7 @@
 package org.pm4j.core.pm.pageable2;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -13,6 +15,7 @@ import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.selection.Selection;
 import org.pm4j.common.selection.SelectionHandler;
+import org.pm4j.common.util.beanproperty.PropertyChangeSupportedBase;
 import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmDataInput;
 import org.pm4j.core.pm.PmEvent;
@@ -38,7 +41,7 @@ import org.pm4j.core.pm.pageable.PageableListImpl;
  *          The kind of corresponding bean, handled by the backing
  *          {@link PageableCollection} instance.
  */
-public class PageablePmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> implements PageableCollection2<T_PM> {
+public class PageablePmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> extends PropertyChangeSupportedBase implements PageableCollection2<T_PM> {
 
   /** The collection type specific selection handler. */
   private SelectionHandlerWithPmFactory<T_PM, T_BEAN> selectionHandler;
@@ -60,7 +63,7 @@ public class PageablePmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> imple
    *          The collection of beans to represent by this collection of bean-PM's.
    */
   @SuppressWarnings("unchecked")
-  public PageablePmBeanCollection(PmObject pmCtxt, Class<?> itemPmClass, PageableCollection2<T_BEAN> pageableBeanCollection) {
+  public PageablePmBeanCollection(final PmObject pmCtxt, Class<?> itemPmClass, PageableCollection2<T_BEAN> pageableBeanCollection) {
     assert pmCtxt != null;
     assert pageableBeanCollection != null;
     assert itemPmClass != null;
@@ -70,6 +73,45 @@ public class PageablePmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> imple
     this.itemPmClass = (Class<T_PM>) itemPmClass;
     this.selectionHandler = new SelectionHandlerWithPmFactory<T_PM, T_BEAN>(pmCtxt, pageableBeanCollection.getSelectionHandler());
     this.modificationHandler = new PmBeanCollectionModificationHandler();
+
+    // Observe changes of the backing collection of beans and forward the events
+    // using the corresponding PM values.
+    beanCollection.addPropertyChangeListener(PageableCollection2.PROP_ITEM_ADD, new PropertyChangeListener() {
+      @Override
+      public void propertyChange(PropertyChangeEvent evt) {
+        firePropertyChange(PageableCollection2.PROP_ITEM_ADD, null, PmFactoryApi.getPmForBean(pmCtxt, evt.getNewValue()));
+      }
+    });
+
+    beanCollection.addPropertyChangeListener(PageableCollection2.PROP_ITEM_UPDATE, new PropertyChangeListener() {
+      @Override
+      public void propertyChange(PropertyChangeEvent evt) {
+        // propagates the changed flag value change.
+        firePropertyChange(PageableCollection2.PROP_ITEM_UPDATE, evt.getOldValue(), evt.getNewValue());
+      }
+    });
+
+    beanCollection.addPropertyChangeListener(PageableCollection2.PROP_ITEM_REMOVE, new PropertyChangeListener() {
+      @Override
+      public void propertyChange(PropertyChangeEvent evt) {
+        Selection<T_PM> deletedItemSelection = new PmSelection<T_PM, T_BEAN>(pmCtxt, (Selection<T_BEAN>) evt.getOldValue());
+        firePropertyChange(PageableCollection2.PROP_ITEM_REMOVE, deletedItemSelection, null);
+      }
+    });
+
+    beanCollection.addPropertyChangeListener(PageableCollection2.PROP_PAGE_IDX, new PropertyChangeListener() {
+      @Override
+      public void propertyChange(PropertyChangeEvent evt) {
+        firePropertyChange(PageableCollection2.PROP_PAGE_IDX, evt.getOldValue(), evt.getNewValue());
+      }
+    });
+
+    beanCollection.addPropertyChangeListener(PageableCollection2.PROP_PAGE_SIZE, new PropertyChangeListener() {
+      @Override
+      public void propertyChange(PropertyChangeEvent evt) {
+        firePropertyChange(PageableCollection2.PROP_PAGE_SIZE, evt.getOldValue(), evt.getNewValue());
+      }
+    });
   }
 
   /**

@@ -17,6 +17,7 @@ import org.pm4j.common.pageable.Modifications;
 import org.pm4j.common.pageable.PageableCollection2;
 import org.pm4j.common.pageable.PageableCollectionBase2;
 import org.pm4j.common.pageable.PageableCollectionUtil2;
+import org.pm4j.common.pageable.querybased.PageableQueryCollection;
 import org.pm4j.common.query.FilterExpression;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.QueryParams;
@@ -209,11 +210,14 @@ public class PageableInMemCollectionImpl<T_ITEM>
         objects.add(item);
       }
       modifications.registerAddedItem(item);
+      PageableInMemCollectionImpl.this.firePropertyChange(PageableCollection2.PROP_ITEM_ADD, null, item);
     };
 
     @Override
     public void updateItem(T_ITEM item, boolean isUpdated) {
+      boolean wasUpdated = modifications.getUpdatedItems().contains(item);
       modifications.registerUpdatedItem(item, isUpdated);
+      PageableInMemCollectionImpl.this.firePropertyChange(PageableCollection2.PROP_ITEM_UPDATE, wasUpdated, isUpdated);
     };
 
     @Override
@@ -236,6 +240,7 @@ public class PageableInMemCollectionImpl<T_ITEM>
         removedItems.add(i);
       }
       modifications.setRemovedItems(new ItemSetSelection<T_ITEM>(removedItems));
+      PageableInMemCollectionImpl.this.firePropertyChange(PageableCollection2.PROP_ITEM_REMOVE, items, null);
       return true;
     }
 

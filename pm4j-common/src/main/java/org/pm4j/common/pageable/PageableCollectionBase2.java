@@ -3,6 +3,7 @@ package org.pm4j.common.pageable;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.selection.Selection;
+import org.pm4j.common.util.beanproperty.PropertyChangeSupportedBase;
 
 
 /**
@@ -12,7 +13,7 @@ import org.pm4j.common.selection.Selection;
  *
  * @author olaf boede
  */
-public abstract class PageableCollectionBase2<T_ITEM> implements PageableCollection2<T_ITEM> {
+public abstract class PageableCollectionBase2<T_ITEM> extends PropertyChangeSupportedBase implements PageableCollection2<T_ITEM> {
 
   private int                pageSize = 10;
   private long               pageIdx;
@@ -53,7 +54,9 @@ public abstract class PageableCollectionBase2<T_ITEM> implements PageableCollect
 
   @Override
   public void setPageSize(int newSize) {
+    int oldSize = this.pageSize;
     pageSize = newSize;
+    firePropertyChange(PROP_PAGE_SIZE, oldSize, newSize);
   }
 
   @Override
@@ -63,7 +66,9 @@ public abstract class PageableCollectionBase2<T_ITEM> implements PageableCollect
 
   @Override
   public void setPageIdx(long pageIdx) {
+    long oldIdx = this.pageIdx;
     this.pageIdx = (pageIdx < 0) ? 0 : pageIdx;
+    firePropertyChange(PROP_PAGE_IDX, oldIdx, this.pageIdx);
   }
 
   @Override
