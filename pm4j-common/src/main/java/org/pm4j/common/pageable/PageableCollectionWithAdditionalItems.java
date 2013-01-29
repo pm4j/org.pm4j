@@ -2,6 +2,7 @@ package org.pm4j.common.pageable;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.beans.PropertyVetoException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -11,6 +12,7 @@ import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.selection.Selection;
 import org.pm4j.common.selection.SelectionHandler;
+import org.pm4j.common.selection.SelectionHandlerUtil;
 import org.pm4j.common.selection.SelectionHandlerWithAdditionalItems;
 import org.pm4j.common.selection.SelectionWithAdditionalItems;
 import org.pm4j.common.util.beanproperty.PropertyChangeSupportedBase;
@@ -205,7 +207,7 @@ public class PageableCollectionWithAdditionalItems<T_ITEM> extends PropertyChang
       if (getPageIdx() == PageableCollectionUtil2.getNumOfPages(PageableCollectionWithAdditionalItems.this)-1) {
         itemsOnPage = null;
       }
-      PageableCollectionWithAdditionalItems.this.firePropertyChange(PageableCollection2.PROP_ITEM_ADD, null, item);
+      PageableCollectionWithAdditionalItems.this.firePropertyChange(PageableCollection2.EVENT_ITEM_ADD, null, item);
     }
 
     @Override
@@ -215,21 +217,29 @@ public class PageableCollectionWithAdditionalItems<T_ITEM> extends PropertyChang
       if (!additionalItems.contains(item)) {
         baseCollection.getModificationHandler().updateItem(item, isUpdated);
       }
-      PageableCollectionWithAdditionalItems.this.firePropertyChange(PageableCollection2.PROP_ITEM_UPDATE, wasUpdated, isUpdated);
+      PageableCollectionWithAdditionalItems.this.firePropertyChange(PageableCollection2.EVENT_ITEM_UPDATE, wasUpdated, isUpdated);
     };
 
     @Override
     public boolean removeSelectedItems() {
       SelectionWithAdditionalItems<T_ITEM> items = (SelectionWithAdditionalItems<T_ITEM>) selectionHandler.getSelection();
       if (! items.isEmpty()) {
+        try {
+          PageableCollectionWithAdditionalItems.this.fireVetoableChange(PageableCollection2.EVENT_REMOVE_SELECTION, items, null);
+        } catch (PropertyVetoException e) {
+          return false;
+        }
+
         // first do the operation that can fail:
         if (!baseCollection.getModificationHandler().removeSelectedItems()) {
           return false;
         }
         additionalItems.removeAll(items.getAdditionalSelectedItems());
-        selectionHandler.selectAll(false);
         clearCaches();
-        PageableCollectionWithAdditionalItems.this.firePropertyChange(PageableCollection2.PROP_ITEM_REMOVE, items, null);
+
+        SelectionHandlerUtil.forceSelectAll(selectionHandler, false);
+
+        PageableCollectionWithAdditionalItems.this.firePropertyChange(PageableCollection2.EVENT_REMOVE_SELECTION, items, null);
       }
       return true;
     }

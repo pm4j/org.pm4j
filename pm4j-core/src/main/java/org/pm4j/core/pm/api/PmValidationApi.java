@@ -11,6 +11,8 @@ import org.pm4j.core.pm.PmElement;
 import org.pm4j.core.pm.PmMessage;
 import org.pm4j.core.pm.PmMessage.Severity;
 import org.pm4j.core.pm.PmObject;
+import org.pm4j.core.pm.api.PmVisitorApi.VisitCallBack;
+import org.pm4j.core.pm.api.PmVisitorApi.VisitResult;
 import org.pm4j.core.pm.impl.PmConversationImpl;
 import org.pm4j.core.pm.impl.PmObjectBase;
 import org.pm4j.core.pm.impl.PmUtil;
@@ -100,6 +102,27 @@ public final class PmValidationApi {
       else {
         return true;
       }
+  }
+
+  // TODO olaf:
+  static boolean validate(PmObject startPm, final boolean skipReadOnly) {
+    VisitCallBack cb = new VisitCallBack() {
+      @Override
+      public VisitResult visit(PmObject pm) {
+        if (!pm.isPmVisible() ||
+            (skipReadOnly && pm.isPmReadonly())) {
+          return VisitResult.SKIP_CHILDREN;
+        } else {
+          if (pm instanceof PmDataInput) {
+            ((PmDataInput)pm).pmValidate();
+          }
+          return VisitResult.CONTINUE;
+        }
+      }
+    };
+    PmVisitorApi.visit(startPm, cb);
+
+    return PmMessageUtil.getPmErrors(startPm).isEmpty();
   }
 
   /**

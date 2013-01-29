@@ -2,6 +2,7 @@ package org.pm4j.common.pageable.inmem;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.beans.PropertyVetoException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -12,12 +13,11 @@ import java.util.List;
 import java.util.Set;
 
 import org.pm4j.common.pageable.ModificationHandler;
-import org.pm4j.common.pageable.ModificationsImpl;
 import org.pm4j.common.pageable.Modifications;
+import org.pm4j.common.pageable.ModificationsImpl;
 import org.pm4j.common.pageable.PageableCollection2;
 import org.pm4j.common.pageable.PageableCollectionBase2;
 import org.pm4j.common.pageable.PageableCollectionUtil2;
-import org.pm4j.common.pageable.querybased.PageableQueryCollection;
 import org.pm4j.common.query.FilterExpression;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.QueryParams;
@@ -25,6 +25,7 @@ import org.pm4j.common.query.inmem.InMemQueryEvaluator;
 import org.pm4j.common.selection.ItemSetSelection;
 import org.pm4j.common.selection.Selection;
 import org.pm4j.common.selection.SelectionHandler;
+import org.pm4j.common.selection.SelectionHandlerUtil;
 import org.pm4j.common.selection.SelectionHandlerWithItemSet;
 import org.pm4j.common.util.collection.IterableUtil;
 
@@ -210,26 +211,30 @@ public class PageableInMemCollectionImpl<T_ITEM>
         objects.add(item);
       }
       modifications.registerAddedItem(item);
-      PageableInMemCollectionImpl.this.firePropertyChange(PageableCollection2.PROP_ITEM_ADD, null, item);
+      PageableInMemCollectionImpl.this.firePropertyChange(PageableCollection2.EVENT_ITEM_ADD, null, item);
     };
 
     @Override
     public void updateItem(T_ITEM item, boolean isUpdated) {
       boolean wasUpdated = modifications.getUpdatedItems().contains(item);
       modifications.registerUpdatedItem(item, isUpdated);
-      PageableInMemCollectionImpl.this.firePropertyChange(PageableCollection2.PROP_ITEM_UPDATE, wasUpdated, isUpdated);
+      PageableInMemCollectionImpl.this.firePropertyChange(PageableCollection2.EVENT_ITEM_UPDATE, wasUpdated, isUpdated);
     };
 
     @Override
     public boolean removeSelectedItems() {
       Selection<T_ITEM> items = selectionHandler.getSelection();
-      if (!selectionHandler.selectAll(false)) {
-        return false;
-      }
-
       if (items.getSize() == 0) {
         return true;
       }
+
+      try {
+        PageableInMemCollectionImpl.this.fireVetoableChange(PageableCollection2.EVENT_REMOVE_SELECTION, items, null);
+      } catch (PropertyVetoException e) {
+        return false;
+      }
+
+      SelectionHandlerUtil.forceSelectAll(selectionHandler, false);
 
       Set<T_ITEM> removedItems = new HashSet<T_ITEM>(IterableUtil.asCollection(modifications.getRemovedItems()));
       for (T_ITEM i : items) {
@@ -240,7 +245,7 @@ public class PageableInMemCollectionImpl<T_ITEM>
         removedItems.add(i);
       }
       modifications.setRemovedItems(new ItemSetSelection<T_ITEM>(removedItems));
-      PageableInMemCollectionImpl.this.firePropertyChange(PageableCollection2.PROP_ITEM_REMOVE, items, null);
+      PageableInMemCollectionImpl.this.firePropertyChange(PageableCollection2.EVENT_REMOVE_SELECTION, items, null);
       return true;
     }
 

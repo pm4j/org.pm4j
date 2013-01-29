@@ -44,7 +44,6 @@ public abstract class PageableQuerySelectionHandler<T_ITEM, T_ID extends Seriali
 
   private final PageableQueryService<T_ITEM, T_ID> service;
   private final ItemIdSelection<T_ITEM, T_ID> emptySelection;
-  private ItemIdSelection<T_ITEM, T_ID> idSelection;
   private QuerySelectionWithClickedIds<T_ITEM, T_ID> currentSelection;
   private boolean inverse;
 
@@ -54,8 +53,7 @@ public abstract class PageableQuerySelectionHandler<T_ITEM, T_ID extends Seriali
 
     this.service = service;
     this.emptySelection = new ItemIdSelection<T_ITEM, T_ID>(service, Collections.EMPTY_LIST);
-    this.idSelection = emptySelection;
-    this.currentSelection = idSelection;
+    this.currentSelection = emptySelection;
   }
 
   @Override
@@ -139,7 +137,7 @@ public abstract class PageableQuerySelectionHandler<T_ITEM, T_ID extends Seriali
 
     try {
       fireVetoableChange(PROP_SELECTION, oldSelection, newSelection);
-      // XXX olaf: check of that can be doene safely...
+      // XXX olaf: check of that can be done safely...
       this.currentSelection = (QuerySelectionWithClickedIds<T_ITEM, T_ID>) newSelection;
       firePropertyChange(PROP_SELECTION, oldSelection, newSelection);
       return true;
@@ -152,7 +150,7 @@ public abstract class PageableQuerySelectionHandler<T_ITEM, T_ID extends Seriali
   protected abstract QueryParams getQueryParams();
 
   private Set<T_ID> getModifyableIdSet() {
-    return new HashSet<T_ID>(idSelection.getSelectedOrDeselectedIds());
+    return new HashSet<T_ID>(currentSelection.getClickedIds().getIds());
   }
 
   /**
@@ -161,7 +159,7 @@ public abstract class PageableQuerySelectionHandler<T_ITEM, T_ID extends Seriali
    * @param selectedIds the new set of selected id's. In case if an inverted selection: the new set of de-selected id's.
    */
   private boolean setSelection(Set<T_ID> selectedIds) {
-    idSelection = selectedIds.isEmpty()
+    ItemIdSelection<T_ITEM, T_ID> idSelection = selectedIds.isEmpty()
                   ? emptySelection
                   : new ItemIdSelection<T_ITEM, T_ID>(service, selectedIds);
 

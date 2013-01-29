@@ -2,6 +2,7 @@ package org.pm4j.core.pm.pageable2;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.beans.PropertyVetoException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -76,26 +77,26 @@ public class PageablePmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> exten
 
     // Observe changes of the backing collection of beans and forward the events
     // using the corresponding PM values.
-    beanCollection.addPropertyChangeListener(PageableCollection2.PROP_ITEM_ADD, new PropertyChangeListener() {
+    beanCollection.addPropertyChangeListener(PageableCollection2.EVENT_ITEM_ADD, new PropertyChangeListener() {
       @Override
       public void propertyChange(PropertyChangeEvent evt) {
-        firePropertyChange(PageableCollection2.PROP_ITEM_ADD, null, PmFactoryApi.getPmForBean(pmCtxt, evt.getNewValue()));
+        firePropertyChange(PageableCollection2.EVENT_ITEM_ADD, null, PmFactoryApi.getPmForBean(pmCtxt, evt.getNewValue()));
       }
     });
 
-    beanCollection.addPropertyChangeListener(PageableCollection2.PROP_ITEM_UPDATE, new PropertyChangeListener() {
+    beanCollection.addPropertyChangeListener(PageableCollection2.EVENT_ITEM_UPDATE, new PropertyChangeListener() {
       @Override
       public void propertyChange(PropertyChangeEvent evt) {
         // propagates the changed flag value change.
-        firePropertyChange(PageableCollection2.PROP_ITEM_UPDATE, evt.getOldValue(), evt.getNewValue());
+        firePropertyChange(PageableCollection2.EVENT_ITEM_UPDATE, evt.getOldValue(), evt.getNewValue());
       }
     });
 
-    beanCollection.addPropertyChangeListener(PageableCollection2.PROP_ITEM_REMOVE, new PropertyChangeListener() {
+    beanCollection.addPropertyChangeListener(PageableCollection2.EVENT_REMOVE_SELECTION, new PropertyChangeListener() {
       @Override
       public void propertyChange(PropertyChangeEvent evt) {
         Selection<T_PM> deletedItemSelection = new PmSelection<T_PM, T_BEAN>(pmCtxt, (Selection<T_BEAN>) evt.getOldValue());
-        firePropertyChange(PageableCollection2.PROP_ITEM_REMOVE, deletedItemSelection, null);
+        firePropertyChange(PageableCollection2.EVENT_REMOVE_SELECTION, deletedItemSelection, null);
       }
     });
 
@@ -334,8 +335,15 @@ public class PageablePmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> exten
     // TODO olaf: ensure that the cleanup code also gets called when the bean modification handler gets used.
     @Override
     public boolean removeSelectedItems() {
-      // clear all messages and references to the set of items to delete.
       Selection<T_PM> selection = getSelectionHandler().getSelection();
+
+      try {
+        PageablePmBeanCollection.this.fireVetoableChange(PageableCollection2.EVENT_REMOVE_SELECTION, selection, null);
+      } catch (PropertyVetoException e) {
+        return false;
+      }
+
+      // clear all messages and references to the set of items to delete.
       for (T_PM p : getItemsOnPage()) {
         if (selection.isSelected(p)) {
           PmMessageUtil.clearSubTreeMessages(p);

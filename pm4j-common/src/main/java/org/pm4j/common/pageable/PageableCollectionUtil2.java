@@ -316,4 +316,43 @@ public final class PageableCollectionUtil2 {
       return idFilterExpr;
     }
   }
+
+/* TODO olaf: helper for query collection that handles additional items too.
+  public static <T_ITEM> List<T_ITEM> getItemsOnPage(
+      PageableCollection2<T_ITEM> pc,
+      PageableQueryService<T_ITEM, ?> pq,
+      QueryParams qp,
+      long pageIdx,
+      List<T_ITEM> additionalItems)
+  {
+    List<T_ITEM> itemsOnPage = new ArrayList<T_ITEM>();
+    int pageSize = pc.getPageSize();
+    long numOfPagesFilledByBaseCollectionPages = pq.getItemCount(qp) / pageSize;
+
+    if (additionalItems.isEmpty() ||
+        (pageIdx < numOfPagesFilledByBaseCollectionPages)) {
+      itemsOnPage = baseCollection.getItemsOnPage();
+    } else {
+      boolean mixedPage = (currentPageIdx == numOfPagesFilledByBaseCollectionPages) &&
+                          (baseCollection.getNumOfItems() % pageSize) != 0;
+      if (mixedPage) {
+        List<T_ITEM> list = new ArrayList<T_ITEM>(baseCollection.getItemsOnPage());
+        for (T_ITEM i : additionalItems) {
+          if (list.size() >= pageSize) {
+            break;
+          }
+          list.add(i);
+        }
+        itemsOnPage = list;
+      } else {
+        long firstItemIdx = (pageIdx) * pageSize;
+        int offset = (int)(firstItemIdx - baseCollection.getNumOfItems());
+        itemsOnPage = new ArrayList<T_ITEM>(ListUtil.subListPage(additionalItems, offset, pageSize));
+      }
+    }
+
+    return itemsOnPage;
+  }
+*/
+
 }

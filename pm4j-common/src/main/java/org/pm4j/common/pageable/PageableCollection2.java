@@ -41,7 +41,7 @@ public interface PageableCollection2<T_ITEM> extends Iterable<T_ITEM>, PropertyC
    * Provides the added item in {@link PropertyChangeEvent#getNewValue()}.<br>
    * See also: {@link ModificationHandler#addItem(Object)}.
    */
-  public static final String PROP_ITEM_ADD = "pageable.item.add";
+  public static final String EVENT_ITEM_ADD = "pageable.item.add";
 
   /**
    * Gets fired whenever the set of updated items was changed.<br>
@@ -52,14 +52,14 @@ public interface PageableCollection2<T_ITEM> extends Iterable<T_ITEM>, PropertyC
    * </ul>
    * See also: {@link ModificationHandler#updateItem(Object, boolean)}.
    */
-  public static final String PROP_ITEM_UPDATE = "pageable.item.update";
+  public static final String EVENT_ITEM_UPDATE = "pageable.item.update";
 
   /**
-   * Gets fired whenever a set of selected items was deleted.<br>
+   * A vetoable event that gets fired whenever a set of selected items was deleted.<br>
    * Provides the set of deleted items in {@link PropertyChangeEvent#getOldValue()}.<br>
    * See also: {@link ModificationHandler#removeSelectedItems()}.
    */
-  public static final String PROP_ITEM_REMOVE = "pageable.item.remove";
+  public static final String EVENT_REMOVE_SELECTION = "pageable.remove-selection";
 
   /**
    * Provides the {@link QueryParams} that defines filter constraints and sort order.

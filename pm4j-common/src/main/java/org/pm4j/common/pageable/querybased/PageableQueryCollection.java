@@ -2,6 +2,7 @@ package org.pm4j.common.pageable.querybased;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.beans.PropertyVetoException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,6 +24,7 @@ import org.pm4j.common.query.FilterNot;
 import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.selection.Selection;
 import org.pm4j.common.selection.SelectionHandler;
+import org.pm4j.common.selection.SelectionHandlerUtil;
 import org.pm4j.common.util.collection.ListUtil;
 
 /**
@@ -102,6 +104,7 @@ public class PageableQueryCollection<T_ITEM, T_ID extends Serializable> extends 
     if (!queryParams.isExecQuery()) {
       return Collections.EMPTY_LIST;
     }
+
     long firstItemIdx = PageableCollectionUtil2.getIdxOfFirstItemOnPage(this)-1;
     if (firstItemIdx < 0) {
     	return Collections.EMPTY_LIST;
@@ -124,6 +127,7 @@ public class PageableQueryCollection<T_ITEM, T_ID extends Serializable> extends 
   public long getNumOfItems() {
     return getQueryParams().isExecQuery()
     	? cachingService.getItemCount(getQueryParamsWithRemovedItems())
+    	// TODO olaf: for new add-handling   + modificationHandler.getModifications().getAddedItems().size()
     	: 0;
   }
 
@@ -220,12 +224,17 @@ public class PageableQueryCollection<T_ITEM, T_ID extends Serializable> extends 
     @Override
     public boolean removeSelectedItems() {
       Selection<T_ITEM> items = selectionHandler.getSelection();
-      if (!selectionHandler.selectAll(false)) {
-        return false;
-      }
       if (items.getSize() == 0) {
         return true;
       }
+
+      try {
+        PageableQueryCollection.this.fireVetoableChange(PageableCollection2.EVENT_REMOVE_SELECTION, items, null);
+      } catch (PropertyVetoException e) {
+        return false;
+      }
+
+      SelectionHandlerUtil.forceSelectAll(selectionHandler, false);
 
       Selection<T_ITEM> oldRemovedItemSelection = modifications.getRemovedItems();
       if (items instanceof ItemIdSelection) {
@@ -256,20 +265,15 @@ public class PageableQueryCollection<T_ITEM, T_ID extends Serializable> extends 
       }
 
       clearCaches();
-      PageableQueryCollection.this.firePropertyChange(PageableCollection2.PROP_ITEM_REMOVE, null, null);
+      PageableQueryCollection.this.firePropertyChange(PageableCollection2.EVENT_REMOVE_SELECTION, null, null);
       return true;
     }
 
-
-
-    /**
-     * Adds the item as the last one.
-     */
     @Override
     public void addItem(T_ITEM item) {
       // XXX olaf: check if this can be handled here. Currently it's handled in the wrapping
       // collection with additional items.
-      // addedItems.add(item);
+      // modifications.registerAddedItem(item);
       throw new UnsupportedOperationException("Please embed this collection in a PageableCollectionWithAdditionalItems to handle add operations.");
     }
 
@@ -277,7 +281,7 @@ public class PageableQueryCollection<T_ITEM, T_ID extends Serializable> extends 
     public void updateItem(T_ITEM item, boolean isUpdated) {
       boolean wasUpdated = modifications.getUpdatedItems().contains(item);
       modifications.registerUpdatedItem(item, isUpdated);
-      PageableQueryCollection.this.firePropertyChange(PageableCollection2.PROP_ITEM_UPDATE, wasUpdated, isUpdated);
+      PageableQueryCollection.this.firePropertyChange(PageableCollection2.EVENT_ITEM_UPDATE, wasUpdated, isUpdated);
     };
 
     @Override

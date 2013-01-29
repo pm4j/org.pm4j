@@ -52,15 +52,6 @@ public interface MasterPmHandler extends PmCommandDecorator {
   Set<?> getChangedMasterBeans();
 
   /**
-   * Provides all detail bean changes grouped by their master beans.
-   *
-   * @return a map to a {@link ChangeSetHandler} that provides
-   */
-  // alternative: getDetailsHandler().getChangeSets()
-//  Map<T_MASTER_BEAN, ChangeSet<T_DETAILS_BEAN>> getDetailsChangeSets();
-
-
-  /**
    * This method needs to be called once before the handler gets active.
    * This is usually internally done within {@link PmTableUtil#addMasterDetailsPmHandler(PmTable, MasterDetailsPmHandler)}.
    */

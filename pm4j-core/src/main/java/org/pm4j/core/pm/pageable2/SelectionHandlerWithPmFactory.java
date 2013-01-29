@@ -8,6 +8,7 @@ import java.util.Collection;
 import org.pm4j.common.selection.SelectMode;
 import org.pm4j.common.selection.Selection;
 import org.pm4j.common.selection.SelectionHandler;
+import org.pm4j.common.selection.SelectionHandlerUtil;
 import org.pm4j.common.util.beanproperty.PropertyAndVetoableChangeListener;
 import org.pm4j.common.util.beanproperty.PropertyChangeSupportedBase;
 import org.pm4j.core.pm.PmBean;
@@ -58,7 +59,7 @@ public class SelectionHandlerWithPmFactory<T_PM extends PmBean<T_BEAN>, T_BEAN> 
 
   @Override
   public boolean select(boolean select, T_PM item) {
-     return baseSelectionHandler.select(select, item.getPmBean());
+     return SelectionHandlerUtil.selectInSameForceMode(this, baseSelectionHandler, select, item.getPmBean());
   }
 
   @Override
@@ -70,17 +71,17 @@ public class SelectionHandlerWithPmFactory<T_PM extends PmBean<T_BEAN>, T_BEAN> 
       beans.add(i.getPmBean());
     }
 
-    return baseSelectionHandler.select(select, beans);
+    return SelectionHandlerUtil.selectInSameForceMode(this, baseSelectionHandler, select, beans);
   }
 
   @Override
   public boolean selectAll(boolean select) {
-    return baseSelectionHandler.selectAll(select);
+    return SelectionHandlerUtil.selectAllInSameForceMode(this, baseSelectionHandler, select);
   }
 
   @Override
   public boolean invertSelection() {
-    return baseSelectionHandler.invertSelection();
+    return SelectionHandlerUtil.invertSelectionInSameForceMode(this, baseSelectionHandler);
   }
 
   @Override
@@ -91,7 +92,8 @@ public class SelectionHandlerWithPmFactory<T_PM extends PmBean<T_BEAN>, T_BEAN> 
   @SuppressWarnings("unchecked")
   @Override
   public boolean setSelection(Selection<T_PM> selection) {
-    return baseSelectionHandler.setSelection(((PmSelection<T_PM, T_BEAN>)selection).beanSelection);
+    Selection<T_BEAN> beanSelection = ((PmSelection<T_PM, T_BEAN>)selection).beanSelection;
+    return SelectionHandlerUtil.setSelectionInSameForceMode(this, baseSelectionHandler, beanSelection);
   }
 
   @Override

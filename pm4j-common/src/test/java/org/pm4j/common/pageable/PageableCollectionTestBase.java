@@ -4,7 +4,7 @@ import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 
 import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
+import java.beans.PropertyVetoException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,6 +16,7 @@ import org.pm4j.common.query.FilterExpression;
 import org.pm4j.common.query.QueryUtil;
 import org.pm4j.common.query.SortOrder;
 import org.pm4j.common.selection.SelectMode;
+import org.pm4j.common.util.beanproperty.PropertyAndVetoableChangeListener;
 import org.pm4j.common.util.collection.IterableUtil;
 
 /**
@@ -62,9 +63,9 @@ public abstract class PageableCollectionTestBase<T> {
     assertTrue(collection.getModificationHandler().getModifications().isModified());
     assertEquals("[ ]", IterableUtil.shallowCopy(collection.getModificationHandler().getModifications().getRemovedItems()).toString());
 
-    collection.addPropertyChangeListener(PageableCollection2.PROP_ITEM_ADD, pclAdd = new TestPropertyChangeListener());
-    collection.addPropertyChangeListener(PageableCollection2.PROP_ITEM_UPDATE, pclUpdate = new TestPropertyChangeListener());
-    collection.addPropertyChangeListener(PageableCollection2.PROP_ITEM_REMOVE, pclRemove = new TestPropertyChangeListener());
+    collection.addPropertyChangeListener(PageableCollection2.EVENT_ITEM_ADD, pclAdd = new TestPropertyChangeListener());
+    collection.addPropertyChangeListener(PageableCollection2.EVENT_ITEM_UPDATE, pclUpdate = new TestPropertyChangeListener());
+    collection.addPropertyAndVetoableListener(PageableCollection2.EVENT_REMOVE_SELECTION, pclRemove = new TestPropertyChangeListener());
     collection.addPropertyChangeListener(PageableCollection2.PROP_PAGE_IDX, pclPageIdx = new TestPropertyChangeListener());
     collection.addPropertyChangeListener(PageableCollection2.PROP_PAGE_SIZE, pclPageSize = new TestPropertyChangeListener());
   }
@@ -122,11 +123,11 @@ public abstract class PageableCollectionTestBase<T> {
     assertEquals(6, collection.getNumOfItems());
     assertEquals("[a, b, c, d, e, f]", IterableUtil.shallowCopy(collection).toString());
 
-    assertEquals("Add event count", 0, pclAdd.getEventCount());
-    assertEquals("Update event count", 0, pclUpdate.getEventCount());
-    assertEquals("Remove event count", 0, pclRemove.getEventCount());
-    assertEquals("Set page index event count", 0, pclPageIdx.getEventCount());
-    assertEquals("Set page size event count", 0, pclPageSize.getEventCount());
+    assertEquals("Add event count", 0, pclAdd.getPropChangeEventCount());
+    assertEquals("Update event count", 0, pclUpdate.getPropChangeEventCount());
+    assertEquals("Remove event count", 0, pclRemove.getPropChangeEventCount());
+    assertEquals("Set page index event count", 0, pclPageIdx.getPropChangeEventCount());
+    assertEquals("Set page size event count", 0, pclPageSize.getPropChangeEventCount());
   }
 
   @Test
@@ -149,11 +150,11 @@ public abstract class PageableCollectionTestBase<T> {
     collection.setPageIdx(3);
     assertEquals("[]", collection.getItemsOnPage().toString());
 
-    assertEquals("Add event count", 0, pclAdd.getEventCount());
-    assertEquals("Update event count", 0, pclUpdate.getEventCount());
-    assertEquals("Remove event count", 0, pclRemove.getEventCount());
-    assertEquals("Set page index event count", 5, pclPageIdx.getEventCount());
-    assertEquals("Set page size event count", 1, pclPageSize.getEventCount());
+    assertEquals("Add event count", 0, pclAdd.getPropChangeEventCount());
+    assertEquals("Update event count", 0, pclUpdate.getPropChangeEventCount());
+    assertEquals("Remove event count", 0, pclRemove.getPropChangeEventCount());
+    assertEquals("Set page index event count", 5, pclPageIdx.getPropChangeEventCount());
+    assertEquals("Set page size event count", 1, pclPageSize.getPropChangeEventCount());
   }
 
   @Test
@@ -169,11 +170,11 @@ public abstract class PageableCollectionTestBase<T> {
     collection.getQueryParams().setSortOrder(null);
     assertEquals("Initial (unsorted) sort order again", "[a, b, c, d, e, f]", IterableUtil.shallowCopy(collection).toString());
 
-    assertEquals("Add event count", 0, pclAdd.getEventCount());
-    assertEquals("Update event count", 0, pclUpdate.getEventCount());
-    assertEquals("Remove event count", 0, pclRemove.getEventCount());
-    assertEquals("Set page index event count", 0, pclPageIdx.getEventCount());
-    assertEquals("Set page size event count", 0, pclPageSize.getEventCount());
+    assertEquals("Add event count", 0, pclAdd.getPropChangeEventCount());
+    assertEquals("Update event count", 0, pclUpdate.getPropChangeEventCount());
+    assertEquals("Remove event count", 0, pclRemove.getPropChangeEventCount());
+    assertEquals("Set page index event count", 0, pclPageIdx.getPropChangeEventCount());
+    assertEquals("Set page size event count", 0, pclPageSize.getPropChangeEventCount());
   }
 
   @Test
@@ -198,11 +199,11 @@ public abstract class PageableCollectionTestBase<T> {
     assertEquals("Initial (unsorted) sort order again.", "[a, b, c, d, e, f]", IterableUtil.shallowCopy(collection).toString());
     assertEquals("[e, f]", collection.getItemsOnPage().toString());
 
-    assertEquals("Add event count", 0, pclAdd.getEventCount());
-    assertEquals("Update event count", 0, pclUpdate.getEventCount());
-    assertEquals("Remove event count", 0, pclRemove.getEventCount());
-    assertEquals("Set page index event count", 1, pclPageIdx.getEventCount());
-    assertEquals("Set page size event count", 0, pclPageSize.getEventCount());
+    assertEquals("Add event count", 0, pclAdd.getPropChangeEventCount());
+    assertEquals("Update event count", 0, pclUpdate.getPropChangeEventCount());
+    assertEquals("Remove event count", 0, pclRemove.getPropChangeEventCount());
+    assertEquals("Set page index event count", 1, pclPageIdx.getPropChangeEventCount());
+    assertEquals("Set page size event count", 0, pclPageSize.getPropChangeEventCount());
   }
 
   @Test
@@ -213,11 +214,11 @@ public abstract class PageableCollectionTestBase<T> {
     collection.getQueryParams().setFilterExpression(null);
     assertEquals("We get all items after resetting the filter.", "[a, b, c, d, e, f]", IterableUtil.shallowCopy(collection).toString());
 
-    assertEquals("Add event count", 0, pclAdd.getEventCount());
-    assertEquals("Update event count", 0, pclUpdate.getEventCount());
-    assertEquals("Remove event count", 0, pclRemove.getEventCount());
-    assertEquals("Set page index event count", 0, pclPageIdx.getEventCount());
-    assertEquals("Set page size event count", 0, pclPageSize.getEventCount());
+    assertEquals("Add event count", 0, pclAdd.getPropChangeEventCount());
+    assertEquals("Update event count", 0, pclUpdate.getPropChangeEventCount());
+    assertEquals("Remove event count", 0, pclRemove.getPropChangeEventCount());
+    assertEquals("Set page index event count", 0, pclPageIdx.getPropChangeEventCount());
+    assertEquals("Set page size event count", 0, pclPageSize.getPropChangeEventCount());
   }
 
   @Test
@@ -232,11 +233,11 @@ public abstract class PageableCollectionTestBase<T> {
     assertTrue(collection.getSelectionHandler().invertSelection());
     assertEquals(1, collection.getSelectionHandler().getSelection().getSize());
 
-    assertEquals("Add event count", 0, pclAdd.getEventCount());
-    assertEquals("Update event count", 0, pclUpdate.getEventCount());
-    assertEquals("Remove event count", 0, pclRemove.getEventCount());
-    assertEquals("Set page index event count", 0, pclPageIdx.getEventCount());
-    assertEquals("Set page size event count", 0, pclPageSize.getEventCount());
+    assertEquals("Add event count", 0, pclAdd.getPropChangeEventCount());
+    assertEquals("Update event count", 0, pclUpdate.getPropChangeEventCount());
+    assertEquals("Remove event count", 0, pclRemove.getPropChangeEventCount());
+    assertEquals("Set page index event count", 0, pclPageIdx.getPropChangeEventCount());
+    assertEquals("Set page size event count", 0, pclPageSize.getPropChangeEventCount());
   }
 
   @Test
@@ -254,11 +255,11 @@ public abstract class PageableCollectionTestBase<T> {
     assertEquals(0, collection.getModifications().getUpdatedItems().size());
     assertEquals("See setUp(): the initial remove item.", 1L, collection.getModifications().getRemovedItems().getSize());
 
-    assertEquals("Add event count", 1, pclAdd.getEventCount());
-    assertEquals("Update event count", 0, pclUpdate.getEventCount());
-    assertEquals("Remove event count", 0, pclRemove.getEventCount());
-    assertEquals("Set page index event count", 0, pclPageIdx.getEventCount());
-    assertEquals("Set page size event count", 0, pclPageSize.getEventCount());
+    assertEquals("Add event count", 1, pclAdd.getPropChangeEventCount());
+    assertEquals("Update event count", 0, pclUpdate.getPropChangeEventCount());
+    assertEquals("Remove event count", 0, pclRemove.getPropChangeEventCount());
+    assertEquals("Set page index event count", 0, pclPageIdx.getPropChangeEventCount());
+    assertEquals("Set page size event count", 0, pclPageSize.getPropChangeEventCount());
   }
 
   // TODO: testUpdateItem()
@@ -277,16 +278,18 @@ public abstract class PageableCollectionTestBase<T> {
     collection.getModificationHandler().removeSelectedItems();
     assertEquals("New collection size", 4L, collection.getNumOfItems());
     assertEquals("Collection after add", "[c, d, e, f]", IterableUtil.shallowCopy(collection).toString());
+    assertTrue(collection.getSelection().isEmpty());
 
     assertEquals(0, collection.getModifications().getAddedItems().size());
     assertEquals(0, collection.getModifications().getUpdatedItems().size());
     assertEquals("Initial removal + the two now ones.", 3L, collection.getModifications().getRemovedItems().getSize());
 
-    assertEquals("Add event count", 0, pclAdd.getEventCount());
-    assertEquals("Update event count", 0, pclUpdate.getEventCount());
-    assertEquals("Remove event count", 1, pclRemove.getEventCount());
-    assertEquals("Set page index event count", 0, pclPageIdx.getEventCount());
-    assertEquals("Set page size event count", 0, pclPageSize.getEventCount());
+    assertEquals("Add event count", 0, pclAdd.getPropChangeEventCount());
+    assertEquals("Update event count", 0, pclUpdate.getPropChangeEventCount());
+    assertEquals("Remove veto event count", 1, pclRemove.getVetoEventCount());
+    assertEquals("Remove event count", 1, pclRemove.getPropChangeEventCount());
+    assertEquals("Set page index event count", 0, pclPageIdx.getPropChangeEventCount());
+    assertEquals("Set page size event count", 0, pclPageSize.getPropChangeEventCount());
   }
 
   protected static List<Bean> makeBeans(String... strings) {
@@ -324,22 +327,33 @@ public abstract class PageableCollectionTestBase<T> {
 
   // test helper
 
-  static class TestPropertyChangeListener implements PropertyChangeListener {
+  static class TestPropertyChangeListener implements PropertyAndVetoableChangeListener {
 
-    private List<PropertyChangeEvent> receivedEvents = new ArrayList<PropertyChangeEvent>();
+    private List<PropertyChangeEvent> receivedPropChangeEvents = new ArrayList<PropertyChangeEvent>();
+    private List<PropertyChangeEvent> receivedVetoableEvents = new ArrayList<PropertyChangeEvent>();
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-      receivedEvents.add(evt);
+      receivedPropChangeEvents.add(evt);
     }
 
-    public int getEventCount() {
-      return receivedEvents.size();
+    @Override
+    public void vetoableChange(PropertyChangeEvent evt) throws PropertyVetoException {
+      receivedVetoableEvents.add(evt);
     }
 
-    public PropertyChangeEvent getLastObserved() {
-      return receivedEvents.isEmpty() ? null : receivedEvents.get(receivedEvents.size()-1);
+    public int getPropChangeEventCount() {
+      return receivedPropChangeEvents.size();
     }
+
+    public int getVetoEventCount() {
+      return receivedVetoableEvents.size();
+    }
+
+    public PropertyChangeEvent getLastObservedPropChangeEvent() {
+      return receivedPropChangeEvents.isEmpty() ? null : receivedPropChangeEvents.get(receivedPropChangeEvents.size()-1);
+    }
+
   }
 
 }
