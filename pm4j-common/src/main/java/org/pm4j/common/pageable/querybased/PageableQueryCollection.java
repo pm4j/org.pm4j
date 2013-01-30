@@ -353,12 +353,18 @@ class PageableQueryUtil {
 
     if (additionalItems.isEmpty() ||
         (pageIdx < numOfPagesFilledByQueryItems)) {
-      long firstItemIdx = PageableCollectionUtil2.getIdxOfFirstItemOnPage(pc, pageIdx);
-      itemsOnPage = pq.getItems(qp, firstItemIdx, pageSize);
+      // all page items are accessible through the query service.
+      if (queryItemCount == 0) {
+        itemsOnPage = Collections.emptyList();
+      } else {
+        long firstItemIdx = PageableCollectionUtil2.getIdxOfFirstItemOnPage(pc, pageIdx);
+        itemsOnPage = pq.getItems(qp, firstItemIdx, pageSize);
+      }
     } else {
       boolean mixedPage = (pageIdx == numOfPagesFilledByQueryItems) &&
                           (queryItemCount % pageSize) != 0;
       if (mixedPage) {
+        // the page starts with query based items and has trailing additional items.
         long firstItemIdx = PageableCollectionUtil2.getIdxOfFirstItemOnPage(pc, pageIdx);
         itemsOnPage = new ArrayList<T_ITEM>(pq.getItems(qp, firstItemIdx, pageSize));
         for (T_ITEM i : additionalItems) {
@@ -368,6 +374,7 @@ class PageableQueryUtil {
           itemsOnPage.add(i);
         }
       } else {
+        // the page shows only additional items.
         long firstItemIdx = (pageIdx) * pageSize;
         int offset = (int)(firstItemIdx - queryItemCount);
         itemsOnPage = new ArrayList<T_ITEM>(ListUtil.subListPage(additionalItems, offset, pageSize));
