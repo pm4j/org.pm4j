@@ -21,12 +21,12 @@ public abstract class ForcedPropertyChange {
   }
 
   public void doIt() {
-    boolean wasVetoEnabled = targetInstance.isVetoEventEnabled();
-    targetInstance.setVetoEventEnabled(false);
+    boolean wasVetoEnabled = targetInstance.isFireVetoEvents();
+    targetInstance.setFireVetoEvents(false);
     try {
       doItImpl();
     } finally {
-      targetInstance.setVetoEventEnabled(wasVetoEnabled);
+      targetInstance.setFireVetoEvents(wasVetoEnabled);
     }
   }
 

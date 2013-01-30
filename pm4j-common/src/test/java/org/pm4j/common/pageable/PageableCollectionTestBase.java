@@ -58,7 +58,10 @@ public abstract class PageableCollectionTestBase<T> {
     nameSortOrder = getOrderByName();
 
     // to get more test coverage: perform all tests with a single deleted item.
+    assertEquals("[ , a, b, c, d, e, f]", IterableUtil.shallowCopy(collection).toString());
+    assertEquals("[ , a]", collection.getItemsOnPage().toString());
     collection.getSelectionHandler().select(true, collection.getItemsOnPage().get(0));
+    assertEquals("[ ]", IterableUtil.shallowCopy(collection.getSelection()).toString());
     assertTrue(collection.getModificationHandler().removeSelectedItems());
     assertTrue(collection.getModificationHandler().getModifications().isModified());
     assertEquals("[ ]", IterableUtil.shallowCopy(collection.getModificationHandler().getModifications().getRemovedItems()).toString());

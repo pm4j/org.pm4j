@@ -12,20 +12,23 @@ import org.apache.commons.logging.LogFactory;
 import org.pm4j.common.pageable.PageableCollection2;
 
 /**
- * Handles selections for a {@link PageableCollection2} with transient additional items.
+ * Handles in front of another {@link SelectionHandler} selected transient items.
+ * <p>
+ * It obtains the set of transient items from the modifications of the related
+ * {@link PageableCollection2}.
  *
  * @author olaf boede
  *
- * @param <T_ITEM>
+ * @param <T_ITEM> type of items to select.
  */
 public class SelectionHandlerWithAdditionalItems<T_ITEM> extends SelectionHandlerBase<T_ITEM> {
-  private static final Log                   LOG              = LogFactory.getLog(SelectionHandlerWithAdditionalItems.class);
+  private static final Log                     LOG            = LogFactory.getLog(SelectionHandlerWithAdditionalItems.class);
 
   private SelectionWithAdditionalItems<T_ITEM> emptySelection = new SelectionWithAdditionalItems<T_ITEM>(
                                                                  EmptySelection.<T_ITEM> getEmptySelection(), null);
 
-  private final PageableCollection2<T_ITEM>  baseCollection;
-  private final List<T_ITEM>                 additionalItems;
+  private final PageableCollection2<T_ITEM>    baseCollection;
+  private final SelectionHandler<T_ITEM>       baseSelectionHandler;
 
   /** The set of currently selected items. */
   private SelectionWithAdditionalItems<T_ITEM> selection      = emptySelection;
@@ -36,66 +39,67 @@ public class SelectionHandlerWithAdditionalItems<T_ITEM> extends SelectionHandle
    * @param transientItems
    *          a reference to the set of additional transient items to consider.
    */
-  public SelectionHandlerWithAdditionalItems(PageableCollection2<T_ITEM> baseCollection, List<T_ITEM> transientItems) {
+  public SelectionHandlerWithAdditionalItems(PageableCollection2<T_ITEM> baseCollection, SelectionHandler<T_ITEM> baseSelectionHandler) {
     assert baseCollection != null;
-    assert transientItems != null;
+    assert baseCollection.getModificationHandler() != null;
+    assert baseSelectionHandler != null;
+    assert !baseSelectionHandler.isFirePropertyEvents() : "Event handling of the nested selection handler should be disabled.";
 
     this.baseCollection = baseCollection;
-    this.additionalItems = transientItems;
+    this.baseSelectionHandler = baseSelectionHandler;
   }
 
   @Override
   public void setSelectMode(SelectMode selectMode) {
     super.setSelectMode(selectMode);
-    baseCollection.getSelectionHandler().setSelectMode(selectMode);
+    baseSelectionHandler.setSelectMode(selectMode);
   }
 
-  // TODO olaf: will be simplified and reduced to a single selection change event when the 'addition item'
-  // case gets handled by the query modification/selection handler too.
   @Override
   public boolean select(boolean select, T_ITEM item) {
-    // FIXME olaf: get rid of this stack level to get less maintainence overhead...
+    assert ! baseSelectionHandler.isFirePropertyEvents();
 
-    SelectionHandler<T_ITEM> baseSelectionHandler = baseCollection.getSelectionHandler();
     Selection<T_ITEM> oldBaseSelection = selection.getBaseSelection();
     boolean success = false;
 
-    if (additionalItems.contains(item)) {
-      Collection<T_ITEM> transientItemSelection = new ArrayList<T_ITEM>(selection.getAdditionalSelectedItems());
-      Selection<T_ITEM> baseSelection = oldBaseSelection;
-      if (select) {
-        if (getSelectMode() == SelectMode.SINGLE) {
-          // the selection switches to the transient item. All other selections need to be removed.
-          if (!SelectionHandlerUtil.selectAllInSameForceMode(this, baseSelectionHandler, false)) {
-            return false;
+    try {
+      if (getAdditionalItems().contains(item)) {
+        Collection<T_ITEM> transientItemSelection = new ArrayList<T_ITEM>(selection.getAdditionalSelectedItems());
+        Selection<T_ITEM> baseSelection = oldBaseSelection;
+        if (select) {
+          if (getSelectMode() == SelectMode.SINGLE) {
+            // the selection switches to the transient item. All other selections need to be removed.
+            if (! baseSelectionHandler.selectAll(false)) {
+              return false;
+            }
+            baseSelection = baseSelectionHandler.getSelection();
+            transientItemSelection.clear();
           }
-          baseSelection = baseSelectionHandler.getSelection();
-          transientItemSelection.clear();
+          transientItemSelection.add(item);
+        } else {
+          transientItemSelection.remove(item);
         }
-        transientItemSelection.add(item);
+
+        SelectionWithAdditionalItems<T_ITEM> newSelection = new SelectionWithAdditionalItems<T_ITEM>(
+              baseSelection,
+              transientItemSelection);
+        success = setSelection(newSelection);
       } else {
-        transientItemSelection.remove(item);
+        if (! baseSelectionHandler.select(select, item)) {
+          return false;
+        }
+
+        SelectionWithAdditionalItems<T_ITEM> newSelection = new SelectionWithAdditionalItems<T_ITEM>(
+            baseSelectionHandler.getSelection(),
+            getSelectMode() == SelectMode.SINGLE
+                ? null
+                : selection.getAdditionalSelectedItems());
+        success = setSelection(newSelection);
       }
-
-      SelectionWithAdditionalItems<T_ITEM> newSelection = new SelectionWithAdditionalItems<T_ITEM>(
-            baseSelection,
-            transientItemSelection);
-      success = setSelection(newSelection);
-    } else {
-      if (!SelectionHandlerUtil.selectInSameForceMode(this, baseSelectionHandler, select, item)) {
-        return false;
+    } finally {
+      if (!success) {
+        baseSelectionHandler.setSelection(oldBaseSelection);
       }
-
-      SelectionWithAdditionalItems<T_ITEM> newSelection = new SelectionWithAdditionalItems<T_ITEM>(
-          baseSelectionHandler.getSelection(),
-          getSelectMode() == SelectMode.SINGLE
-              ? null
-              : selection.getAdditionalSelectedItems());
-      success = setSelection(newSelection);
-    }
-
-    if (! success) {
-      SelectionHandlerUtil.forceSetSelection(baseSelectionHandler, oldBaseSelection);
     }
 
     return success;
@@ -103,81 +107,108 @@ public class SelectionHandlerWithAdditionalItems<T_ITEM> extends SelectionHandle
 
   @Override
   public boolean select(boolean select, Iterable<T_ITEM> items) {
-    SelectionHandler<T_ITEM> baseSelectionHandler = baseCollection.getSelectionHandler();
-    List<T_ITEM> newTransientItems = new ArrayList<T_ITEM>();
-    List<T_ITEM> newBaseItems = new ArrayList<T_ITEM>();
+    assert ! baseSelectionHandler.isFirePropertyEvents();
 
-    for (T_ITEM i : items) {
-      if (additionalItems.contains(i)) {
-        newTransientItems.add(i);
-      } else {
-        newBaseItems.add(i);
+    Selection<T_ITEM> oldBaseSelection = selection.getBaseSelection();
+    boolean success = false;
+
+    try {
+      List<T_ITEM> newTransientItems = new ArrayList<T_ITEM>();
+      List<T_ITEM> newBaseItems = new ArrayList<T_ITEM>();
+
+      for (T_ITEM i : items) {
+        if (getAdditionalItems().contains(i)) {
+          newTransientItems.add(i);
+        } else {
+          newBaseItems.add(i);
+        }
+      }
+
+      // try to change the base collection selection.
+      // if that fails, we simply can skip this operation without side effects.
+      if (!newBaseItems.isEmpty()) {
+        if (! baseSelectionHandler.select(select, newBaseItems)) {
+          return false;
+        }
+      }
+
+      Collection<T_ITEM> selectedTransientItems = new HashSet<T_ITEM>(selection.getAdditionalSelectedItems());
+      for (T_ITEM i : newTransientItems) {
+        if (select) {
+          selectedTransientItems.add(i);
+        } else {
+          selectedTransientItems.remove(i);
+        }
+      }
+      SelectionWithAdditionalItems<T_ITEM> newSelection = new SelectionWithAdditionalItems<T_ITEM>(
+          baseSelectionHandler.getSelection(),
+          selectedTransientItems);
+
+      success = setSelection(newSelection);
+    } finally {
+      if (!success) {
+        baseSelectionHandler.setSelection(oldBaseSelection);
       }
     }
 
-    // try to change the base collection selection.
-    // if that fails, we simply can skip this operation without side effects.
-    if (!newBaseItems.isEmpty()) {
-      if (!SelectionHandlerUtil.selectInSameForceMode(this, baseSelectionHandler, select, newBaseItems)) {
-        return false;
-      }
-    }
-
-    Collection<T_ITEM> selectedTransientItems = new HashSet<T_ITEM>(selection.getAdditionalSelectedItems());
-    for (T_ITEM i : newTransientItems) {
-      if (select) {
-        selectedTransientItems.add(i);
-      } else {
-        selectedTransientItems.remove(i);
-      }
-    }
-    SelectionWithAdditionalItems<T_ITEM> newSelection = new SelectionWithAdditionalItems<T_ITEM>(
-        baseSelectionHandler.getSelection(),
-        selectedTransientItems);
-    // FIXME olaf: a veto leaves the base selection in a wrong state!
-    return setSelection(newSelection);
+    return success;
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public boolean selectAll(boolean select) {
-    SelectionHandler<T_ITEM> baseSelectionHandler = baseCollection.getSelectionHandler();
-    if (!SelectionHandlerUtil.selectAllInSameForceMode(this, baseSelectionHandler, select)) {
-      return false;
-    }
-    SelectionWithAdditionalItems<T_ITEM> newSelection = new SelectionWithAdditionalItems<T_ITEM>(
-        baseSelectionHandler.getSelection(),
-        select
-            ? additionalItems
-            : Collections.EMPTY_LIST);
+    assert ! baseSelectionHandler.isFirePropertyEvents();
 
-    // FIXME olaf: a veto leaves the base selection in a wrong state!
-    return setSelection(newSelection);
+    Selection<T_ITEM> oldBaseSelection = selection.getBaseSelection();
+    boolean success = false;
+
+    try {
+      if (baseSelectionHandler.selectAll(select)) {
+        SelectionWithAdditionalItems<T_ITEM> newSelection = new SelectionWithAdditionalItems<T_ITEM>(
+            baseSelectionHandler.getSelection(),
+            select
+                ? getAdditionalItems()
+                : Collections.EMPTY_LIST);
+
+        success = setSelection(newSelection);
+      }
+    } finally {
+      if (!success) {
+        baseSelectionHandler.setSelection(oldBaseSelection);
+      }
+    }
+
+    return success;
   }
 
   @Override
   public boolean invertSelection() {
+    assert ! baseSelectionHandler.isFirePropertyEvents();
+
     if (getSelectMode() != SelectMode.MULTI) {
       throw new RuntimeException("Invert selection is not supported for select mode: " + getSelectMode());
     }
 
-    SelectionHandler<T_ITEM> baseSelectionHandler = baseCollection.getSelectionHandler();
-    if (! SelectionHandlerUtil.invertSelectionInSameForceMode(this, baseSelectionHandler)) {
-      return false;
+    Selection<T_ITEM> oldBaseSelection = selection.getBaseSelection();
+    boolean success = false;
+
+    try {
+      if (baseSelectionHandler.invertSelection()) {
+        Collection<T_ITEM> transientSelectedItems = new HashSet<T_ITEM>(getAdditionalItems());
+        transientSelectedItems.removeAll(selection.getAdditionalSelectedItems());
+        SelectionWithAdditionalItems<T_ITEM> newSel = new SelectionWithAdditionalItems<T_ITEM>(
+              baseSelectionHandler.getSelection(),
+              transientSelectedItems);
+
+        success = setSelection(newSel);
+      }
+    } finally {
+      if (!success) {
+        baseSelectionHandler.setSelection(oldBaseSelection);
+      }
     }
 
-    Collection<T_ITEM> transientSelectedItems = new HashSet<T_ITEM>(additionalItems);
-    transientSelectedItems.removeAll(selection.getAdditionalSelectedItems());
-    SelectionWithAdditionalItems<T_ITEM> newSel = new SelectionWithAdditionalItems<T_ITEM>(
-          baseSelectionHandler.getSelection(),
-          transientSelectedItems);
-
-    if (!setSelection(newSel)) {
-      SelectionHandlerUtil.forceInvertSelection(baseSelectionHandler);
-      return false;
-    } else {
-      return true;
-    }
+    return success;
   }
 
   @Override
@@ -188,18 +219,21 @@ public class SelectionHandlerWithAdditionalItems<T_ITEM> extends SelectionHandle
 
   @Override
   public boolean setSelection(Selection<T_ITEM> selection) {
+    assert selection instanceof SelectionWithAdditionalItems;
+    assert ! baseSelectionHandler.isFirePropertyEvents();
+
     Selection<T_ITEM> oldSelection = this.selection;
-    Selection<T_ITEM> newSelection = selection;
+    SelectionWithAdditionalItems<T_ITEM> newSelection = (SelectionWithAdditionalItems<T_ITEM>) selection;
 
     // check for noop:
-    if (oldSelection.getSize() == 0 &&
-        newSelection.getSize() == 0) {
+    if (oldSelection.isEmpty() && newSelection.isEmpty()) {
     	return true;
     }
 
     try {
       fireVetoableChange(PROP_SELECTION, oldSelection, newSelection);
-      this.selection = (SelectionWithAdditionalItems<T_ITEM>) newSelection;
+      this.baseSelectionHandler.setSelection(newSelection.getBaseSelection());
+      this.selection = newSelection;
       firePropertyChange(PROP_SELECTION, oldSelection, newSelection);
       return true;
     } catch (PropertyVetoException e) {
@@ -208,6 +242,10 @@ public class SelectionHandlerWithAdditionalItems<T_ITEM> extends SelectionHandle
       }
       return false;
     }
+  }
+
+  protected List<T_ITEM> getAdditionalItems() {
+    return baseCollection.getModifications().getAddedItems();
   }
 
 }

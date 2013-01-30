@@ -23,6 +23,8 @@ import org.pm4j.common.selection.SelectionHandler;
 public final class PageableCollectionUtil2 {
 
   /**
+   * TODO olaf: change to zero based index.
+   *
    * @param pageable
    *          The set to get the result for.
    * @return The index of the first item on the current page.
@@ -31,15 +33,27 @@ public final class PageableCollectionUtil2 {
    *         Is zero if there are no items in this set.
    */
   public static long getIdxOfFirstItemOnPage(PageableCollection2<?> pageable) {
-    int pageSize = pageable.getPageSize();
-    long idx = (pageable.getNumOfItems() > 0)
-            ? (pageSize * pageable.getPageIdx()) + 1
-            : 0;
+    return getIdxOfFirstItemOnPage(pageable, pageable.getPageIdx())+1;
+  }
 
-    if (idx < 0) {
-      throw new RuntimeException("Item index out of bounds: " + idx);
-    }
-    return idx;
+  /**
+   * @param pageable
+   *          the set to get the result for.
+   * @param pageIdx
+   *          index of the page to calculate the item index for.<br>
+   *          The the first page index is <code>zero</code>.
+   * @return the index of the first item on the specified page.
+   *         <p>
+   *         Starts with zero.<br>
+   *         Is <code>-1</code> if there are no items in this set.
+   */
+  public static long getIdxOfFirstItemOnPage(PageableCollection2<?> pageable, long pageIdx) {
+    assert pageIdx >= 0;
+
+    int pageSize = pageable.getPageSize();
+    return (pageable.getNumOfItems() > 0)
+            ? (pageSize * pageIdx)
+            : -1;
   }
 
   public static int getIdxOfFirstItemOnPageAsInt(PageableCollection2<?> pageable) {
@@ -316,43 +330,5 @@ public final class PageableCollectionUtil2 {
       return idFilterExpr;
     }
   }
-
-/* TODO olaf: helper for query collection that handles additional items too.
-  public static <T_ITEM> List<T_ITEM> getItemsOnPage(
-      PageableCollection2<T_ITEM> pc,
-      PageableQueryService<T_ITEM, ?> pq,
-      QueryParams qp,
-      long pageIdx,
-      List<T_ITEM> additionalItems)
-  {
-    List<T_ITEM> itemsOnPage = new ArrayList<T_ITEM>();
-    int pageSize = pc.getPageSize();
-    long numOfPagesFilledByBaseCollectionPages = pq.getItemCount(qp) / pageSize;
-
-    if (additionalItems.isEmpty() ||
-        (pageIdx < numOfPagesFilledByBaseCollectionPages)) {
-      itemsOnPage = baseCollection.getItemsOnPage();
-    } else {
-      boolean mixedPage = (currentPageIdx == numOfPagesFilledByBaseCollectionPages) &&
-                          (baseCollection.getNumOfItems() % pageSize) != 0;
-      if (mixedPage) {
-        List<T_ITEM> list = new ArrayList<T_ITEM>(baseCollection.getItemsOnPage());
-        for (T_ITEM i : additionalItems) {
-          if (list.size() >= pageSize) {
-            break;
-          }
-          list.add(i);
-        }
-        itemsOnPage = list;
-      } else {
-        long firstItemIdx = (pageIdx) * pageSize;
-        int offset = (int)(firstItemIdx - baseCollection.getNumOfItems());
-        itemsOnPage = new ArrayList<T_ITEM>(ListUtil.subListPage(additionalItems, offset, pageSize));
-      }
-    }
-
-    return itemsOnPage;
-  }
-*/
 
 }

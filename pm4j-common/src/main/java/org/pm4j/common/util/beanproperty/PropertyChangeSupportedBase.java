@@ -18,8 +18,10 @@ public class PropertyChangeSupportedBase implements PropertyChangeSupported, Clo
 
   private PropertyChangeSupport pcs;
   private VetoableChangeSupport vpcs;
-  /** A switch that may be used the switch fireing of veto events off. */
-  private boolean vetoEventEnabled = true;
+  /** A switch that may be used the switch firing of veto events off. */
+  private boolean fireVetoEvents = true;
+  /** A switch that may be used to switch firing of all property events off. */
+  private boolean firePropertyEvents = true;
 
   @Override
   public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
@@ -32,11 +34,15 @@ public class PropertyChangeSupportedBase implements PropertyChangeSupported, Clo
   }
 
   protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
-    getPcs().firePropertyChange(propertyName, oldValue, newValue);
+    if (firePropertyEvents) {
+      getPcs().firePropertyChange(propertyName, oldValue, newValue);
+    }
   }
 
   protected void firePropertyChange(PropertyChangeEvent event) {
-    getPcs().firePropertyChange(event);
+    if (firePropertyEvents) {
+      getPcs().firePropertyChange(event);
+    }
   }
 
   @Override
@@ -62,23 +68,31 @@ public class PropertyChangeSupportedBase implements PropertyChangeSupported, Clo
   }
 
   @Override
-  public void setVetoEventEnabled(boolean vetoEventEnabled) {
-    this.vetoEventEnabled = vetoEventEnabled;
+  public void setFireVetoEvents(boolean vetoEventEnabled) {
+    this.fireVetoEvents = vetoEventEnabled;
   }
 
   @Override
-  public boolean isVetoEventEnabled() {
-    return vetoEventEnabled;
+  public boolean isFireVetoEvents() {
+    return fireVetoEvents;
+  }
+
+  public boolean isFirePropertyEvents() {
+    return firePropertyEvents;
+  }
+
+  public void setFirePropertyEvents(boolean firingPropertyEvents) {
+    this.firePropertyEvents = firingPropertyEvents;
   }
 
   protected void fireVetoableChange(String propertyName, Object oldValue, Object newValue) throws PropertyVetoException {
-    if (vetoEventEnabled) {
+    if (firePropertyEvents && fireVetoEvents) {
       getVpcs().fireVetoableChange(propertyName, oldValue, newValue);
     }
   }
 
   protected void fireVetoableChange(PropertyChangeEvent event) throws PropertyVetoException {
-    if (vetoEventEnabled) {
+    if (firePropertyEvents && fireVetoEvents) {
       getVpcs().fireVetoableChange(event);
     }
   }
@@ -92,7 +106,7 @@ public class PropertyChangeSupportedBase implements PropertyChangeSupported, Clo
 		PropertyChangeSupportedBase clone = (PropertyChangeSupportedBase) super.clone();
 		clone.pcs = null;
 		clone.vpcs = null;
-		clone.vetoEventEnabled = true;
+		clone.fireVetoEvents = true;
 		return clone;
 	} catch (CloneNotSupportedException e) {
 		throw new CheckedExceptionWrapper(e);

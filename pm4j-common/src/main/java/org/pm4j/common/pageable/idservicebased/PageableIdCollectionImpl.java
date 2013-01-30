@@ -13,6 +13,7 @@ import org.pm4j.common.pageable.PageableCollectionBase2;
 import org.pm4j.common.pageable.PageableCollectionUtil2;
 import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.selection.SelectionHandler;
+import org.pm4j.common.selection.SelectionHandlerWithAdditionalItems;
 import org.pm4j.common.selection.SelectionHandlerWithIdSet;
 import org.pm4j.common.util.collection.ListUtil;
 
@@ -36,12 +37,16 @@ public class PageableIdCollectionImpl<T_ITEM, T_ID> extends PageableCollectionBa
     assert service != null;
 
     this.service = service;
-    this.selectionHandler = new SelectionHandlerWithIdSet<T_ITEM, T_ID>(service) {
+
+    // Handling of transient and persistent item selection is separated by a handler composition.
+    SelectionHandler<T_ITEM> querySelectionHandler = new SelectionHandlerWithIdSet<T_ITEM, T_ID>(service) {
       @Override
       protected Collection<T_ID> getAllIds() {
         return getIds();
       }
     };
+    querySelectionHandler.setFirePropertyEvents(false);
+    this.selectionHandler = new SelectionHandlerWithAdditionalItems<T_ITEM>(this, querySelectionHandler);
 
     getQueryParams().addPropertyChangeListener(QueryParams.PROP_EFFECTIVE_SORT_ORDER, resetItemsOnQueryChangeListener);
     getQueryParams().addPropertyChangeListener(QueryParams.PROP_EFFECTIVE_FILTER, resetItemsOnQueryChangeListener);

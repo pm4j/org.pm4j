@@ -83,10 +83,10 @@ public class SelectionHandlerUtil {
    * @param parentSelectionHandler
    *          the handler the <code>vetoEventEnabled</code> property is read
    *          from.<br>
-   *          See: {@link PropertyChangeSupported#isVetoEventEnabled()}.
+   *          See: {@link PropertyChangeSupported#isFireVetoEvents()}.
    */
   public static boolean selectAllInSameForceMode(SelectionHandler<?> parentSelectionHandler, final SelectionHandler<?> nestedSelectionHandler, final boolean doSelectItems) {
-    if (parentSelectionHandler.isVetoEventEnabled()) {
+    if (parentSelectionHandler.isFireVetoEvents()) {
       return nestedSelectionHandler.selectAll(doSelectItems);
     } else {
       forceSelectAll(nestedSelectionHandler, doSelectItems);
@@ -102,10 +102,10 @@ public class SelectionHandlerUtil {
    * @param parentSelectionHandler
    *          the handler the <code>vetoEventEnabled</code> property is read
    *          from.<br>
-   *          See: {@link PropertyChangeSupported#isVetoEventEnabled()}.
+   *          See: {@link PropertyChangeSupported#isFireVetoEvents()}.
    */
   public static <T_ITEM> boolean selectInSameForceMode(SelectionHandler<?> parentSelectionHandler, final SelectionHandler<T_ITEM> nestedSelectionHandler, boolean doSelectItem, T_ITEM item) {
-    if (parentSelectionHandler.isVetoEventEnabled()) {
+    if (parentSelectionHandler.isFireVetoEvents()) {
       return nestedSelectionHandler.select(doSelectItem, item);
     } else {
       forceSelect(nestedSelectionHandler, doSelectItem, item);
@@ -121,10 +121,10 @@ public class SelectionHandlerUtil {
    * @param parentSelectionHandler
    *          the handler the <code>vetoEventEnabled</code> property is read
    *          from.<br>
-   *          See: {@link PropertyChangeSupported#isVetoEventEnabled()}.
+   *          See: {@link PropertyChangeSupported#isFireVetoEvents()}.
    */
   public static <T_ITEM> boolean selectInSameForceMode(SelectionHandler<?> parentSelectionHandler, final SelectionHandler<T_ITEM> nestedSelectionHandler, boolean doSelectItem, Iterable<T_ITEM> items) {
-    if (parentSelectionHandler.isVetoEventEnabled()) {
+    if (parentSelectionHandler.isFireVetoEvents()) {
       return nestedSelectionHandler.select(doSelectItem, items);
     } else {
       forceSelect(nestedSelectionHandler, doSelectItem, items);
@@ -140,10 +140,10 @@ public class SelectionHandlerUtil {
    * @param parentSelectionHandler
    *          the handler the <code>vetoEventEnabled</code> property is read
    *          from.<br>
-   *          See: {@link PropertyChangeSupported#isVetoEventEnabled()}.
+   *          See: {@link PropertyChangeSupported#isFireVetoEvents()}.
    */
   public static <T_ITEM> boolean invertSelectionInSameForceMode(SelectionHandler<?> parentSelectionHandler, final SelectionHandler<T_ITEM> nestedSelectionHandler) {
-    if (parentSelectionHandler.isVetoEventEnabled()) {
+    if (parentSelectionHandler.isFireVetoEvents()) {
       return nestedSelectionHandler.invertSelection();
     } else {
       forceInvertSelection(nestedSelectionHandler);
@@ -159,10 +159,10 @@ public class SelectionHandlerUtil {
    * @param parentSelectionHandler
    *          the handler the <code>vetoEventEnabled</code> property is read
    *          from.<br>
-   *          See: {@link PropertyChangeSupported#isVetoEventEnabled()}.
+   *          See: {@link PropertyChangeSupported#isFireVetoEvents()}.
    */
   public static <T_ITEM> boolean setSelectionInSameForceMode(SelectionHandler<?> parentSelectionHandler, final SelectionHandler<T_ITEM> nestedSelectionHandler, final Selection<T_ITEM> selection) {
-    if (parentSelectionHandler.isVetoEventEnabled()) {
+    if (parentSelectionHandler.isFireVetoEvents()) {
       return nestedSelectionHandler.setSelection(selection);
     } else {
       forceSetSelection(nestedSelectionHandler, selection);

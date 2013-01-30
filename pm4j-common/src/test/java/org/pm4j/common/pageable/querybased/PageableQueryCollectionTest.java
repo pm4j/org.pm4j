@@ -6,7 +6,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Ignore;
 import org.pm4j.common.pageable.PageableCollection2;
 import org.pm4j.common.pageable.PageableCollectionTestBase;
 import org.pm4j.common.query.AttrDefinition;
@@ -41,20 +40,6 @@ public class PageableQueryCollectionTest extends PageableCollectionTestBase<Page
   @Override
   protected Bean createItem(String name) {
     return new Bean(name);
-  }
-
-  /**
-   *
-   */
-  @Override @Ignore
-  public void testAddItem() {
-//    try {
-//      super.testAddItem();
-//      fail("add item functionality is not yet supported by the query collection.");
-//    }
-//    catch (UnsupportedOperationException e) {
-//      // ok
-//    }
   }
 
   // --- A fake service implementation that does the job just in memory. ---

@@ -126,19 +126,19 @@ public abstract class PageableQuerySelectionHandler<T_ITEM, T_ID extends Seriali
   @SuppressWarnings("unchecked")
   @Override
   public boolean setSelection(Selection<T_ITEM> selection) {
+    assert selection instanceof QuerySelectionWithClickedIds;
+
     Selection<T_ITEM> oldSelection = this.currentSelection;
-    Selection<T_ITEM> newSelection = selection;
+    QuerySelectionWithClickedIds<T_ITEM, T_ID> newSelection = (QuerySelectionWithClickedIds<T_ITEM, T_ID>) selection;
 
     // check for noop:
-    if (oldSelection.getSize() == 0 &&
-        newSelection.getSize() == 0) {
+    if (oldSelection.isEmpty() && newSelection.isEmpty()) {
     	return true;
     }
 
     try {
       fireVetoableChange(PROP_SELECTION, oldSelection, newSelection);
-      // XXX olaf: check of that can be done safely...
-      this.currentSelection = (QuerySelectionWithClickedIds<T_ITEM, T_ID>) newSelection;
+      this.currentSelection = newSelection;
       firePropertyChange(PROP_SELECTION, oldSelection, newSelection);
       return true;
     } catch (PropertyVetoException e) {

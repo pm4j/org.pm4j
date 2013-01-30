@@ -8,12 +8,13 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import org.pm4j.common.pageable.querybased.PageableQueryCollection;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.selection.Selection;
 import org.pm4j.common.selection.SelectionHandler;
 import org.pm4j.common.selection.SelectionHandlerUtil;
-import org.pm4j.common.selection.SelectionHandlerWithAdditionalItems;
+import org.pm4j.common.selection.DeprecatedSelectionHandlerWithAdditionalItems;
 import org.pm4j.common.selection.SelectionWithAdditionalItems;
 import org.pm4j.common.util.beanproperty.PropertyChangeSupportedBase;
 import org.pm4j.common.util.collection.CombinedIterator;
@@ -27,13 +28,14 @@ import org.pm4j.common.util.collection.ListUtil;
  *          the type of handled items.
  *
  * @author olaf boede
+ * @deprecated The {@link PageableQueryCollection} does the job now completely.
  */
 public class PageableCollectionWithAdditionalItems<T_ITEM> extends PropertyChangeSupportedBase implements PageableCollection2<T_ITEM> {
 
   private final PageableCollection2<T_ITEM>  baseCollection;
   private final List<T_ITEM>                 additionalItems;
   private long                               currentPageIdx = 0;
-  private final SelectionHandlerWithAdditionalItems<T_ITEM> selectionHandler;
+  private final DeprecatedSelectionHandlerWithAdditionalItems<T_ITEM> selectionHandler;
   private final ModificationHandler<T_ITEM>  modificationHandler;
   private List<T_ITEM>                       itemsOnPage;
 
@@ -46,7 +48,7 @@ public class PageableCollectionWithAdditionalItems<T_ITEM> extends PropertyChang
 
     this.baseCollection = baseCollection;
     this.additionalItems   = new ArrayList<T_ITEM>();
-    this.selectionHandler = new SelectionHandlerWithAdditionalItems<T_ITEM>(baseCollection, additionalItems);
+    this.selectionHandler = new DeprecatedSelectionHandlerWithAdditionalItems<T_ITEM>(baseCollection, additionalItems);
     this.modificationHandler = new ModificationHandlerWithAdditionalItems();
 
     // On each query parameter change the locally cached current page needs to be cleared.
@@ -268,7 +270,7 @@ public class PageableCollectionWithAdditionalItems<T_ITEM> extends PropertyChang
       }
 
       @Override
-      public Collection<T_ITEM> getAddedItems() {
+      public List<T_ITEM> getAddedItems() {
         return additionalItems;
       }
 

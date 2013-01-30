@@ -17,7 +17,7 @@ import org.pm4j.common.selection.Selection;
  */
 public class ModificationsImpl<T_ITEM> implements Modifications<T_ITEM> {
 
-  private Collection<T_ITEM> addedItems = Collections.emptyList();
+  private List<T_ITEM> addedItems = Collections.emptyList();
   private Collection<T_ITEM> updatedItems = Collections.emptyList();
 
   @SuppressWarnings("unchecked")
@@ -29,7 +29,7 @@ public class ModificationsImpl<T_ITEM> implements Modifications<T_ITEM> {
   }
 
   @Override
-  public Collection<T_ITEM> getAddedItems() {
+  public List<T_ITEM> getAddedItems() {
     return addedItems;
   }
 

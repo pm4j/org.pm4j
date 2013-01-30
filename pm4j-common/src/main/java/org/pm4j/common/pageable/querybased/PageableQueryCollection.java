@@ -25,6 +25,7 @@ import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.selection.Selection;
 import org.pm4j.common.selection.SelectionHandler;
 import org.pm4j.common.selection.SelectionHandlerUtil;
+import org.pm4j.common.selection.SelectionHandlerWithAdditionalItems;
 import org.pm4j.common.util.collection.ListUtil;
 
 /**
@@ -38,8 +39,8 @@ import org.pm4j.common.util.collection.ListUtil;
  */
 public class PageableQueryCollection<T_ITEM, T_ID extends Serializable> extends PageableCollectionBase2<T_ITEM> {
 
-  private final PageableQueryService<T_ITEM, T_ID>          service;
-  private final PageableQuerySelectionHandler<T_ITEM, T_ID> selectionHandler;
+  final PageableQueryService<T_ITEM, T_ID>                  service;
+  private final SelectionHandler<T_ITEM>                    selectionHandler;
   private final QueryCollectionModificationHandler          modificationHandler;
   private final CachingPageableQueryService<T_ITEM, T_ID>   cachingService;
   /** A cached reference to the query paramerters that considers the removed item set too. */
@@ -68,17 +69,20 @@ public class PageableQueryCollection<T_ITEM, T_ID extends Serializable> extends 
 
     this.service = service;
     this.cachingService = new CachingPageableQueryService<T_ITEM, T_ID>(service);
-    this.selectionHandler = new PageableQuerySelectionHandler<T_ITEM, T_ID>(cachingService) {
+    this.modificationHandler = new QueryCollectionModificationHandler();
+
+    // Uses getQueryParams() because the super ctor may have created it.
+    QueryParams myQueryParams = getQueryParams();
+
+    // Handling of transient and persistent item selection is separated by a handler composition.
+    SelectionHandler<T_ITEM> querySelectionHandler = new PageableQuerySelectionHandler<T_ITEM, T_ID>(cachingService) {
       @Override
       protected QueryParams getQueryParams() {
         return getQueryParamsWithRemovedItems();
       }
     };
-
-    this.modificationHandler = new QueryCollectionModificationHandler();
-
-    // Uses getQueryParams() because the super ctor may have created it.
-    QueryParams myQueryParams = getQueryParams();
+    querySelectionHandler.setFirePropertyEvents(false);
+    this.selectionHandler = new SelectionHandlerWithAdditionalItems<T_ITEM>(this, querySelectionHandler);
 
     // Reset all caches on each query filter criteria change.
     myQueryParams.addPropertyChangeListener(QueryParams.PROP_EFFECTIVE_FILTER, new PropertyChangeListener() {
@@ -105,14 +109,8 @@ public class PageableQueryCollection<T_ITEM, T_ID extends Serializable> extends 
       return Collections.EMPTY_LIST;
     }
 
-    long firstItemIdx = PageableCollectionUtil2.getIdxOfFirstItemOnPage(this)-1;
-    if (firstItemIdx < 0) {
-    	return Collections.EMPTY_LIST;
-    }
-    return cachingService.getItems(
-        queryParams,
-        firstItemIdx,
-        getPageSize());
+    return PageableQueryUtil.getQueryAndAdditionalItemsOnPage
+        (this, cachingService, queryParams, getPageIdx(), getModifications().getAddedItems());
   }
 
   @Override
@@ -126,8 +124,8 @@ public class PageableQueryCollection<T_ITEM, T_ID extends Serializable> extends 
   @Override
   public long getNumOfItems() {
     return getQueryParams().isExecQuery()
-    	? cachingService.getItemCount(getQueryParamsWithRemovedItems())
-    	// TODO olaf: for new add-handling   + modificationHandler.getModifications().getAddedItems().size()
+    	? cachingService.getItemCount(getQueryParamsWithRemovedItems()) +
+    	  modificationHandler.getModifications().getAddedItems().size()
     	: 0;
   }
 
@@ -136,37 +134,7 @@ public class PageableQueryCollection<T_ITEM, T_ID extends Serializable> extends 
   public Iterator<T_ITEM> iterator() {
     return !getQueryParams().isExecQuery()
         ? Collections.EMPTY_LIST.iterator()
-        : new Iterator<T_ITEM>() {
-      int currentIdx;
-      T_ITEM next;
-
-      {
-        readNext();
-      }
-
-      @Override
-      public boolean hasNext() {
-        return next != null;
-      }
-
-      @Override
-      public T_ITEM next() {
-        T_ITEM rval = next;
-        readNext();
-        return rval;
-      }
-
-      @Override
-      public void remove() {
-        throw new UnsupportedOperationException();
-      }
-
-      protected boolean readNext() {
-        // TODO olaf: Needs to be optimized. Blockwise ...
-        next = ListUtil.listToItemOrNull(service.getItems(getQueryParamsWithRemovedItems(), currentIdx++, 1));
-        return next != null;
-      }
-    };
+        : new PageableQueryCollectionIterator<T_ITEM>(this);
   }
 
   @Override
@@ -265,16 +233,14 @@ public class PageableQueryCollection<T_ITEM, T_ID extends Serializable> extends 
       }
 
       clearCaches();
-      PageableQueryCollection.this.firePropertyChange(PageableCollection2.EVENT_REMOVE_SELECTION, null, null);
+      PageableQueryCollection.this.firePropertyChange(PageableCollection2.EVENT_REMOVE_SELECTION, items, null);
       return true;
     }
 
     @Override
     public void addItem(T_ITEM item) {
-      // XXX olaf: check if this can be handled here. Currently it's handled in the wrapping
-      // collection with additional items.
-      // modifications.registerAddedItem(item);
-      throw new UnsupportedOperationException("Please embed this collection in a PageableCollectionWithAdditionalItems to handle add operations.");
+      modifications.registerAddedItem(item);
+      PageableQueryCollection.this.firePropertyChange(PageableCollection2.EVENT_ITEM_ADD, null, item);
     }
 
     @Override
@@ -295,5 +261,121 @@ public class PageableQueryCollection<T_ITEM, T_ID extends Serializable> extends 
     }
 
   }
+
+}
+
+/**
+ * Iterates page wise through a pageable query collection.
+ *
+ * @param <T_ITEM> type of collection items.
+ */
+class PageableQueryCollectionIterator<T_ITEM> implements Iterator<T_ITEM> {
+  private final PageableQueryCollection<T_ITEM, ?> pc;
+  private final QueryParams queryParams;
+  private final List<T_ITEM> additionalItems;
+  private final long numOfPages;
+  private List<T_ITEM> pageItems;
+  private int pageRowIdx = -1;
+  private long currentPageIdx = -1;
+  private T_ITEM next;
+
+  public PageableQueryCollectionIterator(PageableQueryCollection<T_ITEM, ?> pc) {
+    assert pc != null;
+    this.pc = pc;
+    this.queryParams = pc.getQueryParamsWithRemovedItems();
+    this.additionalItems = pc.getModifications().getAddedItems();
+    this.numOfPages = PageableCollectionUtil2.getNumOfPages(pc);
+    readNext();
+  }
+
+  @Override
+  public boolean hasNext() {
+    return next != null;
+  }
+
+  @Override
+  public T_ITEM next() {
+    T_ITEM rval = next;
+    readNext();
+    return rval;
+  }
+
+  @Override
+  public void remove() {
+    throw new UnsupportedOperationException();
+  }
+
+  private void readNext() {
+    next = null;
+    ++pageRowIdx;
+    if ((pageItems == null) || (pageRowIdx == pc.getPageSize())) {
+      ++currentPageIdx;
+      if (currentPageIdx >= numOfPages) {
+        return;
+      }
+      pageItems = PageableQueryUtil.getQueryAndAdditionalItemsOnPage
+                    (pc, pc.service, queryParams, currentPageIdx, additionalItems);
+      pageRowIdx = 0;
+    }
+
+    if (pageRowIdx < pageItems.size()) {
+      next = pageItems.get(pageRowIdx);
+    }
+  }
+}
+
+/**
+ * Helper methods for pageable queries.
+ */
+class PageableQueryUtil {
+
+  /**
+   * Provides the set of page items for a mix of query based and additional transient items.
+   *
+   * @param pc the pageable collection
+   * @param pq
+   * @param qp
+   * @param pageIdx
+   * @param additionalItems
+   * @return
+   */
+  public static <T_ITEM> List<T_ITEM> getQueryAndAdditionalItemsOnPage(
+      PageableCollection2<T_ITEM> pc,
+      PageableQueryService<T_ITEM, ?> pq,
+      QueryParams qp,
+      long pageIdx,
+      List<T_ITEM> additionalItems)
+  {
+    List<T_ITEM> itemsOnPage;
+    int pageSize = pc.getPageSize();
+    long queryItemCount = pq.getItemCount(qp);
+    long numOfPagesFilledByQueryItems = queryItemCount / pageSize;
+
+    if (additionalItems.isEmpty() ||
+        (pageIdx < numOfPagesFilledByQueryItems)) {
+      long firstItemIdx = PageableCollectionUtil2.getIdxOfFirstItemOnPage(pc, pageIdx);
+      itemsOnPage = pq.getItems(qp, firstItemIdx, pageSize);
+    } else {
+      boolean mixedPage = (pageIdx == numOfPagesFilledByQueryItems) &&
+                          (queryItemCount % pageSize) != 0;
+      if (mixedPage) {
+        long firstItemIdx = PageableCollectionUtil2.getIdxOfFirstItemOnPage(pc, pageIdx);
+        itemsOnPage = new ArrayList<T_ITEM>(pq.getItems(qp, firstItemIdx, pageSize));
+        for (T_ITEM i : additionalItems) {
+          if (itemsOnPage.size() >= pageSize) {
+            break;
+          }
+          itemsOnPage.add(i);
+        }
+      } else {
+        long firstItemIdx = (pageIdx) * pageSize;
+        int offset = (int)(firstItemIdx - queryItemCount);
+        itemsOnPage = new ArrayList<T_ITEM>(ListUtil.subListPage(additionalItems, offset, pageSize));
+      }
+    }
+
+    return itemsOnPage;
+  }
+
 
 }

@@ -67,7 +67,7 @@ public abstract class PageableCollectionBase2<T_ITEM> extends PropertyChangeSupp
   @Override
   public void setPageIdx(long pageIdx) {
     long oldIdx = this.pageIdx;
-    this.pageIdx = (pageIdx < 0) ? 0 : pageIdx;
+    this.pageIdx = Math.max(0, pageIdx);
     firePropertyChange(PROP_PAGE_IDX, oldIdx, this.pageIdx);
   }
 

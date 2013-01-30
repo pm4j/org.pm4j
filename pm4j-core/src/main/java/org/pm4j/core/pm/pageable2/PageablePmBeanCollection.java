@@ -391,9 +391,9 @@ public class PageablePmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> exten
 
       @SuppressWarnings("unchecked")
       @Override
-      public Collection<T_PM> getAddedItems() {
-        Collection<T_BEAN> beans = getBeanCollectionModificationHandler().getModifications().getAddedItems();
-        return (Collection<T_PM>) PmFactoryApi.getPmListForBeans(pmCtxt, beans, false);
+      public List<T_PM> getAddedItems() {
+        List<T_BEAN> beans = getBeanCollectionModificationHandler().getModifications().getAddedItems();
+        return (List<T_PM>) PmFactoryApi.getPmListForBeans(pmCtxt, beans, false);
       }
 
       @SuppressWarnings("unchecked")

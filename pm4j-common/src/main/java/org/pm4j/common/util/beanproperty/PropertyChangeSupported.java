@@ -43,14 +43,28 @@ public interface PropertyChangeSupported {
    *
    * @param vetoEventEnabled <code>true</code> allows vetos.
    */
-  void setVetoEventEnabled(boolean vetoEventEnabled);
+  void setFireVetoEvents(boolean vetoEventEnabled);
 
   /**
    * Tells if veto events are fired.
    *
    * @return <code>true</code> if veto events get fired.
    */
-  boolean isVetoEventEnabled();
+  boolean isFireVetoEvents();
+
+  /**
+   * Tells if firing of any property and veto event is enabled.
+   *
+   * @return <code>true</code> if veto events get fired.
+   */
+  boolean isFirePropertyEvents();
+
+  /**
+   * Defines if firing of any property and veto event is enabled.
+   *
+   * @param firingPropertyEvents <code>true</code> allows events.
+   */
+  void setFirePropertyEvents(boolean firingPropertyEvents);
 
   /**
    * Adds the given listener to the set of property change and veto listeners.

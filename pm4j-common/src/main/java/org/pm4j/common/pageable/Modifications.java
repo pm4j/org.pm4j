@@ -1,6 +1,7 @@
 package org.pm4j.common.pageable;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.pm4j.common.selection.Selection;
 
@@ -21,12 +22,12 @@ public interface Modifications<T_ITEM> {
   boolean isModified();
 
   /**
-   * Provides the set of added items.
+   * Provides the list of added items.
    *
    * @return the added items.<br>
    *  If there is no added item: an empty collection.
    */
-  Collection<T_ITEM> getAddedItems();
+  List<T_ITEM> getAddedItems();
 
   /**
    * Provides the set of updated items.
