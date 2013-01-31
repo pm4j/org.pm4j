@@ -3,9 +3,9 @@ package org.pm4j.sample.album;
 import org.eclipse.swt.widgets.Composite;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.impl.PmEventApiHandler;
+import org.pm4j.core.sample.album.AlbumConversationPm;
 import org.pm4j.core.sample.album.AlbumFormPm;
 import org.pm4j.core.sample.album.AlbumPm;
-import org.pm4j.core.sample.album.AlbumSessionPm;
 import org.pm4j.swt.pb.base.PbFormBase;
 import org.pm4j.swt.testtools.SwtTestShell;
 
@@ -34,7 +34,8 @@ public class AlbumFormPb extends PbFormBase<AlbumForm, AlbumFormPm> {
   public static void main(String[] args) {
     PmEventApi.setApiHandler(new PmEventApiHandler.WithThreadLocalEventSource());
     SwtTestShell s = new SwtTestShell(450, 200, "Album Demo Application");
-    new AlbumFormPb().build(s.getShell(), AlbumSessionPm.makeAlbumFormPm());
+    AlbumFormPm albumFormPm = new AlbumFormPm(new AlbumConversationPm());
+    new AlbumFormPb().build(s.getShell(), albumFormPm);
     s.show();
   }
 

@@ -9,7 +9,7 @@ import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.impl.PmEventApiHandler;
 import org.pm4j.core.sample.album.AlbumFormPm;
 import org.pm4j.core.sample.album.AlbumPm;
-import org.pm4j.core.sample.album.AlbumSessionPm;
+import org.pm4j.core.sample.album.AlbumConversationPm;
 import org.pm4j.swing.pb.base.PbFormBase;
 
 public class AlbumFormPb extends PbFormBase<AlbumForm, AlbumFormPm> {
@@ -40,8 +40,8 @@ public class AlbumFormPb extends PbFormBase<AlbumForm, AlbumFormPm> {
 
     JDialog dlg = new JDialog((Frame) null, "Album Demo Application", true);
 
-    AlbumForm form = new AlbumFormPb().build(null,
-    AlbumSessionPm.makeAlbumFormPm());
+    AlbumFormPm formPm = new AlbumFormPm(new AlbumConversationPm());
+    AlbumForm form = new AlbumFormPb().build(null, formPm);
 
     dlg.setContentPane(form);
     dlg.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
