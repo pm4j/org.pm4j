@@ -231,6 +231,9 @@ public class PmTabSetImpl2 extends PmElementImpl implements PmTabSet2 {
     protected boolean beforeDo() {
       boolean canDo = super.beforeDo();
       if (canDo) {
+        // XXX olaf: a strange solution. This should happen in doItImpl()...
+        // A split off to canSwitch and switch could make it clearer. But that makes
+        // it harder to express some business constraints. Check!
         canDo = tabSet.switchToTabPmImpl(this, fromTab, toTab);
       }
       return canDo;

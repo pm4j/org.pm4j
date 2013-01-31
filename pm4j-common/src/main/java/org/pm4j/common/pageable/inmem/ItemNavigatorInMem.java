@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.pm4j.common.pageable.ItemNavigator;
-import org.pm4j.common.selection.Selection;
 
 /**
  * A navigator that keeps a collection of selected items in memory.
@@ -18,7 +17,14 @@ public class ItemNavigatorInMem<T> implements ItemNavigator<T> {
   private List<T> items = new ArrayList<T>();
   private int currentItemIdx;
 
-  public ItemNavigatorInMem(Selection<T> selection) {
+  /**
+   * Copies the given items to an in-memory list to iterate over.
+   *
+   * @param selection
+   *          the set of items to handle.<br>
+   *          <code>null</code> leads to an empty navigator item set.
+   */
+  public ItemNavigatorInMem(Iterable<T> selection) {
     if (selection != null) {
       for (T t : selection) {
         items.add(t);
