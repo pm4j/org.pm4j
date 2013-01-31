@@ -32,12 +32,6 @@ public class PmAttrBigDecimalImpl extends PmAttrNumBase<BigDecimal> implements P
     return getOwnMetaDataWithoutPmInitCall().getMinValue();
   }
 
-  @Override
-  public int getMaxLen() {
-    // TODO Auto-generated method stub
-    return super.getMaxLen();
-  }
-
   // ======== Value handling ======== //
 
 
