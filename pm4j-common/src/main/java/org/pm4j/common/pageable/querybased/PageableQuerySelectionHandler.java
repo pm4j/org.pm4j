@@ -45,7 +45,6 @@ public abstract class PageableQuerySelectionHandler<T_ITEM, T_ID extends Seriali
   private final PageableQueryService<T_ITEM, T_ID> service;
   private final ItemIdSelection<T_ITEM, T_ID> emptySelection;
   private QuerySelectionWithClickedIds<T_ITEM, T_ID> currentSelection;
-  private boolean inverse;
 
   @SuppressWarnings("unchecked")
   public PageableQuerySelectionHandler(PageableQueryService<T_ITEM, T_ID> service) {
@@ -59,7 +58,8 @@ public abstract class PageableQuerySelectionHandler<T_ITEM, T_ID extends Seriali
   @Override
   public boolean select(boolean select, T_ITEM item) {
     T_ID id = service.getIdForItem(item);
-    Set<T_ID> idSet = getModifyableIdSet();
+    Set<T_ID> idSet = getClickedIdSet();
+    boolean inverse = isInverse();
 
     if (select && ! inverse) {
       beforeAddSingleItemSelection(idSet);
@@ -76,9 +76,9 @@ public abstract class PageableQuerySelectionHandler<T_ITEM, T_ID extends Seriali
 
   @Override
   public boolean select(boolean select, Iterable<T_ITEM> items) {
-    Set<T_ID> idSet = getModifyableIdSet();
+    Set<T_ID> idSet = getClickedIdSet();
     for (T_ITEM i : items) {
-      if (select ^ inverse) {
+      if (select ^ isInverse()) {
         idSet.add(service.getIdForItem(i));
       } else {
         idSet.remove(service.getIdForItem(i));
@@ -89,17 +89,18 @@ public abstract class PageableQuerySelectionHandler<T_ITEM, T_ID extends Seriali
     return setSelection(idSet);
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public boolean selectAll(boolean select) {
     if (select && getSelectMode() != SelectMode.MULTI) {
       throw new RuntimeException("Select all for current select mode is not supported: " + getSelectMode());
     }
 
-    boolean oldInverse = inverse;
-    inverse = select;
-    if (!setSelection(Collections.EMPTY_SET)) {
-      inverse = oldInverse;
+    Selection<T_ITEM> s = select
+          // All items selected: all query items do match and there are no de-selecting clicks.
+          ? new InvertedSelection<T_ITEM, T_ID>(service, getQueryParams(), emptySelection)
+          : emptySelection;
+
+    if (!setSelection(s)) {
       return false;
     }
 
@@ -112,7 +113,7 @@ public abstract class PageableQuerySelectionHandler<T_ITEM, T_ID extends Seriali
       throw new RuntimeException("Invert selection is not supported for select mode: " + getSelectMode());
     }
 
-    return setSelection(inverse
+    return setSelection(isInverse()
         ? new ItemIdSelection<T_ITEM, T_ID>(service, currentSelection.getClickedIds().getIds())
         : new InvertedSelection<T_ITEM, T_ID>(service, getQueryParams(), currentSelection));
   }
@@ -147,9 +148,22 @@ public abstract class PageableQuerySelectionHandler<T_ITEM, T_ID extends Seriali
     }
   }
 
+  /**
+   * Sub classes provide here the query that represents all selectable items.
+   *
+   * @return the query parameter set. Never <code>null</code>.
+   */
   protected abstract QueryParams getQueryParams();
 
-  private Set<T_ID> getModifyableIdSet() {
+  /**
+   * @return <code>true</code> if the actual query is a kind of {@link InvertedSelection}.
+   */
+  protected final boolean isInverse() {
+    return (currentSelection instanceof InvertedSelection);
+  }
+
+  /** @return the set of clicked id's */
+  private Set<T_ID> getClickedIdSet() {
     return new HashSet<T_ID>(currentSelection.getClickedIds().getIds());
   }
 
@@ -163,7 +177,7 @@ public abstract class PageableQuerySelectionHandler<T_ITEM, T_ID extends Seriali
                   ? emptySelection
                   : new ItemIdSelection<T_ITEM, T_ID>(service, selectedIds);
 
-    return setSelection(inverse
+    return setSelection(isInverse()
                   ? new InvertedSelection<T_ITEM, T_ID>(service, getQueryParams(), idSelection)
                   : idSelection);
   }
