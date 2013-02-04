@@ -345,13 +345,13 @@ public class PageablePmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> exten
 
       // clear all messages and references to the set of items to delete.
       for (T_PM p : getItemsOnPage()) {
-        if (selection.isSelected(p)) {
+        if (selection.contains(p)) {
           PmMessageUtil.clearSubTreeMessages(p);
           BeanPmCacheUtil.removeBeanPm(pmCtxt, p);
         }
       }
       for (T_PM p : getModifications().getUpdatedItems()) {
-        if (selection.isSelected(p)) {
+        if (selection.contains(p)) {
           PmMessageUtil.clearSubTreeMessages(p);
           BeanPmCacheUtil.removeBeanPm(pmCtxt, p);
         }

@@ -65,9 +65,9 @@ public class PmSelection<T_PM extends PmBean<T_BEAN>, T_BEAN> implements Selecti
   }
 
   @Override
-  public boolean isSelected(T_PM item) {
+  public boolean contains(T_PM item) {
     return item != null
-        ? beanSelection.isSelected(item.getPmBean())
+        ? beanSelection.contains(item.getPmBean())
         : false;
   }
 

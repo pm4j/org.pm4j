@@ -41,7 +41,7 @@ public class PageableQueryAllItemsSelection<T_ITEM, T_ID extends Serializable> e
   }
 
   @Override
-  public boolean isSelected(T_ITEM item) {
+  public boolean contains(T_ITEM item) {
     return true;
   }
 

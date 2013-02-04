@@ -33,7 +33,7 @@ public interface Selection<T_ITEM> extends Iterable<T_ITEM>, Serializable {
    * @param item the item to check.
    * @return <code>true</code> if the item is selected.
    */
-  boolean isSelected(T_ITEM item);
+  boolean contains(T_ITEM item);
 
   /**
    * The set of items can be accessed through an {@link Iterator}.
@@ -41,7 +41,7 @@ public interface Selection<T_ITEM> extends Iterable<T_ITEM>, Serializable {
    * Please consider this iterater may have some performance impact in case of
    * lazy load scenarios.
    * <p>
-   * Please check if you can use {@link #isSelected(Object)}, which is much
+   * Please check if you can use {@link #contains(Object)}, which is much
    * faster in most cases.
    */
   @Override

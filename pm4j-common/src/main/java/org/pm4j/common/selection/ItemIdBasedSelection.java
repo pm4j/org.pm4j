@@ -40,7 +40,7 @@ public class ItemIdBasedSelection<T_ITEM, T_ID> implements Selection<T_ITEM>, Se
   }
 
   @Override
-  public boolean isSelected(T_ITEM item) {
+  public boolean contains(T_ITEM item) {
     return ids.contains(itemIdConverter.getIdForItem(item));
   }
 

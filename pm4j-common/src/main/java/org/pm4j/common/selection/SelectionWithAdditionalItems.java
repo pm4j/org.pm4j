@@ -40,8 +40,8 @@ public class SelectionWithAdditionalItems <T_ITEM> implements Selection<T_ITEM> 
   }
 
   @Override
-  public boolean isSelected(T_ITEM item) {
-    return baseSelection.isSelected(item) || additionalSelectedItems.contains(item);
+  public boolean contains(T_ITEM item) {
+    return baseSelection.contains(item) || additionalSelectedItems.contains(item);
   }
 
   @Override

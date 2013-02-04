@@ -79,7 +79,7 @@ public class ModificationsImpl<T_ITEM> implements Modifications<T_ITEM> {
   private void removeSelectedItemsFromCollection(Selection<T_ITEM> removedItems, Collection<T_ITEM> collection) {
     List<T_ITEM> itemsToRemoveFromCollection = new ArrayList<T_ITEM>();
     for (T_ITEM i : collection) {
-      if (removedItems.isSelected(i)) {
+      if (removedItems.contains(i)) {
         itemsToRemoveFromCollection.add(i);
       }
     }

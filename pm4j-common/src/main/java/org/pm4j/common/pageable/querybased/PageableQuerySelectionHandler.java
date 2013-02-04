@@ -240,7 +240,7 @@ public abstract class PageableQuerySelectionHandler<T_ITEM, T_ID extends Seriali
     }
 
     @Override
-    public boolean isSelected(T_ITEM item) {
+    public boolean contains(T_ITEM item) {
       return ids.contains(getService().getIdForItem(item));
     }
 
@@ -318,8 +318,8 @@ public abstract class PageableQuerySelectionHandler<T_ITEM, T_ID extends Seriali
     }
 
     @Override
-    public boolean isSelected(T_ITEM item) {
-      return ! baseSelection.isSelected(item);
+    public boolean contains(T_ITEM item) {
+      return ! baseSelection.contains(item);
     }
 
     @Override
@@ -327,7 +327,7 @@ public abstract class PageableQuerySelectionHandler<T_ITEM, T_ID extends Seriali
       return new PageableItemIteratorBase<T_ITEM>(iteratorBlockSizeHint) {
         @Override
         protected boolean isItemSelected(T_ITEM item) {
-          return !baseSelection.isSelected(item);
+          return !baseSelection.contains(item);
         }
 
         @Override

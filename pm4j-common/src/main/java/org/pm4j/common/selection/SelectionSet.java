@@ -35,9 +35,9 @@ public class SelectionSet<T> implements Selection<T> {
   }
 
   @Override
-  public boolean isSelected(T item) {
+  public boolean contains(T item) {
     for (Selection<T> s : selections) {
-      if (s.isSelected(item)) {
+      if (s.contains(item)) {
         return true;
       }
     }

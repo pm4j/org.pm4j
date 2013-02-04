@@ -254,25 +254,25 @@ public abstract class PageableCollectionTestBase<T> {
     // select the first item
     assertTrue("select the first item", collection.getSelectionHandler().select(true, firstItem) );
     assertEquals("one item is selected", 1, collection.getSelection().getSize());
-    assertEquals("the first item is selected", true, collection.getSelection().isSelected(firstItem));
-    assertEquals("the second item is not selected", false, collection.getSelection().isSelected(secondItem));
+    assertEquals("the first item is selected", true, collection.getSelection().contains(firstItem));
+    assertEquals("the second item is not selected", false, collection.getSelection().contains(secondItem));
 
     // invert the selection
     assertEquals("invert the selection", true, collection.getSelectionHandler().invertSelection());
-    assertEquals("the first item is not selected", false, collection.getSelection().isSelected(firstItem));
-    assertEquals("the second item is selected", true, collection.getSelection().isSelected(secondItem));
+    assertEquals("the first item is not selected", false, collection.getSelection().contains(firstItem));
+    assertEquals("the second item is selected", true, collection.getSelection().contains(secondItem));
     assertEquals("5 items are selected", 5, collection.getSelection().getSize());
 
     // deselect the second item
     assertEquals("deselect the second item", true, collection.getSelectionHandler().select(false, secondItem));
-    assertEquals("the first item is not selected", false, collection.getSelection().isSelected(firstItem));
-    assertEquals("the second item is not selected", false, collection.getSelection().isSelected(secondItem));
+    assertEquals("the first item is not selected", false, collection.getSelection().contains(firstItem));
+    assertEquals("the second item is not selected", false, collection.getSelection().contains(secondItem));
     assertEquals("4 items are selected", 4, collection.getSelection().getSize());
 
     // invert the selection again
     assertEquals("invert the selection", true, collection.getSelectionHandler().invertSelection());
-    assertEquals("the first item is selected", true, collection.getSelection().isSelected(firstItem));
-    assertEquals("the second item is selected", true, collection.getSelection().isSelected(secondItem));
+    assertEquals("the first item is selected", true, collection.getSelection().contains(firstItem));
+    assertEquals("the second item is selected", true, collection.getSelection().contains(secondItem));
     assertEquals("2 items are selected", 2, collection.getSelection().getSize());
 
   }

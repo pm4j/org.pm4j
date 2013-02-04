@@ -50,7 +50,7 @@ public class ItemSetSelection<T_ITEM> implements Selection<T_ITEM> {
   }
 
   @Override
-  public boolean isSelected(T_ITEM item) {
+  public boolean contains(T_ITEM item) {
     return selectedItems.contains(item);
   }
 

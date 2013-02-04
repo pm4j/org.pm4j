@@ -75,7 +75,7 @@ public class MasterPmTable2HandlerImpl<T_MASTER_BEAN> extends MasterPmSelectionH
       @SuppressWarnings("unchecked")
       Selection<T_MASTER_BEAN> deletedBeansSelection = (Selection<T_MASTER_BEAN>) evt.getOldValue();
       if ((masterBeanBeforeDeleteOperation != null) &&
-          deletedBeansSelection.isSelected(masterBeanBeforeDeleteOperation)) {
+          deletedBeansSelection.contains(masterBeanBeforeDeleteOperation)) {
         for (DetailsPmHandler<?> dh : getDetailsPmHandlers()) {
           dh.afterMasterRecordDelete(masterBeanBeforeDeleteOperation);
         }

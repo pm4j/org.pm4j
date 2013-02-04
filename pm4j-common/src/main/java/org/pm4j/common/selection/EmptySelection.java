@@ -53,7 +53,7 @@ public class EmptySelection<T> implements Selection<T> {
 	}
 
 	@Override
-	public boolean isSelected(T item) {
+	public boolean contains(T item) {
 		return false;
 	}
 }
