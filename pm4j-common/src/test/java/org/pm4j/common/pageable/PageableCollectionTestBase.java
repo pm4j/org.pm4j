@@ -284,11 +284,13 @@ public abstract class PageableCollectionTestBase<T> {
     assertEquals(0, collection.getModifications().getUpdatedItems().size());
     assertEquals("See setUp(): the initial remove item.", 1L, collection.getModifications().getRemovedItems().getSize());
 
-    collection.getModificationHandler().addItem(createItem("hi"));
+    T newItem = createItem("hi");
+    collection.getModificationHandler().addItem(newItem);
     assertEquals("New collection size", 7L, collection.getNumOfItems());
     assertEquals("Collection after add", "[a, b, c, d, e, f, hi]", IterableUtil.shallowCopy(collection).toString());
 
     assertEquals(1, collection.getModifications().getAddedItems().size());
+    assertTrue(collection.getModifications().getAddedItems().contains(newItem));
     assertEquals(0, collection.getModifications().getUpdatedItems().size());
     assertEquals("See setUp(): the initial remove item.", 1L, collection.getModifications().getRemovedItems().getSize());
 
@@ -323,6 +325,39 @@ public abstract class PageableCollectionTestBase<T> {
 
     assertEquals("Add event count", 0, pclAdd.getPropChangeEventCount());
     assertEquals("Update event count", 0, pclUpdate.getPropChangeEventCount());
+    assertEquals("Remove veto event count", 1, pclRemove.getVetoEventCount());
+    assertEquals("Remove event count", 1, pclRemove.getPropChangeEventCount());
+    assertEquals("Set page index event count", 0, pclPageIdx.getPropChangeEventCount());
+    assertEquals("Set page size event count", 0, pclPageSize.getPropChangeEventCount());
+  }
+
+  @Test
+  public void testRemoveOfAddedAndUpdatedItems() {
+    collection.getSelectionHandler().setSelectMode(SelectMode.MULTI);
+    T updatedItem = collection.getItemsOnPage().get(0);
+    collection.getModificationHandler().updateItem(updatedItem, true);
+    collection.getModificationHandler().addItem(createItem("added item"));
+
+    assertEquals(1, collection.getModifications().getAddedItems().size());
+    assertEquals(1, collection.getModifications().getUpdatedItems().size());
+    assertEquals("See setUp(): the initial remove item.", 1L, collection.getModifications().getRemovedItems().getSize());
+
+
+    collection.getSelectionHandler().selectAll(true);
+    assertEquals(7L, collection.getSelection().getSize());
+
+    collection.getModificationHandler().removeSelectedItems();
+    assertEquals("New collection size", 0L, collection.getNumOfItems());
+    assertEquals("Collection after remove all.", "[]", IterableUtil.shallowCopy(collection).toString());
+    assertTrue(collection.getSelection().isEmpty());
+
+    assertEquals(0, collection.getModifications().getAddedItems().size());
+    assertEquals(0, collection.getModifications().getUpdatedItems().size());
+    assertEquals("The added item is not part of the deleted items: 7 instead of 8...",
+        7L, collection.getModifications().getRemovedItems().getSize());
+
+    assertEquals("Add event count", 1, pclAdd.getPropChangeEventCount());
+    assertEquals("Update event count", 1, pclUpdate.getPropChangeEventCount());
     assertEquals("Remove veto event count", 1, pclRemove.getVetoEventCount());
     assertEquals("Remove event count", 1, pclRemove.getPropChangeEventCount());
     assertEquals("Set page index event count", 0, pclPageIdx.getPropChangeEventCount());

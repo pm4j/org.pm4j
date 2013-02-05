@@ -26,6 +26,7 @@ import org.pm4j.common.selection.Selection;
 import org.pm4j.common.selection.SelectionHandler;
 import org.pm4j.common.selection.SelectionHandlerUtil;
 import org.pm4j.common.selection.SelectionHandlerWithAdditionalItems;
+import org.pm4j.common.selection.SelectionWithAdditionalItems;
 import org.pm4j.common.util.collection.ListUtil;
 
 /**
@@ -191,42 +192,61 @@ public class PageableQueryCollection<T_ITEM, T_ID extends Serializable> extends 
     @SuppressWarnings("unchecked")
     @Override
     public boolean removeSelectedItems() {
+      // Nothing to remove in case of an empty selection.
       Selection<T_ITEM> items = selectionHandler.getSelection();
       if (items.getSize() == 0) {
         return true;
       }
 
+      // Check for vetos
       try {
         PageableQueryCollection.this.fireVetoableChange(PageableCollection2.EVENT_REMOVE_SELECTION, items, null);
       } catch (PropertyVetoException e) {
         return false;
       }
 
+      // Clear the selection. All selected items will be deleted.
       SelectionHandlerUtil.forceSelectAll(selectionHandler, false);
 
+      // Identify the sets of persistent and transient items to delete.
+      Selection<T_ITEM> persistentItems = items;
+
+      // In case of a selection with transient items, we have to handle transient items accordingly.
+      if (items instanceof SelectionWithAdditionalItems) {
+        // Removed transient items will simply be forgotten.
+        List<T_ITEM> transientItems = ((SelectionWithAdditionalItems<T_ITEM>)items).getAdditionalSelectedItems();
+        for (T_ITEM i : new ArrayList<T_ITEM>(transientItems)) {
+          modifications.unregisterAddedItem(i);
+        }
+
+        // Only the persistent sub-set needs to be handled in the following code.
+        persistentItems = ((SelectionWithAdditionalItems<T_ITEM>)items).getBaseSelection();
+      }
+
+      // Remember the previous set of removed items. It needs to be extended by some additional items to remove.
       Selection<T_ITEM> oldRemovedItemSelection = modifications.getRemovedItems();
-      if (items instanceof ItemIdSelection) {
+
+
+      if (persistentItems instanceof ItemIdSelection) {
         if (oldRemovedItemSelection.isEmpty()) {
-          modifications.setRemovedItems((ItemIdSelection<T_ITEM, T_ID>) items);
+          modifications.setRemovedItems((ItemIdSelection<T_ITEM, T_ID>) persistentItems);
         } else {
-          Collection<T_ID> ids = ((ItemIdSelection<T_ITEM, T_ID>) items).getClickedIds().getIds();
+          Collection<T_ID> ids = ((ItemIdSelection<T_ITEM, T_ID>) persistentItems).getClickedIds().getIds();
+          // XXX olaf: assumes that we handle removed items as ItemIdSelection. But that will change as soon
+          // as we add remove handling for inverted selections.
           modifications.setRemovedItems(new ItemIdSelection<T_ITEM, T_ID>((ItemIdSelection<T_ITEM, T_ID>)oldRemovedItemSelection, ids));
         }
-// TODO olaf: inverted selections are not yet handled by query
-//      } else if (items instanceof PageableQuerySelectionHandler.InvertedSelection) {
-//        removedInvertedItemSelections.addSelection(items);
       } else {
+     // TODO olaf: inverted selections are not yet handled by query
+//      if (items instanceof PageableQuerySelectionHandler.InvertedSelection) {
+//        removedInvertedItemSelections.addSelection(items);
         // TODO: add exception interface signatur.
-        long newSize = items.getSize() + oldRemovedItemSelection.getSize();
+        long newSize = persistentItems.getSize() + oldRemovedItemSelection.getSize();
         if (newSize > 1000) {
           throw new IndexOutOfBoundsException("Maximum 1000 rows can be removed within a single save operation.");
         }
 
-        Collection<T_ID> ids = new ArrayList<T_ID>((int)items.getSize());
-        for (T_ITEM i : items) {
-          ids.add(cachingService.getIdForItem(i));
-        }
-
+        Collection<T_ID> ids = PageableQueryUtil.getItemIds(cachingService, persistentItems);
         modifications.setRemovedItems(oldRemovedItemSelection.isEmpty()
             ? new ItemIdSelection<T_ITEM, T_ID>(service, ids)
             : new ItemIdSelection<T_ITEM, T_ID>((ItemIdSelection<T_ITEM, T_ID>)oldRemovedItemSelection, ids));
@@ -245,6 +265,11 @@ public class PageableQueryCollection<T_ITEM, T_ID extends Serializable> extends 
 
     @Override
     public void updateItem(T_ITEM item, boolean isUpdated) {
+      // a modification of a new item should not lead to a double-listing within the updated list too.
+      if (isUpdated && modifications.getAddedItems().contains(item)) {
+        return;
+      }
+
       boolean wasUpdated = modifications.getUpdatedItems().contains(item);
       modifications.registerUpdatedItem(item, isUpdated);
       PageableQueryCollection.this.firePropertyChange(PageableCollection2.EVENT_ITEM_UPDATE, wasUpdated, isUpdated);
@@ -384,5 +409,12 @@ class PageableQueryUtil {
     return itemsOnPage;
   }
 
+  public static <T_ITEM, T_ID> Collection<T_ID> getItemIds(PageableQueryService<T_ITEM, T_ID> service, Selection<T_ITEM> items) {
+    Collection<T_ID> ids = new ArrayList<T_ID>((int)items.getSize());
+    for (T_ITEM i : items) {
+      ids.add(service.getIdForItem(i));
+    }
+    return ids;
+  }
 
 }

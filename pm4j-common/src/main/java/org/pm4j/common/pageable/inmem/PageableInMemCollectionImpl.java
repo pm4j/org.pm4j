@@ -216,6 +216,11 @@ public class PageableInMemCollectionImpl<T_ITEM>
 
     @Override
     public void updateItem(T_ITEM item, boolean isUpdated) {
+      // a modification of a new item should not lead to a double-listing within the updated list too.
+      if (isUpdated && modifications.getAddedItems().contains(item)) {
+        return;
+      }
+
       boolean wasUpdated = modifications.getUpdatedItems().contains(item);
       modifications.registerUpdatedItem(item, isUpdated);
       PageableInMemCollectionImpl.this.firePropertyChange(PageableCollection2.EVENT_ITEM_UPDATE, wasUpdated, isUpdated);
@@ -224,25 +229,36 @@ public class PageableInMemCollectionImpl<T_ITEM>
     @Override
     public boolean removeSelectedItems() {
       Selection<T_ITEM> items = selectionHandler.getSelection();
-      if (items.getSize() == 0) {
+      // nothing to remove if nothing is selected.
+      if (items.isEmpty()) {
         return true;
       }
 
+      // check for vetos before doing the change
       try {
         PageableInMemCollectionImpl.this.fireVetoableChange(PageableCollection2.EVENT_REMOVE_SELECTION, items, null);
       } catch (PropertyVetoException e) {
         return false;
       }
 
+      // Deselect all currently selected items because they will be deleted.
       SelectionHandlerUtil.forceSelectAll(selectionHandler, false);
 
+      // Get the set of already removed items. It will be extended by this delete operation.
       Set<T_ITEM> removedItems = new HashSet<T_ITEM>(IterableUtil.asCollection(modifications.getRemovedItems()));
       for (T_ITEM i : items) {
+        // remove the items from the in-memory item list(s).
         originalObjects.remove(i);
         if (objects != null) {
           objects.remove(i);
         }
-        removedItems.add(i);
+
+        // Removed new items disappear without a trace. They are not part of the removed items.
+        if (modifications.getAddedItems().contains(i)) {
+          modifications.unregisterAddedItem(i);
+        } else {
+          removedItems.add(i);
+        }
       }
       modifications.setRemovedItems(new ItemSetSelection<T_ITEM>(removedItems));
       PageableInMemCollectionImpl.this.firePropertyChange(PageableCollection2.EVENT_REMOVE_SELECTION, items, null);

@@ -1,5 +1,9 @@
 package org.pm4j.core.pm.impl.paging;
 
+import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.pm4j.tools.test.PmAssert.setValue;
+
 import java.util.Comparator;
 import java.util.List;
 
@@ -29,6 +33,25 @@ import org.pm4j.core.pm.pageable2.PageablePmBeanCollection;
 public class PageablePmBeanCollectionTest extends PageableCollectionTestBase<PageablePmBeanCollectionTest.BeanRowPm> {
 
   private BeanTablePm beanTablePm  = new BeanTablePm(new PmConversationImpl());
+
+  /**
+   * Extends the basic add test with an update after add. This can be tested
+   * only on PM level because the update mechanism observed PM changes.
+   */
+  @Override
+  public void testAddItem() {
+    super.testAddItem();
+
+    // extends the base test by mo
+    BeanRowPm addedItem = collection.getModifications().getAddedItems().get(0);
+
+    setValue(addedItem.name, "another name");
+
+    assertEquals(1, collection.getModifications().getAddedItems().size());
+    assertTrue(collection.getModifications().getAddedItems().contains(addedItem));
+    assertEquals("The modified item should not be part of the updates because it is already in the set of added items.",
+        0, collection.getModifications().getUpdatedItems().size());
+  }
 
   @Override
   protected PageableCollection2<BeanRowPm> makePageableCollection(String... strings) {

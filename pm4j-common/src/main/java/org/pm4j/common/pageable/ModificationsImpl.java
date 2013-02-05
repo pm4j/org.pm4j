@@ -17,9 +17,13 @@ import org.pm4j.common.selection.Selection;
  */
 public class ModificationsImpl<T_ITEM> implements Modifications<T_ITEM> {
 
+  /** The ordered set of (manually) added items. Ordered according to the sequence of {@link #registerAddedItem(Object)} calls. */
   private List<T_ITEM> addedItems = Collections.emptyList();
+
+  /** The set of (manually) updated items. Not sorted. */
   private Collection<T_ITEM> updatedItems = Collections.emptyList();
 
+  /** Removed items are handled as a {@link Selection} to be able to support large selections. */
   @SuppressWarnings("unchecked")
   private Selection<T_ITEM> removedItems = (Selection<T_ITEM>) EmptySelection.EMPTY_OBJECT_SELECTION;
 
@@ -33,16 +37,6 @@ public class ModificationsImpl<T_ITEM> implements Modifications<T_ITEM> {
     return addedItems;
   }
 
-  @Override
-  public Collection<T_ITEM> getUpdatedItems() {
-    return updatedItems;
-  }
-
-  @Override
-  public Selection<T_ITEM> getRemovedItems() {
-    return removedItems;
-  }
-
   public void registerAddedItem(T_ITEM item) {
     if (addedItems.isEmpty()) {
       addedItems = new ArrayList<T_ITEM>();
@@ -50,6 +44,22 @@ public class ModificationsImpl<T_ITEM> implements Modifications<T_ITEM> {
     if (!addedItems.contains(item)) {
       addedItems.add(item);
     }
+  }
+
+  /**
+   * Removes the given item from the list of added items explicitely.
+   *
+   * @param item the item to remove.
+   */
+  public void unregisterAddedItem(T_ITEM item) {
+    if (!addedItems.isEmpty()) {
+      addedItems.remove(item);
+    }
+  }
+
+  @Override
+  public Collection<T_ITEM> getUpdatedItems() {
+    return updatedItems;
   }
 
   public void registerUpdatedItem(T_ITEM item, boolean isUpdated) {
@@ -68,8 +78,15 @@ public class ModificationsImpl<T_ITEM> implements Modifications<T_ITEM> {
     }
   }
 
+  @Override
+  public Selection<T_ITEM> getRemovedItems() {
+    return removedItems;
+  }
+
   public void setRemovedItems(Selection<T_ITEM> removedItems) {
     this.removedItems = removedItems;
+    // XXX olaf: this line may disappear because the calling code should organize
+    // the added items...
     removeSelectedItemsFromCollection(removedItems, addedItems);
     removeSelectedItemsFromCollection(removedItems, updatedItems);
   }
