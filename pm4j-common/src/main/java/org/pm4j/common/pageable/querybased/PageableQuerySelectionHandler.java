@@ -126,8 +126,18 @@ public abstract class PageableQuerySelectionHandler<T_ITEM, T_ID extends Seriali
 
   @SuppressWarnings("unchecked")
   @Override
-  public boolean setSelection(Selection<T_ITEM> selection) {
-    assert selection instanceof QuerySelectionWithClickedIds;
+  public boolean setSelection(final Selection<T_ITEM> selectionArg) {
+    Selection<T_ITEM> selection;
+    // in case of an empty selection we may get a type withoud 'clicked ids' that's handeled here:
+    if (selectionArg instanceof QuerySelectionWithClickedIds) {
+      selection = selectionArg;
+    } else {
+      if (selectionArg.isEmpty()) {
+        selection = emptySelection;
+      } else {
+        throw new IllegalArgumentException("Can handle only selections of type QuerySelectionWithClickedIds. Found type: " + selectionArg.getClass());
+      }
+    }
 
     Selection<T_ITEM> oldSelection = this.currentSelection;
     QuerySelectionWithClickedIds<T_ITEM, T_ID> newSelection = (QuerySelectionWithClickedIds<T_ITEM, T_ID>) selection;
