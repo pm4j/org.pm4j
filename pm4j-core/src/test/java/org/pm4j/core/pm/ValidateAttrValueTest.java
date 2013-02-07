@@ -15,6 +15,7 @@ import org.junit.Test;
 import org.pm4j.core.pm.PmCommand.CommandState;
 import org.pm4j.core.pm.PmMessage.Severity;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
+import org.pm4j.core.pm.annotation.PmAttrCfg.Validate;
 import org.pm4j.core.pm.annotation.PmAttrIntegerCfg;
 import org.pm4j.core.pm.annotation.PmCommandCfg;
 import org.pm4j.core.pm.api.PmMessageUtil;
@@ -110,13 +111,44 @@ public class ValidateAttrValueTest {
   }
 
   @Test
-  public void testValidateOnSetValue() {
-    pm.validateOnSetValueAttr.setValue(6);
-    assertOnePmMessage(pm.validateOnSetValueAttr, Severity.ERROR, "Please enter a number not more than 5 in field \"OnSetValueValidatingAttr\".");
+  public void testValidateBeforeSetValue() {
+    pm.validateBeforeSetValueAttr.setValue(6);
+    assertOnePmMessage(pm.validateBeforeSetValueAttr, Severity.ERROR, "Please enter a number not more than 5 in field \"BeforeSetValueValidatingAttr\".");
+    assertEquals("Before set value validation prevents setting the backing value.",
+        null, ((PmAttrIntegerImpl)pm.validateBeforeSetValueAttr).getBackingValue());
+    assertEquals("The invalid value will still be presented in the UI.",
+                  new Integer(6), pm.validateBeforeSetValueAttr.getValue());
 
-    pm.validateOnSetValueAttr.setValue(4);
-    assertNoMessages("Setting a valid value clears the error message.", pm.validateOnSetValueAttr);
+    pm.validateBeforeSetValueAttr.setValue(4);
+    assertNoMessages("Setting a valid value clears the error message.", pm.validateBeforeSetValueAttr);
   }
+
+  @Test
+  public void testValidateBeforeSetValueDeprecatedVersion() {
+    pm.validateBeforeSetValueAttrDeprecatedVersion.setValue(6);
+    assertOnePmMessage(pm.validateBeforeSetValueAttrDeprecatedVersion, Severity.ERROR, "Please enter a number not more than 5 in field \"BeforeSetValueValidatingAttr\".");
+    assertEquals("Before set value validation prevents setting the backing value.",
+        null, ((PmAttrIntegerImpl)pm.validateBeforeSetValueAttrDeprecatedVersion).getBackingValue());
+    assertEquals("The invalid value will still be presented in the UI.",
+                  new Integer(6), pm.validateBeforeSetValueAttrDeprecatedVersion.getValue());
+
+    pm.validateBeforeSetValueAttrDeprecatedVersion.setValue(4);
+    assertNoMessages("Setting a valid value clears the error message.", pm.validateBeforeSetValueAttrDeprecatedVersion);
+  }
+
+  @Test
+  public void testValidateAfterSetValue() {
+    pm.validateAfterSetValueAttr.setValue(6);
+    assertOnePmMessage(pm.validateAfterSetValueAttr, Severity.ERROR, "Please enter a number not more than 5 in field \"AfterSetValueValidatingAttr\".");
+    assertEquals("Before set value validation NOT prevents setting the backing value.",
+        new Integer(6), ((PmAttrIntegerImpl)pm.validateAfterSetValueAttr).getBackingValue());
+    assertEquals("After set-value validation does not prevent setting the value.",
+        new Integer(6), pm.validateAfterSetValueAttr.getValue());
+
+    pm.validateAfterSetValueAttr.setValue(4);
+    assertNoMessages("Setting a valid value clears the error message.", pm.validateAfterSetValueAttr);
+  }
+
 
   /**
    * The testee.
@@ -133,12 +165,22 @@ public class ValidateAttrValueTest {
     public final PmAttrInteger i = new PmAttrIntegerImpl(this);
 
     @PmAttrIntegerCfg(maxValue=5)
-    public final PmAttrInteger validateOnSetValueAttr = new PmAttrIntegerImpl(this) {
+    @PmAttrCfg(validate=Validate.BEFORE_SET)
+    public final PmAttrInteger validateBeforeSetValueAttr = new PmAttrIntegerImpl(this);
+
+    @PmAttrIntegerCfg(maxValue=5)
+    @PmAttrCfg(validate=Validate.BEFORE_SET)
+    public final PmAttrInteger validateBeforeSetValueAttrDeprecatedVersion = new PmAttrIntegerImpl(this) {
       @Override
       protected boolean isValidatingOnSetPmValue() {
         return true;
       };
     };
+
+    @PmAttrIntegerCfg(maxValue=5)
+    @PmAttrCfg(validate=Validate.AFTER_SET)
+    public final PmAttrInteger validateAfterSetValueAttr = new PmAttrIntegerImpl(this);
+
 
     public final NestedPm nestedPm = new NestedPm(this);
 

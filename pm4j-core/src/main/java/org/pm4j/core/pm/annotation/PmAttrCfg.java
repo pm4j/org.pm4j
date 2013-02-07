@@ -7,6 +7,8 @@ import java.lang.annotation.Target;
 
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmBean;
+import org.pm4j.core.pm.PmCommand;
+import org.pm4j.core.pm.PmDataInput;
 
 
 /**
@@ -93,6 +95,13 @@ public @interface PmAttrCfg {
   String defaultValue() default "";
 
   /**
+   * Allows to define additional validation tigger times.
+   *
+   * @return the validation strategy definition for this attribute.
+   */
+  Validate validate() default Validate.ON_VALIDATE;
+
+  /**
    * Supports usage of JSR-303 bean validation annotations of a related bean class.
    * <p>
    * If the attribute is simply bound to a corresponding bean attribute having the
@@ -171,6 +180,52 @@ public @interface PmAttrCfg {
      */
     @Deprecated
     SESSIONPROPERTY
-}
+  }
+
+  /**
+   * Defines attribute validation strategies.<br>
+   * Each attribute gets validated when {@link PmDataInput#pmValidate()} gets called.
+   * But the strategies {@link #BEFORE_SET} and {@link #AFTER_SET} allow to define additional
+   * validation triggers.
+   */
+  public enum Validate {
+
+    /**
+     * Validates the attribute only if {@link PmDataInput#pmValidate()} gets called. This
+     * happens usually when a validating {@link PmCommand} gets executed.
+     * <p>
+     * This is the default validation strategy
+     */
+    ON_VALIDATE,
+
+    /**
+     * Validates the received value before setting it to the attibute.
+     * <p>
+     * The method <code>PmAttrImpl.validate(value)</code> gets called.<br>
+     * This validation is limited, because it can't use bean validation and some
+     * logic that may be implemented in <code>pmValidate()</code>.
+     */
+    BEFORE_SET,
+
+    /**
+     * Validates the attribute after setting it.<br>
+     * That means the validation takes place after changing the backing value.
+     * <p>
+     * This allows to use (nearly) the complete validation functionality (incl. bean validation).<br>
+     * But there are restrictions to be considered:<br>
+     * If the validation logic compares to other attribute values it may happen that the corresponding
+     * attribute values are not yet set. Consider using the default validation strategy {@link #ON_VALIDATE}
+     * in that case.
+     * <p>
+     * The validation is applied and before
+     * <ul>
+     *  <li>the afterValueChange() method call,</li>
+     *  <li>the after-do method calls to registered value change decorators and</li>
+     *  <li>before sending the value change event to registered listeners.</li>
+     * </ul>
+     * This way it is possible to check the validation result within these post processing steps.
+     */
+    AFTER_SET
+  }
 
 }
