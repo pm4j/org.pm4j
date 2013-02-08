@@ -21,7 +21,7 @@ public class DetailsPmBeanHandlerImpl<T_MASTER_RECORD> extends
 
   @Override
   protected void afterMasterRecordChangeImpl(T_MASTER_RECORD newMasterBean) {
-    getDetailsPm().setPmBean(newMasterBean);
+    getTypedDetailsPm().setPmBean(newMasterBean);
   }
 
 }

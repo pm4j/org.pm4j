@@ -62,21 +62,21 @@ public interface MasterPmHandler extends PmCommandDecorator {
    *
    * @param detailsHandlers the handler to add.
    */
-  void addDetailsHander(DetailsPmHandler<?> detailsHandlers);
+  void addDetailsHander(DetailsPmHandler detailsHandlers);
 
   /**
    * Adds a set of details handlers.
    *
    * @param detailsHandlers the handlers to add.
    */
-  void addDetailsHanders(DetailsPmHandler<?>... detailsHandlers);
+  void addDetailsHanders(DetailsPmHandler... detailsHandlers);
 
   /**
    * Provides the set of details PM specific handler.
    *
    * @return The configured {@link DetailsPmHandler} set.
    */
-  Collection<DetailsPmHandler<?>> getDetailsPmHandlers();
+  Collection<DetailsPmHandler> getDetailsPmHandlers();
 
   /**
    * @return the master PM.

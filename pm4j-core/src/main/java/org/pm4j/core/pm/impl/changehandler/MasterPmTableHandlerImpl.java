@@ -44,7 +44,7 @@ public class MasterPmTableHandlerImpl<T_MASTER_BEAN> implements MasterPmRecordHa
 
   private final PmTable<?>    masterTablePm;
   private Set<T_MASTER_BEAN>  changedMasterBeans = new HashSet<T_MASTER_BEAN>();
-  private List<DetailsPmHandler<?>> detailsHandlers = new ArrayList<DetailsPmHandler<?>>();
+  private List<DetailsPmHandler> detailsHandlers = new ArrayList<DetailsPmHandler>();
   private PmCommandDecorator masterSelectionChangeDecorator;
 
   /**
@@ -55,9 +55,9 @@ public class MasterPmTableHandlerImpl<T_MASTER_BEAN> implements MasterPmRecordHa
    *          The table PM to observe.
    * @param detailsHandler A handler for the details PM
    */
-  public MasterPmTableHandlerImpl(PmTable<?> masterTablePm, DetailsPmHandler<?>... detailsHandlers) {
+  public MasterPmTableHandlerImpl(PmTable<?> masterTablePm, DetailsPmHandler... detailsHandlers) {
     this.masterTablePm = masterTablePm;
-    for (DetailsPmHandler<?> dh : detailsHandlers) {
+    for (DetailsPmHandler dh : detailsHandlers) {
       addDetailsHander(dh);
     }
   }
@@ -78,17 +78,17 @@ public class MasterPmTableHandlerImpl<T_MASTER_BEAN> implements MasterPmRecordHa
   }
 
   @Override
-  public final void addDetailsHander(DetailsPmHandler<?> detailsHandler) {
+  public final void addDetailsHander(DetailsPmHandler detailsHandler) {
     this.detailsHandlers.add(detailsHandler);
   }
 
   @Override
-  public final void addDetailsHanders(DetailsPmHandler<?>... detailsHandlers) {
+  public final void addDetailsHanders(DetailsPmHandler... detailsHandlers) {
     this.detailsHandlers.addAll(Arrays.asList(detailsHandlers));
   }
 
   @Override
-  public Collection<DetailsPmHandler<?>> getDetailsPmHandlers() {
+  public Collection<DetailsPmHandler> getDetailsPmHandlers() {
     return detailsHandlers;
   }
 
@@ -119,7 +119,7 @@ public class MasterPmTableHandlerImpl<T_MASTER_BEAN> implements MasterPmRecordHa
    * @return <code>true</code> if one details area returns <code>true</code> for the call <code>isPmValueChanged()</code>.
    */
   public boolean isCurrentDetailsAreaChanged() {
-    for (DetailsPmHandler<?> dh : detailsHandlers) {
+    for (DetailsPmHandler dh : detailsHandlers) {
       Object detail = dh.getDetailsPm();
       if ((detail instanceof PmDataInput) &&
           ((PmDataInput)detail).isPmValueChanged()) {
@@ -178,7 +178,7 @@ public class MasterPmTableHandlerImpl<T_MASTER_BEAN> implements MasterPmRecordHa
     }
 
     T_MASTER_BEAN selectedMasterBean = getSelectedMasterBean();
-    for (DetailsPmHandler<?> dh : detailsHandlers) {
+    for (DetailsPmHandler dh : detailsHandlers) {
       dh.afterMasterRecordChange(selectedMasterBean);
     }
   }
@@ -227,7 +227,7 @@ public class MasterPmTableHandlerImpl<T_MASTER_BEAN> implements MasterPmRecordHa
       return false;
     }
 
-    for (DetailsPmHandler<?> dh : detailsHandlers) {
+    for (DetailsPmHandler dh : detailsHandlers) {
       if (!dh.canSwitchMasterRecord()) {
         return false;
       }
@@ -246,7 +246,7 @@ public class MasterPmTableHandlerImpl<T_MASTER_BEAN> implements MasterPmRecordHa
    */
   protected boolean validateDetails() {
     boolean allDetailsValid = true;
-    for (DetailsPmHandler<?> dh : detailsHandlers) {
+    for (DetailsPmHandler dh : detailsHandlers) {
       Object d = dh.getDetailsPm();
       if ((d instanceof PmDataInput) &&
           !PmValidationApi.validateSubTree((PmDataInput)d)) {
@@ -314,7 +314,7 @@ public class MasterPmTableHandlerImpl<T_MASTER_BEAN> implements MasterPmRecordHa
       }
 
       T_MASTER_BEAN selectedMasterBean = getSelectedMasterBean();
-      for (DetailsPmHandler<?> dh : detailsHandlers) {
+      for (DetailsPmHandler dh : detailsHandlers) {
         dh.afterMasterRecordChange(selectedMasterBean);
       }
       changedMasterBean = null;

@@ -12,14 +12,14 @@ import org.pm4j.core.pm.PmObject;
  * @param <T_DETAILS_PM>
  *          Type of the supported details PM.
  */
-public interface DetailsPmHandler<T_DETAILS_PM extends PmObject> {
+public interface DetailsPmHandler {
 
   /**
    * Provides the details area PM to handle.
    *
    * @return The details PM to handle.
    */
-  T_DETAILS_PM getDetailsPm();
+  PmObject getDetailsPm();
 
   /**
    * The details handler can prevent a master record switch by returning here
@@ -46,29 +46,10 @@ public interface DetailsPmHandler<T_DETAILS_PM extends PmObject> {
   void afterMasterRecordChange(Object newMasterBean);
 
   /**
-   * Some {@link MasterPmHandler} call this method to inform the details areas
-   * about a master record delete operation.
-   * <p>
-   * This allows detail handlers to handle the details changes that where
-   * recorded in relation to the given master record.
-   *
-   * @param deletedMasterBean
-   */
-  void afterMasterRecordDelete(Object deletedMasterBean);
-
-  /**
    * Adds a decorator to consider in {@link #canSwitchMasterRecord()} and {@link #afterMasterRecordChange(Object)}.
    *
    * @param decorator
    */
   void addDecorator(PmCommandDecorator decorator);
-
-  /**
-   * Provides all detail bean changes grouped by their master beans.
-   *
-   * @return a map to a {@link ChangeSetHandler} that provides
-   */
-  // TODO olaf: check.
-  // Map<T_MASTER_BEAN, ChangeSetHandler<T_DETAILS_BEAN>> getChangeSetHandler();
 
 }
