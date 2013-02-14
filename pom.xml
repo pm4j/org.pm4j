@@ -13,15 +13,6 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
-
-		<profiles>
-		<profile>
-			<id>artifactory</id>
-			<activation>
-				<activeByDefault>false</activeByDefault>
-			</activation>
-		</profile>
-	</profiles>
 	
 	<organization>
 		<name>pm4j</name>
