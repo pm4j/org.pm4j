@@ -16,7 +16,7 @@
 
 		<profiles>
 		<profile>
-			<id></id>
+			<id>artifactory</id>
 			<activation>
 				<activeByDefault>false</activeByDefault>
 			</activation>
