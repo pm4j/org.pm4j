@@ -14,6 +14,15 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
+		<profiles>
+		<profile>
+			<id></id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+		</profile>
+	</profiles>
+	
 	<organization>
 		<name>pm4j</name>
 		<url>http://www.pm4j.org</url>
