@@ -10,6 +10,7 @@ import java.util.Locale;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.impl.PmAttrBigDecimalImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
 import org.pm4j.core.pm.impl.PmElementImpl;
@@ -18,13 +19,13 @@ public class PmAttrValueAsStringFormatTest {
 
   public static class MyPm extends PmElementImpl {
 
-    /** Default format: <code>#0.00</code> */
+    /** Default format: <code>#.####...</code> */
     public final PmAttrBigDecimal bigDecimalWithDefaultFormat = new PmAttrBigDecimalImpl(this);
 
     /** Format declaration in resource file: <code>#,##0.00;(#,##0.00)</code> */
     public final PmAttrBigDecimal bigDecimalWithEmbracedNegativeFormat = new PmAttrBigDecimalImpl(this);
 
-    /** Format declaration in resource file: <code>0.0|#,##0.00;(#,##0.00)</code> */
+    /** Format declaration in resource file: <code>0.#|#,##0.00</code> */
     public final PmAttrBigDecimal bigDecimalWithMultiFormat = new PmAttrBigDecimalImpl(this);
   }
 
@@ -37,14 +38,13 @@ public class PmAttrValueAsStringFormatTest {
     myPm.getPmConversation().setPmLocale(Locale.ENGLISH);
   }
 
-
   @Test
   public void testBigDecimalWithDefaultFormat() {
     assertEquals("Initial null value.", null, myPm.bigDecimalWithDefaultFormat.getValueAsString());
 
     myPm.bigDecimalWithDefaultFormat.setValueAsString("0");
     assertTrue("The attribute should not report a conversion error.", myPm.bigDecimalWithDefaultFormat.isPmValid());
-    assertEquals("Zero value.", "0.00", myPm.bigDecimalWithDefaultFormat.getValueAsString());
+    assertEquals("Zero value.", "0", myPm.bigDecimalWithDefaultFormat.getValueAsString());
 
     myPm.bigDecimalWithDefaultFormat.setValueAsString("1000.23");
     assertTrue("The attribute should not report a conversion error.", myPm.bigDecimalWithDefaultFormat.isPmValid());

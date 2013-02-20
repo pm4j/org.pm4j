@@ -159,7 +159,7 @@ public interface PmAttr<T> extends PmObject, PmDataInput {
 	 *       (Attribute classes may specify this by implementing
 	 *       <code>getFormatDefaultResKey()</code>.)<br>
 	 *       See: {@link PmAttrDate#RESKEY_DEFAULT_FORMAT_PATTERN} and
-	 *       {@link PmAttrDouble#RESKEY_DEFAULT_FORMAT_PATTERN}.</li>
+	 *       {@link PmAttrNumber#RESKEY_DEFAULT_FLOAT_FORMAT_PATTERN}.</li>
 	 * </ol>
 	 * The resource key gets evaluated in the sequence specified above. The first
 	 * resource key match wins.

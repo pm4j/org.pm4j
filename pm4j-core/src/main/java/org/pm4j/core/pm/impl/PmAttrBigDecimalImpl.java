@@ -54,7 +54,11 @@ public class PmAttrBigDecimalImpl extends PmAttrNumBase<BigDecimal> implements P
     }
   }
 
-
+  @Override
+  protected String getFormatDefaultResKey() {
+    return RESKEY_DEFAULT_FLOAT_FORMAT_PATTERN;
+  }
+  
   // ======== meta data ======== //
 
   @Override
@@ -85,7 +89,7 @@ public class PmAttrBigDecimalImpl extends PmAttrNumBase<BigDecimal> implements P
 
     private BigDecimal maxValue = null;
     private BigDecimal minValue = null;
-    public RoundingMode stringConversionRoundingMode;
+    public RoundingMode stringConversionRoundingMode = RoundingMode.HALF_UP;
 
     public MetaData() {
       // the max length needs to be evaluated dynamically by calling getMaxLenDefault().
@@ -116,6 +120,6 @@ public class PmAttrBigDecimalImpl extends PmAttrNumBase<BigDecimal> implements P
 
   @Override
   public RoundingMode getStringConversionRoundingMode() {
-    return getOwnMetaDataWithoutPmInitCall().stringConversionRoundingMode == null ? RoundingMode.UNNECESSARY : getOwnMetaDataWithoutPmInitCall().stringConversionRoundingMode;
+    return getOwnMetaDataWithoutPmInitCall().stringConversionRoundingMode;
   }
 }
