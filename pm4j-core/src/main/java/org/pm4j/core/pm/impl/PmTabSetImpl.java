@@ -108,6 +108,7 @@ public class PmTabSetImpl extends PmElementImpl implements PmTabSet {
    */
   @Override
   public PmElement getCurrentTabPm() {
+    PmInitApi.ensurePmInitialization(this);
     return (currentTabPm != null)
             ? currentTabPm
             : getFirstTabPm();
