@@ -247,7 +247,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   @Override
   protected boolean isPmReadonlyImpl() {
     return super.isPmReadonlyImpl() ||
-           getPmParentElement().isPmReadonly();
+           getPmParent().isPmReadonly();
   }
 
   @Override
