@@ -9,9 +9,11 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.pm4j.common.pageable.ModificationHandler;
 import org.pm4j.common.pageable.Modifications;
 import org.pm4j.common.pageable.PageableCollection2;
 import org.pm4j.common.pageable.inmem.PageableInMemCollectionImpl;
@@ -41,6 +43,8 @@ import org.pm4j.core.pm.PmTableRow;
 import org.pm4j.core.pm.PmVisitor;
 import org.pm4j.core.pm.annotation.PmTableCfg;
 import org.pm4j.core.pm.annotation.PmTableCfg2;
+import org.pm4j.core.pm.api.PmCacheApi;
+import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmValidationApi;
 import org.pm4j.core.pm.pageable.PageableCollection;
@@ -326,33 +330,45 @@ public class PmTableImpl2
    * Should not be called directly. Please use {@link #updatePmTable(org.pm4j.core.pm.PmTable2.ClearAspect...)}
    * to trigger an update.
    *
-   * @param clearAspect
+   * @param clearAspect the PM aspect to clear.
    */
   protected void clearPmAspectImpl(UpdateAspect clearAspect) {
     switch (clearAspect) {
       case CLEAR_SELECTION:
-        currentRowPm = null;
+        // the 'current' row corrensponds in most case to the selection. It needs to be re-calculated.
+        clearCurrentRowPmCache();
         getPmSelectionHandler().selectAll(false);
+        // ensure the minimal standard selection.
+        // TODO: can be part of selectAll(false). Every selection that leads to a no-Selection.
+        getPmSelectionHandler().ensureSelectionStateRequired();
         break;
       case CLEAR_SORT_ORDER:
         getPmQueryParams().setSortOrder(getPmPageableBeanCollection().getQueryOptions().getDefaultSortOrder());
         break;
       case CLEAR_CHANGES:
-        currentRowPm = null;
-        PmValidationApi.clearInvalidValuesOfSubtree(this);
-        // This change aspect gets called within load and reload operations.
-        // The PM factory cache needs to be cleared to ensure that no outdated bean
-        // gets re-used.
-        BeanPmCacheUtil.clearBeanPmCachesOfSubtree(this);
-        getPmPageableCollection().clearCaches();
-        getPmPageableCollection().getModificationHandler().clearRegisteredModifications();
+        PmCacheApi.clearPmCache(this);
+        ModificationHandler<T_ROW_PM> mh = getPmPageableCollection().getModificationHandler();
+        // a null check for very specific read-only collections
+        if (mh != null) {
+            mh.clearRegisteredModifications();
+        }
         break;
       case CLEAR_USER_FILTER:
-        currentRowPm = null;
+        clearCurrentRowPmCache();
         // User filters can't be cleared on this level. More detailed implementations
         // may implement user defined filters that may be cleared.
         break;
       default: throw new PmRuntimeException(this, "Unknown clear aspect: " + clearAspect);
+    }
+  }
+
+  @Override
+  protected void clearCachedPmValues(Set<CacheKind> cacheSet) {
+    super.clearCachedPmValues(cacheSet);
+    if (cacheSet.contains(CacheKind.VALUE)) {
+      getPmPageableCollection().clearCaches();
+      clearCurrentRowPmCache();
+      getPmSelectionHandler().ensureSelectionStateRequired();
     }
   }
 

@@ -279,11 +279,13 @@ public abstract class PageableCollectionTestBase<T> {
 
   @Test
   public void testAddItem() {
+    // preconditions
     assertEquals("Initial collection size", 6L, collection.getNumOfItems());
     assertEquals(0, collection.getModifications().getAddedItems().size());
     assertEquals(0, collection.getModifications().getUpdatedItems().size());
     assertEquals("See setUp(): the initial remove item.", 1L, collection.getModifications().getRemovedItems().getSize());
 
+    // add the item
     T newItem = createItem("hi");
     collection.getModificationHandler().addItem(newItem);
     assertEquals("New collection size", 7L, collection.getNumOfItems());
@@ -294,12 +296,27 @@ public abstract class PageableCollectionTestBase<T> {
     assertEquals(0, collection.getModifications().getUpdatedItems().size());
     assertEquals("See setUp(): the initial remove item.", 1L, collection.getModifications().getRemovedItems().getSize());
 
+    // select and de-select the added item
+    collection.getSelectionHandler().select(true, newItem);
+    assertEquals(1L, collection.getSelection().getSize());
+
+    collection.getSelectionHandler().select(false, newItem);
+    assertEquals(0L, collection.getSelection().getSize());
+
+    // check number of expected events and service calls
     assertEquals("Add event count", 1, pclAdd.getPropChangeEventCount());
     assertEquals("Update event count", 0, pclUpdate.getPropChangeEventCount());
     assertEquals("Remove event count", 0, pclRemove.getPropChangeEventCount());
     assertEquals("Set page index event count", 0, pclPageIdx.getPropChangeEventCount());
     assertEquals("Set page size event count", 0, pclPageSize.getPropChangeEventCount());
   }
+
+  @Test
+  public void testAddItemInMultiSelectMode() {
+    collection.getSelectionHandler().setSelectMode(SelectMode.MULTI);
+    testAddItem();
+  }
+
 
   // TODO: testUpdateItem()
 

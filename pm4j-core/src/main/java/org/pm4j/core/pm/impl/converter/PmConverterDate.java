@@ -13,12 +13,6 @@ import org.pm4j.core.pm.PmConversation;
 
 public class PmConverterDate extends PmConverterSerializeableBase<Date> {
 
-  /**
-   * The format pattern that is used when no format pattern resource was found
-   * for the current PM locale.
-   */
-  public static final String FALLBACK_FORMAT_PATTERN = "dd.MM.yyyy";
-
   public static final PmConverterDate INSTANCE = new PmConverterDate();
 
   boolean timeZoneAware = true;
@@ -39,10 +33,6 @@ public class PmConverterDate extends PmConverterSerializeableBase<Date> {
       return sdf.parse(s);
     }
 
-    @Override
-    protected String getDefaultFormatPattern() {
-      return FALLBACK_FORMAT_PATTERN;
-    }
   };
 
   @Override

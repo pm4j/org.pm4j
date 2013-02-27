@@ -15,7 +15,6 @@ public class PmConverterBigDecimal extends PmConverterNumber<BigDecimal> {
 
   public PmConverterBigDecimal() {
     super(BigDecimal.class);
-    setDefaultPattern("#0.00");
   }
 
   @Override

@@ -27,6 +27,9 @@ import org.pm4j.core.pm.impl.PmUtil;
  */
 public abstract class MultiFormatParserBase<T extends Serializable> {
 
+  private static final String DEFAULT_PATTERN = "#0";
+
+  
   private static final Log LOG = LogFactory.getLog(MultiFormatParserBase.class);
 
   /** The default separator string used in case of a multi-format resource string specification. */
@@ -77,12 +80,6 @@ public abstract class MultiFormatParserBase<T extends Serializable> {
   protected abstract T parseValue(String s, String format, Locale locale, PmAttr<?> pmAttr) throws ParseException;
 
   /**
-   * Default pattern to be used in case no format String is defined.
-   * @return Default pattern.
-   */
-  protected abstract String getDefaultFormatPattern();
-
-  /**
    * Default implementation, may be overridden by implementations:
    * The last format definition returned by {@link #getParseFormats(PmAttr)}.
    * <p>
@@ -118,7 +115,7 @@ public abstract class MultiFormatParserBase<T extends Serializable> {
    * @return Format strings.
    */
   private String[] getParseFormats(PmAttr<?> pmAttr) {
-    String formatString = StringUtils.defaultIfEmpty(pmAttr != null ? pmAttr.getFormatString() : null, getDefaultFormatPattern());
+    String formatString = StringUtils.defaultIfEmpty(pmAttr != null ? pmAttr.getFormatString() : null, DEFAULT_PATTERN);
     String[] formats = StringUtils.split(formatString, getFormatSplitString(pmAttr));
     return formats;
   }

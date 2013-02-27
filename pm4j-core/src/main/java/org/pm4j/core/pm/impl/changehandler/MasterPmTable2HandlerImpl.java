@@ -24,7 +24,7 @@ public class MasterPmTable2HandlerImpl<T_MASTER_BEAN> extends MasterPmSelectionH
    * @param detailsHandlers
    *          the dependent detail area handlers.
    */
-  public MasterPmTable2HandlerImpl(PmTableImpl2<?, T_MASTER_BEAN> masterPm, DetailsPmHandler<?>[] detailsHandlers) {
+  public MasterPmTable2HandlerImpl(PmTableImpl2<?, T_MASTER_BEAN> masterPm, DetailsPmHandler[] detailsHandlers) {
     super(masterPm, masterPm.getPmPageableBeanCollection().getSelectionHandler(), detailsHandlers);
   }
 
@@ -71,13 +71,15 @@ public class MasterPmTable2HandlerImpl<T_MASTER_BEAN> extends MasterPmSelectionH
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-      getMasterTablePm().clearCurrentRowPmCache();
+      PmTableImpl2<?, T_MASTER_BEAN> masterTablePm = getMasterTablePm();
+      masterTablePm.clearCurrentRowPmCache();
       @SuppressWarnings("unchecked")
       Selection<T_MASTER_BEAN> deletedBeansSelection = (Selection<T_MASTER_BEAN>) evt.getOldValue();
       if ((masterBeanBeforeDeleteOperation != null) &&
           deletedBeansSelection.contains(masterBeanBeforeDeleteOperation)) {
-        for (DetailsPmHandler<?> dh : getDetailsPmHandlers()) {
-          dh.afterMasterRecordDelete(masterBeanBeforeDeleteOperation);
+        T_MASTER_BEAN newMasterBean = masterTablePm.getCurrentRowPmBean();
+        for (DetailsPmHandler dh : getDetailsPmHandlers()) {
+          dh.afterMasterRecordChange(newMasterBean);
         }
       }
     }

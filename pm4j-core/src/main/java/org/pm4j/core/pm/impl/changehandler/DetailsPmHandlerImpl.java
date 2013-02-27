@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.pm4j.core.pm.PmCommandDecorator;
 import org.pm4j.core.pm.PmDataInput;
+import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
 import org.pm4j.core.pm.api.PmMessageUtil;
@@ -22,7 +23,7 @@ import org.pm4j.core.pm.api.PmValidationApi;
  * @param <T_DETAILS_PM>
  *          Type of the supported details PM.
  */
-public class DetailsPmHandlerImpl<T_DETAILS_PM extends PmDataInput, T_MASTER_RECORD> implements DetailsPmHandler<T_DETAILS_PM> {
+public class DetailsPmHandlerImpl<T_DETAILS_PM extends PmDataInput, T_MASTER_RECORD> implements DetailsPmHandler {
 
   /** The details area PM. */
   private final T_DETAILS_PM detailsPm;
@@ -38,7 +39,16 @@ public class DetailsPmHandlerImpl<T_DETAILS_PM extends PmDataInput, T_MASTER_REC
   }
 
   @Override
-  public T_DETAILS_PM getDetailsPm() {
+  public final PmObject getDetailsPm() {
+    return detailsPm;
+  }
+  
+  /**
+   * Provides type save access to the handled details PM. 
+   * 
+   * @return the handled details PM. Never <code>null</code>.
+   */
+  public final T_DETAILS_PM getTypedDetailsPm() {
     return detailsPm;
   }
 
@@ -73,11 +83,6 @@ public class DetailsPmHandlerImpl<T_DETAILS_PM extends PmDataInput, T_MASTER_REC
     for (PmCommandDecorator d : decorators) {
       d.afterDo(null);
     }
-  }
-
-  @Override
-  public void afterMasterRecordDelete(Object deletedMasterBean) {
-    // no logic by default.
   }
 
   /**

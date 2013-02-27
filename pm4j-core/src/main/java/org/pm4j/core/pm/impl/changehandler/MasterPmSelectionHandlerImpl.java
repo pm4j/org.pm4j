@@ -46,7 +46,7 @@ public class MasterPmSelectionHandlerImpl<T_MASTER_BEAN> implements MasterPmReco
 	private final PmObject masterPm;
 	private final SelectionHandler<T_MASTER_BEAN> selectionHandler;
 	private Set<T_MASTER_BEAN>  changedMasterBeans = new HashSet<T_MASTER_BEAN>();
-	private List<DetailsPmHandler<?>> detailsHandlers = new ArrayList<DetailsPmHandler<?>>();
+	private List<DetailsPmHandler> detailsHandlers = new ArrayList<DetailsPmHandler>();
 	private PropertyAndVetoableChangeListener masterSelectionChangeListener;
 
 	/**
@@ -57,29 +57,29 @@ public class MasterPmSelectionHandlerImpl<T_MASTER_BEAN> implements MasterPmReco
 	 *          The table PM to observe.
 	 * @param detailsHandler A handler for the details PM
 	 */
-	public MasterPmSelectionHandlerImpl(PmObject masterPm, SelectionHandler<T_MASTER_BEAN> selectionHandler, DetailsPmHandler<?>... detailsHandlers) {
+	public MasterPmSelectionHandlerImpl(PmObject masterPm, SelectionHandler<T_MASTER_BEAN> selectionHandler, DetailsPmHandler... detailsHandlers) {
 		assert masterPm != null;
 		assert selectionHandler != null;
 
 		this.masterPm = masterPm;
 		this.selectionHandler = selectionHandler;
-		for (DetailsPmHandler<?> dh : detailsHandlers) {
+		for (DetailsPmHandler dh : detailsHandlers) {
 			addDetailsHander(dh);
 		}
 	}
 
   @Override
-  public final void addDetailsHander(DetailsPmHandler<?> detailsHandler) {
+  public final void addDetailsHander(DetailsPmHandler detailsHandler) {
     this.detailsHandlers.add(detailsHandler);
   }
 
   @Override
-  public final void addDetailsHanders(DetailsPmHandler<?>... detailsHandlers) {
+  public final void addDetailsHanders(DetailsPmHandler... detailsHandlers) {
     this.detailsHandlers.addAll(Arrays.asList(detailsHandlers));
   }
 
   @Override
-  public Collection<DetailsPmHandler<?>> getDetailsPmHandlers() {
+  public Collection<DetailsPmHandler> getDetailsPmHandlers() {
     return detailsHandlers;
   }
 
@@ -92,7 +92,7 @@ public class MasterPmSelectionHandlerImpl<T_MASTER_BEAN> implements MasterPmReco
     // adjust the details areas by informing them about the initial master bean.
     T_MASTER_BEAN selectedMasterBean = getSelectedMasterBean();
     if (selectedMasterBean != null) {
-      for (DetailsPmHandler<?> dh : detailsHandlers) {
+      for (DetailsPmHandler dh : detailsHandlers) {
         dh.afterMasterRecordChange(selectedMasterBean);
       }
     }
@@ -122,7 +122,7 @@ public class MasterPmSelectionHandlerImpl<T_MASTER_BEAN> implements MasterPmReco
    *         the call <code>isPmValueChanged()</code>.
    */
   protected boolean isCurrentDetailsAreaChanged() {
-    for (DetailsPmHandler<?> dh : detailsHandlers) {
+    for (DetailsPmHandler dh : detailsHandlers) {
       Object detail = dh.getDetailsPm();
       if ((detail instanceof PmDataInput) && ((PmDataInput) detail).isPmValueChanged()) {
         return true;
@@ -182,7 +182,7 @@ public class MasterPmSelectionHandlerImpl<T_MASTER_BEAN> implements MasterPmReco
     }
 
     T_MASTER_BEAN selectedMasterBean = getSelectedMasterBean();
-    for (DetailsPmHandler<?> dh : detailsHandlers) {
+    for (DetailsPmHandler dh : detailsHandlers) {
       dh.afterMasterRecordChange(selectedMasterBean);
     }
   }
@@ -231,7 +231,7 @@ public class MasterPmSelectionHandlerImpl<T_MASTER_BEAN> implements MasterPmReco
     }
 
     boolean allDetailsValid = true;
-    for (DetailsPmHandler<?> dh : detailsHandlers) {
+    for (DetailsPmHandler dh : detailsHandlers) {
       if (!dh.canSwitchMasterRecord()) {
         allDetailsValid = false;
       }
@@ -309,7 +309,7 @@ public class MasterPmSelectionHandlerImpl<T_MASTER_BEAN> implements MasterPmReco
       }
 
       T_MASTER_BEAN selectedMasterBean = getSelectedMasterBean();
-      for (DetailsPmHandler<?> dh : detailsHandlers) {
+      for (DetailsPmHandler dh : detailsHandlers) {
         dh.afterMasterRecordChange(selectedMasterBean);
       }
       changedMasterBean = null;

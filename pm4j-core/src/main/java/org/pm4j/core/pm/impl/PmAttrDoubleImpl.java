@@ -32,7 +32,7 @@ public class PmAttrDoubleImpl extends PmAttrNumBase<Double> implements PmAttrDou
   // ======== Value handling ======== //
 
   /**
-   * The default format key {@link #RESKEY_DEFAULT_FORMAT_PATTERN} applies when no
+   * The default format key {@link #RESKEY_DEFAULT_FLOAT_FORMAT_PATTERN} applies when no
    * special format is defined (either by resource key with postfix or
    * annotation).
    *
@@ -40,7 +40,7 @@ public class PmAttrDoubleImpl extends PmAttrNumBase<Double> implements PmAttrDou
    */
   @Override
   protected String getFormatDefaultResKey() {
-    return RESKEY_DEFAULT_FORMAT_PATTERN;
+    return RESKEY_DEFAULT_FLOAT_FORMAT_PATTERN;
   }
 
   @Override

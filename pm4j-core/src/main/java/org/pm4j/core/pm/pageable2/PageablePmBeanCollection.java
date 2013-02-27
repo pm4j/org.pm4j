@@ -25,6 +25,7 @@ import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmFactoryApi;
 import org.pm4j.core.pm.api.PmMessageUtil;
+import org.pm4j.core.pm.api.PmValidationApi;
 import org.pm4j.core.pm.impl.BeanPmCacheUtil;
 import org.pm4j.core.pm.pageable.PageableCollection;
 import org.pm4j.core.pm.pageable.PageableListImpl;
@@ -370,6 +371,18 @@ public class PageablePmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> exten
 
     @Override
     public void clearRegisteredModifications() {
+      // FIXME olaf: this clear PM code must be moved to a callback
+      // that gets consistently triggered if this method was only called on
+      // Bean modification handler level.
+      // Otherwise we get an inconsistent PM state.
+
+      PmValidationApi.clearInvalidValuesOfSubtree(pmCtxt);
+
+      // This method gets usually called within load and reload operations.
+      // The PM factory cache needs to be cleared to ensure that no outdated bean
+      // gets re-used.
+      BeanPmCacheUtil.clearBeanPmCachesOfSubtree(pmCtxt);
+
       ModificationHandler<T_BEAN> mh = beanCollection.getModificationHandler();
       if (mh != null) {
         mh.clearRegisteredModifications();

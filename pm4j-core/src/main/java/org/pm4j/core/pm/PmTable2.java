@@ -23,10 +23,13 @@ public interface PmTable2<T_ROW_PM> extends PmObject, PmDataInput {
   public enum UpdateAspect {
     /** Switches back to the default sort order. */
     CLEAR_SORT_ORDER,
+
     /** Clears user defined filters. */
     CLEAR_USER_FILTER,
+
     /** Clears the selection. */
     CLEAR_SELECTION,
+
     /** Clears any registered changed-data states. */
     CLEAR_CHANGES
   }

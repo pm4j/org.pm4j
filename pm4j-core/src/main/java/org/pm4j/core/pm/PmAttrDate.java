@@ -7,9 +7,6 @@ public interface PmAttrDate extends PmAttr<Date> {
   /**
    * The default format resource key as defined in the Resources_xx.properties
    * file of the pm4j Project.
-   * <p>
-   * If that key was not found, the fix pattern defined in
-   * {@link #FALLBACK_FORMAT_PATTERN} will be used.
    */
   public static final String RESKEY_DEFAULT_FORMAT_PATTERN = "pmAttrDate_defaultFormat";
 

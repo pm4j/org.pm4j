@@ -34,6 +34,7 @@ import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmCommandDecorator;
 import org.pm4j.core.pm.PmConstants;
+import org.pm4j.core.pm.PmDataInput;
 import org.pm4j.core.pm.PmElement;
 import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmMessage;
@@ -247,7 +248,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   @Override
   protected boolean isPmReadonlyImpl() {
     return super.isPmReadonlyImpl() ||
-           getPmParentElement().isPmReadonly();
+           getPmParent().isPmReadonly();
   }
 
   @Override
@@ -525,6 +526,12 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     clearPmInvalidValues();
     if (isWritable) {
       setValue(getDefaultValue());
+    }
+
+    // For composite attribute PM's: reset the children.
+    List<PmDataInput> children = PmUtil.getPmChildrenOfType(this, PmDataInput.class);
+    for (PmDataInput child : children) {
+      child.resetPmValues();
     }
   }
 

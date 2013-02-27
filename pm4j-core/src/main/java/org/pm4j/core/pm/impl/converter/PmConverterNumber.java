@@ -1,6 +1,7 @@
  package org.pm4j.core.pm.impl.converter;
 
 import java.lang.reflect.Constructor;
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
@@ -24,7 +25,7 @@ import org.pm4j.core.pm.PmConstants;
 public class PmConverterNumber<T extends Number> extends PmConverterSerializeableBase<T>{
 
   private final Constructor<T> numberCtor;
-  private String defaultPattern = "#0";
+  
 
   public PmConverterNumber(Class<T> numberClass) {
         try {
@@ -88,7 +89,8 @@ public class PmConverterNumber<T extends Number> extends PmConverterSerializeabl
    * Implementation of converter capable of handling multiple input formats.
    */
   private MultiFormatParserBase<T> multiFormatParser = new MultiFormatParserBase<T>() {
-
+    
+    
     @SuppressWarnings("unchecked")
     @Override
     protected T parseValue(String s, String format, Locale locale, PmAttr<?> pmAttr) throws ParseException {
@@ -103,6 +105,7 @@ public class PmConverterNumber<T extends Number> extends PmConverterSerializeabl
         }
         // make sure that max and min fraction match
         try {
+          nf.setRoundingMode(RoundingMode.UNNECESSARY);
           nf.format(object);
         } catch (ArithmeticException e) {
           throw new ParseException(e.getMessage(), 0);
@@ -114,15 +117,7 @@ public class PmConverterNumber<T extends Number> extends PmConverterSerializeabl
       }
       
     }
-
-    @Override
-    protected String getDefaultFormatPattern() {
-      return defaultPattern;
-    }
   };
 
-  public void setDefaultPattern(String defaultPattern) {
-    this.defaultPattern = defaultPattern;
-  }
 
 }
