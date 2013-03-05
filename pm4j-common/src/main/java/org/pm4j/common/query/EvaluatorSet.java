@@ -3,6 +3,11 @@ package org.pm4j.common.query;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * A (technology specific) set of {@link FilterExpressionEvaluator}s and {@link CompOp} evaluators.
+ *
+ * @author olaf boede
+ */
 public class EvaluatorSet {
 
   private final Map<Class<?>, Object> exprEvaluatorMap;

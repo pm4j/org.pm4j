@@ -3,8 +3,16 @@ package org.pm4j.common.query.inmem;
 import org.pm4j.common.query.FilterExpression;
 import org.pm4j.common.query.FilterExpressionEvaluator;
 
-public interface InMemExprEvaluator<T_ITEM> extends FilterExpressionEvaluator {
+/**
+ * Basic interface for in-memory filter expression evaluations.
+ *
+ * @author olaf boede
+ *
+ * TODO olaf: remove this item type
+ * @param <T_ITEM> type of item to
+ */
+public interface InMemExprEvaluator extends FilterExpressionEvaluator {
 
-  boolean eval(InMemQueryEvaluator<T_ITEM> ctxt, T_ITEM item, FilterExpression expr);
+  boolean eval(InMemQueryEvaluator<?> ctxt, Object item, FilterExpression expr);
 
 }

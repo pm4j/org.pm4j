@@ -181,11 +181,11 @@ public class PageableQueryCollection<T_ITEM, T_ID extends Serializable> extends 
     private ModificationsImpl<T_ITEM> modifications = new ModificationsImpl<T_ITEM>();
 
     public FilterExpression getRemovedItemsFilterExpr(FilterExpression queryFilterExpr) {
-      AttrDefinition idAttr = new AttrDefinition("id", Long.class);
       @SuppressWarnings("unchecked")
       ClickedIds<T_ID> ids = modifications.getRemovedItems().isEmpty()
           ? new ClickedIds<T_ID>()
           : ((ItemIdSelection<T_ITEM, T_ID>)modifications.getRemovedItems()).getClickedIds();
+      AttrDefinition idAttr = getQueryOptions().getIdAttribute();
       return new FilterNot(PageableCollectionUtil2.makeSelectionQueryParams(idAttr, queryFilterExpr, ids));
     }
 

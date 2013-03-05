@@ -13,10 +13,8 @@ import org.pm4j.core.pm.api.PmFactoryApi;
  * The filter attribute path expressions start to address realated values from the PM instance.
  *
  * @author olaf boede
- *
- * @param <T_BEAN>
  */
-public class InMemPmQueryEvaluator<T_BEAN> extends InMemQueryEvaluator<T_BEAN> {
+public class InMemPmQueryEvaluator<T_ITEM> extends InMemQueryEvaluator<T_ITEM> {
 
   private final PmObject pmCtxt;
 
@@ -26,7 +24,7 @@ public class InMemPmQueryEvaluator<T_BEAN> extends InMemQueryEvaluator<T_BEAN> {
   }
 
   @Override
-  public Object getAttrValue(T_BEAN item, AttrDefinition attr) {
+  public Object getAttrValue(Object item, AttrDefinition attr) {
     PmBean<?> pmBean = PmFactoryApi.<Object, PmBean<Object>>getPmForBean(pmCtxt, item);
     Object value = PmExpressionApi.findByExpression(pmBean, attr.getPathName());
     return value;

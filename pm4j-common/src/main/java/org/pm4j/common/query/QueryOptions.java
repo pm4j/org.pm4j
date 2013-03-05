@@ -14,6 +14,10 @@ import java.util.Map;
  */
 public class QueryOptions {
 
+  // XXX olaf: check if we want to have this default as it is.
+  /** By default a {@link Long} attribute with the name 'id' is used. */
+  static final AttrDefinition DEFAULT_ID_ATTR = new AttrDefinition("id", Long.class);
+
   private Map<String, SortOrder>        nameToSortOrderMap = new HashMap<String, SortOrder>();
   private SortOrder                     defaultSortOrder;
   private List<FilterCompareDefinition> filterCompareDefinitions = new ArrayList<FilterCompareDefinition>();
@@ -24,7 +28,11 @@ public class QueryOptions {
    * Is in most cases irrelevant for in-memory queries.<br>
    * Is used in query based collections that define constraints in relation to item ID's.
    */
-  private AttrDefinition                idAttribute;
+  private AttrDefinition                idAttribute = DEFAULT_ID_ATTR;
+
+  /** Default constructor. */
+  public QueryOptions() {
+  }
 
   /**
    * Provides the sort order for the given attribute.

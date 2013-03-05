@@ -28,8 +28,8 @@ public class InMemQueryEvaluator<T_ITEM> extends QueryEvaluatorBase {
     super(evaluatorSet);
   }
 
-  public boolean evaluate(T_ITEM item, FilterExpression expr) {
-    InMemExprEvaluator<T_ITEM> ev = getExprEvaluator(expr);
+  public boolean evaluate(Object item, FilterExpression expr) {
+    InMemExprEvaluator ev = getExprEvaluator(expr);
     return ev.eval(this, item, expr);
   }
 
@@ -51,7 +51,7 @@ public class InMemQueryEvaluator<T_ITEM> extends QueryEvaluatorBase {
       return ListUtil.toList(items);
     }
 
-    InMemExprEvaluator<T_ITEM> ev = getExprEvaluator(expr);
+    InMemExprEvaluator ev = getExprEvaluator(expr);
     List<T_ITEM> resultList = new ArrayList<T_ITEM>();
     for (T_ITEM i : items) {
       if (ev.eval(this, i, expr)) {
@@ -85,10 +85,9 @@ public class InMemQueryEvaluator<T_ITEM> extends QueryEvaluatorBase {
     }
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  protected InMemExprEvaluator<T_ITEM> getExprEvaluator(FilterExpression expr) {
-    return (InMemExprEvaluator<T_ITEM>) super.getExprEvaluator(expr);
+  protected InMemExprEvaluator getExprEvaluator(FilterExpression expr) {
+    return (InMemExprEvaluator) super.getExprEvaluator(expr);
   }
 
   @Override
@@ -99,7 +98,7 @@ public class InMemQueryEvaluator<T_ITEM> extends QueryEvaluatorBase {
   /**
    * Gets the specified attribute value from the item.
    */
-  public Object getAttrValue(T_ITEM item, AttrDefinition attr) {
+  public Object getAttrValue(Object item, AttrDefinition attr) {
     // XXX olaf: is called very oftern in case of long lists. cache the parsed expressions
     Expression expr = PathExpressionChain.parse(new ParseCtxt(attr.getPathName()));
     Object value = expr.exec(new ExprExecCtxt(item));

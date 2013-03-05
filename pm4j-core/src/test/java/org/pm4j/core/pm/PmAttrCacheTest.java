@@ -86,14 +86,55 @@ public class PmAttrCacheTest {
   public static class MyPojoPm extends PmTableRowImpl<MyPojo> {
     public final PmAttrString s = new PmAttrStringImpl(this);
 
-    @PmCacheCfg(value=CacheMode.ON) @PmAttrCfg(valuePath="pmBean.s")
+    @PmCacheCfg(value=CacheMode.ON)
+    @PmAttrCfg(valuePath="pmBean.s")
     public final PmAttrString sCached = new PmAttrStringImpl(this);
+
+    // Cache -> Cached, ClearOn or ClearedBy
+
+//    @PmCacheCfg2(title=@Cached(clearedBy=@Clear(pm="s", change=ValueChangeKind.VALUE)))
+
+//    /** Caches the result of {@link PmObject#isPmEnabled()} */
+//    @PmCacheCfg2(enabled=@Cached)
+
+//    /** Caches the result of {@link PmAttr#getValue()} */
+//    @PmCacheCfg2()
+
+//    /** Caches the result of {@link PmAttr#getValue()} */
+//    @PmCacheCfg2(value=@Cached)
+
+//    /**
+//     * Caches the result of {@link PmAttr#getOptionSet()}.<br>
+//     * The cache gets cleared if the value of the PM 's' gets changed.
+//     */
+//    @PmCacheCfg2(optionSet=@Cached(
+//                 clearedBy=@Clear(pm="s", change=ValueChangeKind.VALUE)))
+
+//    /**
+//     * Caches the result of {@link PmAttr#getOptionSet()}.<br>
+//     * The cache gets cleared if
+//     * <ul>
+//     *  <li>the value of the PM 's.x.y' gets changed or</li>
+//     *  <li>the filter of the table 'someTable' gets changed.</li>
+//     * </ul>
+//     */
+//    @PmCacheCfg2(
+//        optionSet=@Cached(
+//            clearedBy={
+//                @Clear(pm={"s.x.y", "b"}),
+//                @Clear(pm="someTable", change=ValueChangeKind.FILTER)
+//        })
+//    )
+
+    @PmAttrCfg(valuePath="pmBean.s")
+    public final PmAttrString sCachedWithInvalidationListener = new PmAttrStringImpl(this);
 
     @PmAttrCfg(valuePath="pmBean.s")
     public final PmAttrString sCachedByClassSpec = new MyCachedAttrClass(this);
 
     /** The attribut class wants to cache but the atttribute declaration switches off. */
-    @PmCacheCfg(all=CacheMode.OFF) @PmAttrCfg(valuePath="pmBean.s")
+    @PmCacheCfg(all=CacheMode.OFF)
+    @PmAttrCfg(valuePath="pmBean.s")
     public final PmAttrString sClassCacheSwitchedOff = new MyCachedAttrClass(this);
 
     public MyPojoPm(PmObject pmParent, MyPojo myPojo) {
