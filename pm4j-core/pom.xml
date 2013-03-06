@@ -4,49 +4,32 @@
 
 	<artifactId>pm4j-core</artifactId>
 	<packaging>jar</packaging>
-	<name>PM4J CORE</name>
+	<name>PM4J CORE ${pm4j.buildnumber}</name>
+	<groupId>org.pm4j</groupId>
+	<version>${pm4j.buildnumber}</version>
 
 	<parent>
 		<groupId>org.pm4j</groupId>
 		<artifactId>main</artifactId>
-		<version>${org.pm4j.release.version}</version>
+		<version>0.4-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
 	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>properties-maven-plugin</artifactId>
-				<version>1.0-alpha-2</version>
-				<executions>
-					<execution>
-						<phase>initialize</phase>
-						<goals>
-							<goal>read-project-properties</goal>
-						</goals>
-						<configuration>
-							<files>
-								<file>${basedir}/../project.properties</file>
-							</files>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
+		
 	</build>
 
 	<dependencies>
 		<dependency>
 			<groupId>org.pm4j</groupId>
 			<artifactId>pm4j-common</artifactId>
-			<version>0.4.001</version>
+			<version>${pm4j.buildnumber}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.pm4j</groupId>
 			<artifactId>pm4j-common</artifactId>
-			<version>0.4.001</version>
+			<version>${pm4j.buildnumber}</version>
 			<classifier>tests</classifier>
 			<scope>test</scope>
 		</dependency>
@@ -85,6 +68,12 @@
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
 			<version>1.6.1</version>
+		</dependency>
+			<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.6</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 </project>

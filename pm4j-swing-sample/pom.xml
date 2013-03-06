@@ -4,52 +4,33 @@
 
 	<artifactId>pm4j-swing-sample</artifactId>
 	<packaging>jar</packaging>
-	<name>PM4J SWING SAMPLE</name>
-
+	<name>PM4J SWING SAMPLE ${pm4j.buildnumber}</name>
+	<version>${pm4j.buildnumber}</version>
 	<parent>
 		<groupId>org.pm4j</groupId>
 		<artifactId>main</artifactId>
-		<version>0.4.001</version>
+		<version>0.4-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
 	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>properties-maven-plugin</artifactId>
-				<version>1.0-alpha-2</version>
-				<executions>
-					<execution>
-						<phase>initialize</phase>
-						<goals>
-							<goal>read-project-properties</goal>
-						</goals>
-						<configuration>
-							<files>
-								<file>${basedir}/../project.properties</file>
-							</files>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
+		
 	</build>
 	<dependencies>
 		<dependency>
 			<artifactId>pm4j-core-sample</artifactId>
 			<groupId>org.pm4j</groupId>
-			<version>0.4.001</version>
+			<version>${pm4j.buildnumber}</version>
 		</dependency>
 			<dependency>
 			<artifactId>pm4j-swing</artifactId>
 			<groupId>org.pm4j</groupId>
-			<version>0.4.001</version>
+			<version>${pm4j.buildnumber}</version>
 		</dependency>
 		<dependency>
 			<artifactId>pm4j-core</artifactId>
 			<groupId>org.pm4j</groupId>
-			<version>0.4.001</version>
+			<version>${pm4j.buildnumber}</version>
 		</dependency>
 	</dependencies>
 </project>
