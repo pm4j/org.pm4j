@@ -18,6 +18,18 @@
 	</build>
 	<dependencies>
 		<dependency>
+			<artifactId>pm4j-core</artifactId>
+			<groupId>org.pm4j</groupId>
+			<version>${pm4j.buildnumber}</version>
+		</dependency>
+
+		<dependency>
+			<artifactId>pm4j-common</artifactId>
+			<groupId>org.pm4j</groupId>
+			<version>${pm4j.buildnumber}</version>
+		</dependency>
+	
+		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>servlet-api</artifactId>
 			<version>2.4</version>
@@ -40,17 +52,5 @@
 			<artifactId>commons-io</artifactId>
 			<version>1.4</version>
 		</dependency>
-
-		<dependency>
-			<artifactId>pm4j-core</artifactId>
-			<groupId>org.pm4j</groupId>
-			<version>${pm4j.buildnumber}</version>
-		</dependency>
-		<dependency>
-			<artifactId>pm4j-common</artifactId>
-			<groupId>org.pm4j</groupId>
-			<version>${pm4j.buildnumber}</version>
-		</dependency>
-
 	</dependencies>
 </project>

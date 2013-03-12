@@ -17,7 +17,7 @@
 		
 	</build>
 	<dependencies>
-	<dependency>
+		<dependency>
 			<artifactId>pm4j-core</artifactId>
 			<groupId>org.pm4j</groupId>
 			<version>${pm4j.buildnumber}</version>
