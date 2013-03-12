@@ -17,6 +17,11 @@
 		
 	</build>
 	<dependencies>
+	<dependency>
+			<artifactId>pm4j-core</artifactId>
+			<groupId>org.pm4j</groupId>
+			<version>${pm4j.buildnumber}</version>
+		</dependency>
 		<dependency>
 			<artifactId>pm4j-core-sample</artifactId>
 			<groupId>org.pm4j</groupId>
@@ -27,10 +32,6 @@
 			<groupId>org.pm4j</groupId>
 			<version>${pm4j.buildnumber}</version>
 		</dependency>
-		<dependency>
-			<artifactId>pm4j-core</artifactId>
-			<groupId>org.pm4j</groupId>
-			<version>${pm4j.buildnumber}</version>
-		</dependency>
+		
 	</dependencies>
 </project>
