@@ -2,14 +2,15 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
+	<name>PM4J COMMON ${pm4j.buildnumber}</name>
 	<artifactId>pm4j-common</artifactId>
 	<packaging>jar</packaging>
-	<name>PM4J COMMON</name>
+	<version>${pm4j.buildnumber}</version>
 
 	<parent>
 		<groupId>org.pm4j</groupId>
 		<artifactId>main</artifactId>
-		<version>0.4.001</version>
+		<version>0.5-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
