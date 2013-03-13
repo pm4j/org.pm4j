@@ -4,14 +4,15 @@
 
 	<groupId>org.pm4j</groupId>
 	<artifactId>main</artifactId>
-	<version>0.4.001</version>
-	<name>MAIN of PM4J</name>
+	<version>0.5-SNAPSHOT</version>
+	<name>MAIN of PM4J ${version}</name>
 	<packaging>pom</packaging>
 
 	<url>http://www.pm4j.org</url>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<pm4j.buildnumber>0.5.001-SNAPSHOT</pm4j.buildnumber>
 	</properties>
 
 	<organization>
@@ -79,6 +80,7 @@
 			</testResource>
 		</testResources>
 		<plugins>
+			
 			<plugin>
 				<artifactId>maven-resources-plugin</artifactId>
 				<version>2.4.1</version>

@@ -4,16 +4,17 @@
 
 	<artifactId>pm4j-facelets</artifactId>
 	<packaging>jar</packaging>
-	<name>PM4J FACELETS</name>
+	<name>PM4J FACELETS ${pm4j.buildnumber}</name>
+	<version>${pm4j.buildnumber}</version>
 	<parent>
 		<groupId>org.pm4j</groupId>
 		<artifactId>main</artifactId>
-		<version>0.4.001</version>
+		<version>0.5-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
 	<build>
-
+		
 	</build>
 	<dependencies>
 		<dependency>
@@ -43,12 +44,12 @@
 		<dependency>
 			<artifactId>pm4j-core</artifactId>
 			<groupId>org.pm4j</groupId>
-			<version>0.4.001</version>
+			<version>${pm4j.buildnumber}</version>
 		</dependency>
 		<dependency>
 			<artifactId>pm4j-common</artifactId>
 			<groupId>org.pm4j</groupId>
-			<version>0.4.001</version>
+			<version>${pm4j.buildnumber}</version>
 		</dependency>
 
 	</dependencies>
