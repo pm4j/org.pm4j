@@ -17,10 +17,30 @@ import java.util.Map;
  */
 public abstract class MapBasedCache<K, V> {
 
-    private Map<K, V> map = new HashMap<K, V>();
+    private Map<K, V> map;
     private int cacheHitCont;
     private int cacheMissCount;
 
+    /**
+     * Construct the MapBasedCache with a conventional HashMap.
+     */
+    public MapBasedCache() {
+        this(new HashMap<K, V>());
+    }
+    
+    /**
+     * Initialize the MapBasedCache with a custom Map implementation.
+     * This allows for more memory preserving implementations like LRU Maps or
+     * org.apache.commons.collections.map.ReferenceMap.
+     * 
+     * @param map
+     *            the instance of the custom map implementation.
+     */
+    public MapBasedCache(Map<K, V> map) {
+        assert map != null;
+        this.map = map;
+    }
+    
     /**
      * Provides the value for the given key.
      *
