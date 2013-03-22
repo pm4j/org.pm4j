@@ -5,7 +5,14 @@ import java.util.List;
 import org.pm4j.common.query.FilterExpression;
 import org.pm4j.common.query.FilterOr;
 
+/**
+ * Evaluates logical OR expressions.
+ *
+ * @author olaf boede
+ */
 public class InMemExprEvaluatorOr extends InMemExprEvaluatorBase<FilterOr> {
+
+  public static final InMemExprEvaluatorOr INSTANCE = new InMemExprEvaluatorOr();
 
   @Override
   protected boolean evalImpl(InMemQueryEvaluator<?> ctxt, Object item, FilterOr expr) {

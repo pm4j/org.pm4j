@@ -17,7 +17,7 @@ import org.pm4j.common.pageable.PageableCollection2;
 import org.pm4j.common.pageable.PageableCollectionBase2;
 import org.pm4j.common.pageable.PageableCollectionUtil2;
 import org.pm4j.common.pageable.querybased.PageableQuerySelectionHandler.ItemIdSelection;
-import org.pm4j.common.query.AttrDefinition;
+import org.pm4j.common.query.QueryAttr;
 import org.pm4j.common.query.FilterAnd;
 import org.pm4j.common.query.FilterExpression;
 import org.pm4j.common.query.FilterNot;
@@ -185,7 +185,7 @@ public class PageableQueryCollection<T_ITEM, T_ID extends Serializable> extends 
       ClickedIds<T_ID> ids = modifications.getRemovedItems().isEmpty()
           ? new ClickedIds<T_ID>()
           : ((ItemIdSelection<T_ITEM, T_ID>)modifications.getRemovedItems()).getClickedIds();
-      AttrDefinition idAttr = getQueryOptions().getIdAttribute();
+      QueryAttr idAttr = getQueryOptions().getIdAttribute();
       return new FilterNot(PageableCollectionUtil2.makeSelectionQueryParams(idAttr, queryFilterExpr, ids));
     }
 

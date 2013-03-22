@@ -1,6 +1,6 @@
 package org.pm4j.core.pm.pageable2;
 
-import org.pm4j.common.query.AttrDefinition;
+import org.pm4j.common.query.QueryAttr;
 import org.pm4j.common.query.inmem.InMemQueryEvaluator;
 import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmObject;
@@ -24,9 +24,14 @@ public class InMemPmQueryEvaluator<T_ITEM> extends InMemQueryEvaluator<T_ITEM> {
   }
 
   @Override
-  public Object getAttrValue(Object item, AttrDefinition attr) {
+  public Object getAttrValue(Object item, QueryAttr attr) {
+    if (! (attr instanceof QueryAttr.WithPath)) {
+      throw new IllegalArgumentException("Can handle only attributes of type Attr.WithPath. Found attribute: " + attr);
+    }
+
     PmBean<?> pmBean = PmFactoryApi.<Object, PmBean<Object>>getPmForBean(pmCtxt, item);
-    Object value = PmExpressionApi.findByExpression(pmBean, attr.getPathName());
+    String pathName = ((QueryAttr.WithPath)attr).getPathName();
+    Object value = PmExpressionApi.findByExpression(pmBean, pathName);
     return value;
   }
 

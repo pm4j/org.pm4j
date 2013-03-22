@@ -22,8 +22,10 @@ public abstract class CompOpBase<T_VALUE> implements CompOp {
   private static final long serialVersionUID = 1L;
 
   /** Relevant for string attribues only. */
+  @Deprecated
   private boolean ignoreCase = false;
   /** Relevant for string attribues only. */
+  @Deprecated
   private boolean ignoreSpaces = false;
 
   private String name;
@@ -110,18 +112,22 @@ public abstract class CompOpBase<T_VALUE> implements CompOp {
           .isEquals();
   }
 
+  @Deprecated
   public boolean isIgnoreCase() {
     return ignoreCase;
   }
 
+  @Deprecated
   public void setIgnoreCase(boolean ignoreCase) {
     this.ignoreCase = ignoreCase;
   }
 
+  @Deprecated
   public boolean isIgnoreSpaces() {
     return ignoreSpaces;
   }
 
+  @Deprecated
   public void setIgnoreSpaces(boolean ignoreSpaces) {
     this.ignoreSpaces = ignoreSpaces;
   }

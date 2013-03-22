@@ -55,14 +55,4 @@ public final class ListUtil {
     return baseList.subList(fromIndex, toIndex);
   }
 
-  /**
-   * Small syntactical helper.
-   * @param <T>
-   * @param items
-   * @return
-   */
-  public static <T> T[] toArray(T... items) {
-    return items;
-  }
-
 }

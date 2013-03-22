@@ -9,15 +9,17 @@ package org.pm4j.common.query;
  * @author olaf boede
  */
 // TODO olaf: Check if its mini-functionality can't be moved to the EvaluatorSet. -> reduce number of artifacts!
+// Remove from in-memory implementation too.
+@Deprecated
 public class QueryEvaluatorBase {
 
-  private EvaluatorSet evaluatorSet;
+  private QueryEvaluatorSet evaluatorSet;
 
   public QueryEvaluatorBase() {
-    this(new EvaluatorSet());
+    this(new QueryEvaluatorSet());
   }
 
-  public QueryEvaluatorBase(EvaluatorSet evaluatorSet) {
+  public QueryEvaluatorBase(QueryEvaluatorSet evaluatorSet) {
     this.evaluatorSet = evaluatorSet;
   }
 
@@ -25,12 +27,16 @@ public class QueryEvaluatorBase {
     return evaluatorSet.getExprEvaluator(expr);
   }
 
-  protected Object getCompOpEvaluator(CompOp compOp) {
-    return evaluatorSet.getCompOpEvaluator(compOp);
+  protected Object getCompOpEvaluator(FilterCompare filterCompare) {
+    return evaluatorSet.getCompOpEvaluator(filterCompare);
   }
 
-  protected void setEvaluatorSet(EvaluatorSet evaluatorSet) {
+  protected void setEvaluatorSet(QueryEvaluatorSet evaluatorSet) {
     this.evaluatorSet = evaluatorSet;
+  }
+
+  public QueryEvaluatorSet getEvaluatorSet() {
+    return evaluatorSet;
   }
 
 }

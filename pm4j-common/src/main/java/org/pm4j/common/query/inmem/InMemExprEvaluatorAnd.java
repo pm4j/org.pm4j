@@ -5,7 +5,14 @@ import java.util.List;
 import org.pm4j.common.query.FilterAnd;
 import org.pm4j.common.query.FilterExpression;
 
+/**
+ * Evaluates logical AND expressions.
+ *
+ * @author olaf boede
+ */
 public class InMemExprEvaluatorAnd extends InMemExprEvaluatorBase<FilterAnd> {
+
+  public static final InMemExprEvaluatorAnd INSTANCE = new InMemExprEvaluatorAnd();
 
   @Override
   protected boolean evalImpl(InMemQueryEvaluator<?> ctxt, Object item, FilterAnd expr) {

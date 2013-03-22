@@ -17,26 +17,7 @@ public class SortOrder implements Serializable, Cloneable {
 
   private boolean ascending;
   private final AttrDefinition attribute;
-  private final SortOrder nextSortOrder;
-
-  @Override
-  public boolean equals(Object obj) {
-    if (obj == this) {
-      return true;
-    }
-    if (! (obj instanceof SortOrder)) {
-      return false;
-    }
-    SortOrder other = (SortOrder)obj;
-    return new EqualsBuilder().append(attribute, other.attribute).append(ascending, other.ascending).append(nextSortOrder, other.nextSortOrder).isEquals();
-  }
-
-  @Override
-  public int hashCode() {
-    return new HashCodeBuilder(23, 47).append(attribute).append(ascending).append(nextSortOrder).toHashCode();
-  }
-
-
+  private SortOrder nextSortOrder;
 
   /**
    * Creates a sort order for a single attribute in ascending order.
@@ -78,6 +59,24 @@ public class SortOrder implements Serializable, Cloneable {
   }
 
   /**
+   * Creates an ascending sort order for multiple attributes.
+   *
+   * @param attributes the set of attributes to sort by. The first one is the most significant.
+   */
+  public SortOrder(final AttrDefinition... attributes) {
+    assert attributes.length > 0;
+
+    this.attribute = attributes[0];
+    this.ascending = true;
+
+    SortOrder so = this;
+    for (int i=1; i<attributes.length; ++i) {
+      so.nextSortOrder = new SortOrder(attributes[i]);
+      so = so.nextSortOrder;
+    }
+  }
+
+  /**
    * @return the ascending
    */
   public boolean isAscending() {
@@ -106,6 +105,10 @@ public class SortOrder implements Serializable, Cloneable {
     return reverseOrder;
   }
 
+  public SortOrder getNextSortOrder() {
+    return nextSortOrder;
+  }
+
   @Override
   public SortOrder clone() {
     try {
@@ -116,12 +119,25 @@ public class SortOrder implements Serializable, Cloneable {
   }
 
   @Override
-  public String toString() {
-    return attribute.getPathName() + " " + (ascending ? "asc" : "desc");
+  public boolean equals(Object obj) {
+    if (obj == this) {
+      return true;
+    }
+    if (! (obj instanceof SortOrder)) {
+      return false;
+    }
+    SortOrder other = (SortOrder)obj;
+    return new EqualsBuilder().append(attribute, other.attribute).append(ascending, other.ascending).append(nextSortOrder, other.nextSortOrder).isEquals();
   }
 
-  public SortOrder getNextSortOrder() {
-    return nextSortOrder;
+  @Override
+  public int hashCode() {
+    return new HashCodeBuilder(23, 47).append(attribute).append(ascending).append(nextSortOrder).toHashCode();
+  }
+
+  @Override
+  public String toString() {
+    return attribute.getPathName() + " " + (ascending ? "asc" : "desc");
   }
 
 }

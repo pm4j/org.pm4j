@@ -28,7 +28,7 @@ public class QueryOptions {
    * Is in most cases irrelevant for in-memory queries.<br>
    * Is used in query based collections that define constraints in relation to item ID's.
    */
-  private AttrDefinition                idAttribute = DEFAULT_ID_ATTR;
+  private QueryAttr                          idAttribute = DEFAULT_ID_ATTR;
 
   /** Default constructor. */
   public QueryOptions() {
@@ -81,14 +81,14 @@ public class QueryOptions {
   /**
    * @return the definition of the ID attribute used for filters related to item ID's.
    */
-  public AttrDefinition getIdAttribute() {
+  public QueryAttr getIdAttribute() {
     return idAttribute;
   }
 
   /**
    * @param idAttribute the definition of the ID attribute used for filters related to item ID's.
    */
-  public void setIdAttribute(AttrDefinition idAttribute) {
+  public void setIdAttribute(QueryAttr idAttribute) {
     this.idAttribute = idAttribute;
   }
 

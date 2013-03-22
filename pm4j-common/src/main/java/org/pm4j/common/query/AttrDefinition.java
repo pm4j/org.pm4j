@@ -1,24 +1,25 @@
 package org.pm4j.common.query;
 
-import java.io.Serializable;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.pm4j.common.exception.CheckedExceptionWrapper;
 
 /**
- * A data object that describes an attribute to filter or to sort by.
+ * Desriptor for a simple <b>single-value</b> attribute to filter or to sort by.
  *
  * @author olaf boede
  */
-public class AttrDefinition implements Serializable {
+// TODO olaf: rename to QueryAttrImpl (?)
+public class AttrDefinition implements QueryAttr.WithPath  {
 
   private static final long serialVersionUID = 1L;
 
   private final String   name;
-  private final String   pathName;
+  private String         pathName;
   private final Class<?> type;
-  private String   title;
+  private String         title;
 
   /**
    * @param pathName
@@ -74,14 +75,12 @@ public class AttrDefinition implements Serializable {
    * @return a path name that is unique within a set of filter/sort order
    *         definitions.
    */
+  @Override
   public String getName() {
     return name;
   }
 
-  /**
-   * @return a path name that is unique within a set of filter/sort order
-   *         definitions.
-   */
+  @Override
   public String getPathName() {
     return pathName;
   }
@@ -89,6 +88,7 @@ public class AttrDefinition implements Serializable {
   /**
    * @return type of the attribute value.
    */
+  @Override
   public Class<?> getType() {
     return type;
   }
@@ -96,6 +96,7 @@ public class AttrDefinition implements Serializable {
   /**
    * @return a title string used to display the attribute to the user.
    */
+  @Override
   public String getTitle() {
     return title;
   }
@@ -105,6 +106,22 @@ public class AttrDefinition implements Serializable {
    */
   public void setTitle(String title) {
     this.title = title;
+  }
+
+  @Override
+  public AttrDefinition clone() {
+    try {
+      return (AttrDefinition) super.clone();
+    } catch (CloneNotSupportedException e) {
+      throw new CheckedExceptionWrapper(e);
+    }
+  }
+
+  /** For internal usage: Clones this attribute. The clone gets the given path prefix. */
+  /* package */ AttrDefinition cloneWithPathPrefix(String prefix) {
+    AttrDefinition a = clone();
+    a.pathName = prefix + this.pathName;
+    return a;
   }
 
   @Override
