@@ -10,15 +10,14 @@ import java.util.Set;
  * A thread safe Map that implements a LRU strategy: If more elements than a given maxSize are
  * put into the map the eldest entries will be removed. Thus the Map will never contain more
  * than maxSize elements.
- * 
+ *
  * @author owahlen
- * @since GLOBE 1.5
- * 
+ *
  * @param <K>
  *            Type of the key elements of the map.
  * @param <V>
  *            Type of the value elements of the map.
- * 
+ *
  */
 public class LRUMap<K, V> implements Map<K, V> {
 
@@ -44,7 +43,7 @@ public class LRUMap<K, V> implements Map<K, V> {
     /**
      * Construct a LRUMap that will never contain more entries than maxSize. If more entries are
      * put into the map the eldest are be removed.
-     * 
+     *
      * @param maxSize
      */
     public LRUMap(final int maxSize) {
