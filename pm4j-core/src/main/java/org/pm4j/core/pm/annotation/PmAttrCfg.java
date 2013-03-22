@@ -99,7 +99,7 @@ public @interface PmAttrCfg {
    *
    * @return the validation strategy definition for this attribute.
    */
-  Validate validate() default Validate.ON_VALIDATE;
+  Validate validate() default Validate.ON_VALIDATE_CALL;
 
   /**
    * Supports usage of JSR-303 bean validation annotations of a related bean class.
@@ -196,7 +196,7 @@ public @interface PmAttrCfg {
      * <p>
      * This is the default validation strategy
      */
-    ON_VALIDATE,
+    ON_VALIDATE_CALL,
 
     /**
      * Validates the received value before setting it to the attibute.

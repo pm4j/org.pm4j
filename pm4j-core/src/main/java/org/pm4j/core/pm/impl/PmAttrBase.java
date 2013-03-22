@@ -1449,7 +1449,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     /** Name of the field configured for JSR 303-validation.<br>
      * Is <code>null</code> if there is nothing to validate this way. */
     private String                          validationFieldName;
-    private PmAttrCfg.Validate              validate                = PmAttrCfg.Validate.ON_VALIDATE;
+    private PmAttrCfg.Validate              validate                = PmAttrCfg.Validate.ON_VALIDATE_CALL;
     private int                             maxLen                  = -1;
     private int                             minLen                  = 0;
     private int                             maxLenDefault;
