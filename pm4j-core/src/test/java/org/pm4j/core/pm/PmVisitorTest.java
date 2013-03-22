@@ -1,7 +1,6 @@
 package org.pm4j.core.pm;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,8 +11,8 @@ import org.junit.Test;
 import org.pm4j.core.pm.annotation.PmBeanCfg;
 import org.pm4j.core.pm.annotation.PmFactoryCfg;
 import org.pm4j.core.pm.api.PmVisitorApi;
-import org.pm4j.core.pm.api.PmVisitorApi.VisitCallBack;
 import org.pm4j.core.pm.api.PmVisitorApi.DefaultVisitCallBack;
+import org.pm4j.core.pm.api.PmVisitorApi.VisitCallBack;
 import org.pm4j.core.pm.api.PmVisitorApi.VisitHint;
 import org.pm4j.core.pm.api.PmVisitorApi.VisitResult;
 import org.pm4j.core.pm.impl.PmAttrPmListImpl;
@@ -27,7 +26,7 @@ public class PmVisitorTest {
 
   private final MyRootPm pm = new MyRootPm(new PmConversationImpl());
 
-  
+
   private final VisitCallBack visitAllCallBack = new DefaultVisitCallBack() {
     @Override
     public VisitResult visit(PmObject pm) {
@@ -147,27 +146,12 @@ public class PmVisitorTest {
     assertEquals("[myChPm1, myChPm2]", calls.toString());
     assertEquals(null, stopObject);
   }
-  
+
   @Test
   public void testConstructor() {
     PmObject stopObject = PmVisitorApi.visit(pm, visitSkipChildren);
     assertEquals("[myChPm1, myChPm2]", calls.toString());
     assertEquals(null, stopObject);
-  }
-
-  @Test(expected = AssertionError.class)
-  public void testNullSafePm() {
-    PmVisitorApi.visit(null, visitSkipChildren, VisitHint.SKIP_DISABLED);
-  }
-
-  @Test(expected = AssertionError.class)
-  public void testNullSafeCallBack() {
-    PmVisitorApi.visit(pm, null, VisitHint.SKIP_DISABLED);
-  }
-
-  @Test(expected = AssertionError.class)
-  public void testNullSafeVisitHint() {
-    PmVisitorApi.visit(pm, visitSkipChildren, (VisitHint[]) null);
   }
 
   @Test
