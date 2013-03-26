@@ -14,7 +14,7 @@ import java.util.Map;
  */
 public class QueryOptions {
 
-  // XXX olaf: check if we want to have this default as it is.
+  // XXX olaf: it would be nice to have the default configurable.
   /** By default a {@link Long} attribute with the name 'id' is used. */
   static final AttrDefinition DEFAULT_ID_ATTR = new AttrDefinition("id", Long.class);
 
@@ -46,8 +46,24 @@ public class QueryOptions {
     return nameToSortOrderMap.get(attrName);
   }
 
+  /**
+   * Adds a sort order option.
+   *
+   * @param name a unique name for the sort order.
+   * @param sortOrder the sort order definition.
+   */
   public void addSortOrder(String name, SortOrder sortOrder) {
     nameToSortOrderMap.put(name, sortOrder);
+  }
+
+  /**
+   * Adds a sort order definition for the given attribute.<br>
+   * The new entry uses the name of the attribute as key.
+   *
+   * @param sortByAttr the attribute to be able to sort by.
+   */
+  public void addSortOrder(AttrDefinition sortByAttr) {
+    nameToSortOrderMap.put(sortByAttr.getName(), new SortOrder(sortByAttr));
   }
 
   /**
