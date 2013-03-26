@@ -11,7 +11,7 @@ public abstract class PageableQuerySelectionBase<T_ITEM, T_ID extends Serializab
   private static final long serialVersionUID = 1L;
 
   /** The service provider may be <code>null</code> in case of non-serializeable selections. */
-  private PageableQueryServiceWithSerialization.SerializeableServiceProvider<T_ITEM, T_ID> serviceProvider;
+  private PageableQueryServiceWithSerialization.SerializeableServiceProvider serviceProvider;
   transient private PageableQueryService<T_ITEM, T_ID> service;
 
   public PageableQuerySelectionBase(PageableQueryService<T_ITEM, T_ID> service) {
@@ -33,10 +33,11 @@ public abstract class PageableQuerySelectionBase<T_ITEM, T_ID extends Serializab
     return getSize() == 0L;
   }
 
+  @SuppressWarnings("unchecked")
   protected PageableQueryService<T_ITEM, T_ID> getService() {
     if (service == null) {
       if (serviceProvider != null) {
-        service = serviceProvider.getQueryService();
+        service = (PageableQueryService<T_ITEM, T_ID>) serviceProvider.getQueryService();
       }
 
       if (service == null) {

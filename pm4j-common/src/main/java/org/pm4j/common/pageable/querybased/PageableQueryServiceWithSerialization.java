@@ -17,16 +17,13 @@ public interface PageableQueryServiceWithSerialization<T_BEAN, T_ID> extends Pag
 
   /**
    * An interface for serializeable objects that can provide a {@link PageableQueryService}.
-   *
-   * @param <T_BEAN> see {@link PageableQueryService}.
-   * @param <T_ID>   see {@link PageableQueryService}.
    */
-  static interface SerializeableServiceProvider<T_BEAN, T_ID> extends Serializable {
+  static interface SerializeableServiceProvider extends Serializable {
 
     /**
      * @return a reference to the service.
      */
-    PageableQueryService<T_BEAN, T_ID> getQueryService();
+    PageableQueryService<?, ?> getQueryService();
 
   }
 
@@ -41,6 +38,6 @@ public interface PageableQueryServiceWithSerialization<T_BEAN, T_ID> extends Pag
    *
    * @return
    */
-  SerializeableServiceProvider<T_BEAN, T_ID> getSerializeableServiceProvider();
+  SerializeableServiceProvider getSerializeableServiceProvider();
 
 }
