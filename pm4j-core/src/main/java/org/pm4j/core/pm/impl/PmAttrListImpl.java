@@ -23,9 +23,9 @@ import org.pm4j.core.util.reflection.ClassUtil;
  *
  * @author olaf boede
  *
- * @param <T>
+ * @param <T> List item type
  */
-public class PmAttrListImpl<T> extends PmAttrBase<List<T>, Collection<T>> implements PmAttrList<T> {
+public class PmAttrListImpl<T> extends PmAttrBase<List<T>, List<T>> implements PmAttrList<T> {
 
   /** Binds to a {@link Collection} of {@link Long}s. */
   @PmAttrListCfg(itemConverter=PmConverterLong.class)
@@ -88,6 +88,25 @@ public class PmAttrListImpl<T> extends PmAttrBase<List<T>, Collection<T>> implem
     }
   }
 
+  /**
+   * Get the bean field type converted to the external PM api type.
+   * In case the list is empty this same list shall be populated with default value(s).
+   * This is different from the super implementation which returns a new list instance with default value(s).
+   */
+  @Override
+  protected List<T> getValueImpl() {
+    List<T> beanAttrValue = getBackingValue();    
+    if(beanAttrValue!=null) {
+      List<T> pmValue = convertBackingValueToPmValue(beanAttrValue);
+      if(pmValue.isEmpty()) {
+        // in case the list is empty the elements from the default list are copied over
+        pmValue.addAll(getDefaultValue());
+        return pmValue;
+      }
+    }
+    return super.getValueImpl();
+  }
+  
   /**
    * The item-{@link PmAttr.Converter} can be configured using the annotation
    * {@link PmAttrListCfg#itemConverter()} or by overriding this method.

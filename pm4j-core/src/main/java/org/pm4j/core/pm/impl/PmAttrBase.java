@@ -568,24 +568,25 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
       // TODO olaf: After conversion the value should be checked using
       // #isEmptyValue() to be able to control the default value logic precisely.
       if (beanAttrValue != null) {
-        return convertBackingValueToPmValue(beanAttrValue);
+        T_PM_VALUE pmValue = convertBackingValueToPmValue(beanAttrValue);
+        if(!isEmptyValue(pmValue)) {
+          return pmValue;          
+        }
+      }
+      // Default values may have only effect if the value was not set
+      // by the user:
+      if (valueWasSet) {
+        return null;
       }
       else {
-        // Default values may have only effect if the value was not set
-        // by the user:
-        if (valueWasSet) {
-          return null;
+        T_PM_VALUE defaultValue = getDefaultValue();
+        if (defaultValue != null) {
+          beanAttrValue = convertPmValueToBackingValue(defaultValue);
+          // XXX olaf: The backing value gets changed within the 'get' functionality.
+          //           Check if that can be postponed...
+          setBackingValue(beanAttrValue);
         }
-        else {
-          T_PM_VALUE defaultValue = getDefaultValue();
-          if (defaultValue != null) {
-            beanAttrValue = convertPmValueToBackingValue(defaultValue);
-            // XXX olaf: The backing value gets changed within the 'get' functionality.
-            //           Check if that can be postponed...
-            setBackingValue(beanAttrValue);
-          }
-          return defaultValue;
-        }
+        return defaultValue;
       }
     }
     catch (Exception e) {
