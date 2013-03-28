@@ -563,31 +563,40 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
 
   protected T_PM_VALUE getValueImpl() {
     try {
+      // the method will try to populate pmValue with different approaches
+      // and return it as result
+      T_PM_VALUE pmValue = null;
+      
       T_BEAN_VALUE beanAttrValue = getBackingValue();
 
-      // TODO olaf: After conversion the value should be checked using
-      // #isEmptyValue() to be able to control the default value logic precisely.
+      // return the converted beanAttrValue if it has #isEmptyValue() set to false.
       if (beanAttrValue != null) {
-        T_PM_VALUE pmValue = convertBackingValueToPmValue(beanAttrValue);
+        pmValue = convertBackingValueToPmValue(beanAttrValue);
         if(!isEmptyValue(pmValue)) {
           return pmValue;          
         }
       }
-      // Default values may have only effect if the value was not set
-      // by the user:
+      
+      // Default values may have only effect if the value was not set by the user:
       if (valueWasSet) {
         return null;
       }
-      else {
-        T_PM_VALUE defaultValue = getDefaultValue();
-        if (defaultValue != null) {
-          beanAttrValue = convertPmValueToBackingValue(defaultValue);
+
+      // At this point pmValue is still either null or empty.
+      // If a default value exists this shall be used to populate it.
+      T_PM_VALUE defaultValue = getDefaultValue();
+      if (defaultValue != null) {
+          T_BEAN_VALUE defaultBeanAttrValue = convertPmValueToBackingValue(defaultValue);
           // XXX olaf: The backing value gets changed within the 'get' functionality.
           //           Check if that can be postponed...
-          setBackingValue(beanAttrValue);
-        }
-        return defaultValue;
+          setBackingValue(defaultBeanAttrValue);
+          return defaultValue;
       }
+      
+      // If non of the above approaches was successful we can do nothing else
+      // then return the pmValue that is either null or an empty list.
+      return pmValue;
+
     }
     catch (Exception e) {
       throw PmRuntimeException.asPmRuntimeException(this, e);
