@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.pm4j.common.pageable.querybased.ClickedIds;
 import org.pm4j.common.query.QueryAttr;
-import org.pm4j.common.query.AttrDefinition;
 import org.pm4j.common.query.CompOpIn;
 import org.pm4j.common.query.FilterAnd;
 import org.pm4j.common.query.FilterCompare;
@@ -24,7 +23,7 @@ import org.pm4j.common.selection.SelectionHandler;
 public final class PageableCollectionUtil2 {
 
   /**
-   * TODO olaf: change to zero based index.
+   * FIXME olaf: change to zero based index.
    *
    * @param pageable
    *          The set to get the result for.
@@ -294,7 +293,7 @@ public final class PageableCollectionUtil2 {
    *          the set of individually selected/deselected item ids.
    * @return the generated filter restriction that represents the selection.
    */
-  public static <T_ID> QueryParams makeSelectionQueryParams(AttrDefinition idAttr, QueryParams queryParams, ClickedIds<T_ID> clickedIds) {
+  public static <T_ID> QueryParams makeSelectionQueryParams(QueryAttr idAttr, QueryParams queryParams, ClickedIds<T_ID> clickedIds) {
     QueryParams qp = queryParams.clone();
     qp.setFilterExpression(makeSelectionQueryParams(idAttr, qp.getFilterExpression(), clickedIds));
     return qp;
