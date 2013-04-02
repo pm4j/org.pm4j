@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmAttrPmList;
 import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmEvent;
@@ -23,12 +24,12 @@ import org.pm4j.core.pm.impl.pathresolver.ExpressionPathResolver;
 import org.pm4j.core.util.reflection.ClassUtil;
 
 /**
- * TODOC:
+ * Implements an attribute that represents a list of beans as a list of PM's.
  *
  * @author olaf boede
  *
- * @param <T_ITEM_PM>
- * @param <T_BEAN>
+ * @param <T_BEAN> type of backing list items.
+ * @param <T_ITEM_PM> type PM used to present a bean item.
  */
 public class PmAttrPmListImpl<T_ITEM_PM extends PmBean<T_BEAN>, T_BEAN> extends PmAttrBase<List<T_ITEM_PM>, Collection<T_BEAN>> implements PmAttrPmList<T_ITEM_PM> {
 
@@ -70,6 +71,20 @@ public class PmAttrPmListImpl<T_ITEM_PM extends PmBean<T_BEAN>, T_BEAN> extends 
 
     // nothing was changed if this code gets executed.
     return false;
+  }
+
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Checks in addition if the unimplemented default value logic is not used.
+   */
+  @Override
+  protected List<T_ITEM_PM> getValueImpl() {
+    if (getDefaultValue() != null) {
+      throw new PmRuntimeException(this, "Default values are currently not supported for PmAttrPmList.\n" +
+    "Please consider overriding getValueImpl() or getBackingValueImpl() to adjust the default using a setBackingValue call.");
+    }
+    return super.getValueImpl();
   }
 
   @Override

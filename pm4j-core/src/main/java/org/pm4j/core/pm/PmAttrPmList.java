@@ -2,8 +2,12 @@ package org.pm4j.core.pm;
 
 import java.util.List;
 
+import org.pm4j.core.pm.annotation.PmFactoryCfg;
+
 /**
- * Presentation model for sets of elements.
+ * Provides an attribute that represents a list of beans as a list of PM's.
+ * <p>
+ * Needs a {@link PmFactoryCfg} to define the PM to be created for each bean list item.
  * <p>
  * Example: The set of childeren of a person object may be represented by
  * an element set with the name 'children'.
@@ -24,6 +28,7 @@ public interface PmAttrPmList<T_ITEM_PM extends PmElement>
    * that the method returns an object. The same analysis perfomed on this
    * method will provide the result that the returned value is a list...
    *
+   * @deprecated please use {@link #getValue()}.
    * @return The list value.
    */
   List<T_ITEM_PM> getValueAsList();
@@ -53,6 +58,7 @@ public interface PmAttrPmList<T_ITEM_PM extends PmElement>
    * @see #getValueAsList()
    * @param value
    *          The new list value.
+   * @deprecated please use {@link #setValue(Object)}.
    */
   void setValueAsList(List<T_ITEM_PM> value);
 
