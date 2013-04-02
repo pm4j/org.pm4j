@@ -579,7 +579,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
       
       // Default values may have only effect if the value was not set by the user:
       if (valueWasSet) {
-        return null;
+        return pmValue;
       }
 
       // At this point pmValue is still either null or empty.
@@ -587,8 +587,8 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
       T_PM_VALUE defaultValue = getDefaultValue();
       if (defaultValue != null) {
           T_BEAN_VALUE defaultBeanAttrValue = convertPmValueToBackingValue(defaultValue);
-          // XXX olaf: The backing value gets changed within the 'get' functionality.
-          //           Check if that can be postponed...
+          // The backing value gets changed within the 'get' functionality.
+          // This is ok according to the default value logic. See: Wiki entry TODO
           setBackingValue(defaultBeanAttrValue);
           return defaultValue;
       }
