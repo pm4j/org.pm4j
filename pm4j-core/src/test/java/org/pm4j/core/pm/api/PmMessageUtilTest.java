@@ -4,11 +4,16 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.pm4j.core.pm.PmAttrString;
 import org.pm4j.core.pm.PmMessage;
 import org.pm4j.core.pm.PmMessage.Severity;
+import org.pm4j.core.pm.annotation.PmAttrCfg;
+import org.pm4j.core.pm.impl.PmAttrStringImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
 
 public class PmMessageUtilTest {
+
+  private TestPm testPm = new TestPm();
 
   @Test
   public void testFindMostSevereMessage() {
@@ -29,4 +34,34 @@ public class PmMessageUtilTest {
     myPm.clearPmMessages(null, null);
     Assert.assertNull(PmMessageUtil.findMostSevereMessage(myPm));
   }
+
+  /**
+   * Tests the logic that is implemented in {@link PmMessageUtil#makeRequiredWarning(org.pm4j.core.pm.PmAttr)}
+   */
+  @Test
+  public void testRequiredDefaultMessage() {
+    testPm.pmValidate();
+    Assert.assertEquals("Please enter a value into \"Attr 1\".", PmMessageUtil.getPmMessages(testPm.attrWithDefaultRequiredMessage).get(0).getTitle());
+  }
+
+  /**
+   * Tests the logic that is implemented in {@link PmMessageUtil#makeRequiredWarning(org.pm4j.core.pm.PmAttr)}
+   */
+  @Test
+  public void testRequiredResourceDefinedSpecialMessage() {
+    testPm.pmValidate();
+    Assert.assertEquals("The attribute Attr 2 is really required ;-)", PmMessageUtil.getPmMessages(testPm.attrWithIndividualRequiredMessage).get(0).getTitle());
+  }
+
+
+  /** A PM used within this test. */
+  public static class TestPm extends PmConversationImpl {
+    @PmAttrCfg(required=true)
+    public final PmAttrString attrWithDefaultRequiredMessage = new PmAttrStringImpl(this);
+
+    /** Has a special required message defined in the Resource.properties file.  */
+    @PmAttrCfg(required=true)
+    public final PmAttrString attrWithIndividualRequiredMessage = new PmAttrStringImpl(this);
+  }
+
 }

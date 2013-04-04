@@ -128,7 +128,7 @@ public class PmMessageUtil {
    */
   public static PmResourceData makeRequiredWarning(PmAttr<?> pm) {
     PmAttrBase<?, ?> pmImpl = (PmAttrBase<?, ?>)pm;
-    String msgKey = pmImpl.getPmResKeyBase() + PmConstants.RESKEY_POSTFIX_REQUIRED_MSG;
+    String msgKey = pmImpl.getPmResKey() + PmConstants.RESKEY_POSTFIX_REQUIRED_MSG;
     String customMsg = PmLocalizeApi.findLocalization(pmImpl, msgKey);
 
     if (customMsg == null) {
