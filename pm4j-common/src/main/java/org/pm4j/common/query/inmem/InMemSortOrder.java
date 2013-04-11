@@ -3,7 +3,8 @@ package org.pm4j.common.query.inmem;
 import java.io.Serializable;
 import java.util.Comparator;
 
-import org.pm4j.common.query.AttrDefinition;
+import org.pm4j.common.query.QueryAttr;
+import org.pm4j.common.query.QueryAttr;
 import org.pm4j.common.query.SortOrder;
 import org.pm4j.common.util.CompareUtil;
 import org.pm4j.common.util.InvertingComparator;
@@ -19,7 +20,7 @@ public class InMemSortOrder extends SortOrder {
 
   private Comparator<Object> comparator;
 
-  public InMemSortOrder(AttrDefinition attrDefinition) {
+  public InMemSortOrder(QueryAttr attrDefinition) {
     this(attrDefinition, new ComparableComparator());
   }
 
@@ -32,13 +33,13 @@ public class InMemSortOrder extends SortOrder {
    *          based collection needs to be serialized.
    */
   @SuppressWarnings("unchecked")
-  public InMemSortOrder(AttrDefinition attrDefinition, Comparator<?> comparator) {
+  public InMemSortOrder(QueryAttr attrDefinition, Comparator<?> comparator) {
     super(attrDefinition, true);
     this.comparator = (Comparator<Object>) comparator;
   }
 
   public InMemSortOrder(Comparator<?> comparator) {
-    this(new AttrDefinition("this", Object.class), comparator);
+    this(new QueryAttr("this", Object.class), comparator);
   }
 
   public Comparator<Object> getComparator() {

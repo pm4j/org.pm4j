@@ -198,7 +198,7 @@ public class PmTableColImpl2 extends PmObjectBase implements PmTableCol2 {
           if (event.getValueChangeKind() == ValueChangeKind.SORT_ORDER) {
             SortOrder tableSortOrder = getPmTableImpl().getPmPageableCollection().getQueryParams().getSortOrder();
             if (tableSortOrder != null &&
-                ObjectUtils.equals(tableSortOrder.getAttribute().getName(), PmTableColImpl2.this.getPmName())) {
+                ObjectUtils.equals(tableSortOrder.getAttr().getName(), PmTableColImpl2.this.getPmName())) {
               PmTableColImpl2.this.sortOrder = tableSortOrder.isAscending() ? PmSortOrder.ASC : PmSortOrder.DESC;
             } else {
               PmTableColImpl2.this.sortOrder = PmSortOrder.NEUTRAL;

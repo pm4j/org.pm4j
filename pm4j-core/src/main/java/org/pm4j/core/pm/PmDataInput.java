@@ -59,6 +59,7 @@ public interface PmDataInput extends PmObject {
    * Fires {@link PmEvent#VALIDATION_STATE_CHANGE} events in case of a change
    * of the valid-state.
    */
+  // TODO olaf: move public interface to validation API. Change to protected implementation method.
   void pmValidate();
 
 }

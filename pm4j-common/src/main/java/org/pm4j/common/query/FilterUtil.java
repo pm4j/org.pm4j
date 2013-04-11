@@ -22,7 +22,7 @@ public final class FilterUtil {
    */
   public static final FilterCompare makeCompareExpr(String attrPath, Class<? extends CompOp> compOpClass, Object compareValue) {
     Class<?> attrClass = compareValue != null ? compareValue.getClass() : Object.class;
-    AttrDefinition attr = new AttrDefinition(attrPath, attrClass);
+    QueryAttr attr = new QueryAttr(attrPath, attrClass);
     return new FilterCompare(attr, compOpClass, compareValue);
   }
 
@@ -39,7 +39,7 @@ public final class FilterUtil {
    */
   public static FilterCompareDefinition findFilterCompareDefinitionByPathName(Collection<FilterCompareDefinition> fcds, String name) {
     for (FilterCompareDefinition fcd : fcds) {
-      if (StringUtils.equals(fcd.getAttr().getPathName(), name)) {
+      if (StringUtils.equals(fcd.getAttr().getPath(), name)) {
         return fcd;
       }
     }

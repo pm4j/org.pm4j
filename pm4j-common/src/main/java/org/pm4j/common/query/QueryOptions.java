@@ -16,7 +16,7 @@ public class QueryOptions {
 
   // XXX olaf: it would be nice to have the default configurable.
   /** By default a {@link Long} attribute with the name 'id' is used. */
-  static final AttrDefinition DEFAULT_ID_ATTR = new AttrDefinition("id", Long.class);
+  static final QueryAttr DEFAULT_ID_ATTR = new QueryAttr("id", Long.class);
 
   private Map<String, SortOrder>        nameToSortOrderMap = new HashMap<String, SortOrder>();
   private SortOrder                     defaultSortOrder;
@@ -62,7 +62,7 @@ public class QueryOptions {
    *
    * @param sortByAttr the attribute to be able to sort by.
    */
-  public void addSortOrder(AttrDefinition sortByAttr) {
+  public void addSortOrder(QueryAttr sortByAttr) {
     nameToSortOrderMap.put(sortByAttr.getName(), new SortOrder(sortByAttr));
   }
 

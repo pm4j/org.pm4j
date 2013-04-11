@@ -14,7 +14,12 @@ import org.pm4j.navi.NaviLink;
 import org.pm4j.navi.NaviRuleLink;
 
 /**
- * TODOC:
+ * A default {@link PmExceptionHandler} implementation.
+ * <p>
+ * TODO olaf:
+ * a) Cleanup {@link #onException(PmObject, Throwable, boolean)} signature.
+ * b) Check usage within set and get operations.
+ * c) Make it more powerful by adding an exception to handler map.
  *
  * @author olaf boede
  */
@@ -27,10 +32,7 @@ public class PmExceptionHandlerImpl implements PmExceptionHandler {
   public PmExceptionHandlerImpl() {
   }
 
-
-  /* (non-Javadoc)
-   * @see org.pm4j.core.pm.impl.PmExceptionHandler#onException(org.pm4j.core.pm.PmObject, java.lang.Throwable, boolean)
-   */
+  @Override
   public NaviLink onException(PmObject pmObject, Throwable throwable,
       boolean inNaviContext) {
     if(pmObject instanceof PmCommand) {
@@ -55,8 +57,19 @@ public class PmExceptionHandlerImpl implements PmExceptionHandler {
                 ? new NaviRuleLink(ruleString)
                 : null;
     }
-    // default: rethrow exception 
+    // default: rethrow exception
     throw new PmRuntimeException(pmObject, throwable);
+  }
+
+  /**
+   * The default implementation just throws the exception to the caller.
+   * <p>
+   * If you have business exceptions that should be considered as validation errors,
+   * please override this method to implement your business specific logic.
+   */
+  @Override
+  public void onExceptionInPmValidation(PmObject pmToValidate, RuntimeException exception) {
+    throw exception;
   }
 
   /**

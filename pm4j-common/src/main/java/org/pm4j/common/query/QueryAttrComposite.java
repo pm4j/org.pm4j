@@ -13,23 +13,55 @@ import org.pm4j.core.util.lang.CloneUtil;
  *
  * @author olaf boede
  */
-public class QueryAttrComposite extends AttrDefinition implements QueryAttr.WithPath, QueryAttr.MultiPart {
+public class QueryAttrComposite extends QueryAttr {
 
   private static final long serialVersionUID = 1L;
 
   /** The set of attribute fields. */
-  private List<QueryAttr.WithPath> parts = new ArrayList<QueryAttr.WithPath>();
+  private List<QueryAttr>     parts = new ArrayList<QueryAttr>();
 
+  /**
+   * @param pathName
+   *          a path expression string that provides access to the attribute
+   *          value.
+   * @param type
+   *          type of the attribute value.
+   */
   public QueryAttrComposite(String pathName, Class<?> type) {
-    super(pathName, type);
+    this(pathName, pathName, type, null);
   }
 
+  /**
+   * @param name
+   *          a path name that is unique within a set of filter/sort order
+   *          definitions.
+   * @param pathName
+   *          a path expression string that provides access to the attribute
+   *          value.
+   * @param type
+   *          type of the attribute value.
+   * @param title
+   *          the title string to display for this attribute. E.g. in filter
+   *          dialogs.<br>
+   *          If <code>null</code> is provided here, a table filter will try to
+   *          get the title from a table column having the same name.
+   */
   public QueryAttrComposite(String name, String pathName, Class<?> type, String title) {
     super(name, pathName, type, title);
   }
 
+  /**
+   * @param name
+   *          a path name that is unique within a set of filter/sort order
+   *          definitions.
+   * @param pathName
+   *          a path expression string that provides access to the attribute
+   *          value.
+   * @param type
+   *          type of the attribute value.
+   */
   public QueryAttrComposite(String name, String pathName, Class<?> type) {
-    super(name, pathName, type);
+    this(name, pathName, type, null);
   }
 
   /**
@@ -40,7 +72,7 @@ public class QueryAttrComposite extends AttrDefinition implements QueryAttr.With
    * @param part the composite part to add.
    * @return the whole composite for inline usage.
    */
-  public QueryAttrComposite addPart(QueryAttr.WithPath part) {
+  public QueryAttrComposite addPart(QueryAttr part) {
     parts.add(part);
     return this;
   }
@@ -55,11 +87,10 @@ public class QueryAttrComposite extends AttrDefinition implements QueryAttr.With
    * @return the whole composite for inline usage.
    */
   public QueryAttrComposite addPart(String path, Class<?> type) {
-    return addPart(new AttrDefinition(path, type));
+    return addPart(new QueryAttr(path, type));
   }
 
-  @Override
-  public List<WithPath> getParts() {
+  public List<QueryAttr> getParts() {
     if (parts.isEmpty()) {
       throw new IllegalStateException("Composite attribute '" + this +
           "' has no parts. Please add all parts before using the method getParts()");
@@ -72,15 +103,14 @@ public class QueryAttrComposite extends AttrDefinition implements QueryAttr.With
    *
    * @return the set of of 'full path' attribute parts.
    */
-  @Override
-  public List<QueryAttr.WithPath> getPartsWithFullPath() {
+  public List<QueryAttr> getPartsWithFullPath() {
     // uses getParts() to get a checked collection.
-    List<QueryAttr.WithPath> parts = getParts();
-    List<QueryAttr.WithPath> list = new ArrayList<QueryAttr.WithPath>(parts.size());
+    List<QueryAttr> parts = getParts();
+    List<QueryAttr> list = new ArrayList<QueryAttr>(parts.size());
 
-    String prefix = this.getPathName() + ".";
-    for (QueryAttr.WithPath ad : parts) {
-      list.add(cloneChildWithPathPrefix(prefix, ad));
+    String prefix = this.getPath() + ".";
+    for (QueryAttr part : parts) {
+      list.add(part.cloneWithPathPrefix(prefix));
     }
 
     return list;
@@ -91,17 +121,6 @@ public class QueryAttrComposite extends AttrDefinition implements QueryAttr.With
     QueryAttrComposite clone = (QueryAttrComposite) super.clone();
     clone.parts = CloneUtil.cloneList(this.getParts(), true);
     return clone;
-  }
-
-  private QueryAttr.WithPath cloneChildWithPathPrefix(String prefix, QueryAttr.WithPath srcAttr) {
-    QueryAttr a = srcAttr.clone();
-    if (a instanceof AttrDefinition) {
-      return ((AttrDefinition) srcAttr).cloneWithPathPrefix(prefix);
-    } else if (a instanceof QueryAttrComposite) {
-      return ((QueryAttrComposite) srcAttr).cloneWithPathPrefix(prefix);
-    } else {
-      throw new IllegalArgumentException("Usage as sub-attribute is only supported for single and composite attribues. Found type: " + srcAttr.getClass());
-    }
   }
 
 }

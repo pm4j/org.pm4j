@@ -19,8 +19,8 @@ public class InMemEvaluationTest {
 
   private Bean bean = new Bean("hi", 3);
   private InMemQueryEvaluator<Bean> ctxt = new InMemQueryEvaluator<Bean>();
-  private AttrDefinition attrS = new AttrDefinition("s", String.class);
-  private AttrDefinition attrI = new AttrDefinition("i", String.class);
+  private QueryAttr attrS = new QueryAttr("s", String.class);
+  private QueryAttr attrI = new QueryAttr("i", String.class);
 
 
   @Test

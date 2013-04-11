@@ -566,17 +566,17 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
       // the method will try to populate pmValue with different approaches
       // and return it as result
       T_PM_VALUE pmValue = null;
-      
+
       T_BEAN_VALUE beanAttrValue = getBackingValue();
 
       // return the converted beanAttrValue if it has #isEmptyValue() set to false.
       if (beanAttrValue != null) {
         pmValue = convertBackingValueToPmValue(beanAttrValue);
         if(!isEmptyValue(pmValue)) {
-          return pmValue;          
+          return pmValue;
         }
       }
-      
+
       // Default values may have only effect if the value was not set by the user:
       if (valueWasSet) {
         return pmValue;
@@ -592,7 +592,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
           setBackingValue(defaultBeanAttrValue);
           return defaultValue;
       }
-      
+
       // If non of the above approaches was successful we can do nothing else
       // then return the pmValue that is either null or an empty list.
       return pmValue;
@@ -1007,6 +1007,11 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     }
   }
 
+  /**
+   * Check the JSR-303 bean validation constraints for this attribute.
+   * <p>
+   * All found violations are reported as error messages in relation to this attribute.
+   */
   void performJsr303Validations() {
     Validator validator = PmImplUtil.getBeanValidator();
     if (validator != null) {
@@ -1038,6 +1043,9 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
           PmResourceData exResData = e.getResourceData();
           PmValidationMessage msg = new PmValidationMessage(this, exResData.msgKey, exResData.msgArgs);
           conversation.addPmMessage(msg);
+        }
+        catch (RuntimeException e) {
+          conversation.getPmExceptionHandler().onExceptionInPmValidation(this, e);
         }
 
         boolean isValid = isPmValid();

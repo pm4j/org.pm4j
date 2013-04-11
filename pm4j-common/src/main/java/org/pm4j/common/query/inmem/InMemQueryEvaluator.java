@@ -10,11 +10,10 @@ import org.pm4j.common.expr.ExprExecCtxt;
 import org.pm4j.common.expr.Expression;
 import org.pm4j.common.expr.PathExpressionChain;
 import org.pm4j.common.expr.parser.ParseCtxt;
-import org.pm4j.common.query.AttrDefinition;
+import org.pm4j.common.query.QueryAttr;
+import org.pm4j.common.query.QueryAttrMulti;
 import org.pm4j.common.query.FilterCompare;
 import org.pm4j.common.query.FilterExpression;
-import org.pm4j.common.query.QueryAttr;
-import org.pm4j.common.query.QueryAttrMultiField;
 import org.pm4j.common.query.QueryEvaluatorBase;
 import org.pm4j.common.query.QueryEvaluatorSet;
 import org.pm4j.common.query.SortOrder;
@@ -140,25 +139,22 @@ public class InMemQueryEvaluator<T_ITEM> extends QueryEvaluatorBase {
    * Sub classes may define here other value resolution algorithms.
    */
   public Object getAttrValue(Object item, QueryAttr attr) {
-    if (attr instanceof QueryAttrMultiField) {
-      QueryAttrMultiField mattr = (QueryAttrMultiField) attr;
+    if (attr instanceof QueryAttrMulti) {
+      QueryAttrMulti mattr = (QueryAttrMulti) attr;
 
-      List<QueryAttr.WithPath> partAttrDefs = mattr.getParts();
+      List<QueryAttr> partAttrDefs = mattr.getParts();
       Object[] values = new Object[partAttrDefs.size()];
       for (int i=0; i<partAttrDefs.size(); ++i) {
         values[i] = getAttrValue(item, partAttrDefs.get(i));
       }
       return new MultiObjectValue(values);
     }
-    else if (attr instanceof QueryAttr.WithPath) {
+    else  {
       // XXX olaf: is called very often in case of long lists. Cache the parsed expressions!
-      String path = ((QueryAttr.WithPath)attr).getPathName();
+      String path = attr.getPath();
       Expression expr = PathExpressionChain.parse(new ParseCtxt(path));
       Object value = expr.exec(new ExprExecCtxt(item));
       return value;
-    }
-    else {
-      throw new IllegalArgumentException("Can handle only attributes of type Attr.WithPath and AttrMultiField. Found attribute: " + attr);
     }
   }
 
@@ -187,7 +183,7 @@ public class InMemQueryEvaluator<T_ITEM> extends QueryEvaluatorBase {
 
     @Override
     public int compare(T o1, T o2) {
-      AttrDefinition d = sortOrder.getAttribute();
+      QueryAttr d = sortOrder.getAttr();
       Object v1 = evaluatorCtxt.getAttrValue(o1, d);
       Object v2 = evaluatorCtxt.getAttrValue(o2, d);
 

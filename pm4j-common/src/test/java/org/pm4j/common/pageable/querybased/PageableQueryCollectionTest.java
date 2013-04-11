@@ -8,7 +8,7 @@ import java.util.Map;
 
 import org.pm4j.common.pageable.PageableCollection2;
 import org.pm4j.common.pageable.PageableCollectionTestBase;
-import org.pm4j.common.query.AttrDefinition;
+import org.pm4j.common.query.QueryAttr;
 import org.pm4j.common.query.CompOpStringStartsWith;
 import org.pm4j.common.query.FilterCompareDefinition;
 import org.pm4j.common.query.QueryOptions;
@@ -84,7 +84,7 @@ public class PageableQueryCollectionTest extends PageableCollectionTestBase<Page
     @Override
     public QueryOptions getQueryOptions() {
       QueryOptions options = new QueryOptions();
-      AttrDefinition nameAttr = new AttrDefinition("name", String.class);
+      QueryAttr nameAttr = new QueryAttr("name", String.class);
 
       options.addSortOrder("name", new InMemSortOrder(new Comparator<Bean>() {
         @Override

@@ -90,7 +90,7 @@ public class QueryEvaluatorSet {
    *            compare operator evaluator (interpreter)
    */
   public void addCompOpEvaluator(Class<? extends CompOp> compOpClass, CompOpEvaluator e) {
-    addCompOpEvaluator(AttrDefinition.class, compOpClass, e);
+    addCompOpEvaluator(QueryAttr.class, compOpClass, e);
   }
 
   /**
@@ -106,7 +106,7 @@ public class QueryEvaluatorSet {
    *          compare operator evaluator (interpreter)
    */
   public void addCompOpEvaluator(Class<? extends QueryAttr> forAttrClass, Class<? extends CompOp> compOpClass, CompOpEvaluator e) {
-    if (forAttrClass == AttrDefinition.class) {
+    if (forAttrClass == QueryAttr.class) {
       defaultAttrCompOpEvaluatorMap.put(compOpClass, e);
       return;
     }

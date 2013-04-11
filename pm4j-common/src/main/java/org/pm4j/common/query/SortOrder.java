@@ -16,7 +16,7 @@ public class SortOrder implements Serializable, Cloneable {
   private static final long serialVersionUID = 1L;
 
   private boolean ascending;
-  private final AttrDefinition attribute;
+  private final QueryAttr attr;
   private SortOrder nextSortOrder;
 
   /**
@@ -25,35 +25,35 @@ public class SortOrder implements Serializable, Cloneable {
    * @param attribute
    *            definition of the attribute to sort on
    */
-  public SortOrder(final AttrDefinition attribute) {
+  public SortOrder(final QueryAttr attribute) {
     this(attribute, true, null);
   }
 
   /**
    * Creates a sort order for a single attribute.
    *
-   * @param attribute
+   * @param attr
    *            definition of the attribute to sort on
    * @param ascending
    *            true if order is ascending values
    */
-  public SortOrder(final AttrDefinition attribute, final boolean ascending) {
-    this(attribute, ascending, null);
+  public SortOrder(final QueryAttr attr, final boolean ascending) {
+    this(attr, ascending, null);
   }
 
   /**
    * Creates a sort order that sorts by multiple attributes.
    *
-   * @param attribute
+   * @param attr
    *            definition of the attribute to sort on
    * @param ascending
    *            true if order is ascending values
    * @param nextSortOrder the next attribute to sort by.
    */
-  public SortOrder(final AttrDefinition attribute, final boolean ascending, SortOrder nextSortOrder) {
-    assert attribute != null;
+  public SortOrder(final QueryAttr attr, final boolean ascending, SortOrder nextSortOrder) {
+    assert attr != null;
 
-    this.attribute = attribute;
+    this.attr = attr;
     this.ascending = ascending;
     this.nextSortOrder = nextSortOrder;
   }
@@ -61,17 +61,17 @@ public class SortOrder implements Serializable, Cloneable {
   /**
    * Creates an ascending sort order for multiple attributes.
    *
-   * @param attributes the set of attributes to sort by. The first one is the most significant.
+   * @param attrs the set of attributes to sort by. The first one is the most significant.
    */
-  public SortOrder(final AttrDefinition... attributes) {
-    assert attributes.length > 0;
+  public SortOrder(final QueryAttr... attrs) {
+    assert attrs.length > 0;
 
-    this.attribute = attributes[0];
+    this.attr = attrs[0];
     this.ascending = true;
 
     SortOrder so = this;
-    for (int i=1; i<attributes.length; ++i) {
-      so.nextSortOrder = new SortOrder(attributes[i]);
+    for (int i=1; i<attrs.length; ++i) {
+      so.nextSortOrder = new SortOrder(attrs[i]);
       so = so.nextSortOrder;
     }
   }
@@ -86,8 +86,8 @@ public class SortOrder implements Serializable, Cloneable {
   /**
    * @return the attribute
    */
-  public AttrDefinition getAttribute() {
-      return attribute;
+  public QueryAttr getAttr() {
+      return attr;
   }
 
   /**
@@ -127,17 +127,17 @@ public class SortOrder implements Serializable, Cloneable {
       return false;
     }
     SortOrder other = (SortOrder)obj;
-    return new EqualsBuilder().append(attribute, other.attribute).append(ascending, other.ascending).append(nextSortOrder, other.nextSortOrder).isEquals();
+    return new EqualsBuilder().append(attr, other.attr).append(ascending, other.ascending).append(nextSortOrder, other.nextSortOrder).isEquals();
   }
 
   @Override
   public int hashCode() {
-    return new HashCodeBuilder(23, 47).append(attribute).append(ascending).append(nextSortOrder).toHashCode();
+    return new HashCodeBuilder(23, 47).append(attr).append(ascending).append(nextSortOrder).toHashCode();
   }
 
   @Override
   public String toString() {
-    return attribute.getPathName() + " " + (ascending ? "asc" : "desc");
+    return attr + " " + (ascending ? "asc" : "desc");
   }
 
 }

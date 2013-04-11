@@ -9,9 +9,13 @@ import java.util.Set;
  *
  * @param <T_RECORD_BEAN> type of the master record beans to track.
  */
+// TODO olaf: check if this extra interface is really needed. - Less is often more...
 public interface MasterPmRecordHandler<T_RECORD_BEAN> extends MasterPmHandler {
 
+  /**
+   * Provides the set of master beans with registered details changes.
+   */
   @Override
-  public Set<T_RECORD_BEAN> getChangedMasterBeans();
+  Set<T_RECORD_BEAN> getChangedMasterBeans();
 
 }

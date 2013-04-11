@@ -14,6 +14,8 @@ import org.pm4j.core.pm.PmObject;
 
 /**
  * Internally used helper methods.
+ * <p>
+ * TODO olaf: change to a pluggable bean validator that may be used for customization...
  *
  * @author olaf boede
  */

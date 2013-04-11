@@ -8,8 +8,8 @@ import java.util.Map;
 
 import org.pm4j.common.pageable.PageableCollection2;
 import org.pm4j.common.pageable.PageableCollectionWithMultiFieldIdTestBase;
-import org.pm4j.common.query.AttrDefinition;
-import org.pm4j.common.query.QueryAttrMultiField;
+import org.pm4j.common.query.QueryAttrMulti;
+import org.pm4j.common.query.QueryAttr;
 import org.pm4j.common.query.CompOpStringStartsWith;
 import org.pm4j.common.query.FilterCompareDefinition;
 import org.pm4j.common.query.QueryOptions;
@@ -87,11 +87,11 @@ public class PageableQueryCollectionWithMultiFieldIdTest extends PageableCollect
     public QueryOptions getQueryOptions() {
       QueryOptions options = new QueryOptions();
       options.setIdAttribute(
-          new QueryAttrMultiField("identity (pseudo field)")
+          new QueryAttrMulti("identity (pseudo field)")
             .addPart("id1", Integer.class)
             .addPart("id2", Integer.class));
 
-      AttrDefinition nameAttr = new AttrDefinition("name", String.class);
+      QueryAttr nameAttr = new QueryAttr("name", String.class);
 
       options.addSortOrder("name", new InMemSortOrder(new Comparator<Bean>() {
         @Override

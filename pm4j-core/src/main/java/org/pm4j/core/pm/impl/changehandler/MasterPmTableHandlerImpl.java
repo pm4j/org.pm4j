@@ -18,6 +18,7 @@ import org.pm4j.core.pm.PmEventListener;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmTable;
 import org.pm4j.core.pm.PmTable.TableChange;
+import org.pm4j.core.pm.PmTable2;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmValidationApi;
 import org.pm4j.core.pm.impl.PmUtil;
@@ -37,6 +38,7 @@ import org.pm4j.core.pm.impl.PmUtil;
  *          Type of beans handled by the master PM.
  *
  * @author olaf boede
+ * @deprecated please use {@link PmTable2}
  */
 public class MasterPmTableHandlerImpl<T_MASTER_BEAN> implements MasterPmRecordHandler<T_MASTER_BEAN> {
 

@@ -12,8 +12,8 @@ public class SomeEvaluationTest {
   @Test
   public void testBuildSqlAndSerialization() {
     FilterExpression expr = new FilterAnd(
-        new FilterCompare(new AttrDefinition("i", Integer.class), CompOpEquals.class, 1),
-        new FilterCompare(new AttrDefinition("j", Integer.class), CompOpEquals.class, 3)
+        new FilterCompare(new QueryAttr("i", Integer.class), CompOpEquals.class, 1),
+        new FilterCompare(new QueryAttr("j", Integer.class), CompOpEquals.class, 3)
         );
 
     Assert.assertEquals("select * from x where i=1 and j=3",

@@ -1,92 +1,174 @@
 package org.pm4j.common.query;
 
 import java.io.Serializable;
-import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.pm4j.common.exception.CheckedExceptionWrapper;
 
 /**
  * Descriptor for a query attribute to filter or to sort by.
  *
  * @author olaf boede
  */
-public interface QueryAttr extends Serializable, Cloneable {
+public class QueryAttr implements Serializable, Cloneable {
+
+  private static final long serialVersionUID = 1L;
+
+  private final String   name;
+  private String         path;
+  private final Class<?> type;
+  private String         title;
+
+  /**
+   * @param path
+   *          a path name that is unique within a set of filter/sort order
+   *          definitions.
+   * @param type
+   *          type of the attribute value.
+   */
+  public QueryAttr(String path, Class<?> type) {
+    this(path, path, type, null);
+  }
+
+  /**
+   * @param name
+   *          a path name that is unique within a set of filter/sort order
+   *          definitions.
+   * @param path
+   *          a path expression string that provides access to the attribute value.
+   * @param type
+   *          type of the attribute value.
+   */
+  public QueryAttr(String name, String path, Class<?> type) {
+    this(name, path, type, null);
+  }
+
+  /**
+   * @param name
+   *          a path name that is unique within a set of filter/sort order
+   *          definitions.
+   * @param path
+   *          a path expression string that provides access to the attribute
+   *          value.
+   * @param type
+   *          type of the attribute value.
+   * @param title
+   *          the title string to display for this attribute. E.g. in filter
+   *          dialogs.<br>
+   *          If <code>null</code> is provided here, a table filter will try to
+   *          get the title from a table column having the same name.
+   */
+  public QueryAttr(String name, String path, Class<?> type, String title) {
+    assert StringUtils.isNotBlank(name);
+    assert type != null;
+
+    this.name = name;
+    this.path = path;
+    this.type = type;
+    this.title = title;
+  }
 
   /**
    * A unique attribute name identifer. <br>
-   * It usually corresponds to the name of the column displaying that attribute.<br>
-   * In case
+   * It usually corresponds to the name of the column displaying that attribute.
    *
    * @return the attribute name identifier.
    */
-  String getName();
+  public String getName() {
+    return name;
+  }
 
   /**
-   * A convenient title string that may be used in generic dialogs that have to display
-   * a title for this attribute. E.g. a generic filter-by dialog.
+   * A convenient title string that may be used in generic dialogs that have to
+   * display a title for this attribute. E.g. a generic filter-by dialog.
    * <p>
-   * Applications that support internationalization may provide here a resource key
-   * for the language specific title to display.
+   * Applications that support internationalization may provide here a resource
+   * key for the language specific title to display.
    *
    * @return the title string.
    */
-  String getTitle();
+  public String getTitle() {
+    return title;
+  }
+
+  /**
+   * A (dot separated) attribute path expression identifying the location of the
+   * attribute within its bean.
+   * <p>
+   * Examples: <code>'id'</code> for a typical identifier attribute or
+   * <code>subObject.name</code> for a path to an attribute within a sub-entity.
+   *
+   * @return the attribute path expression string. Is never <code>null</code>.
+   */
+  public String getPath() {
+    return path;
+  }
+
+  /**
+   * The type of values behind this attributes. Instances of that type can be
+   * used in compare operations for this attribute.
+   *
+   * @return the attribute value type.
+   */
+  public Class<?> getType() {
+    return type;
+  }
+
+  /**
+   * @param title a title string used to display the attribute to the user.
+   */
+  public void setTitle(String title) {
+    this.title = title;
+  }
 
   /**
    * @return the clone.
    */
-  QueryAttr clone();
+  @Override
+  public QueryAttr clone() {
+    try {
+      return (QueryAttr) super.clone();
+    } catch (CloneNotSupportedException e) {
+      throw new CheckedExceptionWrapper(e);
+    }
+  }
 
-  /**
-   * A conventional attribute having a path that referrs to the attribute
-   * instance within its bean.<br>
-   * It may be a simple attribute like an integer or a complex attribute (an
-   * object containing other attributes).<br>
-   * An attribute of type {@link QueryAttrMultiField} is not an attribute
-   * {@link WithPath}, because it does not referr to a single attribute
-   * instance.
-   */
-  public interface WithPath extends QueryAttr {
+  /** For internal usage: Clones this attribute. The clone gets the given path prefix. */
+  /* package */ QueryAttr cloneWithPathPrefix(String prefix) {
+    QueryAttr a = clone();
+    a.path = prefix + this.path;
+    return a;
+  }
 
-    /**
-     * A (dot separated) attribute path expression identifying the location of the attribute
-     * within its bean.
-     * <p>
-     * Examples: <code>'id'</code> for a typical identifier attribute or <code>subObject.name</code> for a path to an attribute
-     * within a sub-entity.
-     *
-     * @return the attribute path expression string. Is never <code>null</code>.
-     */
-    String getPathName();
-
-    /**
-     *
-     *
-     * @return
-     */
-    Class<?> getType();
-
+  @Override
+  public String toString() {
+    return path;
   }
 
   /**
-   * An attribute containing multiple fields.<br>
-   * Typical examples are business keys or unique constraints for views.
+   * The compare mechanism just compares the query relevant fields. The
+   * {@link #title} is not considered.
+   * <p>
+   * It is done this way to support identification of identical query requests.<br>
+   * The UI-title is currently not relevant or this aspect.
    */
-  public interface MultiPart extends QueryAttr {
+  @Override
+  public boolean equals(Object obj) {
+    if (obj == this) {
+      return true;
+    }
+    if (! (obj instanceof QueryAttr)) {
+      return false;
+    }
+    QueryAttr other = (QueryAttr)obj;
+    return new EqualsBuilder().append(name, other.name).append(path, other.path).append(type, other.type).isEquals();
+  }
 
-    /**
-     * Provides the composite parts as a set of (relative) attributes.
-     *
-     * @return the composite sub-attribute set. The provided list contains at least a single item.
-     */
-    List<QueryAttr.WithPath> getParts();
-
-    /**
-     * Provides the composite parts as a set of attributes with full path identifiers containing
-     * the path of the parent attribute too.
-     *
-     * @return the composite sub-attribute set. The provided list contains at least a single item.
-     */
-    List<QueryAttr.WithPath> getPartsWithFullPath();
-
+  @Override
+  public int hashCode() {
+    return new HashCodeBuilder(11, 47).append(name).append(path).append(type).toHashCode();
   }
 
 }

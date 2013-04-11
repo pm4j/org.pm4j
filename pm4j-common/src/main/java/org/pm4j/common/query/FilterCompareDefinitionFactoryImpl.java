@@ -45,7 +45,7 @@ public class FilterCompareDefinitionFactoryImpl implements FilterCompareDefiniti
    * @return the filter definition.
    */
   @Override
-  public FilterCompareDefinition createCompareDefinition(AttrDefinition attr) {
+  public FilterCompareDefinition createCompareDefinition(QueryAttr attr) {
 	  CompOp[] comps = getCompOpsForValueType(attr);
 
 	  if (comps == null) {
@@ -56,7 +56,7 @@ public class FilterCompareDefinitionFactoryImpl implements FilterCompareDefiniti
       return fcd;
   }
 
-  protected CompOp[] getCompOpsForValueType(AttrDefinition attr) {
+  protected CompOp[] getCompOpsForValueType(QueryAttr attr) {
 	Class<?> valueType = attr.getType();
 
     // first try exact type matches
