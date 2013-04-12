@@ -8,6 +8,7 @@ import java.util.Locale;
 
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmAttrBigDecimal;
+import org.pm4j.core.pm.impl.PmAttrBigDecimalImpl;
 
 public class PmConverterBigDecimal extends PmConverterNumber<BigDecimal> {
 
@@ -21,7 +22,7 @@ public class PmConverterBigDecimal extends PmConverterNumber<BigDecimal> {
   protected NumberFormat getNumberFormat(Locale locale, String formatString, PmAttr<?> pmAttr) {
     DecimalFormat decimalFormat = new DecimalFormat(formatString, new DecimalFormatSymbols(locale));
     if(pmAttr instanceof PmAttrBigDecimal) {
-      PmAttrBigDecimal pmAttrBigDecimal = (PmAttrBigDecimal) pmAttr;
+      PmAttrBigDecimalImpl pmAttrBigDecimal = (PmAttrBigDecimalImpl) pmAttr;
       decimalFormat.setRoundingMode(pmAttrBigDecimal.getStringConversionRoundingMode());
     }
     decimalFormat.setParseBigDecimal(true);

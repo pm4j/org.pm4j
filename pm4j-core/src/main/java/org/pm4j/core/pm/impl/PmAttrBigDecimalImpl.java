@@ -117,8 +117,13 @@ public class PmAttrBigDecimalImpl extends PmAttrNumBase<BigDecimal> implements P
   private final MetaData getOwnMetaDataWithoutPmInitCall() {
     return (MetaData) getPmMetaDataWithoutPmInitCall();
   }
-
-  @Override
+  
+  /**
+   * @return rounding mode when converting to pm value. Changing this to a value
+   *         different than RoundingMode.UNNECESSARY will allow to set more
+   *         fraction digits than specified in the format. Those additional
+   *         digits will then be rounded.
+   */
   public RoundingMode getStringConversionRoundingMode() {
     return getOwnMetaDataWithoutPmInitCall().stringConversionRoundingMode;
   }

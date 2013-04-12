@@ -7,6 +7,7 @@ import java.util.Locale;
 
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmAttrDouble;
+import org.pm4j.core.pm.impl.PmAttrDoubleImpl;
 
 public class PmConverterDouble extends PmConverterNumber<Double> {
 
@@ -20,7 +21,7 @@ public class PmConverterDouble extends PmConverterNumber<Double> {
   protected NumberFormat getNumberFormat(Locale locale, String formatString, PmAttr<?> pmAttr) {
     DecimalFormat decimalFormat = new DecimalFormat(formatString, new DecimalFormatSymbols(locale));
     if(pmAttr instanceof PmAttrDouble) {
-      PmAttrDouble pmAttrDouble = (PmAttrDouble) pmAttr;
+      PmAttrDoubleImpl pmAttrDouble = (PmAttrDoubleImpl) pmAttr;
       decimalFormat.setRoundingMode(pmAttrDouble.getStringConversionRoundingMode());
     }
     return decimalFormat;
