@@ -6,6 +6,7 @@ import org.pm4j.common.util.collection.ArrayUtil;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmObject;
+import org.pm4j.core.pm.impl.PmAttrBase;
 import org.pm4j.core.pm.impl.PmLocalizeApiHandler;
 import org.pm4j.core.pm.impl.PmObjectBase;
 import org.pm4j.core.pm.impl.ResKeyUtil;
@@ -141,6 +142,16 @@ public final class PmLocalizeApi {
    */
   public static void setResourceStringProvider(ResourceStringProvider resourceStringProvider) {
     apiHandler.setResourceStringProvider(resourceStringProvider);
+  }
+
+  /**
+   * Provides the localized output format string for the given attribute.
+   *
+   * @param pmAttr the attribute to get the output format for.
+   * @return the found output format or <code>null</code>.
+   */
+  public static String getOutputFormatString(PmAttr<?> pmAttr) {
+    return apiHandler.getOutputFormatString((PmAttrBase<?, ?>) pmAttr);
   }
 
 }

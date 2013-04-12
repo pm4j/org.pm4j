@@ -22,10 +22,9 @@ import org.pm4j.core.pm.PmConstants;
  *
  * @param <T> The concrete {@link Number} type to convert.
  */
-public class PmConverterNumber<T extends Number> extends PmConverterSerializeableBase<T>{
+public class PmConverterNumber<T extends Number> extends PmConverterSerializeableBase<T> implements MultiFormatConverter {
 
   private final Constructor<T> numberCtor;
-  
 
   public PmConverterNumber(Class<T> numberClass) {
         try {
@@ -36,7 +35,6 @@ public class PmConverterNumber<T extends Number> extends PmConverterSerializeabl
 
   }
 
-  
   @Override
   public T stringToValue(PmAttr<?> pmAttr, String s) {
     try {
@@ -52,13 +50,18 @@ public class PmConverterNumber<T extends Number> extends PmConverterSerializeabl
       throw new PmResourceRuntimeException(pmAttr, PmConstants.MSGKEY_VALIDATION_NUMBER_CONVERSION_FROM_STRING_FAILED, pmAttr.getPmTitle());
     }
   }
-  
+
   @Override
   public String valueToString(PmAttr<?> pmAttr, T v) {
     String outputFormatString = multiFormatParser.getOutputFormat(pmAttr);
     NumberFormat format = getNumberFormat(pmAttr.getPmConversation().getPmLocale(), outputFormatString, pmAttr);
     return format.format(v);
   };
+
+  @Override
+  public String getOutputFormat(PmAttr<?> pmAttr) {
+    return multiFormatParser.getOutputFormat(pmAttr);
+  }
 
   /**
    * @param pmAttr
@@ -89,8 +92,7 @@ public class PmConverterNumber<T extends Number> extends PmConverterSerializeabl
    * Implementation of converter capable of handling multiple input formats.
    */
   private MultiFormatParserBase<T> multiFormatParser = new MultiFormatParserBase<T>() {
-    
-    
+
     @SuppressWarnings("unchecked")
     @Override
     protected T parseValue(String s, String format, Locale locale, PmAttr<?> pmAttr) throws ParseException {
@@ -110,12 +112,12 @@ public class PmConverterNumber<T extends Number> extends PmConverterSerializeabl
         } catch (ArithmeticException e) {
           throw new ParseException(e.getMessage(), 0);
         }
-        
+
         return (T) object;
       } else {
         return (T) nf.parse(s);
       }
-      
+
     }
   };
 
