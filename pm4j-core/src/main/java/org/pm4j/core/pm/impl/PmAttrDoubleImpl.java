@@ -1,5 +1,7 @@
 package org.pm4j.core.pm.impl;
 
+import java.math.RoundingMode;
+
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.exception.PmValidationException;
 import org.pm4j.core.pm.PmAttrDouble;
@@ -22,11 +24,11 @@ public class PmAttrDoubleImpl extends PmAttrNumBase<Double> implements PmAttrDou
   // ======== Interface implementation ======== //
 
   public Double getMax() {
-    return getOwnMetaData().maxValue;
+    return getOwnMetaDataWithoutPmInitCall().maxValue;
   }
 
   public Double getMin() {
-    return getOwnMetaData().minValue;
+    return getOwnMetaDataWithoutPmInitCall().minValue;
   }
 
   // ======== Value handling ======== //
@@ -69,7 +71,8 @@ public class PmAttrDoubleImpl extends PmAttrNumBase<Double> implements PmAttrDou
   protected void initMetaData(PmObjectBase.MetaData metaData) {
     super.initMetaData(metaData);
     MetaData myMetaData = (MetaData) metaData;
-
+    myMetaData.setConverterDefault(PmConverterDouble.INSTANCE);
+    
     PmAttrDoubleCfg annotation = AnnotationUtil.findAnnotation(this, PmAttrDoubleCfg.class);
     if (annotation != null) {
       double maxValue = myMetaData.maxValue = annotation.maxValue();
@@ -78,23 +81,30 @@ public class PmAttrDoubleImpl extends PmAttrNumBase<Double> implements PmAttrDou
       if (minValue > maxValue) {
         throw new PmRuntimeException(this, "minValue(" + minValue + ") > maxValue(" + maxValue + ")");
       }
+      myMetaData.stringConversionRoundingMode = annotation.stringConversionRoundingMode();
     }
-
-    myMetaData.setConverterDefault(PmConverterDouble.INSTANCE);
   }
 
   protected static class MetaData extends PmAttrNumBase.MetaData {
     private double maxValue = Double.MAX_VALUE;
     private double minValue = -Double.MAX_VALUE;
+    public RoundingMode stringConversionRoundingMode = RoundingMode.HALF_UP;
 
     @Override
     protected double getMaxValue() {
       return maxValue;
     }
+
   }
 
-  private final MetaData getOwnMetaData() {
-    return (MetaData) getPmMetaData();
+  private final MetaData getOwnMetaDataWithoutPmInitCall() {
+    return (MetaData) getPmMetaDataWithoutPmInitCall();
   }
+  
+  @Override
+  public RoundingMode getStringConversionRoundingMode() {
+    return getOwnMetaDataWithoutPmInitCall().stringConversionRoundingMode;
+  }
+
 
 }

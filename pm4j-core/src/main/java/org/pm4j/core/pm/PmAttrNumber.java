@@ -1,7 +1,11 @@
 package org.pm4j.core.pm;
 
+import java.math.RoundingMode;
+
 public interface PmAttrNumber<T extends Number> extends PmAttr<T> {
 
+  public static final RoundingMode ROUNDINGMODE_DEFAULT = RoundingMode.UNNECESSARY; 
+  
   /**
    * The default format resource key as defined in the Resources_xx.properties
    * file of the pm4j Project. Used as default for all floating point numbers.
