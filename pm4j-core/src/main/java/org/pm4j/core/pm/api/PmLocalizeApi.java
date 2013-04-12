@@ -121,23 +121,6 @@ public final class PmLocalizeApi {
   }
 
   /**
-   * Provides a localization based on a key and option resource string arguments.
-   * <p>
-   * Used localization key: {@link #getPmResKeyBase()}+key.<br>
-   *
-   * @param key A resource key.
-   * @param resStringArgs Optional resource string arguments.
-   * @return The localized string.
-   * @throws PmRuntimeException if no localization for the given key was found.
-   * @deprecated Please use PmLocalizeApi.findLocalization(this, getResKey() + "myPostfix")
-   */
-  @Deprecated
-  public static String findLocalizationWithPfx(PmObject pm, String key, Object... resStringArgs) {
-    return findLocalization(pm, ((PmObjectBase)pm).getPmResKeyBase() + key, resStringArgs);
-  }
-
-
-  /**
    * @param resourceStringProvider The algorithm that provides resource strings for given resource keys.
    */
   public static void setResourceStringProvider(ResourceStringProvider resourceStringProvider) {
