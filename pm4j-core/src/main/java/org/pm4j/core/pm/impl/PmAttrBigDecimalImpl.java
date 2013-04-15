@@ -89,7 +89,7 @@ public class PmAttrBigDecimalImpl extends PmAttrNumBase<BigDecimal> implements P
 
     private BigDecimal maxValue = null;
     private BigDecimal minValue = null;
-    public RoundingMode stringConversionRoundingMode = RoundingMode.HALF_UP;
+    public RoundingMode stringConversionRoundingMode = ROUNDINGMODE_DEFAULT;
 
     public MetaData() {
       // the max length needs to be evaluated dynamically by calling getMaxLenDefault().

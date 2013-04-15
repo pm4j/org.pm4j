@@ -88,7 +88,7 @@ public class PmAttrDoubleImpl extends PmAttrNumBase<Double> implements PmAttrDou
   protected static class MetaData extends PmAttrNumBase.MetaData {
     private double maxValue = Double.MAX_VALUE;
     private double minValue = -Double.MAX_VALUE;
-    public RoundingMode stringConversionRoundingMode = RoundingMode.HALF_UP;
+    public RoundingMode stringConversionRoundingMode = ROUNDINGMODE_DEFAULT;
 
     @Override
     protected double getMaxValue() {
