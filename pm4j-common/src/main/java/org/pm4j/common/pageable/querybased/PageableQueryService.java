@@ -7,7 +7,7 @@ import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.selection.ItemIdConverter;
 
 /**
- * Provides the services used for the {@link PageableQueryCollection}.
+ * Provides the data used for the {@link PageableQueryCollection}.
  *
  * @param <T_BEAN>
  *          the type of handled colleciton items.
