@@ -354,7 +354,6 @@ public class PmTableImpl2
         }
         break;
       case CLEAR_USER_FILTER:
-        clearCurrentRowPmCache();
         // User filters can't be cleared on this level. More detailed implementations
         // may implement user defined filters that may be cleared.
         break;
