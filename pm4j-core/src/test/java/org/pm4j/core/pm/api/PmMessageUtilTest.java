@@ -2,7 +2,10 @@ package org.pm4j.core.pm.api;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.Locale;
+
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.pm4j.core.pm.PmAttrString;
 import org.pm4j.core.pm.PmMessage;
@@ -14,6 +17,11 @@ import org.pm4j.core.pm.impl.PmConversationImpl;
 public class PmMessageUtilTest {
 
   private TestPm testPm = new TestPm();
+
+  @Before
+  public void setUp() {
+    testPm.getPmConversation().setPmLocale(Locale.ENGLISH);
+  }
 
   @Test
   public void testFindMostSevereMessage() {
