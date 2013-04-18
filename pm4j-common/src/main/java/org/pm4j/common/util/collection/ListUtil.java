@@ -4,6 +4,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.commons.lang.ObjectUtils;
+
+/**
+ * Some helper methods for list handling.
+ *
+ * @author olaf boede
+ */
 public final class ListUtil {
 
   public static <T> T listToItemOrNull(List<T> list) {
@@ -18,6 +25,29 @@ public final class ListUtil {
       }
     }
   }
+
+  /**
+   * Identifies the index position of the given item within the provided list.
+   * <p>
+   * Uses the <code>equals</code> implementation to compare the given item with
+   * the list items.
+   *
+   * @param list the list to check.
+   * @param item the item to get the position for.
+   * @return the list index of the item or <code>-1</code> if the item is not part of the list.
+   */
+  public static <T> int getItemPos(List<T> list, T item) {
+    if (list != null) {
+      for (int i = 0; i < list.size(); ++i) {
+          if (ObjectUtils.equals(list.get(i), item)) {
+              return i;
+          }
+      }
+    }
+
+    // not found
+    return -1;
+}
 
   public static <T> T lastItemOrNull(List<T> list) {
     return (list == null || list.isEmpty())

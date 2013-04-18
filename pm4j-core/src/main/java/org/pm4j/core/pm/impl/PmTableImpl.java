@@ -202,7 +202,12 @@ public class PmTableImpl
   public List<T_ROW_ELEMENT_PM> getRowsWithChanges() {
     return new ArrayList<T_ROW_ELEMENT_PM>((Collection)changedStateRegistry.getChangedItems());
   }
-  
+
+  @SuppressWarnings({ "unchecked", "rawtypes" })
+  public List<T_ROW_ELEMENT_PM> getAddedRowPms() {
+    return (List) changedStateRegistry.getAddedItems();
+  }
+
   @Override
   public void clearRowsWithChanges() {
     changedStateRegistry.clearChangedItems();

@@ -3,8 +3,11 @@ package org.pm4j.core.pm.impl.changehandler;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.IdentityHashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.pm4j.common.pageable.ModificationHandler;
+import org.pm4j.common.pageable.Modifications;
 import org.pm4j.core.pm.PmDataInput;
 import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmEventListener;
@@ -21,6 +24,7 @@ import org.pm4j.core.pm.api.PmValidationApi;
  *
  * @author OBOEDE
  *
+ * @deprecated please use {@link ModificationHandler} and {@link Modifications}.
  */
 public class ChangedChildStateRegistry {
 
@@ -34,6 +38,11 @@ public class ChangedChildStateRegistry {
 
   /** The set of modified rows. */
   private Map<PmObject, CHANGE> changedItemPms = new IdentityHashMap<PmObject, CHANGE>();
+
+  /**
+   * This parallel collection is a quick workaround for the missing sort order of added items.
+   */
+  private List<PmObject> addedItemPms = new ArrayList<PmObject>();
 
   private boolean recordsDeleted = false;
 
@@ -148,11 +157,13 @@ public class ChangedChildStateRegistry {
   public void clearChangedItems() {
     PmValidationApi.clearInvalidValuesOfSubtree(observedRootPm);
     changedItemPms.clear();
+    addedItemPms.clear();
     recordsDeleted = false;
   }
 
   public void onAddNewItem(PmObject newItemPm) {
     changedItemPms.put(newItemPm, CHANGE.ADD);
+    addedItemPms.add(newItemPm);
   }
 
   public void onDeleteItem(PmObject deletedItem) {
@@ -165,10 +176,15 @@ public class ChangedChildStateRegistry {
 
     // Any change recorded for the deleted item is no longer influencing the changed state.
     changedItemPms.remove(deletedItem);
+    addedItemPms.remove(deletedItem);
   }
 
   public Collection<PmObject> getChangedItems() {
     return changedItemPms.keySet();
+  }
+
+  public List<PmObject> getAddedItems() {
+    return addedItemPms;
   }
 
 }
