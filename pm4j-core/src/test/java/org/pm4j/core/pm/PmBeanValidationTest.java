@@ -20,6 +20,7 @@ import org.pm4j.core.pm.annotation.PmValidationCfg;
 import org.pm4j.core.pm.impl.PmAttrIntegerImpl;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
 import org.pm4j.core.pm.impl.PmBeanImpl;
+import org.pm4j.core.pm.impl.PmCommandImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
 import org.pm4j.core.pm.impl.PmElementBase;
 
@@ -52,6 +53,8 @@ public class PmBeanValidationTest {
     public final PmAttrString s = new PmAttrStringImpl(this);
     public final PmAttrInteger i = new PmAttrIntegerImpl(this);
     public final PmAttrInteger j = new PmAttrIntegerImpl(this);
+    public final PmCommand cmdTriggeringValidation = new PmCommandImpl(this);
+
 
     public MyBeanPm(PmObject pmParent, MyBean b) {
       super(pmParent, b);
@@ -87,6 +90,17 @@ public class PmBeanValidationTest {
     Assert.assertEquals("The @Size.max constraint is read from the bean restriction.", 4, myBeanPm.s.getMaxLen());
 
     myBeanPm.pmValidate();
+    Assert.assertTrue(myBeanPm.s.isPmValid());
+    Assert.assertFalse(myBeanPm.i.isPmValid());
+    Assert.assertFalse(myBeanPm.j.isPmValid());
+  }
+
+  @Test
+  public void testAttributeValidationForEmptyBeanTriggeredByCommand() {
+    myBeanPm.setPmBean(new MyBean(null, null, null));
+    Assert.assertEquals("The @Size.max constraint is read from the bean restriction.", 4, myBeanPm.s.getMaxLen());
+
+    myBeanPm.cmdTriggeringValidation.doIt();
     Assert.assertTrue(myBeanPm.s.isPmValid());
     Assert.assertFalse(myBeanPm.i.isPmValid());
     Assert.assertFalse(myBeanPm.j.isPmValid());

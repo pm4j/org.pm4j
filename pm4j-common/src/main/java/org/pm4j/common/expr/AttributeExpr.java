@@ -8,7 +8,7 @@ import org.pm4j.core.util.reflection.ReflectionException;
 
 /**
  * A path that uses a public field or getter/setter to resolve the path string.
- * 
+ *
  * @author olaf boede
  */
 public class AttributeExpr extends ExprBase<ExprExecCtxt> implements OptionalExpression {
@@ -64,13 +64,13 @@ public class AttributeExpr extends ExprBase<ExprExecCtxt> implements OptionalExp
     	// Property does not exist. Check if that's ok.
     	// Consider the old meaning of 'o' which also worked like an 'x'.
         if(ParseCtxt.getSyntaxVersion() == SyntaxVersion.VERSION_1) {
-            if (!(hasNameModifier(Modifier.OPTIONAL) || hasNameModifier(Modifier.EXISTS_OPTIONALLY))) {
-                throw new ExprExecExeption(ctxt, "Unable to resolve expression part '" + name + "'.", e);
-              }
+          if (!(hasNameModifier(Modifier.OPTIONAL) || hasNameModifier(Modifier.EXISTS_OPTIONALLY))) {
+              throw new ExprExecExeption(ctxt, "Unable to resolve expression part '" + name + "'.", e);
+          }
         } else {
-            if (!hasNameModifier(Modifier.EXISTS_OPTIONALLY)) {
-                throw new ExprExecExeption(ctxt, "Unable to resolve expression part '" + name + "'.", e);
-              }        	
+          if (!hasNameModifier(Modifier.EXISTS_OPTIONALLY)) {
+              throw new ExprExecExeption(ctxt, "Unable to resolve expression part '" + name + "'.", e);
+          }
         }
         return null;
       }

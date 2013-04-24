@@ -22,7 +22,8 @@ public interface Modifications<T_ITEM> {
   boolean isModified();
 
   /**
-   * Provides the list of added items.
+   * Provides the list of added items.<br>
+   * The first added item appears as first list item.
    *
    * @return the added items.<br>
    *  If there is no added item: an empty collection.
@@ -30,7 +31,8 @@ public interface Modifications<T_ITEM> {
   List<T_ITEM> getAddedItems();
 
   /**
-   * Provides the set of updated items.
+   * Provides the (unsorted) set of updated items.
+   *
    *
    * @return the updated item set.<br>
    *  If there is no updated item: an empty collection.
@@ -48,6 +50,5 @@ public interface Modifications<T_ITEM> {
    *  If there is no deleted item: an empty selection.
    */
   Selection<T_ITEM> getRemovedItems();
-
 
 }

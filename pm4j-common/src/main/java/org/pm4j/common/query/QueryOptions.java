@@ -14,6 +14,10 @@ import java.util.Map;
  */
 public class QueryOptions {
 
+  // XXX olaf: it would be nice to have the default configurable.
+  /** By default a {@link Long} attribute with the name 'id' is used. */
+  static final QueryAttr DEFAULT_ID_ATTR = new QueryAttr("id", Long.class);
+
   private Map<String, SortOrder>        nameToSortOrderMap = new HashMap<String, SortOrder>();
   private SortOrder                     defaultSortOrder;
   private List<FilterCompareDefinition> filterCompareDefinitions = new ArrayList<FilterCompareDefinition>();
@@ -24,7 +28,11 @@ public class QueryOptions {
    * Is in most cases irrelevant for in-memory queries.<br>
    * Is used in query based collections that define constraints in relation to item ID's.
    */
-  private AttrDefinition                idAttribute;
+  private QueryAttr                          idAttribute = DEFAULT_ID_ATTR;
+
+  /** Default constructor. */
+  public QueryOptions() {
+  }
 
   /**
    * Provides the sort order for the given attribute.
@@ -38,8 +46,24 @@ public class QueryOptions {
     return nameToSortOrderMap.get(attrName);
   }
 
+  /**
+   * Adds a sort order option.
+   *
+   * @param name a unique name for the sort order.
+   * @param sortOrder the sort order definition.
+   */
   public void addSortOrder(String name, SortOrder sortOrder) {
     nameToSortOrderMap.put(name, sortOrder);
+  }
+
+  /**
+   * Adds a sort order definition for the given attribute.<br>
+   * The new entry uses the name of the attribute as key.
+   *
+   * @param sortByAttr the attribute to be able to sort by.
+   */
+  public void addSortOrder(QueryAttr sortByAttr) {
+    nameToSortOrderMap.put(sortByAttr.getName(), new SortOrder(sortByAttr));
   }
 
   /**
@@ -73,14 +97,14 @@ public class QueryOptions {
   /**
    * @return the definition of the ID attribute used for filters related to item ID's.
    */
-  public AttrDefinition getIdAttribute() {
+  public QueryAttr getIdAttribute() {
     return idAttribute;
   }
 
   /**
    * @param idAttribute the definition of the ID attribute used for filters related to item ID's.
    */
-  public void setIdAttribute(AttrDefinition idAttribute) {
+  public void setIdAttribute(QueryAttr idAttribute) {
     this.idAttribute = idAttribute;
   }
 

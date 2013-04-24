@@ -1,6 +1,7 @@
 package org.pm4j.core.pm.pageable2;
 
-import org.pm4j.common.query.AttrDefinition;
+import org.pm4j.common.query.QueryAttr;
+import org.pm4j.common.query.QueryAttrMulti;
 import org.pm4j.common.query.inmem.InMemQueryEvaluator;
 import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmObject;
@@ -13,10 +14,8 @@ import org.pm4j.core.pm.api.PmFactoryApi;
  * The filter attribute path expressions start to address realated values from the PM instance.
  *
  * @author olaf boede
- *
- * @param <T_BEAN>
  */
-public class InMemPmQueryEvaluator<T_BEAN> extends InMemQueryEvaluator<T_BEAN> {
+public class InMemPmQueryEvaluator<T_ITEM> extends InMemQueryEvaluator<T_ITEM> {
 
   private final PmObject pmCtxt;
 
@@ -26,9 +25,21 @@ public class InMemPmQueryEvaluator<T_BEAN> extends InMemQueryEvaluator<T_BEAN> {
   }
 
   @Override
-  public Object getAttrValue(T_BEAN item, AttrDefinition attr) {
+  public Object getAttrValue(Object item, QueryAttr attr) {
     PmBean<?> pmBean = PmFactoryApi.<Object, PmBean<Object>>getPmForBean(pmCtxt, item);
-    Object value = PmExpressionApi.findByExpression(pmBean, attr.getPathName());
+
+    if (attr instanceof QueryAttrMulti) {
+      // TODO olaf:
+      throw new RuntimeException("generic value access for multi attributes is not yet implemented here.");
+      //AttrMulti.makeValueObject(item, fd)
+    }
+
+    String pathName = attr.getPath();
+    if (pathName == null) {
+      throw new IllegalArgumentException("Can't get a value for an attribute without path information. Attr: " + attr);
+    }
+
+    Object value = PmExpressionApi.findByExpression(pmBean, pathName);
     return value;
   }
 

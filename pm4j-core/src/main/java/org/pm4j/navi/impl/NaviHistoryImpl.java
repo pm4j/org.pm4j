@@ -11,7 +11,7 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.pm4j.common.util.collection.ListUtil;
+import org.pm4j.common.util.collection.ArrayUtil;
 import org.pm4j.navi.NaviHistory;
 import org.pm4j.navi.NaviHistoryCfg;
 import org.pm4j.navi.NaviLink;
@@ -82,7 +82,7 @@ public class NaviHistoryImpl implements NaviHistory {
     this.naviManager = naviSession.getNaviManager();
     this.sessionId = naviSession.getSessionId();
     this.version = version;
-    this.items = ListUtil.toArray(naviLink);
+    this.items = ArrayUtil.toArray(naviLink);
   }
 
   /**

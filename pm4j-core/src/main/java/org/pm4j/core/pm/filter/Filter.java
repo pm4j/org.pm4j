@@ -18,6 +18,7 @@ public interface Filter {
    * @return <code>true</code> if the item should be visible.<br>
    *         <code>false</code> if the item should be hidden.
    */
+  @Deprecated
   boolean doesItemMatch(Object item);
 
   /**

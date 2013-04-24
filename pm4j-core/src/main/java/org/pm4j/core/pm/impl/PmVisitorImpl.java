@@ -15,7 +15,7 @@ import org.pm4j.core.pm.api.PmVisitorApi.VisitResult;
 
 /**
  * Visitor implementations. Descends deep first.
- * 
+ *
  */
 public class PmVisitorImpl {
 
@@ -25,7 +25,7 @@ public class PmVisitorImpl {
 
   /**
    * Creates a visitor.
-   * 
+   *
    * @param callBack
    *          the core part of the visitor client.
    * @param hints
@@ -40,7 +40,7 @@ public class PmVisitorImpl {
 
   /**
    * Starts the visit of pm and pm's children.
-   * 
+   *
    * @param pm
    *          the visited p.m
    */
@@ -52,7 +52,7 @@ public class PmVisitorImpl {
   /**
    * If {@link VisitCallBack} visit returns {@link VisitResult#STOP_VISIT} the
    * responsible pm child will be returned.
-   * 
+   *
    * @return the visit stopping pm object.
    */
   public PmObject getStopOnPmObject() {
@@ -109,7 +109,7 @@ public class PmVisitorImpl {
           vhcb.leaveChildren(pm, children);
         }
         else {
-          visitChildrenCollection(children);          
+          visitChildrenCollection(children);
         }
       }
       if (stopOnPmObject != null) {

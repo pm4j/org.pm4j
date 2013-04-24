@@ -13,20 +13,20 @@ import java.util.Collections;
  */
 public class FilterCompareDefinition {
 
-  private AttrDefinition     attr;
+  private QueryAttr               attr;
   private Collection<CompOp> compOps;
   private CompOp             defaultCompOp;
   private Object             defaultFilterByValue;
 
   @SuppressWarnings("unchecked")
-  public FilterCompareDefinition(AttrDefinition attr, Collection<CompOp> compOps) {
+  public FilterCompareDefinition(QueryAttr attr, Collection<CompOp> compOps) {
     assert attr != null;
 
     this.attr = attr;
     this.compOps = new ArrayList<CompOp>(compOps != null ? compOps : Collections.EMPTY_LIST);
   }
 
-  public FilterCompareDefinition(AttrDefinition attr, CompOp... compOps) {
+  public FilterCompareDefinition(QueryAttr attr, CompOp... compOps) {
     assert attr != null;
 
     this.attr = attr;
@@ -36,7 +36,7 @@ public class FilterCompareDefinition {
   /**
    * @return the attribute to compare.
    */
-  public AttrDefinition getAttr() {
+  public QueryAttr getAttr() {
     return attr;
   }
 

@@ -9,7 +9,7 @@
 	<parent>
 		<groupId>org.pm4j</groupId>
 		<artifactId>main</artifactId>
-		<version>0.4-SNAPSHOT</version>
+		<version>0.5</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
@@ -53,6 +53,17 @@
 			<groupId>swt</groupId>
 			<artifactId>osgi</artifactId>
 			<version>3.0m8</version>
+		</dependency>
+		<dependency>
+			<artifactId>pm4j-core</artifactId>
+			<groupId>org.pm4j</groupId>
+			<version>${pm4j.buildnumber}</version>
+		</dependency>
+			<dependency>
+			<artifactId>pm4j-core</artifactId>
+			<groupId>org.pm4j</groupId>
+			<version>${pm4j.buildnumber}</version>
+			<classifier>tests</classifier>
 		</dependency>
 	</dependencies>
 

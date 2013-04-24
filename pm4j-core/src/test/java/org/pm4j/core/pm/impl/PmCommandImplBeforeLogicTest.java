@@ -39,7 +39,7 @@ public class PmCommandImplBeforeLogicTest {
         0, PmMessageUtil.getPmErrors(conversationPm).size() );
 
     // TODO olaf: enhance the default exception handler!
-    conversationPm.setPmExceptionHandler(new PmExceptionHandler() {
+    conversationPm.setPmExceptionHandler(new PmExceptionHandlerImpl() {
       @Override
       public NaviLink onException(PmObject pmObject, Throwable throwable, boolean inNaviContext) {
         PmMessageUtil.makeExceptionMsg(pmObject, Severity.ERROR, throwable);

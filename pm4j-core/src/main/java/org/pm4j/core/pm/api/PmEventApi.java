@@ -61,6 +61,10 @@ public class PmEventApi {
   }
 
   public static void addHierarchyListener(PmObject hierachyRootPm, int eventMask, PmEventListener listener) {
+    apiHandler.addPmEventListener(hierachyRootPm, eventMask | PmEvent.IS_EVENT_PROPAGATION, listener);
+  }
+
+  public static void addWeakHierarchyListener(PmObject hierachyRootPm, int eventMask, PmEventListener listener) {
     apiHandler.addWeakPmEventListener(hierachyRootPm, eventMask | PmEvent.IS_EVENT_PROPAGATION, listener);
   }
 
@@ -135,7 +139,7 @@ public class PmEventApi {
   }
 
   /**
-   * Propagates rootEvent to rootPm and its children. 
+   * Propagates rootEvent to rootPm and its children.
    * @param rootPm start point.
    * @param rootEvent the event.
    */
@@ -145,7 +149,7 @@ public class PmEventApi {
       @Override
       public VisitResult visit(PmObject pm) {
         if(rootPm == pm) {
-          PmEventApi.firePmEvent(pm, event);      
+          PmEventApi.firePmEvent(pm, event);
         }
         else {
           PmEventApi.firePmEvent(pm, new PmEvent(event.getSource(), pm, event.getChangeMask(), event.getValueChangeKind()));

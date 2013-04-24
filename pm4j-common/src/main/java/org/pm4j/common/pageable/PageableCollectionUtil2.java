@@ -4,7 +4,7 @@ import java.awt.print.Pageable;
 import java.util.List;
 
 import org.pm4j.common.pageable.querybased.ClickedIds;
-import org.pm4j.common.query.AttrDefinition;
+import org.pm4j.common.query.QueryAttr;
 import org.pm4j.common.query.CompOpIn;
 import org.pm4j.common.query.FilterAnd;
 import org.pm4j.common.query.FilterCompare;
@@ -23,7 +23,7 @@ import org.pm4j.common.selection.SelectionHandler;
 public final class PageableCollectionUtil2 {
 
   /**
-   * TODO olaf: change to zero based index.
+   * FIXME olaf: change to zero based index.
    *
    * @param pageable
    *          The set to get the result for.
@@ -293,7 +293,7 @@ public final class PageableCollectionUtil2 {
    *          the set of individually selected/deselected item ids.
    * @return the generated filter restriction that represents the selection.
    */
-  public static <T_ID> QueryParams makeSelectionQueryParams(AttrDefinition idAttr, QueryParams queryParams, ClickedIds<T_ID> clickedIds) {
+  public static <T_ID> QueryParams makeSelectionQueryParams(QueryAttr idAttr, QueryParams queryParams, ClickedIds<T_ID> clickedIds) {
     QueryParams qp = queryParams.clone();
     qp.setFilterExpression(makeSelectionQueryParams(idAttr, qp.getFilterExpression(), clickedIds));
     return qp;
@@ -311,7 +311,7 @@ public final class PageableCollectionUtil2 {
    *          the set of individually selected/deselected item ids.
    * @return the generated filter restriction that represents the selection.
    */
-  public static <T_ID> FilterExpression makeSelectionQueryParams(AttrDefinition idAttr, FilterExpression baseFilterExpr, ClickedIds<T_ID> clickedIds) {
+  public static <T_ID> FilterExpression makeSelectionQueryParams(QueryAttr idAttr, FilterExpression baseFilterExpr, ClickedIds<T_ID> clickedIds) {
     FilterExpression idFilterExpr = new FilterCompare(idAttr, new CompOpIn(), clickedIds.getIds());
     if (clickedIds.isInvertedSelection()) {
       // no de-select clicks: the original filter provides the complete inverse selection..

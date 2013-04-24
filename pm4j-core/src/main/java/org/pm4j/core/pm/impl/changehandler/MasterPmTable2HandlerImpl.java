@@ -3,6 +3,7 @@ package org.pm4j.core.pm.impl.changehandler;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyVetoException;
 
+import org.pm4j.common.pageable.ModificationHandler;
 import org.pm4j.common.pageable.PageableCollection2;
 import org.pm4j.common.selection.Selection;
 import org.pm4j.common.util.beanproperty.PropertyAndVetoableChangeListener;
@@ -29,6 +30,12 @@ public class MasterPmTable2HandlerImpl<T_MASTER_BEAN> extends MasterPmSelectionH
   }
 
   @Override
+  protected ModificationHandler<T_MASTER_BEAN> getModificationHandler() {
+    return getMasterTablePm().getPmPageableBeanCollection().getModificationHandler();
+  }
+
+
+  @Override
   public void startObservers() {
     super.startObservers();
     getMasterTablePm().getPmPageableBeanCollection().addPropertyAndVetoableListener(
@@ -36,7 +43,9 @@ public class MasterPmTable2HandlerImpl<T_MASTER_BEAN> extends MasterPmSelectionH
   }
 
   /**
-   * Provides the 'current' row bean of the table.
+   * Provides the 'current' row bean of the table.<br>
+   * In some scenarions the 'current' may be different from the 'selected' row.
+   * E.g. in case of a multi selection with a 'current' acive row.
    */
   @Override
   protected T_MASTER_BEAN getSelectedMasterBean() {

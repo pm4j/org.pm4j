@@ -19,12 +19,12 @@ public @interface PmAttrBigDecimalCfg {
   /**
    * @return The String representation of the minimum value according to the BigDecimal string representation .
    */
-  String minValueString();
+  String minValueString() default "";
 
   /**
    * @return The String representation of the max value according to the BigDecimal string representation.
    */
-  String maxValueString();
+  String maxValueString() default "";
  
   /**
    * @return rounding mode when converting to pm value. Changing this will allow

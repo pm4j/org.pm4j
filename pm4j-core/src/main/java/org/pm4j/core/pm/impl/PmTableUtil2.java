@@ -4,7 +4,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.pm4j.common.query.AttrDefinition;
+import org.pm4j.common.query.QueryAttr;
 import org.pm4j.common.query.FilterCompareDefinitionFactory;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.SortOrder;
@@ -125,7 +125,7 @@ public final class PmTableUtil2 {
         if (colCfg.filterType() != Void.class) {
           // The default logic: the filter compares the bean field with the same name.
           // TODO olaf: make it configurable within the column configuration.
-          AttrDefinition a = new AttrDefinition(col.getPmName(), "pmBean." + col.getPmName(), colCfg.filterType());
+          QueryAttr a = new QueryAttr(col.getPmName(), "pmBean." + col.getPmName(), colCfg.filterType());
           options.addFilterCompareDefinition(f.createCompareDefinition(a));
         }
       }

@@ -9,7 +9,7 @@
 	<parent>
 		<groupId>org.pm4j</groupId>
 		<artifactId>main</artifactId>
-		<version>0.4-SNAPSHOT</version>
+		<version>0.5</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
@@ -52,5 +52,17 @@
 			<artifactId>commons-io</artifactId>
 			<version>1.4</version>
 		</dependency>
+
+		<dependency>
+			<artifactId>pm4j-core</artifactId>
+			<groupId>org.pm4j</groupId>
+			<version>${pm4j.buildnumber}</version>
+		</dependency>
+		<dependency>
+			<artifactId>pm4j-common</artifactId>
+			<groupId>org.pm4j</groupId>
+			<version>${pm4j.buildnumber}</version>
+		</dependency>
+
 	</dependencies>
 </project>

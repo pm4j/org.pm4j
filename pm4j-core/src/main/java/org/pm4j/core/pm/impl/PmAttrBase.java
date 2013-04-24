@@ -45,6 +45,7 @@ import org.pm4j.core.pm.PmOptionSet;
 import org.pm4j.core.pm.PmVisitor;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.annotation.PmAttrCfg.Restriction;
+import org.pm4j.core.pm.annotation.PmAttrCfg.Validate;
 import org.pm4j.core.pm.annotation.PmCacheCfg;
 import org.pm4j.core.pm.annotation.PmCacheCfg.CacheMode;
 import org.pm4j.core.pm.annotation.PmCommandCfg;
@@ -562,30 +563,40 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
 
   protected T_PM_VALUE getValueImpl() {
     try {
+      // the method will try to populate pmValue with different approaches
+      // and return it as result
+      T_PM_VALUE pmValue = null;
+
       T_BEAN_VALUE beanAttrValue = getBackingValue();
 
-      // TODO olaf: After conversion the value should be checked using
-      // #isEmptyValue() to be able to control the default value logic precisely.
+      // return the converted beanAttrValue if it has #isEmptyValue() set to false.
       if (beanAttrValue != null) {
-        return convertBackingValueToPmValue(beanAttrValue);
-      }
-      else {
-        // Default values may have only effect if the value was not set
-        // by the user:
-        if (valueWasSet) {
-          return null;
+        pmValue = convertBackingValueToPmValue(beanAttrValue);
+        if(!isEmptyValue(pmValue)) {
+          return pmValue;
         }
-        else {
-          T_PM_VALUE defaultValue = getDefaultValue();
-          if (defaultValue != null) {
-            beanAttrValue = convertPmValueToBackingValue(defaultValue);
-            // XXX olaf: The backing value gets changed within the 'get' functionality.
-            //           Check if that can be postponed...
-            setBackingValue(beanAttrValue);
-          }
+      }
+
+      // Default values may have only effect if the value was not set by the user:
+      if (valueWasSet) {
+        return pmValue;
+      }
+
+      // At this point pmValue is still either null or empty.
+      // If a default value exists this shall be used to populate it.
+      T_PM_VALUE defaultValue = getDefaultValue();
+      if (defaultValue != null) {
+          T_BEAN_VALUE defaultBeanAttrValue = convertPmValueToBackingValue(defaultValue);
+          // The backing value gets changed within the 'get' functionality.
+          // This is ok according to the default value logic. See: Wiki entry TODO
+          setBackingValue(defaultBeanAttrValue);
           return defaultValue;
-        }
       }
+
+      // If non of the above approaches was successful we can do nothing else
+      // then return the pmValue that is either null or an empty list.
+      return pmValue;
+
     }
     catch (Exception e) {
       throw PmRuntimeException.asPmRuntimeException(this, e);
@@ -601,6 +612,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
    */
   protected boolean setValueImpl(SetValueContainer<T_PM_VALUE> value) {
     PmEventApi.ensureThreadEventSource(this);
+    MetaData metaData = getOwnMetaData();
 
     try {
       assert value.isPmValueSet();
@@ -618,7 +630,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
       clearPmInvalidValues();
 
       // Ensure that primitive types will not be set to null.
-      if ((newPmValue == null) && getOwnMetaData().primitiveType) {
+      if ((newPmValue == null) && metaData.primitiveType) {
         setAndPropagateInvalidValue(value, PmConstants.MSGKEY_VALIDATION_MISSING_REQUIRED_VALUE);
         return false;
       }
@@ -630,7 +642,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
         return false;
       }
 
-      if (isValidatingOnSetPmValue()) {
+      if (metaData.validate == Validate.BEFORE_SET || isValidatingOnSetPmValue()) {
         // Validate even if nothing was changed. The currentValue may be invalid too.
         // Example: New object with empty attributes values.
         try {
@@ -664,7 +676,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
                         ? convertPmValueToBackingValue(newPmValue)
                         : null;
         setBackingValue(beanAttrValue);
-        getOwnMetaData().cacheStrategyForValue.setAndReturnCachedValue(this, newPmValue);
+        metaData.cacheStrategyForValue.setAndReturnCachedValue(this, newPmValue);
 
         // From now on the value should be handled as intentionally modified.
         // That means that the default value shouldn't be returned, even if the
@@ -672,12 +684,25 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
         valueWasSet = true;
 
         setValueChanged(currentValue, newPmValue);
+
+        // optional after-set validation done before afterChange calls. See: Validate.AFTER_SET.
+        // TODO olaf: Check domain exception handling here. After an exception the value is
+        // changed but no event will get fired.
+        if (metaData.validate == Validate.AFTER_SET) {
+          pmValidate();
+        }
+
+        // internal after-change logic before external after-change logic.
+        afterValueChange(currentValue, newPmValue);
+
+        // tighter coupled value change decorators before more unspecific event listeners
         for (PmCommandDecorator d : getValueChangeDecorators()) {
           d.afterDo(cmd);
         }
-        afterValueChange(currentValue, newPmValue);
 
         PmEventApi.firePmEvent(this, PmEvent.VALUE_CHANGE);
+
+        // after all post-processing it's really done an available for undo calls.
         getPmConversation().getPmCommandHistory().commandDone(cmd);
 
         return true;
@@ -706,10 +731,20 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   }
 
   /**
-   * Gets called after a value change.
+   * A method that may be overridden to add domain specific after value change logic.
+   * <p>
+   * It's called
+   * <ul>
+   *  <li><b>after</b> changing the attribute value,</li>
+   *  <li><b>before</b> the after-do method calls to registered value change decorators and
+   *  <li><b>before</b> sending the value change event to registered listeners.</li>
+   * </ul>
    *
    * @param oldValue The old attribute value.
    * @param newValue The new (current) value.
+   *
+   * @see #addValueChangeDecorator(PmCommandDecorator)
+   * @see PmEventApi#addPmEventListener(PmObject, int, org.pm4j.core.pm.PmEventListener)
    */
   protected void afterValueChange(T_PM_VALUE oldValue, T_PM_VALUE newValue) {
   }
@@ -950,7 +985,10 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
    * immediate call to {@link #pmValidate()}.
    * <p>
    * Alternatively validation is usually triggered by a command.
+   *
+   * @deprecated Please use {@link PmAttrCfg#validate()} using the parameter {@link PmAttrCfg.Validate#BEFORE_SET}.
    */
+  @Deprecated
   protected boolean isValidatingOnSetPmValue() {
     return false;
   }
@@ -969,6 +1007,11 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     }
   }
 
+  /**
+   * Check the JSR-303 bean validation constraints for this attribute.
+   * <p>
+   * All found violations are reported as error messages in relation to this attribute.
+   */
   void performJsr303Validations() {
     Validator validator = PmImplUtil.getBeanValidator();
     if (validator != null) {
@@ -1000,6 +1043,9 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
           PmResourceData exResData = e.getResourceData();
           PmValidationMessage msg = new PmValidationMessage(this, exResData.msgKey, exResData.msgArgs);
           conversation.addPmMessage(msg);
+        }
+        catch (RuntimeException e) {
+          conversation.getPmExceptionHandler().onExceptionInPmValidation(this, e);
         }
 
         boolean isValid = isPmValid();
@@ -1253,6 +1299,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
       if (fieldAnnotation.valueRestriction() != Restriction.NONE) {
         myMetaData.valueRestriction = fieldAnnotation.valueRestriction();
       }
+      myMetaData.validate = fieldAnnotation.validate();
 
       accessKindCfgValue = fieldAnnotation.accessKind();
       myMetaData.formatResKey = StringUtils.defaultIfEmpty(fieldAnnotation.formatResKey(), null);
@@ -1420,6 +1467,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     /** Name of the field configured for JSR 303-validation.<br>
      * Is <code>null</code> if there is nothing to validate this way. */
     private String                          validationFieldName;
+    private PmAttrCfg.Validate              validate                = PmAttrCfg.Validate.ON_VALIDATE_CALL;
     private int                             maxLen                  = -1;
     private int                             minLen                  = 0;
     private int                             maxLenDefault;

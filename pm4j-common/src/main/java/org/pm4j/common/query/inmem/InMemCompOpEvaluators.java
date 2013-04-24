@@ -15,6 +15,7 @@ import org.pm4j.common.query.CompOpStringNotContains;
 import org.pm4j.common.query.CompOpStringStartsWith;
 import org.pm4j.common.util.CompareUtil;
 
+// TODO olaf: move to InMemEvaluatorSet to reduce the number of artifacts.
 public class InMemCompOpEvaluators {
 
   public static final InMemCompOpEvaluator EQUALS = new InMemCompOpEvaluatorBase<CompOpEquals, Object>() {

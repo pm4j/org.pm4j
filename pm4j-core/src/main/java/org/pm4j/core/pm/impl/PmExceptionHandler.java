@@ -1,6 +1,5 @@
 package org.pm4j.core.pm.impl;
 
-import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.navi.NaviLink;
 
@@ -27,5 +26,19 @@ public interface PmExceptionHandler {
    *         navigation.
    */
   NaviLink onException(PmObject pmObject, Throwable throwable, boolean inNaviContext);
+
+  /**
+   * Gets called if a validation throws a runtime exception.
+   * <p>
+   * The default implementaion translates the exception into an error message that is related
+   * to the PM to validate.
+   * <p>
+   * Specific implementations may override this method to translate domain specific exceptions
+   * to validation messages.
+   *
+   * @param pmToValidate the PM the validation was called for.
+   * @param exception the exception that occured within the validation call.
+   */
+  void onExceptionInPmValidation(PmObject pmToValidate, RuntimeException exception);
 
 }

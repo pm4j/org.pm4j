@@ -47,7 +47,7 @@ public final class ListUtil {
 
     // not found
     return -1;
-}
+  }
 
   public static <T> T lastItemOrNull(List<T> list) {
     return (list == null || list.isEmpty())

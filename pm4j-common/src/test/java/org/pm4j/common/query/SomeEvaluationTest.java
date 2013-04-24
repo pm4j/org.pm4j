@@ -12,8 +12,8 @@ public class SomeEvaluationTest {
   @Test
   public void testBuildSqlAndSerialization() {
     FilterExpression expr = new FilterAnd(
-        new FilterCompare(new AttrDefinition("i", Integer.class), CompOpEquals.class, 1),
-        new FilterCompare(new AttrDefinition("j", Integer.class), CompOpEquals.class, 3)
+        new FilterCompare(new QueryAttr("i", Integer.class), CompOpEquals.class, 1),
+        new FilterCompare(new QueryAttr("j", Integer.class), CompOpEquals.class, 3)
         );
 
     Assert.assertEquals("select * from x where i=1 and j=3",
@@ -48,13 +48,13 @@ public class SomeEvaluationTest {
       return (SqlExprEvaluator<?>) super.getExprEvaluator(expr);
     }
 
-    public SqlCompOpEvaluator<? extends CompOp> getCompOpEvaluator(CompOp co) {
+    public SqlCompOpEvaluator<? extends CompOp> getCompOpEvaluator(FilterCompare co) {
       return (SqlCompOpEvaluator<?>) super.getCompOpEvaluator(co);
     }
 
 
-    private EvaluatorSet makeEvaluatorSet() {
-      EvaluatorSet set = new EvaluatorSet();
+    private QueryEvaluatorSet makeEvaluatorSet() {
+      QueryEvaluatorSet set = new QueryEvaluatorSet();
 
       set.addExprEvaluator(FilterAnd.class, new SqlExprEvaluator<FilterAnd>() {
         @Override
@@ -73,9 +73,9 @@ public class SomeEvaluationTest {
       set.addExprEvaluator(FilterCompare.class, new SqlExprEvaluator<FilterCompare>() {
         @Override
         protected void buildSql(FilterCompare expr, StringBuilder sb) {
-          AttrDefinition attr = expr.getAttr();
-          sb.append(attr.getPathName());
-          getCompOpEvaluator(expr.getCompOp()).build(expr.getCompOp(), expr.getValue(), sb);
+          QueryAttr attr = expr.getAttr();
+          sb.append(attr.getName());
+          getCompOpEvaluator(expr).build(expr.getCompOp(), expr.getValue(), sb);
         }
        });
 

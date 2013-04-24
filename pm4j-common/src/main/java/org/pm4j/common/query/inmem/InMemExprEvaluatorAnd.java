@@ -5,16 +5,23 @@ import java.util.List;
 import org.pm4j.common.query.FilterAnd;
 import org.pm4j.common.query.FilterExpression;
 
-public class InMemExprEvaluatorAnd extends InMemExprEvaluatorBase<FilterAnd, Object> {
+/**
+ * Evaluates logical AND expressions.
+ *
+ * @author olaf boede
+ */
+public class InMemExprEvaluatorAnd extends InMemExprEvaluatorBase<FilterAnd> {
+
+  public static final InMemExprEvaluatorAnd INSTANCE = new InMemExprEvaluatorAnd();
 
   @Override
-  protected boolean evalImpl(InMemQueryEvaluator<Object> ctxt, Object item, FilterAnd expr) {
+  protected boolean evalImpl(InMemQueryEvaluator<?> ctxt, Object item, FilterAnd expr) {
     List<FilterExpression> list = expr.getExpressions();
     if (list.isEmpty()) {
       throw new IllegalArgumentException("An AND expression should have at least a single member expression.");
     }
     for (FilterExpression e : list) {
-      InMemExprEvaluator<Object> ev = ctxt.getExprEvaluator(e);
+      InMemExprEvaluator ev = ctxt.getExprEvaluator(e);
       if (! ev.eval(ctxt, item, e)) {
         return false;
       }

@@ -23,6 +23,7 @@ import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.selection.SelectMode;
 import org.pm4j.common.selection.Selection;
 import org.pm4j.common.selection.SelectionHandler;
+import org.pm4j.common.selection.SelectionHandlerUtil;
 import org.pm4j.common.util.beanproperty.PropertyAndVetoableChangeListener;
 import org.pm4j.common.util.collection.ListUtil;
 import org.pm4j.core.exception.PmRuntimeException;
@@ -337,8 +338,11 @@ public class PmTableImpl2
       case CLEAR_SELECTION:
         // the 'current' row corrensponds in most case to the selection. It needs to be re-calculated.
         clearCurrentRowPmCache();
-        getPmSelectionHandler().selectAll(false);
-        // ensure the minimal standard selection.
+        // In case of a clear call we do not handle vetos.
+        // TODO olaf: Write unit tests to verify that that's not problem in all master details cases.
+        SelectionHandlerUtil.forceSelectAll(getPmSelectionHandler(), false);
+
+        // Ensure that the minimal standard selection gets re-created on next get-selection request.
         // TODO: can be part of selectAll(false). Every selection that leads to a no-Selection.
         getPmSelectionHandler().ensureSelectionStateRequired();
         break;
@@ -354,6 +358,7 @@ public class PmTableImpl2
         }
         break;
       case CLEAR_USER_FILTER:
+        clearCurrentRowPmCache();
         // User filters can't be cleared on this level. More detailed implementations
         // may implement user defined filters that may be cleared.
         break;

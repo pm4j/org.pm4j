@@ -16,7 +16,7 @@ import org.pm4j.core.util.reflection.ClassUtil;
 public class FilterCompare implements FilterExpression, Cloneable {
 
   private static final long serialVersionUID = 1L;
-  private AttrDefinition attr;
+  private QueryAttr attr;
   private CompOp compOp;
   private Object value;
 
@@ -28,13 +28,13 @@ public class FilterCompare implements FilterExpression, Cloneable {
    * <p>
    * If you need a stateful compare operator (e.g. with an uppercase value
    * specificiation) use the constructor taking a {@link CompOp} instance parameter:
-   * {@link #FilterCompare(AttrDefinition, CompOp, Object)}.
+   * {@link #FilterCompare(QueryAttr, CompOp, Object)}.
    *
    * @param attr the attribute to compare.
    * @param compOpType the type of compare operator to apply.
    * @param value the value to compare to.
    */
-  public FilterCompare(AttrDefinition attr, Class<? extends CompOp> compOpType, Object value) {
+  public FilterCompare(QueryAttr attr, Class<? extends CompOp> compOpType, Object value) {
     this(attr, (CompOp)ClassUtil.newInstance(compOpType), value);
   }
 
@@ -45,7 +45,7 @@ public class FilterCompare implements FilterExpression, Cloneable {
    * @param compOp the compare operator to apply.
    * @param value the value to compare to.
    */
-  public FilterCompare(AttrDefinition attr, CompOp compOp, Object value) {
+  public FilterCompare(QueryAttr attr, CompOp compOp, Object value) {
     this.attr = attr;
     this.compOp = compOp;
     this.value = value;
@@ -71,7 +71,7 @@ public class FilterCompare implements FilterExpression, Cloneable {
    *
    * @return the unique identifier.
    */
-  public AttrDefinition getAttr() {
+  public QueryAttr getAttr() {
     return attr;
   }
 
@@ -92,7 +92,7 @@ public class FilterCompare implements FilterExpression, Cloneable {
     return value;
   }
 
-  public void setAttr(AttrDefinition attr) {
+  public void setAttr(QueryAttr attr) {
     this.attr = attr;
   }
 

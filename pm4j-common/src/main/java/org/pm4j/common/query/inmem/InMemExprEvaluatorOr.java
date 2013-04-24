@@ -5,16 +5,23 @@ import java.util.List;
 import org.pm4j.common.query.FilterExpression;
 import org.pm4j.common.query.FilterOr;
 
-public class InMemExprEvaluatorOr extends InMemExprEvaluatorBase<FilterOr, Object> {
+/**
+ * Evaluates logical OR expressions.
+ *
+ * @author olaf boede
+ */
+public class InMemExprEvaluatorOr extends InMemExprEvaluatorBase<FilterOr> {
+
+  public static final InMemExprEvaluatorOr INSTANCE = new InMemExprEvaluatorOr();
 
   @Override
-  protected boolean evalImpl(InMemQueryEvaluator<Object> ctxt, Object item, FilterOr expr) {
+  protected boolean evalImpl(InMemQueryEvaluator<?> ctxt, Object item, FilterOr expr) {
     List<FilterExpression> list = expr.getExpressions();
     if (list.isEmpty()) {
       throw new IllegalArgumentException("An OR expression should have at least a single member expression.");
     }
     for (FilterExpression e : list) {
-      InMemExprEvaluator<Object> ev = ctxt.getExprEvaluator(e);
+      InMemExprEvaluator ev = ctxt.getExprEvaluator(e);
       if (ev.eval(ctxt, item, e)) {
         return true;
       }

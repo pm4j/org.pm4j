@@ -12,7 +12,9 @@ import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.pm4j.core.exception.PmRuntimeException;
+import org.pm4j.core.pm.PmAttr.Converter;
 import org.pm4j.core.pm.PmObject;
+import org.pm4j.core.pm.impl.converter.MultiFormatConverter;
 import org.pm4j.core.pm.impl.title.ClassPathResourceStringProvider;
 import org.pm4j.core.pm.impl.title.ResourceStringProvider;
 
@@ -69,6 +71,15 @@ public class PmLocalizeApiHandler {
     }
 
     return s;
+  }
+
+  public String getOutputFormatString(PmAttrBase<?, ?> pmAttr) {
+    Converter<?> c = pmAttr.getConverter();
+    if (c instanceof MultiFormatConverter) {
+      return ((MultiFormatConverter)c).getOutputFormat(pmAttr);
+    } else {
+      return pmAttr.getFormatString();
+    }
   }
 
   public void setResourceStringProvider(ResourceStringProvider resourceStringProvider) {

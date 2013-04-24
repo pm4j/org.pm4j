@@ -9,7 +9,7 @@ import java.util.List;
 
 import org.pm4j.common.pageable.PageableCollection2;
 import org.pm4j.common.pageable.PageableCollectionTestBase;
-import org.pm4j.common.query.AttrDefinition;
+import org.pm4j.common.query.QueryAttr;
 import org.pm4j.common.query.CompOpStringStartsWith;
 import org.pm4j.common.query.FilterCompareDefinition;
 import org.pm4j.common.query.QueryOptions;
@@ -58,7 +58,7 @@ public class PageablePmBeanCollectionTest extends PageableCollectionTestBase<Pag
     List<Bean> beans = makeBeans(strings);
 
     QueryOptions qo = new QueryOptions();
-    AttrDefinition attrNameValue = new AttrDefinition("name", "name.value", String.class);
+    QueryAttr attrNameValue = new QueryAttr("name", "name.value", String.class);
 
     FilterCompareDefinition fcd = new FilterCompareDefinition(attrNameValue, new CompOpStringStartsWith());
     qo.addFilterCompareDefinition(fcd);

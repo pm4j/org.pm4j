@@ -6,13 +6,18 @@ import java.util.Locale;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.pm4j.core.pm.PmConversation;
+import org.pm4j.core.pm.PmAttrDouble;
+import org.pm4j.core.pm.impl.PmAttrDoubleImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
 
 public class PmLocalizeApiTest {
 
-  /** An anonymous class is used because the default resource loader uses... */
-  private PmConversation pmCtxt = new PmConversationImpl() {};
+  public static class TestPm extends PmConversationImpl {
+    /** The resource file defines the format: ###.##|##0.00 */
+    public final PmAttrDouble aMultiFormatAttribute = new PmAttrDoubleImpl(this);
+  }
+
+  private TestPm pmCtxt = new TestPm();
 
   @Before
   public void setUp() {
@@ -85,6 +90,11 @@ public class PmLocalizeApiTest {
         "1 items", PmLocalizeApi.localizeOneOrMany(pmCtxt, "pmLocalizeApiTest.itemsWithNoneFallback", 1));
     assertEquals("If the provided number argument is greter than one, the provided resource key will be used directly since there is no key with the _many postfix defined.",
         "3 items", PmLocalizeApi.localizeOneOrMany(pmCtxt, "pmLocalizeApiTest.itemsWithNoneFallback", 3));
+  }
+
+  @Test
+  public void testOutputFormatString() {
+    assertEquals("##0.00", PmLocalizeApi.getOutputFormatString(pmCtxt.aMultiFormatAttribute));
   }
 
 }

@@ -6,6 +6,7 @@ import org.pm4j.common.util.collection.ArrayUtil;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmObject;
+import org.pm4j.core.pm.impl.PmAttrBase;
 import org.pm4j.core.pm.impl.PmLocalizeApiHandler;
 import org.pm4j.core.pm.impl.PmObjectBase;
 import org.pm4j.core.pm.impl.ResKeyUtil;
@@ -120,27 +121,20 @@ public final class PmLocalizeApi {
   }
 
   /**
-   * Provides a localization based on a key and option resource string arguments.
-   * <p>
-   * Used localization key: {@link #getPmResKeyBase()}+key.<br>
-   *
-   * @param key A resource key.
-   * @param resStringArgs Optional resource string arguments.
-   * @return The localized string.
-   * @throws PmRuntimeException if no localization for the given key was found.
-   * @deprecated Please use PmLocalizeApi.findLocalization(this, getResKey() + "myPostfix")
-   */
-  @Deprecated
-  public static String findLocalizationWithPfx(PmObject pm, String key, Object... resStringArgs) {
-    return findLocalization(pm, ((PmObjectBase)pm).getPmResKeyBase() + key, resStringArgs);
-  }
-
-
-  /**
    * @param resourceStringProvider The algorithm that provides resource strings for given resource keys.
    */
   public static void setResourceStringProvider(ResourceStringProvider resourceStringProvider) {
     apiHandler.setResourceStringProvider(resourceStringProvider);
+  }
+
+  /**
+   * Provides the localized output format string for the given attribute.
+   *
+   * @param pmAttr the attribute to get the output format for.
+   * @return the found output format or <code>null</code>.
+   */
+  public static String getOutputFormatString(PmAttr<?> pmAttr) {
+    return apiHandler.getOutputFormatString((PmAttrBase<?, ?>) pmAttr);
   }
 
 }
