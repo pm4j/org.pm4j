@@ -5,12 +5,12 @@ import java.beans.PropertyVetoException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.pm4j.common.pageable.ModificationHandler;
+import org.pm4j.common.pageable.Modifications;
 import org.pm4j.common.selection.Selection;
 import org.pm4j.common.selection.SelectionHandler;
 import org.pm4j.common.util.beanproperty.PropertyAndVetoableChangeListener;
@@ -39,34 +39,45 @@ import org.pm4j.core.pm.impl.PmUtil;
  *
  * @author olaf boede
  */
-public class MasterPmSelectionHandlerImpl<T_MASTER_BEAN> implements MasterPmRecordHandler<T_MASTER_BEAN> {
+public abstract class MasterPmSelectionHandlerImpl<T_MASTER_BEAN> implements MasterPmHandler {
 
-	private static final Log    LOG                = LogFactory.getLog(MasterPmSelectionHandlerImpl.class);
+  private static final Log    LOG                = LogFactory.getLog(MasterPmSelectionHandlerImpl.class);
 
-	private final PmObject masterPm;
-	private final SelectionHandler<T_MASTER_BEAN> selectionHandler;
-	private Set<T_MASTER_BEAN>  changedMasterBeans = new HashSet<T_MASTER_BEAN>();
-	private List<DetailsPmHandler> detailsHandlers = new ArrayList<DetailsPmHandler>();
-	private PropertyAndVetoableChangeListener masterSelectionChangeListener;
+  private final PmObject masterPm;
+  private final SelectionHandler<T_MASTER_BEAN> selectionHandler;
+  private List<DetailsPmHandler> detailsHandlers = new ArrayList<DetailsPmHandler>();
+  private PropertyAndVetoableChangeListener masterSelectionChangeListener;
 
-	/**
-	 * Creates an instance uing a {@link DetailsPmHandler} that is responsible
-	 * for handling the details changes after a master record change.
-	 *
-	 * @param masterTablePm
-	 *          The table PM to observe.
-	 * @param detailsHandler A handler for the details PM
-	 */
-	public MasterPmSelectionHandlerImpl(PmObject masterPm, SelectionHandler<T_MASTER_BEAN> selectionHandler, DetailsPmHandler... detailsHandlers) {
-		assert masterPm != null;
-		assert selectionHandler != null;
+  /**
+   * Creates an instance uing a {@link DetailsPmHandler} that is responsible
+   * for handling the details changes after a master record change.
+   *
+   * @param masterTablePm
+   *          The table PM to observe.
+   * @param detailsHandler A handler for the details PM
+   */
+  public MasterPmSelectionHandlerImpl(PmObject masterPm, SelectionHandler<T_MASTER_BEAN> selectionHandler, DetailsPmHandler... detailsHandlers) {
+    assert masterPm != null;
+    assert selectionHandler != null;
 
-		this.masterPm = masterPm;
-		this.selectionHandler = selectionHandler;
-		for (DetailsPmHandler dh : detailsHandlers) {
-			addDetailsHander(dh);
-		}
-	}
+    this.masterPm = masterPm;
+    this.selectionHandler = selectionHandler;
+    for (DetailsPmHandler dh : detailsHandlers) {
+      addDetailsHander(dh);
+    }
+  }
+
+  /**
+   * Provides the modification handler that gets informed in case of a details change.
+   *
+   * @return the modification handler.
+   */
+  protected abstract ModificationHandler<T_MASTER_BEAN> getModificationHandler();
+
+  @Override
+  public Modifications<T_MASTER_BEAN> getMasterBeanModifications() {
+    return getModificationHandler().getModifications();
+  }
 
   @Override
   public final void addDetailsHander(DetailsPmHandler detailsHandler) {
@@ -85,9 +96,37 @@ public class MasterPmSelectionHandlerImpl<T_MASTER_BEAN> implements MasterPmReco
 
   @Override
   public void startObservers() {
+    // observe master record selection change events.
     selectionHandler
-        .addPropertyAndVetoableListener(SelectionHandler.PROP_SELECTION, makeTableSelectionChangeListener());
-    PmEventApi.addPmEventListener(masterPm, PmEvent.VALUE_CHANGE, makeTableValueChangeListener());
+        .addPropertyAndVetoableListener(SelectionHandler.PROP_SELECTION, getMasterSelectionChangeListener());
+
+    // observe master table content change events.
+    PmEventApi.addPmEventListener(masterPm, PmEvent.VALUE_CHANGE, new PmEventListener() {
+      @Override
+      public void handleEvent(PmEvent event) {
+        afterMasterSelectionChange();
+      }
+    });
+
+    // A listener that reacts on pure VALUE_CHANGE events as they
+    // get triggered by <b>user data entry events</b>.
+    PmEventListener el = new PmEventListener() {
+      @Override
+      public void handleEvent(PmEvent event) {
+        // Only propagations of pure sub-PM value changes should be considered.
+        // Combined events, such as PmEvent.ALL_CHANGE_EVENTS, are not relevant for user data
+        // entry modification tracking.
+        if ((event.getChangeMask() == (PmEvent.VALUE_CHANGE | PmEvent.IS_EVENT_PROPAGATION)) &&
+            isCurrentDetailsAreaChanged()) {
+          T_MASTER_BEAN selectedMasterBean = getSelectedMasterBean();
+          registerDetailsChangeForMasterBean(selectedMasterBean);
+        }
+      }
+    };
+
+    for (DetailsPmHandler dh : detailsHandlers) {
+      PmEventApi.addHierarchyListener(dh.getDetailsPm(), PmEvent.VALUE_CHANGE, el);
+    }
 
     // adjust the details areas by informing them about the initial master bean.
     T_MASTER_BEAN selectedMasterBean = getSelectedMasterBean();
@@ -95,23 +134,6 @@ public class MasterPmSelectionHandlerImpl<T_MASTER_BEAN> implements MasterPmReco
       for (DetailsPmHandler dh : detailsHandlers) {
         dh.afterMasterRecordChange(selectedMasterBean);
       }
-    }
-  }
-
-  /**
-   * Checks first for already registered details-triggered master record
-   * changes.<br>
-   * If none is found, the details areas are checked if they are actually
-   * changed.
-   */
-  @Override
-  public boolean isChangeRegistered() {
-    Set<T_MASTER_BEAN> changedMasterBeans = getChangedMasterBeans();
-    if (changedMasterBeans != null &&
-        !changedMasterBeans.isEmpty()) {
-      return true;
-    } else {
-      return isCurrentDetailsAreaChanged();
     }
   }
 
@@ -146,60 +168,20 @@ public class MasterPmSelectionHandlerImpl<T_MASTER_BEAN> implements MasterPmReco
         : null;
   }
 
-  @Override
-  public Set<T_MASTER_BEAN> getChangedMasterBeans() {
-    T_MASTER_BEAN masterBean = getSelectedMasterBean();
-    if (masterBean != null && isCurrentDetailsAreaChanged()) {
-      HashSet<T_MASTER_BEAN> set = new HashSet<T_MASTER_BEAN>(changedMasterBeans);
-      if (!changedMasterBeans.contains(masterBean)) {
-        set.add(masterBean);
-      }
-      return set;
-    } else {
-      return changedMasterBeans;
-    }
-  }
-
   /**
-   * Sets the handler to an 'unchanged' state by clearing the set of
-   * {@link #changedMasterBeans}. Re-adjusts the details area by calling
+   * Re-adjusts the details area by calling
    * {@link DetailsPmHandler#afterMasterRecordChange(Object)} with the new
    * selected table row.
-   *
-   * @param event
-   *          the master PM value change event.
    */
-  public void onMasterTableValueChange(PmEvent event) {
-    if (LOG.isDebugEnabled() && isChangeRegistered()) {
-      LOG.debug("Reset master-details changed state for " + PmUtil.getPmLogString(masterPm));
-    }
-
-    switch (event.getValueChangeKind()) {
-    case RELOAD: // fall through
-    case VALUE:
-      changedMasterBeans.clear();
-    default: // nothing to do
+  public void afterMasterSelectionChange() {
+    if (LOG.isDebugEnabled() && getMasterBeanModifications().isModified()) {
+      LOG.debug("Propagate successful master-details change for " + PmUtil.getPmLogString(masterPm));
     }
 
     T_MASTER_BEAN selectedMasterBean = getSelectedMasterBean();
     for (DetailsPmHandler dh : detailsHandlers) {
       dh.afterMasterRecordChange(selectedMasterBean);
     }
-  }
-
-  /**
-   * Provides a listener that resets the registered changes in case of a table
-   * value change (other records to handle).
-   *
-   * @return The listener.
-   */
-  protected PmEventListener makeTableValueChangeListener() {
-    return new PmEventListener() {
-      @Override
-      public void handleEvent(PmEvent event) {
-        onMasterTableValueChange(event);
-      }
-    };
   }
 
   /**
@@ -225,7 +207,7 @@ public class MasterPmSelectionHandlerImpl<T_MASTER_BEAN> implements MasterPmReco
    *
    * @return <code>true</code> if the switch can be performed.
    */
-  public boolean canSwitch() {
+  public boolean beforeSwitch() {
     if (getSelectedMasterBean() == null) {
       return true;
     }
@@ -239,7 +221,7 @@ public class MasterPmSelectionHandlerImpl<T_MASTER_BEAN> implements MasterPmReco
     return allDetailsValid;
   }
 
-  // TODO olaf: check if we can simply call canSwitch...
+  // FIXME olaf: check if we can simply call beforeSwitch... a duplicate control flow...
   @Override
   public boolean beforeDo(PmCommand cmd) {
     PropertyAndVetoableChangeListener l = getMasterSelectionChangeListener();
@@ -261,12 +243,9 @@ public class MasterPmSelectionHandlerImpl<T_MASTER_BEAN> implements MasterPmReco
     }
   }
 
-  // XXX olaf: translates to a property change event as it would be thrown by
-  // the selection handler.
   @Override
   public void afterDo(PmCommand cmd) {
-    PropertyAndVetoableChangeListener l = getMasterSelectionChangeListener();
-    l.propertyChange(new PropertyChangeEvent(getMasterPm(), SelectionHandler.PROP_SELECTION, null, null));
+    afterMasterSelectionChange();
   }
 
   private PropertyAndVetoableChangeListener getMasterSelectionChangeListener() {
@@ -281,54 +260,58 @@ public class MasterPmSelectionHandlerImpl<T_MASTER_BEAN> implements MasterPmReco
 	 * and sets the new details area if the change was executed.<br>
 	 * It also registers the master records that where changed within the details area.
 	 */
-	protected class MasterSelectionChangeListener implements PropertyAndVetoableChangeListener {
+	public class MasterSelectionChangeListener implements PropertyAndVetoableChangeListener {
       private T_MASTER_BEAN changedMasterBean;
 
       @Override
       public void vetoableChange(PropertyChangeEvent evt) throws PropertyVetoException {
-        if (!canSwitch()) {
+        if (!beforeSwitch()) {
           throw new PropertyVetoException("MasterPmSelectionHandler prevents switch", evt);
         }
 
         T_MASTER_BEAN masterBean = getSelectedMasterBean();
         changedMasterBean =
               (masterBean != null) && isCurrentDetailsAreaChanged()
-                   ? getCurrentModifiedMasterRecord()
+                   ? masterBean
                    : null;
     }
 
+    /**
+     * This method gets called <b>after</b> a successful master record selection change.
+     * <p>
+     * If there was a change registered for the previous master record, this gets registered
+     * within the set of changed master beans.
+     * <p>
+     * Informs all details handlers about the selection change.
+     */
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-      if (changedMasterBean != null &&
-          !changedMasterBeans.contains(changedMasterBean)) {
-        changedMasterBeans.add(changedMasterBean);
+      registerDetailsChangeForMasterBean(changedMasterBean);
+      afterMasterSelectionChange();
 
-        if (LOG.isDebugEnabled()) {
-          LOG.debug("Registered a master-details change. Changed bean: " + changedMasterBean);
-        }
-      }
-
-      T_MASTER_BEAN selectedMasterBean = getSelectedMasterBean();
-      for (DetailsPmHandler dh : detailsHandlers) {
-        dh.afterMasterRecordChange(selectedMasterBean);
-      }
       changedMasterBean = null;
+    }
+  }
+
+  /**
+   * Gets called whenever a details change was observed that causes the master
+   * record to be marked as modified.
+   *
+   * @param masterBean the master bean the details change was observed for.
+   */
+  protected void registerDetailsChangeForMasterBean(T_MASTER_BEAN masterBean) {
+    if (masterBean != null) {
+      getModificationHandler().updateItem(masterBean, true);
+
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Registered a details change for master bean: " + masterBean);
+      }
     }
   }
 
   @Override
   public PmObject getMasterPm() {
     return masterPm;
-  }
-
-  /**
-   * @return The currently selected master record in case it is marked a
-   *         actually changed within the details area. May be <code>null</code>.
-   */
-  private T_MASTER_BEAN getCurrentModifiedMasterRecord() {
-    return isCurrentDetailsAreaChanged()
-        ? getSelectedMasterBean()
-        : null;
   }
 
 }

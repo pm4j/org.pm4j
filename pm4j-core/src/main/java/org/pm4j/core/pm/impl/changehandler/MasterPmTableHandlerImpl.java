@@ -3,12 +3,16 @@ package org.pm4j.core.pm.impl.changehandler;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.pm4j.common.pageable.Modifications;
+import org.pm4j.common.selection.EmptySelection;
+import org.pm4j.common.selection.Selection;
 import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmCommandDecorator;
@@ -40,7 +44,7 @@ import org.pm4j.core.pm.impl.PmUtil;
  * @author olaf boede
  * @deprecated please use {@link PmTable2}
  */
-public class MasterPmTableHandlerImpl<T_MASTER_BEAN> implements MasterPmRecordHandler<T_MASTER_BEAN> {
+public class MasterPmTableHandlerImpl<T_MASTER_BEAN> implements MasterPmHandler {
 
   private static final Log    LOG                = LogFactory.getLog(MasterPmTableHandlerImpl.class);
 
@@ -79,6 +83,46 @@ public class MasterPmTableHandlerImpl<T_MASTER_BEAN> implements MasterPmRecordHa
     }
   }
 
+  /**
+   * Provides a bridge to the new master handler interface.
+   */
+  @Override
+  public Modifications<T_MASTER_BEAN> getMasterBeanModifications() {
+    return new Modifications<T_MASTER_BEAN>() {
+      @Override
+      public boolean isModified() {
+        return (!changedMasterBeans.isEmpty()) || isCurrentDetailsAreaChanged();
+      }
+
+      /** The set of added items is currently not relevant for the old master details scenarios. */
+      @Override
+      public List<T_MASTER_BEAN> getAddedItems() {
+        return Collections.emptyList();
+      }
+
+      @Override
+      public Collection<T_MASTER_BEAN> getUpdatedItems() {
+        T_MASTER_BEAN masterBean = getSelectedMasterBean();
+        if (masterBean != null &&
+            isCurrentDetailsAreaChanged()) {
+          HashSet<T_MASTER_BEAN> set = new HashSet<T_MASTER_BEAN>(changedMasterBeans);
+          if (!changedMasterBeans.contains(masterBean)) {
+            set.add(masterBean);
+          }
+          return set;
+        } else {
+          return changedMasterBeans;
+        }
+      }
+
+      /** The set of removed items is currently not relevant for the old master details scenarios. */
+      @Override
+      public Selection<T_MASTER_BEAN> getRemovedItems() {
+        return EmptySelection.getEmptySelection();
+      }
+    };
+  }
+
   @Override
   public final void addDetailsHander(DetailsPmHandler detailsHandler) {
     this.detailsHandlers.add(detailsHandler);
@@ -98,21 +142,6 @@ public class MasterPmTableHandlerImpl<T_MASTER_BEAN> implements MasterPmRecordHa
   public void startObservers() {
     masterTablePm.addDecorator(this, TableChange.SELECTION);
     PmEventApi.addPmEventListener(masterTablePm, PmEvent.VALUE_CHANGE, makeTableValueChangeListener());
-  }
-
-  /**
-   * Checks first for already registered details-triggered master record changes.<br>
-   * If none is found, the details areas are checked if they are actually changed.
-   */
-  @Override
-  public boolean isChangeRegistered() {
-    Set<T_MASTER_BEAN> changedMasterBeans = getChangedMasterBeans();
-    if (changedMasterBeans != null && !changedMasterBeans.isEmpty()) {
-      return true;
-    }
-    else {
-      return isCurrentDetailsAreaChanged();
-    }
   }
 
   /**
@@ -141,21 +170,6 @@ public class MasterPmTableHandlerImpl<T_MASTER_BEAN> implements MasterPmRecordHa
   }
 
   @Override
-  public Set<T_MASTER_BEAN> getChangedMasterBeans() {
-    T_MASTER_BEAN masterBean = getSelectedMasterBean();
-    if (masterBean != null &&
-        isCurrentDetailsAreaChanged()) {
-      HashSet<T_MASTER_BEAN> set = new HashSet<T_MASTER_BEAN>(changedMasterBeans);
-      if (!changedMasterBeans.contains(masterBean)) {
-        set.add(masterBean);
-      }
-      return set;
-    } else {
-      return changedMasterBeans;
-    }
-  }
-
-  @Override
   public PmObject getMasterPm() {
     return masterTablePm;
   }
@@ -168,8 +182,8 @@ public class MasterPmTableHandlerImpl<T_MASTER_BEAN> implements MasterPmRecordHa
    * @param event the master PM value change event.
    */
   protected void onMasterTableValueChange(PmEvent event) {
-    if (LOG.isDebugEnabled() && isChangeRegistered()) {
-      LOG.debug("Reset master-details changed state for " + PmUtil.getPmLogString(masterTablePm));
+    if (LOG.isDebugEnabled() && getMasterBeanModifications().isModified()) {
+      LOG.debug("Propagate successful master-details change for " + PmUtil.getPmLogString(masterTablePm));
     }
 
     switch (event.getValueChangeKind()) {

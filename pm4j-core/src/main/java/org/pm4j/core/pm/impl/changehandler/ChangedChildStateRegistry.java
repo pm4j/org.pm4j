@@ -109,7 +109,7 @@ public class ChangedChildStateRegistry {
 
   private boolean isDetailsChangeRegistered() {
     for (MasterPmHandler d : detailsPmHandlers) {
-      if (d.isChangeRegistered()) {
+      if (d.getMasterBeanModifications().isModified()) {
         return true;
       }
     }
