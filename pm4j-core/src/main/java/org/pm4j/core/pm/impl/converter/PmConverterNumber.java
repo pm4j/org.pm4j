@@ -53,9 +53,16 @@ public class PmConverterNumber<T extends Number> extends PmConverterSerializeabl
 
   @Override
   public String valueToString(PmAttr<?> pmAttr, T v) {
-    String outputFormatString = multiFormatParser.getOutputFormat(pmAttr);
-    NumberFormat format = getNumberFormat(pmAttr.getPmConversation().getPmLocale(), outputFormatString, pmAttr);
-    return format.format(v);
+    String outputFormatString = null;
+    try {
+      outputFormatString = multiFormatParser.getOutputFormat(pmAttr);
+      NumberFormat format = getNumberFormat(pmAttr.getPmConversation().getPmLocale(), outputFormatString, pmAttr);
+      return format.format(v);
+    }
+    catch (Exception e) {
+      // Coding error, output format limits more than the input format.  
+      throw new PmRuntimeException(pmAttr, "Unable to apply '" + v+"' to format: '"+outputFormatString+"'", e);
+    }
   };
 
   @Override
