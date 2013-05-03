@@ -2,13 +2,13 @@ package org.pm4j.core.pm.serialization;
 
 import java.io.Serializable;
 
+import org.pm4j.core.deprecated.PmVisitorAdapter;
 import org.pm4j.core.exception.PmConverterException;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmAspect;
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.impl.PmUtil;
-import org.pm4j.core.pm.impl.PmVisitorAdapter;
 
 public class PmContentSetVisitor extends PmVisitorAdapter {
 

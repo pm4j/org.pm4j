@@ -4,8 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO.VALIDATE;
-import static org.pm4j.tools.test.PmAssert.assertNoMessages;
-import static org.pm4j.tools.test.PmAssert.assertOnePmMessage;
+import static org.pm4j.tools.test.PmAssert.assertNoMessagesInSubTree;
+import static org.pm4j.tools.test.PmAssert.assertSingleErrorMessage;
 
 import java.util.Locale;
 
@@ -113,40 +113,40 @@ public class ValidateAttrValueTest {
   @Test
   public void testValidateBeforeSetValue() {
     pm.validateBeforeSetValueAttr.setValue(6);
-    assertOnePmMessage(pm.validateBeforeSetValueAttr, Severity.ERROR, "Please enter a number not more than 5 in field \"BeforeSetValueValidatingAttr\".");
+    assertSingleErrorMessage(pm.validateBeforeSetValueAttr, "Please enter a number not more than 5 in field \"BeforeSetValueValidatingAttr\".");
     assertEquals("Before set value validation prevents setting the backing value.",
         null, ((PmAttrIntegerImpl)pm.validateBeforeSetValueAttr).getBackingValue());
     assertEquals("The invalid value will still be presented in the UI.",
                   new Integer(6), pm.validateBeforeSetValueAttr.getValue());
 
     pm.validateBeforeSetValueAttr.setValue(4);
-    assertNoMessages("Setting a valid value clears the error message.", pm.validateBeforeSetValueAttr);
+    assertNoMessagesInSubTree("Setting a valid value clears the error message.", pm.validateBeforeSetValueAttr);
   }
 
   @Test
   public void testValidateBeforeSetValueDeprecatedVersion() {
     pm.validateBeforeSetValueAttrDeprecatedVersion.setValue(6);
-    assertOnePmMessage(pm.validateBeforeSetValueAttrDeprecatedVersion, Severity.ERROR, "Please enter a number not more than 5 in field \"BeforeSetValueValidatingAttr\".");
+    assertSingleErrorMessage(pm.validateBeforeSetValueAttrDeprecatedVersion, "Please enter a number not more than 5 in field \"BeforeSetValueValidatingAttr\".");
     assertEquals("Before set value validation prevents setting the backing value.",
         null, ((PmAttrIntegerImpl)pm.validateBeforeSetValueAttrDeprecatedVersion).getBackingValue());
     assertEquals("The invalid value will still be presented in the UI.",
                   new Integer(6), pm.validateBeforeSetValueAttrDeprecatedVersion.getValue());
 
     pm.validateBeforeSetValueAttrDeprecatedVersion.setValue(4);
-    assertNoMessages("Setting a valid value clears the error message.", pm.validateBeforeSetValueAttrDeprecatedVersion);
+    assertNoMessagesInSubTree("Setting a valid value clears the error message.", pm.validateBeforeSetValueAttrDeprecatedVersion);
   }
 
   @Test
   public void testValidateAfterSetValue() {
     pm.validateAfterSetValueAttr.setValue(6);
-    assertOnePmMessage(pm.validateAfterSetValueAttr, Severity.ERROR, "Please enter a number not more than 5 in field \"AfterSetValueValidatingAttr\".");
+    assertSingleErrorMessage(pm.validateAfterSetValueAttr, "Please enter a number not more than 5 in field \"AfterSetValueValidatingAttr\".");
     assertEquals("Before set value validation NOT prevents setting the backing value.",
         new Integer(6), ((PmAttrIntegerImpl)pm.validateAfterSetValueAttr).getBackingValue());
     assertEquals("After set-value validation does not prevent setting the value.",
         new Integer(6), pm.validateAfterSetValueAttr.getValue());
 
     pm.validateAfterSetValueAttr.setValue(4);
-    assertNoMessages("Setting a valid value clears the error message.", pm.validateAfterSetValueAttr);
+    assertNoMessagesInSubTree("Setting a valid value clears the error message.", pm.validateAfterSetValueAttr);
   }
 
 

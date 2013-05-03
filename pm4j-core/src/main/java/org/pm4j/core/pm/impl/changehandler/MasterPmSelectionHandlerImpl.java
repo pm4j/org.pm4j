@@ -100,11 +100,22 @@ public abstract class MasterPmSelectionHandlerImpl<T_MASTER_BEAN> implements Mas
     selectionHandler
         .addPropertyAndVetoableListener(SelectionHandler.PROP_SELECTION, getMasterSelectionChangeListener());
 
-    // observe master table content change events.
+    // Observe master table content change events.
+    // After complete processing of the masterPm value change event the details PMs
+    // will get a message about the potential master record change.
+    // This prevents conflicts between the changed state handling and the master record
+    // selection change logic.
     PmEventApi.addPmEventListener(masterPm, PmEvent.VALUE_CHANGE, new PmEventListener() {
+      PostProcessor<Object> postProcessor = new PostProcessor<Object>() {
+        @Override
+        public void postProcess(PmEvent event, Object postProcessPayload) {
+          afterMasterSelectionChange();
+        }
+      };
+
       @Override
       public void handleEvent(PmEvent event) {
-        afterMasterSelectionChange();
+        event.addPostProcessingListener(postProcessor, null);
       }
     });
 

@@ -5,6 +5,10 @@ import java.util.Collections;
 
 import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmObject;
+import org.pm4j.core.pm.api.PmVisitorApi;
+import org.pm4j.core.pm.api.PmVisitorApi.VisitCallBack;
+import org.pm4j.core.pm.api.PmVisitorApi.VisitHint;
+import org.pm4j.core.pm.api.PmVisitorApi.VisitResult;
 
 /**
  * Provides INTERNAL methods for bean factory cache handling.
@@ -13,6 +17,12 @@ import org.pm4j.core.pm.PmObject;
  */
 public final class BeanPmCacheUtil {
 
+  /**
+   * Clears the PM factory cache for the given particular PM.<br>
+   * Does NOT apply the call recursively to child PMs.
+   *
+   * @param factoryOwningPm
+   */
   public static void clearBeanPmCache(PmObject factoryOwningPm) {
     if (((PmObjectBase)factoryOwningPm).pmBeanFactoryCache != null) {
       ((PmObjectBase)factoryOwningPm).pmBeanFactoryCache.clear();
@@ -25,18 +35,14 @@ public final class BeanPmCacheUtil {
    * @param rootPm The root of the PM tree to handle.
    */
   public static void clearBeanPmCachesOfSubtree(PmObject rootPm) {
-    rootPm.accept(new PmVisitorAdapter() {
+    VisitCallBack callBack = new VisitCallBack() {
       @Override
-      protected void onVisit(PmObject pm) {
-        // There are no caches to clear if the PM is not yet initialized.
-        if (PmInitApi.isPmInitialized(pm)) {
-          BeanPmCacheUtil.clearBeanPmCache(pm);
-          for (PmObject c : PmUtil.getPmChildren(pm)) {
-            c.accept(this);
-          }
-        }
+      public VisitResult visit(PmObject pm) {
+        BeanPmCacheUtil.clearBeanPmCache(pm);
+        return VisitResult.CONTINUE;
       }
-    });
+    };
+    PmVisitorApi.visit(rootPm, callBack, VisitHint.SKIP_NOT_INITIALIZED);
   }
 
   public static void removeBeanPm(PmObject factoryOwningPm, PmBean<?> pmToRemove) {

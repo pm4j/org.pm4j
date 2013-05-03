@@ -8,7 +8,7 @@ import org.pm4j.core.pm.impl.PmVisitorImpl;
 
 /**
  * PM tree visitor functionality.
- * 
+ *
  * @author DZABEL
  */
 public class PmVisitorApi {
@@ -33,7 +33,7 @@ public class PmVisitorApi {
   public interface VisitCallBack {
     /**
      * Called by the visitor to do the visit work.
-     * 
+     *
      * @param pm
      *          the current visited PM.
      * @return how the visiting should go on.
@@ -57,8 +57,8 @@ public class PmVisitorApi {
      * @param parent the parent.
      */
     void leaveChildren(PmObject pmParent, Collection<PmObject> pmChildren);
-  }  
-  
+  }
+
   /**
    * Gives the user of the PmVisitCallBack the possibility to affect the PM tree
    * traverse.
@@ -86,25 +86,14 @@ public class PmVisitorApi {
     /** Skip visiting {@link PmConversation} pm's */
     SKIP_CONVERSATION,
     /** Skip visiting factory generated child pm's */
-    SKIP_FACTORY_GENERATED_CHILD_PMS
-  }
-
-  /**
-   * See {@link PmVisitorApi#visit(PmObject, VisitCallBack, VisitHint...)}
-   * 
-   * @param startPm
-   *          the visit start point.
-   * @param visitCallBack
-   *          defines what to be done when visiting the PM.
-   * @return the object which explicit stopped the visiting.
-   */
-  public static PmObject visit(PmObject startPm, VisitCallBack visitCallBack) {
-    return visit(startPm, visitCallBack, new VisitHint[0]);
+    SKIP_FACTORY_GENERATED_CHILD_PMS,
+    /** Skip of yet initialized child pm's. */
+    SKIP_NOT_INITIALIZED
   }
 
   /**
    * Visits {@code startPm} and corresponding children.
-   * 
+   *
    * @param startPm
    *          the visit start point.
    * @param visitCallBack
@@ -116,6 +105,23 @@ public class PmVisitorApi {
   public static PmObject visit(PmObject startPm, VisitCallBack visitCallBack, VisitHint... hints) {
     PmVisitorImpl v = new PmVisitorImpl(visitCallBack, hints);
     v.visit(startPm);
+    return v.getStopOnPmObject();
+  }
+
+  /**
+   * Visits the children of the given {@code startPm}.
+   *
+   * @param parentPm
+   *          the parent of the children to visit.
+   * @param visitCallBack
+   *          defines what to be done when visiting a PM.
+   * @param hints
+   *          static selection informations. See {@link VisitHint}
+   * @return the object which explicit stopped the visiting.
+   */
+  public static PmObject visitChildren(PmObject parentPm, VisitCallBack visitCallBack, VisitHint... hints) {
+    PmVisitorImpl v = new PmVisitorImpl(visitCallBack, hints);
+    v.visitChildren(parentPm);
     return v.getStopOnPmObject();
   }
 

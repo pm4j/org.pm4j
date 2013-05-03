@@ -16,7 +16,6 @@ import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.impl.PmAttrImpl;
 import org.pm4j.core.pm.impl.PmCommandImpl;
 import org.pm4j.core.pm.impl.PmElementImpl;
-import org.pm4j.core.pm.impl.PmVisitorAddAttributeEventListener;
 import org.pm4j.core.sample.album.domain.Album;
 import org.pm4j.core.sample.album.domain.AlbumService;
 import org.pm4j.standards.PmConfirmedCommand;
@@ -90,14 +89,15 @@ public class AlbumFormPm extends PmElementImpl {
     //           In addition the number of fired events should be minimized.
     //           In this case the enablement change event should only be fired if the
     //           enabled state really changes.
-    album.accept(new PmVisitorAddAttributeEventListener(PmEvent.VALUE_CHANGED_STATE_CHANGE,
-          new PmEventListener() {
-            @Override
-            public void handleEvent(PmEvent event) {
-              PmEventApi.firePmEvent(cmdSave, PmEvent.ENABLEMENT_CHANGE);
-              PmEventApi.firePmEvent(cmdCancel, PmEvent.ENABLEMENT_CHANGE);
-            }
-          })
-        );
+    PmEventApi.addHierarchyListener(this, PmEvent.VALUE_CHANGED_STATE_CHANGE,
+        new PmEventListener() {
+      @Override
+      public void handleEvent(PmEvent event) {
+        if (event.pm != cmdSave && event.pm != cmdCancel) {
+          PmEventApi.firePmEvent(cmdSave, PmEvent.ENABLEMENT_CHANGE);
+          PmEventApi.firePmEvent(cmdCancel, PmEvent.ENABLEMENT_CHANGE);
+        }
+      }
+    });
   }
 }

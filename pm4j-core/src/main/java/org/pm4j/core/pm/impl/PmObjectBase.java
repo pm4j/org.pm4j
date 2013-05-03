@@ -1361,8 +1361,13 @@ class PmEventTable {
     }
   }
 
+  /**
+   * @param event the event to handle.
+   * @param preProcess if set to <code>true</code>, only the pre process part will be done for each listener.<br>
+   *                   if set to <code>false</code>, only the handle part will be done for each listener.<br>
+   */
   @SuppressWarnings("unchecked")
-  public void fireEvent(final PmEvent event) {
+  /* package */ void fireEvent(final PmEvent event, boolean preProcess) {
     boolean hasListeners = !pmEventListeners.isEmpty();
 
     if (log.isTraceEnabled())
@@ -1382,15 +1387,17 @@ class PmEventTable {
         boolean isPropagationListener = ((listenerMask & PmEvent.IS_EVENT_PROPAGATION) != 0);
         // Propagation events have to be passed only to listeners that observe that special flag.
         // Standard events will be passed to listeners that don't have set this flag.
-        if (isPropagationEvent) {
-          if (isPropagationListener &&
-              (listenerMask & event.getChangeMask()) != 0)
+        boolean listenerMaskMatch = (listenerMask & event.getChangeMask()) != 0;
+        if (listenerMaskMatch &&
+            (isPropagationEvent == isPropagationListener)) {
+          if (preProcess) {
+            // XXX olaf: prevent this permanent base class check to optimize runtime.
+            if (e.getKey() instanceof PmEventListener.WithPreprocessCallback) {
+              ((PmEventListener.WithPreprocessCallback)e.getKey()).preProcess(event);
+            }
+          } else {
             e.getKey().handleEvent(event);
-        }
-        else {
-          if ((! isPropagationListener) &&
-              (listenerMask & event.getChangeMask()) != 0)
-            e.getKey().handleEvent(event);
+          }
         }
       }
     }

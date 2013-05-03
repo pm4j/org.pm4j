@@ -16,6 +16,7 @@ import org.pm4j.core.pm.api.PmVisitorApi.VisitResult;
 /**
  * Visitor implementations. Descends deep first.
  *
+ * @author dietmar zabel, olaf boede
  */
 public class PmVisitorImpl {
 
@@ -50,6 +51,35 @@ public class PmVisitorImpl {
   }
 
   /**
+   * Starts the visit of pm's children.
+   *
+   * @param pm
+   *          the visited p.m
+   */
+  public VisitResult visitChildren(PmObject pm) {
+    assert pm != null;
+    Collection<PmObject> children = getChildren(pm);
+    if (!children.isEmpty()) {
+      if(callBack instanceof VisitHierarchyCallBack) {
+        VisitHierarchyCallBack vhcb = (VisitHierarchyCallBack)callBack;
+        vhcb.enterChildren(pm, children);
+        visitChildrenCollection(children);
+        vhcb.leaveChildren(pm, children);
+      }
+      else {
+        visitChildrenCollection(children);
+      }
+    }
+    if (stopOnPmObject != null) {
+      return VisitResult.STOP_VISIT;
+    }
+
+    // no stop
+    return VisitResult.CONTINUE;
+  }
+
+
+  /**
    * If {@link VisitCallBack} visit returns {@link VisitResult#STOP_VISIT} the
    * responsible pm child will be returned.
    *
@@ -60,6 +90,15 @@ public class PmVisitorImpl {
   }
 
   private VisitResult considerHints(PmObject pm) {
+
+    if (!PmInitApi.isPmInitialized(pm)) {
+      if (hints.contains(VisitHint.SKIP_NOT_INITIALIZED)) {
+        return VisitResult.SKIP_CHILDREN;
+      } else {
+        PmInitApi.ensurePmInitialization(pm);
+      }
+    }
+
     if (hints.contains(VisitHint.SKIP_CONVERSATION)) {
       if (pm instanceof PmConversation) {
         return VisitResult.SKIP_CHILDREN;
@@ -94,29 +133,16 @@ public class PmVisitorImpl {
     VisitResult result = callBack.visit(pm);
 
     switch (result) {
-    case STOP_VISIT:
-      stopOnPmObject = pm;
-      return VisitResult.STOP_VISIT;
-    case SKIP_CHILDREN:
-      return VisitResult.SKIP_CHILDREN;
-    case CONTINUE:
-      Collection<PmObject> children = getChildren(pm);
-      if (!children.isEmpty()) {
-        if(callBack instanceof VisitHierarchyCallBack) {
-          VisitHierarchyCallBack vhcb = (VisitHierarchyCallBack)callBack;
-          vhcb.enterChildren(pm, children);
-          visitChildrenCollection(children);
-          vhcb.leaveChildren(pm, children);
-        }
-        else {
-          visitChildrenCollection(children);
-        }
-      }
-      if (stopOnPmObject != null) {
+      case STOP_VISIT:
+        stopOnPmObject = pm;
         return VisitResult.STOP_VISIT;
-      }
+      case SKIP_CHILDREN:
+        return VisitResult.SKIP_CHILDREN;
+      case CONTINUE:
+        return visitChildren(pm);
+      default:
+        throw new RuntimeException("Unhandled visit result: " + result);
     }
-    return result;
   }
 
   private Collection<PmObject> getChildren(PmObject pm) {

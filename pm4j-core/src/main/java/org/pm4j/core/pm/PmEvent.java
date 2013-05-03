@@ -1,6 +1,12 @@
 package org.pm4j.core.pm;
 
+import java.util.Collections;
 import java.util.EventObject;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.pm4j.core.pm.PmEventListener.PostProcessor;
+import org.pm4j.core.pm.api.PmEventApi;
 
 
 /**
@@ -92,6 +98,44 @@ public class PmEvent extends EventObject {
   private final ValueChangeKind valueChangeKind;
 
   /**
+   * The set of listeners that requested a call back after the current event processing phase.
+   */
+  private Map<PostProcessor<?>, Object> postProcessorToPayloadMap = Collections.emptyMap();
+
+  
+  /**
+   * An event constructor without event source specification.
+   * <p>
+   * In some configurations (rich client UIs) the event source will be read from
+   * the thread local storage. 
+   * 
+   * @param pm
+   *          the PM this event is related to.
+   * @param changeMask
+   *          A bit mask for the change kind.
+   */
+  public PmEvent(PmObject pm, int changeMask) {
+    this(PmEventApi.ensureThreadEventSource(pm), pm, changeMask);
+  }
+
+  /**
+   * An event constructor without event source specification.
+   * <p>
+   * In some configurations (rich client UIs) the event source will be read from
+   * the thread local storage. 
+   * 
+   * @param pm
+   *          the PM this event is related to.
+   * @param changeMask
+   *          A bit mask for the change kind.
+   * @param valueChange
+   *          A value change kind specification.
+   */
+  public PmEvent(PmObject pm, int changeMask, ValueChangeKind valueChange) {
+    this(PmEventApi.ensureThreadEventSource(pm), pm, changeMask, valueChange);
+  }
+
+  /**
    * @param eventSource
    *          The control or command that triggered the change.<br>
    *          Should not be <code>null</code>.
@@ -174,6 +218,26 @@ public class PmEvent extends EventObject {
    */
   public int getChangeMask() {
     return changeMask;
+  }
+
+  /**
+   * Registers a listener that gets informed after finishing this event processing phase.
+   *
+   * @param listener the listener to call after this processing phase.
+   * @param payload the payload data to be added to the event gets passed to the post
+   */
+  public void addPostProcessingListener(PostProcessor<?> listener, Object payload) {
+    if (postProcessorToPayloadMap.isEmpty()) {
+      postProcessorToPayloadMap = new HashMap<PostProcessor<?>, Object>();
+    }
+    postProcessorToPayloadMap.put(listener, payload);
+  }
+
+  /**
+   * @return the set of registered post event listeners and their payload data.
+   */
+  public Map<PostProcessor<?>, Object> getPostProcessorToPayloadMap() {
+    return postProcessorToPayloadMap;
   }
 
   @Override

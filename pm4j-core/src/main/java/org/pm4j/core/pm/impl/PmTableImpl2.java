@@ -258,6 +258,9 @@ public class PmTableImpl2
    * to define the 'current' row.
    */
   public void clearCurrentRowPmCache() {
+    if ((currentRowPm != null) && LOG.isTraceEnabled()) {
+      LOG.trace(this + " - clearing current master row.");
+    }
     this.currentRowPm = null;
   }
 

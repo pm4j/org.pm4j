@@ -1,14 +1,12 @@
 package org.pm4j.core.pm.api;
 
 import org.pm4j.core.pm.PmAttr;
-import org.pm4j.core.pm.PmEvent;
-import org.pm4j.core.pm.PmEvent.ValueChangeKind;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmCommandDecorator;
+import org.pm4j.core.pm.PmEvent;
+import org.pm4j.core.pm.PmEvent.ValueChangeKind;
 import org.pm4j.core.pm.PmEventListener;
 import org.pm4j.core.pm.PmObject;
-import org.pm4j.core.pm.api.PmVisitorApi.VisitCallBack;
-import org.pm4j.core.pm.api.PmVisitorApi.VisitResult;
 import org.pm4j.core.pm.impl.PmAttrValueChangeDecorator;
 import org.pm4j.core.pm.impl.PmEventApiHandler;
 
@@ -87,7 +85,7 @@ public class PmEventApi {
    * listener.
    */
   public static void firePmEvent(PmObject pm, int eventMask, ValueChangeKind valueChangeKind) {
-    apiHandler.firePmEvent(pm, new PmEvent(ensureThreadEventSource(pm), pm, eventMask, valueChangeKind));
+    PmEventApiHandler.firePmEvent(pm, new PmEvent(ensureThreadEventSource(pm), pm, eventMask, valueChangeKind), true);
   }
 
   /**
@@ -95,7 +93,7 @@ public class PmEventApi {
    * listener.
    */
   public static void firePmEvent(PmObject pm, int eventMask) {
-    apiHandler.firePmEvent(pm, new PmEvent(ensureThreadEventSource(pm), pm, eventMask, ValueChangeKind.UNKNOWN));
+    PmEventApiHandler.firePmEvent(pm, new PmEvent(ensureThreadEventSource(pm), pm, eventMask, ValueChangeKind.UNKNOWN), true);
   }
 
   public static void firePmEventIfInitialized(PmObject pm, int eventMask, ValueChangeKind valueChangeKind) {
@@ -107,7 +105,7 @@ public class PmEventApi {
   }
 
   public static void firePmEvent(PmObject pm, PmEvent event) {
-    apiHandler.firePmEvent(pm, event);
+    PmEventApiHandler.firePmEvent(pm, event, true);
   }
 
   public static void firePmEventIfInitialized(PmObject pm, PmEvent event) {
@@ -138,24 +136,4 @@ public class PmEventApi {
     apiHandler = newApiHandler;
   }
 
-  /**
-   * Propagates rootEvent to rootPm and its children.
-   * @param rootPm start point.
-   * @param rootEvent the event.
-   */
-  public static void firePmEventRecursively(final PmObject rootPm, final PmEvent rootEvent) {
-    PmVisitorApi.visit(rootPm, new VisitCallBack() {
-      private  PmEvent event = rootEvent;
-      @Override
-      public VisitResult visit(PmObject pm) {
-        if(rootPm == pm) {
-          PmEventApi.firePmEvent(pm, event);
-        }
-        else {
-          PmEventApi.firePmEvent(pm, new PmEvent(event.getSource(), pm, event.getChangeMask(), event.getValueChangeKind()));
-        }
-        return VisitResult.CONTINUE;
-      }
-    });
-  }
 }

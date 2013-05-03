@@ -618,7 +618,7 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
     // TODO olaf: that's not really always true. Subclasses should be able to control that.
     if (getBeforeDoStrategy() == BEFORE_DO.VALIDATE) {
       PmDataInput validationParentPm = getValidationExecRootPm();
-      validationParentPm.accept(new PmVisitorSetToUnchanged());
+      validationParentPm.setPmValueChanged(false);
     }
 
     // Clear specified caches the pm-tree up till the enclosing element.

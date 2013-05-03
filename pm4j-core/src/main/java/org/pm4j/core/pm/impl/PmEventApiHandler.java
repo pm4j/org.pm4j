@@ -1,5 +1,7 @@
 package org.pm4j.core.pm.impl;
 
+import java.util.Map;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.pm4j.core.pm.PmAttr;
@@ -7,11 +9,19 @@ import org.pm4j.core.pm.PmCommandDecorator;
 import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmEvent.ValueChangeKind;
+import org.pm4j.core.pm.PmEventListener.PostProcessor;
 import org.pm4j.core.pm.PmEventListener;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.impl.PmObjectBase.PmInitState;
 
+/**
+ * A pm4j <b>INTERNAL</b> event handling support class.
+ * <p>
+ * Please use {@link PmEventApi} for handling {@link PmEvent}s.
+ *
+ * @author olaf boede
+ */
 public class PmEventApiHandler {
 
   private static final Log LOG = LogFactory.getLog(PmEventApiHandler.class);
@@ -112,10 +122,17 @@ public class PmEventApiHandler {
     }
   }
 
-  public void firePmEvent(PmObject pm, PmEvent event) {
+  public static void firePmEvent(PmObject pm, PmEvent event, boolean withPreAndPostProcessing) {
     PmObjectBase pmImpl = (PmObjectBase)pm;
 
+    // Do the operations that only should be done non-propagation events.
     if (! event.isPropagationEvent()) {
+      if (withPreAndPostProcessing) {
+        // call the optional event pre processing.
+        sendToListeners(pm, event, true /* pre process */);
+      }
+
+      // call the simple onEvent() methods.
       dispatchToOnEventMethodCalls(pmImpl, event, event.getChangeMask());
 
       if (LOG.isTraceEnabled()) {
@@ -123,7 +140,11 @@ public class PmEventApiHandler {
       }
     }
 
-    fireOnEventTables(pm, event);
+    sendToListeners(pm, event, false /* handle event */);
+
+    if (withPreAndPostProcessing) {
+      postProcessEvent(event);
+    }
 
     // Non-init events will be propagated to the parent hierarchy.
     // This allows to maintain the changed state of a sub-tree.
@@ -132,12 +153,25 @@ public class PmEventApiHandler {
       PmConversation conversationPm = pmImpl.getPmConversation();
       PmEvent propagationEvent = new PmEvent(event.getSource(), event.pm, event.getChangeMask() | PmEvent.IS_EVENT_PROPAGATION, event.getValueChangeKind());
       for (PmObject p = pmImpl; p != null; p = p.getPmParent()) {
-        fireOnEventTables(p, propagationEvent);
+        sendToListeners(p, propagationEvent, false /* handle event */);
         // stop after reaching the conversation.
         if (p == conversationPm) {
           break;
         }
       }
+    }
+  }
+
+  /**
+   * Calls the registered {@link PmEventListener.PostProcessor}s.
+   *
+   * @param event the event to postprocess. It contains a set of registered post processors and related data.
+   */
+  public static void postProcessEvent(PmEvent event) {
+    for (Map.Entry<PostProcessor<?>, Object> e : event.getPostProcessorToPayloadMap().entrySet()) {
+      @SuppressWarnings("unchecked")
+      PostProcessor<Object> pp = (PostProcessor<Object>) e.getKey();
+      pp.postProcess(event, e.getValue());
     }
   }
 
@@ -163,7 +197,7 @@ public class PmEventApiHandler {
    * @param event The event to propagate.
    * @param eventMask Defines the set of on-methods to be called.
    */
-  protected void dispatchToOnEventMethodCalls(PmObjectBase pmImpl, PmEvent event, int eventMask) {
+  protected static void dispatchToOnEventMethodCalls(PmObjectBase pmImpl, PmEvent event, int eventMask) {
     // XXX olaf: the onPmXXX methods are really convenient to use, but
     //           this construction costs some performance...
     //           Is this really an issue?
@@ -173,13 +207,21 @@ public class PmEventApiHandler {
     }
   }
 
-  private void fireOnEventTables(PmObject pm, PmEvent event) {
+  /**
+   * Sends the event to all registered listeners.
+   *
+   * @param pm the PM to inform the registered listeners for.
+   * @param event the event to handle.
+   * @param preProcess if set to <code>true</code>, only the pre process part will be done for each listener.<br>
+   *                   if set to <code>false</code>, only the handle part will be done for each listener.<br>
+   */
+  /* package */ static void sendToListeners(PmObject pm, PmEvent event, boolean preProcess) {
     PmObjectBase pmImpl = (PmObjectBase)pm;
     if (pmImpl.pmEventTable != null && !pmImpl.pmEventTable.isEmpty()) {
-      pmImpl.pmEventTable.fireEvent(event);
+      pmImpl.pmEventTable.fireEvent(event, preProcess);
     }
     if (pmImpl.pmWeakEventTable != null && !pmImpl.pmWeakEventTable.isEmpty()) {
-      pmImpl.pmWeakEventTable.fireEvent(event);
+      pmImpl.pmWeakEventTable.fireEvent(event, preProcess);
     }
   }
 

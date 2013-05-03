@@ -1,7 +1,6 @@
 package org.pm4j.core.pm.impl;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -9,23 +8,17 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 
 import org.apache.commons.lang.StringUtils;
-import org.pm4j.common.pageable.Modifications;
-import org.pm4j.common.util.collection.ListUtil;
 import org.pm4j.core.exception.PmRuntimeException;
-import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmBean;
-import org.pm4j.core.pm.PmConversation;
+import org.pm4j.core.pm.PmDataInput;
 import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmEvent.ValueChangeKind;
 import org.pm4j.core.pm.PmMessage.Severity;
 import org.pm4j.core.pm.PmObject;
-import org.pm4j.core.pm.PmTable;
-import org.pm4j.core.pm.PmTable2;
 import org.pm4j.core.pm.annotation.PmBeanCfg;
 import org.pm4j.core.pm.annotation.PmBoolean;
 import org.pm4j.core.pm.annotation.PmValidationCfg;
 import org.pm4j.core.pm.api.PmCacheApi;
-import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmExpressionApi;
 import org.pm4j.core.pm.api.PmFactoryApi;
 import org.pm4j.core.pm.api.PmMessageUtil;
@@ -156,8 +149,7 @@ public abstract class PmBeanBase<T_BEAN>
       // Otherwise we get the risk if initialization race conditions.
       if (pmInitState == PmInitState.INITIALIZED) {
         // the cached dynamic sub PMs are obsolete after switching to a new bean value.
-        BeanPmCacheUtil.clearBeanPmCachesOfSubtree(this);
-        new SetPmBeanEventVisitor(PmEvent.ALL_CHANGE_EVENTS).visit(this);
+        new ValueChangeEventProcessor(this, false).doIt();
       }
     }
   }
@@ -178,8 +170,7 @@ public abstract class PmBeanBase<T_BEAN>
     // Otherwise we get the risk if initialization race conditions.
     if (pmInitState == PmInitState.INITIALIZED) {
       // the cached dynamic sub PMs are obsolete after switching to a new bean value.
-      BeanPmCacheUtil.clearBeanPmCachesOfSubtree(this);
-      new SetPmBeanEventVisitor(PmEvent.ALL_CHANGE_EVENTS | PmEvent.RELOAD).visit(this);
+      new ValueChangeEventProcessor(this, true).doIt();
     }
   }
 
@@ -188,13 +179,7 @@ public abstract class PmBeanBase<T_BEAN>
       return false;
     }
 
-    PmEventApi.ensureThreadEventSource(this);
-
     pmBean = null;
-
-    // Old cache values are related to the old bean.
-    PmMessageUtil.clearSubTreeMessages(this);
-    PmCacheApi.clearPmCache(this);
 
     if (bean != null) {
       checkBeanClass(bean);
@@ -210,91 +195,6 @@ public abstract class PmBeanBase<T_BEAN>
 
     return true;
   }
-
-  /**
-   * Informs sub-PMs about a backing bean exchange event.
-   */
-  public static class SetPmBeanEventVisitor extends PmVisitorAdapter {
-
-    private final int eventMask;
-    private ValueChangeKind changeKind;
-
-    public SetPmBeanEventVisitor(int eventMask) {
-      this.eventMask = eventMask;
-      this.changeKind = ((eventMask & PmEvent.RELOAD) != 0) ? ValueChangeKind.RELOAD : ValueChangeKind.VALUE;
-    }
-
-    @Override
-    protected void onVisit(PmObject pm) {
-      PmEventApi.firePmEvent(pm, eventMask, changeKind);
-      for (PmObject child : PmUtil.getPmChildren(pm)) {
-        // Don't iterate over closed sub conversations.
-        // This will only generate overhead an trouble.
-        if ((child instanceof PmConversation) && !child.isPmVisible()) {
-          continue;
-        }
-
-        // The children may have relevant event handling code. Thus we make
-        // sure that each child receives the call.
-        PmInitApi.ensurePmInitialization(child);
-
-        // Switch for each child to an event that is related to the child.
-        // Registered listeners for the child will expect that the event contains a
-        // reference to the PM it was registered for.
-        // TODO olaf: add a event cause to PmEvent.
-        SetPmBeanEventVisitor childVisitor = new SetPmBeanEventVisitor(eventMask);
-        child.accept(childVisitor);
-      }
-    }
-
-    @Override
-    public void visit(@SuppressWarnings("rawtypes") PmTable table) {
-      @SuppressWarnings("unchecked")
-      List<Object> changedRows = new ArrayList<Object>(table.getRowsWithChanges());
-
-      onVisit(table);
-      ((PmTableImpl<?>)table).setPmValueChanged(false);
-
-      // Changed rows get informed to make sure that all invalid PM states get cleared.
-      // Informs the ChangedChildStateRegistry of the table.
-      // TODO olaf: check if the PMs of the current page need to be informed individually too.
-      //            I suspect not, since the all-change-event causes a re-binding of all table rows PMs.
-      PmEventApi.firePmEvent(table, eventMask);
-
-      // Inform the changed rows to make sure that all invalid PM states get cleared.
-      for (Object row : changedRows) {
-        if (row instanceof PmObject) {
-          onVisit((PmObject) row);
-        }
-      }
-    }
-
-    @Override
-    public void visit(PmTable2<?> table) {
-      Modifications<?> m = table.getPmPageableCollection().getModifications();
-      List<Object> changedRows = ListUtil.collectionsToList(m.getAddedItems(), m.getUpdatedItems());
-      onVisit(table);
-      table.updatePmTable();
-
-      // Changed rows get informed to make sure that all invalid PM states get cleared.
-      // Informs the ChangedChildStateRegistry of the table.
-      // TODO olaf: check if the PMs of the current page need to be informed individually too.
-      //            I suspect not, since the all-change-event causes a re-binding of all table rows PMs.
-      PmEventApi.firePmEvent(table, eventMask);
-
-      // Inform the changed rows to make sure that all invalid PM states get cleared.
-      for (Object row : changedRows) {
-        onVisit((PmObject) row);
-      }
-    }
-
-    @Override
-    public void visit(PmAttr<?> attr) {
-      attr.setPmValueChanged(false);
-      onVisit(attr);
-    }
-  }
-
 
   /**
    * The default implementation provides a unique identifier
@@ -514,5 +414,43 @@ public abstract class PmBeanBase<T_BEAN>
   private final MetaData getOwnMetaData() {
     return (MetaData) getPmMetaDataWithoutPmInitCall();
   }
+
+  public static class ValueChangeEventProcessor extends RecursivePmEventProcessor {
+    public ValueChangeEventProcessor(PmDataInput rootPm, boolean isReloadEvent) {
+      super(rootPm,
+          isReloadEvent
+              ? PmEvent.ALL_CHANGE_EVENTS | PmEvent.RELOAD
+              : PmEvent.ALL_CHANGE_EVENTS,
+          isReloadEvent ? ValueChangeKind.RELOAD : ValueChangeKind.VALUE);
+    }
+
+    @Override
+    protected void fireEvents() {
+      // == Cleanup all PM state, because the bean to show is a new one. ==
+
+      // Forget all changes and dynamic PM's below this instance.
+      BeanPmCacheUtil.clearBeanPmCachesOfSubtree(rootPm);
+
+      // All sub PM messages are no longer relevant.
+      PmMessageUtil.clearSubTreeMessages(rootPm);
+
+      // Old cache values are related to the old bean.
+      // This cache cleanup can only be done AFTER visiting the tree because
+      // it cleans the current-row information that is relevant.
+      PmCacheApi.clearPmCache(rootPm);
+
+      // Visit the sub-tree to inform all PM listeners.
+      super.fireEvents();
+
+      // Another (postponed) cleanup:
+      // Mark the whole sub tree as unchanged.
+
+      // FIXME olaf: this is done AFTER the main visit to keep some old code alive.
+      // See: RoleEditorBeanTabPm...
+      rootPm.setPmValueChanged(false);
+    }
+
+  };
+
 
 }

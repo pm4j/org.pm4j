@@ -793,11 +793,8 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
              super.isPmValueChangedImpl();
   }
 
-
-  // TODO olaf: distinguish explicite changed flag and value change.
   @Override
   protected void setPmValueChangedImpl(boolean newChangedState) {
-    PmEventApi.ensureThreadEventSource(this);
     setValueChanged(UNKNOWN_VALUE_INDICATOR, newChangedState
             ? CHANGED_VALUE_INDICATOR
             : UNCHANGED_VALUE_INDICATOR);
