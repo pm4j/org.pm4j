@@ -212,13 +212,13 @@
       <uniqueVersion>true</uniqueVersion>
       <id>artifactory</id>
       <name>artifactory-releases</name>
-      <url>http://artifactory.ham.hamburgsud.com:8081/artifactory/simple/ext-release-local</url>
+      <url>http://artifactory.ham.hamburgsud.com:8081/artifactory/ext-release-local</url>
     </repository>
     <snapshotRepository>
       <uniqueVersion>true</uniqueVersion>
       <id>artifactory</id>
       <name>artifactory-snapshots</name>
-      <url>http://artifactory.ham.hamburgsud.com:8081/artifactory/simple/ext-snapshot-local</url>
+      <url>http://artifactory.ham.hamburgsud.com:8081/artifactory/ext-snapshot-local</url>
     </snapshotRepository>
   </distributionManagement>
 
