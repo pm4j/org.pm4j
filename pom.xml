@@ -189,8 +189,8 @@
 	<configuration>
 	  <!-- Auto-Version all modules the same as the parent module -->
 	  <autoVersionSubmodules>true</autoVersionSubmodules>
-	  <!-- Commit tags locally, only -->
-	  <pushChanges>false</pushChanges>
+	  <!-- Push changes to remote, automatically -->
+	  <pushChanges>true</pushChanges>
 	  <!-- Format of the git tags when release is done -->
 	  <tagNameFormat>v@{project.version}</tagNameFormat>
 	  <goals>deploy</goals>
