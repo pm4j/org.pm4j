@@ -21,24 +21,24 @@
 		<dependency>
 			<groupId>org.pm4j</groupId>
 			<artifactId>pm4j-core</artifactId>
-			<version>${version}</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.pm4j</groupId>
 			<artifactId>pm4j-common</artifactId>
-			<version>${version}</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.pm4j</groupId>
 			<artifactId>pm4j-common</artifactId>
-			<version>${version}</version>
+			<version>${project.version}</version>
 			<classifier>tests</classifier>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.pm4j</groupId>
 			<artifactId>pm4j-core</artifactId>
-			<version>${version}</version>
+			<version>${project.version}</version>
 			<classifier>tests</classifier>
 
 		</dependency>

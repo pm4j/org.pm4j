@@ -19,13 +19,13 @@
 		<dependency>
 			<artifactId>pm4j-core</artifactId>
 			<groupId>org.pm4j</groupId>
-			<version>${version}</version>
+			<version>${project.version}</version>
 		</dependency>
 
 		<dependency>
 			<artifactId>pm4j-common</artifactId>
 			<groupId>org.pm4j</groupId>
-			<version>${version}</version>
+			<version>${project.version}</version>
 		</dependency>
 	
 		<dependency>
@@ -50,17 +50,6 @@
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
 			<version>1.4</version>
-		</dependency>
-
-		<dependency>
-			<artifactId>pm4j-core</artifactId>
-			<groupId>org.pm4j</groupId>
-			<version>${version}</version>
-		</dependency>
-		<dependency>
-			<artifactId>pm4j-common</artifactId>
-			<groupId>org.pm4j</groupId>
-			<version>${version}</version>
 		</dependency>
 
 	</dependencies>

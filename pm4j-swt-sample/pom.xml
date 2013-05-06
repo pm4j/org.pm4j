@@ -20,39 +20,39 @@
 		<dependency>
 			<artifactId>pm4j-core-sample</artifactId>
 			<groupId>org.pm4j</groupId>
-			<version>${version}</version>
+			<version>${project.version}</version>
 		</dependency>
 		
 		<dependency>
 			<artifactId>pm4j-core-sample</artifactId>
 			<groupId>org.pm4j</groupId>
-			<version>${version}</version>
+			<version>${project.version}</version>
 			<classifier>tests</classifier>
 		</dependency>
 		
 		<dependency>
 			<artifactId>pm4j-swt</artifactId>
 			<groupId>org.pm4j</groupId>
-			<version>${version}</version>
+			<version>${project.version}</version>
 		</dependency>
 		
 		<dependency>
 			<artifactId>pm4j-swt</artifactId>
 			<groupId>org.pm4j</groupId>
-			<version>${version}</version>
+			<version>${project.version}</version>
 			<classifier>tests</classifier>
 		</dependency>
 
 		<dependency>
 			<artifactId>pm4j-core</artifactId>
 			<groupId>org.pm4j</groupId>
-			<version>${version}</version>
+			<version>${project.version}</version>
 		</dependency>
 		
 		<dependency>
 			<artifactId>pm4j-core</artifactId>
 			<groupId>org.pm4j</groupId>
-			<version>${version}</version>
+			<version>${project.version}</version>
 			<classifier>tests</classifier>
 		</dependency>
 	</dependencies>
