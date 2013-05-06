@@ -1,18 +1,16 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>org.pm4j</groupId>
 	<artifactId>main</artifactId>
-	<version>0.5</version>
-	<name>MAIN of PM4J ${version}</name>
+	<version>0.5.5-SNAPSHOT</version>
+	<name>MAIN of PM4J</name>
 	<packaging>pom</packaging>
 
 	<url>http://www.pm4j.org</url>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<pm4j.buildnumber>0.5.001-SNAPSHOT</pm4j.buildnumber>
 	</properties>
 
 	<organization>
@@ -27,7 +25,7 @@
 		</developer>
 	</developers>
 	<scm>
-		<url>git://github.com/pm4j/org.pm4j.git</url>
+		<developerConnection>scm:git:git://github.com/pm4j/org.pm4j.git/</developerConnection>
 	</scm>
 	<modules>
 
@@ -173,6 +171,15 @@
 					<target>1.6</target>
 				</configuration>
 			</plugin>
+			<plugin>
+			  <artifactId>maven-release-plugin</artifactId>
+			  <version>2.4.1</version>
+			  <configuration>
+			    <!-- Auto-Version all modules the same as the parent module -->
+			    <autoVersionSubmodules>true</autoVersionSubmodules>
+			  </configuration>
+			</plugin>
+			  
 		</plugins>
 	</build>
 
@@ -182,4 +189,20 @@
 			<url>http://mvnrepository.com/artifact/</url>
 		</repository>
 	</repositories>
+
+	<distributionManagement>
+	  <repository>
+	    <uniqueVersion>true</uniqueVersion>
+	    <id>artifactory</id>
+	    <name>artifactory-releases</name>
+	    <url>http://artifactory.ham.hamburgsud.com:8081/artifactory/simple/ext-release-local</url>
+	  </repository>
+	  <snapshotRepository>
+	    <uniqueVersion>true</uniqueVersion>
+	    <id>artifactory</id>
+	    <name>artifactory-snapshots</name>
+	    <url>http://artifactory.ham.hamburgsud.com:8081/artifactory/simple/ext-snapshot-local</url>
+	  </snapshotRepository>
+	</distributionManagement>
+
 </project>

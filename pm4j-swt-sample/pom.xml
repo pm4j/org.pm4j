@@ -4,12 +4,12 @@
 
 	<artifactId>pm4j-swt-sample</artifactId>
 	<packaging>jar</packaging>
-	<name>PM4J SWT SAMPLE ${pm4j.buildnumber}</name>
-	<version>${pm4j.buildnumber}</version>
+	<name>PM4J SWT SAMPLE</name>
+	<version>0.5.1-SNAPSHOT</version>
 	<parent>
 		<groupId>org.pm4j</groupId>
 		<artifactId>main</artifactId>
-		<version>0.5</version>
+		<version>0.5.1-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
@@ -20,39 +20,39 @@
 		<dependency>
 			<artifactId>pm4j-core-sample</artifactId>
 			<groupId>org.pm4j</groupId>
-			<version>${pm4j.buildnumber}</version>
+			<version>${version}</version>
 		</dependency>
 		
 		<dependency>
 			<artifactId>pm4j-core-sample</artifactId>
 			<groupId>org.pm4j</groupId>
-			<version>${pm4j.buildnumber}</version>
+			<version>${version}</version>
 			<classifier>tests</classifier>
 		</dependency>
 		
 		<dependency>
 			<artifactId>pm4j-swt</artifactId>
 			<groupId>org.pm4j</groupId>
-			<version>${pm4j.buildnumber}</version>
+			<version>${version}</version>
 		</dependency>
 		
 		<dependency>
 			<artifactId>pm4j-swt</artifactId>
 			<groupId>org.pm4j</groupId>
-			<version>${pm4j.buildnumber}</version>
+			<version>${version}</version>
 			<classifier>tests</classifier>
 		</dependency>
 
 		<dependency>
 			<artifactId>pm4j-core</artifactId>
 			<groupId>org.pm4j</groupId>
-			<version>${pm4j.buildnumber}</version>
+			<version>${version}</version>
 		</dependency>
 		
 		<dependency>
 			<artifactId>pm4j-core</artifactId>
 			<groupId>org.pm4j</groupId>
-			<version>${pm4j.buildnumber}</version>
+			<version>${version}</version>
 			<classifier>tests</classifier>
 		</dependency>
 	</dependencies>
