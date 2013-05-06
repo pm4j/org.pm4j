@@ -3,7 +3,7 @@
 
   <groupId>org.pm4j</groupId>
   <artifactId>main</artifactId>
-  <version>0.5.5-SNAPSHOT</version>
+  <version>0.5.5</version>
   <name>MAIN of PM4J</name>
   <packaging>pom</packaging>
 
@@ -26,6 +26,7 @@
   </developers>
   <scm>
     <developerConnection>scm:git:https://github.com/pm4j/org.pm4j.git</developerConnection>
+    <tag>v0.5.5</tag>
   </scm>
   <modules>
 
