@@ -25,7 +25,7 @@
     </developer>
   </developers>
   <scm>
-    <developerConnection>scm:git:git://github.com/pm4j/org.pm4j.git/</developerConnection>
+    <developerConnection>scm:git:https://github.com/pm4j/org.pm4j.git</developerConnection>
   </scm>
   <modules>
 
