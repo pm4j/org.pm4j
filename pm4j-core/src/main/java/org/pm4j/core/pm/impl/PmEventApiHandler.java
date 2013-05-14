@@ -144,20 +144,11 @@ public class PmEventApiHandler {
 
     if (withPreAndPostProcessing) {
       postProcessEvent(event);
-    }
 
-    // Non-init events will be propagated to the parent hierarchy.
-    // This allows to maintain the changed state of a sub-tree.
-    if (! event.isInitializationEvent()) {
-      // propagate the event to the parent hierarchy until the conversation is reached.
-      PmConversation conversationPm = pmImpl.getPmConversation();
-      PmEvent propagationEvent = new PmEvent(event.getSource(), event.pm, event.getChangeMask() | PmEvent.IS_EVENT_PROPAGATION, event.getValueChangeKind());
-      for (PmObject p = pmImpl; p != null; p = p.getPmParent()) {
-        sendToListeners(p, propagationEvent, false /* handle event */);
-        // stop after reaching the conversation.
-        if (p == conversationPm) {
-          break;
-        }
+      // Non-init events will be propagated to the parent hierarchy.
+      // This allows to maintain the changed state of a sub-tree.
+      if (! event.isInitializationEvent()) {
+        propagateEventToParents(pmImpl, event);
       }
     }
   }
@@ -172,6 +163,27 @@ public class PmEventApiHandler {
       @SuppressWarnings("unchecked")
       PostProcessor<Object> pp = (PostProcessor<Object>) e.getKey();
       pp.postProcess(event, e.getValue());
+    }
+  }
+
+  /**
+   * Propagates the given <code>event</code> to the parents of the given <code>pm</code>.
+   * The propagation stopps when the embedding {@link PmConversation} is reached.<br>
+   * The start PM and the parent conversation will also receive the propagation call.
+   *
+   * @param pm the PM to start with.
+   * @param event the event to propagate.
+   */
+  public static void propagateEventToParents(PmObject pm, PmEvent event) {
+    // propagate the event to the parent hierarchy until the conversation is reached.
+    PmConversation conversationPm = pm.getPmConversation();
+    PmEvent propagationEvent = new PmEvent(event.getSource(), event.pm, event.getChangeMask() | PmEvent.IS_EVENT_PROPAGATION, event.getValueChangeKind());
+    for (PmObject p = pm; p != null; p = p.getPmParent()) {
+      sendToListeners(p, propagationEvent, false /* handle event */);
+      // stop after reaching the conversation.
+      if (p == conversationPm) {
+        break;
+      }
     }
   }
 

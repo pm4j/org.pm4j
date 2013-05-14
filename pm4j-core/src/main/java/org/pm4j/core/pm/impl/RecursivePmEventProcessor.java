@@ -71,9 +71,7 @@ public class RecursivePmEventProcessor {
           return VisitResult.SKIP_CHILDREN;
         }
 
-        PmEvent event = new PmEvent(pm, eventMask, changeKind);
-        pmToEventMap.put(pm, event);
-        PmEventApiHandler.sendToListeners(pm, event, true /* preProcess */);
+        PmEventApiHandler.sendToListeners(pm, getEventForPm(pm), true /* preProcess */);
         return VisitResult.CONTINUE;
       }
     },
@@ -95,9 +93,7 @@ public class RecursivePmEventProcessor {
         // If there is an existing event instance from the pre-process loop, it will
         // be used again.
         // This way it is possible to accumulate the post processing requests.
-        PmEvent e = pmToEventMap.containsKey(pm)
-                  ? pmToEventMap.get(pm)
-                  : new PmEvent(pm, eventMask, changeKind);
+        PmEvent e = getEventForPm(pm);
 
         PmEventApiHandler.firePmEvent(pm, e, false /* handle */);
 
@@ -115,11 +111,32 @@ public class RecursivePmEventProcessor {
     PmVisitorApi.visit(rootPm, handleEventCallBack, VisitHint.SKIP_NOT_INITIALIZED);
   }
 
-  void postProcess() {
+  protected void postProcess() {
     // Perform the event postprocessing for all listeners that requested it.
     for (PmEvent e : eventsToPostProcess) {
       PmEventApiHandler.postProcessEvent(e);
     }
+
+    PmEventApiHandler.propagateEventToParents(rootPm, getEventForPm(rootPm));
   }
 
+  /**
+   * Provides the event instance used for the given PM.
+   * <p>
+   * If there is an existing event instance from a previous event processing step, it will
+   * be used again.
+   * <p>
+   * This way it is possible to accumulate PM related data within the event instance.
+   *
+   * @param pm
+   * @return
+   */
+  protected final PmEvent getEventForPm(PmObject pm) {
+    PmEvent event = pmToEventMap.get(pm);
+    if (event == null) {
+        event = new PmEvent(pm, eventMask, changeKind);
+        pmToEventMap.put(pm, event);
+    }
+    return event;
+  }
 }

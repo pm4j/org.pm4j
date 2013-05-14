@@ -53,22 +53,26 @@ public class PmEventApiTest {
 
     PmEventApi.firePmEvent(myPm.s, VALUE_CHANGE);
 
-    assertEquals(1, attrListener.receivedEvents.size());
-    assertEquals(0, elementListener.receivedEvents.size());
-    assertEquals(1, elemHierarchyListener.receivedEvents.size());
+    assertEquals("The attribute sent a single call to its listeners.", 1, attrListener.receivedEvents.size());
+    assertEquals("A listener on the parent PM will not get informed about a sub PM event.", 0, elementListener.receivedEvents.size());
+    assertEquals("A hierarchy listener gets informed about a child PM event.", 1, elemHierarchyListener.receivedEvents.size());
   }
 
   @Test
   public void testFireEventRecursively() {
     PmEventApi.addWeakPmEventListener(myPm, VALUE_CHANGE, elementListener);
     PmEventApi.addWeakPmEventListener(myPm.s, VALUE_CHANGE, attrListener);
+    TestListener elemHierarchyListener = new TestListener();
+    PmEventApi.addWeakHierarchyListener(myPm, VALUE_CHANGE, elemHierarchyListener);
 
     new RecursivePmEventProcessor(myPm, VALUE_CHANGE).doIt();
 
-    assertEquals(1, attrListener.receivedEvents.size());
-    assertEquals(1, elementListener.receivedEvents.size());
-    assertEquals(myPm, elementListener.receivedEvents.get(0).getPm());
-    assertEquals(myPm.s, attrListener.receivedEvents.get(0).getPm());
+    assertEquals("Each listener in the PM tree gets called once.", 1, attrListener.receivedEvents.size());
+    assertEquals("Each listener in the PM tree gets called once.", 1, elementListener.receivedEvents.size());
+    assertEquals("Each event references the currently visited sub PM.", myPm, elementListener.receivedEvents.get(0).getPm());
+    assertEquals("Each event references the currently visited sub PM.", myPm.s, attrListener.receivedEvents.get(0).getPm());
+    assertEquals("Only a single hierarchy event will be generated for the parents.", 1, elemHierarchyListener.receivedEvents.size());
+    assertEquals("The hierarchy event will be reported for the PM the recursive call was started for.", myPm, elemHierarchyListener.receivedEvents.get(0).pm);
   }
 
   @Test
