@@ -7,7 +7,13 @@ import java.util.Collections;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmCommandDecorator;
 
-class PmCommandDecoratorSetImpl implements PmCommandDecorator {
+/**
+ * A set of command decorators that may be used as a single decorator.<br>
+ * It delegates its calls internally to all decorator set items.
+ *
+ * @author olaf boede
+ */
+class PmCommandDecoratorSetImpl implements PmCommandDecorator.WithExceptionHandling {
 
   private Collection<PmCommandDecorator> decorators = Collections.emptyList();
 
@@ -50,6 +56,22 @@ class PmCommandDecoratorSetImpl implements PmCommandDecorator {
       d.afterDo(cmd);
     }
   }
+
+  @Override
+  public boolean onException(PmCommand cmd, Exception exception) {
+    boolean proceedWithStandardExceptionHandling = true;
+
+    for (PmCommandDecorator d : decorators) {
+      if (d instanceof PmCommandDecorator.WithExceptionHandling) {
+        if (! ((WithExceptionHandling)d).onException(cmd, exception)) {
+          proceedWithStandardExceptionHandling = false;
+        }
+      }
+    }
+
+    return proceedWithStandardExceptionHandling;
+  }
+
 
   public PmCommandDecorator beforeDoReturnVetoDecorator(PmCommand cmd) {
     if (decorators != null) {

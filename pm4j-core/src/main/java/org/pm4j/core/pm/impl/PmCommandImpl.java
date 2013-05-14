@@ -227,7 +227,22 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
       }
       catch (Exception e) {
         cmd.commandState = CommandState.FAILED;
-        link = getPmConversationImpl().getPmExceptionHandler().onException(cmd, e, false);
+
+        // The standard exception handling can be prevented by a decorator that
+        // says that it already handeled everything.
+        boolean useStandardExceptionHandling = true;
+        Exception exceptionToHandle = e;
+
+        try {
+          useStandardExceptionHandling = commandDecorators.onException(this, e);
+        } catch (RuntimeException e2) {
+          LOG.info(PmUtil.getPmLogString(cmd) + ": Exception thrown by a command decorator while handling a catched exception '" + this + "'", e);
+          exceptionToHandle = e2;
+        }
+
+        if (useStandardExceptionHandling) {
+          link = getPmConversationImpl().getPmExceptionHandler().onException(cmd, exceptionToHandle, false);
+        }
 
         if (LOG.isDebugEnabled()) {
           LOG.debug("Command '" + PmUtil.getPmLogString(cmd) + "' failed with exception: '" + e.getMessage() + "'.");
@@ -242,6 +257,7 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
     return cmd;
   }
 
+  // TODO olaf: 80% code copy of doIt(boolean)...
   public final String doItReturnString() {
     PmCommandImpl cmd = zz_doCloneAndRegisterEventSource();
     NaviLink link = null;
@@ -258,7 +274,25 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
       }
       catch (Exception e) {
         cmd.commandState = CommandState.FAILED;
-        link = cmd.actionReturnOnFailure(getPmConversationImpl().getPmExceptionHandler().onException(cmd, e, true));
+
+        // The standard exception handling can be prevented by a decorator that
+        // says that it already handeled everything.
+        boolean useStandardExceptionHandling = true;
+        Exception exceptionToHandle = e;
+
+        try {
+          useStandardExceptionHandling = commandDecorators.onException(this, e);
+        } catch (RuntimeException e2) {
+          LOG.info(PmUtil.getPmLogString(cmd) + ": Exception thrown by a command decorator while handling a catched exception '" + this + "'", e);
+          exceptionToHandle = e2;
+        }
+
+        if (useStandardExceptionHandling) {
+          link = getPmConversationImpl().getPmExceptionHandler().onException(cmd, exceptionToHandle, true);
+        }
+
+        link = cmd.actionReturnOnFailure(link);
+
 
         if (LOG.isDebugEnabled()) {
           LOG.debug("Command '" + PmUtil.getPmLogString(cmd) + "' failed with exception: '" + e.getMessage() + "'.");

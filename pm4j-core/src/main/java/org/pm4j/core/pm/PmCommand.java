@@ -134,6 +134,10 @@ public interface PmCommand extends PmObject {
   boolean isRequiresValidValues();
 
   /**
+   * Adds some decorator logic that gets applied on command execution.
+   * <p>
+   * May be already be called at construction time.
+   *
    * @param commandDecorator The decorator to add to the command execution logic.
    */
   void addCommandDecorator(PmCommandDecorator commandDecorator);
