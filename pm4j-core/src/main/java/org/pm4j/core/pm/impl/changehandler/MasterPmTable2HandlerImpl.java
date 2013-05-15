@@ -43,13 +43,13 @@ public class MasterPmTable2HandlerImpl<T_MASTER_BEAN> extends MasterPmSelectionH
   }
 
   /**
-   * Provides the 'current' row bean of the table.<br>
-   * In some scenarions the 'current' may be different from the 'selected' row.
-   * E.g. in case of a multi selection with a 'current' acive row.
+   * Provides the master row bean of the table.<br>
+   * In some scenarios the master may be different from the 'selected' row.
+   * E.g. in case of a multi selection with an active master row.
    */
   @Override
   protected T_MASTER_BEAN getSelectedMasterBean() {
-    return getMasterTablePm().getCurrentRowPmBean();
+    return getMasterTablePm().getMasterRowPmBean();
   }
 
   /**
@@ -81,12 +81,12 @@ public class MasterPmTable2HandlerImpl<T_MASTER_BEAN> extends MasterPmSelectionH
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
       PmTableImpl2<?, T_MASTER_BEAN> masterTablePm = getMasterTablePm();
-      masterTablePm.clearCurrentRowPmCache();
+      masterTablePm.clearMasterRowPm();
       @SuppressWarnings("unchecked")
       Selection<T_MASTER_BEAN> deletedBeansSelection = (Selection<T_MASTER_BEAN>) evt.getOldValue();
       if ((masterBeanBeforeDeleteOperation != null) &&
           deletedBeansSelection.contains(masterBeanBeforeDeleteOperation)) {
-        T_MASTER_BEAN newMasterBean = masterTablePm.getCurrentRowPmBean();
+        T_MASTER_BEAN newMasterBean = masterTablePm.getMasterRowPmBean();
         for (DetailsPmHandler dh : getDetailsPmHandlers()) {
           dh.afterMasterRecordChange(newMasterBean);
         }

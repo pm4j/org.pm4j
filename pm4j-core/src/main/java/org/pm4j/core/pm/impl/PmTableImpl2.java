@@ -94,8 +94,8 @@ public class PmTableImpl2
   /** Listens for filter changes and handles the table relates logic. */
   private TableFilterChangeListener pmTableFilterChangeListener = new TableFilterChangeListener();
 
-  /** A cached reference to the selected current row. */
-  private T_ROW_PM currentRowPm;
+  /** A cached reference to the selected master row. */
+  private T_ROW_PM masterRowPm;
 
   /**
    * Creates an empty table.
@@ -211,24 +211,31 @@ public class PmTableImpl2
     return getPmPageableCollection().getSelectionHandler();
   }
 
-  @Override
+  /**
+   * @deprecated please use {@link #getMasterRowPm()}
+   */
   public final T_ROW_PM getCurrentRowPm() {
-    if (currentRowPm == null) {
-      currentRowPm = getCurrentRowPmImpl();
+    return getMasterRowPm();
+  }
+  
+  @Override
+  public final T_ROW_PM getMasterRowPm() {
+    if (masterRowPm == null) {
+      masterRowPm = getMasterRowPmImpl();
     }
-    return currentRowPm;
+    return masterRowPm;
   }
 
   /**
-   * Provides the current row logic behind the (cached)
-   * {@link #getCurrentRowPm()} method.
+   * Provides the master row logic behind the (cached)
+   * {@link #getMasterRowPm()} method.
    * <p>
    * The default implementation provides the selected item in case of single
    * selection mode. For other modes it provides <code>null</code>.
    *
-   * @return the current row. <code>null</code> if there is no 'current' row.
+   * @return the master row. <code>null</code> if there is no master row.
    */
-  protected T_ROW_PM getCurrentRowPmImpl() {
+  protected T_ROW_PM getMasterRowPmImpl() {
 	if (getPmRowSelectMode() == SelectMode.SINGLE) {
 	  Selection<T_ROW_PM> selection = getPmSelectionHandler().getSelection();
 	  if (selection.getSize() == 1) {
@@ -239,29 +246,38 @@ public class PmTableImpl2
   }
 
   /**
-   * Provides the bean behind the current row PM.<br>
-   * See {@link #getCurrentRowPm()}.
-   *
-   * @return the bean behind the currently active row PM or <code>null</code>.
+   * @deprecated please use {@link #getMasterRowPmBean()} 
    */
-  public T_ROW_BEAN getCurrentRowPmBean() {
-    T_ROW_PM rowPm = getCurrentRowPm();
+  public final T_ROW_BEAN getCurrentRowPmBean() {
+    return getMasterRowPmBean();
+  }
+  
+
+  /**
+   * Provides the bean behind the master row PM.<br>
+   * See {@link #getMasterRowPm()}.
+   *
+   * @return the bean behind the currently active master row PM or <code>null</code>.
+   */
+  public T_ROW_BEAN getMasterRowPmBean() {
+    T_ROW_PM rowPm = getMasterRowPm();
     return (rowPm != null)
         ? rowPm.getPmBean()
         : null;
   }
 
+
   /**
-   * INTERNAL method that manually clears the cached current row PM.
+   * INTERNAL method that manually clears the cached master row PM.
    * <p>
    * Is helpful for implementations that don't use the selection of the pageable collection
-   * to define the 'current' row.
+   * to define the master row.
    */
-  public void clearCurrentRowPmCache() {
-    if ((currentRowPm != null) && LOG.isTraceEnabled()) {
-      LOG.trace(this + " - clearing current master row.");
+  public void clearMasterRowPm() {
+    if ((masterRowPm != null) && LOG.isTraceEnabled()) {
+      LOG.trace(this + " - clearing master row.");
     }
-    this.currentRowPm = null;
+    this.masterRowPm = null;
   }
 
   /**
@@ -340,7 +356,7 @@ public class PmTableImpl2
     switch (clearAspect) {
       case CLEAR_SELECTION:
         // the 'current' row corrensponds in most case to the selection. It needs to be re-calculated.
-        clearCurrentRowPmCache();
+        clearMasterRowPm();
         // In case of a clear call we do not handle vetos.
         // TODO olaf: Write unit tests to verify that that's not problem in all master details cases.
         SelectionHandlerUtil.forceSelectAll(getPmSelectionHandler(), false);
@@ -361,7 +377,7 @@ public class PmTableImpl2
         }
         break;
       case CLEAR_USER_FILTER:
-        clearCurrentRowPmCache();
+        clearMasterRowPm();
         // User filters can't be cleared on this level. More detailed implementations
         // may implement user defined filters that may be cleared.
         break;
@@ -374,7 +390,7 @@ public class PmTableImpl2
     super.clearCachedPmValues(cacheSet);
     if (cacheSet.contains(CacheKind.VALUE)) {
       getPmPageableCollection().clearCaches();
-      clearCurrentRowPmCache();
+      clearMasterRowPm();
       getPmSelectionHandler().ensureSelectionStateRequired();
     }
   }
@@ -640,7 +656,7 @@ public class PmTableImpl2
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-      currentRowPm = null;
+      masterRowPm = null;
       for (PmCommandDecorator d : getPmDecorators(TableChange.SELECTION)) {
         d.afterDo(null);
       }
@@ -667,7 +683,7 @@ public class PmTableImpl2
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-      currentRowPm = null;
+      masterRowPm = null;
       // FIXME: may fire too often a DB query. What happens in case of a series of QueryParam changes?
 //      PageableCollectionUtil2.ensureCurrentPageInRange(getPmPageableCollection());
 

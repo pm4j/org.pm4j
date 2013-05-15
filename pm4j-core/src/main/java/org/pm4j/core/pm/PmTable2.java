@@ -89,20 +89,20 @@ public interface PmTable2<T_ROW_PM> extends PmObject, PmDataInput {
   SelectionHandler<T_ROW_PM> getPmSelectionHandler();
 
   /**
-   * Provides the single currently active row. This information is usually used
+   * Provides the single currently active master row. This information is usually used
    * in master-details scenarios.
    * <p>
    * In case or {@link RowSelectMode#SINGLE} this is usually the selected row.<br>
    * In case of {@link RowSelectMode#MULTI} the default implementation returns
    * <code>null</code>.
    * <p>
-   * Sub classes with a different 'current row' definition logic
+   * Sub classes with a different 'master row' definition logic
    * may provide alternate implementations by overriding this method.
    *
-   * @return The currently active (selected) row or <code>null</code> if none is
+   * @return The currently active (selected) master row or <code>null</code> if none is
    *         active.
    */
-  T_ROW_PM getCurrentRowPm();
+  T_ROW_PM getMasterRowPm();
 
   /** The set of table changes that can be considered. */
   enum TableChange { SELECTION, FILTER, PAGE, SORT }
