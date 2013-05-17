@@ -4,24 +4,30 @@ import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.impl.PmExpressionApiHandler;
+import org.pm4j.core.pm.impl.connector.NamedObjectResolver;
 
+/**
+ * An API that allows to resolve values by expressions.
+ * <p>
+ * Some PM expression documentation may be found on the page:<br>
+ * https://github.com/pm4j/org.pm4j/wiki/Resolving-path-expressions .
+ * <p>
+ * TODO olaf: complete the expression syntax documentation!
+ *
+ * @author olaf boede
+ */
 public class PmExpressionApi {
 
   private static final PmExpressionApiHandler apiHandler = new PmExpressionApiHandler();
 
   /**
-   * Finds a named property from the following scopes (if available):
-   * <ol>
-   * <li>navigation scope</li>
-   * <li>conversation scope</li>
-   * <li>@link {@link PmConversation} property</li>
-   * <li>http-request and session properties</li>
-   * <li>application configuration property (e.g. Spring)</li>
-   * </ol>
+   * Finds an object for the given expression.
    *
+   * @param pm
+   *          the PM context.
    * @param expression
-   *          Name of the property to find.
-   * @return The found property value or <code>null</code> when not found.
+   *          the expession used to resolve the object.
+   * @return the found object or <code>null</code> when not found.
    */
   public static Object findByExpression(PmObject pm, String expression) {
     return apiHandler.findByExpression(pm, expression);
@@ -31,16 +37,18 @@ public class PmExpressionApi {
    * Imperative version of {@link #findPmProperty(String)}. Throws an exception
    * if there is no value for the given property.
    *
-   * @param name
-   *          Name of the property to find.
-   * @return The found property value.
+   * @param pm
+   *          the PM context.
+   * @param expression
+   *          the expession used to resolve the object.
+   * @return the found object.
    * @throws PmRuntimeException
    *           if there is no value for the given property name.
    */
-  public static Object getByExpression(PmObject pm, String name) throws PmRuntimeException {
-    Object result = apiHandler.findByExpression(pm, name);
+  public static Object getByExpression(PmObject pm, String expression) throws PmRuntimeException {
+    Object result = apiHandler.findByExpression(pm, expression);
     if (result == null) {
-      throw new PmRuntimeException(pm, "No property value found for path '" + name + "'.");
+      throw new PmRuntimeException(pm, "Unable to resolve the expression '" + expression + "'.");
     }
     return result;
   }
@@ -52,35 +60,33 @@ public class PmExpressionApi {
    * case of a property type mismatch.
    *
    * @param <T>
-   *          The expected property type.
+   *          the expected result type.
    * @param pm
-   *          The method calls {@link PmObject#findPmProperty(String)} on this
-   *          object.
-   * @param propName
-   *          Path of the property to find.
-   * @param propType
-   *          The found property will be checked to be an instance of this
-   *          class.
-   * @return The found property or <code>null</code>.
+   *          the PM context.
+   * @param expression
+   *          the expession used to resolve the object.
+   * @param resultType
+   *          the expectes result type.
+   * @return The found object or <code>null</code>.
    * @throws PmRuntimeException
-   *           if the found property value is not compatible to the given
-   *           propType parameter.
+   *           if the found object is not compatible to the given
+   *           <code>resultType</code>.
    */
   @SuppressWarnings("unchecked")
-  public static <T> T findByExpression(PmObject pm, String propName, Class<T> propType) {
-    Object o = findByExpression(pm, propName);
-    if (o != null &&
-        ! propType.isAssignableFrom(o.getClass())) {
-      throw new PmRuntimeException(pm, "Invalid property type of pmProperty '" + propName +
-          "'. It has the type '" + o.getClass() + "' expected class is '" + propType);
+  public static <T> T findByExpression(PmObject pm, String expression, Class<T> resultType) {
+    Object o = findByExpression(pm, expression);
+    if (o != null && !resultType.isAssignableFrom(o.getClass())) {
+      throw new PmRuntimeException(pm, "Expression '" + expression + "' provides an object with an unexpected type."
+          + "\n Found type: '" + o.getClass() + "' but the code expects a kind of: '" + resultType + "'.");
     }
-    return (T)o;
+    return (T) o;
   }
 
   /**
    * Imperative version of {@link #findByExpression(PmObject, String, Class)}.
    *
-   * @throws PmRuntimeException if no property value was found.
+   * @throws PmRuntimeException
+   *           if no object was found.
    */
   public static <T> T getByExpression(PmObject pm, String propName, Class<T> propType) {
     T t = findByExpression(pm, propName, propType);
@@ -90,15 +96,17 @@ public class PmExpressionApi {
     return t;
   }
 
-
   /**
    * Finds an object within the named object scopes of the application.
    * <p>
-   * In difference to {@link #findPmProperty(String)} this method does not
-   * support object navigation expressions.
+   * In difference to {@link #findByExpression(PmObject, String)} this method
+   * does not support object navigation expressions.
+   * <p>
+   * Uses the {@link NamedObjectResolver} configured within the {@link PmConversation}.
    *
-   * @param objName Name of the object to find.
-   * @return The found instance of <code>null</code>.
+   * @param objName
+   *          name of the object to find.
+   * @return the found instance of <code>null</code>.
    */
   public static Object findNamedObject(PmObject pm, String objName) {
     return apiHandler.findNamedObject(pm, objName);

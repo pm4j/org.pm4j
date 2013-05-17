@@ -22,6 +22,8 @@ import org.pm4j.core.pm.PmMessage.Severity;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmValidationApi;
+import org.pm4j.core.pm.impl.connector.NamedObjectResolver;
+import org.pm4j.core.pm.impl.connector.NamedObjectResolverChain;
 import org.pm4j.core.pm.impl.connector.PmToNoViewTechnologyConnector;
 import org.pm4j.core.pm.impl.connector.PmToViewTechnologyConnector;
 import org.pm4j.navi.NaviHistory;
@@ -44,6 +46,11 @@ public class PmConversationImpl extends PmElementBase implements PmConversation 
   private TimeZone pmTimeZone = TimeZone.getDefault();
   private PmExceptionHandler pmExceptionHandler;
   private PmToViewTechnologyConnector pmToViewTechnologyConnector;
+  /**
+   * A chain of {@link NamedObjectResolver}s that is used to resolve
+   * objects referenced by PM expressions.
+   */
+  private NamedObjectResolver pmNamedObjectResolver;
 
   /**
    * Configurable default settings for this conversation.
@@ -219,8 +226,24 @@ public class PmConversationImpl extends PmElementBase implements PmConversation 
     return result;
   }
 
-  public void setPmToViewTechnologyConnector(PmToViewTechnologyConnector navigationHandler) {
-    this.pmToViewTechnologyConnector = navigationHandler;
+  /**
+   * Defines the {@link NamedObjectResolver} to be used for PM expressions.
+   *
+   * @param namedObjectResolver the new resolver to use.
+   */
+  public void setPmNamedObjectResolver(NamedObjectResolver namedObjectResolver) {
+    this.pmNamedObjectResolver = namedObjectResolver;
+  }
+
+  /**
+   * Defines a connector to a view technology layer that allows to access some
+   * callbacks that need to be executed by the view.
+   *
+   * @param pmToViewTechnologyConnector the connector.
+   */
+  public void setPmToViewTechnologyConnector(PmToViewTechnologyConnector pmToViewTechnologyConnector) {
+    this.pmToViewTechnologyConnector = pmToViewTechnologyConnector;
+    this.pmNamedObjectResolver = NamedObjectResolverChain.combineResolvers(pmNamedObjectResolver, pmToViewTechnologyConnector.getNamedObjectResolver());
   }
 
   /**
@@ -442,7 +465,7 @@ public class PmConversationImpl extends PmElementBase implements PmConversation 
   }
 
   /**
-   * Will be called when {@link #findNamedPmObject(String)} did not find a
+   * Will be called when {@link #getPmNamedObject(String)} did not find a
    * value for the given name.<br>
    * An implementation may use this method to generate the requested object
    * on the fly.
@@ -458,19 +481,38 @@ public class PmConversationImpl extends PmElementBase implements PmConversation 
     }
   }
 
+  @Override
   public boolean getHasPmErrors() {
     return !getPmMessages(null, Severity.ERROR).isEmpty();
   }
 
-  public Object getPmNamedObject(Object key) {
+  @Override
+  public Object getPmNamedObject(String key) {
+    // 1. check the explicitely defined named objects
     Object obj = pmNamedObjects.get(key);
-    return obj == null &&
-           getPmParent() != null
-              ? getPmParentConversation().getPmNamedObject(key)
-              : obj;
+    if (obj != null) {
+      return obj;
+    }
+
+    // 2. check the explicitely defined named object resolver
+    if (pmNamedObjectResolver != null) {
+      obj = pmNamedObjectResolver.findObject(key);
+      if (obj != null) {
+          return obj;
+        }
+    }
+
+    // 3. if not found locally: ask the parent conversation
+    PmConversation pc = getPmParentConversation();
+    if (pc != null) {
+      obj = pc.getPmNamedObject(key);
+    }
+
+    return obj;
   }
 
-  public Object setPmNamedObject(Object key, Object value) {
+  @Override
+  public Object setPmNamedObject(String key, Object value) {
     if (LOG.isDebugEnabled()) {
       LOG.debug("setPmNamedObject '" + key + "' to '" + value + "'. PmConversation context: " + PmUtil.getPmLogString(this));
     }

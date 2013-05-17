@@ -133,7 +133,7 @@ public interface PmConversation extends PmElement {
    * @return The value that was bound to the given key before this call.<br>
    *         <code>null</code> if the property was set for the first time.
    */
-  Object setPmNamedObject(Object key, Object value);
+  Object setPmNamedObject(String key, Object value);
 
   /**
    * @see #setPmNamedObject(Object, Object) for more detailed information.
@@ -144,7 +144,7 @@ public interface PmConversation extends PmElement {
    *          The found property value. May be <code>null</code> when the property
    *          is not set.
    */
-  Object getPmNamedObject(Object key);
+  Object getPmNamedObject(String key);
 
   // TODO: move to PmDataInput when support for other buffer scopes is implemented.
   /**

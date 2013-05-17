@@ -4,34 +4,24 @@ import org.apache.commons.lang.StringUtils;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.PmObject;
-import org.pm4j.core.pm.impl.connector.PmToViewTechnologyConnector;
 import org.pm4j.core.pm.impl.pathresolver.PathResolver;
 import org.pm4j.core.pm.impl.pathresolver.PmExpressionPathResolver;
-import org.pm4j.navi.NaviHistory;
+import org.pm4j.navi.NaviHistoryNamedObjectResolver;
 
 public class PmExpressionApiHandler {
 
   /**
-   * Finds a named property from the following scopes (if available):
-   * <ol>
-   * <li>navigation scope</li>
-   * <li>conversation scope</li>
-   * <li>@link {@link PmConversation} property</li>
-   * <li>http-request and session properties</li>
-   * <li>application configuration property (e.g. Spring)</li>
-   * </ol>
-   *
-   * @param name
-   *          Name of the property to find.
-   * @return The found property value or <code>null</code> when not found.
+   * @param expression
+   *          expression for the object to find.
+   * @return the found object or <code>null</code> when not found.
    */
-  public Object findByExpression(PmObject pm, String name) {
-    if (StringUtils.isBlank(name)) {
+  public Object findByExpression(PmObject pm, String expression) {
+    if (StringUtils.isBlank(expression)) {
       throw new PmRuntimeException(pm, "'null' and blank property keys are not supported.");
     }
 
     PathResolver pr = PmExpressionPathResolver.parse(
-                          name,
+                          expression,
                           true /* allow that the first expression part addresses an attribute of the given pm. */ );
     return pr.getValue(pm);
   }
@@ -66,23 +56,13 @@ public class PmExpressionApiHandler {
    */
   protected static Object _findNamedObjectImpl(PmObject pm, String objName) {
     Object result = null;
-    PmConversationImpl pmConversation = (PmConversationImpl)pm.getPmConversation();
-    PmToViewTechnologyConnector viewTechnologyConnector = pmConversation.getPmToViewTechnologyConnector();
-    NaviHistory h = viewTechnologyConnector.getNaviHistory();
+    PmConversation pmConversation = (PmConversationImpl)pm.getPmConversation();
 
-    if (h != null) {
-      result = h.getNaviScopeProperty(objName);
-
-      if (result == null) {
-        result = h.getConversationProperty(objName);
-      }
-    }
+    // TODO olaf: move that out as a very optional configuration part of the conversation or view connector...
+    result = new NaviHistoryNamedObjectResolver(pmConversation).findObject(objName);
 
     if (result == null) {
       result = pmConversation.getPmNamedObject(objName);
-      if (result == null) {
-        result = viewTechnologyConnector.findNamedObject(objName);
-      }
     }
 
     return result;

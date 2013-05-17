@@ -18,6 +18,12 @@ public class PmToNoViewTechnologyConnector implements PmToViewTechnologyConnecto
 
   private static final Log LOG = LogFactory.getLog(PmToNoViewTechnologyConnector.class);
   private NaviLink lastNaviLink;
+  private NamedObjectResolver namedObjectResolver = new NamedObjectResolver() {
+    @Override
+    public Object findObject(String name) {
+      return System.getProperty(name);
+    }
+  };
 
   /**
    * Just reports a warning.
@@ -63,12 +69,16 @@ public class PmToNoViewTechnologyConnector implements PmToViewTechnologyConnecto
   }
 
   @Override
-  public Object findNamedObject(String attrName) {
-    return System.getProperty(attrName);
+  public Object createPmToViewConnector(PmObject pm) {
+    return null;
   }
 
   @Override
-  public Object createPmToViewConnector(PmObject pm) {
-    return null;
+  public NamedObjectResolver getNamedObjectResolver() {
+    return namedObjectResolver;
+  }
+
+  public void setNamedObjectResolver(NamedObjectResolver namedObjectResolver) {
+    this.namedObjectResolver = namedObjectResolver;
   }
 }

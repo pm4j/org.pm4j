@@ -32,7 +32,7 @@ public interface PmToViewTechnologyConnector {
   void redirectWithRequestParams(String toPageId);
 
   /**
-   * @return <code>true</code> when the current location was started with pm4j request parametets.
+   * @return <code>true</code> when the current location was started with pm4j request parameters.
    */
   boolean hasRequestParams();
 
@@ -69,16 +69,14 @@ public interface PmToViewTechnologyConnector {
   void setRequestAttribute(String attrName, Object value);
 
   /**
-   * Finds a named object within the technology specific environment.
+   * Provides an optional view technology specific named object resolver.
    * <p>
-   * Concrete implementations may provide here HTTP attributes as well as EJB
-   * and Spring attributes.
+   * It may be configured to provide objects defined in a view technology
+   * specific naming context. E.g. JSF.
    *
-   * @param attrName
-   *          Name of the attribute to find.
-   * @return The found attribute value or <code>null</code>.
+   * @return the configued resolver or <code>null</code>.
    */
-  Object findNamedObject(String attrName);
+  NamedObjectResolver getNamedObjectResolver();
 
   /**
    * Provides a view technology specific connector.
