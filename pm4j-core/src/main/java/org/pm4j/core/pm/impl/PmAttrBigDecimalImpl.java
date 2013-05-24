@@ -58,7 +58,7 @@ public class PmAttrBigDecimalImpl extends PmAttrNumBase<BigDecimal> implements P
   protected String getFormatDefaultResKey() {
     return RESKEY_DEFAULT_FLOAT_FORMAT_PATTERN;
   }
-  
+
   // ======== meta data ======== //
 
   @Override
@@ -74,6 +74,8 @@ public class PmAttrBigDecimalImpl extends PmAttrNumBase<BigDecimal> implements P
 
     PmAttrBigDecimalCfg annotation = AnnotationUtil.findAnnotation(this, PmAttrBigDecimalCfg.class);
     if (annotation != null) {
+      // FIXME: make max and min value config optional!
+      // BTW: the names should be less redundant: min, max, roundingMode
       BigDecimal maxValue = new BigDecimal(annotation.maxValueString());
       myMetaData.maxValue = maxValue;
       BigDecimal minValue = myMetaData.minValue = new BigDecimal(annotation.minValueString());
@@ -117,7 +119,7 @@ public class PmAttrBigDecimalImpl extends PmAttrNumBase<BigDecimal> implements P
   private final MetaData getOwnMetaDataWithoutPmInitCall() {
     return (MetaData) getPmMetaDataWithoutPmInitCall();
   }
-  
+
   /**
    * @return rounding mode when converting to pm value. Changing this to a value
    *         different than RoundingMode.UNNECESSARY will allow to set more
