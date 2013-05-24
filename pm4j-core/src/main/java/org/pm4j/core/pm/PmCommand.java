@@ -67,14 +67,6 @@ public interface PmCommand extends PmObject {
   PmCommand doIt();
 
   /**
-   * Executes the command. If the command provides a next dialog (E.g. in case of wizard
-   * page flows), the PM of the next page will be returned.
-   *
-   * @return The PM of the next page to show.
-   */
-  PmObject doItReturnNextDlgPm();
-
-  /**
    * Provides an instance that may undo the effect of this command.
    * <p>
    * A command is 'undo-able' when this method returns <code>null</code>.
