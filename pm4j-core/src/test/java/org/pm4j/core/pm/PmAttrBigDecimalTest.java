@@ -1,7 +1,6 @@
 package org.pm4j.core.pm;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -15,8 +14,12 @@ import org.pm4j.core.pm.annotation.PmAttrBigDecimalCfg;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.impl.PmAttrBigDecimalImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
-import org.pm4j.tools.test.PmAssert;
 
+/**
+ * If you modify this test, please consider at least {@link PmAttrDoubleTest}.
+ * @author dzabel
+ *
+ */
 public class PmAttrBigDecimalTest {
   
   private MyPm myPm;
@@ -24,24 +27,22 @@ public class PmAttrBigDecimalTest {
   @Before
   public void setup() {
     myPm = new MyPm();
+    myPm.setPmLocale(Locale.ENGLISH);
   }
 
   @Test
   public void testValueAccess() {
-
-    assertNull("Initial value should be null", myPm.bigDecMaxLen6.getValue());
-    assertNull("Initial value as string should be null", myPm.bigDecMaxLen6.getValueAsString());
-
+    assertNull("Initial value should be null", myPm.maxLen6.getValue());
+    assertNull("Initial value as string should be null", myPm.maxLen6.getValueAsString());
     BigDecimal assignedValue = new BigDecimal("123");
-    myPm.bigDecMaxLen6.setValue(assignedValue);
-
-    assertEquals("The assigned value should be the current one.", assignedValue, myPm.bigDecMaxLen6.getValue());
-    assertEquals("The assigned value should also appear as string.", "123", myPm.bigDecMaxLen6.getValueAsString());
+    myPm.maxLen6.setValue(assignedValue);
+    assertEquals("The assigned value should be the current one.", assignedValue, myPm.maxLen6.getValue());
+    assertEquals("The assigned value should also appear as string.", "123", myPm.maxLen6.getValueAsString());
   }
 
   @Test
   public void testMaxLen() {
-    assertEquals(6, myPm.bigDecMaxLen6.getMaxLen());
+    assertEquals(6, myPm.maxLen6.getMaxLen());
   }
 
   
@@ -49,23 +50,30 @@ public class PmAttrBigDecimalTest {
   @Ignore("FIXME: Wrong locale is choosen, germany should use a dot as decimal divider. See property _de file.")
   public void testDefaultNoRoundingGermany() {
     myPm.getPmConversation().setPmLocale(Locale.GERMAN);
-    myPm.bigDecimal.setValueAsString("123,56789");
-    assertTrue("By default any BigDecimal should be valid.", myPm.bigDecimal.isPmValid());
-    assertEquals("By default any BigDecimal should not be formatted.","123,56789", myPm.bigDecimal.getValueAsString());    
+    myPm.bare.setValueAsString("123,56789");
+    assertTrue("By default any BigDecimal should be valid.", myPm.bare.isPmValid());
+    assertEquals("By default any BigDecimal should not be formatted.","123,56789", myPm.bare.getValueAsString());    
   }
 
 
   @Test
   public void testDefaultNoRoundingEnglish() {
     myPm.getPmConversation().setPmLocale(Locale.ENGLISH);
-    myPm.bigDecimal.setValueAsString("123.56789");
-    assertTrue("By default any BigDecimal should be valid.", myPm.bigDecimal.isPmValid());
-    assertEquals("By default any BigDecimal should not be formatted.","123.56789", myPm.bigDecimal.getValueAsString());    
+    myPm.bare.setValueAsString("123.56789");
+    assertTrue("By default any BigDecimal should be valid.", myPm.bare.isPmValid());
+    assertEquals("By default any BigDecimal should not be formatted.","123.56789", myPm.bare.getValueAsString());    
   }
 
   @Test
+  public void testDefaultNoRoundingWithSetValue() {
+    myPm.bare.setValue(new BigDecimal("123.56789"));
+    assertTrue("By default any BigDecimal should be valid.", myPm.bare.isPmValid());
+    assertEquals("By default any BigDecimal should not be formatted.","123.56789", myPm.bare.getValueAsString());
+    assertEquals(new BigDecimal("123.56789"),myPm.bare.getValue());
+  }
+  
+  @Test
   public void testReadOnly() {
-    MyPm myPm = new MyPm();
     assertTrue(myPm.readOnlyAttr.isPmReadonly());
     assertEquals(new BigDecimal(MyPm.READONLY_VALUE), myPm.readOnlyAttr.getValue());    
     myPm.readOnlyAttr.setValue(new BigDecimal("0.01"));
@@ -76,8 +84,13 @@ public class PmAttrBigDecimalTest {
   
   @Test
   public void testGetMinMax() {
-    assertEquals(999, myPm.minMaxAttr.getMax().longValue());
-    assertEquals(6, myPm.minMaxAttr.getMaxLen());    
+    assertEquals(new BigDecimal("999.99"), myPm.minMaxAttr.getMax());
+    assertEquals(new BigDecimal("0.1"), myPm.minMaxAttr.getMin());
+  }
+  
+  @Test
+  public void testGetMaxLen() {
+    assertEquals(6, myPm.maxLen6.getMaxLen());    
   }
   
   private void assertMinMax(String number, boolean isValid) {
@@ -102,36 +115,32 @@ public class PmAttrBigDecimalTest {
 
   @Test
   public void testDefaultStringFormat() {
-    assertEquals("An un-set value provides a null.", null, myPm.bigDecMaxLen6.getValueAsString());
-    myPm.bigDecMaxLen6.setValueAsString("0");
-
-    assertEquals("Default format for zero.", "0", myPm.bigDecMaxLen6.getValueAsString());
-
-    myPm.bigDecMaxLen6.setValueAsString("0.153");
-    assertEquals("0.153", myPm.bigDecMaxLen6.getValueAsString());
+    assertEquals("An un-set value provides a null.", null, myPm.maxLen6.getValueAsString());
+    myPm.maxLen6.setValueAsString("0");
+    assertEquals("Default format for zero.", "0", myPm.maxLen6.getValueAsString());
+    myPm.maxLen6.setValueAsString("0.153");
+    assertEquals("0.153", myPm.maxLen6.getValueAsString());
   }
   
   @Test
   public void testFormatted() {
-    assertEquals("An un-set value provides a null.", null, myPm.bigFormatted.getValueAsString());
-    myPm.bigFormatted.setValueAsString("0");
-
-    assertEquals("Default format for zero.", "0", myPm.bigFormatted.getValueAsString());
-
-    myPm.bigFormatted.setValueAsString("0.123");
-    assertEquals("0.123", myPm.bigFormatted.getValueAsString());
+    assertEquals("An un-set value provides a null.", null, myPm.formatted.getValueAsString());
+    myPm.formatted.setValueAsString("0");
+    assertEquals("Default format for zero.", "0", myPm.formatted.getValueAsString());
+    myPm.formatted.setValueAsString("0.123");
+    assertEquals("0.123", myPm.formatted.getValueAsString());
   }
 
   static class MyPm extends PmConversationImpl {
     public static final String READONLY_VALUE = "1.51";
     
     @PmAttrCfg(maxLen=6)
-    public final PmAttrBigDecimal bigDecMaxLen6 = new PmAttrBigDecimalImpl(this);
+    public final PmAttrBigDecimal maxLen6 = new PmAttrBigDecimalImpl(this);
 
-    public final PmAttrBigDecimal bigDecimal = new PmAttrBigDecimalImpl(this);
+    public final PmAttrBigDecimal bare = new PmAttrBigDecimalImpl(this);
     
     @PmAttrCfg(formatResKey="")
-    public final PmAttrBigDecimal bigFormatted = new PmAttrBigDecimalImpl(this);
+    public final PmAttrBigDecimal formatted = new PmAttrBigDecimalImpl(this);
     
     @PmAttrBigDecimalCfg(minValueString="0.1", maxValueString="999.99")
     public final PmAttrBigDecimal minMaxAttr = new PmAttrBigDecimalImpl(this);
@@ -143,13 +152,6 @@ public class PmAttrBigDecimalTest {
       }
     };
 
-    @Override
-    protected void onPmInit() {
-      super.onPmInit();
-      // FIXME olaf: there is an unresolved language issue.
-      // The test does not work for GERMAN, even if the related resources are defined within a default resource file.
-      setPmLocale(Locale.ENGLISH);
-    }
   }
 
 }
