@@ -66,6 +66,16 @@ public class PmAttrBigDecimalImpl extends PmAttrNumBase<BigDecimal> implements P
     return new MetaData();
   }
 
+  /**
+   * Null safe implementation
+   * @param number the number
+   * @return a BigDecimal
+   */
+  private BigDecimal convert(String number) {
+    boolean isEmpty =  number == null || "".equals(number);
+    return isEmpty ? null : new BigDecimal(number);
+  }
+  
   @Override
   protected void initMetaData(PmObjectBase.MetaData metaData) {
     super.initMetaData(metaData);
@@ -74,11 +84,10 @@ public class PmAttrBigDecimalImpl extends PmAttrNumBase<BigDecimal> implements P
 
     PmAttrBigDecimalCfg annotation = AnnotationUtil.findAnnotation(this, PmAttrBigDecimalCfg.class);
     if (annotation != null) {
-      BigDecimal maxValue = new BigDecimal(annotation.maxValueString());
-      myMetaData.maxValue = maxValue;
-      BigDecimal minValue = myMetaData.minValue = new BigDecimal(annotation.minValueString());
+      BigDecimal maxValue = myMetaData.maxValue = convert(annotation.maxValueString());
+      BigDecimal minValue = myMetaData.minValue = convert(annotation.minValueString());
 
-      if (minValue.compareTo(maxValue) >= 1) {
+      if (minValue != null && maxValue != null && minValue.compareTo(maxValue) >= 1) {
         throw new PmRuntimeException(this, "minValue(" + minValue + ") > maxValue(" + maxValue + ")");
       }
       myMetaData.stringConversionRoundingMode = annotation.stringConversionRoundingMode();

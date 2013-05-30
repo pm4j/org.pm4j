@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Locale;
 
 import org.junit.Before;
@@ -93,24 +94,45 @@ public class PmAttrBigDecimalTest {
     assertEquals(6, myPm.maxLen6.getMaxLen());    
   }
   
-  private void assertMinMax(String number, boolean isValid) {
-    myPm.minMaxAttr.setValueAsString(number);
-    myPm.minMaxAttr.pmValidate();
-    assertEquals(number, myPm.minMaxAttr.getValueAsString());
-    if(isValid) {
-      assertEquals(new BigDecimal(number), myPm.minMaxAttr.getValue());
-    }
-    assertEquals(isValid, myPm.minMaxAttr.isPmValid());    
+  private void assertValue(PmAttrBigDecimal pm, String number, boolean isValid) {
+    pm.setValueAsString(number);
+    pm.pmValidate();
+    assertEquals(number, pm.getValueAsString());
+    assertEquals(new BigDecimal(number), pm.getValue());
+  }
+  
+ 
+  private void testMinMax(PmAttrBigDecimal pm) {
+    assertValue(pm, "0", false);
+    assertValue(pm, "0.1", true);
+    assertValue(pm, "0.09", false);
+    assertValue(pm, "999.9900001", false);
+    assertValue(pm, "9.9999", true);
+    assertValue(pm, "99999", false);    
+  }
+
+  @Test
+  public void testMinMax() {
+    testMinMax(myPm.minMaxAttr);
+    testMinMax(myPm.minSingleValue);
+    testMinMax(myPm.maxSingleValue);
   }
   
   @Test
-  public void testMinMax() {
-    assertMinMax("0", false);
-    assertMinMax("0.1", true);
-    assertMinMax("0.09", false);
-    assertMinMax("999.9900001", false);
-    assertMinMax("9.9999", true);
-    assertMinMax("99999", false);    
+  public void testRoundingHalfDown() {
+    myPm.roundingHalfDown.setValueAsString("1.005");
+    myPm.roundingHalfDown.pmValidate();
+    assertEquals("0.005 will be removed because of the format and rounding", "1.00", myPm.roundingHalfDown.getValueAsString());
+    assertEquals("Should not have been changed", new BigDecimal("1.005"), myPm.roundingHalfDown.getValue());
+  }
+
+  @Test
+  public void testRoundingHalfUp() {
+    myPm.roundingHalfUp.setValueAsString("1.005");
+    myPm.roundingHalfUp.pmValidate();
+    // the 0.005 will be rounded because of the format and rounding mode
+    assertEquals("0.005 will be added because of the format and rounding", "1.01", myPm.roundingHalfUp.getValueAsString());
+    assertEquals("Should not have been changed", new BigDecimal("1.005"), myPm.roundingHalfUp.getValue());
   }
 
   @Test
@@ -131,8 +153,24 @@ public class PmAttrBigDecimalTest {
     assertEquals("0.123", myPm.formatted.getValueAsString());
   }
 
+
+  
   static class MyPm extends PmConversationImpl {
     public static final String READONLY_VALUE = "1.51";
+
+    @PmAttrBigDecimalCfg(minValueString="0.1")
+    public final PmAttrBigDecimal minSingleValue = new PmAttrBigDecimalImpl(this);
+
+    @PmAttrBigDecimalCfg(maxValueString="999.9")
+    public final PmAttrBigDecimal maxSingleValue = new PmAttrBigDecimalImpl(this);
+
+    @PmAttrCfg(formatResKey="pmAttrNumber_twoDecimalPlaces")
+    @PmAttrBigDecimalCfg(stringConversionRoundingMode = RoundingMode.HALF_DOWN)
+    public final PmAttrBigDecimal roundingHalfDown = new PmAttrBigDecimalImpl(this);
+
+    @PmAttrCfg(formatResKey="pmAttrNumber_twoDecimalPlaces")
+    @PmAttrBigDecimalCfg(stringConversionRoundingMode = RoundingMode.HALF_UP)
+    public final PmAttrBigDecimal roundingHalfUp = new PmAttrBigDecimalImpl(this);
     
     @PmAttrCfg(maxLen=6)
     public final PmAttrBigDecimal maxLen6 = new PmAttrBigDecimalImpl(this);

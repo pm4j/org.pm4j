@@ -114,7 +114,6 @@ public class PmConverterNumber<T extends Number> extends PmConverterSerializeabl
         }
         // make sure that max and min fraction match
         try {
-          nf.setRoundingMode(RoundingMode.UNNECESSARY);
           nf.format(object);
         } catch (ArithmeticException e) {
           throw new ParseException(e.getMessage(), 0);

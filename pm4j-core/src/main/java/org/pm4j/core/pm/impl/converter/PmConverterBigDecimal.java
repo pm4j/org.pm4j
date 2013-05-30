@@ -8,8 +8,14 @@ import java.util.Locale;
 
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmAttrBigDecimal;
+import org.pm4j.core.pm.PmAttrNumber;
 import org.pm4j.core.pm.impl.PmAttrBigDecimalImpl;
 
+/**
+ * A number converter for type {@link BigDecimal}.
+ *
+ * @author dietmar zabel
+ */
 public class PmConverterBigDecimal extends PmConverterNumber<BigDecimal> {
 
   public static final PmConverterBigDecimal INSTANCE = new PmConverterBigDecimal();
@@ -24,7 +30,11 @@ public class PmConverterBigDecimal extends PmConverterNumber<BigDecimal> {
     if(pmAttr instanceof PmAttrBigDecimal) {
       PmAttrBigDecimalImpl pmAttrBigDecimal = (PmAttrBigDecimalImpl) pmAttr;
       decimalFormat.setRoundingMode(pmAttrBigDecimal.getStringConversionRoundingMode());
+    } else {
+      // Fall back for special attributes sometimes representing a BigDecimal value 
+      decimalFormat.setRoundingMode(PmAttrNumber.ROUNDINGMODE_DEFAULT);
     }
+    
     decimalFormat.setParseBigDecimal(true);
     return decimalFormat;
   }

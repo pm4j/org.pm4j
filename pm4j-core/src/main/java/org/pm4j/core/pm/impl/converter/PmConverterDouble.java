@@ -7,8 +7,14 @@ import java.util.Locale;
 
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmAttrDouble;
+import org.pm4j.core.pm.PmAttrNumber;
 import org.pm4j.core.pm.impl.PmAttrDoubleImpl;
 
+/**
+ * A number converter for type {@link Double}.
+ *
+ * @author olaf boede
+ */
 public class PmConverterDouble extends PmConverterNumber<Double> {
 
   public static final PmConverterDouble INSTANCE = new PmConverterDouble();
@@ -23,6 +29,9 @@ public class PmConverterDouble extends PmConverterNumber<Double> {
     if(pmAttr instanceof PmAttrDouble) {
       PmAttrDoubleImpl pmAttrDouble = (PmAttrDoubleImpl) pmAttr;
       decimalFormat.setRoundingMode(pmAttrDouble.getStringConversionRoundingMode());
+    } else {
+      // Fall back for special attributes sometimes representing a Double value 
+      decimalFormat.setRoundingMode(PmAttrNumber.ROUNDINGMODE_DEFAULT);
     }
     return decimalFormat;
   }

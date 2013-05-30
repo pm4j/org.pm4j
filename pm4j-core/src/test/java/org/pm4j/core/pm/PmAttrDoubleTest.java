@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.math.RoundingMode;
 import java.util.Locale;
 
 import org.junit.Before;
@@ -15,7 +16,7 @@ import org.pm4j.core.pm.impl.PmAttrDoubleImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
 
 /**
- * If you modify this test, please consider at least {@link PmAttrBigDecimalTest}.
+ * If you modify this test, please consider at least {@link PmAttrDoubleTest}.
  * @author dzabel
  *
  */
@@ -49,23 +50,23 @@ public class PmAttrDoubleTest {
   public void testDefaultNoRoundingGermany() {
     myPm.getPmConversation().setPmLocale(Locale.GERMAN);
     myPm.bare.setValueAsString("123,56789");
-    assertTrue("By default any BigDecimal should be valid.", myPm.bare.isPmValid());
-    assertEquals("By default any BigDecimal should not be formatted.","123,56789", myPm.bare.getValueAsString());    
+    assertTrue("By default any Double should be valid.", myPm.bare.isPmValid());
+    assertEquals("By default any Double should not be formatted.","123,56789", myPm.bare.getValueAsString());    
   }
 
   @Test
   public void testDefaultNoRoundingEnglish() {
     myPm.getPmConversation().setPmLocale(Locale.ENGLISH);
     myPm.bare.setValueAsString("123.56789");
-    assertTrue("By default any BigDecimal should be valid.", myPm.bare.isPmValid());
-    assertEquals("By default any BigDecimal should not be formatted.","123.56789", myPm.bare.getValueAsString());    
+    assertTrue("By default any Double should be valid.", myPm.bare.isPmValid());
+    assertEquals("By default any Double should not be formatted.","123.56789", myPm.bare.getValueAsString());    
   }
 
   @Test
   public void testDefaultNoRoundingWithSetValue() {
     myPm.bare.setValue(new Double("123.56789"));
-    assertTrue("By default any BigDecimal should be valid.", myPm.bare.isPmValid());
-    assertEquals("By default any BigDecimal should not be formatted.","123.56789", myPm.bare.getValueAsString());
+    assertTrue("By default any Double should be valid.", myPm.bare.isPmValid());
+    assertEquals("By default any Double should not be formatted.","123.56789", myPm.bare.getValueAsString());
     assertEquals(new Double("123.56789"),myPm.bare.getValue());
   }
   
@@ -90,26 +91,49 @@ public class PmAttrDoubleTest {
     assertEquals(6, myPm.maxLen6.getMaxLen());    
   }
   
-  private void assertMinMax(String number, boolean isValid) {
-    myPm.minMaxAttr.setValueAsString(number);
-    myPm.minMaxAttr.pmValidate();
-    assertEquals(number, myPm.minMaxAttr.getValueAsString());
-    if(isValid) {
-      assertEquals(new Double(number), myPm.minMaxAttr.getValue());
-    }
-    assertEquals(isValid, myPm.minMaxAttr.isPmValid());    
+  private void assertValue(PmAttrDouble pm, String number, boolean isValid) {
+    pm.setValueAsString(number);
+    pm.pmValidate();
+    assertEquals(number, pm.getValueAsString());
+    assertEquals(new Double(number), pm.getValue());
   }
   
-  @Test
-  public void testMinMax() {
-    assertMinMax("0", false);
-    assertMinMax("0.1", true);
-    assertMinMax("0.09", false);
-    assertMinMax("999.9900001", false);
-    assertMinMax("9.9999", true);
-    assertMinMax("99999", false);    
+ 
+  private void testMinMax(PmAttrDouble pm) {
+    assertValue(pm, "0", false);
+    assertValue(pm, "0.1", true);
+    assertValue(pm, "0.09", false);
+    assertValue(pm, "999.9900001", false);
+    assertValue(pm, "9.9999", true);
+    assertValue(pm, "99999", false);    
   }
 
+  @Test
+  public void testMinMax() {
+    testMinMax(myPm.minMaxAttr);
+    testMinMax(myPm.minSingleValue);
+    testMinMax(myPm.maxSingleValue);
+  }
+
+  
+  @Test
+  public void testRoundingHalfDown() {
+    myPm.roundingHalfDown.setValueAsString("1.005");
+    myPm.roundingHalfDown.pmValidate();
+    assertEquals("0.005 will be removed because of the format and rounding", "1.00", myPm.roundingHalfDown.getValueAsString());
+    assertEquals("Should not have been changed", new Double("1.005"), myPm.roundingHalfDown.getValue());
+  }
+
+  @Test
+  public void testRoundingHalfUp() {
+    myPm.roundingHalfUp.setValueAsString("1.005");
+    myPm.roundingHalfUp.pmValidate();
+    // the 0.005 will be rounded because of the format and rounding mode
+    assertEquals("0.005 will be added because of the format and rounding", "1.01", myPm.roundingHalfUp.getValueAsString());
+    assertEquals("Should not have been changed", new Double("1.005"), myPm.roundingHalfUp.getValue());
+  }
+
+  
   @Test
   public void testDefaultStringFormat() {
     assertEquals("An un-set value provides a null.", null, myPm.maxLen6.getValueAsString());
@@ -152,11 +176,25 @@ public class PmAttrDoubleTest {
   
   static class MyPm extends PmConversationImpl {
     public static final String READONLY_VALUE = "1.51";
-    
-    public final PmAttrDouble bare = new PmAttrDoubleImpl(this);
+
+    @PmAttrDoubleCfg(minValue=0.1)
+    public final PmAttrDouble minSingleValue = new PmAttrDoubleImpl(this);
+
+    @PmAttrDoubleCfg(maxValue=999.9)
+    public final PmAttrDouble maxSingleValue = new PmAttrDoubleImpl(this);
+
+    @PmAttrCfg(formatResKey="pmAttrNumber_twoDecimalPlaces")
+    @PmAttrDoubleCfg(stringConversionRoundingMode = RoundingMode.HALF_DOWN)
+    public final PmAttrDouble roundingHalfDown = new PmAttrDoubleImpl(this);
+
+    @PmAttrCfg(formatResKey="pmAttrNumber_twoDecimalPlaces")
+    @PmAttrDoubleCfg(stringConversionRoundingMode = RoundingMode.HALF_UP)
+    public final PmAttrDouble roundingHalfUp = new PmAttrDoubleImpl(this);
     
     @PmAttrCfg(maxLen=6)
     public final PmAttrDouble maxLen6 = new PmAttrDoubleImpl(this);
+
+    public final PmAttrDouble bare = new PmAttrDoubleImpl(this);
     
     @PmAttrCfg(formatResKey="")
     public final PmAttrDouble formatted = new PmAttrDoubleImpl(this);
