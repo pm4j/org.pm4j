@@ -525,7 +525,12 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     }
     clearPmInvalidValues();
     if (isWritable) {
-      setValue(getDefaultValue());
+      T_PM_VALUE dv = getDefaultValue();
+      // TODO olaf: handle scalar values!
+//      if (dv == null && getOwnMetaData().primitiveType) {
+//        getOwnMetaData().
+//      }
+      setValue(dv);
     }
 
     // For composite attribute PM's: reset the children.
@@ -582,15 +587,18 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
         return pmValue;
       }
 
-      // At this point pmValue is still either null or empty.
-      // If a default value exists this shall be used to populate it.
-      T_PM_VALUE defaultValue = getDefaultValue();
-      if (defaultValue != null) {
-          T_BEAN_VALUE defaultBeanAttrValue = convertPmValueToBackingValue(defaultValue);
+      // The default value will be considered if the attribute is enabled.
+      if (isPmEnabled()) {
+        // At this point pmValue is still either null or empty.
+        // If a default value exists this shall be used to populate it.
+        T_PM_VALUE defaultValue = getDefaultValue();
+        if (defaultValue != null) {
           // The backing value gets changed within the 'get' functionality.
           // This is ok according to the default value logic. See: Wiki entry TODO
+          T_BEAN_VALUE defaultBeanAttrValue = convertPmValueToBackingValue(defaultValue);
           setBackingValue(defaultBeanAttrValue);
           return defaultValue;
+        }
       }
 
       // If non of the above approaches was successful we can do nothing else
