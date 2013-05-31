@@ -56,6 +56,20 @@ public class FilterCompareDefinitionFactoryImpl implements FilterCompareDefiniti
       return fcd;
   }
 
+  /**
+   * Creates a {@link FilterCompareDefinition} for the given attribute and
+   * adds it to the given query options.
+   *
+   * @param queryOptions the options to add the compare definition to.
+   * @param attr the attribute to generate the compare definition for.
+   * @return the generated compare definition.
+   */
+  public FilterCompareDefinition addFilter(QueryOptions queryOptions, QueryAttr attr) {
+    FilterCompareDefinition d = createCompareDefinition(attr);
+    queryOptions.addFilterCompareDefinition(d);
+    return d;
+  }
+
   protected CompOp[] getCompOpsForValueType(QueryAttr attr) {
 	Class<?> valueType = attr.getType();
 

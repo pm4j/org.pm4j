@@ -14,7 +14,10 @@ public class NamedObjectResolverForJsfEl implements NamedObjectResolver {
     // ELContext elCtxt = fc.getELContext();
     // fc.getApplication().getExpressionFactory().createValueExpression(elCtxt, name, Object.class);
 
-    Object o = fc.getApplication().createValueBinding("#{" + attrName + "}").getValue(fc);
+    Object o = null;
+    if (fc != null) {
+      o = fc.getApplication().createValueBinding("#{" + attrName + "}").getValue(fc);
+    }
     return o;
   }
 
