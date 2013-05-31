@@ -21,11 +21,11 @@ public class PmAttrLongImpl extends PmAttrNumBase<Long> implements PmAttrLong {
 
   // ======== Interface implementation ======== //
 
-  public Long getMax() {
+  public Long getMaxValue() {
     return getOwnMetaData().maxValue;
   }
 
-  public Long getMin() {
+  public Long getMinValue() {
     return getOwnMetaData().minValue;
   }
 
@@ -37,11 +37,11 @@ public class PmAttrLongImpl extends PmAttrNumBase<Long> implements PmAttrLong {
 
     if (value != null) {
       long v = value.longValue();
-      if (v < getMin().longValue()) {
-        throw new PmValidationException(this, PmConstants.MSGKEY_VALIDATION_VALUE_TOO_LOW, getMin());
+      if (v < getMinValue().longValue()) {
+        throw new PmValidationException(this, PmConstants.MSGKEY_VALIDATION_VALUE_TOO_LOW, getMinValue());
       }
-      if (v > getMax().longValue()) {
-        throw new PmValidationException(this, PmConstants.MSGKEY_VALIDATION_VALUE_TOO_HIGH, getMax());
+      if (v > getMaxValue().longValue()) {
+        throw new PmValidationException(this, PmConstants.MSGKEY_VALIDATION_VALUE_TOO_HIGH, getMaxValue());
       }
     }
   }

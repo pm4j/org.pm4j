@@ -21,11 +21,11 @@ public class PmAttrIntegerImpl extends PmAttrNumBase<Integer> implements PmAttrI
 
   // ======== Interface implementation ======== //
 
-  public Integer getMax() {
+  public Integer getMaxValue() {
     return getOwnMetaData().maxValue;
   }
 
-  public Integer getMin() {
+  public Integer getMinValue() {
     return getOwnMetaData().minValue;
   }
 
@@ -37,11 +37,11 @@ public class PmAttrIntegerImpl extends PmAttrNumBase<Integer> implements PmAttrI
 
     if (value != null) {
       int v = value.intValue();
-      if (v < getMin().longValue()) {
-        throw new PmValidationException(this, PmConstants.MSGKEY_VALIDATION_VALUE_TOO_LOW, getMin());
+      if (v < getMinValue().longValue()) {
+        throw new PmValidationException(this, PmConstants.MSGKEY_VALIDATION_VALUE_TOO_LOW, getMinValue());
       }
-      if (v > getMax().longValue()) {
-        throw new PmValidationException(this, PmConstants.MSGKEY_VALIDATION_VALUE_TOO_HIGH, getMax());
+      if (v > getMaxValue().longValue()) {
+        throw new PmValidationException(this, PmConstants.MSGKEY_VALIDATION_VALUE_TOO_HIGH, getMaxValue());
       }
     }
   }

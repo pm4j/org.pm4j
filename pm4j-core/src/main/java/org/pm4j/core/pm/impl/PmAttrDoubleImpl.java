@@ -23,11 +23,11 @@ public class PmAttrDoubleImpl extends PmAttrNumBase<Double> implements PmAttrDou
 
   // ======== Interface implementation ======== //
 
-  public Double getMax() {
+  public Double getMaxValue() {
     return getOwnMetaDataWithoutPmInitCall().maxValue;
   }
 
-  public Double getMin() {
+  public Double getMinValue() {
     return getOwnMetaDataWithoutPmInitCall().minValue;
   }
 
@@ -51,11 +51,11 @@ public class PmAttrDoubleImpl extends PmAttrNumBase<Double> implements PmAttrDou
 
     if (value != null) {
       double v = value.doubleValue();
-      if (v < getMin().doubleValue()) {
-        throw new PmValidationException(this, PmConstants.MSGKEY_VALIDATION_VALUE_TOO_LOW, getMin());
+      if (v < getMinValue().doubleValue()) {
+        throw new PmValidationException(this, PmConstants.MSGKEY_VALIDATION_VALUE_TOO_LOW, getMinValue());
       }
-      if (v > getMax().doubleValue()) {
-        throw new PmValidationException(this, PmConstants.MSGKEY_VALIDATION_VALUE_TOO_HIGH, getMax());
+      if (v > getMaxValue().doubleValue()) {
+        throw new PmValidationException(this, PmConstants.MSGKEY_VALIDATION_VALUE_TOO_HIGH, getMaxValue());
       }
     }
   }
@@ -67,6 +67,21 @@ public class PmAttrDoubleImpl extends PmAttrNumBase<Double> implements PmAttrDou
     return new MetaData();
   }
 
+  /**
+   * Just to consider deprecated annotation attributes.
+   * @param annotation the annotation.
+   * @return the rounding mode.
+   */
+  @SuppressWarnings("deprecation")
+  private RoundingMode getRoundingMode(PmAttrDoubleCfg annotation) {
+    RoundingMode rm = annotation.roundingMode();
+    if(rm == ROUNDINGMODE_DEFAULT) {
+      rm = annotation.stringConversionRoundingMode();
+    }
+    return rm;
+  }
+
+  
   @Override
   protected void initMetaData(PmObjectBase.MetaData metaData) {
     super.initMetaData(metaData);
@@ -81,14 +96,14 @@ public class PmAttrDoubleImpl extends PmAttrNumBase<Double> implements PmAttrDou
       if (minValue > maxValue) {
         throw new PmRuntimeException(this, "minValue(" + minValue + ") > maxValue(" + maxValue + ")");
       }
-      myMetaData.stringConversionRoundingMode = annotation.stringConversionRoundingMode();
+      myMetaData.roundingMode = getRoundingMode(annotation);
     }
   }
 
   protected static class MetaData extends PmAttrNumBase.MetaData {
     private double maxValue = Double.MAX_VALUE;
     private double minValue = -Double.MAX_VALUE;
-    public RoundingMode stringConversionRoundingMode = ROUNDINGMODE_DEFAULT;
+    public RoundingMode roundingMode = ROUNDINGMODE_DEFAULT;
 
     @Override
     protected double getMaxValue() {
@@ -107,8 +122,8 @@ public class PmAttrDoubleImpl extends PmAttrNumBase<Double> implements PmAttrDou
    *         fraction digits than specified in the format. Those additional
    *         digits will then be rounded.
    */  
-  public RoundingMode getStringConversionRoundingMode() {
-    return getOwnMetaDataWithoutPmInitCall().stringConversionRoundingMode;
+  public RoundingMode getRoundingMode() {
+    return getOwnMetaDataWithoutPmInitCall().roundingMode;
   }
 
 

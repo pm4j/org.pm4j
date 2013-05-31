@@ -25,10 +25,10 @@ public interface PmAttrNumber<T extends Number> extends PmAttr<T> {
   /**
    * @return The maximum value for this attribute.
    */
-  T getMax();
+  T getMaxValue();
 
   /**
    * @return The minimum value for this attribute.
    */
-  T getMin();
+  T getMinValue();
 }

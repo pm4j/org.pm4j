@@ -28,7 +28,7 @@ public class PmConverterDouble extends PmConverterNumber<Double> {
     DecimalFormat decimalFormat = new DecimalFormat(formatString, new DecimalFormatSymbols(locale));
     if(pmAttr instanceof PmAttrDouble) {
       PmAttrDoubleImpl pmAttrDouble = (PmAttrDoubleImpl) pmAttr;
-      decimalFormat.setRoundingMode(pmAttrDouble.getStringConversionRoundingMode());
+      decimalFormat.setRoundingMode(pmAttrDouble.getRoundingMode());
     } else {
       // Fall back for special attributes sometimes representing a Double value 
       decimalFormat.setRoundingMode(PmAttrNumber.ROUNDINGMODE_DEFAULT);

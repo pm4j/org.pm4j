@@ -28,6 +28,12 @@ public @interface PmAttrDoubleCfg {
   double maxValue() default Double.MAX_VALUE;
 
   /**
+   * @deprecated please use roundingMode instead.
+   */
+  @Deprecated
+  RoundingMode stringConversionRoundingMode() default RoundingMode.UNNECESSARY;
+
+  /**
    * Rounding mode when converting to PM value. Changing this will allow to set
    * more fraction digits than specified in the format. Those additional digits
    * will then be rounded.
@@ -36,5 +42,5 @@ public @interface PmAttrDoubleCfg {
    * 
    * @return the rounding mode.
    */
-  RoundingMode stringConversionRoundingMode() default RoundingMode.UNNECESSARY;
+  RoundingMode roundingMode() default RoundingMode.UNNECESSARY;
 }

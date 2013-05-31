@@ -29,7 +29,7 @@ public class PmConverterBigDecimal extends PmConverterNumber<BigDecimal> {
     DecimalFormat decimalFormat = new DecimalFormat(formatString, new DecimalFormatSymbols(locale));
     if(pmAttr instanceof PmAttrBigDecimal) {
       PmAttrBigDecimalImpl pmAttrBigDecimal = (PmAttrBigDecimalImpl) pmAttr;
-      decimalFormat.setRoundingMode(pmAttrBigDecimal.getStringConversionRoundingMode());
+      decimalFormat.setRoundingMode(pmAttrBigDecimal.getRoundingMode());
     } else {
       // Fall back for special attributes sometimes representing a BigDecimal value 
       decimalFormat.setRoundingMode(PmAttrNumber.ROUNDINGMODE_DEFAULT);

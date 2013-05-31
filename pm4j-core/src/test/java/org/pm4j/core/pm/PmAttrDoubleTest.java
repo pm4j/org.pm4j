@@ -82,8 +82,8 @@ public class PmAttrDoubleTest {
   
   @Test
   public void testGetMinMax() {
-    assertEquals(new Double("999.99"), myPm.minMaxAttr.getMax());
-    assertEquals(new Double("0.1"), myPm.minMaxAttr.getMin());
+    assertEquals(new Double("999.99"), myPm.minMaxAttr.getMaxValue());
+    assertEquals(new Double("0.1"), myPm.minMaxAttr.getMinValue());
   }
   
   @Test
@@ -173,9 +173,19 @@ public class PmAttrDoubleTest {
 //
 //  }
 
+  @Test
+  public void testCombination() {
+    assertTrue(myPm.combination.isPmReadonly());
+    assertEquals(new Double(MyPm.READONLY_VALUE), myPm.combination.getValue());    
+    myPm.combination.setValue(new Double("0.01"));
+    assertEquals(new Double(MyPm.READONLY_VALUE), myPm.combination.getValue());    
+    assertTrue(myPm.combination.isPmValid());
+    assertEquals(MyPm.READONLY_VALUE_ROUNDED, myPm.combination.getValueAsString());
+  }
   
   static class MyPm extends PmConversationImpl {
-    public static final String READONLY_VALUE = "1.51";
+    public static final String READONLY_VALUE = "1.515";
+    public static final String READONLY_VALUE_ROUNDED = "1.52";
 
     @PmAttrDoubleCfg(minValue=0.1)
     public final PmAttrDouble minSingleValue = new PmAttrDoubleImpl(this);
@@ -184,11 +194,11 @@ public class PmAttrDoubleTest {
     public final PmAttrDouble maxSingleValue = new PmAttrDoubleImpl(this);
 
     @PmAttrCfg(formatResKey="pmAttrNumber_twoDecimalPlaces")
-    @PmAttrDoubleCfg(stringConversionRoundingMode = RoundingMode.HALF_DOWN)
+    @PmAttrDoubleCfg(roundingMode = RoundingMode.HALF_DOWN)
     public final PmAttrDouble roundingHalfDown = new PmAttrDoubleImpl(this);
 
     @PmAttrCfg(formatResKey="pmAttrNumber_twoDecimalPlaces")
-    @PmAttrDoubleCfg(stringConversionRoundingMode = RoundingMode.HALF_UP)
+    @PmAttrDoubleCfg(roundingMode = RoundingMode.HALF_UP)
     public final PmAttrDouble roundingHalfUp = new PmAttrDoubleImpl(this);
     
     @PmAttrCfg(maxLen=6)
@@ -207,6 +217,16 @@ public class PmAttrDoubleTest {
       protected Double getBackingValueImpl() {
         return new Double(READONLY_VALUE);
       }
+    };
+
+    // Check old style as well.
+    @PmAttrCfg(readOnly = true, formatResKey="pmAttrNumber_twoDecimalPlaces")
+    @PmAttrDoubleCfg(stringConversionRoundingMode = RoundingMode.HALF_UP, minValue = 0, maxValue = 2.01)
+    public final PmAttrDouble combination = new PmAttrDoubleImpl(this) {
+        @Override
+        protected Double getBackingValueImpl() {
+          return new Double(READONLY_VALUE);
+        }
     };
 
   }

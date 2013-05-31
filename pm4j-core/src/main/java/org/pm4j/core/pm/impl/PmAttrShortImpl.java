@@ -21,11 +21,11 @@ public class PmAttrShortImpl extends PmAttrNumBase<Short> implements PmAttrShort
 
   // ======== Interface implementation ======== //
 
-  public Short getMax() {
+  public Short getMaxValue() {
     return getOwnMetaDataWithoutPmInitCall().maxValue;
   }
 
-  public Short getMin() {
+  public Short getMinValue() {
     return getOwnMetaDataWithoutPmInitCall().minValue;
   }
 
@@ -37,11 +37,11 @@ public class PmAttrShortImpl extends PmAttrNumBase<Short> implements PmAttrShort
 
     if (value != null) {
       int v = value.intValue();
-      if (v < getMin().longValue()) {
-        throw new PmValidationException(this, PmConstants.MSGKEY_VALIDATION_VALUE_TOO_LOW, getMin());
+      if (v < getMinValue().longValue()) {
+        throw new PmValidationException(this, PmConstants.MSGKEY_VALIDATION_VALUE_TOO_LOW, getMinValue());
       }
-      if (v > getMax().longValue()) {
-        throw new PmValidationException(this, PmConstants.MSGKEY_VALIDATION_VALUE_TOO_HIGH, getMax());
+      if (v > getMaxValue().longValue()) {
+        throw new PmValidationException(this, PmConstants.MSGKEY_VALIDATION_VALUE_TOO_HIGH, getMaxValue());
       }
     }
   }

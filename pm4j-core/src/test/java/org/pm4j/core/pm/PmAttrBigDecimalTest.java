@@ -85,8 +85,8 @@ public class PmAttrBigDecimalTest {
   
   @Test
   public void testGetMinMax() {
-    assertEquals(new BigDecimal("999.99"), myPm.minMaxAttr.getMax());
-    assertEquals(new BigDecimal("0.1"), myPm.minMaxAttr.getMin());
+    assertEquals(new BigDecimal("999.99"), myPm.minMaxAttr.getMaxValue());
+    assertEquals(new BigDecimal("0.1"), myPm.minMaxAttr.getMinValue());
   }
   
   @Test
@@ -153,23 +153,32 @@ public class PmAttrBigDecimalTest {
     assertEquals("0.123", myPm.formatted.getValueAsString());
   }
 
-
+  @Test
+  public void testCombination() {
+    assertTrue(myPm.combination.isPmReadonly());
+    assertEquals(new BigDecimal(MyPm.READONLY_VALUE), myPm.combination.getValue());    
+    myPm.combination.setValue(new BigDecimal("0.01"));
+    assertEquals(new BigDecimal(MyPm.READONLY_VALUE), myPm.combination.getValue());    
+    assertTrue(myPm.combination.isPmValid());
+    assertEquals(MyPm.READONLY_VALUE_ROUNDED, myPm.combination.getValueAsString());
+  }
   
   static class MyPm extends PmConversationImpl {
-    public static final String READONLY_VALUE = "1.51";
+    public static final String READONLY_VALUE = "1.515";
+    public static final String READONLY_VALUE_ROUNDED = "1.52";
 
-    @PmAttrBigDecimalCfg(minValueString="0.1")
+    @PmAttrBigDecimalCfg(minValue="0.1")
     public final PmAttrBigDecimal minSingleValue = new PmAttrBigDecimalImpl(this);
 
-    @PmAttrBigDecimalCfg(maxValueString="999.9")
+    @PmAttrBigDecimalCfg(maxValue="999.9")
     public final PmAttrBigDecimal maxSingleValue = new PmAttrBigDecimalImpl(this);
 
     @PmAttrCfg(formatResKey="pmAttrNumber_twoDecimalPlaces")
-    @PmAttrBigDecimalCfg(stringConversionRoundingMode = RoundingMode.HALF_DOWN)
+    @PmAttrBigDecimalCfg(roundingMode = RoundingMode.HALF_DOWN)
     public final PmAttrBigDecimal roundingHalfDown = new PmAttrBigDecimalImpl(this);
 
     @PmAttrCfg(formatResKey="pmAttrNumber_twoDecimalPlaces")
-    @PmAttrBigDecimalCfg(stringConversionRoundingMode = RoundingMode.HALF_UP)
+    @PmAttrBigDecimalCfg(roundingMode = RoundingMode.HALF_UP)
     public final PmAttrBigDecimal roundingHalfUp = new PmAttrBigDecimalImpl(this);
     
     @PmAttrCfg(maxLen=6)
@@ -180,16 +189,26 @@ public class PmAttrBigDecimalTest {
     @PmAttrCfg(formatResKey="")
     public final PmAttrBigDecimal formatted = new PmAttrBigDecimalImpl(this);
     
-    @PmAttrBigDecimalCfg(minValueString="0.1", maxValueString="999.99")
+    @PmAttrBigDecimalCfg(minValue="0.1", maxValue="999.99")
     public final PmAttrBigDecimal minMaxAttr = new PmAttrBigDecimalImpl(this);
     
     @PmAttrCfg(readOnly = true)
     public final PmAttrBigDecimal readOnlyAttr = new PmAttrBigDecimalImpl(this) {
+      @Override
       protected BigDecimal getBackingValueImpl() {
         return new BigDecimal(READONLY_VALUE);
       }
     };
 
+    // Check old style as well.
+    @PmAttrCfg(readOnly = true, formatResKey="pmAttrNumber_twoDecimalPlaces")
+    @PmAttrBigDecimalCfg(stringConversionRoundingMode = RoundingMode.HALF_UP, minValueString = "0", maxValueString = "2.01")
+    public final PmAttrBigDecimal combination = new PmAttrBigDecimalImpl(this) {
+        @Override
+        protected BigDecimal getBackingValueImpl() {
+          return new BigDecimal(READONLY_VALUE);
+        }
+    };
   }
 
 }
