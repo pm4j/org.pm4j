@@ -4,11 +4,11 @@
 	<artifactId>pm4j-swing</artifactId>
 	<packaging>jar</packaging>
 	<name>PM4J SWING</name>
-	<version>0.5.7-SNAPSHOT</version>
+	<version>0.5.7</version>
 	<parent>
 		<groupId>org.pm4j</groupId>
 		<artifactId>main</artifactId>
-		<version>0.5.7-SNAPSHOT</version>
+		<version>0.5.7</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
