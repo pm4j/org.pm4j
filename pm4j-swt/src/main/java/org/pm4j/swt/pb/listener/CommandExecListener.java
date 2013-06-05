@@ -3,6 +3,7 @@ package org.pm4j.swt.pb.listener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.pm4j.core.pb.PbFactoryBase;
+import org.pm4j.core.pb.PbUtil;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.swt.pb.standards.PbConfirmDialog;
@@ -25,7 +26,7 @@ public class CommandExecListener extends SelectionAdapter {
   @Override
   public void widgetSelected(SelectionEvent e) {
     PmCommand cmd = PbFactoryBase.getBoundPm(e.widget);
-    PmObject pm = cmd.doItReturnNextDlgPm();
+    PmObject pm = PbUtil.doItReturnNextDlgPm(cmd);
     if (pm != null) {
       // FIXME: add a view mapping here...
 //        PmSwtUtil.buildView(e.widget, pm);

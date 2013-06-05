@@ -37,13 +37,10 @@ public class PmTabSetImpl2 extends PmElementImpl implements PmTabSet2 {
   private PmTab currentTabPm;
 
   /**
-   * Default constructor (for some dependency injection scenarios).<br>
-   * {@link #setPmParent(PmObject)} needs to be called before the instance can be used.
+   * Creates the tab set PM.
+   *
+   * @param pmParent the PM hierarchy parent instance.
    */
-  public PmTabSetImpl2() {
-    super();
-  }
-
   public PmTabSetImpl2(PmObject pmParent) {
     super(pmParent);
   }

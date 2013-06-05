@@ -26,16 +26,15 @@ import org.pm4j.core.pm.PmVisitor;
 import org.pm4j.core.pm.annotation.PmCommandCfg;
 import org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO;
 import org.pm4j.core.pm.api.PmCacheApi;
+import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmLocalizeApi;
 import org.pm4j.core.pm.api.PmMessageUtil;
 import org.pm4j.core.pm.api.PmValidationApi;
-import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
 import org.pm4j.navi.NaviHistory;
 import org.pm4j.navi.NaviLink;
 import org.pm4j.navi.NaviRuleLink;
 import org.pm4j.navi.impl.NaviLinkImpl;
-import org.pm4j.standards.PmConfirmedCommand;
 
 /**
  * Implementation for {@link PmCommand}.
@@ -194,19 +193,8 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
     visitor.visit(this);
   }
 
-  public PmCommand doIt() {
+  public final PmCommand doIt() {
     return doIt(true);
-  }
-
-  @Override
-  public PmObject doItReturnNextDlgPm() {
-    PmCommand executedCmd = doIt();
-    PmObject nextDlgPm = null;
-    NaviLinkImpl l = (NaviLinkImpl)executedCmd.getNaviLink();
-    if (l != null) {
-      nextDlgPm = (PmObject) l.getNaviScopeParams().get(PmConfirmedCommand.NAVI_PARAM_NEXT_DLG_PM);
-    }
-    return nextDlgPm;
   }
 
   /**

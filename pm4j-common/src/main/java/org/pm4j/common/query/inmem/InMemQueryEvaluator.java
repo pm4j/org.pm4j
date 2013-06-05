@@ -10,10 +10,10 @@ import org.pm4j.common.expr.ExprExecCtxt;
 import org.pm4j.common.expr.Expression;
 import org.pm4j.common.expr.PathExpressionChain;
 import org.pm4j.common.expr.parser.ParseCtxt;
-import org.pm4j.common.query.QueryAttr;
-import org.pm4j.common.query.QueryAttrMulti;
 import org.pm4j.common.query.FilterCompare;
 import org.pm4j.common.query.FilterExpression;
+import org.pm4j.common.query.QueryAttr;
+import org.pm4j.common.query.QueryAttrMulti;
 import org.pm4j.common.query.QueryEvaluatorBase;
 import org.pm4j.common.query.QueryEvaluatorSet;
 import org.pm4j.common.query.SortOrder;
@@ -92,9 +92,14 @@ public class InMemQueryEvaluator<T_ITEM> extends QueryEvaluatorBase {
    *         sort order was <code>null</code>.
    */
   public Comparator<T_ITEM> getComparator(SortOrder sortOrder) {
-    return sortOrder != null
-        ? new AttrPathComparator<T_ITEM>(this, (InMemSortOrder)sortOrder)
-        : null;
+    if (sortOrder instanceof InMemSortOrder) {
+      return new AttrPathComparator<T_ITEM>(this, (InMemSortOrder)sortOrder);
+    } else if (sortOrder != null) {
+      // TODO oboede: a weak fall back that does not yet support multi-attr etc.
+      return new AttrPathComparator<T_ITEM>(this, new InMemSortOrder(sortOrder.getAttr()));
+    } else {
+      return null;
+    }
   }
 
   /**
