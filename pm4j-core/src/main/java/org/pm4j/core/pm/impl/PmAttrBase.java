@@ -254,7 +254,9 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   @Override
   public final boolean isPmEnabled() {
     // link enable status to read only even if the default impl of isPmEnabledImpl is overwritten
-    return super.isPmEnabled() && !isPmReadonly();
+    // The read-only check is done first because some domain implementations of isPmEnabledImpl()
+    // are implemented in a way that fails under some read-only conditions (e.g. in case of a missing backing bean).
+    return !isPmReadonly() && super.isPmEnabled();
   }
 
   // TODO olaf: move common logic to isPmVisible. Additional effort: ensure that isPmVisible stays final
@@ -587,18 +589,28 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
         return pmValue;
       }
 
-      // The default value will be considered if the attribute is enabled.
-      if (isPmEnabled()) {
-        // At this point pmValue is still either null or empty.
-        // If a default value exists this shall be used to populate it.
-        T_PM_VALUE defaultValue = getDefaultValue();
-        if (defaultValue != null) {
-          // The backing value gets changed within the 'get' functionality.
-          // This is ok according to the default value logic. See: Wiki entry TODO
+      // At this point pmValue is still either null or empty.
+      // If a default value exists this shall be used to populate it.
+
+      // The default value will be show in read-only scenarios instead of
+      // the real 'null' value.
+      // TODO oboede: this behavior needs to be checked/well documented!
+      T_PM_VALUE defaultValue = getDefaultValue();
+      if (defaultValue != null) {
+        // The backing value gets changed within the 'get' functionality.
+        // This is ok according to the default value logic. See: Wiki entry TODO
+        //
+        // This modification can't be done for disabled attributes, since this
+        // operation may fail in some cases. (E.g. if the backing bean is 'null'.)
+        //
+        // FIXME oboede: It was not possible to ask 'isPmEnabled' because some isPmEnabledImpl
+        // code asked 'getValue()', which generates a stack overflow.
+        // We need a clear documented way to fix this issue.
+        if (!isPmReadonly()) {
           T_BEAN_VALUE defaultBeanAttrValue = convertPmValueToBackingValue(defaultValue);
           setBackingValue(defaultBeanAttrValue);
-          return defaultValue;
         }
+        return defaultValue;
       }
 
       // If non of the above approaches was successful we can do nothing else
