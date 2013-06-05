@@ -4,6 +4,8 @@ import org.pm4j.core.pm.PmAttrPmList;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmBeanCfg;
+import org.pm4j.core.pm.annotation.PmCommandCfg;
+import org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO;
 import org.pm4j.core.pm.annotation.PmFactoryCfg;
 import org.pm4j.core.pm.impl.PmAttrPmListImpl;
 import org.pm4j.core.pm.impl.PmBeanBase;
@@ -26,6 +28,7 @@ public class FilterSetPm<T_FILTERSET_BEAN extends FilterSet> extends PmBeanBase<
     }
   };
 
+  @PmCommandCfg(beforeDo = BEFORE_DO.CLEAR)
   public final PmCommand cmdClear = new PmCommandImpl(this) {
     @Override
     protected void doItImpl() {
