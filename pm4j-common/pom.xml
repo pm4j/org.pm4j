@@ -4,12 +4,12 @@
 	<name>PM4J COMMON</name>
 	<artifactId>pm4j-common</artifactId>
 	<packaging>jar</packaging>
-	<version>0.5.8-SNAPSHOT</version>
+	<version>0.5.9-SNAPSHOT</version>
 
 	<parent>
 		<groupId>org.pm4j</groupId>
 		<artifactId>main</artifactId>
-		<version>0.5.8-SNAPSHOT</version>
+		<version>0.5.9-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
