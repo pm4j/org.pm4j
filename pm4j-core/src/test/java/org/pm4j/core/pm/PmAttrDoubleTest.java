@@ -193,11 +193,11 @@ public class PmAttrDoubleTest {
     @PmAttrDoubleCfg(maxValue=999.9)
     public final PmAttrDouble maxSingleValue = new PmAttrDoubleImpl(this);
 
-    @PmAttrCfg(formatResKey="pmAttrNumber_twoDecimalPlaces")
+    @PmAttrCfg(formatResKey="pmAttrNumberTest_twoDecimalPlaces")
     @PmAttrDoubleCfg(roundingMode = RoundingMode.HALF_DOWN)
     public final PmAttrDouble roundingHalfDown = new PmAttrDoubleImpl(this);
 
-    @PmAttrCfg(formatResKey="pmAttrNumber_twoDecimalPlaces")
+    @PmAttrCfg(formatResKey="pmAttrNumberTest_twoDecimalPlaces")
     @PmAttrDoubleCfg(roundingMode = RoundingMode.HALF_UP)
     public final PmAttrDouble roundingHalfUp = new PmAttrDoubleImpl(this);
     
@@ -220,7 +220,7 @@ public class PmAttrDoubleTest {
     };
 
     // Check old style as well.
-    @PmAttrCfg(readOnly = true, formatResKey="pmAttrNumber_twoDecimalPlaces")
+    @PmAttrCfg(readOnly = true, formatResKey="pmAttrNumberTest_twoDecimalPlaces")
     @PmAttrDoubleCfg(stringConversionRoundingMode = RoundingMode.HALF_UP, minValue = 0, maxValue = 2.01)
     public final PmAttrDouble combination = new PmAttrDoubleImpl(this) {
         @Override

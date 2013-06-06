@@ -103,13 +103,12 @@ public class PmAttrDoubleImpl extends PmAttrNumBase<Double> implements PmAttrDou
   protected static class MetaData extends PmAttrNumBase.MetaData {
     private double maxValue = Double.MAX_VALUE;
     private double minValue = -Double.MAX_VALUE;
-    public RoundingMode roundingMode = ROUNDINGMODE_DEFAULT;
+    private RoundingMode roundingMode = ROUNDINGMODE_DEFAULT;
 
     @Override
-    protected double getMaxValue() {
-      return maxValue;
-    }
-
+    public double getMaxValue() { return maxValue; }
+    public double getMinValue() { return minValue; }
+    public RoundingMode getRoundingMode() { return roundingMode; }
   }
 
   private final MetaData getOwnMetaDataWithoutPmInitCall() {
@@ -125,6 +124,4 @@ public class PmAttrDoubleImpl extends PmAttrNumBase<Double> implements PmAttrDou
   public RoundingMode getRoundingMode() {
     return getOwnMetaDataWithoutPmInitCall().roundingMode;
   }
-
-
 }

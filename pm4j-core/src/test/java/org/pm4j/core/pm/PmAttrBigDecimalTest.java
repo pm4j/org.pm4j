@@ -173,11 +173,11 @@ public class PmAttrBigDecimalTest {
     @PmAttrBigDecimalCfg(maxValue="999.9")
     public final PmAttrBigDecimal maxSingleValue = new PmAttrBigDecimalImpl(this);
 
-    @PmAttrCfg(formatResKey="pmAttrNumber_twoDecimalPlaces")
+    @PmAttrCfg(formatResKey="pmAttrNumberTest_twoDecimalPlaces")
     @PmAttrBigDecimalCfg(roundingMode = RoundingMode.HALF_DOWN)
     public final PmAttrBigDecimal roundingHalfDown = new PmAttrBigDecimalImpl(this);
 
-    @PmAttrCfg(formatResKey="pmAttrNumber_twoDecimalPlaces")
+    @PmAttrCfg(formatResKey="pmAttrNumberTest_twoDecimalPlaces")
     @PmAttrBigDecimalCfg(roundingMode = RoundingMode.HALF_UP)
     public final PmAttrBigDecimal roundingHalfUp = new PmAttrBigDecimalImpl(this);
     
@@ -201,7 +201,7 @@ public class PmAttrBigDecimalTest {
     };
 
     // Check old style as well.
-    @PmAttrCfg(readOnly = true, formatResKey="pmAttrNumber_twoDecimalPlaces")
+    @PmAttrCfg(readOnly = true, formatResKey="pmAttrNumberTest_twoDecimalPlaces")
     @PmAttrBigDecimalCfg(stringConversionRoundingMode = RoundingMode.HALF_UP, minValueString = "0", maxValueString = "2.01")
     public final PmAttrBigDecimal combination = new PmAttrBigDecimalImpl(this) {
         @Override

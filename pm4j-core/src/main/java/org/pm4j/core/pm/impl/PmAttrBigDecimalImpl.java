@@ -2,7 +2,15 @@ package org.pm4j.core.pm.impl;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.util.Locale;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.exception.PmValidationException;
 import org.pm4j.core.pm.PmAttrBigDecimal;
@@ -19,6 +27,8 @@ import org.pm4j.core.pm.impl.converter.PmConverterBigDecimal;
 public class PmAttrBigDecimalImpl extends PmAttrNumBase<BigDecimal> implements PmAttrBigDecimal {
 
   public static final int MAX_LENGTH_DEFAULT = 80;
+  
+  private static final Log LOG = LogFactory.getLog(PmAttrBigDecimalImpl.class);
   
   public PmAttrBigDecimalImpl(PmObject pmParent) {
     super(pmParent);
@@ -74,8 +84,19 @@ public class PmAttrBigDecimalImpl extends PmAttrNumBase<BigDecimal> implements P
    * @return a BigDecimal
    */
   private BigDecimal convert(String number) {
-    boolean isEmpty =  number == null || "".equals(number);
-    return isEmpty ? null : new BigDecimal(number);
+    BigDecimal bd = null;
+    if(!StringUtils.isBlank(number)) {
+      DecimalFormat decimalFormat = (DecimalFormat) NumberFormat.getInstance(Locale.ENGLISH);
+      decimalFormat.setParseBigDecimal(true);
+      try {
+        bd = (BigDecimal) decimalFormat.parse(number);
+      } catch (ParseException e) {
+        if (LOG.isTraceEnabled()) {
+          LOG.trace("Error while parsing BigDecimal number: \"" + number +"\"", e);
+        }
+      } 
+    } 
+    return bd;
   }
   
   /**
@@ -144,19 +165,11 @@ public class PmAttrBigDecimalImpl extends PmAttrNumBase<BigDecimal> implements P
 
     private BigDecimal maxValue = null;
     private BigDecimal minValue = null;
-    public RoundingMode roundingMode = ROUNDINGMODE_DEFAULT;
+    private RoundingMode roundingMode = ROUNDINGMODE_DEFAULT;
 
     public MetaData() {
       // the max length needs to be evaluated dynamically by calling getMaxLenDefault().
       super(-1);
-    }
-
-    protected BigDecimal getMaxValue() {
-      return maxValue;
-    }
-
-    public BigDecimal getMinValue() {
-      return minValue;
     }
 
     @Override
@@ -167,6 +180,10 @@ public class PmAttrBigDecimalImpl extends PmAttrNumBase<BigDecimal> implements P
       }
       return MAX_LENGTH_DEFAULT;
     }
+
+    public BigDecimal getMaxValue() {  return maxValue;  }
+    public BigDecimal getMinValue() { return minValue; }
+    public RoundingMode getRoundingMode() { return roundingMode; }
   }
 
   private final MetaData getOwnMetaDataWithoutPmInitCall() {

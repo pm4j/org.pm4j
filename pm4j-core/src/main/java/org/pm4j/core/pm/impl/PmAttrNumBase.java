@@ -47,6 +47,7 @@ public abstract class PmAttrNumBase<T extends Number> extends PmAttrBase<T, T> i
      * the maximal value as provided by {@link #getMaxValue()}.
      */
     protected int getMaxLenDefault() {
+      // TODO there is already a task defined fixing this implementation.
       return new Double(Math.ceil(Math.log10(getMaxValue()))).intValue();
     }
   }
