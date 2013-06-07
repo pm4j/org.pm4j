@@ -15,6 +15,7 @@ import org.pm4j.core.pm.impl.inject.DiResolverFactory;
 import org.pm4j.core.pm.impl.inject.DiResolverFactoryPmInjectFieldByExpression;
 import org.pm4j.core.pm.impl.inject.DiResolverFactoryPmInjectFieldByParentOfType;
 import org.pm4j.core.pm.impl.inject.DiResolverFactoryPmInjectSetterByExpression;
+import org.pm4j.core.pm.impl.inject.DiResolverFactoryPmInjectSetterByParentOfType;
 import org.pm4j.core.pm.impl.title.AsteriskAttrTitleProvider;
 import org.pm4j.core.pm.impl.title.PmTitleProvider;
 import org.pm4j.core.pm.impl.title.TitleProviderPmResBased;
@@ -130,7 +131,8 @@ public class PmDefaults implements Cloneable {
   private DiResolverFactory[] diResolverFactories = {
       new DiResolverFactoryPmInjectFieldByExpression(),
       new DiResolverFactoryPmInjectSetterByExpression(),
-      new DiResolverFactoryPmInjectFieldByParentOfType()
+      new DiResolverFactoryPmInjectFieldByParentOfType(),
+      new DiResolverFactoryPmInjectSetterByParentOfType()
   };
 
   // TODO olaf: add something to the command that allows to configure that. - An application default may also be useful...
