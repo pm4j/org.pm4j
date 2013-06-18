@@ -145,14 +145,6 @@ public class PageableInMemCollectionImpl<T_ITEM>
     objects = null;
   }
 
-  @Override
-  public void setSortOrderComparator(Comparator<T_ITEM> comparator) {
-    if (comparator != this.sortOrderComparator) {
-      sortOrderComparator = comparator;
-      objects = null;
-    }
-  }
-
   private Comparator<T_ITEM> _getSortOrderComparator() {
     if (sortOrderComparator == null) {
       sortOrderComparator = inMemQueryEvaluator.getComparator(getQueryParams().getEffectiveSortOrder());
