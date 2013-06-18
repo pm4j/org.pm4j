@@ -6,6 +6,8 @@ import org.pm4j.core.pm.pageable.PageableCollection;
  * PM for a control that allows to switch between pages.
  *
  * @author olaf boede
+ *
+ * @deprecated new interface: {@link PmPager2}
  */
 public interface PmPager {
 

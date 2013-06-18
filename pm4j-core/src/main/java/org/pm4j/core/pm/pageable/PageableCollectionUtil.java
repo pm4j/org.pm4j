@@ -4,11 +4,15 @@ import java.awt.print.Pageable;
 import java.util.Iterator;
 import java.util.List;
 
+import org.pm4j.common.pageable.PageableCollectionUtil2;
+
 /**
  * Some common algorithms that should not be implemented redundantly for each
  * kind of {@link Pageable}.
  *
  * @author olaf boede
+ *
+ * @deprecated please use {@link PageableCollectionUtil2}.
  */
 public final class PageableCollectionUtil {
 

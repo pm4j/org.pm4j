@@ -10,6 +10,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.pm4j.common.pageable.inmem.PageableInMemCollectionImpl;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmDefaults;
 import org.pm4j.core.pm.filter.Filter;
@@ -22,6 +23,8 @@ import org.pm4j.core.pm.filter.Filter;
  *
  * @param <T_ITEM>
  *          The type of items handled by this set.
+ *
+ * @deprecated please use {@link PageableInMemCollectionImpl}
  */
 public class PageableListImpl<T_ITEM> implements PageableCollection<T_ITEM> {
 

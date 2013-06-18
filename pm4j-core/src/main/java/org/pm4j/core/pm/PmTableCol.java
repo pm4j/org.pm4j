@@ -10,6 +10,8 @@ import org.pm4j.core.util.table.ColSizeSpec;
  * PM of a table column.
  *
  * @author olaf boede
+ *
+ * @deprecated Please use {@link PmTableCol2}
  */
 public interface PmTableCol extends PmObject, FilterByDefinitionProvider {
 

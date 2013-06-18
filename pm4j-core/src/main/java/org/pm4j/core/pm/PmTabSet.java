@@ -23,6 +23,8 @@ import org.pm4j.core.pm.impl.PmTabSetImpl;
  * that acts as a tab set.
  *
  * @author olaf boede
+ * 
+ * @deprecated
  */
 public interface PmTabSet extends PmElement {
 

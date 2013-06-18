@@ -15,6 +15,7 @@ import org.pm4j.core.pm.impl.changehandler.MasterPmHandler;
  * Some table related helper functions.
  *
  * @author olaf boede
+ * @deprecated please use {@link PmTableUtil2}
  */
 public final class PmTableUtil {
 

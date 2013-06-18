@@ -17,8 +17,8 @@ import org.pm4j.core.pm.PmEvent.ValueChangeKind;
 import org.pm4j.core.pm.PmEventListener;
 import org.pm4j.core.pm.PmMessage;
 import org.pm4j.core.pm.PmObject;
+// FIXME oboede: deprecated enum used
 import org.pm4j.core.pm.PmSortOrder;
-import org.pm4j.core.pm.PmTable;
 import org.pm4j.core.pm.PmTable2;
 import org.pm4j.core.pm.PmTableCol2;
 import org.pm4j.core.pm.PmVisitor;

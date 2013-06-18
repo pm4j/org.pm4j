@@ -6,6 +6,8 @@ import java.util.Collection;
  * The interface for filter compare operator definitions.
  *
  * @author olaf boede
+ *
+ * @deprecated see {@link org.pm4j.common.query.CompOp}
  */
 public interface CompOp {
 

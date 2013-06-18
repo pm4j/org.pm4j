@@ -16,6 +16,8 @@ import org.pm4j.core.pm.filter.Filterable;
  * @author OBOEDE
  *
  * @param <T_ROW_OBJ> The type used for row objects.
+ *
+ * @deprecated Please use {@link PmTable2}.
  */
 public interface PmTable<T_ROW_OBJ> extends PmObject, PmDataInput, Filterable, FilterByDefinitionProvider {
 
@@ -68,7 +70,7 @@ public interface PmTable<T_ROW_OBJ> extends PmObject, PmDataInput, Filterable, F
    * @return The set of rows containing changed data.
    */
   List<T_ROW_OBJ> getRowsWithChanges();
-  
+
   /**
    * Clear set of rows containing changed data.
    */

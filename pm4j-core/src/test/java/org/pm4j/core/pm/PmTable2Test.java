@@ -19,7 +19,6 @@ import org.pm4j.core.pm.impl.PmConversationImpl;
 import org.pm4j.core.pm.impl.PmTableColImpl2;
 import org.pm4j.core.pm.impl.PmTableImpl2;
 import org.pm4j.core.pm.impl.PmTableRowImpl;
-import org.pm4j.core.pm.pageable2.PageablePmBeanCollection;
 
 public class PmTable2Test {
 
@@ -76,14 +75,6 @@ public class PmTable2Test {
     PmCacheApi.clearPmCache(myTablePm);
     assertEquals("After an update call the table should display the current content.",
         "[d]", myTablePm.getRowPms().toString());
-  }
-
-  @Test
-  public void testEmptyTable() {
-    myTablePm.setPmPageableCollection(new PageablePmBeanCollection<RowPm, RowBean>(myTablePm, RowPm.class, new ArrayList<RowBean>()));
-
-    assertEquals(0, myTablePm.getTotalNumOfPmRows());
-    assertEquals(0, myTablePm.getRowPms().size());
   }
 
   @PmFactoryCfg(beanPmClasses=RowPm.class)

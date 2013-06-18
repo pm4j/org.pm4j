@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
+import org.pm4j.common.pageable.PageableCollection2;
 import org.pm4j.core.pm.filter.Filter;
 
 /**
@@ -16,6 +17,8 @@ import org.pm4j.core.pm.filter.Filter;
  *
  * @param <T_ITEM>
  *          The type of items handled by this set.
+ *
+ * @deprecated please use {@link PageableCollection2}.
  */
 public interface PageableCollection<T_ITEM> {
 

@@ -35,6 +35,7 @@ import org.pm4j.core.util.table.ColSizeSpec;
  * Implements the table column PM behavior.
  *
  * @author olaf boede
+ * @deprecated please use {@link PmTableColImpl2}
  */
 public class PmTableColImpl extends PmObjectBase implements PmTableCol {
 

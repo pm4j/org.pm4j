@@ -23,6 +23,7 @@ import org.pm4j.core.pm.pageable.PageableListImpl;
  * @author olaf boede
  *
  * @param <T_ITEM>
+ * @deprecated please use {@link PmPagerImpl2}
  */
 @PmTitleCfg(resKeyBase = "pmPager")
 @PmBeanCfg(beanClass=PageableCollection.class)

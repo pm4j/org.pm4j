@@ -27,8 +27,6 @@ import org.pm4j.core.pm.api.PmFactoryApi;
 import org.pm4j.core.pm.api.PmMessageUtil;
 import org.pm4j.core.pm.api.PmValidationApi;
 import org.pm4j.core.pm.impl.BeanPmCacheUtil;
-import org.pm4j.core.pm.pageable.PageableCollection;
-import org.pm4j.core.pm.pageable.PageableListImpl;
 
 /**
  * A {@link PageableCollection2} instance that provides {@link PmBean} instances in

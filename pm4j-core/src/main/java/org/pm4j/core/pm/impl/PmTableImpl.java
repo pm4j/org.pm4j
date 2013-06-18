@@ -51,6 +51,7 @@ import org.pm4j.core.util.reflection.ClassUtil;
  * <p>
  *
  * @author olaf boede
+ * @deprecated please use {@link PmTableImpl2}.
  */
 public class PmTableImpl
         <T_ROW_ELEMENT_PM extends PmElement>

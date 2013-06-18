@@ -27,6 +27,7 @@ import org.pm4j.common.selection.SelectionHandlerUtil;
 import org.pm4j.common.util.beanproperty.PropertyAndVetoableChangeListener;
 import org.pm4j.common.util.collection.ListUtil;
 import org.pm4j.core.exception.PmRuntimeException;
+import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmCommandDecorator;
 import org.pm4j.core.pm.PmDefaults;
@@ -36,7 +37,6 @@ import org.pm4j.core.pm.PmEvent.ValueChangeKind;
 import org.pm4j.core.pm.PmEventListener;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmPager2;
-import org.pm4j.core.pm.PmTable.RowSelectMode;
 import org.pm4j.core.pm.PmTable2;
 import org.pm4j.core.pm.PmTableCol2;
 import org.pm4j.core.pm.PmTableGenericRow2;
@@ -47,8 +47,8 @@ import org.pm4j.core.pm.annotation.PmTableCfg2;
 import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
 import org.pm4j.core.pm.api.PmEventApi;
+import org.pm4j.core.pm.api.PmExpressionApi;
 import org.pm4j.core.pm.api.PmValidationApi;
-import org.pm4j.core.pm.pageable.PageableCollection;
 import org.pm4j.core.pm.pageable2.InMemPmQueryEvaluator;
 import org.pm4j.core.pm.pageable2.PageablePmBeanCollection;
 
@@ -98,15 +98,27 @@ public class PmTableImpl2
   private T_ROW_PM masterRowPm;
 
   /**
-   * Creates an empty table.
-   * <p>
-   * The table may be connected to some data source by calling {@link #setPmPageableCollection(PageableCollection)}.
+   * Creates a table PM.
    *
    * @param pmParent The presentation model context for this table.
    */
   public PmTableImpl2(PmObject pmParent) {
     super(pmParent);
   }
+
+  @Override
+  protected void onPmInit() {
+    super.onPmInit();
+    // Reset the pageable collection if the context of the table says that new
+    // data needs to be displayed.
+    PmEventApi.addPmEventListener(getPmParent(), PmEvent.VALUE_CHANGE, new PmEventListener(){
+      @Override
+      public void handleEvent(PmEvent event) {
+        pmPageableCollection = null;
+      }} );
+  }
+
+
 
   @Override
   public List<PmTableCol2> getColumnPms() {
@@ -217,7 +229,7 @@ public class PmTableImpl2
   public final T_ROW_PM getCurrentRowPm() {
     return getMasterRowPm();
   }
-  
+
   @Override
   public final T_ROW_PM getMasterRowPm() {
     if (masterRowPm == null) {
@@ -246,12 +258,12 @@ public class PmTableImpl2
   }
 
   /**
-   * @deprecated please use {@link #getMasterRowPmBean()} 
+   * @deprecated please use {@link #getMasterRowPmBean()}
    */
   public final T_ROW_BEAN getCurrentRowPmBean() {
     return getMasterRowPmBean();
   }
-  
+
 
   /**
    * Provides the bean behind the master row PM.<br>
@@ -495,6 +507,9 @@ public class PmTableImpl2
   /**
    * Gets called whenever the internal collection is <code>null</code> and
    * {@link #getPmPageableCollection()} gets called.
+   * <p>
+   * The default implementation provides an in-memory collection based on the result provided
+   * by {@link #getPmInMemoryCollectionImpl()}.
    *
    * @return The collection to use. Never <code>null</code>.
    */
@@ -510,9 +525,27 @@ public class PmTableImpl2
     return new PageablePmBeanCollection<T_ROW_PM, T_ROW_BEAN>(this, PmTableRow.class, inMemPageableCollection);
   }
 
+  /**
+   * Provides the set of beans used by the default implementation of {@link #getPmPageableBeanCollection()}.
+   * <p>
+   * The default implementation tries the following:<br>
+   * If the parent PM is a kind of {@link PmBean}, it tries to access a collection field
+   * within the referenced bean having the same name as this table within its parent PM.
+   * <p>
+   * TODO oboede: support annotation cfg an a valuePath
+   * TODO oboede: check if that should be moved to the in-mem collection.
+   *
+   * @return
+   */
   @SuppressWarnings("unchecked")
   protected Collection<T_ROW_BEAN> getPmInMemoryCollectionImpl() {
-    return (Collection<T_ROW_BEAN>)Collections.EMPTY_LIST;
+    String path = getPmName();
+    try {
+      Collection<T_ROW_BEAN> beans = (Collection<T_ROW_BEAN>) PmExpressionApi.findByExpression(this, "pmParent.(o)pmBean." + path);
+      return beans;
+    } catch (RuntimeException e) {
+      throw new PmRuntimeException(this, "Unable to access the bound collection value.", e);
+    }
   }
 
   /**
@@ -544,7 +577,8 @@ public class PmTableImpl2
   }
 
   /**
-   * Defines the data set to be presented by the table.
+   * Defines the data set to be presented by the table.<br>
+   * HINT: Please check if you can define {@link #getPmPageableCollectionImpl()} instead.
    *
    * @param pageable
    *          the data set to present. If it is <code>null</code> an empty
@@ -555,6 +589,9 @@ public class PmTableImpl2
   }
 
   /**
+   * Defines the data set to be presented by the table.<br>
+   * HINT: Please check if you can define {@link #getPmPageableCollectionImpl()} instead.
+   *
    * @param pageable
    *          the data set to present. If it is <code>null</code> an empty
    *          collection will be created internally by the next {@link #getPmPageableCollection()} call.

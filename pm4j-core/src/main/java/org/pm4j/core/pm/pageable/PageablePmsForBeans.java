@@ -13,6 +13,7 @@ import org.pm4j.core.pm.PmTable.TableChange;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmFactoryApi;
 import org.pm4j.core.pm.filter.Filter;
+import org.pm4j.core.pm.pageable2.PageablePmBeanCollection;
 
 /**
  * A {@link PageableItems} instance that provides {@link PmBean} instances in
@@ -26,6 +27,8 @@ import org.pm4j.core.pm.filter.Filter;
  * @param <T_BEAN>
  *          The kind of corresponding bean, handled by the backing
  *          {@link PageableCollection} instance.
+ *
+ * @deprecated please use {@link PageablePmBeanCollection}
  */
 // TODO olaf: control/ensure that the PM factory releases the PMs for the beans that are no longer on the current page.
 public class PageablePmsForBeans<T_PM extends PmBean<T_BEAN>, T_BEAN> implements PageableCollection<T_PM> {

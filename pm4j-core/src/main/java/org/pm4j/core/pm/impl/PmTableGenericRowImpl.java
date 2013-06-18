@@ -21,6 +21,7 @@ import org.pm4j.core.pm.PmTableGenericRow;
  * same name as the table column.
  *
  * @author olaf boede
+ * @deprecated please use {@link PmTableGenericRowImpl2}
  */
 public class PmTableGenericRowImpl<T_ROW_ELEMENT extends PmElement> implements PmTableGenericRow<T_ROW_ELEMENT> {
 

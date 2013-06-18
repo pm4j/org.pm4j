@@ -3,7 +3,9 @@ package org.pm4j.core.pm.filter;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.pm4j.common.query.QueryParams;
 import org.pm4j.core.pm.PmBean;
+import org.pm4j.core.pm.PmTable2;
 
 /**
  * A {@link MultiFilter} supports three filter sets with the following logic:
@@ -34,6 +36,8 @@ import org.pm4j.core.pm.PmBean;
  * This allows to replace and remove specific filters.
  *
  * @author olaf boede
+ *
+ * @deprecated see {@link PmTable2} and {@link QueryParams}.
  */
 public class MultiFilter implements Filter {
 

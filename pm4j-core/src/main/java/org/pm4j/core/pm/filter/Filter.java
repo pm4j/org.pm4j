@@ -1,13 +1,18 @@
 package org.pm4j.core.pm.filter;
 
+import org.pm4j.common.query.FilterExpression;
+import org.pm4j.common.query.QueryParams;
+import org.pm4j.core.pm.PmTable2;
+
 /**
  * Interface for classes used to filter collection items.
  * <p>
  * A filter may be declared to filter PM items by passing the {@link #doesItemMatch(Object)} method
  * to beans behind the PM items.<br>
  * In this case the method {@link #isBeanFilter()} should provide the value <code>true</code>.
+ *
+ * @deprecated see {@link FilterExpression}
  */
-// TODO: @Deprecated - will be moved out with old PmTable
 public interface Filter {
 
   /**

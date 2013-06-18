@@ -1,12 +1,16 @@
 package org.pm4j.core.pm.filter;
 
+import org.pm4j.common.query.QueryParams;
+import org.pm4j.core.pm.PmTable2;
+
 /**
  * Interface for classes that may use dynamically defined filters.<br>
  * E.g. for tables or lists with filters that may be specified by the user.
  *
  * @author olaf boede.
+ *
+ * @deprecated see {@link PmTable2} and {@link QueryParams}.
  */
-//TODO: @Deprecated - will be moved out with old PmTable
 public interface Filterable {
 
   /**
