@@ -5,7 +5,6 @@ import java.beans.PropertyVetoException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +34,6 @@ import org.pm4j.core.pm.PmEvent.ValueChangeKind;
 import org.pm4j.core.pm.PmEventListener;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmPager2;
-import org.pm4j.core.pm.PmTable.RowSelectMode;
 import org.pm4j.core.pm.PmTable2;
 import org.pm4j.core.pm.PmTableCol2;
 import org.pm4j.core.pm.PmTableGenericRow2;
@@ -47,20 +45,19 @@ import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmValidationApi;
-import org.pm4j.core.pm.pageable.PageableCollection;
 import org.pm4j.core.pm.pageable2.PageableInMemCollectionFactoryExprBased;
 import org.pm4j.core.pm.pageable2.PageablePmBeanCollection;
 
 /**
  * A table that presents the content of a set of {@link PmElement}s.
  * <p>
- * The table data related logic is provided by a {@link PageableCollection}.
+ * The table data related logic is provided by a {@link PageableCollection2}.
  * This collection supports the logic for
  * <ul>
- * <li>pagination (see {@link PageableCollection#setCurrentPageIdx(int)} etc.).</li>
- * <li>row selection (see {@link PageableCollection#select(Object)} etc.).</li>
- * <li>sorting (see {@link PageableCollection#sortItems(Comparator)}).</li>
- * <li>filtering (see TODO: )</li>
+ * <li>pagination (see {@link PageableCollection2#setPageIdx(long)} etc.).</li>
+ * <li>row selection</li>
+ * <li>sorting</li>
+ * <li>filtering (see TODO: ...)</li>
  * </ul>.
  * <p>
  *
@@ -75,7 +72,7 @@ public class PmTableImpl2
 
   /** The content this table is based on. */
   private PageablePmBeanCollection<T_ROW_PM, T_ROW_BEAN> pmPageableCollection;
-  
+
   /** Creates the bean collection to represent. */
   private PageableCollectionFactory<T_ROW_BEAN> pmPageableBeanCollectionFactory;
 
@@ -166,7 +163,7 @@ public class PmTableImpl2
    * The implementation does currently not fire any change events
    * sif this method gets called.
    *
-   * @param rowSelectMode The {@link RowSelectMode} to be used by this table.
+   * @param rowSelectMode The {@link SelectMode} to be used by this table.
    */
   public void setPmRowSelectMode(SelectMode rowSelectMode) {
     this.rowSelectMode = rowSelectMode;
@@ -474,7 +471,7 @@ public class PmTableImpl2
    */
   public PageableCollectionFactory<T_ROW_BEAN> getPmPageableBeanCollectionFactory() {
     if (pmPageableBeanCollectionFactory == null) {
-      pmPageableBeanCollectionFactory = new PageableInMemCollectionFactoryExprBased<T_ROW_BEAN>(this, "(o)pmBean.(o)" + getPmName());
+      pmPageableBeanCollectionFactory = new PageableInMemCollectionFactoryExprBased<T_ROW_BEAN>(this, "pmParent.(o)pmBean." + getPmName());
     }
     return pmPageableBeanCollectionFactory;
   }
