@@ -11,7 +11,7 @@ import org.pm4j.core.pm.api.PmFactoryApi;
 /**
  * A filter evaluation context for a set of beans that has an associated set of PMs.
  * <p>
- * The filter attribute path expressions start to address realated values from the PM instance.
+ * The filter attribute path expressions start to address related values from the PM instance.
  *
  * @author olaf boede
  */

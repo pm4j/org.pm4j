@@ -11,6 +11,24 @@ import java.util.List;
 public class IterableUtil {
 
   /**
+   * Provides the first item of the given list.
+   *
+   * @param list the list. May be <code>null</code>.
+   * @return the first list item or <code>null</code> if the list was empty or <code>null</code>.
+   */
+  public static <T> T firstItem(Iterable<T> list) {
+    if (list != null) {
+      Iterator<T> i = list.iterator();
+      if (i.hasNext()) {
+        return i.next();
+      }
+    }
+
+    return null;
+  }
+
+
+  /**
    * Generates a new {@link Iterable} that references the items of the given
    * {@link Iterable}.
    *

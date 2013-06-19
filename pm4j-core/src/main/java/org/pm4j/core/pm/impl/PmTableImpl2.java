@@ -16,9 +16,8 @@ import org.apache.commons.logging.LogFactory;
 import org.pm4j.common.pageable.ModificationHandler;
 import org.pm4j.common.pageable.Modifications;
 import org.pm4j.common.pageable.PageableCollection2;
-import org.pm4j.common.pageable.inmem.PageableInMemCollectionImpl;
+import org.pm4j.common.pageable.PageableCollectionFactory;
 import org.pm4j.common.query.FilterCompareDefinitionFactory;
-import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.selection.SelectMode;
 import org.pm4j.common.selection.Selection;
@@ -27,7 +26,6 @@ import org.pm4j.common.selection.SelectionHandlerUtil;
 import org.pm4j.common.util.beanproperty.PropertyAndVetoableChangeListener;
 import org.pm4j.common.util.collection.ListUtil;
 import org.pm4j.core.exception.PmRuntimeException;
-import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmCommandDecorator;
 import org.pm4j.core.pm.PmDefaults;
@@ -37,6 +35,7 @@ import org.pm4j.core.pm.PmEvent.ValueChangeKind;
 import org.pm4j.core.pm.PmEventListener;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmPager2;
+import org.pm4j.core.pm.PmTable.RowSelectMode;
 import org.pm4j.core.pm.PmTable2;
 import org.pm4j.core.pm.PmTableCol2;
 import org.pm4j.core.pm.PmTableGenericRow2;
@@ -47,9 +46,9 @@ import org.pm4j.core.pm.annotation.PmTableCfg2;
 import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
 import org.pm4j.core.pm.api.PmEventApi;
-import org.pm4j.core.pm.api.PmExpressionApi;
 import org.pm4j.core.pm.api.PmValidationApi;
-import org.pm4j.core.pm.pageable2.InMemPmQueryEvaluator;
+import org.pm4j.core.pm.pageable.PageableCollection;
+import org.pm4j.core.pm.pageable2.PageableInMemCollectionFactoryExprBased;
 import org.pm4j.core.pm.pageable2.PageablePmBeanCollection;
 
 /**
@@ -76,6 +75,9 @@ public class PmTableImpl2
 
   /** The content this table is based on. */
   private PageablePmBeanCollection<T_ROW_PM, T_ROW_BEAN> pmPageableCollection;
+  
+  /** Creates the bean collection to represent. */
+  private PageableCollectionFactory<T_ROW_BEAN> pmPageableBeanCollectionFactory;
 
   /** Defines the row-selection behavior. */
   private SelectMode rowSelectMode;
@@ -105,20 +107,6 @@ public class PmTableImpl2
   public PmTableImpl2(PmObject pmParent) {
     super(pmParent);
   }
-
-  @Override
-  protected void onPmInit() {
-    super.onPmInit();
-    // Reset the pageable collection if the context of the table says that new
-    // data needs to be displayed.
-    PmEventApi.addPmEventListener(getPmParent(), PmEvent.VALUE_CHANGE, new PmEventListener(){
-      @Override
-      public void handleEvent(PmEvent event) {
-        pmPageableCollection = null;
-      }} );
-  }
-
-
 
   @Override
   public List<PmTableCol2> getColumnPms() {
@@ -482,6 +470,23 @@ public class PmTableImpl2
   }
 
   /**
+   * @return the pmPageableBeanCollectionFactory
+   */
+  public PageableCollectionFactory<T_ROW_BEAN> getPmPageableBeanCollectionFactory() {
+    if (pmPageableBeanCollectionFactory == null) {
+      pmPageableBeanCollectionFactory = new PageableInMemCollectionFactoryExprBased<T_ROW_BEAN>(this, "(o)pmBean.(o)" + getPmName());
+    }
+    return pmPageableBeanCollectionFactory;
+  }
+
+  /**
+   * @param pmPageableBeanCollectionFactory the pmPageableBeanCollectionFactory to set
+   */
+  public void setPmPageableBeanCollectionFactory(PageableCollectionFactory<T_ROW_BEAN> pmPageableBeanCollectionFactory) {
+    this.pmPageableBeanCollectionFactory = pmPageableBeanCollectionFactory;
+  }
+
+  /**
    * @return The {@link PageableCollection} that handles the table row PM's to display.
    */
   @Override
@@ -508,44 +513,13 @@ public class PmTableImpl2
    * Gets called whenever the internal collection is <code>null</code> and
    * {@link #getPmPageableCollection()} gets called.
    * <p>
-   * The default implementation provides an in-memory collection based on the result provided
-   * by {@link #getPmInMemoryCollectionImpl()}.
+   * Uses the configured {@link #pmPageableBeanCollectionFactory}.
    *
    * @return The collection to use. Never <code>null</code>.
    */
   protected PageablePmBeanCollection<T_ROW_PM, T_ROW_BEAN> getPmPageableCollectionImpl() {
-    QueryOptions qoptions = PmTableUtil2.makeQueryOptionsForInMemoryTable(this);
-    // @formatter:off
-    PageableCollection2<T_ROW_BEAN> inMemPageableCollection = new PageableInMemCollectionImpl<T_ROW_BEAN>(
-        new InMemPmQueryEvaluator<T_ROW_BEAN>(this),
-        getPmInMemoryCollectionImpl(),
-        qoptions,
-        null);
-    // @formatter:on
-    return new PageablePmBeanCollection<T_ROW_PM, T_ROW_BEAN>(this, PmTableRow.class, inMemPageableCollection);
-  }
-
-  /**
-   * Provides the set of beans used by the default implementation of {@link #getPmPageableBeanCollection()}.
-   * <p>
-   * The default implementation tries the following:<br>
-   * If the parent PM is a kind of {@link PmBean}, it tries to access a collection field
-   * within the referenced bean having the same name as this table within its parent PM.
-   * <p>
-   * TODO oboede: support annotation cfg an a valuePath
-   * TODO oboede: check if that should be moved to the in-mem collection.
-   *
-   * @return
-   */
-  @SuppressWarnings("unchecked")
-  protected Collection<T_ROW_BEAN> getPmInMemoryCollectionImpl() {
-    String path = getPmName();
-    try {
-      Collection<T_ROW_BEAN> beans = (Collection<T_ROW_BEAN>) PmExpressionApi.findByExpression(this, "pmParent.(o)pmBean." + path);
-      return beans;
-    } catch (RuntimeException e) {
-      throw new PmRuntimeException(this, "Unable to access the bound collection value.", e);
-    }
+    PageableCollection2<T_ROW_BEAN> pageableBeanCollection =  getPmPageableBeanCollectionFactory().create(null, null);
+    return new PageablePmBeanCollection<T_ROW_PM, T_ROW_BEAN>(this, PmTableRow.class, pageableBeanCollection);
   }
 
   /**

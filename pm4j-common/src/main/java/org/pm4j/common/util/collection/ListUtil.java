@@ -13,6 +13,14 @@ import org.apache.commons.lang.ObjectUtils;
  */
 public final class ListUtil {
 
+  /**
+   * Transforms a list to a single item or to a <code>null</code> if the list has no item.
+   * <p>
+   * Throws an {@link IllegalArgumentException} if the list has more than one item.
+   *
+   * @param list the list to transform. May be <code>null</code>.
+   * @return the single list item or <code>null</code>.
+   */
   public static <T> T listToItemOrNull(List<T> list) {
     if (list == null) {
       return null;
