@@ -165,7 +165,7 @@ public abstract class PageableInMemCollectionBase<T_ITEM>
   private List<T_ITEM> _getObjects() {
     if (objects == null) {
       Collection<T_ITEM> backingCollection = getBackingCollection();
-      if (backingCollection.isEmpty() || !getQueryParams().isExecQuery()) {
+      if (!getQueryParams().isExecQuery()) {
         objects = Collections.emptyList();
       }
       else {
