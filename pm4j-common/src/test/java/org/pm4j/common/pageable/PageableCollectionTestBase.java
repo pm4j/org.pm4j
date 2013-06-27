@@ -65,14 +65,17 @@ public abstract class PageableCollectionTestBase<T> {
     assertTrue(collection.getModificationHandler().removeSelectedItems());
     assertTrue(collection.getModificationHandler().getModifications().isModified());
     assertEquals("[ ]", IterableUtil.shallowCopy(collection.getModificationHandler().getModifications().getRemovedItems()).toString());
+    addAllTestPropertyChangeListener();
+  }
 
+  private void addAllTestPropertyChangeListener() {
     collection.addPropertyChangeListener(PageableCollection2.EVENT_ITEM_ADD, pclAdd = new TestPropertyChangeListener());
     collection.addPropertyChangeListener(PageableCollection2.EVENT_ITEM_UPDATE, pclUpdate = new TestPropertyChangeListener());
     collection.addPropertyAndVetoableListener(PageableCollection2.EVENT_REMOVE_SELECTION, pclRemove = new TestPropertyChangeListener());
     collection.addPropertyChangeListener(PageableCollection2.PROP_PAGE_IDX, pclPageIdx = new TestPropertyChangeListener());
-    collection.addPropertyChangeListener(PageableCollection2.PROP_PAGE_SIZE, pclPageSize = new TestPropertyChangeListener());
+    collection.addPropertyChangeListener(PageableCollection2.PROP_PAGE_SIZE, pclPageSize = new TestPropertyChangeListener());    
   }
-
+  
   @Test
   public void testFullCollectionItersationResult() {
     assertEquals("[a, b, c, d, e, f]", IterableUtil.shallowCopy(collection).toString());
@@ -81,7 +84,7 @@ public abstract class PageableCollectionTestBase<T> {
   protected ItemNavigator<T> getItemNavigator() {
     return new ItemNavigatorInMem<T>(collection.getSelectionHandler().getSelection());
   }
-
+  
   @Test
   public void testItemNavigator() {
     // multi selection for this test
@@ -312,6 +315,46 @@ public abstract class PageableCollectionTestBase<T> {
   }
 
   @Test
+  public void testAddItemToEmptyCollection() {
+
+    // setup empty pageable collection
+    collection = makePageableCollection((String[]) null);
+    addAllTestPropertyChangeListener();
+
+    // preconditions
+    assertEquals("Empty collection size", 0L, collection.getNumOfItems());
+    assertEquals(0, collection.getModifications().getAddedItems().size());
+    assertEquals(0, collection.getModifications().getUpdatedItems().size());
+    assertEquals(0, collection.getModifications().getRemovedItems().getSize());
+
+    // add the item
+    T newItem = createItem("hi");
+    collection.getModificationHandler().addItem(newItem);
+    assertEquals("New collection size", 1L, collection.getNumOfItems());
+    assertEquals("Collection after add", "[hi]", IterableUtil.shallowCopy(collection).toString());
+
+    assertEquals(1, collection.getModifications().getAddedItems().size());
+    assertTrue(collection.getModifications().getAddedItems().contains(newItem));
+    assertEquals(0, collection.getModifications().getUpdatedItems().size());
+
+    assertEquals(0, collection.getModifications().getRemovedItems().getSize());
+
+    // select and de-select the added item
+    collection.getSelectionHandler().select(true, newItem);
+    assertEquals(1L, collection.getSelection().getSize());
+
+    collection.getSelectionHandler().select(false, newItem);
+    assertEquals(0L, collection.getSelection().getSize());
+
+    // check number of expected events and service calls
+    assertEquals("Add event count", 1, pclAdd.getPropChangeEventCount());
+    assertEquals("Update event count", 0, pclUpdate.getPropChangeEventCount());
+    assertEquals("Remove event count", 0, pclRemove.getPropChangeEventCount());
+    assertEquals("Set page index event count", 0, pclPageIdx.getPropChangeEventCount());
+    assertEquals("Set page size event count", 0, pclPageSize.getPropChangeEventCount());
+  }
+
+  @Test
   public void testAddItemInMultiSelectMode() {
     collection.getSelectionHandler().setSelectMode(SelectMode.MULTI);
     testAddItem();
@@ -383,8 +426,10 @@ public abstract class PageableCollectionTestBase<T> {
 
   protected static List<Bean> makeBeans(String... strings) {
     List<Bean> list = new ArrayList<Bean>();
-    for (String s : strings) {
-      list.add(new Bean(s));
+    if (strings != null) {
+      for (String s : strings) {
+        list.add(new Bean(s));
+      }
     }
     return list;
   }

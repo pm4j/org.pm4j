@@ -25,10 +25,12 @@ public class PageableQueryCollectionTest extends PageableCollectionTestBase<Page
   @Override
   protected PageableCollection2<Bean> makePageableCollection(String... strings) {
     int counter = 1;
-    for (String s : strings) {
-      service.addBean(new Bean(++counter, s));
+    service.removeAllBeans();
+    if (strings != null) {
+      for (String s : strings) {
+        service.addBean(new Bean(++counter, s));
+      }
     }
-
     return new PageableQueryCollection<Bean, Integer>(service);
   }
 
@@ -78,6 +80,10 @@ public class PageableQueryCollectionTest extends PageableCollectionTestBase<Page
 
     public void addBean(Bean b) {
       idToBeanMap.put(b.getId(), b);
+    }
+    
+    public void removeAllBeans() {
+      idToBeanMap.clear();
     }
 
     // some in memory fakes ...
