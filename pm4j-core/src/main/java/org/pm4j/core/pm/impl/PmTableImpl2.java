@@ -77,12 +77,12 @@ public class PmTableImpl2
   private PageableCollectionFactory<T_ROW_BEAN> pmPageableBeanCollectionFactory;
 
   /** Defines the row-selection behavior. */
-  private SelectMode rowSelectMode;
+  private SelectMode pmRowSelectMode;
 
   /**
    * The number of rows per page. If it is <code>null</code> the statically defined number of rows will be used.
    */
-  private Integer numOfPageRows;
+  private Integer numOfPageRowPms;
 
   /** The set of decorators for various table change kinds. */
   private Map<TableChange, PmCommandDecoratorSetImpl> pmChangeDecoratorMap = Collections.emptyMap();
@@ -145,16 +145,16 @@ public class PmTableImpl2
   }
 
   public SelectMode getPmRowSelectMode() {
-    if (rowSelectMode == null) {
+    if (pmRowSelectMode == null) {
       PmTableCfg2 cfg = AnnotationUtil.findAnnotation(this, PmTableCfg2.class);
-      rowSelectMode = (cfg != null &&
+      pmRowSelectMode = (cfg != null &&
                        cfg.rowSelectMode() != SelectMode.DEFAULT)
           ? cfg.rowSelectMode()
           // TODO: add to PmDefaults.
           : SelectMode.NO_SELECTION;
     }
 
-    return rowSelectMode;
+    return pmRowSelectMode;
   }
 
   /**
@@ -166,7 +166,7 @@ public class PmTableImpl2
    * @param rowSelectMode The {@link SelectMode} to be used by this table.
    */
   public void setPmRowSelectMode(SelectMode rowSelectMode) {
-    this.rowSelectMode = rowSelectMode;
+    this.pmRowSelectMode = rowSelectMode;
     if (pmPageableCollection != null) {
       pmPageableCollection.getSelectionHandler().setSelectMode(rowSelectMode);
     }
@@ -174,15 +174,15 @@ public class PmTableImpl2
 
   @Override
   public int getNumOfPageRowPms() {
-    if (numOfPageRows == null) {
+    if (numOfPageRowPms == null) {
       PmTableCfg cfg = AnnotationUtil.findAnnotation(this, PmTableCfg.class);
-      numOfPageRows = (cfg != null &&
+      numOfPageRowPms = (cfg != null &&
                        cfg.numOfPageRows() > 0)
           ? cfg.numOfPageRows()
           // TODO: add to PmDefaults.
           : 10;
     }
-    return numOfPageRows;
+    return numOfPageRowPms;
   }
 
   /**
@@ -192,7 +192,7 @@ public class PmTableImpl2
    *          will be used.
    */
   public void setNumOfPageRowPms(Integer numOfPageRows) {
-    this.numOfPageRows = numOfPageRows;
+    this.numOfPageRowPms = numOfPageRows;
     if (pmPageableCollection != null) {
       pmPageableCollection.setPageSize(numOfPageRows);
     }
@@ -342,7 +342,7 @@ public class PmTableImpl2
   }
 
   /**
-   * Implements the table subclass sepecific update operation.
+   * Implements the table subclass specific update operation.
    * <p>
    * Should not be called directly. Please use {@link #updatePmTable(org.pm4j.core.pm.PmTable2.ClearAspect...)}
    * to trigger an update.
