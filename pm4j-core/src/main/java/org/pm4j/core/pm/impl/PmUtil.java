@@ -310,6 +310,21 @@ public final class PmUtil {
   }
 
   /**
+   * Checks if the value is assumed as an empty one for the given attribute.
+   * <p>
+   * The check is value type specific. E.g. for a numeric attribute is only <code>null</code>
+   * empty. But for a list is also am empty list 'empty'.
+   *
+   * @param pmAttr
+   * @param value
+   * @return
+   */
+  @SuppressWarnings("unchecked")
+  public static boolean isEmptyValue(PmAttr<?> pmAttr, Object value) {
+    return ((PmAttrBase<Object, ?>)pmAttr).isEmptyValue(value);
+  }
+
+  /**
    * Provides the a space separated lists of style classes for the given PM.
    *
    * @param viewMap
