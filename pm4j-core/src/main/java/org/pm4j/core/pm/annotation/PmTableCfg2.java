@@ -6,20 +6,40 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.util.Comparator;
 
+import org.pm4j.common.pageable.PageableCollection2;
 import org.pm4j.common.selection.SelectMode;
-import org.pm4j.core.pm.PmTable;
-import org.pm4j.core.pm.PmTable.RowSelectMode;
-import org.pm4j.core.pm.PmTableCol;
-import org.pm4j.core.pm.impl.PmTableImpl;
+import org.pm4j.core.pm.PmTable2;
+import org.pm4j.core.pm.impl.PmTableImpl2;
 
 /**
- * Annotation configuration for {@link PmTable} instances.
+ * Annotation configuration for {@link PmTable2} instances.
  *
  * @author olaf boede
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.TYPE, ElementType.FIELD })
 public @interface PmTableCfg2 {
+
+  /**
+   * May be used to specify an expression that provides a collection of beans to show in this table.
+   * <p>
+   * The expression evaluation starts at the parent PM of the table.<br>
+   * An example for a table that is used within a containing <code>PmBean</code>:
+   * <pre>beanCollectionPath="pmBean.aSubBean.theCollectionToUse"</pre>
+   * <p>
+   * For more information regarding expressions see: {@link PmExpressionApi}
+   * <p>
+   * If you leave this annotation undefined, the expression "(o)pmBean.<myTablePmFieldName>". This addresses
+   * a collection within the backing bean having the same field name.
+   * <p>
+   * If you need more flexibility: Please override <code>PmTableImpl2#getPmBeansImpl()</code>.
+   * <p>
+   * Alternatively - e.g. for pageable query service based tables - you use a specific {@link PageableCollection2} 
+   * behind your table. Then this <code>valuePath</code> is irrelevant.
+   *
+   * @return an expression string.
+   */
+  String valuePath() default "";
 
   /**
    * An optional default setting for column sortability.
@@ -65,6 +85,8 @@ public @interface PmTableCfg2 {
    * Defines the maximum number of rows per page.
    * <p>
    * This definition may be overridden by a call to {@link PmTableImpl#setNumOfPageRows(Integer)}.
+   * <p>
+   * TODO oboede: add a default value to PmDefaults or find another application specific solution.
    *
    * @return The maximum number of rows per page. Only a positive value has an effect on the table.
    */

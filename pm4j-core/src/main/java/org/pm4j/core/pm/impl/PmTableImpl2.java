@@ -10,13 +10,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.pm4j.common.pageable.ModificationHandler;
 import org.pm4j.common.pageable.Modifications;
 import org.pm4j.common.pageable.PageableCollection2;
 import org.pm4j.common.pageable.PageableCollectionFactory;
+import org.pm4j.common.pageable.inmem.PageableInMemCollectionBase;
 import org.pm4j.common.query.FilterCompareDefinitionFactory;
+import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.selection.SelectMode;
 import org.pm4j.common.selection.Selection;
@@ -25,6 +28,7 @@ import org.pm4j.common.selection.SelectionHandlerUtil;
 import org.pm4j.common.util.beanproperty.PropertyAndVetoableChangeListener;
 import org.pm4j.common.util.collection.ListUtil;
 import org.pm4j.core.exception.PmRuntimeException;
+import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmCommandDecorator;
 import org.pm4j.core.pm.PmDefaults;
@@ -39,13 +43,12 @@ import org.pm4j.core.pm.PmTableCol2;
 import org.pm4j.core.pm.PmTableGenericRow2;
 import org.pm4j.core.pm.PmTableRow;
 import org.pm4j.core.pm.PmVisitor;
-import org.pm4j.core.pm.annotation.PmTableCfg;
 import org.pm4j.core.pm.annotation.PmTableCfg2;
 import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
 import org.pm4j.core.pm.api.PmEventApi;
+import org.pm4j.core.pm.api.PmExpressionApi;
 import org.pm4j.core.pm.api.PmValidationApi;
-import org.pm4j.core.pm.pageable2.PageableInMemCollectionFactoryExprBased;
 import org.pm4j.core.pm.pageable2.PageablePmBeanCollection;
 
 /**
@@ -68,12 +71,18 @@ public class PmTableImpl2
         extends PmDataInputBase
         implements PmTable2<T_ROW_PM> {
 
+  /**
+   * The default number of rows per page. Is used if no number of rows is specified
+   * in {@link PmTableCfg2#numOfPageRows()} or by calling {@link #setNumOfPageRowPms(Integer)}.
+   */
+  public static final int DEFAULT_NUM_OF_PAGE_ROW_PMS = 10;
+
   private static final Log LOG = LogFactory.getLog(PmTableImpl2.class);
 
   /** The content this table is based on. */
   private PageablePmBeanCollection<T_ROW_PM, T_ROW_BEAN> pmPageableCollection;
 
-  /** Creates the bean collection to represent. */
+  @Deprecated
   private PageableCollectionFactory<T_ROW_BEAN> pmPageableBeanCollectionFactory;
 
   /** Defines the row-selection behavior. */
@@ -175,12 +184,11 @@ public class PmTableImpl2
   @Override
   public int getNumOfPageRowPms() {
     if (numOfPageRowPms == null) {
-      PmTableCfg cfg = AnnotationUtil.findAnnotation(this, PmTableCfg.class);
+      PmTableCfg2 cfg = AnnotationUtil.findAnnotation(this, PmTableCfg2.class);
       numOfPageRowPms = (cfg != null &&
                        cfg.numOfPageRows() > 0)
           ? cfg.numOfPageRows()
-          // TODO: add to PmDefaults.
-          : 10;
+          : DEFAULT_NUM_OF_PAGE_ROW_PMS;
     }
     return numOfPageRowPms;
   }
@@ -470,9 +478,6 @@ public class PmTableImpl2
    * @return the pmPageableBeanCollectionFactory
    */
   public PageableCollectionFactory<T_ROW_BEAN> getPmPageableBeanCollectionFactory() {
-    if (pmPageableBeanCollectionFactory == null) {
-      pmPageableBeanCollectionFactory = new PageableInMemCollectionFactoryExprBased<T_ROW_BEAN>(this, "pmParent.(o)pmBean." + getPmName());
-    }
     return pmPageableBeanCollectionFactory;
   }
 
@@ -484,7 +489,7 @@ public class PmTableImpl2
   }
 
   /**
-   * @return The {@link PageableCollection} that handles the table row PM's to display.
+   * @return The {@link PageableCollection2} that handles the table row PM's to display.
    */
   @Override
   public final PageableCollection2<T_ROW_PM> getPmPageableCollection() {
@@ -499,7 +504,7 @@ public class PmTableImpl2
    * This method provides access to a collection that handles the beans behind
    * the row PMs.
    * <p>
-   * @return The {@link PageableCollection} that handles the table row beans to display.
+   * @return The {@link PageableCollection2} that handles the table row beans to display.
    */
   @SuppressWarnings("unchecked")
   public PageableCollection2<T_ROW_BEAN> getPmPageableBeanCollection() {
@@ -515,8 +520,43 @@ public class PmTableImpl2
    * @return The collection to use. Never <code>null</code>.
    */
   protected PageablePmBeanCollection<T_ROW_PM, T_ROW_BEAN> getPmPageableCollectionImpl() {
-    PageableCollection2<T_ROW_BEAN> pageableBeanCollection =  getPmPageableBeanCollectionFactory().create(null, null);
-    return new PageablePmBeanCollection<T_ROW_PM, T_ROW_BEAN>(this, PmTableRow.class, pageableBeanCollection);
+    // TODO oboede: temp. solution  for the deprecated factory...
+    if (getPmPageableBeanCollectionFactory() != null) {
+      PageableCollection2<T_ROW_BEAN> pageableBeanCollection =  getPmPageableBeanCollectionFactory().create(null, null);
+      return new PageablePmBeanCollection<T_ROW_PM, T_ROW_BEAN>(this, PmTableRow.class, pageableBeanCollection);
+    } else {
+      QueryOptions qo = PmTableUtil2.makeQueryOptionsForInMemoryTable(this);
+      PageableCollection2<T_ROW_BEAN> pageableBeanCollection = new PageableInMemCollectionBase<T_ROW_BEAN>(qo, null) {
+        @Override
+        protected Collection<T_ROW_BEAN> getBackingCollectionImpl() {
+          return getPmBeansImpl();
+        }
+      };
+      return new PageablePmBeanCollection<T_ROW_PM, T_ROW_BEAN>(this, PmTableRow.class, pageableBeanCollection);
+    }
+  }
+
+
+  /**
+   * Used for in-memory tables.<br>
+   * The default implementation of {@link #getPmPageableCollectionImpl()} asks this method for the
+   * set of beans to represent.
+   * <p>
+   * The default implementation uses either the configured {@link PmTableCfg2#valuePath()}.<br>
+   * If that is not configured the expression <code>"(o)pmBean.<pmName of my table>"</code>
+   * will be used. This default expression is often useful for tables in {@link PmBean}s that represent a
+   * bean collection having the same name.
+   *
+   * @return the set of beans to display. May be <code>null</code>.
+   */
+  @SuppressWarnings("unchecked")
+  protected Collection<T_ROW_BEAN> getPmBeansImpl() {
+    PmTableCfg2 cfg = AnnotationUtil.findAnnotation(this, PmTableCfg2.class);
+    String exprString = (cfg != null && StringUtils.isNotEmpty(cfg.valuePath()))
+        ? cfg.valuePath()
+        : "(o)pmBean." + getPmName();
+    Collection<T_ROW_BEAN> beans = (Collection<T_ROW_BEAN>)PmExpressionApi.findByExpression(getPmParent(), exprString, Collection.class);
+    return beans;
   }
 
   /**
@@ -525,7 +565,7 @@ public class PmTableImpl2
    * Gets called whenever a new {@link #pmPageableCollection} gets assigned:
    * <ul>
    *  <li>by calling {@link #getPmPageableCollectionImpl()} or </li>
-   *  <li>by a call to {@link #setPmPageableCollection(PageableCollection, boolean, ValueChangeKind)}.</li>
+   *  <li>by a call to {@link #setPmPageableCollection(PageableCollection2, boolean, ValueChangeKind)}.</li>
    * </ul>
    * The default settings applied in this base implementation are:
    * <ul>

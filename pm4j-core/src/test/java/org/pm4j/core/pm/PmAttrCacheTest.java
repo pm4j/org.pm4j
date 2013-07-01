@@ -8,7 +8,6 @@ import java.util.Collection;
 import java.util.List;
 
 import org.junit.Test;
-import org.pm4j.common.pageable.inmem.PageableInMemCollectionFactoryBase;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.annotation.PmBeanCfg;
 import org.pm4j.core.pm.annotation.PmCacheCfg;
@@ -53,13 +52,9 @@ public class PmAttrCacheTest {
   public void testSimpleAttributeCacheInTableRows() {
     final List<MyPojo> list = Arrays.asList(new MyPojo(), new MyPojo());
     MyTablePm t = new MyTablePm(new PmConversationImpl()) {
-      {
-        setPmPageableBeanCollectionFactory(new PageableInMemCollectionFactoryBase<MyPojo>() {
-          @Override
-          protected Collection<MyPojo> getBackingCollectionImpl() {
-            return list;
-          }
-        });
+      @Override
+      protected Collection<MyPojo> getPmBeansImpl() {
+        return list;
       }
     };
 

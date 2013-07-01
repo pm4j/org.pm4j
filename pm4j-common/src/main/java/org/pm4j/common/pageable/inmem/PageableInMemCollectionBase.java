@@ -97,12 +97,13 @@ public abstract class PageableInMemCollectionBase<T_ITEM>
     modificationHandler = new InMemModificationHandler();
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public final Collection<T_ITEM> getBackingCollection() {
     Collection<T_ITEM> beans = getBackingCollectionImpl();
     return beans != null
         ? beans
-        : new ArrayList<T_ITEM>();
+        : Collections.EMPTY_LIST;
   }
 
   /**

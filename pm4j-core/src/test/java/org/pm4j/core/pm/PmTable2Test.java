@@ -10,7 +10,6 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.pm4j.common.pageable.PageableCollectionUtil2;
-import org.pm4j.common.pageable.inmem.PageableInMemCollectionFactoryBase;
 import org.pm4j.core.pm.annotation.PmBeanCfg;
 import org.pm4j.core.pm.annotation.PmFactoryCfg;
 import org.pm4j.core.pm.api.PmCacheApi;
@@ -35,15 +34,11 @@ public class PmTable2Test {
     ));
 
     myTablePm = new TablePm(new PmConversationImpl()) {
-      {
-        /** We use here an in-memory data table.
-         * The table represents the items of the collection provided by this method. */
-        setPmPageableBeanCollectionFactory(new PageableInMemCollectionFactoryBase<RowBean>() {
-          @Override
-          protected Collection<RowBean> getBackingCollectionImpl() {
-            return editedRowBeanList;
-          }
-        });
+      /** We use here an in-memory data table.
+       * The table represents the items of the collection provided by this method. */
+      @Override
+      protected Collection<RowBean> getPmBeansImpl() {
+        return editedRowBeanList;
       }
     };
   }
