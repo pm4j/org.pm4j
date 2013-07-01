@@ -7,6 +7,7 @@ import org.pm4j.common.pageable.inmem.PageableInMemCollectionFactoryBase;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.QueryParams;
 import org.pm4j.core.pm.PmObject;
+import org.pm4j.core.pm.annotation.PmTableCfg2;
 import org.pm4j.core.pm.api.PmExpressionApi;
 import org.pm4j.core.pm.impl.PmTableImpl2;
 import org.pm4j.core.pm.impl.PmTableUtil2;
@@ -17,7 +18,9 @@ import org.pm4j.core.pm.impl.PmTableUtil2;
  * @author oboede
  *
  * @param <T_ITEM>
+ * @deprecated Please use {@link PmTableCfg2#valuePath()} or override <code>PmTableImpl2#getPmBeans()</code> instead.
  */
+@Deprecated
 public class PageableInMemCollectionFactoryExprBased<T_ITEM> extends PageableInMemCollectionFactoryBase<T_ITEM> {
 
   private PmObject pmCtxt;

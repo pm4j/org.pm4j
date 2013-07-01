@@ -9,6 +9,8 @@ import java.util.Comparator;
 import org.pm4j.common.pageable.PageableCollection2;
 import org.pm4j.common.selection.SelectMode;
 import org.pm4j.core.pm.PmTable2;
+import org.pm4j.core.pm.PmTableCol2;
+import org.pm4j.core.pm.api.PmExpressionApi;
 import org.pm4j.core.pm.impl.PmTableImpl2;
 
 /**
@@ -34,7 +36,7 @@ public @interface PmTableCfg2 {
    * <p>
    * If you need more flexibility: Please override <code>PmTableImpl2#getPmBeansImpl()</code>.
    * <p>
-   * Alternatively - e.g. for pageable query service based tables - you use a specific {@link PageableCollection2} 
+   * Alternatively - e.g. for pageable query service based tables - you use a specific {@link PageableCollection2}
    * behind your table. Then this <code>valuePath</code> is irrelevant.
    *
    * @return an expression string.
@@ -65,7 +67,7 @@ public @interface PmTableCfg2 {
    * Defines a bean comparator that provides the initial table sort order.
    * <p>
    * In difference to {@link #defaultSortCol()} this initial sort order gets not reflected
-   * within the {@link PmTableCol#getSortOrderAttr()}.
+   * within the {@link PmTableCol2#getSortOrderAttr()}.
    * It just defines the initial 'unsorted' state of the table items.
    *
    * @return The defined comparator.
@@ -73,9 +75,9 @@ public @interface PmTableCfg2 {
   Class<?> initialBeanSortComparator() default Comparator.class;
 
   /**
-   * Defines the {@link RowSelectMode} to use.
+   * Defines the {@link SelectMode} to use.
    * <p>
-   * This definition may be overridden by a call to {@link PmTableImpl#setRowSelectMode(RowSelectMode)}.
+   * This definition may be overridden by a call to {@link PmTableImpl2#setPmRowSelectMode(SelectMode)}.
    *
    * @return The row selection mode.
    */
@@ -84,7 +86,7 @@ public @interface PmTableCfg2 {
   /**
    * Defines the maximum number of rows per page.
    * <p>
-   * This definition may be overridden by a call to {@link PmTableImpl#setNumOfPageRows(Integer)}.
+   * This definition may be overridden by a call to {@link PmTableImpl2#setNumOfPageRowPms(Integer)}.
    * <p>
    * TODO oboede: add a default value to PmDefaults or find another application specific solution.
    *

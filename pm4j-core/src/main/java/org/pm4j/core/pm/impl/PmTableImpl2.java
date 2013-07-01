@@ -47,8 +47,10 @@ import org.pm4j.core.pm.annotation.PmTableCfg2;
 import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
 import org.pm4j.core.pm.api.PmEventApi;
-import org.pm4j.core.pm.api.PmExpressionApi;
 import org.pm4j.core.pm.api.PmValidationApi;
+
+import org.pm4j.core.pm.impl.pathresolver.PathResolver;
+import org.pm4j.core.pm.impl.pathresolver.PmExpressionPathResolver;
 import org.pm4j.core.pm.pageable2.PageablePmBeanCollection;
 
 /**
@@ -155,12 +157,11 @@ public class PmTableImpl2
 
   public SelectMode getPmRowSelectMode() {
     if (pmRowSelectMode == null) {
-      PmTableCfg2 cfg = AnnotationUtil.findAnnotation(this, PmTableCfg2.class);
-      pmRowSelectMode = (cfg != null &&
-                       cfg.rowSelectMode() != SelectMode.DEFAULT)
-          ? cfg.rowSelectMode()
-          // TODO: add to PmDefaults.
-          : SelectMode.NO_SELECTION;
+      pmRowSelectMode = getOwnMetaDataWithoutPmInitCall().rowSelectMode;
+      if (pmRowSelectMode == SelectMode.DEFAULT) {
+        // XXX oboede: add a configurable default?
+        pmRowSelectMode = SelectMode.NO_SELECTION;
+      }
     }
 
     return pmRowSelectMode;
@@ -175,20 +176,20 @@ public class PmTableImpl2
    * @param rowSelectMode The {@link SelectMode} to be used by this table.
    */
   public void setPmRowSelectMode(SelectMode rowSelectMode) {
-    this.pmRowSelectMode = rowSelectMode;
+    // the default case is internally represented by having a 'null' value.
+    this.pmRowSelectMode = (rowSelectMode != SelectMode.DEFAULT)
+        ? rowSelectMode
+        : null;
+
     if (pmPageableCollection != null) {
-      pmPageableCollection.getSelectionHandler().setSelectMode(rowSelectMode);
+      pmPageableCollection.getSelectionHandler().setSelectMode(getPmRowSelectMode());
     }
   }
 
   @Override
   public int getNumOfPageRowPms() {
     if (numOfPageRowPms == null) {
-      PmTableCfg2 cfg = AnnotationUtil.findAnnotation(this, PmTableCfg2.class);
-      numOfPageRowPms = (cfg != null &&
-                       cfg.numOfPageRows() > 0)
-          ? cfg.numOfPageRows()
-          : DEFAULT_NUM_OF_PAGE_ROW_PMS;
+      numOfPageRowPms = getOwnMetaDataWithoutPmInitCall().numOfPageRowPms;
     }
     return numOfPageRowPms;
   }
@@ -551,11 +552,7 @@ public class PmTableImpl2
    */
   @SuppressWarnings("unchecked")
   protected Collection<T_ROW_BEAN> getPmBeansImpl() {
-    PmTableCfg2 cfg = AnnotationUtil.findAnnotation(this, PmTableCfg2.class);
-    String exprString = (cfg != null && StringUtils.isNotEmpty(cfg.valuePath()))
-        ? cfg.valuePath()
-        : "(o)pmBean." + getPmName();
-    Collection<T_ROW_BEAN> beans = (Collection<T_ROW_BEAN>)PmExpressionApi.findByExpression(getPmParent(), exprString, Collection.class);
+    Collection<T_ROW_BEAN> beans = (Collection<T_ROW_BEAN>) getOwnMetaData().valuePathResolver.getValue(getPmParent());
     return beans;
   }
 
@@ -739,6 +736,57 @@ public class PmTableImpl2
         d.afterDo(null);
       }
     }
+  }
+
+  // ======== meta data ======== //
+
+  @Override
+  protected MetaData makeMetaData() {
+    return new MetaData();
+  }
+
+  @Override
+  protected void initMetaData(PmDataInputBase.MetaData metaData) {
+    super.initMetaData(metaData);
+    @SuppressWarnings("unchecked")
+    MetaData myMetaData = (MetaData) metaData;
+
+    PmTableCfg2 cfg = AnnotationUtil.findAnnotation(this, PmTableCfg2.class);
+
+    if (cfg != null) {
+      myMetaData.rowSelectMode = cfg.rowSelectMode();
+      if (cfg.numOfPageRows() > 0) {
+        myMetaData.numOfPageRowPms = cfg.numOfPageRows();
+      }
+
+    }
+
+    // -- initialize the optional path resolver for in-memory tables. --
+    String valuePath = ((cfg != null) && StringUtils.isNotEmpty(cfg.valuePath()))
+        ? valuePath = cfg.valuePath()
+        : (getPmParent() instanceof PmBean)
+            ? "(o)pmBean." + getPmName()
+            : "";
+    myMetaData.valuePathResolver = PmExpressionPathResolver.parse(valuePath);
+  }
+
+  protected class MetaData extends PmDataInputBase.MetaData {
+    private SelectMode rowSelectMode = SelectMode.DEFAULT;
+    private int numOfPageRowPms = DEFAULT_NUM_OF_PAGE_ROW_PMS;
+    private PathResolver valuePathResolver;
+
+    /** May be used to define a different default value. */
+    public void setNumOfPageRowPms(int numOfPageRowPms) { this.numOfPageRowPms = numOfPageRowPms; }
+  }
+
+  @SuppressWarnings("unchecked")
+  private final MetaData getOwnMetaData() {
+    return (MetaData) getPmMetaData();
+  }
+
+  @SuppressWarnings("unchecked")
+  private final MetaData getOwnMetaDataWithoutPmInitCall() {
+    return (MetaData) getPmMetaDataWithoutPmInitCall();
   }
 
 }

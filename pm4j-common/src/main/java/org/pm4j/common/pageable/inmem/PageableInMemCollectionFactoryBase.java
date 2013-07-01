@@ -16,6 +16,7 @@ import org.pm4j.common.query.QueryParams;
  * @param <T_ITEM> type of collection items.
  *
  * @author olaf boede
+ * @deprecated Please use {@link PmTableCfg2#valuePath()} or override <code>PmTableImpl2#getPmBeans()</code> instead.
  */
 public abstract class PageableInMemCollectionFactoryBase<T_ITEM> implements PageableCollectionFactory<T_ITEM> {
 

@@ -22,10 +22,19 @@ public class PmExpressionPathResolver extends PathResolverBase {
 
   /**
    * @param exprString The string to parse.
+   */
+  public static PathResolver parse(String exprString) {
+    return StringUtils.isEmpty(exprString)
+            ? PassThroughPathResolver.INSTANCE
+            : new PmExpressionPathResolver(exprString, true);
+  }
+
+  /**
+   * @param exprString The string to parse.
    * @param isStartAttrAllowed
    *          Defines if the first expression part may address a field.
    *          <p>
-   *          Is used to prevent initializaion loops for injected fields that
+   *          Is used to prevent initialization loops for injected fields that
    *          use the name of a referenced variable.
    */
   public static PathResolver parse(String exprString, boolean isStartAttrAllowed) {
