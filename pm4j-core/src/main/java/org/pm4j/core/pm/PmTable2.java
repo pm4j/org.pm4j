@@ -5,13 +5,11 @@ import java.util.List;
 
 import org.pm4j.common.pageable.PageableCollection2;
 import org.pm4j.common.selection.SelectionHandler;
-import org.pm4j.core.pm.PmTable.RowSelectMode;
-import org.pm4j.core.pm.pageable.PageableCollection;
 
 
 /**
  * PM for tables.<br>
- * A table provides columns (@see {@link #getColumns()}) and rows (see {@link #getTotalNumOfRows()}).
+ * A table provides columns (@see {@link #getColumnPms()}) and rows (see {@link #getRowPms()}).
  *
  * @author OBOEDE
  *
@@ -19,7 +17,7 @@ import org.pm4j.core.pm.pageable.PageableCollection;
  */
 public interface PmTable2<T_ROW_PM> extends PmObject, PmDataInput {
 
-  /** Identifer for things that may be cleared by calling {@link PmTable2#updatePmTable(UpdateAspect...)} */
+  /** Identifier for things that may be cleared by calling {@link PmTable2#updatePmTable(UpdateAspect...)} */
   public enum UpdateAspect {
     /** Switches back to the default sort order. */
     CLEAR_SORT_ORDER,
@@ -140,21 +138,5 @@ public interface PmTable2<T_ROW_PM> extends PmObject, PmDataInput {
    * @param updateAspect the updates to do. If no value is passed, all updates will be done.
    */
   void updatePmTable(UpdateAspect... updateAspect);
-
-  /**
-   * PM for table with a pager.
-   *
-   * @param <T_ROW_PM> The type used for row objects.
-   */
-  public static interface WithPager<T_ROW_ELEMENT> extends PmTable2<T_ROW_ELEMENT>{
-
-    /**
-     * @return The pager used for the table.
-     */
-    PmPager getPmPager();
-
-    /** @deprecated Please use {@link #getPmPager()} */
-    PmPager getPager();
-  }
 
 }
