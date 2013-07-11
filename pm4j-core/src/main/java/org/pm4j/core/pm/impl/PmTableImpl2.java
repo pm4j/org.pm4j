@@ -758,13 +758,12 @@ public class PmTableImpl2
       if (cfg.numOfPageRows() > 0) {
         myMetaData.numOfPageRowPms = cfg.numOfPageRows();
       }
-
     }
 
     // -- initialize the optional path resolver for in-memory tables. --
     String valuePath = ((cfg != null) && StringUtils.isNotEmpty(cfg.valuePath()))
         ? valuePath = cfg.valuePath()
-        : (getPmParent() instanceof PmBean)
+        : (getPmParent() instanceof PmBean) && StringUtils.isNotBlank(getPmName())
             ? "(o)pmBean." + getPmName()
             : "";
     myMetaData.valuePathResolver = PmExpressionPathResolver.parse(valuePath);
