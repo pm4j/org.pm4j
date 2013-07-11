@@ -4,11 +4,11 @@
 	<artifactId>pm4j-facelets</artifactId>
 	<packaging>jar</packaging>
 	<name>PM4J FACELETS</name>
-	<version>0.6.5</version>
+	<version>0.6.6-SNAPSHOT</version>
 	<parent>
 		<groupId>org.pm4j</groupId>
 		<artifactId>main</artifactId>
-		<version>0.6.5</version>
+		<version>0.6.6-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
