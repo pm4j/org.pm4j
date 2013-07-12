@@ -552,8 +552,17 @@ public class PmTableImpl2
    */
   @SuppressWarnings("unchecked")
   protected Collection<T_ROW_BEAN> getPmBeansImpl() {
-    Collection<T_ROW_BEAN> beans = (Collection<T_ROW_BEAN>) getOwnMetaData().valuePathResolver.getValue(getPmParent());
-    return beans;
+    PathResolver valuePathResolver = getOwnMetaData().valuePathResolver;
+    if (valuePathResolver != null) {
+      Collection<T_ROW_BEAN> beans = (Collection<T_ROW_BEAN>) valuePathResolver.getValue(getPmParent());
+      return beans;
+    } else {
+      throw new PmRuntimeException(this, "The table PM is not bound to any data to represent." +
+          "\nYou may provide table data using the following ways:" +
+          "\n\ta) bind the table to an collection by an expresssion: Configure @PmTableCfg(valuePath=...)"+
+          "\n\tb) bind the table to an collection by overriding: getPmBeansImpl()"+
+          "\n\tc) override getPmPageableCollectionImpl() to provide your specific pageable data source.");
+    }
   }
 
   /**
@@ -766,7 +775,9 @@ public class PmTableImpl2
         : (getPmParent() instanceof PmBean) && StringUtils.isNotBlank(getPmName())
             ? "(o)pmBean." + getPmName()
             : "";
-    myMetaData.valuePathResolver = PmExpressionPathResolver.parse(valuePath);
+    if (StringUtils.isNotBlank(valuePath)) {
+      myMetaData.valuePathResolver = PmExpressionPathResolver.parse(valuePath);
+    }
   }
 
   protected class MetaData extends PmDataInputBase.MetaData {
