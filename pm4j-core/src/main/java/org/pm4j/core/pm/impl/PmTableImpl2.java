@@ -557,11 +557,12 @@ public class PmTableImpl2
       Collection<T_ROW_BEAN> beans = (Collection<T_ROW_BEAN>) valuePathResolver.getValue(getPmParent());
       return beans;
     } else {
-      throw new PmRuntimeException(this, "The table PM is not bound to any data to represent." +
+      LOG.warn("The table PM '" + PmUtil.getPmLogString(this) + "' is not bound to any data to represent." +
           "\nYou may provide table data using the following ways:" +
-          "\n\ta) bind the table to an collection by an expresssion: Configure @PmTableCfg(valuePath=...)"+
-          "\n\tb) bind the table to an collection by overriding: getPmBeansImpl()"+
+          "\n\ta) bind to a Collection by defining a valuePath expresssion within a @PmTableCfg annotation"+
+          "\n\tb) bind to a Collection by overriding getPmBeansImpl()"+
           "\n\tc) override getPmPageableCollectionImpl() to provide your specific pageable data source.");
+      return Collections.EMPTY_LIST;
     }
   }
 
