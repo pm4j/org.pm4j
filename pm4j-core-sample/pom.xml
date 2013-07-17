@@ -4,12 +4,12 @@
 	<artifactId>pm4j-core-sample</artifactId>
 	<packaging>jar</packaging>
 	<name>PM4J CORE SAMPLE</name>
-	<version>0.6.6</version>
+	<version>0.6.7-SNAPSHOT</version>
 
 	<parent>
 		<groupId>org.pm4j</groupId>
 		<artifactId>main</artifactId>
-		<version>0.6.6</version>
+		<version>0.6.7-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
