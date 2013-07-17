@@ -75,8 +75,21 @@ public class QueryOptions {
     return defaultSortOrder;
   }
 
+  /**
+   * Defines the default sort order to use.
+   * @param defaultSortOrder the default sort order. <code>null</code> removes the default sort order.
+   */
   public void setDefaultSortOrder(SortOrder defaultSortOrder) {
     this.defaultSortOrder = defaultSortOrder;
+  }
+
+  /**
+   * Defines the default sort order to use. It will sort by the given attribute(s) in ascending order.
+   *
+   * @param sortAttrs the attribute(s) to sort by.
+   */
+  public void setDefaultSortOrder(QueryAttr... sortAttrs) {
+    this.defaultSortOrder = new SortOrder(sortAttrs);
   }
 
   /**
