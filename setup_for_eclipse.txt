@@ -1,14 +1,22 @@
 Setup pm4j projects for eclipse 
 
+preconditions:
+* eclipse (indigo or higher)
+* maven3
+
 1. download pm4j:
  git clone https://pm4j@github.com/pm4j/org.pm4j.git
- this creates a directory 'pm4j.org'
+ this creates a directory 'org.pm4j'
+
+2. generate eclipse project configuration files
+ change to directory 'org.pm4j'
+ call 'mvn eclipse:eclipse'
  
 2. start eclipse 
  setup or use an eclipse workspace
  import the pm4j projects
  
-3. setup an OS specific SWT library project
+3. optional: setup an OS specific SWT library project
  create an project 'org.eclipse.swt'
  use "Project>Properties>Java Build Path>Libraries>Add external JARs) to
  add the following jars to the classpath:
