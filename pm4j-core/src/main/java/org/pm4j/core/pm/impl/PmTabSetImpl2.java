@@ -19,7 +19,7 @@ import org.pm4j.core.pm.impl.connector.PmTabSetConnector;
 import org.pm4j.navi.NaviLink;
 
 /**
- * Basic implementation of a {@link PmTabSet}.
+ * Basic implementation of a {@link PmTabSet2}.
  * <p>
  * Each {@link PmTab} child will be considered as a tab of this set.
  * The tabs are sorted as they are declared here.
