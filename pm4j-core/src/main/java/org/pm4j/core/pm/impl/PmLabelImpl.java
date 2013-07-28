@@ -2,7 +2,6 @@ package org.pm4j.core.pm.impl;
 
 import org.pm4j.core.pm.PmLabel;
 import org.pm4j.core.pm.PmObject;
-import org.pm4j.core.pm.PmVisitor;
 
 /**
  * A label implementation.
@@ -24,11 +23,6 @@ public class PmLabelImpl extends PmObjectBase implements PmLabel {
   @Override
   public void clearPmInvalidValues() {
     // nothing to do.
-  }
-
-  @Override
-  public void accept(PmVisitor visitor) {
-    visitor.visit(this);
   }
 
   @Override

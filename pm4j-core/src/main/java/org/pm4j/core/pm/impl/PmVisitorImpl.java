@@ -43,18 +43,37 @@ public class PmVisitorImpl {
    * Starts the visit of pm and pm's children.
    *
    * @param pm
-   *          the visited p.m
+   *          the PM to visit
+   * @return the visit result state.
    */
-  public void visit(PmObject pm) {
+  public VisitResult visit(PmObject pm) {
     assert pm != null;
-    visitObject(pm);
+    VisitResult hintResult = considerHints(pm);
+    if (hintResult != null) {
+      return hintResult;
+    }
+
+    // The moment where the elephant...
+    VisitResult result = callBack.visit(pm);
+
+    switch (result) {
+      case STOP_VISIT:
+        stopOnPmObject = pm;
+        return VisitResult.STOP_VISIT;
+      case SKIP_CHILDREN:
+        return VisitResult.SKIP_CHILDREN;
+      case CONTINUE:
+        return visitChildren(pm);
+      default:
+        throw new RuntimeException("Unhandled visit result: " + result);
+    }
   }
 
   /**
    * Starts the visit of pm's children.
    *
    * @param pm
-   *          the visited p.m
+   *          the PM to visit.
    */
   public VisitResult visitChildren(PmObject pm) {
     assert pm != null;
@@ -62,9 +81,18 @@ public class PmVisitorImpl {
     if (!children.isEmpty()) {
       if(callBack instanceof VisitHierarchyCallBack) {
         VisitHierarchyCallBack vhcb = (VisitHierarchyCallBack)callBack;
-        vhcb.enterChildren(pm, children);
-        visitChildrenCollection(children);
-        vhcb.leaveChildren(pm, children);
+        VisitResult enterResult = vhcb.enterChildren(pm, children);
+        switch (enterResult) {
+        case CONTINUE:
+          visitChildrenCollection(children);
+          vhcb.leaveChildren(pm, children);
+          break;
+        case SKIP_CHILDREN:
+          // continue without having the children visited.
+          return VisitResult.CONTINUE;
+        case STOP_VISIT:
+          return VisitResult.STOP_VISIT;
+        }
       }
       else {
         visitChildrenCollection(children);
@@ -122,29 +150,6 @@ public class PmVisitorImpl {
     return null;
   }
 
-  private VisitResult visitObject(PmObject pm) {
-
-    VisitResult hintResult = considerHints(pm);
-    if (hintResult != null) {
-      return hintResult;
-    }
-
-    // The moment where the elephant...
-    VisitResult result = callBack.visit(pm);
-
-    switch (result) {
-      case STOP_VISIT:
-        stopOnPmObject = pm;
-        return VisitResult.STOP_VISIT;
-      case SKIP_CHILDREN:
-        return VisitResult.SKIP_CHILDREN;
-      case CONTINUE:
-        return visitChildren(pm);
-      default:
-        throw new RuntimeException("Unhandled visit result: " + result);
-    }
-  }
-
   private Collection<PmObject> getChildren(PmObject pm) {
     Collection<PmObject> allChildren = new ArrayList<PmObject>();
     allChildren.addAll(((PmObjectBase) pm).getPmChildren());
@@ -159,7 +164,7 @@ public class PmVisitorImpl {
       if (stopOnPmObject != null) {
         return;
       }
-      visitObject(child);
+      visit(child);
     }
   }
 }

@@ -1,30 +1,34 @@
 package org.pm4j.core.pm.serialisation;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
 
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.pm4j.core.pm.PmAttrInteger;
 import org.pm4j.core.pm.PmAttrString;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.api.PmExpressionApi;
 import org.pm4j.core.pm.impl.PmAttrIntegerImpl;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
-import org.pm4j.core.pm.impl.PmElementImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
+import org.pm4j.core.pm.impl.PmElementImpl;
 import org.pm4j.core.pm.serialization.PmContentSerializer;
 
-public class PmSerializerTest extends TestCase {
+public class PmSerializerTest {
 
   private MyPmConversation clientSession, serverSession;
   private PmContentSerializer clientSerializer, serverSerializer;
 
-  @Override
-  protected void setUp() throws Exception {
+  @Before
+  public void setUp() throws Exception {
     clientSession = new MyPmConversation();
     serverSession = new MyPmConversation();
     clientSerializer = new PmContentSerializer();
     serverSerializer = new PmContentSerializer();
   }
 
+  @Test @Ignore("oboede: re-implement serialization!")
   public void testInitServerPmBasedOnClientValues() {
     MyTestPm clientPm = (MyTestPm)PmExpressionApi.getByExpression(serverSession, "myTestPm");
     clientPm.s1.setValue("abc");
@@ -39,6 +43,7 @@ public class PmSerializerTest extends TestCase {
     assertEquals(new Integer(3), serverPm.i1.getValue());
   }
 
+  @Test @Ignore("oboede: re-implement serialization!")
   public void testGetClientPmFromServerAndSendEnteredValuesBack() {
     MyTestPm serverPm = (MyTestPm)PmExpressionApi.getByExpression(serverSession, "myTestPm");
     serverPm.s1.setValue("serverValue");

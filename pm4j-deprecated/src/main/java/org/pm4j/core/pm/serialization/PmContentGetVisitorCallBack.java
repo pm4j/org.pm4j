@@ -19,8 +19,7 @@ import org.pm4j.core.pm.impl.PmUtil;
  */
 public class PmContentGetVisitorCallBack implements VisitHierarchyCallBack {
 
-  private PmContentContainer currentContainer, parentContainer;
-  private Pair currentPair;
+  private PmContentContainer currentContainer, parentContainer, rootPmContainer;
   private final PmContentCfg contentCfg;
   private final Deque<Pair> contentStack = new ArrayDeque<Pair>();
   private boolean isRootPm = true;
@@ -55,43 +54,38 @@ public class PmContentGetVisitorCallBack implements VisitHierarchyCallBack {
     this.contentCfg = contentCfg;
   }
 
-  private boolean isVisitVisiblePm(PmObject pm) {
-    return (!contentCfg.isOnlyVisibleItems()) || pm.isPmVisible();
-  }
-  
-  private static class Pair{
-    public final PmContentContainer container;
-    public final PmObject pm;
-    public Pair(PmContentContainer container, PmObject pm) {
-      this.container = container;
-      this.pm = pm;
-    } 
-  }
-
   @Override
   public VisitResult visit(PmObject pm) {
     if (isVisitVisiblePm(pm)) {
       String pmName = pm.getPmName();
       if(isRootPm) {
-        // rootPm has its own PmContentContainer instantiation which has to be reused. 
-        currentContainer.initNamedChildContentMap();
-        currentContainer.getNamedChildContentMap().put(pmName,  new PmContentContainer());
+        // rootPm has its own PmContentContainer instantiation which has to be reused.
+        parentContainer.initNamedChildContentMap();
+        currentContainer = new PmContentContainer();
+        parentContainer.getNamedChildContentMap().put(pmName, currentContainer);
+        rootPmContainer = currentContainer;
         isRootPm = false;
       } else {
         // Create new PmContentContainer for this visit.
         currentContainer = parentContainer.addNamedChildContent(pmName);
       }
-      currentPair = new Pair(currentContainer, pm);
-      storeCurrentPairAspect();
+
+      if (pm instanceof PmAttr<?>) {
+        Serializable value = PmUtil.getPmContentAspect(pm, PmAspect.VALUE);
+        if (contentCfg.hasAspect(PmAspect.VALUE) && (value != null )) {
+          currentContainer.addAspect(PmAspect.VALUE, value);
+        }
+      }
     }
     return VisitResult.CONTINUE;
   }
 
   @Override
-  public void enterChildren(PmObject parent, Collection<PmObject> pmChildren) {
-    contentStack.push(currentPair);
+  public VisitResult enterChildren(PmObject parent, Collection<PmObject> pmChildren) {
+    contentStack.push(new Pair(parentContainer, parent));
     parentContainer = currentContainer;
     currentContainer = null;
+    return VisitResult.CONTINUE;
   }
 
   @Override
@@ -101,28 +95,15 @@ public class PmContentGetVisitorCallBack implements VisitHierarchyCallBack {
     parentContainer = (!contentStack.isEmpty())
         ? contentStack.peekLast().container
         : null;
-    
-    assert pair.pm == parent;
-  }
 
-  /**
-   * Stores the value aspect in value container.
-   */
-  private void storeCurrentPairAspect() {
-    final PmAspect aspect = PmAspect.VALUE;
-    if (currentPair.pm instanceof PmAttr<?>) {
-      Serializable value = PmUtil.getPmContentAspect(currentPair.pm, aspect);
-      if (contentCfg.hasAspect(aspect) && (value != null )) {
-        currentPair.container.addAspect(aspect, value);
-      }
-    }
+    assert pair.pm == parent;
   }
 
   /**
    * @return the contentContainer
    */
   public PmContentContainer getContentContainer() {
-    return currentContainer;
+    return rootPmContainer;
   }
 
   /**
@@ -130,5 +111,19 @@ public class PmContentGetVisitorCallBack implements VisitHierarchyCallBack {
    */
   public PmContentCfg getContentCfg() {
     return contentCfg;
-  }  
+  }
+
+  private boolean isVisitVisiblePm(PmObject pm) {
+    return (!contentCfg.isOnlyVisibleItems()) || pm.isPmVisible();
+  }
+
+  private static class Pair{
+    public final PmContentContainer container;
+    public final PmObject pm;
+    public Pair(PmContentContainer container, PmObject pm) {
+      this.container = container;
+      this.pm = pm;
+    }
+  }
+
 }

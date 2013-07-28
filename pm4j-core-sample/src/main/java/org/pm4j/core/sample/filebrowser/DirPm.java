@@ -36,8 +36,13 @@ public class DirPm extends FilePmBase {
 
     /** Show details as a table of directories. */
     @Override protected PmObject getNodeDetailsPmImpl() {
-      return new FileTablePm(this, getValue());
-    };
+      return new FileTablePm(this) {
+        @SuppressWarnings("unchecked")
+        protected Collection<File> getPmBeansImpl() {
+          return (Collection<File>)(Object) subDirs.getValue();
+        }
+      };
+    }
   };
 
   /** The set of files within the directory. */
@@ -50,8 +55,13 @@ public class DirPm extends FilePmBase {
 
     /** Show details as a table of files. */
     @Override protected PmObject getNodeDetailsPmImpl() {
-      return new FileTablePm(this, getValue());
-    };
+      return new FileTablePm(this) {
+        @SuppressWarnings("unchecked")
+        protected Collection<File> getPmBeansImpl() {
+          return (Collection<File>)(Object) files.getValue();
+        }
+      };
+    }
   };
 
   public final PmCommand cmdMakeSubDir = new PmConfirmedCommand(this) {

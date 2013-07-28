@@ -42,13 +42,11 @@ import org.pm4j.core.pm.PmTable2;
 import org.pm4j.core.pm.PmTableCol2;
 import org.pm4j.core.pm.PmTableGenericRow2;
 import org.pm4j.core.pm.PmTableRow;
-import org.pm4j.core.pm.PmVisitor;
 import org.pm4j.core.pm.annotation.PmTableCfg2;
 import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmValidationApi;
-
 import org.pm4j.core.pm.impl.pathresolver.PathResolver;
 import org.pm4j.core.pm.impl.pathresolver.PmExpressionPathResolver;
 import org.pm4j.core.pm.pageable2.PageablePmBeanCollection;
@@ -441,11 +439,6 @@ public class PmTableImpl2
   }
 
   // -- helper methods --
-
-  @Override
-  public void accept(PmVisitor visitor) {
-    visitor.visit(this);
-  }
 
   @Override
   protected boolean isPmValueChangedImpl() {

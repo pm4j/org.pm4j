@@ -83,83 +83,73 @@ public class PmVisitorTest {
 
   @Test
   public void testSkipFactoryPms() {
-    PmObject stopObject = PmVisitorApi.visit(pm, visitAllCallBack, VisitHint.SKIP_FACTORY_GENERATED_CHILD_PMS);
+    PmVisitorApi.visit(pm, visitAllCallBack, VisitHint.SKIP_FACTORY_GENERATED_CHILD_PMS);
     String expected = "[pmVisitorTest_MyRootPm, myChPm1, myChPm1_disabled, myChPm1_convImpl, myChPm1_readOnly, myChPm1_invisible, myChPm2, myChPm2_disabled, myChPm2_convImpl, myChPm2_readOnly, myChPm2_invisible, myPmList]";
     assertEquals(expected, calls.toString());
-    assertEquals(null, stopObject);
   }
 
   @Test
   public void testSkipReadOnly() {
-    PmObject stopObject = PmVisitorApi.visit(pm, visitAllCallBack, VisitHint.SKIP_READ_ONLY,
+    PmVisitorApi.visit(pm, visitAllCallBack, VisitHint.SKIP_READ_ONLY,
         VisitHint.SKIP_FACTORY_GENERATED_CHILD_PMS);
     String expected = "[pmVisitorTest_MyRootPm, myChPm1, myChPm1_disabled, myChPm1_convImpl, myChPm1_invisible, myChPm2, myChPm2_disabled, myChPm2_convImpl, myChPm2_invisible, myPmList]";
     assertEquals(expected, calls.toString());
-    assertEquals(null, stopObject);
   }
 
   @Test
   public void testSkipInvisible() {
-    PmObject stopObject = PmVisitorApi.visit(pm, visitAllCallBack, VisitHint.SKIP_INVISIBLE,
+    PmVisitorApi.visit(pm, visitAllCallBack, VisitHint.SKIP_INVISIBLE,
         VisitHint.SKIP_FACTORY_GENERATED_CHILD_PMS);
     String expected = "[pmVisitorTest_MyRootPm, myChPm1, myChPm1_disabled, myChPm1_convImpl, myChPm1_readOnly, myChPm2, myChPm2_disabled, myChPm2_convImpl, myChPm2_readOnly, myPmList]";
     assertEquals(expected, calls.toString());
-    assertEquals(null, stopObject);
   }
 
   @Test
   public void testSkipDisabled() {
-    PmObject stopObject = PmVisitorApi.visit(pm, visitAllCallBack, VisitHint.SKIP_DISABLED,
+    PmVisitorApi.visit(pm, visitAllCallBack, VisitHint.SKIP_DISABLED,
         VisitHint.SKIP_FACTORY_GENERATED_CHILD_PMS);
     String expected = "[pmVisitorTest_MyRootPm, myChPm1, myChPm1_convImpl, myChPm1_readOnly, myChPm1_invisible, myChPm2, myChPm2_convImpl, myChPm2_readOnly, myChPm2_invisible, myPmList]";
     assertEquals(expected, calls.toString());
-    assertEquals(null, stopObject);
   }
 
   @Test
   public void testSkipConversation() {
-    PmObject stopObject = PmVisitorApi.visit(pm, visitAllCallBack, VisitHint.SKIP_CONVERSATION,
+    PmVisitorApi.visit(pm, visitAllCallBack, VisitHint.SKIP_CONVERSATION,
         VisitHint.SKIP_FACTORY_GENERATED_CHILD_PMS);
     String expected = "[pmVisitorTest_MyRootPm, myChPm1, myChPm1_disabled, myChPm1_readOnly, myChPm1_invisible, myChPm2, myChPm2_disabled, myChPm2_readOnly, myChPm2_invisible, myPmList]";
     assertEquals(expected, calls.toString());
-    assertEquals(null, stopObject);
   }
 
   @Test
   public void testVisitSameType() {
-    PmObject stopObject = PmVisitorApi.visit(pm, visitAllStrings, VisitHint.SKIP_FACTORY_GENERATED_CHILD_PMS);
+    PmVisitorApi.visit(pm, visitAllStrings, VisitHint.SKIP_FACTORY_GENERATED_CHILD_PMS);
     String expected = "[myChPm1_invisible, myChPm2_invisible]";
     assertEquals(expected, calls.toString());
-    assertEquals(null, stopObject);
   }
 
   @Test
   public void testFilterOnePm() {
-    PmObject stopObject = PmVisitorApi.visit(pm, visitChildByRelativeName, VisitHint.SKIP_FACTORY_GENERATED_CHILD_PMS);
+    PmVisitorApi.visit(pm, visitChildByRelativeName, VisitHint.SKIP_FACTORY_GENERATED_CHILD_PMS);
     assertEquals("[myChPm1]", calls.toString());
-    assertEquals(pm.myChPm1, stopObject);
   }
 
   @Test
   public void testSkipChildren() {
-    PmObject stopObject = PmVisitorApi.visit(pm, visitSkipChildren);
+    PmVisitorApi.visit(pm, visitSkipChildren);
     assertEquals("[myChPm1, myChPm2]", calls.toString());
-    assertEquals(null, stopObject);
   }
 
   @Test
   public void testConstructor() {
-    PmObject stopObject = PmVisitorApi.visit(pm, visitSkipChildren);
+    PmVisitorApi.visit(pm, visitSkipChildren);
     assertEquals("[myChPm1, myChPm2]", calls.toString());
-    assertEquals(null, stopObject);
   }
 
   @Test
   public void testGeneratedChildren() {
-    PmObject stopObject = PmVisitorApi.visit(pm, visitAllCallBack);
+    PmVisitorApi.visit(pm, visitAllCallBack);
     String expected = "[pmVisitorTest_MyRootPm, myChPm1, myChPm1_disabled, myChPm1_convImpl, myChPm1_readOnly, myChPm1_invisible, myChPm2, myChPm2_disabled, myChPm2_convImpl, myChPm2_readOnly, myChPm2_invisible, myPmList, pmVisitorTest_MyBeanPm, s, pmVisitorTest_MyBeanPm, s]";
     assertEquals(expected, calls.toString());
-    assertEquals(null, stopObject);
   }
 
   public static class MyRootPm extends PmElementImpl {

@@ -5,12 +5,10 @@ import java.util.Collection;
 import org.pm4j.common.pageable.Modifications;
 import org.pm4j.core.pm.PmCommandDecorator;
 import org.pm4j.core.pm.PmObject;
-import org.pm4j.core.pm.PmTable;
-import org.pm4j.core.pm.impl.PmTableUtil;
 
 /**
  * Interface for handlers that observes changes within some details area. The
- * observed details changes can be inclueded in value change identification of
+ * observed details changes can be included in value change identification of
  * the 'master' PM.
  * <p>
  * For master tables you may add a details change handler by calling

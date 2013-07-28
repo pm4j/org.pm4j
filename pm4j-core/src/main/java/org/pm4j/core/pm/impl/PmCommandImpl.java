@@ -22,7 +22,6 @@ import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmMessage;
 import org.pm4j.core.pm.PmMessage.Severity;
 import org.pm4j.core.pm.PmObject;
-import org.pm4j.core.pm.PmVisitor;
 import org.pm4j.core.pm.annotation.PmCommandCfg;
 import org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO;
 import org.pm4j.core.pm.api.PmCacheApi;
@@ -186,11 +185,6 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
     return (commandSet == CommandSet.POPUP)
               ? Collections.EMPTY_LIST
               : super.getVisiblePmCommands(commandSet);
-  }
-
-  @Override
-  public void accept(PmVisitor visitor) {
-    visitor.visit(this);
   }
 
   public final PmCommand doIt() {

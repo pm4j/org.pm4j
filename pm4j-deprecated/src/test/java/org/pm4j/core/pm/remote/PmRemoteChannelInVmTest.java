@@ -1,7 +1,11 @@
 package org.pm4j.core.pm.remote;
 
+import static org.junit.Assert.assertEquals;
 import junit.framework.TestCase;
 
+import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.pm4j.core.pm.PmAttrInteger;
 import org.pm4j.core.pm.PmAttrString;
 import org.pm4j.core.pm.PmCommand;
@@ -19,8 +23,9 @@ import org.pm4j.core.pm.impl.PmElementImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
 import org.pm4j.core.pm.impl.PmUtil;
 
-public class PmRemoteChannelInVmTest extends TestCase {
+public class PmRemoteChannelInVmTest {
 
+  @Test @Ignore("oboede: re-implement serialization!")
   public void testRemoteCall() {
     PmConversation clientSession = new PmConversationImpl();
     ClientPm clientPm = new ClientPm(clientSession);
@@ -31,6 +36,7 @@ public class PmRemoteChannelInVmTest extends TestCase {
     assertEquals("Server says hello!", clientPm.s1.getValue());
   }
 
+  @Test @Ignore("oboede: re-implement serialization!")
   public void testRemoteCallWithFailedServerValidation() {
     PmConversation clientSession = new PmConversationImpl();
     ClientPm clientPm = new ClientPm(clientSession);

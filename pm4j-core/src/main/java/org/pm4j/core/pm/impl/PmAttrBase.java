@@ -42,7 +42,6 @@ import org.pm4j.core.pm.PmMessage.Severity;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmOption;
 import org.pm4j.core.pm.PmOptionSet;
-import org.pm4j.core.pm.PmVisitor;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.annotation.PmAttrCfg.Restriction;
 import org.pm4j.core.pm.annotation.PmAttrCfg.Validate;
@@ -278,11 +277,6 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     if (isRequired()) {
       styleClassSet.add(STYLE_CLASS_REQUIRED);
     }
-  }
-
-  @Override
-  public void accept(PmVisitor visitor) {
-    visitor.visit(this);
   }
 
   // ======= Messages =======

@@ -7,8 +7,6 @@ import org.pm4j.common.query.FilterCompareDefinitionFactory;
 import org.pm4j.core.pm.annotation.PmCommandCfg;
 import org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO;
 import org.pm4j.core.pm.annotation.PmInject;
-import org.pm4j.core.pm.filter.FilterByDefinition;
-import org.pm4j.core.pm.filter.impl.FilterByPmAttrValueLocalized;
 import org.pm4j.core.pm.impl.PmObjectBase.NameBuilder;
 import org.pm4j.core.pm.impl.PmObjectBase.NameBuilderRelNameWithHashCode;
 import org.pm4j.core.pm.impl.inject.DiResolverFactory;
@@ -47,19 +45,6 @@ public class PmDefaults implements Cloneable {
    * Default value for this attribute: {@link TitleProviderPmResBased}.
    */
   private PmTitleProvider pmAttrTitleProvider = TitleProviderPmResBased.INSTANCE;
-
-  /**
-   * The default filter-by definition class that is used if no specific
-   * definition is provided. An example:
-   *
-   * <pre>@PmTableColCfg(filterBy=@FilterByCfg)</pre>
-   *
-   * This will use the filter-by definition that is declared here.
-   * <p>
-   * The default value is {@link FilterByPmAttrValueLocalized} which allows to
-   * filter by the value string that is visible for the user.
-   */
-  private Class<? extends FilterByDefinition> defaultFilterByDefintionClass = FilterByPmAttrValueLocalized.class;
 
   /**
    * The application specific filter compare definition factory. Used for table filters.
@@ -259,14 +244,6 @@ public class PmDefaults implements Cloneable {
 
   public void setBeforeDoCommandDefault(PmCommandCfg.BEFORE_DO beforeDoCommandDefault) {
     this.beforeDoCommandDefault = beforeDoCommandDefault;
-  }
-
-  public Class<? extends FilterByDefinition> getDefaultFilterByDefintionClass() {
-    return defaultFilterByDefintionClass;
-  }
-
-  public void setDefaultFilterByDefintionClass(Class<? extends FilterByDefinition> defaultFilterByDefintionClass) {
-    this.defaultFilterByDefintionClass = defaultFilterByDefintionClass;
   }
 
   public String getMultiFormatPatternDelimiter() {

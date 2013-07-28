@@ -1,27 +1,25 @@
 package org.pm4j.core.sample.filebrowser;
 
-import java.util.Collection;
+import java.io.File;
 
 import org.pm4j.core.pm.PmObject;
-import org.pm4j.core.pm.PmTableCol;
-import org.pm4j.core.pm.annotation.PmBoolean;
-import org.pm4j.core.pm.annotation.PmTableCfg;
-import org.pm4j.core.pm.annotation.PmTableColCfg;
-import org.pm4j.core.pm.impl.PmTableColImpl;
-import org.pm4j.core.pm.impl.DeprecatedPmTableOfPmElementsImpl;
+import org.pm4j.core.pm.PmTableCol2;
+import org.pm4j.core.pm.annotation.PmTableCfg2;
+import org.pm4j.core.pm.impl.PmTableColImpl2;
+import org.pm4j.core.pm.impl.PmTableImpl2;
 
 /**
  * PM for a table of files.
  */
-@PmTableCfg(sortable=PmBoolean.TRUE)
-public class FileTablePm extends DeprecatedPmTableOfPmElementsImpl<FilePmBase> {
+@PmTableCfg2(sortable=true)
+public class FileTablePm extends PmTableImpl2<FilePmBase, File> {
 
-  public FileTablePm(PmObject pmCtxt, Collection<? extends FilePmBase> rowElements) {
-    super(pmCtxt, rowElements);
+  public FileTablePm(PmObject pmCtxt) {
+    super(pmCtxt);
   }
 
-  @PmTableColCfg(prefSize="50")
-  public final PmTableCol name = new PmTableColImpl(this);
-  @PmTableColCfg(prefSize="100pt")
-  public final PmTableCol lastModified = new PmTableColImpl(this);
+  //@PmTableColCfg(prefSize="50")
+  public final PmTableCol2 name = new PmTableColImpl2(this);
+  //@PmTableColCfg(prefSize="100pt")
+  public final PmTableCol2 lastModified = new PmTableColImpl2(this);
 }

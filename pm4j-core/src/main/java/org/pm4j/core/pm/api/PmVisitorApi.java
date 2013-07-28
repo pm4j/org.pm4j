@@ -19,7 +19,8 @@ public class PmVisitorApi {
    */
   public static abstract class DefaultVisitCallBack implements VisitHierarchyCallBack {
     @Override
-    public void enterChildren(PmObject parent, Collection<PmObject> pmChildren) {
+    public VisitResult enterChildren(PmObject parent, Collection<PmObject> pmChildren) {
+      return VisitResult.CONTINUE;
     }
 
     @Override
@@ -49,8 +50,9 @@ public class PmVisitorApi {
     /**
      * If parents children will be visited, this method is called before visiting all children.
      * @param parent the parent.
+     * @return controls if the children should really be visited.
      */
-    void enterChildren(PmObject pmParent, Collection<PmObject> pmChildren);
+    VisitResult enterChildren(PmObject pmParent, Collection<PmObject> pmChildren);
 
     /**
      * If parents children will be visited, this method is called after visiting all children.
@@ -102,10 +104,9 @@ public class PmVisitorApi {
    *          static selection informations. See {@link VisitHint}
    * @return the object which explicit stopped the visiting.
    */
-  public static PmObject visit(PmObject startPm, VisitCallBack visitCallBack, VisitHint... hints) {
+  public static VisitResult visit(PmObject startPm, VisitCallBack visitCallBack, VisitHint... hints) {
     PmVisitorImpl v = new PmVisitorImpl(visitCallBack, hints);
-    v.visit(startPm);
-    return v.getStopOnPmObject();
+    return v.visit(startPm);
   }
 
   /**
@@ -117,12 +118,11 @@ public class PmVisitorApi {
    *          defines what to be done when visiting a PM.
    * @param hints
    *          static selection informations. See {@link VisitHint}
-   * @return the object which explicit stopped the visiting.
+   * @return the visit result state.
    */
-  public static PmObject visitChildren(PmObject parentPm, VisitCallBack visitCallBack, VisitHint... hints) {
+  public static VisitResult visitChildren(PmObject parentPm, VisitCallBack visitCallBack, VisitHint... hints) {
     PmVisitorImpl v = new PmVisitorImpl(visitCallBack, hints);
-    v.visitChildren(parentPm);
-    return v.getStopOnPmObject();
+    return v.visitChildren(parentPm);
   }
 
 }

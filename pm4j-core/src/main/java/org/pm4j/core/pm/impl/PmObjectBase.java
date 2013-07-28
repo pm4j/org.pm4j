@@ -36,8 +36,6 @@ import org.pm4j.core.pm.PmEventListener;
 import org.pm4j.core.pm.PmMessage;
 import org.pm4j.core.pm.PmMessage.Severity;
 import org.pm4j.core.pm.PmObject;
-import org.pm4j.core.pm.PmTableCol;
-import org.pm4j.core.pm.PmVisitor;
 import org.pm4j.core.pm.annotation.PmCacheCfg;
 import org.pm4j.core.pm.annotation.PmCacheCfg.CacheMode;
 import org.pm4j.core.pm.annotation.PmFactoryCfg;
@@ -724,7 +722,6 @@ public abstract class PmObjectBase implements PmObject {
 
             // -- Meta data initialization for PM fields --
             List<BeanAttrAccessor> allFields = new ArrayList<BeanAttrAccessor>();
-            List<BeanAttrAccessor> columnFields = new ArrayList<BeanAttrAccessor>();
             for (Field f : ClassUtil.getAllFields(getClass())) {
               // XXX olaf: Currently only public fields are considered.
               if ((f.getModifiers() & Modifier.PUBLIC) != 0 &&
@@ -740,8 +737,6 @@ public abstract class PmObjectBase implements PmObject {
                   }
 
                   allFields.add(accessor);
-                  if (fieldValue instanceof PmTableCol)
-                    columnFields.add(accessor);
                 }
               }
             }
@@ -1035,11 +1030,6 @@ public abstract class PmObjectBase implements PmObject {
 
     public boolean isReadOnly() { return readOnly; }
     public void setReadOnly(boolean readOnly) { this.readOnly = readOnly; }
-  }
-
-  @Override
-  public void accept(PmVisitor visitor) {
-    visitor.visit(this);
   }
 
   /**

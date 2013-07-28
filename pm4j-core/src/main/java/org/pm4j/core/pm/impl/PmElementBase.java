@@ -1,9 +1,7 @@
 package org.pm4j.core.pm.impl;
 
 import java.io.Serializable;
-import java.lang.annotation.Annotation;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -14,7 +12,6 @@ import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.PmElement;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmTreeNode;
-import org.pm4j.core.pm.PmVisitor;
 import org.pm4j.core.pm.api.PmCacheApi;
 
 public abstract class PmElementBase
@@ -63,11 +60,6 @@ public abstract class PmElementBase
   @Override
   public Serializable getPmKey() {
     return ObjectUtils.identityToString(this);
-  }
-
-  @Override
-  public void accept(PmVisitor visitor) {
-    visitor.visit(this);
   }
 
   @Override

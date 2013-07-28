@@ -17,18 +17,17 @@ import org.pm4j.core.pm.PmEvent.ValueChangeKind;
 import org.pm4j.core.pm.PmEventListener;
 import org.pm4j.core.pm.PmMessage;
 import org.pm4j.core.pm.PmObject;
-// FIXME oboede: deprecated enum used
 import org.pm4j.core.pm.PmSortOrder;
 import org.pm4j.core.pm.PmTable2;
 import org.pm4j.core.pm.PmTableCol2;
-import org.pm4j.core.pm.PmVisitor;
 import org.pm4j.core.pm.annotation.PmCommandCfg;
 import org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO;
-import org.pm4j.core.pm.annotation.PmTableColCfg;
+import org.pm4j.core.pm.annotation.PmTableColCfg2;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmLocalizeApi;
 import org.pm4j.core.pm.api.PmMessageUtil;
 import org.pm4j.core.util.table.ColSizeSpec;
+// FIXME oboede: deprecated enum used
 
 /**
  * Implements the table column PM behavior.
@@ -173,13 +172,6 @@ public class PmTableColImpl2 extends PmObjectBase implements PmTableCol2 {
     return getPmTableImpl().getPmPageableCollection().getQueryOptions().getSortOrder(colName);
   }
 
-  @Override
-  public void accept(PmVisitor visitor) {
-    visitor.visit(this);
-  }
-
-
-
   /**
    * Default sort order PM attribute class.
    * <p>
@@ -288,10 +280,11 @@ public class PmTableColImpl2 extends PmObjectBase implements PmTableCol2 {
     super.initMetaData(metaData);
     MetaData myMetaData = (MetaData) metaData;
 
-    PmTableColCfg annotation = AnnotationUtil.findAnnotation(this, PmTableColCfg.class);
+    // FIXME oboede: the column annotation needs to be considered asap.
+    PmTableColCfg2 annotation = AnnotationUtil.findAnnotation(this, PmTableColCfg2.class);
     if (annotation != null) {
-      myMetaData.colSizeSpec = new ColSizeSpec(
-          annotation.prefSize(), annotation.minSize(), annotation.maxSize());
+//      myMetaData.colSizeSpec = new ColSizeSpec(
+//          annotation.prefSize(), annotation.minSize(), annotation.maxSize());
 
 //      if (annotation.sortable() != PmBoolean.UNDEFINED) {
 //        throw new PmRuntimeException(this, "The sortable annotation is not supported by PmTableColImpl2. Please use the table query options.");

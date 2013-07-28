@@ -200,11 +200,6 @@ public interface PmObject extends Comparable<PmObject> {
   void setPmProperty(String propName, Object value);
 
   /**
-   * @param visitor A visitor to call back.
-   */
-  void accept(PmVisitor visitor);
-
-  /**
    * PMs may exist in sortable contexts. (For example a cell in a table.)<br>
    * This method allows to perform the required sort operations in these
    * contexts.

@@ -2,15 +2,15 @@ package org.pm4j.core.pm.serialization;
 
 import java.io.Serializable;
 
-import org.pm4j.core.deprecated.PmVisitorAdapter;
 import org.pm4j.core.exception.PmConverterException;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmAspect;
-import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.impl.PmUtil;
 
-public class PmContentSetVisitor extends PmVisitorAdapter {
+public class PmContentSetVisitor
+//extends PmVisitorAdapter
+{
 
   private PmContentContainer contentContainer;
   private Object eventSource;
@@ -21,23 +21,23 @@ public class PmContentSetVisitor extends PmVisitorAdapter {
     this.eventSource = eventSource;
   }
 
-  @Override
-  protected void onVisit(PmObject pm) {
-    for (PmObject child : PmUtil.getPmChildren(pm)) {
-      PmContentContainer c = contentContainer.getNamedChildContentMap().get(child.getPmName());
-      if (c != null) {
-        child.accept(new PmContentSetVisitor(eventSource, c));
-      }
-    }
-    super.onVisit(pm);
-  }
+//  @Override
+//  protected void onVisit(PmObject pm) {
+//    for (PmObject child : PmUtil.getPmChildren(pm)) {
+//      PmContentContainer c = contentContainer.getNamedChildContentMap().get(child.getPmName());
+//      if (c != null) {
+////        child.accept(new PmContentSetVisitor(eventSource, c));
+//      }
+//    }
+//    super.onVisit(pm);
+//  }
 
-  @Override
-  public void visit(PmAttr<?> attr) {
-    setAspect(attr, PmAspect.VALUE);
-    super.visit(attr);
-
-  }
+//  @Override
+//  public void visit(PmAttr<?> attr) {
+//    setAspect(attr, PmAspect.VALUE);
+//    super.visit(attr);
+//
+//  }
 
   private void setAspect(PmObject pm, PmAspect aspect) {
     Serializable value = contentContainer.getAspect(aspect);

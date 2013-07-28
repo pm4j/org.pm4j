@@ -38,6 +38,7 @@
     <module>pm4j-facelets</module>
 
     <module>pm4j-swing</module>
+    <module>pm4j-deprecated</module>
     <!-- module>pm4j-swing-sample</module -->
 
     <!-- module>pm4j-swt</module> -->
