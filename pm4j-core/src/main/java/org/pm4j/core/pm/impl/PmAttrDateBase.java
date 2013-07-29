@@ -17,6 +17,7 @@ import org.pm4j.core.pm.impl.converter.PmConverterDate;
  *
  * @param <T_BACKING_DATE> The backing value type this attribute is bound to.
  */
+// TODO oboede: remove this class.
 public class PmAttrDateBase<T_BACKING_DATE> extends PmAttrBase<Date, T_BACKING_DATE> implements PmAttrDate {
 
   public PmAttrDateBase(PmObject pmParent) {
