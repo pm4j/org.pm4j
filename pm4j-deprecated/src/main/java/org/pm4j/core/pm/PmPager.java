@@ -111,10 +111,11 @@ public interface PmPager {
    * Registers a decorator to be called before and after a page change triggered by
    * this pager.
    * <p>
-   * A decorator may prevent the page switch by returning <code>true</code> in it's
+   * A decorator may prevent the page switch by returning <code>false</code> in it's
    * <code>beforDo</code> implementation.
    *
    * @param decorator The decorator.
    */
   void addPageChangeDecorator(PmCommandDecorator decorator);
+
 }
