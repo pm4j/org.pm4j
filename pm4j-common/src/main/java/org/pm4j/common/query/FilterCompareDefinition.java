@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
+import org.pm4j.core.util.reflection.ClassUtil;
+
 /**
  * Provides the meta data set for the UI of a filter item.<br>
  * It provides the options the user can define for a filter item.
@@ -32,6 +34,19 @@ public class FilterCompareDefinition {
     this.attr = attr;
     this.compOps = new ArrayList<CompOp>(Arrays.asList(compOps));
   }
+
+  public FilterCompareDefinition(QueryAttr attr, Class<? extends CompOp>... compOps) {
+    assert attr != null;
+
+    this.attr = attr;
+    this.compOps = new ArrayList<CompOp>(compOps.length);
+
+    for (Class<? extends CompOp> c : compOps) {
+      CompOp co = ClassUtil.newInstance(c);
+      this.compOps.add(co);
+    }
+  }
+
 
   /**
    * @return the attribute to compare.
