@@ -4,12 +4,12 @@
 	<artifactId>pm4j-deprecated</artifactId>
 	<packaging>jar</packaging>
 	<name>PM4J DEPRECATED</name>
-	<version>0.6.9-SNAPSHOT</version>
+	<version>0.6.9</version>
 
 	<parent>
 		<groupId>org.pm4j</groupId>
 		<artifactId>main</artifactId>
-		<version>0.6.9-SNAPSHOT</version>
+		<version>0.6.9</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
