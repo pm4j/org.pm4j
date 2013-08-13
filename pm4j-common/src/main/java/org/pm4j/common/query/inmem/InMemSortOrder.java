@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.Comparator;
 
 import org.pm4j.common.query.QueryAttr;
-import org.pm4j.common.query.QueryAttr;
 import org.pm4j.common.query.SortOrder;
 import org.pm4j.common.util.CompareUtil;
 import org.pm4j.common.util.InvertingComparator;
@@ -22,6 +21,26 @@ public class InMemSortOrder extends SortOrder {
 
   public InMemSortOrder(QueryAttr attrDefinition) {
     this(attrDefinition, new ComparableComparator());
+  }
+
+  /**
+   * Generates an in-memory sort order based on a technology neutral sort order
+   * definition.<br>
+   * Generates the complete sort order chain as found in the given base sort order.
+   *
+   * @param baseSortOrder The sort order to use.
+   */
+  public InMemSortOrder(SortOrder baseSortOrder) {
+    this(baseSortOrder.getAttr());
+    // handle inverse sort order definitions
+    if (!baseSortOrder.isAscending()) {
+      comparator = new InvertingComparator<Object>(comparator);
+      setAscending(false);
+    }
+    // add all chained sort order attributes.
+    if (baseSortOrder.getNextSortOrder() != null) {
+      setNextSortOrder(new InMemSortOrder(baseSortOrder.getNextSortOrder()));
+    }
   }
 
   /**
@@ -47,7 +66,7 @@ public class InMemSortOrder extends SortOrder {
   }
 
   @Override
-  public SortOrder getReverseSortOrder() {
+  public InMemSortOrder getReverseSortOrder() {
     InMemSortOrder reverse = (InMemSortOrder) super.getReverseSortOrder();
     if (comparator.getClass() == InvertingComparator.class) {
       reverse.comparator = ((InvertingComparator<Object>)comparator).getBaseComparator();

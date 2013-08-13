@@ -17,6 +17,7 @@ import org.pm4j.common.query.QueryAttrMulti;
 import org.pm4j.common.query.QueryEvaluatorBase;
 import org.pm4j.common.query.QueryEvaluatorSet;
 import org.pm4j.common.query.SortOrder;
+import org.pm4j.common.util.InvertingComparator;
 import org.pm4j.common.util.collection.ListUtil;
 import org.pm4j.common.util.collection.MultiObjectValue;
 
@@ -95,8 +96,7 @@ public class InMemQueryEvaluator<T_ITEM> extends QueryEvaluatorBase {
     if (sortOrder instanceof InMemSortOrder) {
       return new AttrPathComparator<T_ITEM>(this, (InMemSortOrder)sortOrder);
     } else if (sortOrder != null) {
-      // TODO oboede: a weak fall back that does not yet support multi-attr etc.
-      return new AttrPathComparator<T_ITEM>(this, new InMemSortOrder(sortOrder.getAttr()));
+      return new AttrPathComparator<T_ITEM>(this, new InMemSortOrder(sortOrder));
     } else {
       return null;
     }

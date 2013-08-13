@@ -1,9 +1,18 @@
-package org.pm4j.common.query;
+package org.pm4j.common.query.inmem;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
+import org.pm4j.common.query.CompOpEquals;
+import org.pm4j.common.query.CompOpLt;
+import org.pm4j.common.query.CompOpNotEquals;
+import org.pm4j.common.query.FilterAnd;
+import org.pm4j.common.query.FilterCompare;
+import org.pm4j.common.query.FilterExpression;
+import org.pm4j.common.query.FilterNot;
+import org.pm4j.common.query.FilterOr;
+import org.pm4j.common.query.QueryAttr;
 import org.pm4j.common.query.inmem.InMemQueryEvaluator;
 
 public class InMemEvaluationTest {

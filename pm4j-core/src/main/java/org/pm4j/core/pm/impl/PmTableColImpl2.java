@@ -3,7 +3,6 @@ package org.pm4j.core.pm.impl;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.commons.lang.ObjectUtils;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.SortOrder;
 import org.pm4j.common.util.collection.ListUtil;
@@ -187,10 +186,14 @@ public class PmTableColImpl2 extends PmObjectBase implements PmTableCol2 {
       PmEventListener tableSortOrderChangeListener = new PmEventListener() {
         @Override
         public void handleEvent(PmEvent event) {
-          if (event.getValueChangeKind() == ValueChangeKind.SORT_ORDER) {
+          if ((event.getValueChangeKind() == ValueChangeKind.SORT_ORDER) &&
+              // Checks if the event source is not this column to prevent set value ping-pong games.
+              (event.getPm() != PmTableColImpl2.this)) {
             SortOrder tableSortOrder = getPmTableImpl().getPmPageableCollection().getQueryParams().getSortOrder();
+            SortOrder columnSortOrderOption = getSortOrderQueryOption();
             if (tableSortOrder != null &&
-                ObjectUtils.equals(tableSortOrder.getAttr().getName(), PmTableColImpl2.this.getPmName())) {
+                columnSortOrderOption != null &&
+                SortOrder.bothOrdersUseTheSameAttributeSet(tableSortOrder, columnSortOrderOption)) {
               PmTableColImpl2.this.sortOrder = tableSortOrder.isAscending() ? PmSortOrder.ASC : PmSortOrder.DESC;
             } else {
               PmTableColImpl2.this.sortOrder = PmSortOrder.NEUTRAL;
@@ -254,7 +257,7 @@ public class PmTableColImpl2 extends PmObjectBase implements PmTableCol2 {
 
       // TODO: move to a listerner within the table implementation.
       // fire a value change event.
-      PmEventApi.firePmEventIfInitialized(pmTable, PmEvent.VALUE_CHANGE, ValueChangeKind.SORT_ORDER);
+      PmEventApi.firePmEventIfInitialized(pmTable, new PmEvent(PmTableColImpl2.this, pmTable, PmEvent.VALUE_CHANGE, ValueChangeKind.SORT_ORDER));
     }
 
     @Override

@@ -2,6 +2,7 @@ package org.pm4j.common.query;
 
 import java.io.Serializable;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.pm4j.common.exception.CheckedExceptionWrapper;
@@ -109,6 +110,20 @@ public class SortOrder implements Serializable, Cloneable {
     return nextSortOrder;
   }
 
+  /**
+   * @param nextSortOrder the nextSortOrder to set
+   */
+  protected void setNextSortOrder(SortOrder nextSortOrder) {
+    this.nextSortOrder = nextSortOrder;
+  }
+
+  /**
+   * @param ascending the ascending to set
+   */
+  protected void setAscending(boolean ascending) {
+    this.ascending = ascending;
+  }
+
   @Override
   public SortOrder clone() {
     try {
@@ -138,6 +153,25 @@ public class SortOrder implements Serializable, Cloneable {
   @Override
   public String toString() {
     return attr + " " + (ascending ? "asc" : "desc");
+  }
+
+  /**
+   * Checks if both sort orders use the same chain of attributes.<br>
+   * It ignores any asc/desc information.
+   *
+   * @param so1
+   * @param so2
+   * @return <code>true</code> if both use the same attribute set.
+   */
+  public static boolean bothOrdersUseTheSameAttributeSet(SortOrder so1, SortOrder so2) {
+    if (so1 == so2) {
+      return true;
+    }
+    if (so1 == null || so2 == null) {
+      return false;
+    }
+    return ObjectUtils.equals(so1.getAttr(), so2.getAttr())
+        && bothOrdersUseTheSameAttributeSet(so1.getNextSortOrder(), so2.getNextSortOrder());
   }
 
 }
