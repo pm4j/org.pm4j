@@ -166,7 +166,7 @@ public interface PmObject extends Comparable<PmObject> {
    * Is often used to check if the UI should show a not valid attribute with a
    * special style.
    *
-   * @return <code>true</code> if there is an error (may be a validation error)
+   * @return <code>false</code> if there is an error (may be a validation error)
    *         related this PM.
    */
   boolean isPmValid();
