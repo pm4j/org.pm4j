@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.pm4j.common.exception.CheckedExceptionWrapper;
+import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.annotation.PmCacheCfg;
 import org.pm4j.core.pm.annotation.PmCacheCfg.CacheMode;
@@ -62,6 +63,18 @@ public class AnnotationUtil {
     return pm.getPmMetaDataWithoutPmInitCall().isPmField
               ? (T) findAnnotation(pm, annotationClass, pm.getPmParent().getClass())
               : (T) findAnnotationInClassTree(pm.getClass(), annotationClass);
+  }
+
+  /**
+   * Imperative version of {@link #findAnnotation(PmObjectBase, Class)}.<br>
+   * Throws a {@link PmRuntimeException} if the annotation can't be found.
+   */
+  public static <T extends Annotation> T getAnnotation(PmObjectBase pm, Class<? extends T> annotationClass) {
+    T t = findAnnotation(pm, annotationClass);
+    if (t == null) {
+      throw new PmRuntimeException(pm, "Missing annotation: " + annotationClass);
+    }
+    return t;
   }
 
   /**
