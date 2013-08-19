@@ -1,10 +1,9 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.pm4j</groupId>
   <artifactId>main</artifactId>
-  <version>0.6.11-SNAPSHOT</version>
+  <version>0.6.11</version>
   <packaging>pom</packaging>
 
   <name>pm4j parent pom</name>
@@ -33,7 +32,7 @@
 
   <scm>
     <developerConnection>scm:git:https://github.com/pm4j/org.pm4j.git</developerConnection>
-    <tag>HEAD</tag>
+    <tag>v0.6.11</tag>
   </scm>
 
   <distributionManagement>
