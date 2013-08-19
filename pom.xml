@@ -153,20 +153,29 @@
             <file>
               <name>.settings/org.eclipse.core.resources.prefs</name>
               <content>
-		<![CDATA[
+<![CDATA[
 encoding/<project>=${project.build.sourceEncoding}
 eclipse.preferences.version=1
-		]]>
+]]>
               </content>
             </file>
             <file>
               <name>.settings/org.eclipse.jdt.core.prefs</name>
               <content>
-		<![CDATA[
+<![CDATA[
 org.eclipse.jdt.core.formatter.lineSplit=120
 org.eclipse.jdt.core.formatter.tabulation.size=2
 org.eclipse.jdt.core.formatter.tabulation.char=space
-		]]>
+]]>
+              </content>
+            </file>
+            <file>
+              <name>.settings/org.eclipse.core.runtime.prefs</name>
+              <content>
+<![CDATA[
+eclipse.preferences.version=1
+line.separator=\n
+]]>
               </content>
             </file>
           </additionalConfig>

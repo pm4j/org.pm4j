@@ -13,7 +13,6 @@ import org.pm4j.common.query.FilterExpression;
 import org.pm4j.common.query.FilterNot;
 import org.pm4j.common.query.FilterOr;
 import org.pm4j.common.query.QueryAttr;
-import org.pm4j.common.query.inmem.InMemQueryEvaluator;
 
 public class InMemEvaluationTest {
 

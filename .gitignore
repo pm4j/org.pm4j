@@ -8,9 +8,7 @@
 **/.hg/*
 **/.hgignore
 **/.svn/**
-**/.settings/org.eclipse.wst.*
-**/.settings/org.eclipse.jdt.core.prefs
-**/.settings/org.eclipse.core.resources.prefs
+**/.settings/**
 **/.classpath
 **/.project
 *.sh

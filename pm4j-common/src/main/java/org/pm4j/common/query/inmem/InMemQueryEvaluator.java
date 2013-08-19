@@ -17,7 +17,6 @@ import org.pm4j.common.query.QueryAttrMulti;
 import org.pm4j.common.query.QueryEvaluatorBase;
 import org.pm4j.common.query.QueryEvaluatorSet;
 import org.pm4j.common.query.SortOrder;
-import org.pm4j.common.util.InvertingComparator;
 import org.pm4j.common.util.collection.ListUtil;
 import org.pm4j.common.util.collection.MultiObjectValue;
 
