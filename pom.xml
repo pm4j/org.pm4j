@@ -173,8 +173,9 @@ org.eclipse.jdt.core.formatter.tabulation.char=space
               <name>.settings/org.eclipse.core.runtime.prefs</name>
               <content>
 <![CDATA[
+# temporary configuration for Windows line break
 eclipse.preferences.version=1
-line.separator=\n
+line.separator=\r\n
 ]]>
               </content>
             </file>
