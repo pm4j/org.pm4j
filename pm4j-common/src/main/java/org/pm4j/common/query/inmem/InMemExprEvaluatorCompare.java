@@ -1,7 +1,7 @@
 package org.pm4j.common.query.inmem;
 
-import org.pm4j.common.query.QueryAttr;
 import org.pm4j.common.query.FilterCompare;
+import org.pm4j.common.query.QueryAttr;
 
 /**
  * Evaluates logical compare expressions.

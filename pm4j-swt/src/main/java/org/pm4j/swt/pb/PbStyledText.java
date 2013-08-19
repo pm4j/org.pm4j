@@ -11,7 +11,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.pm4j.core.pm.PmAttrString;
 import org.pm4j.core.pm.PmEvent;
-import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmEventCallGate;
 import org.pm4j.swt.pb.base.PbControlToAttrBase;
 import org.pm4j.swt.pb.listener.SwtMaxTextLenVerifier;

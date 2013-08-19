@@ -6,9 +6,9 @@ import junit.framework.TestCase;
 
 import org.pm4j.navi.NaviHistory;
 import org.pm4j.navi.NaviHistoryCfg;
+import org.pm4j.navi.NaviHistoryCfg.SessionIdGenStrategy;
 import org.pm4j.navi.NaviLink;
 import org.pm4j.navi.NaviManager;
-import org.pm4j.navi.NaviHistoryCfg.SessionIdGenStrategy;
 import org.pm4j.navi.impl.NaviLinkImpl;
 import org.pm4j.navi.impl.NaviManagerImpl;
 import org.pm4j.navi.impl.NaviUtil;

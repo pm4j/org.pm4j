@@ -5,8 +5,6 @@ import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.pm4j.core.util.reflection.ClassUtil;
-
 import junit.framework.TestCase;
 
 public class ClassUtilTest extends TestCase {

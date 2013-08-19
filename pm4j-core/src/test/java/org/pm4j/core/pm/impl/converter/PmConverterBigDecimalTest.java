@@ -1,6 +1,6 @@
 package org.pm4j.core.pm.impl.converter;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.math.BigDecimal;
 import java.util.Locale;
@@ -8,11 +8,9 @@ import java.util.Locale;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmAttrBigDecimal;
 import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.impl.PmAttrBigDecimalImpl;
-import org.pm4j.core.pm.impl.PmAttrImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
 
 public class PmConverterBigDecimalTest {

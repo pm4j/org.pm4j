@@ -1,17 +1,16 @@
 package org.pm4j.core.pm;
 
 import java.util.Arrays;
-import java.util.Collection;
 
 import junit.framework.TestCase;
 
 import org.pm4j.core.pm.annotation.PmBeanCfg;
 import org.pm4j.core.pm.annotation.PmFactoryCfg;
+import org.pm4j.core.pm.impl.DeprecatedPmTableOfPmBeansImpl;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
 import org.pm4j.core.pm.impl.PmBeanBase;
 import org.pm4j.core.pm.impl.PmConversationImpl;
 import org.pm4j.core.pm.impl.PmTableColImpl;
-import org.pm4j.core.pm.impl.DeprecatedPmTableOfPmBeansImpl;
 
 
 public class PmTableOfPmElementsTest extends TestCase {

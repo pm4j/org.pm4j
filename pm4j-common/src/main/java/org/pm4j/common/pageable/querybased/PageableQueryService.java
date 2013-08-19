@@ -2,8 +2,8 @@ package org.pm4j.common.pageable.querybased;
 
 import java.util.List;
 
-import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.query.QueryOptions;
+import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.selection.ItemIdConverter;
 
 /**

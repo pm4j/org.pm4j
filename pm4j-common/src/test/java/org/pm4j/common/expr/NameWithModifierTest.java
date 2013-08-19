@@ -3,7 +3,6 @@ package org.pm4j.common.expr;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
-import org.pm4j.common.expr.NameWithModifier;
 import org.pm4j.common.expr.NameWithModifier.Modifier;
 import org.pm4j.common.expr.parser.ParseCtxt;
 

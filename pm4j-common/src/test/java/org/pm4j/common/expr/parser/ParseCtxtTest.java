@@ -1,7 +1,5 @@
 package org.pm4j.common.expr.parser;
 
-import org.pm4j.common.expr.parser.ParseCtxt;
-
 import junit.framework.TestCase;
 
 public class ParseCtxtTest extends TestCase {

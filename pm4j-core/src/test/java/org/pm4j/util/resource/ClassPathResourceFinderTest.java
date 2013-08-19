@@ -3,9 +3,9 @@ package org.pm4j.util.resource;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-import org.pm4j.common.util.resource.ClassPathResourceFinder;
-
 import junit.framework.TestCase;
+
+import org.pm4j.common.util.resource.ClassPathResourceFinder;
 
 /**
  * Resource finder test cases.

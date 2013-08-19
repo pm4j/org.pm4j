@@ -1,80 +1,79 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
 
-	<artifactId>pm4j-swt</artifactId>
-	<packaging>jar</packaging>
-	<name>PM4J SWT</name>
-	<version>0.5.1-SNAPSHOT</version>
-	<parent>
-		<groupId>org.pm4j</groupId>
-		<artifactId>main</artifactId>
-		<version>0.5.1-SNAPSHOT</version>
-		<relativePath>../pom.xml</relativePath>
-	</parent>
+  <groupId>org.pm4j</groupId>
+  <artifactId>pm4j-swt</artifactId>
+  <version>0.5.1-SNAPSHOT</version>
 
-	<build>
-		
-	</build>
-	
-	<dependencies>
-		<dependency>
-			<artifactId>pm4j-core</artifactId>
-			<groupId>org.pm4j</groupId>
-			<version>${project.version}</version>
-		</dependency>
-			<dependency>
-			<artifactId>pm4j-core</artifactId>
-			<groupId>org.pm4j</groupId>
-			<version>${project.version}</version>
-			<classifier>tests</classifier>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse.swt</groupId>
-			<artifactId>org.eclipse.swt.win32.win32.x86</artifactId>
-			<version>3.6.2</version>
-		</dependency>
-		<dependency>
-			<groupId>swt</groupId>
-			<artifactId>jface</artifactId>
-			<version>3.0m8</version>
-		</dependency>
-		<dependency>
-			<groupId>swt</groupId>
-			<artifactId>forms</artifactId>
-			<version>3.0m8</version>
-		</dependency>
-		<dependency>
-			<groupId>swt</groupId>
-			<artifactId>runtime</artifactId>
-			<version>3.0m8</version>
-		</dependency>
-		<dependency>
-			<groupId>swt</groupId>
-			<artifactId>osgi</artifactId>
-			<version>3.0m8</version>
-		</dependency>
-		<dependency>
-			<artifactId>pm4j-core</artifactId>
-			<groupId>org.pm4j</groupId>
-			<version>${project.version}</version>
-		</dependency>
-			<dependency>
-			<artifactId>pm4j-core</artifactId>
-			<groupId>org.pm4j</groupId>
-			<version>${project.version}</version>
-			<classifier>tests</classifier>
-		</dependency>
-	</dependencies>
+  <parent>
+    <groupId>org.pm4j</groupId>
+    <artifactId>main</artifactId>
+    <version>0.5.1-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
 
-	<repositories>
-		<repository>
-			<id>swtrepo</id>
-			<url>http://maven.eclipse.org</url>
-		</repository>
-		<repository>
-			<id>swtrepo2</id>
-			<url>http://maven.eclipse.org/nexus/content/repositories/testing/</url>
-		</repository>
-	</repositories>
+  <name>pm4j swt</name>
+
+  <repositories>
+    <repository>
+      <id>swtrepo</id>
+      <url>http://maven.eclipse.org</url>
+    </repository>
+    <repository>
+      <id>swtrepo2</id>
+      <url>http://maven.eclipse.org/nexus/content/repositories/testing/</url>
+    </repository>
+  </repositories>
+
+  <dependencies>
+    <dependency>
+      <artifactId>pm4j-core</artifactId>
+      <groupId>org.pm4j</groupId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <artifactId>pm4j-core</artifactId>
+      <groupId>org.pm4j</groupId>
+      <version>${project.version}</version>
+      <classifier>tests</classifier>
+    </dependency>
+
+    <dependency>
+      <groupId>org.pm4j</groupId>
+      <artifactId>pm4j-deprecated</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.eclipse.swt</groupId>
+      <artifactId>org.eclipse.swt.win32.win32.x86</artifactId>
+      <version>3.6.2</version>
+    </dependency>
+
+    <dependency>
+      <groupId>swt</groupId>
+      <artifactId>jface</artifactId>
+      <version>3.0m8</version>
+    </dependency>
+
+    <dependency>
+      <groupId>swt</groupId>
+      <artifactId>forms</artifactId>
+      <version>3.0m8</version>
+    </dependency>
+
+    <dependency>
+      <groupId>swt</groupId>
+      <artifactId>runtime</artifactId>
+      <version>3.0m8</version>
+    </dependency>
+
+    <dependency>
+      <groupId>swt</groupId>
+      <artifactId>osgi</artifactId>
+      <version>3.0m8</version>
+    </dependency>
+  </dependencies>
 </project>

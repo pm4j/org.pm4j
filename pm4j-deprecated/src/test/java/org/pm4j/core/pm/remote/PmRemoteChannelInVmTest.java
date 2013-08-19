@@ -1,17 +1,15 @@
 package org.pm4j.core.pm.remote;
 
 import static org.junit.Assert.assertEquals;
-import junit.framework.TestCase;
 
-import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.pm4j.core.pm.PmAttrInteger;
 import org.pm4j.core.pm.PmAttrString;
 import org.pm4j.core.pm.PmCommand;
+import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.PmElement;
 import org.pm4j.core.pm.PmObject;
-import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.annotation.PmAttrIntegerCfg;
 import org.pm4j.core.pm.annotation.PmCommandCfg;
 import org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO;
@@ -19,8 +17,8 @@ import org.pm4j.core.pm.api.PmMessageUtil;
 import org.pm4j.core.pm.impl.PmAttrIntegerImpl;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
 import org.pm4j.core.pm.impl.PmCommandImpl;
-import org.pm4j.core.pm.impl.PmElementImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
+import org.pm4j.core.pm.impl.PmElementImpl;
 import org.pm4j.core.pm.impl.PmUtil;
 
 public class PmRemoteChannelInVmTest {

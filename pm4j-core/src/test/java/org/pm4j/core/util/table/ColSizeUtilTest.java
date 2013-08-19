@@ -5,8 +5,6 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.pm4j.core.util.table.ColSizeSpec;
-import org.pm4j.core.util.table.ColSizeUtil;
 import org.pm4j.core.util.table.ColSizeSpec.Unit;
 
 public class ColSizeUtilTest extends TestCase {

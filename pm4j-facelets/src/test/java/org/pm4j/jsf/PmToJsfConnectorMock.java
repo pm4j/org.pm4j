@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang.NotImplementedException;
-import org.pm4j.jsf.PmToJsfConnector;
 import org.pm4j.navi.NaviHistory;
 
 /**

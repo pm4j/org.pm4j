@@ -9,11 +9,11 @@ import org.pm4j.common.query.CompOpNotEquals;
 import org.pm4j.common.query.CompOpStringContains;
 import org.pm4j.common.query.CompOpStringNotContains;
 import org.pm4j.common.query.CompOpStringStartsWith;
-import org.pm4j.common.query.QueryEvaluatorSet;
 import org.pm4j.common.query.FilterAnd;
 import org.pm4j.common.query.FilterCompare;
 import org.pm4j.common.query.FilterNot;
 import org.pm4j.common.query.FilterOr;
+import org.pm4j.common.query.QueryEvaluatorSet;
 
 /**
  * The default set of in memory evaluators.

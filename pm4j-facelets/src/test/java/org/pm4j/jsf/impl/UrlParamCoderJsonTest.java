@@ -3,11 +3,10 @@ package org.pm4j.jsf.impl;
 import java.util.HashMap;
 import java.util.Map;
 
+import junit.framework.TestCase;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.pm4j.jsf.impl.UrlParamCoderJson;
-
-import junit.framework.TestCase;
 
 public class UrlParamCoderJsonTest extends TestCase {
 

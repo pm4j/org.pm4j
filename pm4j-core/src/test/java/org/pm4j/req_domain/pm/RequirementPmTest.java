@@ -4,8 +4,8 @@ import junit.framework.TestCase;
 
 import org.pm4j.core.event.impl.RecordingTestListener;
 import org.pm4j.core.pm.PmAttrString;
-import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmConversation;
+import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmFactoryApi;
 import org.pm4j.core.pm.impl.PmConversationImpl;

@@ -1,46 +1,46 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
 
-	<artifactId>pm4j-core-sample</artifactId>
-	<packaging>jar</packaging>
-	<name>PM4J CORE SAMPLE</name>
-	<version>0.6.11-SNAPSHOT</version>
+  <groupId>org.pm4j</groupId>
+  <artifactId>pm4j-core-sample</artifactId>
+  <version>0.6.11-SNAPSHOT</version>
 
-	<parent>
-		<groupId>org.pm4j</groupId>
-		<artifactId>main</artifactId>
-		<version>0.6.11-SNAPSHOT</version>
-		<relativePath>../pom.xml</relativePath>
-	</parent>
+  <parent>
+    <groupId>org.pm4j</groupId>
+    <artifactId>main</artifactId>
+    <version>0.6.11-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
 
-	<build>
-		
-	</build>
+  <name>pm4j core sample</name>
 
-	<dependencies>
-		<dependency>
-			<groupId>org.pm4j</groupId>
-			<artifactId>pm4j-core</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.pm4j</groupId>
-			<artifactId>pm4j-common</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.pm4j</groupId>
-			<artifactId>pm4j-common</artifactId>
-			<version>${project.version}</version>
-			<classifier>tests</classifier>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.pm4j</groupId>
-			<artifactId>pm4j-core</artifactId>
-			<version>${project.version}</version>
-			<classifier>tests</classifier>
+  <dependencies>
+    <dependency>
+      <groupId>org.pm4j</groupId>
+      <artifactId>pm4j-core</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
-		</dependency>
-	</dependencies>
+    <dependency>
+      <groupId>org.pm4j</groupId>
+      <artifactId>pm4j-common</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.pm4j</groupId>
+      <artifactId>pm4j-common</artifactId>
+      <version>${project.version}</version>
+      <classifier>tests</classifier>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.pm4j</groupId>
+      <artifactId>pm4j-core</artifactId>
+      <version>${project.version}</version>
+      <classifier>tests</classifier>
+    </dependency>
+  </dependencies>
 </project>

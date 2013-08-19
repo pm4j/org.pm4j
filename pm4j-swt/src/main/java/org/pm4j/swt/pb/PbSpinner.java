@@ -8,7 +8,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Spinner;
 import org.pm4j.core.pm.PmAttrNumber;
 import org.pm4j.core.pm.PmEvent;
-import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmEventCallGate;
 import org.pm4j.swt.pb.base.PbControlToAttrBase;
 
@@ -42,8 +41,8 @@ public class PbSpinner extends PbControlToAttrBase<Spinner, PmAttrNumber<?>> {
     public void bind() {
       super.bind();
 
-      view.setMinimum(pm.getMin().intValue());
-      view.setMaximum(pm.getMax().intValue());
+      view.setMinimum(pm.getMinLen());
+      view.setMaximum(pm.getMaxLen());
 
       view.addModifyListener(this);
     }

@@ -1,56 +1,55 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
 
-	<artifactId>pm4j-facelets</artifactId>
-	<packaging>jar</packaging>
-	<name>PM4J FACELETS</name>
-	<version>0.6.11-SNAPSHOT</version>
-	<parent>
-		<groupId>org.pm4j</groupId>
-		<artifactId>main</artifactId>
-		<version>0.6.11-SNAPSHOT</version>
-		<relativePath>../pom.xml</relativePath>
-	</parent>
+  <groupId>org.pm4j</groupId>
+  <artifactId>pm4j-facelets</artifactId>
+  <version>0.6.11-SNAPSHOT</version>
 
-	<build>
-		
-	</build>
-	<dependencies>
-		<dependency>
-			<artifactId>pm4j-core</artifactId>
-			<groupId>org.pm4j</groupId>
-			<version>${project.version}</version>
-		</dependency>
+  <parent>
+    <groupId>org.pm4j</groupId>
+    <artifactId>main</artifactId>
+    <version>0.6.11-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
 
-		<dependency>
-			<artifactId>pm4j-common</artifactId>
-			<groupId>org.pm4j</groupId>
-			<version>${project.version}</version>
-		</dependency>
-	
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>servlet-api</artifactId>
-			<version>2.4</version>
-		</dependency>
+  <name>pm4j facelets</name>
 
-		<dependency>
-			<groupId>org.apache.myfaces.core</groupId>
-			<artifactId>myfaces-api</artifactId>
-			<version>1.2.10</version>
-		</dependency>
+  <dependencies>
+    <dependency>
+      <artifactId>pm4j-core</artifactId>
+      <groupId>org.pm4j</groupId>
+      <version>${project.version}</version>
+    </dependency>
 
-		<dependency>
-			<groupId>org.apache.myfaces.core</groupId>
-			<artifactId>myfaces-impl</artifactId>
-			<version>1.2.10</version>
-		</dependency>
+    <dependency>
+      <artifactId>pm4j-common</artifactId>
+      <groupId>org.pm4j</groupId>
+      <version>${project.version}</version>
+    </dependency>
 
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-			<version>1.4</version>
-		</dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <version>2.4</version>
+    </dependency>
 
-	</dependencies>
+    <dependency>
+      <groupId>org.apache.myfaces.core</groupId>
+      <artifactId>myfaces-api</artifactId>
+      <version>1.2.10</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.myfaces.core</groupId>
+      <artifactId>myfaces-impl</artifactId>
+      <version>1.2.10</version>
+    </dependency>
+
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>1.4</version>
+    </dependency>
+  </dependencies>
 </project>

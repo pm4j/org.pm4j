@@ -2,9 +2,6 @@ package org.pm4j.common.expr;
 
 import junit.framework.TestCase;
 
-import org.pm4j.common.expr.AttributeExpr;
-import org.pm4j.common.expr.ExprExecCtxt;
-import org.pm4j.common.expr.Expression;
 import org.pm4j.common.expr.parser.ParseCtxt;
 
 public class AttributeExprTest extends TestCase {

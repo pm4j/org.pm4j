@@ -1,8 +1,6 @@
 package org.pm4j.core.pm.filter;
 
 import org.pm4j.common.query.FilterExpression;
-import org.pm4j.common.query.QueryParams;
-import org.pm4j.core.pm.PmTable2;
 
 /**
  * Interface for classes used to filter collection items.

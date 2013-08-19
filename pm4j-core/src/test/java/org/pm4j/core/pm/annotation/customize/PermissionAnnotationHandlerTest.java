@@ -11,8 +11,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.pm4j.core.pm.PmAttrString;
 import org.pm4j.core.pm.PmObject;
-import org.pm4j.core.pm.annotation.customize.PermissionAnnotationHandler;
-import org.pm4j.core.pm.annotation.customize.PmAnnotationApi;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
 import org.pm4j.core.pm.impl.PmElementImpl;

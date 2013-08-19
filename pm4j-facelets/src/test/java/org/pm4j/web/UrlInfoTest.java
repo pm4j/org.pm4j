@@ -1,7 +1,5 @@
 package org.pm4j.web;
 
-import org.pm4j.web.UrlInfo;
-
 import junit.framework.TestCase;
 
 public class UrlInfoTest extends TestCase {

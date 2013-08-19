@@ -3,7 +3,6 @@ package org.pm4j.swt.pb.base;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Widget;
-import org.pm4j.core.pb.PbMatcherFactory;
 import org.pm4j.core.pm.PmObject;
 
 /**

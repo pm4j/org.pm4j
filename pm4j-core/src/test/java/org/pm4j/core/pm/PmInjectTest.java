@@ -3,12 +3,10 @@ package org.pm4j.core.pm;
 import junit.framework.TestCase;
 
 import org.pm4j.core.exception.PmRuntimeException;
-import org.pm4j.core.pm.PmConversation;
-import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmInject;
 import org.pm4j.core.pm.annotation.PmInject.Mode;
-import org.pm4j.core.pm.impl.PmElementImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
+import org.pm4j.core.pm.impl.PmElementImpl;
 
 /**
  * Tests some PmInject variants.

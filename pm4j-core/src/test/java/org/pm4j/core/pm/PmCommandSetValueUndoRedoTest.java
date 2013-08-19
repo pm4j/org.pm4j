@@ -2,7 +2,6 @@ package org.pm4j.core.pm;
 
 import junit.framework.TestCase;
 
-import org.pm4j.core.pm.PmAttrString;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
 

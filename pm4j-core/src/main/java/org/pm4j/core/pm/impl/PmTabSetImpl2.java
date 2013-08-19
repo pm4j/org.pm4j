@@ -11,7 +11,6 @@ import org.pm4j.core.pm.PmCommand.CommandState;
 import org.pm4j.core.pm.PmCommandDecorator;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmTab;
-import org.pm4j.core.pm.PmTabSet;
 import org.pm4j.core.pm.PmTabSet2;
 import org.pm4j.core.pm.annotation.PmCommandCfg;
 import org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO;

@@ -2,8 +2,6 @@ package org.pm4j.common.expr;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.pm4j.common.expr.ExprExecCtxt;
-import org.pm4j.common.expr.MethodCallExpr;
 import org.pm4j.common.expr.parser.ParseCtxt;
 
 public class MethodCallExprTest {

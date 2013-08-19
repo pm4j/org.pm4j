@@ -4,8 +4,8 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.pm4j.common.query.QueryAttr;
 import org.pm4j.common.query.FilterCompareDefinitionFactory;
+import org.pm4j.common.query.QueryAttr;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.SortOrder;
 import org.pm4j.common.query.inmem.InMemSortOrder;

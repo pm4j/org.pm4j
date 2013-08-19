@@ -4,12 +4,12 @@ import java.awt.print.Pageable;
 import java.util.List;
 
 import org.pm4j.common.pageable.querybased.ClickedIds;
-import org.pm4j.common.query.QueryAttr;
 import org.pm4j.common.query.CompOpIn;
 import org.pm4j.common.query.FilterAnd;
 import org.pm4j.common.query.FilterCompare;
 import org.pm4j.common.query.FilterExpression;
 import org.pm4j.common.query.FilterNot;
+import org.pm4j.common.query.QueryAttr;
 import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.selection.SelectionHandler;
 

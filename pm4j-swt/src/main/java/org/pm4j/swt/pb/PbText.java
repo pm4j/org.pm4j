@@ -13,7 +13,6 @@ import org.eclipse.swt.widgets.Text;
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmAttrString;
 import org.pm4j.core.pm.PmEvent;
-import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmEventCallGate;
 import org.pm4j.swt.pb.base.PbControlToAttrBase;
 import org.pm4j.swt.pb.listener.SwtMaxTextLenVerifier;

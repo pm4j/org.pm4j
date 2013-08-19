@@ -7,8 +7,8 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.pm4j.core.pm.PmAttrList;
-import org.pm4j.core.pm.PmOptionSet;
 import org.pm4j.core.pm.PmConversation;
+import org.pm4j.core.pm.PmOptionSet;
 import org.pm4j.core.pm.annotation.PmBeanCfg;
 import org.pm4j.core.pm.api.PmFactoryApi;
 import org.pm4j.core.pm.impl.options.PmOptionImpl;

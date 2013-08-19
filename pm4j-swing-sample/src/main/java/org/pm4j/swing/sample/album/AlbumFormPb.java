@@ -7,9 +7,9 @@ import javax.swing.JDialog;
 
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.impl.PmEventApiHandler;
+import org.pm4j.core.sample.album.AlbumConversationPm;
 import org.pm4j.core.sample.album.AlbumFormPm;
 import org.pm4j.core.sample.album.AlbumPm;
-import org.pm4j.core.sample.album.AlbumConversationPm;
 import org.pm4j.swing.pb.base.PbFormBase;
 
 public class AlbumFormPb extends PbFormBase<AlbumForm, AlbumFormPm> {

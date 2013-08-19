@@ -1,7 +1,5 @@
 package org.pm4j.swing.pb;
 
-import org.pm4j.core.pm.api.PmEventCallGate;
-
 import java.awt.Container;
 import java.util.List;
 
@@ -17,6 +15,7 @@ import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmOption;
 import org.pm4j.core.pm.PmOptionSet;
+import org.pm4j.core.pm.api.PmEventCallGate;
 import org.pm4j.core.pm.impl.PmUtil;
 import org.pm4j.swing.pb.base.PbJComponentToAttrBase;
 

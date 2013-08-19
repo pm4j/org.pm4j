@@ -5,9 +5,9 @@ import java.util.List;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmElement;
 import org.pm4j.core.pm.PmObject;
-import org.pm4j.core.pm.PmTable2;
 import org.pm4j.core.pm.PmPager.PagerVisibility;
 import org.pm4j.core.pm.PmTable;
+import org.pm4j.core.pm.PmTable2;
 import org.pm4j.core.pm.PmTableCol;
 import org.pm4j.core.pm.impl.changehandler.MasterPmHandler;
 

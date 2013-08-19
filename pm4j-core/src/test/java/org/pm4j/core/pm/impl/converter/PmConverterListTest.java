@@ -3,12 +3,10 @@ package org.pm4j.core.pm.impl.converter;
 import java.util.Arrays;
 import java.util.List;
 
+import junit.framework.TestCase;
+
 import org.pm4j.core.pm.impl.PmAttrImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
-import org.pm4j.core.pm.impl.converter.PmConverterInteger;
-import org.pm4j.core.pm.impl.converter.PmConverterList;
-
-import junit.framework.TestCase;
 
 public class PmConverterListTest extends TestCase {
 

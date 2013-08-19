@@ -13,7 +13,6 @@ import org.pm4j.core.pm.impl.PmAttrIntegerImpl;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
 import org.pm4j.core.pm.impl.PmElementImpl;
-import org.pm4j.core.pm.impl.changehandler.ChangedChildStateRegistry;
 
 public class ChangedChildStateRegistryTest {
 

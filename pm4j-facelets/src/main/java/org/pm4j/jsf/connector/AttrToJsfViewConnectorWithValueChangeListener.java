@@ -1,7 +1,5 @@
 package org.pm4j.jsf.connector;
 
-import javax.faces.component.UIComponent;
-import javax.faces.context.FacesContext;
 import javax.faces.event.ValueChangeEvent;
 
 import org.apache.commons.lang.StringUtils;

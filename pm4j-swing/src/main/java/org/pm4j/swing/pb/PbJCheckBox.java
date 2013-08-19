@@ -1,7 +1,5 @@
 package org.pm4j.swing.pb;
 
-import org.pm4j.core.pm.api.PmEventCallGate;
-
 import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -10,7 +8,7 @@ import javax.swing.JCheckBox;
 
 import org.pm4j.core.pm.PmAttrBoolean;
 import org.pm4j.core.pm.PmEvent;
-import org.pm4j.core.pm.api.PmEventApi;
+import org.pm4j.core.pm.api.PmEventCallGate;
 import org.pm4j.swing.pb.base.PbJComponentToAttrBase;
 
 public class PbJCheckBox extends

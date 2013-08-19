@@ -1,7 +1,6 @@
  package org.pm4j.core.pm.impl.converter;
 
 import java.lang.reflect.Constructor;
-import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;

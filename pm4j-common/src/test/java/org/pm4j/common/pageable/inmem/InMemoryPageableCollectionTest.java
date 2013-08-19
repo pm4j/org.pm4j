@@ -4,9 +4,9 @@ import java.util.Comparator;
 
 import org.pm4j.common.pageable.PageableCollection2;
 import org.pm4j.common.pageable.PageableCollectionTestBase;
-import org.pm4j.common.query.QueryAttr;
 import org.pm4j.common.query.CompOpStringStartsWith;
 import org.pm4j.common.query.FilterCompareDefinition;
+import org.pm4j.common.query.QueryAttr;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.SortOrder;
 import org.pm4j.common.query.inmem.InMemQueryEvaluator;

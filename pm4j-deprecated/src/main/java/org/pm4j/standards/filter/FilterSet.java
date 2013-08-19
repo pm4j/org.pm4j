@@ -3,8 +3,6 @@ package org.pm4j.standards.filter;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.pm4j.core.pm.filter.CombinedBy;
-
 /**
  * A set of filter items that is used to express combined filter criteria.
  *

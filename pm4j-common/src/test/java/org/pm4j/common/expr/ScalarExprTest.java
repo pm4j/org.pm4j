@@ -1,11 +1,8 @@
 package org.pm4j.common.expr;
 
-import org.pm4j.common.expr.ExprExecCtxt;
-import org.pm4j.common.expr.PathExpressionChain;
-import org.pm4j.common.expr.ScalarExpr;
-import org.pm4j.common.expr.parser.ParseCtxt;
-
 import junit.framework.TestCase;
+
+import org.pm4j.common.expr.parser.ParseCtxt;
 
 
 public class ScalarExprTest extends TestCase {

@@ -1,6 +1,5 @@
 package org.pm4j.core.pm;
 
-import java.math.BigDecimal;
 
 
 /**

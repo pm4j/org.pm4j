@@ -1,30 +1,31 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
 
-	<artifactId>pm4j-swing</artifactId>
-	<packaging>jar</packaging>
-	<name>PM4J SWING</name>
-	<version>0.6.11-SNAPSHOT</version>
-	<parent>
-		<groupId>org.pm4j</groupId>
-		<artifactId>main</artifactId>
-		<version>0.6.11-SNAPSHOT</version>
-		<relativePath>../pom.xml</relativePath>
-	</parent>
+  <groupId>org.pm4j</groupId>
+  <artifactId>pm4j-swing</artifactId>
+  <version>0.6.11-SNAPSHOT</version>
 
-	<build>
-		
-	</build>
-	<dependencies>
-		<dependency>
-			<artifactId>pm4j-core</artifactId>
-			<groupId>org.pm4j</groupId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<artifactId>pm4j-common</artifactId>
-			<groupId>org.pm4j</groupId>
-			<version>${project.version}</version>
-		</dependency>
-	</dependencies>
+  <parent>
+    <groupId>org.pm4j</groupId>
+    <artifactId>main</artifactId>
+    <version>0.6.11-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+
+  <name>pm4j swing</name>
+
+  <dependencies>
+    <dependency>
+      <artifactId>pm4j-core</artifactId>
+      <groupId>org.pm4j</groupId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <artifactId>pm4j-common</artifactId>
+      <groupId>org.pm4j</groupId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
 </project>

@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.pm4j.common.query.FilterCompareDefinition;
+import org.pm4j.core.pm.filter.FilterByDefinition;
 
 
 /**

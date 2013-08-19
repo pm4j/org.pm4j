@@ -1,6 +1,6 @@
 package org.pm4j.core.pm.impl;
 
-import static junit.framework.Assert.*;
+import static junit.framework.Assert.assertSame;
 
 import org.junit.Test;
 import org.pm4j.core.pm.PmConversation;

@@ -1,10 +1,7 @@
 package org.pm4j.core.pm;
 
-import java.util.Locale;
-
 import junit.framework.TestCase;
 
-import org.pm4j.core.pm.impl.PmAttrBase;
 import org.pm4j.core.pm.impl.PmAttrIntegerImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
 

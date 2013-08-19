@@ -8,10 +8,10 @@ import java.util.Map;
 
 import org.pm4j.common.pageable.PageableCollection2;
 import org.pm4j.common.pageable.PageableCollectionWithMultiFieldIdTestBase;
-import org.pm4j.common.query.QueryAttrMulti;
-import org.pm4j.common.query.QueryAttr;
 import org.pm4j.common.query.CompOpStringStartsWith;
 import org.pm4j.common.query.FilterCompareDefinition;
+import org.pm4j.common.query.QueryAttr;
+import org.pm4j.common.query.QueryAttrMulti;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.query.SortOrder;
