@@ -121,10 +121,10 @@ public class ClassUtil {
    * @return The found constructor or <code>null</code>
    */
   @SuppressWarnings("unchecked")
-  public static Constructor<Object> findConstructor(Class< ? > cls, Class< ? >... args) {
-    Constructor<Object> constructor = null;
+  public static <T> Constructor<T> findConstructor(Class<T> cls, Class< ? >... args) {
+    Constructor<T> constructor = null;
 
-    Constructor<?>[] ctors = cls.getConstructors();
+    Constructor<T>[] ctors = (Constructor<T>[]) cls.getConstructors();
     for (int i = 0; i < ctors.length; i++) {
       Class< ? >[] ptypes = ctors[i].getParameterTypes();
       if (args.length == ptypes.length) {
@@ -137,7 +137,7 @@ public class ClassUtil {
         }
 
         if (doesMatch) {
-          constructor = (Constructor<Object>) ctors[i];
+          constructor = (Constructor<T>) ctors[i];
         }
       }
     }
@@ -173,8 +173,8 @@ public class ClassUtil {
    * @return The found constructor or <code>null</code>.
    * @throws IllegalArgumentException when there is no match.
    */
-  public static Constructor<Object> getConstructor(Class< ? > cls, Class<?>... args) {
-    Constructor<Object> c = ClassUtil.findConstructor(cls, args);
+  public static <T> Constructor<T> getConstructor(Class<T> cls, Class<?>... args) {
+    Constructor<T> c = ClassUtil.findConstructor(cls, args);
 
     if (c == null) {
       throw new IllegalArgumentException("No matching constructor for class '" + cls
