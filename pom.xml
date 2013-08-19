@@ -154,8 +154,8 @@
               <name>.settings/org.eclipse.core.resources.prefs</name>
               <content>
 		<![CDATA[
-			 encoding/<project>=${project.build.sourceEncoding}
-			 eclipse.preferences.version=1
+encoding/<project>=${project.build.sourceEncoding}
+eclipse.preferences.version=1
 		]]>
               </content>
             </file>
@@ -163,9 +163,9 @@
               <name>.settings/org.eclipse.jdt.core.prefs</name>
               <content>
 		<![CDATA[
-			 org.eclipse.jdt.core.formatter.lineSplit=120
-			 org.eclipse.jdt.core.formatter.tabulation.size=2
-			 org.eclipse.jdt.core.formatter.tabulation.char=space
+org.eclipse.jdt.core.formatter.lineSplit=120
+org.eclipse.jdt.core.formatter.tabulation.size=2
+org.eclipse.jdt.core.formatter.tabulation.char=space
 		]]>
               </content>
             </file>
