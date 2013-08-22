@@ -2,6 +2,7 @@ package org.pm4j.core.pm.impl;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -24,6 +25,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.pm4j.common.util.CompareUtil;
+import org.pm4j.common.util.GenericsUtil;
 import org.pm4j.common.util.collection.MapUtil;
 import org.pm4j.core.exception.PmConverterException;
 import org.pm4j.core.exception.PmResourceData;
@@ -1174,6 +1176,15 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     }
 
     return format;
+  }
+
+  @Override
+  public Class<?> getValueType() {
+    Type t = GenericsUtil.findFirstSuperClassParameterType(getClass());
+    if (!(t instanceof Class)) {
+      throw new PmRuntimeException(this, "Unable to handle an attribute value type that is not a class or interface. Found type: " + t);
+    }
+    return (Class<?>) t;
   }
 
   /**

@@ -1,6 +1,7 @@
 package org.pm4j.core.pm;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 import org.pm4j.core.pm.impl.PmAttrEnumImpl;
@@ -32,6 +33,12 @@ public class PmAttrEnumTest {
     assertEquals("Changing the value back to it's original value will make the field unchanged again.", false, myPm.isPmValueChanged());
   }
 
+  @Test
+  public void testValueType() {
+    Class<?> t = new MyPm().myEnum.getValueType();
+    assertEquals(MyEnum.class, t);
+    assertTrue(Enum.class.isAssignableFrom(t));
+  }
 
   enum MyEnum { A, B, C };
   public static class MyPm extends PmConversationImpl {

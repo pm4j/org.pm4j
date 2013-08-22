@@ -21,9 +21,9 @@ import org.pm4j.core.pm.impl.PmConversationImpl;
  *
  */
 public class PmAttrDoubleTest {
-  
+
   private MyPm myPm;
-  
+
   @Before
   public void setup() {
     myPm = new MyPm();
@@ -44,14 +44,14 @@ public class PmAttrDoubleTest {
   public void testMaxLen() {
     assertEquals(6, myPm.maxLen6.getMaxLen());
   }
-  
+
   @Test
   @Ignore("FIXME: Wrong locale is choosen, germany should use a dot as decimal divider. See property _de file.")
   public void testDefaultNoRoundingGermany() {
     myPm.getPmConversation().setPmLocale(Locale.GERMAN);
     myPm.bare.setValueAsString("123,56789");
     assertTrue("By default any Double should be valid.", myPm.bare.isPmValid());
-    assertEquals("By default any Double should not be formatted.","123,56789", myPm.bare.getValueAsString());    
+    assertEquals("By default any Double should not be formatted.","123,56789", myPm.bare.getValueAsString());
   }
 
   @Test
@@ -59,7 +59,7 @@ public class PmAttrDoubleTest {
     myPm.getPmConversation().setPmLocale(Locale.ENGLISH);
     myPm.bare.setValueAsString("123.56789");
     assertTrue("By default any Double should be valid.", myPm.bare.isPmValid());
-    assertEquals("By default any Double should not be formatted.","123.56789", myPm.bare.getValueAsString());    
+    assertEquals("By default any Double should not be formatted.","123.56789", myPm.bare.getValueAsString());
   }
 
   @Test
@@ -69,43 +69,43 @@ public class PmAttrDoubleTest {
     assertEquals("By default any Double should not be formatted.","123.56789", myPm.bare.getValueAsString());
     assertEquals(new Double("123.56789"),myPm.bare.getValue());
   }
-  
+
   @Test
   public void testReadOnly() {
     assertTrue(myPm.readOnlyAttr.isPmReadonly());
-    assertEquals(new Double(MyPm.READONLY_VALUE), myPm.readOnlyAttr.getValue());    
+    assertEquals(new Double(MyPm.READONLY_VALUE), myPm.readOnlyAttr.getValue());
     myPm.readOnlyAttr.setValue(new Double("0.01"));
-    assertEquals(new Double(MyPm.READONLY_VALUE), myPm.readOnlyAttr.getValue());    
+    assertEquals(new Double(MyPm.READONLY_VALUE), myPm.readOnlyAttr.getValue());
     assertTrue(myPm.readOnlyAttr.isPmValid());
     assertEquals(MyPm.READONLY_VALUE, myPm.readOnlyAttr.getValueAsString());
   }
-  
+
   @Test
   public void testGetMinMax() {
     assertEquals(new Double("999.99"), myPm.minMaxAttr.getMaxValue());
     assertEquals(new Double("0.1"), myPm.minMaxAttr.getMinValue());
   }
-  
+
   @Test
   public void testGetMaxLen() {
-    assertEquals(6, myPm.maxLen6.getMaxLen());    
+    assertEquals(6, myPm.maxLen6.getMaxLen());
   }
-  
+
   private void assertValue(PmAttrDouble pm, String number, boolean isValid) {
     pm.setValueAsString(number);
     pm.pmValidate();
     assertEquals(number, pm.getValueAsString());
     assertEquals(new Double(number), pm.getValue());
   }
-  
- 
+
+
   private void testMinMax(PmAttrDouble pm) {
     assertValue(pm, "0", false);
     assertValue(pm, "0.1", true);
     assertValue(pm, "0.09", false);
     assertValue(pm, "999.9900001", false);
     assertValue(pm, "9.9999", true);
-    assertValue(pm, "99999", false);    
+    assertValue(pm, "99999", false);
   }
 
   @Test
@@ -115,7 +115,7 @@ public class PmAttrDoubleTest {
     testMinMax(myPm.maxSingleValue);
   }
 
-  
+
   @Test
   public void testRoundingHalfDown() {
     myPm.roundingHalfDown.setValueAsString("1.005");
@@ -133,7 +133,7 @@ public class PmAttrDoubleTest {
     assertEquals("Should not have been changed", new Double("1.005"), myPm.roundingHalfUp.getValue());
   }
 
-  
+
   @Test
   public void testDefaultStringFormat() {
     assertEquals("An un-set value provides a null.", null, myPm.maxLen6.getValueAsString());
@@ -142,7 +142,7 @@ public class PmAttrDoubleTest {
     myPm.maxLen6.setValueAsString("0.153");
     assertEquals("0.153", myPm.maxLen6.getValueAsString());
   }
-  
+
   @Test
   public void testFormatted() {
     assertEquals("An un-set value provides a null.", null, myPm.formatted.getValueAsString());
@@ -176,13 +176,13 @@ public class PmAttrDoubleTest {
   @Test
   public void testCombination() {
     assertTrue(myPm.combination.isPmReadonly());
-    assertEquals(new Double(MyPm.READONLY_VALUE), myPm.combination.getValue());    
+    assertEquals(new Double(MyPm.READONLY_VALUE), myPm.combination.getValue());
     myPm.combination.setValue(new Double("0.01"));
-    assertEquals(new Double(MyPm.READONLY_VALUE), myPm.combination.getValue());    
+    assertEquals(new Double(MyPm.READONLY_VALUE), myPm.combination.getValue());
     assertTrue(myPm.combination.isPmValid());
     assertEquals(MyPm.READONLY_VALUE_ROUNDED, myPm.combination.getValueAsString());
   }
-  
+
   static class MyPm extends PmConversationImpl {
     public static final String READONLY_VALUE = "1.515";
     public static final String READONLY_VALUE_ROUNDED = "1.52";
@@ -200,18 +200,18 @@ public class PmAttrDoubleTest {
     @PmAttrCfg(formatResKey="pmAttrNumberTest_twoDecimalPlaces")
     @PmAttrDoubleCfg(roundingMode = RoundingMode.HALF_UP)
     public final PmAttrDouble roundingHalfUp = new PmAttrDoubleImpl(this);
-    
+
     @PmAttrCfg(maxLen=6)
     public final PmAttrDouble maxLen6 = new PmAttrDoubleImpl(this);
 
     public final PmAttrDouble bare = new PmAttrDoubleImpl(this);
-    
+
     @PmAttrCfg(formatResKey="")
     public final PmAttrDouble formatted = new PmAttrDoubleImpl(this);
-    
+
     @PmAttrDoubleCfg(minValue=0.1, maxValue=999.99)
     public final PmAttrDouble minMaxAttr = new PmAttrDoubleImpl(this);
-    
+
     @PmAttrCfg(readOnly = true)
     public final PmAttrDouble readOnlyAttr = new PmAttrDoubleImpl(this) {
       protected Double getBackingValueImpl() {
@@ -229,6 +229,11 @@ public class PmAttrDoubleTest {
         }
     };
 
+  }
+
+  @Test
+  public void testValueType() {
+    assertEquals(Double.class, myPm.bare.getValueType());
   }
 
 }

@@ -3,7 +3,9 @@ package org.pm4j.core.pm;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
+import java.util.List;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.pm4j.core.pm.impl.PmAttrListImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
@@ -24,6 +26,11 @@ public class PmAttrListTest {
     assertEquals("second 2-item subset", Arrays.asList(3L), e.listOfLongs.getValueSubset(2, 2));
   }
 
+  @Test @Ignore("FIXME oboede: The generics parameter is here the list item type. Check that.")
+  public void testValueType() {
+    Class<?> t = new MyTestElement().listOfLongs.getValueType();
+    assertEquals(List.class, t);
+  }
 
   enum MyEnum { V1, V2, V3 };
   public static class MyTestElement extends PmConversationImpl {

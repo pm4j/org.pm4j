@@ -35,6 +35,13 @@ public class PmAttrShortTest {
                   PmConstants.MSGKEY_VALIDATION_NUMBER_CONVERSION_FROM_STRING_FAILED, PmMessageUtil.findMostSevereMessage(myPm.shortAttr).getMsgKey());
   }
 
+  @Test
+  public void testValueType() {
+    Class<?> t = new MyPm().shortAttr.getValueType();
+    assertEquals(Short.class, t);
+  }
+
+
   static class MyPm extends PmConversationImpl {
     public final PmAttrShort shortAttr = new PmAttrShortImpl(this);
   }

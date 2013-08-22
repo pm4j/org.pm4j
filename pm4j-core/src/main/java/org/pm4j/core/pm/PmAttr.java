@@ -170,6 +170,18 @@ public interface PmAttr<T> extends PmObject, PmDataInput {
 	String getFormatString();
 
 	/**
+	 * Provides value type information.<br>
+	 * This may be used by some view code that visualizes attributes value type specific.
+	 * <p>
+	 * An attribute implementation may support type conversion between it's externally
+	 * provided PM value type and a backing value type.<br>
+	 * This method only reports about the externally provided PM value type.
+	 *
+	 * @return The value type handled by this attribute PM.
+	 */
+	Class<?> getValueType();
+
+	/**
 	 * Converts single values between its attribute type representation and {@link String}
 	 * or {@link Serializable} representation.
 	 *

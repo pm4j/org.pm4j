@@ -45,7 +45,10 @@ public class GenericsUtil {
           ? (T) typeArray[paramIdx]
           : null;
     } else {
-    return findSuperClassParameterType(cls.getSuperclass(), paramIdx);
+      Class<?> superCls = cls.getSuperclass();
+      return (superCls != null)
+        ? (T) findSuperClassParameterType(superCls, paramIdx)
+        : null;
     }
   }
 
@@ -55,9 +58,9 @@ public class GenericsUtil {
   public static <T extends Type> T getSuperClassParameterType(Class<?> cls, int paramIdx) {
     T t = findSuperClassParameterType(cls, paramIdx);
     if (t == null) {
-      throw new RuntimeException("Did not find a type parameter with index=" + paramIdx + " within super class hierarchy of " + cls);
+      throw new RuntimeException("Unable to find a generics parameter with (zero based) index '" + paramIdx +
+          "' for class " + cls);
     }
     return t;
   }
-
 }
