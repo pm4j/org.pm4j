@@ -63,6 +63,9 @@ public abstract class PmDataInputBase extends PmObjectBase implements PmDataInpu
     boolean changedStateChanged = _setPmValueChangedForThisInstanceOnly(this, changed);
 
     if (changedStateChanged) {
+      // Inform about the change directly:
+      PmEventApi.firePmEvent(this, PmEvent.VALUE_CHANGE);
+
       // Collects the state change information to send the related event only when the
       // state change of the related sub-tree is really completed.
       final List<PmObject> childrenWithChangedStateChange = new ArrayList<PmObject>();
