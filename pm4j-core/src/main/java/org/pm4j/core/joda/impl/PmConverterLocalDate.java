@@ -7,11 +7,12 @@ import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.pm4j.core.pm.PmAttr;
+import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.impl.converter.MultiFormatParserBase;
 import org.pm4j.core.pm.impl.converter.PmConverterSerializeableBase;
 
 /**
- * Converter for Joda LocalDateTime type capable to parse different input formats.
+ * Converter for Joda LocalDate type capable to parse different input formats.
  * 
  * @author Harm Gnoyke
  * @since GLOBE 1.3
@@ -27,12 +28,12 @@ public class PmConverterLocalDate extends PmConverterSerializeableBase<LocalDate
     private MultiFormatParserBase<LocalDate> multiFormatParser = new MultiFormatParserBase<LocalDate>() {
 
         /**
-         * Locale is ignored here.
+         * {@inheritDoc}
          */
         @Override
         protected LocalDate parseValue(String input, String format, Locale locale, PmAttr<?> pmAttr) throws ParseException {
             try {
-                DateTimeFormatter fmt = DateTimeFormat.forPattern(format);
+                DateTimeFormatter fmt = DateTimeFormat.forPattern(format).withLocale(locale);
                 return fmt.parseLocalDate(input);
             } catch (Exception e) {
                 ParseException pe = new ParseException("Error parsing Date with Joda", 0);
@@ -53,7 +54,8 @@ public class PmConverterLocalDate extends PmConverterSerializeableBase<LocalDate
      */
     @Override
     public LocalDate stringToValue(PmAttr<?> pmAttr, String input) {
-        return multiFormatParser.parseString(pmAttr, input);
+        LocalDate returnDate = multiFormatParser.parseString(pmAttr, input);
+        return returnDate;
     }
 
     /**
@@ -62,7 +64,9 @@ public class PmConverterLocalDate extends PmConverterSerializeableBase<LocalDate
     @Override
     public String valueToString(PmAttr<?> pmAttr, LocalDate v) {
         String outputFormat = multiFormatParser.getOutputFormat(pmAttr);
-        DateTimeFormatter fmt = DateTimeFormat.forPattern(outputFormat);
+        PmConversation conversation = pmAttr.getPmConversation();
+        Locale locale = conversation.getPmLocale();
+        DateTimeFormatter fmt = DateTimeFormat.forPattern(outputFormat).withLocale(locale);
         return fmt.print(v);
     }
 

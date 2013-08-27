@@ -7,6 +7,7 @@ import org.joda.time.LocalDateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.pm4j.core.pm.PmAttr;
+import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.impl.converter.MultiFormatParserBase;
 import org.pm4j.core.pm.impl.converter.PmConverterSerializeableBase;
 
@@ -31,13 +32,13 @@ public class PmConverterLocalDateTime extends PmConverterSerializeableBase<Local
   private MultiFormatParserBase<LocalDateTime> multiFormatParser = new MultiFormatParserBase<LocalDateTime>() {
 
     /**
-     * Locale is ignored here.
+     * {@inheritDoc}
      */
     @Override
     protected LocalDateTime parseValue(String input, String format, Locale locale, PmAttr<?> pmAttr)
         throws ParseException {
       try {
-        DateTimeFormatter fmt = DateTimeFormat.forPattern(format);
+        DateTimeFormatter fmt = DateTimeFormat.forPattern(format).withLocale(locale);
         return fmt.parseLocalDateTime(input);
       } catch (Exception e) {
         ParseException pe = new ParseException("Error parsing Date with Joda", 0);
@@ -64,7 +65,9 @@ public class PmConverterLocalDateTime extends PmConverterSerializeableBase<Local
   @Override
   public String valueToString(PmAttr<?> pmAttr, LocalDateTime v) {
     String outputFormat = multiFormatParser.getOutputFormat(pmAttr);
-    DateTimeFormatter fmt = DateTimeFormat.forPattern(outputFormat);
+    PmConversation conversation = pmAttr.getPmConversation();
+    Locale locale = conversation.getPmLocale();
+    DateTimeFormatter fmt = DateTimeFormat.forPattern(outputFormat).withLocale(locale);
     return fmt.print(v);
   }
 }
