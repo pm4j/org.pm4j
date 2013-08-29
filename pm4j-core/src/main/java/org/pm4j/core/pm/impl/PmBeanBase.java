@@ -8,6 +8,10 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.jodah.typetools.TypeResolver;
+import org.jodah.typetools.TypeResolver.Unknown;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmDataInput;
@@ -24,10 +28,14 @@ import org.pm4j.core.pm.api.PmFactoryApi;
 import org.pm4j.core.pm.api.PmMessageUtil;
 import org.pm4j.core.util.reflection.BeanAttrAccessor;
 import org.pm4j.core.util.reflection.BeanAttrAccessorImpl;
+import org.pm4j.core.util.reflection.ReflectionException;
 
 public abstract class PmBeanBase<T_BEAN>
       extends PmElementBase
       implements PmBean<T_BEAN> {
+  
+  /** Logger of this class. */
+  private final static Log LOG = LogFactory.getLog(PmBeanBase.class);
 
   /** The bean data object behind this PM. */
   private T_BEAN pmBean;
@@ -354,30 +362,71 @@ public abstract class PmBeanBase<T_BEAN>
     super.initMetaData(metaData);
     MetaData myMetaData = (MetaData) metaData;
 
+    // evaluate annotation
     PmBeanCfg annotation = AnnotationUtil.findAnnotation(this, PmBeanCfg.class);
 
+    // evaluate myMetaData.beanClass
+    {
+      // evaluate bean class from annotation PmBeanCfg
+      Class<?> beanClassFromAnnotation = annotation != null ? annotation.beanClass() : null; 
+  
+      // evaluate bean class from type of generic parameter of PmBean
+      // Class<?> beanClassFromGeneric = ClassUtil.findFirstGenericParameterOfInterface(PmBean.class, this.getClass());
+      Class<?> beanClassFromGeneric = TypeResolver.resolveRawArgument(PmBean.class, this.getClass());
+      
+      if (beanClassFromAnnotation != null && beanClassFromGeneric != Unknown.class) {
+        // annotation parameter PmBeanCfg.beanClass shall override generic parameter of interface PmBean
+        myMetaData.beanClass = beanClassFromAnnotation;
+        
+        // if PmBeanCfg.beanClass is not assignable from PmBean.genericParameter, throw PmRuntimeException
+        if (!beanClassFromGeneric.isAssignableFrom(beanClassFromAnnotation)) {
+          throw new PmRuntimeException(this, ": PmBeanCfg.beanClass " + beanClassFromGeneric.getSimpleName()
+              + " is not assignable from PmBean.genericParameter " + beanClassFromAnnotation.getSimpleName());
+
+        } else if (!beanClassFromAnnotation.equals(beanClassFromGeneric)) {
+          // if PmBeanCfg.beanClass and PmBean.genericParameter are assignable, but of different type, log debug
+          if (LOG.isDebugEnabled()) {
+            LOG.debug(this.toString() + ": PmBeanCfg.beanClass " + beanClassFromGeneric.getSimpleName()
+                + " is assignable from PmBean.genericParameter " + beanClassFromAnnotation.getSimpleName() + ", but of different type");
+          }
+        }
+        
+      } else if (beanClassFromAnnotation != null && beanClassFromGeneric == Unknown.class) {
+        // take bean class from PmBeanCfg.beanClass
+        myMetaData.beanClass = beanClassFromAnnotation;
+
+        // if PmBean.genericParameter is unknown, log warning
+        LOG.warn(this.toString() + ": PmBean.genericParameter is unknown");
+        
+      } else if (beanClassFromAnnotation == null && beanClassFromGeneric != Unknown.class) {
+        // if PmBeanCfg.beanClass is Void, take bean class from PmBean.genericParameter
+        myMetaData.beanClass = beanClassFromGeneric;
+        
+      } else if (beanClassFromAnnotation == null && beanClassFromGeneric == Unknown.class) {
+        // if PmBeanCfg.beanClass is Void and PmBean.genericParameter is unknown, throw PmRuntimeException
+        throw new PmRuntimeException(this, "PmBeanCfg.beanClass and PmBean.genericParameter are both unknown");
+      }
+    }
+    // myMetaData.beanClass is defined now
+    
+    // create BeanAttrAccessor
     if (annotation != null) {
-      myMetaData.beanClass = annotation.beanClass();
+      myMetaData.autoCreateBean = annotation.autoCreateBean();
+      myMetaData.beanPropertyKey = StringUtils.trimToEmpty(annotation.findBeanExpr());
+      myMetaData.setReadOnly(annotation.readOnly());
+
       if (StringUtils.isNotBlank(annotation.key())) {
         try {
           myMetaData.idAttrAccessor = new BeanAttrAccessorImpl(myMetaData.beanClass, annotation.key());
         }
-        catch (org.pm4j.core.util.reflection.ReflectionException e) {
+        catch (ReflectionException e) {
           if (annotation.key().equals(PmBeanCfg.DEFAULT_BEAN_ID_ATTR)) {
-            // Ok, there was not specific id configuration
-          }
-          else {
+            // a specific id is not configured
+          } else {
             PmObjectUtil.throwAsPmRuntimeException(this, e);
           }
         }
       }
-      myMetaData.autoCreateBean = annotation.autoCreateBean();
-      myMetaData.beanPropertyKey = StringUtils.trimToEmpty(annotation.findBeanExpr());
-      myMetaData.setReadOnly(annotation.readOnly());
-    }
-
-    if (myMetaData.beanClass == null) {
-      throw new IllegalArgumentException("Missing annotation " + PmBeanCfg.class.getSimpleName() + " for class " + getClass());
     }
 
     // Check if bean validation can be used:

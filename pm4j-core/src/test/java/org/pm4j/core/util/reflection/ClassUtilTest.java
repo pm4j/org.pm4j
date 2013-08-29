@@ -1,9 +1,13 @@
 package org.pm4j.core.util.reflection;
 
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Set;
+
+import org.pm4j.core.pm.PmBean;
+import org.pm4j.core.pm.impl.PmBeanBase;
 
 import junit.framework.TestCase;
 
@@ -73,18 +77,18 @@ public class ClassUtilTest extends TestCase {
 
   }
 
-  public static interface B<T> { }
-  public static class C implements B<Integer> { }
-  public static class D extends C { }
-  public static class E<T> implements B<T> { }
-  public static class F extends E<Float> { }
+  public static class B{};
+  public static class C extends PmBeanBase<B> { };
+//  public static class D extends C { }
+//  public static class E<T> extends B<T> { }
+//  public static class F extends E<Float> { }
 
 
-  public void testFindFirstGenericParameterOfInterface() {
-//    assertEquals(Integer.class, ClassUtil.findFirstGenericParameterOfInterface(C.class, B.class));
-//    assertEquals(Integer.class, ClassUtil.findFirstGenericParameterOfInterface(D.class, B.class));
-//    assertEquals(Float.class, ClassUtil.findFirstGenericParameterOfInterface(F.class, B.class));
-
+  // GLOBE00112470
+  public void testFindFirstGenericParameter() {
+    assertEquals(B.class, ClassUtil.findFirstGenericParameterOfInterface(PmBean.class, C.class));
+//    assertEquals(Integer.class, ClassUtil.findFirstGenericParameterOfInterface(D.class));
+//    assertEquals(Float.class, ClassUtil.findFirstGenericParameterOfInterface(F.class));
   }
 
 

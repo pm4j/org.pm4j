@@ -53,16 +53,6 @@ class BeanPmFactory {
             "' to identify the bean class that can be handled by this presentation model.");
       }
       addClassToPmConstructorMapItem(annotation.beanClass(), beanPmClass);
-
-// TODO: enhance class metadata inspection to prevent the (in most cases) redundant
-//       beanClass attribute specification.
-//      Class<?> beanClass = ClassUtil.findFirstGenericParameterOfInterface(beanPmClass, PmBean.class);
-//      if (beanClass == null) {
-//        throw new PmConfigurationException("Unable to identify bean class for PM class '" +
-//            beanPmClass.getSimpleName() +
-//            "'. Please check if the class really implementes the interface " + PmBean.class.getSimpleName());
-//      }
-//      addClassToPmConstructorMapItem(beanClass, beanPmClass);
     }
   }
 
