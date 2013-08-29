@@ -49,6 +49,28 @@ public class IterableUtil {
   }
 
   /**
+   * Provides a shallow copy of the given collection.
+   * Removes all <code>null</code> items from <code>srcList</code>,
+   *
+   * @param srcList The source list. May be <code>null</code> and may contain <code>null</code> items.
+   * @return A list with no <code>null</code> items. Never <code>null</code>.
+   */
+  public static <T> List<T> shallowCopyWithoutNulls(Collection<T> srcList) {
+    if (srcList == null) {
+      return new ArrayList<T>();
+    }
+
+    List<T> copy = new ArrayList<T>(srcList.size());
+    for (T t : srcList) {
+      if (t != null) {
+        copy.add(t);
+      }
+    }
+
+    return copy;
+  }
+
+  /**
    * Generates a collection that references the items of the given
    * {@link Iterator}.<br>
    * The iterator should be at its start position.

@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.pm4j.common.util.CompareUtil;
+import org.pm4j.common.util.collection.IterableUtil;
 
 
 /**
@@ -20,16 +21,17 @@ public class FilterAnd implements FilterExpression {
   /**
    * A static helper method that joins the given set of expressions to an and-combined expression.
    *
-   * @param expressions a set of expressions. May be empty or <code>null</code>.
+   * @param expressions a set of expressions. May be empty or <code>null</code> or may contain <code>null</code> items.
    * @return the resulting expression. May be <code>null</code> if the given parameter was empty or <code>null</code>.
    */
   public static FilterExpression joinToAnd(Collection<? extends FilterExpression> expressions) {
-    if (expressions == null || expressions.isEmpty()) {
+    List<? extends FilterExpression> list = IterableUtil.shallowCopyWithoutNulls(expressions);
+    if (list.isEmpty()) {
       return null;
-    } else if (expressions.size() == 1) {
-      return expressions.iterator().next();
+    } else if (list.size() == 1) {
+      return list.iterator().next();
     } else {
-      return new FilterAnd(expressions);
+      return new FilterAnd(list);
     }
   }
 
