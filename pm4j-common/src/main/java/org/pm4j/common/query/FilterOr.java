@@ -17,6 +17,33 @@ import org.pm4j.common.util.CompareUtil;
  */
 public class FilterOr implements FilterExpression {
 
+  /**
+   * A static helper method that joins the given set of expressions to an or-combined expression.
+   *
+   * @param expressions a set of expressions. May be empty or <code>null</code>.
+   * @return the resulting expression. May be <code>null</code> if the given parameter was empty or <code>null</code>.
+   */
+  public static FilterExpression joinToOr(Collection<? extends FilterExpression> expressions) {
+    if (expressions == null || expressions.isEmpty()) {
+      return null;
+    } else if (expressions.size() == 1) {
+      return expressions.iterator().next();
+    } else {
+      return new FilterOr(expressions);
+    }
+  }
+
+  /**
+   * A static helper method that joins the given set of expressions to an or-combined expression.
+   *
+   * @param expressions a set of expressions. May be empty.
+   * @return the resulting expression. May be <code>null</code> if the given parameter was empty or <code>null</code>.
+   */
+  public static FilterExpression joinToAnd(FilterExpression... expressions) {
+    return joinToOr(Arrays.asList(expressions));
+  }
+
+
   private static final long serialVersionUID = 1L;
   private List<FilterExpression> expressions;
 

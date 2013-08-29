@@ -38,6 +38,8 @@ import org.pm4j.common.util.collection.ListUtil;
  *
  * @author olaf boede
  */
+// TODO oboede: remove Serializable form the signature. It makes generics declaration all usages too complex.
+// In addition there may be use cases that don't need serialization of keys at all.
 public class PageableQueryCollection<T_ITEM, T_ID extends Serializable> extends PageableCollectionBase2<T_ITEM> {
 
   final PageableQueryService<T_ITEM, T_ID>                  service;

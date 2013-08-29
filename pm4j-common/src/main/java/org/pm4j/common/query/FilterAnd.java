@@ -17,9 +17,6 @@ import org.pm4j.common.util.CompareUtil;
  */
 public class FilterAnd implements FilterExpression {
 
-  private static final long serialVersionUID = 1L;
-  private List<FilterExpression> expressions;
-
   /**
    * A static helper method that joins the given set of expressions to an and-combined expression.
    *
@@ -35,6 +32,19 @@ public class FilterAnd implements FilterExpression {
       return new FilterAnd(expressions);
     }
   }
+
+  /**
+   * A static helper method that joins the given set of expressions to an and-combined expression.
+   *
+   * @param expressions a set of expressions. May be empty.
+   * @return the resulting expression. May be <code>null</code> if the given parameter was empty or <code>null</code>.
+   */
+  public static FilterExpression joinToAnd(FilterExpression... expressions) {
+    return joinToAnd(Arrays.asList(expressions));
+  }
+
+  private static final long serialVersionUID = 1L;
+  private List<FilterExpression> expressions;
 
   public FilterAnd(FilterExpression... expressions) {
     this(Arrays.asList(expressions));
