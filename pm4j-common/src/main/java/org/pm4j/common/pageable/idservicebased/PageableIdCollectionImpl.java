@@ -33,7 +33,7 @@ public class PageableIdCollectionImpl<T_ITEM, T_ID> extends PageableCollectionBa
   };
 
   public PageableIdCollectionImpl(PageableIdService<T_ITEM, T_ID> service, QueryParams query) {
-    super(null, query);
+    super(service.getQueryOptions(), query);
     assert service != null;
 
     this.service = service;
@@ -147,7 +147,7 @@ public class PageableIdCollectionImpl<T_ITEM, T_ID> extends PageableCollectionBa
         currentPageItems = null;
         QueryParams queryParams = getQueryParams();
         ids = queryParams.isExecQuery()
-            ? service.findIds(queryParams)
+            ? service.findIds(queryParams, 0, Integer.MAX_VALUE)
             // In no-exec case: an unmodifyable collection.
             : Collections.EMPTY_LIST;
       }
