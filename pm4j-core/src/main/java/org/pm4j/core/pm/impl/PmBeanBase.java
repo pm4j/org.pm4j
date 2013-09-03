@@ -33,7 +33,7 @@ import org.pm4j.core.util.reflection.ReflectionException;
 public abstract class PmBeanBase<T_BEAN>
       extends PmElementBase
       implements PmBean<T_BEAN> {
-  
+
   /** Logger of this class. */
   private final static Log LOG = LogFactory.getLog(PmBeanBase.class);
 
@@ -368,21 +368,24 @@ public abstract class PmBeanBase<T_BEAN>
     // evaluate myMetaData.beanClass
     {
       // evaluate bean class from annotation PmBeanCfg
-      Class<?> beanClassFromAnnotation = annotation != null ? annotation.beanClass() : null; 
-  
+      Class<?> beanClassFromAnnotation = annotation != null ? annotation.beanClass() : null;
+
       // evaluate bean class from type of generic parameter of PmBean
       // Class<?> beanClassFromGeneric = ClassUtil.findFirstGenericParameterOfInterface(PmBean.class, this.getClass());
       Class<?> beanClassFromGeneric = TypeResolver.resolveRawArgument(PmBean.class, this.getClass());
-      
+
       if (beanClassFromAnnotation != null && beanClassFromGeneric != Unknown.class) {
         // annotation parameter PmBeanCfg.beanClass shall override generic parameter of interface PmBean
         myMetaData.beanClass = beanClassFromAnnotation;
-        
+
         // if PmBeanCfg.beanClass is not assignable from PmBean.genericParameter, throw PmRuntimeException
         if (!beanClassFromGeneric.isAssignableFrom(beanClassFromAnnotation)) {
-          throw new PmRuntimeException(this, ": PmBeanCfg.beanClass " + beanClassFromGeneric.getSimpleName()
+          // FIXME oboede: is disabled to be able to deliversomething.
+          // Needs to be reactivated asap.
+          LOG.error(PmUtil.getPmLogString(this) + ": PmBeanCfg.beanClass " + beanClassFromGeneric.getSimpleName()
               + " is not assignable from PmBean.genericParameter " + beanClassFromAnnotation.getSimpleName());
-
+//          throw new PmRuntimeException(this, ": PmBeanCfg.beanClass " + beanClassFromGeneric.getSimpleName()
+//              + " is not assignable from PmBean.genericParameter " + beanClassFromAnnotation.getSimpleName());
         } else if (!beanClassFromAnnotation.equals(beanClassFromGeneric)) {
           // if PmBeanCfg.beanClass and PmBean.genericParameter are assignable, but of different type, log debug
           if (LOG.isDebugEnabled()) {
@@ -390,25 +393,25 @@ public abstract class PmBeanBase<T_BEAN>
                 + " is assignable from PmBean.genericParameter " + beanClassFromAnnotation.getSimpleName() + ", but of different type");
           }
         }
-        
+
       } else if (beanClassFromAnnotation != null && beanClassFromGeneric == Unknown.class) {
         // take bean class from PmBeanCfg.beanClass
         myMetaData.beanClass = beanClassFromAnnotation;
 
         // if PmBean.genericParameter is unknown, log warning
         LOG.warn(this.toString() + ": PmBean.genericParameter is unknown");
-        
+
       } else if (beanClassFromAnnotation == null && beanClassFromGeneric != Unknown.class) {
         // if PmBeanCfg.beanClass is Void, take bean class from PmBean.genericParameter
         myMetaData.beanClass = beanClassFromGeneric;
-        
+
       } else if (beanClassFromAnnotation == null && beanClassFromGeneric == Unknown.class) {
         // if PmBeanCfg.beanClass is Void and PmBean.genericParameter is unknown, throw PmRuntimeException
         throw new PmRuntimeException(this, "PmBeanCfg.beanClass and PmBean.genericParameter are both unknown");
       }
     }
     // myMetaData.beanClass is defined now
-    
+
     // create BeanAttrAccessor
     if (annotation != null) {
       myMetaData.autoCreateBean = annotation.autoCreateBean();
