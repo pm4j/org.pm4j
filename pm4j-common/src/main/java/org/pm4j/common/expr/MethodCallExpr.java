@@ -30,7 +30,8 @@ public class MethodCallExpr
   private Expression[] paramExpressions = {};
   private Class<?>[] paramTypes = {};
 
-  private MethodCallExpr(NameWithModifier nameWithModifier, Collection<Expression> paramExprList) {
+  private MethodCallExpr(ParseCtxt ctxt, NameWithModifier nameWithModifier, Collection<Expression> paramExprList) {
+    super(ctxt);
     this.nameWithModifier = nameWithModifier.clone();
 
     int paramCount = paramExprList.size();
@@ -93,7 +94,7 @@ public class MethodCallExpr
       }
     }
 
-    return new MethodCallExpr(n, paramList);
+    return new MethodCallExpr(ctxt, n, paramList);
   }
 
 
@@ -182,14 +183,14 @@ public class MethodCallExpr
       } catch (NoSuchMethodException e) {
       	// Property does not exist. Check if that's ok.
       	// Consider the old meaning of 'o' which also worked like an 'x'.
-    	  if(ParseCtxt.getSyntaxVersion() == SyntaxVersion.VERSION_1) {
+    	  if(getSyntaxVersion() == SyntaxVersion.VERSION_1) {
               if (!(hasNameModifier(Modifier.OPTIONAL) || hasNameModifier(Modifier.EXISTS_OPTIONALLY))) {
                   throw new ExprExecExeption(ctxt, "Method '" + nameWithModifier.getName() + "' not found in class: " + objClass.getName());
                 }
           } else {
               if (!hasNameModifier(Modifier.EXISTS_OPTIONALLY)) {
                   throw new ExprExecExeption(ctxt, "Method '" + nameWithModifier.getName() + "' not found in class: " + objClass.getName());
-                }        	
+                }
           }
           return null;
       }

@@ -2,6 +2,7 @@ package org.pm4j.core.pm.impl.pathresolver;
 
 import junit.framework.TestCase;
 
+import org.pm4j.common.expr.Expression.SyntaxVersion;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.impl.PmConversationImpl;
 
@@ -27,12 +28,16 @@ public class PathComparatorFactoryTest extends TestCase {
 
   // XXX olaf: split in a method per test case
   public void testComparePath() {
-    assertEquals(-1, PathComparatorFactory.parse("child.s1").getComparator(pm).compare(a1a, a2));
-    assertEquals(1, PathComparatorFactory.parse("child.s1 desc").getComparator(pm).compare(a1a, a2));
-    assertEquals(0, PathComparatorFactory.parse("child.s1").getComparator(pm).compare(a1a, a1b));
-    assertEquals(-1, PathComparatorFactory.parse("child.s1, child.s2").getComparator(pm).compare(a1a, a1b));
-    assertEquals(1, PathComparatorFactory.parse("child.s1, child.s2 desc").getComparator(pm).compare(a1a, a1b));
-    assertEquals(1, PathComparatorFactory.parse("s1, child.s1, child.s2 desc").getComparator(pm).compare(a1a, a1b));
+    assertEquals(-1, parse("child.s1").getComparator(pm).compare(a1a, a2));
+    assertEquals(1, parse("child.s1 desc").getComparator(pm).compare(a1a, a2));
+    assertEquals(0, parse("child.s1").getComparator(pm).compare(a1a, a1b));
+    assertEquals(-1, parse("child.s1, child.s2").getComparator(pm).compare(a1a, a1b));
+    assertEquals(1, parse("child.s1, child.s2 desc").getComparator(pm).compare(a1a, a1b));
+    assertEquals(1, parse("s1, child.s1, child.s2 desc").getComparator(pm).compare(a1a, a1b));
+  }
+
+  private PathComparatorFactory parse(String s) {
+    return PathComparatorFactory.parse(s, SyntaxVersion.VERSION_2);
   }
 
 }

@@ -3,6 +3,7 @@ package org.pm4j.core.pm.impl.pathresolver;
 import org.apache.commons.lang.StringUtils;
 import org.pm4j.common.expr.ExprExecCtxt;
 import org.pm4j.common.expr.Expression;
+import org.pm4j.common.expr.Expression.SyntaxVersion;
 import org.pm4j.common.expr.parser.ParseCtxt;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.impl.expr.PathExpressionChain;
@@ -22,51 +23,26 @@ public class PmExpressionPathResolver extends PathResolverBase {
 
   /**
    * @param exprString The string to parse.
+   * @param syntaxVersion The expression syntax version to use.
    */
-  public static PathResolver parse(String exprString) {
+  public static PathResolver parse(String exprString, SyntaxVersion syntaxVersion) {
     return StringUtils.isEmpty(exprString)
             ? PassThroughPathResolver.INSTANCE
-            : new PmExpressionPathResolver(exprString, true);
+            : new PmExpressionPathResolver(PathExpressionChain.parse(exprString, syntaxVersion), syntaxVersion);
   }
 
   /**
-   * @param exprString The string to parse.
-   * @param isStartAttrAllowed
-   *          Defines if the first expression part may address a field.
-   *          <p>
-   *          Is used to prevent initialization loops for injected fields that
-   *          use the name of a referenced variable.
+   * @param parseCtxt The parse string context.
    */
-  public static PathResolver parse(String exprString, boolean isStartAttrAllowed) {
-    return StringUtils.isEmpty(exprString)
-            ? PassThroughPathResolver.INSTANCE
-            : new PmExpressionPathResolver(exprString, isStartAttrAllowed);
-  }
-
-  public static PathResolver parse(ParseCtxt parseCtxt, boolean isStartAttrAllowed) {
+  public static PathResolver parse(ParseCtxt parseCtxt) {
     parseCtxt.skipBlanks();
     return parseCtxt.isDone()
             ? PassThroughPathResolver.INSTANCE
-            : new PmExpressionPathResolver(parseCtxt, isStartAttrAllowed);
+            : new PmExpressionPathResolver(PathExpressionChain.parse(parseCtxt), parseCtxt.getSyntaxVersion());
   }
 
-  /**
-   * @param exprString The string to parse.
-   * @param isStartAttrAllowed
-   *          Defines if the first expression part may address a field.
-   *          <p>
-   *          Is used to prevent initializaion loops for injected fields that
-   *          use the name of a referenced variable.
-   */
-  protected PmExpressionPathResolver(String exprString, boolean isStartAttrAllowed) {
-    this(PathExpressionChain.parse(exprString, isStartAttrAllowed));
-  }
-
-  protected PmExpressionPathResolver(ParseCtxt parseCtxt, boolean isStartAttrAllowed) {
-    this(PathExpressionChain.parse(parseCtxt, isStartAttrAllowed));
-  }
-
-  protected PmExpressionPathResolver(Expression expression) {
+  protected PmExpressionPathResolver(Expression expression, SyntaxVersion syntaxVersion) {
+    super(syntaxVersion);
     this.expression = expression;
   }
 

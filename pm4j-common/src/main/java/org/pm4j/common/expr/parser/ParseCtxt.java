@@ -4,32 +4,54 @@ import org.apache.commons.lang.StringUtils;
 import org.pm4j.common.expr.Expression.SyntaxVersion;
 
 /**
- * Parse context for expression context.
+ * A context object for expression parse operations.
+ * <p>
+ * Provides the string to parse as well as the current parse position and some other parse information.
+ *
+ * @author olaf boede
  */
 public class ParseCtxt {
 
-  public static SyntaxVersion syntaxVersion = SyntaxVersion.VERSION_1;
+  /** The expression syntax version to apply within the parse operation. */
+  private final SyntaxVersion syntaxVersion;
 
-	/** The text to parse. */
-	private String text;
+  /** The text to parse. */
+  private String text;
 
-	/** The current parse position within the {@link #text}. Starts with <code>0</code>. */
-	private int pos;
+  /**
+   * The current parse position within the {@link #text}. Starts with
+   * <code>0</code>.
+   */
+  private int pos;
 
-	/**
-	 * @param text the text to parse.
-	 */
-	public ParseCtxt(String text) {
-		this.text = StringUtils.defaultString(text);
-		this.pos = 0;
-	}
+  /**
+   * @param text
+   *          the text to parse.
+   */
+  public ParseCtxt(String text) {
+    this(text, SyntaxVersion.VERSION_2);
+  }
 
-	/**
-	 * @return <code>true</code> if ({link {@link #pos}) reached the end of the text.
-	 */
-	public final boolean isDone() {
-		return pos >= text.length();
-	}
+  /**
+   * @param text
+   *          the text to parse.
+   * @param syntaxVersion the expression syntax version to use.
+   */
+  public ParseCtxt(String text, SyntaxVersion syntaxVersion) {
+    assert syntaxVersion != null;
+
+    this.text = StringUtils.defaultString(text);
+    this.syntaxVersion = syntaxVersion;
+    this.pos = 0;
+  }
+
+  /**
+   * @return <code>true</code> if ({link {@link #pos}) reached the end of the
+   *         text.
+   */
+  public final boolean isDone() {
+    return pos >= text.length();
+  }
 
   /**
    * @param ch the character to skip.
@@ -253,8 +275,7 @@ public class ParseCtxt {
 	/**
 	 * @return Die Syntax version.
 	 */
-	public static SyntaxVersion getSyntaxVersion()
-	{
+	public SyntaxVersion getSyntaxVersion()	{
 	  return syntaxVersion;
 	}
 

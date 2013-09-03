@@ -17,7 +17,7 @@ public abstract class PathResolverTest extends TestCase {
    */
   public void testReadFlatFromPojo() {
     Pojo p = new Pojo("head");
-    Expression expr = PathExpressionChain.parse("name", true);
+    Expression expr = PathExpressionChain.parse("name");
     assertEquals("head", expr.exec(new ExprExecCtxt(p)));
   }
 
@@ -26,7 +26,7 @@ public abstract class PathResolverTest extends TestCase {
    */
   public void testWriteFlatToPojoPath() {
     Pojo p = new Pojo("head");
-    Expression expr = PathExpressionChain.parse("name", true);
+    Expression expr = PathExpressionChain.parse("name");
     expr.execAssign(new ExprExecCtxt(p), "NewHead");
     assertEquals("NewHead", p.name);
   }
@@ -36,7 +36,7 @@ public abstract class PathResolverTest extends TestCase {
    */
   public void testReadHierarchicalFromPojoPath() {
     Pojo p = Pojo.make("head", "sub", "subSub");
-    Expression expr = PathExpressionChain.parse("sub.sub.name", true);
+    Expression expr = PathExpressionChain.parse("sub.sub.name");
     assertEquals("subSub", expr.exec(new ExprExecCtxt(p)));
   }
 
@@ -45,7 +45,7 @@ public abstract class PathResolverTest extends TestCase {
    */
   public void testWriteHierarchicalToPojoPath() {
     Pojo p = Pojo.make("head", "subName", "subSubName");
-    Expression expr = PathExpressionChain.parse("sub.sub.name", true);
+    Expression expr = PathExpressionChain.parse("sub.sub.name");
     expr.execAssign(new ExprExecCtxt(p), "newValue");
     assertEquals("newValue", p.sub.sub.name);
   }
@@ -56,7 +56,7 @@ public abstract class PathResolverTest extends TestCase {
    */
   public void testWriteHierarchicalToPojoPathWithMissingElement() {
     Pojo p = Pojo.make("head", "subName");
-    Expression expr = PathExpressionChain.parse("sub.sub.name", true);
+    Expression expr = PathExpressionChain.parse("sub.sub.name");
     try {
       expr.execAssign(new ExprExecCtxt(p), "newValue");
       fail();
@@ -71,7 +71,7 @@ public abstract class PathResolverTest extends TestCase {
    */
   public void testWriteHierarchicalToOptionalNotExistingPojoPath() {
     Pojo p = Pojo.make("head", "subName");
-    Expression expr = PathExpressionChain.parse("sub.(o)sub.name", true);
+    Expression expr = PathExpressionChain.parse("sub.(o)sub.name");
     expr.execAssign(new ExprExecCtxt(p), "newValue");
     assertEquals("subName", p.sub.name);
   }
@@ -84,7 +84,7 @@ public abstract class PathResolverTest extends TestCase {
   public void testReadFromPmConversationObject() {
     PmConversation pmConversation = new PmConversationImpl();
     pmConversation.setPmNamedObject("myProp", Pojo.make("head", "subName", "subSubName"));
-    Expression expr = PathExpressionChain.parse("#myProp.sub.sub.name", true);
+    Expression expr = PathExpressionChain.parse("#myProp.sub.sub.name");
     assertEquals("subSubName", expr.exec(new PmExprExecCtxt(pmConversation)));
   }
 
@@ -95,7 +95,7 @@ public abstract class PathResolverTest extends TestCase {
     Pojo p = Pojo.make("head");
     PmConversation pmConversation = new PmConversationImpl();
     pmConversation.setPmNamedObject("myProp", p);
-    Expression expr = PathExpressionChain.parse("#myProp.(o)sub.name", true);
+    Expression expr = PathExpressionChain.parse("#myProp.(o)sub.name");
     assertNull(expr.exec(new PmExprExecCtxt(pmConversation)));
   }
 
@@ -106,7 +106,7 @@ public abstract class PathResolverTest extends TestCase {
     Pojo p = Pojo.make("head", "subName");
     PmConversation pmConversation = new PmConversationImpl();
     pmConversation.setPmNamedObject("myProp", p);
-    Expression expr = PathExpressionChain.parse("#myProp.(o)sub.name", true);
+    Expression expr = PathExpressionChain.parse("#myProp.(o)sub.name");
     assertEquals("subName", expr.exec(new PmExprExecCtxt(pmConversation)));
   }
 
@@ -117,7 +117,7 @@ public abstract class PathResolverTest extends TestCase {
     Pojo p = Pojo.make("head");
     PmConversation pmConversation = new PmConversationImpl();
     pmConversation.setPmNamedObject("myProp", p);
-    Expression expr = PathExpressionChain.parse("#myProp.(o)getSubMethod().name", true);
+    Expression expr = PathExpressionChain.parse("#myProp.(o)getSubMethod().name");
     assertNull(expr.exec(new PmExprExecCtxt(pmConversation)));
   }
 
@@ -128,7 +128,7 @@ public abstract class PathResolverTest extends TestCase {
     Pojo p = Pojo.make("head", "subName");
     PmConversation pmConversation = new PmConversationImpl();
     pmConversation.setPmNamedObject("myProp", p);
-    Expression expr = PathExpressionChain.parse("#myProp.(o)getSubMethod().name", true);
+    Expression expr = PathExpressionChain.parse("#myProp.(o)getSubMethod().name");
     assertEquals("subName", expr.exec(new PmExprExecCtxt(pmConversation)));
   }
 
@@ -139,7 +139,7 @@ public abstract class PathResolverTest extends TestCase {
     Pojo p = Pojo.make("head", "subName");
     PmConversation pmConversation = new PmConversationImpl();
     pmConversation.setPmNamedObject("myProp", p);
-    Expression expr = PathExpressionChain.parse("#myProp.(x)getSubMethod().name", true);
+    Expression expr = PathExpressionChain.parse("#myProp.(x)getSubMethod().name");
     assertEquals("subName", expr.exec(new PmExprExecCtxt(pmConversation)));
   }
 
@@ -151,7 +151,7 @@ public abstract class PathResolverTest extends TestCase {
     Pojo p = Pojo.make("head", "subName");
     PmConversation pmConversation = new PmConversationImpl();
     pmConversation.setPmNamedObject("myProp", p);
-    Expression expr = PathExpressionChain.parse("#myProp.(x)getNotExistingMethod().notExistingField", true);
+    Expression expr = PathExpressionChain.parse("#myProp.(x)getNotExistingMethod().notExistingField");
     assertNull(expr.exec(new PmExprExecCtxt(pmConversation)));
   }
 
@@ -162,7 +162,7 @@ public abstract class PathResolverTest extends TestCase {
     Pojo p = Pojo.make("head", "subName");
     PmConversation pmConversation = new PmConversationImpl();
     pmConversation.setPmNamedObject("myProp", p);
-    Expression expr = PathExpressionChain.parse("#myProp.getNotExistingMethod()", true);
+    Expression expr = PathExpressionChain.parse("#myProp.getNotExistingMethod()");
     try {
       expr.exec(new PmExprExecCtxt(pmConversation));
       fail();
@@ -179,7 +179,7 @@ public abstract class PathResolverTest extends TestCase {
     Pojo p = Pojo.make("head");
     PmConversation pmConversation = new PmConversationImpl();
     pmConversation.setPmNamedObject("myProp", p);
-    Expression expr = PathExpressionChain.parse("#myProp.(o)getSubMethod().name", true);
+    Expression expr = PathExpressionChain.parse("#myProp.(o)getSubMethod().name");
     assertNull(expr.exec(new PmExprExecCtxt(pmConversation)));
   }
 
@@ -190,7 +190,7 @@ public abstract class PathResolverTest extends TestCase {
    */
   public void testReadFlatOptionalFieldWithNullValue() {
     Pojo p = new Pojo(null);
-    Expression expr = PathExpressionChain.parse("(o)name", true);
+    Expression expr = PathExpressionChain.parse("(o)name");
     assertNull(expr.exec(new ExprExecCtxt(p)));
   }
 
@@ -199,7 +199,7 @@ public abstract class PathResolverTest extends TestCase {
    */
   public void testReadOptionalHierarchicalField() {
     Pojo p = Pojo.make("head", "subName");
-    Expression expr = PathExpressionChain.parse("sub.(o)name", true);
+    Expression expr = PathExpressionChain.parse("sub.(o)name");
     assertEquals("subName", expr.exec(new ExprExecCtxt(p)));
   }
 
@@ -208,7 +208,7 @@ public abstract class PathResolverTest extends TestCase {
    */
   public void testReadOptionalHierarchicalUnsetField() {
     Pojo p = Pojo.make("head", "subName");
-    Expression expr = PathExpressionChain.parse("sub.(o)sub.name", true);
+    Expression expr = PathExpressionChain.parse("sub.(o)sub.name");
     assertNull(expr.exec(new ExprExecCtxt(p)));
   }
 
@@ -218,7 +218,7 @@ public abstract class PathResolverTest extends TestCase {
    */
   public void testReadOptionalExistingWhichIsNotExistingField() {
     Pojo p = Pojo.make("head", "subName");
-    Expression expr = PathExpressionChain.parse("sub.(x)notExistingField", true);
+    Expression expr = PathExpressionChain.parse("sub.(x)notExistingField");
     assertNull(expr.exec(new ExprExecCtxt(p)));
   }
 
@@ -228,7 +228,7 @@ public abstract class PathResolverTest extends TestCase {
    */
   public void testReadOptionalExistingWhichIsNotExistingFieldWithMethodCall() {
     Pojo p = Pojo.make("head", "subName");
-    Expression expr = PathExpressionChain.parse("sub.(x)notExistingField.getNotExisting()", true);
+    Expression expr = PathExpressionChain.parse("sub.(x)notExistingField.getNotExisting()");
     assertNull(expr.exec(new ExprExecCtxt(p)));
   }
 
@@ -238,7 +238,7 @@ public abstract class PathResolverTest extends TestCase {
    */
   public void testReadOptionalExistingOptionalFieldWhichIsNotExistingField() {
     Pojo p = Pojo.make("head", "subName");
-    Expression expr = PathExpressionChain.parse("sub.(x,o)sub.name", true);
+    Expression expr = PathExpressionChain.parse("sub.(x,o)sub.name");
     assertNull(expr.exec(new ExprExecCtxt(p)));
   }
 
@@ -247,7 +247,7 @@ public abstract class PathResolverTest extends TestCase {
    */
   public void testReadOptionalWithDifferentOrder() {
     Pojo p = Pojo.make("head", "subName");
-    Expression expr = PathExpressionChain.parse("sub.(o,x)sub.name", true);
+    Expression expr = PathExpressionChain.parse("sub.(o,x)sub.name");
     assertNull(expr.exec(new ExprExecCtxt(p)));
   }
 
@@ -257,7 +257,7 @@ public abstract class PathResolverTest extends TestCase {
    */
   public void testReadOptionalExistingOptionalFieldWhichIsExistingField() {
     Pojo p = Pojo.make("head", "subName", "subSubName");
-    Expression expr = PathExpressionChain.parse("sub.(x,o)sub.name", true);
+    Expression expr = PathExpressionChain.parse("sub.(x,o)sub.name");
     assertEquals("subSubName", expr.exec(new ExprExecCtxt(p)));
   }
 
@@ -267,7 +267,7 @@ public abstract class PathResolverTest extends TestCase {
    */
   public void testReadOptionalAndNonExistingFieldPrventNpe() {
     Pojo p = Pojo.make("head", "subName");
-    Expression expr = PathExpressionChain.parse("sub.(o)sub.name", true);
+    Expression expr = PathExpressionChain.parse("sub.(o)sub.name");
     assertNull(expr.exec(new ExprExecCtxt(p)));
   }
 
@@ -277,7 +277,7 @@ public abstract class PathResolverTest extends TestCase {
    */
   public void testCallMethodAndReadExistingAttribut() {
     Pojo p = Pojo.make("head", "subName");
-    Expression expr = PathExpressionChain.parse("getSubMethod().name", true);
+    Expression expr = PathExpressionChain.parse("getSubMethod().name");
     assertEquals("subName", expr.exec(new ExprExecCtxt(p)));
   }
 
@@ -287,7 +287,7 @@ public abstract class PathResolverTest extends TestCase {
    */
   public void testCallsAChainedMethodAndReadExistingAttribut() {
     Pojo p = Pojo.make("head", "subName", "subSubName");
-    Expression expr = PathExpressionChain.parse("getSubMethod().getSubMethod().name", true);
+    Expression expr = PathExpressionChain.parse("getSubMethod().getSubMethod().name");
     assertEquals("subSubName", expr.exec(new ExprExecCtxt(p)));
   }
 
@@ -299,7 +299,7 @@ public abstract class PathResolverTest extends TestCase {
    */
   public void testCallsAChainedMethodAndReadExistingAttribut2() {
     Pojo p = Pojo.make("head", "subName");
-    Expression expr = PathExpressionChain.parse("getSubMethod().(o)getSubMethod().name", true);
+    Expression expr = PathExpressionChain.parse("getSubMethod().(o)getSubMethod().name");
     assertNull(expr.exec(new ExprExecCtxt(p)));
   }
 
@@ -309,7 +309,7 @@ public abstract class PathResolverTest extends TestCase {
    */
   public void testCallMethodAndReadExistingAttributWithNullValue() {
     Pojo p = Pojo.make("head", null);
-    Expression expr = PathExpressionChain.parse("getSubMethod().name", true);
+    Expression expr = PathExpressionChain.parse("getSubMethod().name");
     assertNull(expr.exec(new ExprExecCtxt(p)));
   }
 
@@ -318,7 +318,7 @@ public abstract class PathResolverTest extends TestCase {
    */
   public void testCallOptionalExistingMethod() {
     Pojo p = Pojo.make("head");
-    Expression expr = PathExpressionChain.parse("(x)nonExistingMethod().name", true);
+    Expression expr = PathExpressionChain.parse("(x)nonExistingMethod().name");
     assertNull(expr.exec(new ExprExecCtxt(p)));
   }
 
@@ -328,7 +328,7 @@ public abstract class PathResolverTest extends TestCase {
    */
   public void testCallNotExistingOptionalOrOptionalExistingMethod() {
     Pojo p = Pojo.make("head");
-    Expression expr = PathExpressionChain.parse("(x,o)nonExistingMethod().name", true);
+    Expression expr = PathExpressionChain.parse("(x,o)nonExistingMethod().name");
     assertNull(expr.exec(new ExprExecCtxt(p)));
   }
 
@@ -338,7 +338,7 @@ public abstract class PathResolverTest extends TestCase {
    */
   public void testCallExistingOptionalMethod() {
     Pojo p = Pojo.make("head");
-    Expression expr = PathExpressionChain.parse("(x,o)getSubMethod().name", true);
+    Expression expr = PathExpressionChain.parse("(x,o)getSubMethod().name");
     assertNull(expr.exec(new ExprExecCtxt(p)));
   }
 
@@ -347,7 +347,7 @@ public abstract class PathResolverTest extends TestCase {
    * object.
    */
   public void testCallMethodWithParam() {
-    Expression expr = PathExpressionChain.parse("addAPlus(this.name)", true);
+    Expression expr = PathExpressionChain.parse("addAPlus(this.name)");
     assertEquals("myName+", expr.exec(new ExprExecCtxt(new Pojo("myName"))));
   }
 
@@ -356,7 +356,7 @@ public abstract class PathResolverTest extends TestCase {
    */
   public void testConcatStrings() {
     Expression expr = PathExpressionChain.parse(
-        "'Name of head instance: ' + name + '. Name of sub instance: ' + sub.name + '.'", true);
+        "'Name of head instance: ' + name + '. Name of sub instance: ' + sub.name + '.'");
     assertEquals("Name of head instance: head. Name of sub instance: sub.",
         expr.exec(new ExprExecCtxt(Pojo.make("head", "sub"))));
   }

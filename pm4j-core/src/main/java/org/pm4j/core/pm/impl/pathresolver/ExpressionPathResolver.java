@@ -3,6 +3,7 @@ package org.pm4j.core.pm.impl.pathresolver;
 import org.apache.commons.lang.StringUtils;
 import org.pm4j.common.expr.ExprExecCtxt;
 import org.pm4j.common.expr.Expression;
+import org.pm4j.common.expr.Expression.SyntaxVersion;
 import org.pm4j.core.pm.impl.expr.PathExpressionChain;
 
 /**
@@ -14,18 +15,19 @@ public class ExpressionPathResolver extends PathResolverBase {
 
   private final Expression expression;
 
-  public static PathResolver parse(String exprString) {
+  public static PathResolver parse(String exprString, SyntaxVersion syntaxVersion) {
     return StringUtils.isEmpty(exprString)
-            ? PassThroughPathResolver.INSTANCE
-            : new ExpressionPathResolver(exprString);
+        ? PassThroughPathResolver.INSTANCE
+        : new ExpressionPathResolver(syntaxVersion, exprString);
   }
 
-  protected ExpressionPathResolver(String exprString) {
-    this(PathExpressionChain.parse(exprString, true /* allow attribute access in start expression */ ));
+  public static PathResolver parse(String exprString) {
+    return parse(exprString, SyntaxVersion.VERSION_2);
   }
 
-  protected ExpressionPathResolver(Expression expression) {
-    this.expression = expression;
+  protected ExpressionPathResolver(SyntaxVersion syntaxVersion, String exprString) {
+    super(syntaxVersion);
+    this.expression = PathExpressionChain.parse(exprString, syntaxVersion);
   }
 
   @Override

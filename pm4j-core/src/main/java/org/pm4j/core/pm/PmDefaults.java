@@ -3,6 +3,7 @@ package org.pm4j.core.pm;
 import java.util.Arrays;
 
 import org.pm4j.common.exception.CheckedExceptionWrapper;
+import org.pm4j.common.expr.Expression.SyntaxVersion;
 import org.pm4j.common.query.FilterCompareDefinitionFactory;
 import org.pm4j.core.pm.annotation.PmCommandCfg;
 import org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO;
@@ -120,6 +121,11 @@ public class PmDefaults implements Cloneable {
       new DiResolverFactoryPmInjectSetterByParentOfType()
   };
 
+  /**
+   * The expression syntax may be configured here globally or per conversation.
+   */
+  private SyntaxVersion expressionSyntaxVersion = SyntaxVersion.VERSION_2;
+
   // TODO olaf: add something to the command that allows to configure that. - An application default may also be useful...
 //  /**
 //   * Defines if the application supports commands that can be undone.
@@ -134,7 +140,7 @@ public class PmDefaults implements Cloneable {
   private boolean elementsInheritAnnotationsOnlyFromSession = false;
 
   @Override
-  protected PmDefaults clone() {
+  public PmDefaults clone() {
     try {
       return (PmDefaults) super.clone();
     } catch (CloneNotSupportedException e) {
@@ -260,6 +266,20 @@ public class PmDefaults implements Cloneable {
 
   public void setFilterCompareDefinitionFactory(FilterCompareDefinitionFactory filterCompareDefinitionFactory) {
     this.filterCompareDefinitionFactory = filterCompareDefinitionFactory;
+  }
+
+  /**
+   * @return the expressionSyntaxVersion
+   */
+  public SyntaxVersion getExpressionSyntaxVersion() {
+    return expressionSyntaxVersion;
+  }
+
+  /**
+   * @param expressionSyntaxVersion the expressionSyntaxVersion to set
+   */
+  public void setExpressionSyntaxVersion(SyntaxVersion expressionSyntaxVersion) {
+    this.expressionSyntaxVersion = expressionSyntaxVersion;
   }
 
 }

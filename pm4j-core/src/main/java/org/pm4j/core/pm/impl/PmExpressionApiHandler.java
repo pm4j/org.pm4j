@@ -4,6 +4,7 @@ import org.apache.commons.lang.StringUtils;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.PmObject;
+import org.pm4j.core.pm.api.PmExpressionApi;
 import org.pm4j.core.pm.impl.pathresolver.PathResolver;
 import org.pm4j.core.pm.impl.pathresolver.PmExpressionPathResolver;
 import org.pm4j.navi.NaviHistoryNamedObjectResolver;
@@ -22,7 +23,7 @@ public class PmExpressionApiHandler {
 
     PathResolver pr = PmExpressionPathResolver.parse(
                           expression,
-                          true /* allow that the first expression part addresses an attribute of the given pm. */ );
+                          PmExpressionApi.getSyntaxVersion(pm));
     return pr.getValue(pm);
   }
 

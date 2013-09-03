@@ -23,11 +23,13 @@ public class PathExpressionChain extends ExprBase<ExprExecCtxt> {
 
   private OptionalExpression[] chain;
 
-  public PathExpressionChain(List<OptionalExpression> exprChain) {
+  public PathExpressionChain(ParseCtxt ctxt, List<OptionalExpression> exprChain) {
+    super(ctxt);
     this.chain = exprChain.toArray(new OptionalExpression[exprChain.size()]);
   }
 
-  public PathExpressionChain(OptionalExpression... chain) {
+  protected PathExpressionChain(SyntaxVersion syntaxVersion, OptionalExpression... chain) {
+    super(syntaxVersion);
     this.chain = chain;
   }
 
@@ -88,7 +90,7 @@ public class PathExpressionChain extends ExprBase<ExprExecCtxt> {
   // if it fails: try to repeat r...
   private ExprExecCtxt evalRepeated(ExprExecCtxt ctxt, OptionalExpression repeatedExpr, OptionalExpression[] restChain) {
     try {
-      PathExpressionChain restPathExprChain = new PathExpressionChain(restChain);
+      PathExpressionChain restPathExprChain = new PathExpressionChain(getSyntaxVersion(), restChain);
       ExprExecCtxt clonedCtxt = ctxt.clone();
       restPathExprChain.exec(clonedCtxt);
       return clonedCtxt;
@@ -115,20 +117,25 @@ public class PathExpressionChain extends ExprBase<ExprExecCtxt> {
 
   /**
    * @param s The string to parse.
-   * @param isStartAttrAllowed
-   *          Defines if the first expression part may address a field.
-   *          <p>
-   *          Is used to prevent initializaion loops for injected fields that
-   *          use the name of a referenced variable.
+   * @param syntaxVersion The syntax version to apply.
+   *
    * @return The parsed expression or <code>null</code> if there was an empty
    *         string to parse.
    */
-  // TODO: boolean parameter seems to be obsolete, since variables are
-  //       addressed explicitely
-  public static Expression parse(String s, boolean isStartAttrAllowed) {
+  public static Expression parse(String s, SyntaxVersion syntaxVersion) {
+    ParseCtxt ctxt = new ParseCtxt(s, syntaxVersion);
     return StringUtils.isEmpty(s)
-                ? ThisExpr.INSTANCE
-                : parse(new ParseCtxt(s), isStartAttrAllowed);
+                ? new ThisExpr(ctxt)
+                : parse(ctxt);
+  }
+
+  /**
+   * @param s The string to parse.
+   * @return The parsed expression or <code>null</code> if there was an empty
+   *         string to parse.
+   */
+  public static Expression parse(String s) {
+    return parse(s, SyntaxVersion.VERSION_2);
   }
 
   public static Expression parse(ParseCtxt ctxt) {
@@ -162,7 +169,7 @@ public class PathExpressionChain extends ExprBase<ExprExecCtxt> {
 
     return (eList.size() == 1)
         ? eList.get(0)
-        : new ConcatExpr(eList);
+        : new ConcatExpr(ctxt, eList);
   }
 
 
@@ -211,7 +218,7 @@ public class PathExpressionChain extends ExprBase<ExprExecCtxt> {
         return startExpr;
       }
       else {
-        return new PathExpressionChain(exprList);
+        return new PathExpressionChain(ctxt, exprList);
       }
     }
     else {

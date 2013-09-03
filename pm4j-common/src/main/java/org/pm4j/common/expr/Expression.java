@@ -19,7 +19,8 @@ public interface Expression {
      * The (o) and (x) modifier have different meanings.
      * The # hash prefix is mandatory for named objects.
      */
-    VERSION_2};
+    VERSION_2
+  };
 
   /**
    * Executes the expression and returns the evaluated result value.

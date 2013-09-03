@@ -1,28 +1,15 @@
 package org.pm4j.core.pm.impl.pathresolver;
 
+import static org.pm4j.common.expr.Expression.SyntaxVersion.VERSION_1;
+
 import org.pm4j.common.expr.ExprExecCtxt;
 import org.pm4j.common.expr.Expression;
-import org.pm4j.common.expr.Expression.SyntaxVersion;
-import org.pm4j.common.expr.parser.ParseCtxt;
 import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.impl.PmConversationImpl;
 import org.pm4j.core.pm.impl.expr.PathExpressionChain;
 import org.pm4j.core.pm.impl.expr.PmExprExecCtxt;
 
 public class PathResolverSyntaxVersion1Test extends PathResolverTest {
-
-  private SyntaxVersion oldVersion;
-
-  @Override
-  public void setUp() {
-    oldVersion = ParseCtxt.syntaxVersion;
-    ParseCtxt.syntaxVersion = SyntaxVersion.VERSION_1;
-  }
-
-  @Override
-  public void tearDown() {
-    ParseCtxt.syntaxVersion = oldVersion;
-  }
 
   /**
    * Reading a named object from PmConversation. Notice the MISSING '#' sign.
@@ -31,7 +18,7 @@ public class PathResolverSyntaxVersion1Test extends PathResolverTest {
   public void testCompatiblityStyleReadFromPmConversationObject() {
     PmConversation pmConversation = new PmConversationImpl();
     pmConversation.setPmNamedObject("myProp", Pojo.make("head", "subName", "subSubName"));
-    Expression expr = PathExpressionChain.parse("myProp.sub.sub.name", true);
+    Expression expr = PathExpressionChain.parse("myProp.sub.sub.name", VERSION_1);
     assertEquals("subSubName", expr.exec(new PmExprExecCtxt(pmConversation)));
   }
 
@@ -40,7 +27,7 @@ public class PathResolverSyntaxVersion1Test extends PathResolverTest {
    */
   public void testCompatibleStyleOptionalField() {
     Pojo p = Pojo.make("head", "subName");
-    Expression expr = PathExpressionChain.parse("sub.(o)notExistingField", true);
+    Expression expr = PathExpressionChain.parse("sub.(o)notExistingField", VERSION_1);
     assertNull(expr.exec(new ExprExecCtxt(p)));
   }
 

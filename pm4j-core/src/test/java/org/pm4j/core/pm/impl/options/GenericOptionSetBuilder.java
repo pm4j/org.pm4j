@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
+import org.pm4j.common.expr.Expression.SyntaxVersion;
 import org.pm4j.core.pm.PmOption;
 import org.pm4j.core.pm.PmOptionSet;
 import org.pm4j.core.pm.annotation.PmOptionCfg;
@@ -83,7 +84,7 @@ class GenericOptionSetBuilder {
     this.nullOptionTitleResKey = StringUtils.defaultIfEmpty(nullOptionTitleResKey, null);
     this.sortComparatorFactory = PmOptionCfg.NO_SORT_SPEC.equals(sortOrderSpec)
           ? null
-          : PathComparatorFactory.parse(sortOrderSpec);
+          : PathComparatorFactory.parse(sortOrderSpec, SyntaxVersion.VERSION_2);
   }
 
   public List<PmOption> makeOptions(final PmAttrBase<?,?> forAttr, Collection<?> objects) {

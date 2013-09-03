@@ -9,13 +9,16 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.pm4j.common.expr.Expression.SyntaxVersion;
 import org.pm4j.common.util.collection.IterableUtil;
 import org.pm4j.core.exception.PmRuntimeException;
+import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmElement;
 import org.pm4j.core.pm.PmOption;
 import org.pm4j.core.pm.PmOptionSet;
 import org.pm4j.core.pm.annotation.PmOptionCfg;
 import org.pm4j.core.pm.annotation.PmOptionCfg.NullOption;
+import org.pm4j.core.pm.api.PmExpressionApi;
 import org.pm4j.core.pm.impl.PmAttrBase;
 import org.pm4j.core.pm.impl.PmUtil;
 import org.pm4j.core.pm.impl.pathresolver.ExpressionPathResolver;
@@ -42,19 +45,20 @@ public abstract class OptionSetDefBase<T_ATTR extends PmAttrBase<?,?>> implement
   protected final PathComparatorFactory sortComparatorFactory;
 
 
-  public OptionSetDefBase(PmOptionCfg cfg, Method getOptionValuesMethod) {
+  public OptionSetDefBase(PmAttr<?> pmAttr, PmOptionCfg cfg, Method getOptionValuesMethod) {
+    SyntaxVersion syntaxVersion = PmExpressionApi.getSyntaxVersion(pmAttr);
     this.optionsPath = StringUtils.isNotBlank(cfg.values())
-        ? PmExpressionPathResolver.parse(cfg.values(), true)
+        ? PmExpressionPathResolver.parse(cfg.values(), syntaxVersion)
         : null;
     this.getOptionValuesMethod = getOptionValuesMethod;
-    this.idPath = ExpressionPathResolver.parse(cfg.id());
-    this.titlePath = ExpressionPathResolver.parse(cfg.title());
-    this.valuePath = ExpressionPathResolver.parse(cfg.value());
+    this.idPath = ExpressionPathResolver.parse(cfg.id(), syntaxVersion);
+    this.titlePath = ExpressionPathResolver.parse(cfg.title(), syntaxVersion);
+    this.valuePath = ExpressionPathResolver.parse(cfg.value(), syntaxVersion);
     this.nullOption = cfg.nullOption();
     this.nullOptionTitleResKey = StringUtils.defaultIfEmpty(cfg.nullOptionResKey(), null);
     this.sortComparatorFactory = PmOptionCfg.NO_SORT_SPEC.equals(cfg.sortBy())
                 ? null
-                : PathComparatorFactory.parse(cfg.sortBy());
+                : PathComparatorFactory.parse(cfg.sortBy(), syntaxVersion);
   }
 
   @Override

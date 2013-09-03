@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.pm4j.core.exception.PmRuntimeException;
+import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmOption;
 import org.pm4j.core.pm.PmOptionSet;
 import org.pm4j.core.pm.annotation.PmOptionCfg;
@@ -56,8 +57,8 @@ public class EnumOptionSetDefWithOptionCfg extends OptionSetDefBase<PmAttrEnumIm
   private final String resKeyPfx;
 
 
-  public EnumOptionSetDefWithOptionCfg(Class<?> enumClass, PmOptionCfg optionCfg, Method getOptionValuesMethod) {
-    super(optionCfg, getOptionValuesMethod);
+  public EnumOptionSetDefWithOptionCfg(PmAttr<?> pmAttr, Class<?> enumClass, PmOptionCfg optionCfg, Method getOptionValuesMethod) {
+    super(pmAttr, optionCfg, getOptionValuesMethod);
     assert enumClass != null;
     assert enumClass.getEnumConstants() != null : "The class must represent an enum definition.";
 

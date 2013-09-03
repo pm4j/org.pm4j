@@ -22,7 +22,7 @@ public class PmInjectTest extends TestCase {
       super(pmParent);
     }
 
-    @PmInject(value="myProp")
+    @PmInject(value="#myProp")
     private String myInjectedProp;
 
     @PmInject
@@ -36,7 +36,7 @@ public class PmInjectTest extends TestCase {
 
     private String setterInjectedProp;
 
-    @PmInject("myProp")
+    @PmInject("#myProp")
     public void setSetterInjectedProp(String s) {
       this.setterInjectedProp = s;
     }

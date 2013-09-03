@@ -1,5 +1,6 @@
 package org.pm4j.core.pm.api;
 
+import org.pm4j.common.expr.Expression.SyntaxVersion;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.PmObject;
@@ -110,6 +111,14 @@ public class PmExpressionApi {
    */
   public static Object findNamedObject(PmObject pm, String objName) {
     return apiHandler.findNamedObject(pm, objName);
+  }
+
+  /**
+   * @param pm The PM to check.
+   * @return The expression syntax version used for the given PM.
+   */
+  public static SyntaxVersion getSyntaxVersion(PmObject pm) {
+    return pm.getPmConversation().getPmDefaults().getExpressionSyntaxVersion();
   }
 
 }

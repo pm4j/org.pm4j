@@ -5,8 +5,8 @@ import org.pm4j.common.expr.ExprExecCtxt;
 import org.pm4j.common.expr.ExprExecExeption;
 import org.pm4j.common.expr.Expression;
 import org.pm4j.common.expr.NameWithModifier;
-import org.pm4j.common.expr.NameWithModifier.Modifier;
 import org.pm4j.common.expr.OptionalExpression;
+import org.pm4j.common.expr.OptionalExpressionBase;
 import org.pm4j.common.expr.parser.ParseCtxt;
 import org.pm4j.core.util.reflection.BeanAttrAccessor;
 import org.pm4j.core.util.reflection.BeanAttrAccessorImpl;
@@ -20,17 +20,16 @@ import org.pm4j.core.util.reflection.ReflectionException;
  *
  * @author olaf boede
  */
-public class PmVariableOrAttributeExpr implements OptionalExpression {
+public class PmVariableOrAttributeExpr extends OptionalExpressionBase<ExprExecCtxt> {
 
-  private final NameWithModifier nameWithModifier;
   private Expression concreteExpr;
 
-  public PmVariableOrAttributeExpr(NameWithModifier nameWithModifier) {
-    this.nameWithModifier = nameWithModifier;
+  public PmVariableOrAttributeExpr(ParseCtxt ctxt, NameWithModifier nameWithModifier) {
+    super(ctxt, nameWithModifier);
   }
 
   @Override
-  public Object exec(ExprExecCtxt ctxt) {
+  protected Object execImpl(ExprExecCtxt ctxt) {
     ensureResolver(ctxt);
     try {
       return concreteExpr.exec(ctxt);
@@ -42,16 +41,11 @@ public class PmVariableOrAttributeExpr implements OptionalExpression {
   }
 
   @Override
-  public void execAssign(ExprExecCtxt ctxt, Object value) {
+  protected void execAssignImpl(ExprExecCtxt ctxt, Object value) {
     ensureResolver(ctxt);
     if (concreteExpr != null) {
       concreteExpr.execAssign(ctxt, value);
     }
-  }
-
-  @Override
-  public boolean hasNameModifier(Modifier nameModifier) {
-    return nameWithModifier.getModifiers().contains(nameModifier);
   }
 
   private void ensureResolver(ExprExecCtxt ctxt) {
@@ -61,11 +55,11 @@ public class PmVariableOrAttributeExpr implements OptionalExpression {
     try {
       String name = nameWithModifier.getName();
       accessor = new BeanAttrAccessorImpl(classOfCurrentValue, name);
-      concreteExpr = new AttributeExpr(nameWithModifier, accessor);
+      concreteExpr = new AttributeExpr(getSyntaxVersion(), nameWithModifier, accessor);
     }
     catch (ReflectionException e) {
       if (ctxt instanceof PmExprExecCtxt) {
-        concreteExpr = new PmVariableExpr(nameWithModifier);
+        concreteExpr = new PmVariableExpr(getSyntaxVersion(), nameWithModifier);
       }
       else {
         if (! nameWithModifier.isOptional()) {
@@ -74,11 +68,6 @@ public class PmVariableOrAttributeExpr implements OptionalExpression {
         }
       }
     }
-  }
-
-  @Override
-  public String toString() {
-    return nameWithModifier.toString();
   }
 
   public static OptionalExpression parse(ParseCtxt ctxt) {
@@ -90,15 +79,15 @@ public class PmVariableOrAttributeExpr implements OptionalExpression {
 
     // Decides if its a variable or Attribut Expression.
     if(n.isVariable()) {
-      return new PmVariableExpr(n);
+      return new PmVariableExpr(ctxt, n);
     }
     else {
-      return (ParseCtxt.getSyntaxVersion() == SyntaxVersion.VERSION_2)
-        // Strict mode. 
-        ? new AttributeExpr(n)
+      return (ctxt.getSyntaxVersion() == SyntaxVersion.VERSION_2)
+        // Strict mode.
+        ? new AttributeExpr(ctxt, n)
         // Compatibility mode.
-        : new PmVariableOrAttributeExpr(n);
+        : new PmVariableOrAttributeExpr(ctxt, n);
     }
   }
-  
+
 }

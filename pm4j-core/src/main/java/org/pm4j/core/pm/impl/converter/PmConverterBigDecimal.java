@@ -28,13 +28,14 @@ public class PmConverterBigDecimal extends PmConverterNumber<BigDecimal> {
   protected NumberFormat getNumberFormat(Locale locale, String formatString, PmAttr<?> pmAttr) {
     DecimalFormat decimalFormat = new DecimalFormat(formatString, new DecimalFormatSymbols(locale));
     if(pmAttr instanceof PmAttrBigDecimal) {
+      // TODO oboede: Add a method to PmAttrNumberBase to get the rounding mode.
       PmAttrBigDecimalImpl pmAttrBigDecimal = (PmAttrBigDecimalImpl) pmAttr;
       decimalFormat.setRoundingMode(pmAttrBigDecimal.getRoundingMode());
     } else {
-      // Fall back for special attributes sometimes representing a BigDecimal value 
+      // Fall back for special attributes sometimes representing a BigDecimal value
       decimalFormat.setRoundingMode(PmAttrNumber.ROUNDINGMODE_DEFAULT);
     }
-    
+
     decimalFormat.setParseBigDecimal(true);
     return decimalFormat;
   }

@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
+import org.pm4j.common.expr.parser.ParseCtxt;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmInject;
@@ -32,7 +33,7 @@ public class DiResolverFactoryPmInjectFieldByExpression implements DiResolverFac
                             ? a.value()
                             : "#" + f.getName();
 
-        PathResolver r = PmExpressionPathResolver.parse(propName, false);
+        PathResolver r = PmExpressionPathResolver.parse(new ParseCtxt(propName));
         r.setNullAllowed(a.nullAllowed());
 
         fieldInjectionMap.put(f, r);

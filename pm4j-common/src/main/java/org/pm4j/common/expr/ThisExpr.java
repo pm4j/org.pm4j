@@ -11,9 +11,11 @@ import org.pm4j.common.expr.parser.ParseCtxt;
  */
 public class ThisExpr extends ExprBase<ExprExecCtxt> implements OptionalExpression {
 
-  public static ThisExpr INSTANCE = new ThisExpr();
-
   public static final String THIS_KEYWORD = "this";
+
+  public ThisExpr(ParseCtxt ctxt) {
+    super(ctxt);
+  }
 
   @Override
   protected Object execImpl(ExprExecCtxt ctxt) {
@@ -32,7 +34,7 @@ public class ThisExpr extends ExprBase<ExprExecCtxt> implements OptionalExpressi
    */
   public static ThisExpr parse(ParseCtxt ctxt) {
     return ctxt.readOptionalString("this")
-              ? ThisExpr.INSTANCE
+              ? new ThisExpr(ctxt)
               : null;
   }
 

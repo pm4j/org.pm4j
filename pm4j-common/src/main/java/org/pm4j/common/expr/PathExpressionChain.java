@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
 import org.pm4j.common.expr.NameWithModifier.Modifier;
 import org.pm4j.common.expr.parser.ParseCtxt;
 import org.pm4j.common.expr.parser.ParseException;
@@ -13,11 +12,13 @@ public class PathExpressionChain extends ExprBase<ExprExecCtxt> {
 
   private OptionalExpression[] chain;
 
-  public PathExpressionChain(List<OptionalExpression> exprChain) {
+  public PathExpressionChain(ParseCtxt ctxt, List<OptionalExpression> exprChain) {
+    super(ctxt);
     this.chain = exprChain.toArray(new OptionalExpression[exprChain.size()]);
   }
 
-  public PathExpressionChain(OptionalExpression... chain) {
+  protected PathExpressionChain(SyntaxVersion syntaxVersion, OptionalExpression... chain) {
+    super(syntaxVersion);
     this.chain = chain;
   }
 
@@ -76,7 +77,7 @@ public class PathExpressionChain extends ExprBase<ExprExecCtxt> {
   // if it fails: try to repeat r...
   private ExprExecCtxt evalRepeated(ExprExecCtxt ctxt, OptionalExpression repeatedExpr, OptionalExpression[] restChain) {
     try {
-      PathExpressionChain restPathExprChain = new PathExpressionChain(restChain);
+      PathExpressionChain restPathExprChain = new PathExpressionChain(getSyntaxVersion(), restChain);
       ExprExecCtxt clonedCtxt = ctxt.clone();
       restPathExprChain.exec(clonedCtxt);
       return clonedCtxt;
@@ -102,40 +103,13 @@ public class PathExpressionChain extends ExprBase<ExprExecCtxt> {
   }
 
   /**
-   * @param s The string to parse.
-   * @param isStartAttrAllowed
-   *          Defines if the first expression part may address a field.
-   *          <p>
-   *          Is used to prevent initializaion loops for injected fields that
-   *          use the name of a referenced variable.
-   * @return The parsed expression or <code>null</code> if there was an empty
-   *         string to parse.
-   */
-  // TODO: boolean parameter seems to be obsolete, since variables are
-  //       addressed explicitely
-  public static Expression parse(String s, boolean isStartAttrAllowed) {
-    return StringUtils.isEmpty(s)
-                ? ThisExpr.INSTANCE
-                : parse(new ParseCtxt(s), isStartAttrAllowed);
-  }
-
-  public static Expression parse(ParseCtxt ctxt) {
-    return parse(ctxt, true);
-  }
-
-  /**
    * @param ctxt
    *          The current parse context (text and parse position).
-   * @param isStartAttrAllowed
-   *          Defines if the first expression part may address a field.
-   *          <p>
-   *          Is used to prevent initialization loops for injected fields that
-   *          use the name of a referenced variable.
    * @return The parsed expression or <code>null</code> if there was an empty
    *         string to parse.
    */
-  public static Expression parse(ParseCtxt ctxt, boolean isStartAttrAllowed) {
-    Expression e = parseOneExpr(ctxt, isStartAttrAllowed);
+  public static Expression parse(ParseCtxt ctxt) {
+    Expression e = parseOneExpr(ctxt);
     if (e == null || ctxt.isDone()) {
       return e;
     }
@@ -144,17 +118,17 @@ public class PathExpressionChain extends ExprBase<ExprExecCtxt> {
     List<Expression> eList = new ArrayList<Expression>();
     eList.add(e);
     while (ctxt.skipBlanks().readOptionalChar('+')) {
-      e = parseOneExpr(ctxt, isStartAttrAllowed);
+      e = parseOneExpr(ctxt);
       eList.add(e);
     }
 
     return (eList.size() == 1)
         ? eList.get(0)
-        : new ConcatExpr(eList);
+        : new ConcatExpr(ctxt, eList);
   }
 
 
-  private static Expression parseOneExpr(ParseCtxt ctxt, boolean isStartAttrAllowed) {
+  private static Expression parseOneExpr(ParseCtxt ctxt) {
     Expression basicExpr = ScalarExpr.parse(ctxt);
     if (basicExpr != null) {
       return basicExpr;
@@ -188,7 +162,7 @@ public class PathExpressionChain extends ExprBase<ExprExecCtxt> {
         return startExpr;
       }
       else {
-        return new PathExpressionChain(exprList);
+        return new PathExpressionChain(ctxt, exprList);
       }
     }
     else {

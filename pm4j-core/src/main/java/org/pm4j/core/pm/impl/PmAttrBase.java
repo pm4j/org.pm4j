@@ -24,6 +24,7 @@ import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.pm4j.common.expr.Expression.SyntaxVersion;
 import org.pm4j.common.util.CompareUtil;
 import org.pm4j.common.util.GenericsUtil;
 import org.pm4j.common.util.collection.MapUtil;
@@ -56,6 +57,7 @@ import org.pm4j.core.pm.annotation.PmOptionCfg.NullOption;
 import org.pm4j.core.pm.annotation.PmTitleCfg;
 import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.api.PmEventApi;
+import org.pm4j.core.pm.api.PmExpressionApi;
 import org.pm4j.core.pm.api.PmLocalizeApi;
 import org.pm4j.core.pm.api.PmMessageUtil;
 import org.pm4j.core.pm.impl.cache.PmCacheStrategy;
@@ -1252,7 +1254,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   // XXX olaf: really required? May be solved by overriding initMetaData too.
   protected PmOptionSetDef<?> makeOptionSetDef(PmOptionCfg cfg, Method getOptionValuesMethod) {
     return cfg != null
-              ? new GenericOptionSetDef(cfg, getOptionValuesMethod)
+              ? new GenericOptionSetDef(this, cfg, getOptionValuesMethod)
               : OptionSetDefNoOption.INSTANCE;
   }
 
@@ -1340,11 +1342,12 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
       switch (accessKindCfgValue) {
         case DEFAULT:
           if (StringUtils.isNotBlank(fieldAnnotation.valuePath())) {
-            myMetaData.valuePathResolver = PmExpressionPathResolver.parse(fieldAnnotation.valuePath(), true);
+            SyntaxVersion syntaxVersion = PmExpressionApi.getSyntaxVersion(this);
+            myMetaData.valuePathResolver = PmExpressionPathResolver.parse(fieldAnnotation.valuePath(), syntaxVersion);
             int lastDotPos = fieldAnnotation.valuePath().lastIndexOf('.');
             if (lastDotPos > 0) {
               String parentPath = fieldAnnotation.valuePath().substring(0, lastDotPos);
-              myMetaData.valueContainingObjPathResolver = PmExpressionPathResolver.parse(parentPath, true);
+              myMetaData.valueContainingObjPathResolver = PmExpressionPathResolver.parse(parentPath, syntaxVersion);
             }
             useReflection = false;
             myMetaData.valueAccessStrategy = ValueAccessByExpression.INSTANCE;

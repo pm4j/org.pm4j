@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import org.pm4j.common.expr.Expression.SyntaxVersion;
 import org.pm4j.common.expr.parser.ParseCtxt;
 import org.pm4j.common.expr.parser.ParseException;
 import org.pm4j.common.util.CompareUtil;
@@ -54,13 +55,12 @@ public class PathComparatorFactory {
     };
   }
 
-
-  public static final PathComparatorFactory parse(String compareString) {
+  public static final PathComparatorFactory parse(String compareString, SyntaxVersion syntaxVersion) {
     List<CompareItem> compareItems = new ArrayList<CompareItem>();
-    ParseCtxt ctxt = new ParseCtxt(compareString);
+    ParseCtxt ctxt = new ParseCtxt(compareString, syntaxVersion);
 
     while (!ctxt.isDone()) {
-      PathResolver expr = PmExpressionPathResolver.parse(ctxt, true);
+      PathResolver expr = PmExpressionPathResolver.parse(ctxt);
       boolean ascending = true;
 
       if (ctxt.skipBlanks().isOnChar(',')) {

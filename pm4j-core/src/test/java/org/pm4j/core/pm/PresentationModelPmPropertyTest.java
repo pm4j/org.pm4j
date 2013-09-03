@@ -55,10 +55,10 @@ public class PresentationModelPmPropertyTest extends TestCase {
       super(pmParent);
     }
 
-    @PmInject(value="myCtxtData.s1")
+    @PmInject(value="#myCtxtData.s1")
     private String myInjectedS1;
 
-    @PmInject(value="nonExistingPropertyRef", nullAllowed=true)
+    @PmInject(value="#nonExistingPropertyRef", nullAllowed=true)
     private String myNullInjectedField;
 
   }
@@ -83,8 +83,8 @@ public class PresentationModelPmPropertyTest extends TestCase {
   }
 
   public void testGetPmProperty() {
-    assertEquals("s1", PmExpressionApi.getByExpression(myPm, "myCtxtData.s1"));
-    assertEquals("s2", PmExpressionApi.getByExpression(myPm, "myCtxtData.s2"));
+    assertEquals("s1", PmExpressionApi.getByExpression(myPm, "#myCtxtData.s1"));
+    assertEquals("s2", PmExpressionApi.getByExpression(myPm, "#myCtxtData.s2"));
   }
 
 }

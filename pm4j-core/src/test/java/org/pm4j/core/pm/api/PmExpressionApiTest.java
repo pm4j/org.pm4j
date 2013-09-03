@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.pm4j.common.expr.Expression.SyntaxVersion;
 import org.pm4j.core.pm.PmAttrString;
 import org.pm4j.core.pm.PmElement;
 import org.pm4j.core.pm.PmLabel;
@@ -40,9 +41,7 @@ public class PmExpressionApiTest {
   @Test
   public void testExistsOptionallyExpr() {
     assertEquals(null, PmExpressionApi.findByExpression(testPm, "s.(x)somethingThatDoesntExist"));
-    // TODO olaf: the current 'o' implementation als supports the semantic of 'x'.
-    //            a configuration should allow to switch between strict and non-strict mode.
-    assertEquals(null, PmExpressionApi.findByExpression(testPm, "s.(o)somethingThatDoesntExist"));
+    assertEquals(null, PmExpressionApi.findByExpression(testPm, "s.(x,o)somethingThatDoesntExist"));
   }
 
   @Test
@@ -61,8 +60,7 @@ public class PmExpressionApiTest {
 
   @Test
   public void testSetRepeatedExpr() {
-    // TODO: add set method to api
-    PathResolver pr = PmExpressionPathResolver.parse("(*)pmParent.s.value", true);
+    PathResolver pr = PmExpressionPathResolver.parse("(*)pmParent.s.value", SyntaxVersion.VERSION_2);
     pr.setValue(testPm.child1.child2.aLabel, "hi");
     assertEquals("hi", testPm.s.getValue());
   }

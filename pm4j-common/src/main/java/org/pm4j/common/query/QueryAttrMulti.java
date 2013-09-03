@@ -6,6 +6,7 @@ import java.util.List;
 import org.pm4j.common.expr.ExprExecCtxt;
 import org.pm4j.common.expr.Expression;
 import org.pm4j.common.expr.PathExpressionChain;
+import org.pm4j.common.expr.parser.ParseCtxt;
 import org.pm4j.common.util.collection.MultiObjectValue;
 import org.pm4j.core.util.lang.CloneUtil;
 
@@ -101,7 +102,7 @@ public class QueryAttrMulti extends QueryAttr {
     Object[] values = new Object[parts.size()];
     for (int i=0; i< parts.size(); ++i) {
       QueryAttr d = parts.get(i);
-      Expression ex = PathExpressionChain.parse(d.getPath(), true);
+      Expression ex = PathExpressionChain.parse(new ParseCtxt(d.getPath()));
       values[i] = ex.exec(new ExprExecCtxt(item));
     }
     return new MultiObjectValue(values);

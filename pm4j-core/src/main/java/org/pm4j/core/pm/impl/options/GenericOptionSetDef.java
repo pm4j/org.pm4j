@@ -3,6 +3,7 @@ package org.pm4j.core.pm.impl.options;
 import java.lang.reflect.Method;
 
 import org.apache.commons.lang.ObjectUtils;
+import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmOption;
 import org.pm4j.core.pm.annotation.PmOptionCfg;
 import org.pm4j.core.pm.impl.PmAttrBase;
@@ -15,8 +16,8 @@ import org.pm4j.core.pm.impl.PmAttrBase;
  */
 public class GenericOptionSetDef extends OptionSetDefBase<PmAttrBase<?,?>> {
 
-  public GenericOptionSetDef(PmOptionCfg cfg, Method getOptionValuesMethod) {
-    super(cfg, getOptionValuesMethod);
+  public GenericOptionSetDef(PmAttr<?> pmAttr, PmOptionCfg cfg, Method getOptionValuesMethod) {
+    super(pmAttr, cfg, getOptionValuesMethod);
   }
 
   @Override

@@ -1,23 +1,15 @@
 package org.pm4j.common.expr;
 
-import java.util.Map;
-
+import org.apache.commons.lang.StringUtils;
 import org.pm4j.common.expr.parser.ParseCtxt;
-import org.pm4j.common.util.collection.MapUtil;
 
 /**
  * Encapsulates the parsing logic for all supported scalar value expressions.
- * 
+ *
  * @author olaf boede
  */
 public class ScalarExpr {
 
-  private static final Map<String, Expression> RESERVED_WORD_TO_EXPR_MAP = MapUtil.makeHashMap(
-      "true", new BooleanExpr(Boolean.TRUE),
-      "false", new BooleanExpr(Boolean.FALSE),
-      "null", new NullExpr()
-      );
-  
   public static Expression parse(ParseCtxt ctxt) {
     Expression e = StringExpr.parse(ctxt);
     if (e == null) {
@@ -26,7 +18,7 @@ public class ScalarExpr {
     if (e == null) {
       int oriPos = ctxt.getPos();
       String s = ctxt.skipBlanks().readNameString();
-      e = RESERVED_WORD_TO_EXPR_MAP.get(s);
+      e = parseReservedWord(ctxt, s);
       if (e == null) {
         ctxt.setPos(oriPos);
       }
@@ -34,11 +26,29 @@ public class ScalarExpr {
     return e;
   }
 
+  private static Expression parseReservedWord(ParseCtxt ctxt, String s) {
+    if (StringUtils.isEmpty(s)) {
+      return null;
+    }
+    if (s.equals("true")) {
+      return new BooleanExpr(ctxt, Boolean.TRUE);
+    }
+    if (s.equals("false")) {
+      return new BooleanExpr(ctxt, Boolean.FALSE);
+    }
+    if (s.equals("null")) {
+      return new NullExpr(ctxt);
+    }
+    // no match
+    return null;
+  }
+
   public static class StringExpr extends ExprBase<ExprExecCtxt> {
 
     private String stringValue;
 
-    public StringExpr(String stringValue) {
+    public StringExpr(ParseCtxt ctxt, String stringValue) {
+      super(ctxt);
       this.stringValue = stringValue;
     }
 
@@ -54,7 +64,7 @@ public class ScalarExpr {
         String s = ctxt.readTill('\'');
         if (ctxt.isOnChar('\'')) {
           ctxt.readCharAndAdvance();
-          return new StringExpr(s);
+          return new StringExpr(ctxt, s);
         }
       }
       // no match:
@@ -67,7 +77,8 @@ public class ScalarExpr {
 
     private Boolean value;
 
-    public BooleanExpr(Boolean value) {
+    public BooleanExpr(ParseCtxt ctxt, Boolean value) {
+      super(ctxt);
       this.value = value;
     }
 
@@ -78,6 +89,11 @@ public class ScalarExpr {
   }
 
   public static class NullExpr extends ExprBase<ExprExecCtxt> {
+
+    public NullExpr(ParseCtxt ctxt) {
+      super(ctxt);
+    }
+
     @Override
     protected Object execImpl(ExprExecCtxt ctxt) {
       return null;
@@ -88,7 +104,8 @@ public class ScalarExpr {
 
     private Number number;
 
-    public NumberExpr(Number number) {
+    public NumberExpr(ParseCtxt ctxt, Number number) {
+      super(ctxt);
       this.number = number;
     }
 
@@ -139,20 +156,21 @@ public class ScalarExpr {
         switch (ch) {
           case 'l':
           case 'L':
-            return new NumberExpr(new Long(digits.toString()));
+            return new NumberExpr(ctxt, new Long(digits.toString()));
           case 'd':
           case 'D':
-            return new NumberExpr(new Double(digits.toString()));
+            return new NumberExpr(ctxt, new Double(digits.toString()));
           case 'f':
           case 'F':
-            return new NumberExpr(new Float(digits.toString()));
+            return new NumberExpr(ctxt, new Float(digits.toString()));
           default:
             // put the last read character back. It was not a type indicator:
             if (otherCharRead)
               ctxt.setPos(ctxt.getPos() - 1);
 
-            return hasDot ? new NumberExpr(new Double(digits.toString())) : new NumberExpr(new Integer(
-                digits.toString()));
+            return hasDot
+                ? new NumberExpr(ctxt, new Double(digits.toString()))
+                : new NumberExpr(ctxt, new Integer(digits.toString()));
         }
       }
 

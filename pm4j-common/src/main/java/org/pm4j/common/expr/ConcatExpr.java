@@ -7,7 +7,7 @@ import org.apache.commons.lang.StringUtils;
 import org.pm4j.common.expr.parser.ParseCtxt;
 
 /**
- * A string concatination expression.
+ * A string concatenation expression.
  * <p>
  * Supports one or more arguments.
  * <p>
@@ -21,7 +21,8 @@ public class ConcatExpr extends ExprBase<ExprExecCtxt>{
 
   private final Expression[] argList;
 
-  public ConcatExpr(List<Expression> argList) {
+  public ConcatExpr(ParseCtxt ctxt, List<Expression> argList) {
+    super(ctxt);
     this.argList = argList.toArray(new Expression[argList.size()]);
   }
 

@@ -3,8 +3,6 @@ package org.pm4j.core.pm.impl.pathresolver;
 import org.pm4j.common.expr.ExprExecCtxt;
 import org.pm4j.common.expr.ExprExecExeption;
 import org.pm4j.common.expr.Expression;
-import org.pm4j.common.expr.Expression.SyntaxVersion;
-import org.pm4j.common.expr.parser.ParseCtxt;
 import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.impl.PmConversationImpl;
 import org.pm4j.core.pm.impl.expr.PathExpressionChain;
@@ -12,26 +10,13 @@ import org.pm4j.core.pm.impl.expr.PmExprExecCtxt;
 
 public class PathResolverSyntaxVersion2Test extends PathResolverTest {
 
-  private SyntaxVersion oldVersion;
-
-  @Override
-  public void setUp() {
-    oldVersion = ParseCtxt.syntaxVersion;
-    ParseCtxt.syntaxVersion = SyntaxVersion.VERSION_2;
-  }
-
-  @Override
-  public void tearDown() {
-    ParseCtxt.syntaxVersion = oldVersion;
-  }
-
   /**
    * Calling an optional but not existing method should throw an
    * ExprExecExeption.
    */
   public void testCallOptionalMethodButMethodDoesNotExist() {
     Pojo p = Pojo.make("head");
-    Expression expr = PathExpressionChain.parse("(o)nonExistingMethod().notExistingField", true);
+    Expression expr = PathExpressionChain.parse("(o)nonExistingMethod().notExistingField");
     try {
       expr.exec(new ExprExecCtxt(p));
       fail();
@@ -48,7 +33,7 @@ public class PathResolverSyntaxVersion2Test extends PathResolverTest {
   public void testStrictStyleReadFromPmConversationObject() {
     PmConversation pmConversation = new PmConversationImpl();
     pmConversation.setPmNamedObject("myProp", Pojo.make("head"));
-    Expression expr = PathExpressionChain.parse("myProp.name", true);
+    Expression expr = PathExpressionChain.parse("myProp.name");
     try {
       expr.exec(new PmExprExecCtxt(pmConversation));
       fail();
@@ -62,7 +47,7 @@ public class PathResolverSyntaxVersion2Test extends PathResolverTest {
    */
   public void testStrictStyleOptionalField() {
     Pojo p = Pojo.make("head", "subName");
-    Expression expr = PathExpressionChain.parse("sub.(o)notExistingField", true);
+    Expression expr = PathExpressionChain.parse("sub.(o)notExistingField");
     try {
       expr.exec(new ExprExecCtxt(p));
       fail();
@@ -76,7 +61,7 @@ public class PathResolverSyntaxVersion2Test extends PathResolverTest {
    */
   public void testStrictStyleOptionalMethod() {
     Pojo p = Pojo.make("head", "subName");
-    Expression expr = PathExpressionChain.parse("sub.(o)notExistingMethod()", true);
+    Expression expr = PathExpressionChain.parse("sub.(o)notExistingMethod()");
     try {
       expr.exec(new ExprExecCtxt(p));
       fail();

@@ -46,6 +46,7 @@ import org.pm4j.core.pm.annotation.PmTableCfg2;
 import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
 import org.pm4j.core.pm.api.PmEventApi;
+import org.pm4j.core.pm.api.PmExpressionApi;
 import org.pm4j.core.pm.api.PmValidationApi;
 import org.pm4j.core.pm.impl.pathresolver.PathResolver;
 import org.pm4j.core.pm.impl.pathresolver.PmExpressionPathResolver;
@@ -770,7 +771,7 @@ public class PmTableImpl2
             ? "(o)pmBean." + getPmName()
             : "";
     if (StringUtils.isNotBlank(valuePath)) {
-      myMetaData.valuePathResolver = PmExpressionPathResolver.parse(valuePath);
+      myMetaData.valuePathResolver = PmExpressionPathResolver.parse(valuePath, PmExpressionApi.getSyntaxVersion(this));
     }
   }
 
