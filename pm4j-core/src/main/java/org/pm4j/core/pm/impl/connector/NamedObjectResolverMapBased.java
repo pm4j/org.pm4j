@@ -3,6 +3,8 @@ package org.pm4j.core.pm.impl.connector;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
+
 /**
  * A named object resolver that is implemented based on a simple name-value map.
  *
@@ -11,6 +13,10 @@ import java.util.Map;
 public class NamedObjectResolverMapBased implements NamedObjectResolver {
 
   private Map<String, Object> map = new HashMap<String, Object>();
+
+  public void put(Class<?> interfaceClass, Object value) {
+    map.put(StringUtils.uncapitalize(interfaceClass.getSimpleName()), value);
+  }
 
   public void put(String name, Object value) {
     map.put(name, value);

@@ -37,7 +37,7 @@ public class PageableQueryAllItemsSelection<T_ITEM, T_ID extends Serializable> e
 
   @Override
   public long getSize() {
-    return getService().getItemCount(queryParams);
+    return getPageableQueryService().getItemCount(queryParams);
   }
 
   @Override
@@ -50,7 +50,7 @@ public class PageableQueryAllItemsSelection<T_ITEM, T_ID extends Serializable> e
     return new PageableItemIteratorBase<T_ITEM>(pageSize) {
       @Override
       protected List<T_ITEM> getItems(long startIdx, int blockSize) {
-        return getService().getItems(queryParams, startIdx, blockSize);
+        return getPageableQueryService().getItems(queryParams, startIdx, blockSize);
       }
     };
   }
@@ -59,6 +59,10 @@ public class PageableQueryAllItemsSelection<T_ITEM, T_ID extends Serializable> e
   public void setIteratorBlockSizeHint(int readBlockSize) {
     assert readBlockSize > 0;
     pageSize = readBlockSize;
+  }
+
+  protected PageableQueryService<T_ITEM, T_ID> getPageableQueryService() {
+    return (PageableQueryService<T_ITEM, T_ID>) getService();
   }
 
 }

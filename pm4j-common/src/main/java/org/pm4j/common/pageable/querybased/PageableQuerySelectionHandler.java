@@ -1,7 +1,6 @@
 package org.pm4j.common.pageable.querybased;
 
 import java.beans.PropertyVetoException;
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -12,6 +11,7 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.pm4j.common.query.QueryParams;
+import org.pm4j.common.selection.ItemIdConverter;
 import org.pm4j.common.selection.SelectMode;
 import org.pm4j.common.selection.Selection;
 import org.pm4j.common.selection.SelectionHandlerBase;
@@ -38,7 +38,7 @@ import org.pm4j.core.util.lang.CloneUtil;
  * @param <T_ID>
  *          type of the related item identifier.
  */
-public abstract class PageableQuerySelectionHandler<T_ITEM, T_ID extends Serializable> extends SelectionHandlerBase<T_ITEM> {
+public abstract class PageableQuerySelectionHandler<T_ITEM, T_ID> extends SelectionHandlerBase<T_ITEM> {
 
   private static final Log LOG = LogFactory.getLog(PageableQuerySelectionHandler.class);
 
@@ -193,11 +193,11 @@ public abstract class PageableQuerySelectionHandler<T_ITEM, T_ID extends Seriali
   }
 
   /** Base class for query based selections that consider a set of clicked ID's. */
-  public static abstract class QuerySelectionWithClickedIds<T_ITEM, T_ID extends Serializable> extends PageableQuerySelectionBase<T_ITEM, T_ID> {
+  public static abstract class QuerySelectionWithClickedIds<T_ITEM, T_ID> extends PageableQuerySelectionBase<T_ITEM, T_ID> {
 
     private static final long serialVersionUID = 1L;
 
-    public QuerySelectionWithClickedIds(PageableQueryService<T_ITEM, T_ID> service) {
+    public QuerySelectionWithClickedIds(ItemIdConverter<T_ITEM, T_ID> service) {
       super(service);
     }
 
@@ -216,7 +216,7 @@ public abstract class PageableQuerySelectionHandler<T_ITEM, T_ID extends Seriali
    * <p>
    * It uses a {@link PageableQueryService} instance to retrieve the selected instances from the service.
    */
-  static class ItemIdSelection<T_ITEM, T_ID extends Serializable> extends QuerySelectionWithClickedIds<T_ITEM, T_ID> {
+  static class ItemIdSelection<T_ITEM, T_ID> extends QuerySelectionWithClickedIds<T_ITEM, T_ID> {
     private static final long serialVersionUID = 1L;
 
     private final Collection<T_ID> ids;
@@ -228,7 +228,7 @@ public abstract class PageableQuerySelectionHandler<T_ITEM, T_ID extends Seriali
      * @param ids the set of selected id's.
      */
     @SuppressWarnings("unchecked")
-    public ItemIdSelection(PageableQueryService<T_ITEM, T_ID> service, Collection<T_ID> ids) {
+    public ItemIdSelection(ItemIdConverter<T_ITEM, T_ID> service, Collection<T_ID> ids) {
       super(service);
       this.ids = (ids != null) ? Collections.unmodifiableCollection(ids) : Collections.EMPTY_LIST;
     }
@@ -299,7 +299,7 @@ public abstract class PageableQuerySelectionHandler<T_ITEM, T_ID extends Seriali
    * A selection that is based on a query that identifies all items.<br>
    * It may have also a set of de-selected item-identifiers.
    */
-  static class InvertedSelection<T_ITEM, T_ID extends Serializable> extends QuerySelectionWithClickedIds<T_ITEM, T_ID> {
+  static class InvertedSelection<T_ITEM, T_ID> extends QuerySelectionWithClickedIds<T_ITEM, T_ID> {
 
     private static final long serialVersionUID = 1L;
     private final QueryParams query;
@@ -322,7 +322,7 @@ public abstract class PageableQuerySelectionHandler<T_ITEM, T_ID extends Seriali
     @Override
     public long getSize() {
       if (size == null) {
-        size = getService().getItemCount(query) - baseSelection.getSize();
+        size = getPageableQueryService().getItemCount(query) - baseSelection.getSize();
       }
       return size;
     }
@@ -342,7 +342,7 @@ public abstract class PageableQuerySelectionHandler<T_ITEM, T_ID extends Seriali
 
         @Override
         protected List<T_ITEM> getItems(long startIdx, int blockSize) {
-          return getService().getItems(query, startIdx, blockSize);
+          return getPageableQueryService().getItems(query, startIdx, blockSize);
         }
       };
     }
@@ -355,6 +355,12 @@ public abstract class PageableQuerySelectionHandler<T_ITEM, T_ID extends Seriali
     public ClickedIds<T_ID> getClickedIds() {
       return new ClickedIds<T_ID>(baseSelection.getClickedIds().getIds(), true);
     }
+
+    /** Type access helper */
+    protected PageableQueryService<T_ITEM, T_ID> getPageableQueryService() {
+      return (PageableQueryService<T_ITEM, T_ID>) getService();
+    }
+
   }
 
 }

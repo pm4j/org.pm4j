@@ -33,13 +33,13 @@ public class PropertyChangeSupportedBase implements PropertyChangeSupported, Clo
     getPcs().removePropertyChangeListener(propertyName, listener);
   }
 
-  protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
+  public void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
     if (firePropertyEvents) {
       getPcs().firePropertyChange(propertyName, oldValue, newValue);
     }
   }
 
-  protected void firePropertyChange(PropertyChangeEvent event) {
+  public void firePropertyChange(PropertyChangeEvent event) {
     if (firePropertyEvents) {
       getPcs().firePropertyChange(event);
     }
@@ -85,13 +85,13 @@ public class PropertyChangeSupportedBase implements PropertyChangeSupported, Clo
     this.firePropertyEvents = firingPropertyEvents;
   }
 
-  protected void fireVetoableChange(String propertyName, Object oldValue, Object newValue) throws PropertyVetoException {
+  public void fireVetoableChange(String propertyName, Object oldValue, Object newValue) throws PropertyVetoException {
     if (firePropertyEvents && fireVetoEvents) {
       getVpcs().fireVetoableChange(propertyName, oldValue, newValue);
     }
   }
 
-  protected void fireVetoableChange(PropertyChangeEvent event) throws PropertyVetoException {
+  public void fireVetoableChange(PropertyChangeEvent event) throws PropertyVetoException {
     if (firePropertyEvents && fireVetoEvents) {
       getVpcs().fireVetoableChange(event);
     }

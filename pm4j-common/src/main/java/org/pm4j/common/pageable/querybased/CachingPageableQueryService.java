@@ -1,6 +1,5 @@
 package org.pm4j.common.pageable.querybased;
 
-import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -25,7 +24,7 @@ import org.pm4j.common.util.beanproperty.ReleaseOnPropChangeRef;
  * @param <T_ITEM> type of collection items.
  * @param <T_ID> type of collection item id's.
  */
-class CachingPageableQueryService<T_ITEM, T_ID extends Serializable> implements PageableQueryService<T_ITEM, T_ID> {
+class CachingPageableQueryService<T_ITEM, T_ID> implements PageableQueryService<T_ITEM, T_ID> {
   private static final Log LOG = LogFactory.getLog(CachingPageableQueryService.class);
 
   private final PageableQueryService<T_ITEM, T_ID> baseService;
@@ -108,7 +107,7 @@ class CachingPageableQueryService<T_ITEM, T_ID extends Serializable> implements 
     return baseService;
   }
 
-  static class Cache<T_ITEM, T_ID extends Serializable> {
+  static class Cache<T_ITEM, T_ID> {
     private final PageableQueryService<T_ITEM, T_ID> service;
     private long                                     cachedPageStartIdx = -1;
     private int                                      cachedPageSize = -1;

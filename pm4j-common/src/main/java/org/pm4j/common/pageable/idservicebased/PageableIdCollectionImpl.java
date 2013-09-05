@@ -11,7 +11,9 @@ import java.util.List;
 import org.pm4j.common.pageable.ModificationHandler;
 import org.pm4j.common.pageable.PageableCollectionBase2;
 import org.pm4j.common.pageable.PageableCollectionUtil2;
+import org.pm4j.common.pageable.querybased.QueryCollectionModificationHandlerBase;
 import org.pm4j.common.query.QueryParams;
+import org.pm4j.common.selection.ItemIdConverter;
 import org.pm4j.common.selection.SelectionHandler;
 import org.pm4j.common.selection.SelectionHandlerWithAdditionalItems;
 import org.pm4j.common.selection.SelectionHandlerWithIdSet;
@@ -22,6 +24,12 @@ public class PageableIdCollectionImpl<T_ITEM, T_ID> extends PageableCollectionBa
   private final PageableIdService<T_ITEM, T_ID> service;
   /** The collection type specific selection handler. */
   private final SelectionHandler<T_ITEM>  selectionHandler;
+  private final ModificationHandler<T_ITEM> modificationHandler = new QueryCollectionModificationHandlerBase<T_ITEM, T_ID>(this) {
+    @Override
+    protected ItemIdConverter<T_ITEM, T_ID> getItemIdService() {
+      return service;
+    }
+  };
   private List<T_ID>                      ids;
   private List<T_ITEM>                    currentPageItems;
 
@@ -99,8 +107,7 @@ public class PageableIdCollectionImpl<T_ITEM, T_ID> extends PageableCollectionBa
 
   @Override
   public ModificationHandler<T_ITEM> getModificationHandler() {
-    // TODO Auto-generated method stub
-    return null;
+    return modificationHandler;
   }
 
   @Override
@@ -114,7 +121,7 @@ public class PageableIdCollectionImpl<T_ITEM, T_ID> extends PageableCollectionBa
     long last = PageableCollectionUtil2.getIdxOfLastItemOnPage(this);
 
     if (first < 0) {
-      throw new RuntimeException();
+      return Collections.emptyList();
     }
     if (last > Integer.MAX_VALUE) {
       throw new RuntimeException("Id collection based implementation is limites to 2exp32 items. Requested last item index: " + last);
