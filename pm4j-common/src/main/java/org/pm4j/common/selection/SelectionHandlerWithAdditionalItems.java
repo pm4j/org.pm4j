@@ -41,7 +41,6 @@ public class SelectionHandlerWithAdditionalItems<T_ITEM> extends SelectionHandle
    */
   public SelectionHandlerWithAdditionalItems(PageableCollection2<T_ITEM> baseCollection, SelectionHandler<T_ITEM> baseSelectionHandler) {
     assert baseCollection != null;
-    assert baseCollection.getModificationHandler() != null;
     assert baseSelectionHandler != null;
     assert !baseSelectionHandler.isFirePropertyEvents() : "Event handling of the nested selection handler should be disabled.";
 

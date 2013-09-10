@@ -73,9 +73,9 @@ public abstract class PageableCollectionTestBase<T> {
     collection.addPropertyChangeListener(PageableCollection2.EVENT_ITEM_UPDATE, pclUpdate = new TestPropertyChangeListener());
     collection.addPropertyAndVetoableListener(PageableCollection2.EVENT_REMOVE_SELECTION, pclRemove = new TestPropertyChangeListener());
     collection.addPropertyChangeListener(PageableCollection2.PROP_PAGE_IDX, pclPageIdx = new TestPropertyChangeListener());
-    collection.addPropertyChangeListener(PageableCollection2.PROP_PAGE_SIZE, pclPageSize = new TestPropertyChangeListener());    
+    collection.addPropertyChangeListener(PageableCollection2.PROP_PAGE_SIZE, pclPageSize = new TestPropertyChangeListener());
   }
-  
+
   @Test
   public void testFullCollectionItersationResult() {
     assertEquals("[a, b, c, d, e, f]", IterableUtil.shallowCopy(collection).toString());
@@ -84,7 +84,7 @@ public abstract class PageableCollectionTestBase<T> {
   protected ItemNavigator<T> getItemNavigator() {
     return new ItemNavigatorInMem<T>(collection.getSelectionHandler().getSelection());
   }
-  
+
   @Test
   public void testItemNavigator() {
     // multi selection for this test
@@ -306,11 +306,23 @@ public abstract class PageableCollectionTestBase<T> {
     collection.getSelectionHandler().select(false, newItem);
     assertEquals(0L, collection.getSelection().getSize());
 
+    // now iterate over the set of pages:
+    assertEquals("[a, b]", collection.getItemsOnPage().toString());
+    collection.setPageIdx(2);
+    assertEquals("[e, f]", collection.getItemsOnPage().toString());
+    collection.setPageIdx(3);
+    assertEquals("[hi]", collection.getItemsOnPage().toString());
+    // remove an item to be able to test a mixed page containing persistent and added items:
+    collection.setPageIdx(2);
+    collection.getSelectionHandler().select(true, collection.getItemsOnPage().get(0));
+    collection.getModificationHandler().removeSelectedItems();
+    assertEquals("[f, hi]", collection.getItemsOnPage().toString());
+
     // check number of expected events and service calls
     assertEquals("Add event count", 1, pclAdd.getPropChangeEventCount());
     assertEquals("Update event count", 0, pclUpdate.getPropChangeEventCount());
-    assertEquals("Remove event count", 0, pclRemove.getPropChangeEventCount());
-    assertEquals("Set page index event count", 0, pclPageIdx.getPropChangeEventCount());
+    assertEquals("Remove event count", 1, pclRemove.getPropChangeEventCount());
+    assertEquals("Set page index event count", 3, pclPageIdx.getPropChangeEventCount());
     assertEquals("Set page size event count", 0, pclPageSize.getPropChangeEventCount());
   }
 

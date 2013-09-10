@@ -37,6 +37,7 @@ public class ModificationsImpl<T_ITEM> implements Modifications<T_ITEM> {
     return addedItems;
   }
 
+  /** A pm4j internal functionality that's public only for technical reasons. Please don't call it! */
   public void registerAddedItem(T_ITEM item) {
     if (addedItems.isEmpty()) {
       addedItems = new ArrayList<T_ITEM>();
@@ -47,6 +48,8 @@ public class ModificationsImpl<T_ITEM> implements Modifications<T_ITEM> {
   }
 
   /**
+   * A pm4j internal functionality that's public only for technical reasons. Please don't call it!
+   * <p>
    * Removes the given item from the list of added items explicitely.
    *
    * @param item the item to remove.
@@ -62,6 +65,7 @@ public class ModificationsImpl<T_ITEM> implements Modifications<T_ITEM> {
     return updatedItems;
   }
 
+  /** A pm4j internal functionality that's public only for technical reasons. Please don't call it! */
   public void registerUpdatedItem(T_ITEM item, boolean isUpdated) {
     if (isUpdated) {
       if (updatedItems.isEmpty()) {
@@ -83,6 +87,7 @@ public class ModificationsImpl<T_ITEM> implements Modifications<T_ITEM> {
     return removedItems;
   }
 
+  /** A pm4j internal functionality that's public only for technical reasons. Please don't call it! */
   public void setRemovedItems(Selection<T_ITEM> removedItems) {
     this.removedItems = removedItems;
     // XXX olaf: this line may disappear because the calling code should organize

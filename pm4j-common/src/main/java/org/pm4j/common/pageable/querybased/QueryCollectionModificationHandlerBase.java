@@ -20,14 +20,18 @@ import org.pm4j.common.selection.Selection;
 import org.pm4j.common.selection.SelectionHandlerUtil;
 import org.pm4j.common.selection.SelectionWithAdditionalItems;
 
-public abstract class QueryCollectionModificationHandlerBase<T_ITEM, T_ID>  implements ModificationHandler<T_ITEM> {
+public class QueryCollectionModificationHandlerBase<T_ITEM, T_ID>  implements ModificationHandler<T_ITEM> {
 
   private ModificationsImpl<T_ITEM> modifications = new ModificationsImpl<T_ITEM>();
   private final PageableCollectionBase2<T_ITEM> pageableCollection;
+  /** The service that provides the data to handle. */
+  private ItemIdConverter<T_ITEM, T_ID> service;
 
-  public QueryCollectionModificationHandlerBase(PageableCollectionBase2<T_ITEM> pageableCollection) {
+  public QueryCollectionModificationHandlerBase(PageableCollectionBase2<T_ITEM> pageableCollection, ItemIdConverter<T_ITEM, T_ID> service) {
     assert pageableCollection != null;
+    assert service != null;
     this.pageableCollection = pageableCollection;
+    this.service = service;
   }
 
   public FilterExpression getRemovedItemsFilterExpr(FilterExpression queryFilterExpr) {
@@ -96,11 +100,11 @@ public abstract class QueryCollectionModificationHandlerBase<T_ITEM, T_ID>  impl
         throw new IndexOutOfBoundsException("Maximum 1000 rows can be removed within a single save operation.");
       }
 
-      Collection<T_ID> ids = PageableQueryUtil.getItemIds(getItemIdService(), persistentItems);
+      Collection<T_ID> ids = PageableQueryUtil.getItemIds(service, persistentItems);
       modifications.setRemovedItems(oldRemovedItemSelection.isEmpty()
           // XXX oboede: here was the cached internal service used. But i suspect that the external service isn't less
           // efficient.
-          ? new ItemIdSelection<T_ITEM, T_ID>(getItemIdService(), ids)
+          ? new ItemIdSelection<T_ITEM, T_ID>(service, ids)
           : new ItemIdSelection<T_ITEM, T_ID>((ItemIdSelection<T_ITEM, T_ID>)oldRemovedItemSelection, ids));
     }
 
@@ -108,12 +112,6 @@ public abstract class QueryCollectionModificationHandlerBase<T_ITEM, T_ID>  impl
     pageableCollection.firePropertyChange(PageableCollection2.EVENT_REMOVE_SELECTION, selectedItems, null);
     return true;
   }
-
-  /**
-   *
-   * @return The service that provides the data to handle.
-   */
-  protected abstract ItemIdConverter<T_ITEM, T_ID> getItemIdService();
 
   @Override
   public void addItem(T_ITEM item) {

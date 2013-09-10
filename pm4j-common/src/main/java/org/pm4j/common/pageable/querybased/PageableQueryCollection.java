@@ -1,7 +1,5 @@
 package org.pm4j.common.pageable.querybased;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -11,10 +9,8 @@ import java.util.List;
 
 import org.pm4j.common.pageable.ModificationHandler;
 import org.pm4j.common.pageable.PageableCollection2;
-import org.pm4j.common.pageable.PageableCollectionBase2;
 import org.pm4j.common.pageable.PageableCollectionUtil2;
-import org.pm4j.common.query.FilterAnd;
-import org.pm4j.common.query.FilterExpression;
+import org.pm4j.common.pageable.idservicebased.PageableQueryCollectionBase;
 import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.selection.ItemIdConverter;
 import org.pm4j.common.selection.Selection;
@@ -33,14 +29,11 @@ import org.pm4j.common.util.collection.ListUtil;
  */
 // TODO oboede: remove Serializable form the signature. It makes generics declaration all usages too complex.
 // In addition there may be use cases that don't need serialization of keys at all.
-public class PageableQueryCollection<T_ITEM, T_ID extends Serializable> extends PageableCollectionBase2<T_ITEM> {
+public class PageableQueryCollection<T_ITEM, T_ID extends Serializable> extends PageableQueryCollectionBase<T_ITEM, T_ID> {
 
   final PageableQueryService<T_ITEM, T_ID>                  service;
   private final SelectionHandler<T_ITEM>                    selectionHandler;
-  private final QueryCollectionModificationHandlerBase<T_ITEM, T_ID> modificationHandler;
   private final CachingPageableQueryService<T_ITEM, T_ID>   cachingService;
-  /** A cached reference to the query parameters that considers the removed item set too. */
-  private QueryParams                                       queryParamsWithRemovedItems;
 
   /**
    * Creates a service based collection without query restrictions.
@@ -65,15 +58,7 @@ public class PageableQueryCollection<T_ITEM, T_ID extends Serializable> extends 
 
     this.service = service;
     this.cachingService = new CachingPageableQueryService<T_ITEM, T_ID>(service);
-    this.modificationHandler = new QueryCollectionModificationHandlerBase<T_ITEM, T_ID>(this) {
-      @Override
-      protected ItemIdConverter<T_ITEM, T_ID> getItemIdService() {
-        return cachingService;
-      }
-    };
-
-    // Uses getQueryParams() because the super ctor may have created it.
-    QueryParams myQueryParams = getQueryParams();
+    this.modificationHandler = new QueryCollectionModificationHandlerBase<T_ITEM, T_ID>(this, cachingService);
 
     // Handling of transient and persistent item selection is separated by a handler composition.
     SelectionHandler<T_ITEM> querySelectionHandler = new PageableQuerySelectionHandler<T_ITEM, T_ID>(cachingService) {
@@ -85,21 +70,13 @@ public class PageableQueryCollection<T_ITEM, T_ID extends Serializable> extends 
     querySelectionHandler.setFirePropertyEvents(false);
     this.selectionHandler = new SelectionHandlerWithAdditionalItems<T_ITEM>(this, querySelectionHandler);
 
-    // Reset all caches on each query filter criteria change.
-    myQueryParams.addPropertyChangeListener(QueryParams.PROP_EFFECTIVE_FILTER, new PropertyChangeListener() {
-      @Override
-      public void propertyChange(PropertyChangeEvent evt) {
-        clearCaches();
-      }
-    });
-    // In addition: reset the page item cache on sort order change.
-    myQueryParams.addPropertyChangeListener(QueryParams.PROP_EFFECTIVE_SORT_ORDER, new PropertyChangeListener() {
-      @Override
-      public void propertyChange(PropertyChangeEvent evt) {
-        cachingService.getCache().clearPageCache();
-        queryParamsWithRemovedItems = null;
-      }
-    });
+  }
+
+  /** In addition: reset the page item cache on sort order change. */
+  @Override
+  protected void onSortOrderChange() {
+    super.onSortOrderChange();
+    cachingService.getCache().clearPageCache();
   }
 
   @SuppressWarnings("unchecked")
@@ -145,8 +122,8 @@ public class PageableQueryCollection<T_ITEM, T_ID extends Serializable> extends 
 
   @Override
   public void clearCaches() {
+    super.clearCaches();
     cachingService.getCache().clear();
-    queryParamsWithRemovedItems = null;
   }
 
   @Override
@@ -154,24 +131,6 @@ public class PageableQueryCollection<T_ITEM, T_ID extends Serializable> extends 
     return modificationHandler;
   }
 
-  QueryParams getQueryParamsWithRemovedItems() {
-	if (queryParamsWithRemovedItems == null) {
-	    if (modificationHandler.getModifications().getRemovedItems().isEmpty()) {
-	    	queryParamsWithRemovedItems = getQueryParams();
-	    }
-	    else {
-		    QueryParams qParams = getQueryParams().clone();
-		    FilterExpression queryFilterExpr = qParams.getFilterExpression();
-		    FilterExpression removedItemsFilterExpr = modificationHandler.getRemovedItemsFilterExpr(queryFilterExpr);
-		    qParams.setFilterExpression(queryFilterExpr != null
-		        ? new FilterAnd(queryFilterExpr, removedItemsFilterExpr)
-		        : removedItemsFilterExpr);
-		    queryParamsWithRemovedItems = qParams;
-	    }
-	}
-
-	return queryParamsWithRemovedItems;
-  }
 }
 
 /**
