@@ -1,4 +1,4 @@
-package org.pm4j.common.pageable.idservicebased;
+package org.pm4j.common.pageable.querybased.idquery;
 
 import org.pm4j.common.query.QueryOptions;
 

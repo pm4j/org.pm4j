@@ -1,10 +1,9 @@
-package org.pm4j.common.pageable.idservicebased;
+package org.pm4j.common.pageable.querybased;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import org.pm4j.common.pageable.PageableCollectionBase2;
-import org.pm4j.common.pageable.querybased.QueryCollectionModificationHandlerBase;
 import org.pm4j.common.query.FilterAnd;
 import org.pm4j.common.query.FilterExpression;
 import org.pm4j.common.query.QueryOptions;

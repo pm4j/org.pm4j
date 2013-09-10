@@ -1,4 +1,4 @@
-package org.pm4j.common.pageable.idservicebased;
+package org.pm4j.common.pageable.querybased.idquery;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -9,6 +9,8 @@ import java.util.Map;
 
 import org.pm4j.common.pageable.PageableCollection2;
 import org.pm4j.common.pageable.PageableCollectionTestBase;
+import org.pm4j.common.pageable.querybased.idquery.PageableIdCollectionImpl;
+import org.pm4j.common.pageable.querybased.idquery.PageableIdService;
 import org.pm4j.common.query.CompOpStringStartsWith;
 import org.pm4j.common.query.FilterCompareDefinition;
 import org.pm4j.common.query.QueryAttr;

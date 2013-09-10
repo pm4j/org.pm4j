@@ -381,16 +381,6 @@ public abstract class PageableCollectionWithMultiFieldIdTestBase<T> {
     assertEquals("Set page size event count", 0, pclPageSize.getPropChangeEventCount());
   }
 
-  protected static List<Bean> makeBeans(String... strings) {
-    List<Bean> list = new ArrayList<Bean>();
-    for (int i = 0; i < strings.length; ++i) {
-      String s = strings[i];
-      list.add(new Bean(s));
-    }
-    return list;
-  }
-
-
   public static class Bean {
     public final Integer id1;
     public final Integer id2;

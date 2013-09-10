@@ -1,4 +1,4 @@
-package org.pm4j.common.pageable.idservicebased;
+package org.pm4j.common.pageable.querybased.idquery;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -13,6 +13,7 @@ import org.apache.commons.logging.LogFactory;
 import org.pm4j.common.pageable.ModificationHandler;
 import org.pm4j.common.pageable.PageableCollection2;
 import org.pm4j.common.pageable.PageableCollectionUtil2;
+import org.pm4j.common.pageable.querybased.PageableQueryCollectionBase;
 import org.pm4j.common.pageable.querybased.QueryCollectionModificationHandlerBase;
 import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.selection.Selection;
@@ -218,6 +219,9 @@ public class PageableIdCollectionImpl<T_ITEM, T_ID> extends PageableQueryCollect
    * added item sort order.<br>
    * This allows (for future implementations) to add strategies for other new-item
    * sort order definitions.
+   * <p>
+   * (Is not an interface because an embedded interface can't use the generics of the
+   * embedding class.)
    */
   abstract class AddItemStrategy {
     public abstract void onAddItem(T_ITEM item);

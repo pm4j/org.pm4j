@@ -10,7 +10,6 @@ import java.util.List;
 import org.pm4j.common.pageable.ModificationHandler;
 import org.pm4j.common.pageable.PageableCollection2;
 import org.pm4j.common.pageable.PageableCollectionUtil2;
-import org.pm4j.common.pageable.idservicebased.PageableQueryCollectionBase;
 import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.selection.ItemIdConverter;
 import org.pm4j.common.selection.Selection;
