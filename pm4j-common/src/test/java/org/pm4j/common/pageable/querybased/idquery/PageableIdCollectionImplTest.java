@@ -9,8 +9,8 @@ import java.util.Map;
 
 import org.pm4j.common.pageable.PageableCollection2;
 import org.pm4j.common.pageable.PageableCollectionTestBase;
-import org.pm4j.common.pageable.querybased.idquery.PageableIdCollectionImpl;
-import org.pm4j.common.pageable.querybased.idquery.PageableIdService;
+import org.pm4j.common.pageable.querybased.idquery.PageableIdQueryCollectionImpl;
+import org.pm4j.common.pageable.querybased.idquery.PageableIdQueryService;
 import org.pm4j.common.query.CompOpStringStartsWith;
 import org.pm4j.common.query.FilterCompareDefinition;
 import org.pm4j.common.query.QueryAttr;
@@ -34,7 +34,7 @@ public class PageableIdCollectionImplTest extends PageableCollectionTestBase<Pag
         service.addBean(new Bean(++counter, s));
       }
     }
-    return new PageableIdCollectionImpl<Bean, Integer>(service, null);
+    return new PageableIdQueryCollectionImpl<Bean, Integer>(service, null);
   }
 
   @Override
@@ -50,7 +50,7 @@ public class PageableIdCollectionImplTest extends PageableCollectionTestBase<Pag
   // --- A fake service implementation that does the job just in memory. ---
 
   // TODO oboede: Missing Dao/Service fake infrastructure im pm4j common!
-  static class TestService implements PageableIdService<Bean, Integer> {
+  static class TestService implements PageableIdQueryService<Bean, Integer> {
 
     private Map<Integer, Bean> idToBeanMap = new LinkedHashMap<Integer, Bean>();
 

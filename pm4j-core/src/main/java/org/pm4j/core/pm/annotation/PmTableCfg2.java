@@ -6,8 +6,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.util.Comparator;
 
+import org.pm4j.common.pageable.ItemIdDao;
 import org.pm4j.common.pageable.PageableCollection2;
-import org.pm4j.common.selection.ItemIdConverter;
 import org.pm4j.common.selection.SelectMode;
 import org.pm4j.core.pm.PmTable2;
 import org.pm4j.core.pm.PmTableCol2;
@@ -48,7 +48,7 @@ public @interface PmTableCfg2 {
    * @return The service to use. The corresponding instance will be found via ServiceLocator.
    */
   @SuppressWarnings("rawtypes")
-  Class<? extends ItemIdConverter> serviceClass() default ItemIdConverter.class;
+  Class<? extends ItemIdDao> serviceClass() default ItemIdDao.class;
 
 
   /**

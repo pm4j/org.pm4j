@@ -23,10 +23,10 @@ import org.pm4j.common.selection.SelectionHandlerWithIdSet;
 import org.pm4j.common.util.collection.ListUtil;
 
 /**
- * A {@link PageableCollection2} based on an {@link PageableIdService}.
+ * A {@link PageableCollection2} based on an {@link PageableIdQueryService}.
  * <p>
- * To get the items it first asks the service for the ID's by calling {@link PageableIdService#findIds(QueryParams, long, int)}.
- * After that it asks the service to provide the items for the current page by calling {@link PageableIdService#getItems(List)}.
+ * To get the items it first asks the service for the ID's by calling {@link PageableIdQueryService#findIds(QueryParams, long, int)}.
+ * After that it asks the service to provide the items for the current page by calling {@link PageableIdQueryService#getItems(List)}.
  * <p>
  * The current implementation is can handle a limited result set size because it holds all item ID's in
  * memory.<br>
@@ -37,11 +37,11 @@ import org.pm4j.common.util.collection.ListUtil;
  * @param <T_ITEM> The type of handled items.
  * @param <T_ID> The item identifier type.
  */
-public class PageableIdCollectionImpl<T_ITEM, T_ID> extends PageableQueryCollectionBase<T_ITEM, T_ID> {
+public class PageableIdQueryCollectionImpl<T_ITEM, T_ID> extends PageableQueryCollectionBase<T_ITEM, T_ID> {
 
-  private static final Log LOG = LogFactory.getLog(PageableIdCollectionImpl.class);
+  private static final Log LOG = LogFactory.getLog(PageableIdQueryCollectionImpl.class);
 
-  private final PageableIdService<T_ITEM, T_ID> service;
+  private final PageableIdQueryService<T_ITEM, T_ID> service;
   /** The collection type specific selection handler. */
   private final SelectionHandler<T_ITEM>  selectionHandler;
   private List<T_ID>                      ids;
@@ -70,7 +70,7 @@ public class PageableIdCollectionImpl<T_ITEM, T_ID> extends PageableQueryCollect
     }
   }
 
-  public PageableIdCollectionImpl(PageableIdService<T_ITEM, T_ID> service, QueryParams query) {
+  public PageableIdQueryCollectionImpl(PageableIdQueryService<T_ITEM, T_ID> service, QueryParams query) {
     super(service.getQueryOptions(), query);
     assert service != null;
 
@@ -104,7 +104,7 @@ public class PageableIdCollectionImpl<T_ITEM, T_ID> extends PageableQueryCollect
     });
   }
 
-  protected PageableIdService<T_ITEM, T_ID> getService() {
+  protected PageableIdQueryService<T_ITEM, T_ID> getService() {
     return service;
   }
 
@@ -239,7 +239,7 @@ public class PageableIdCollectionImpl<T_ITEM, T_ID> extends PageableQueryCollect
       // Add the new item to the current page cache list if it's just the last page.
       if ((currentPageItems != null) &&
           (currentPageItems.size() < getPageSize()) &&
-          (PageableCollectionUtil2.getNumOfPages(PageableIdCollectionImpl.this) == getPageIdx()+1)) {
+          (PageableCollectionUtil2.getNumOfPages(PageableIdQueryCollectionImpl.this) == getPageIdx()+1)) {
         currentPageItems.add(item);
       }
     }
@@ -303,8 +303,8 @@ public class PageableIdCollectionImpl<T_ITEM, T_ID> extends PageableQueryCollect
 
     protected List<T_ID> getCurrentPageIds() {
       // TODO oboede: change the utility method to a zero based index.
-      int first = (int)PageableCollectionUtil2.getIdxOfFirstItemOnPage(PageableIdCollectionImpl.this) - 1;
-      long last = PageableCollectionUtil2.getIdxOfLastItemOnPage(PageableIdCollectionImpl.this);
+      int first = (int)PageableCollectionUtil2.getIdxOfFirstItemOnPage(PageableIdQueryCollectionImpl.this) - 1;
+      long last = PageableCollectionUtil2.getIdxOfLastItemOnPage(PageableIdQueryCollectionImpl.this);
 
       if (first < 0) {
         return Collections.emptyList();

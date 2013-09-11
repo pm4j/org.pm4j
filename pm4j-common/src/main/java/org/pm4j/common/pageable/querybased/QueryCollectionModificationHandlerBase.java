@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.pm4j.common.pageable.ItemIdDao;
 import org.pm4j.common.pageable.ModificationHandler;
 import org.pm4j.common.pageable.Modifications;
 import org.pm4j.common.pageable.ModificationsImpl;
@@ -15,7 +16,6 @@ import org.pm4j.common.pageable.querybased.PageableQuerySelectionHandler.ItemIdS
 import org.pm4j.common.query.FilterExpression;
 import org.pm4j.common.query.FilterNot;
 import org.pm4j.common.query.QueryAttr;
-import org.pm4j.common.selection.ItemIdConverter;
 import org.pm4j.common.selection.Selection;
 import org.pm4j.common.selection.SelectionHandlerUtil;
 import org.pm4j.common.selection.SelectionWithAdditionalItems;
@@ -25,9 +25,9 @@ public class QueryCollectionModificationHandlerBase<T_ITEM, T_ID>  implements Mo
   private ModificationsImpl<T_ITEM> modifications = new ModificationsImpl<T_ITEM>();
   private final PageableCollectionBase2<T_ITEM> pageableCollection;
   /** The service that provides the data to handle. */
-  private ItemIdConverter<T_ITEM, T_ID> service;
+  private ItemIdDao<T_ITEM, T_ID> service;
 
-  public QueryCollectionModificationHandlerBase(PageableCollectionBase2<T_ITEM> pageableCollection, ItemIdConverter<T_ITEM, T_ID> service) {
+  public QueryCollectionModificationHandlerBase(PageableCollectionBase2<T_ITEM> pageableCollection, ItemIdDao<T_ITEM, T_ID> service) {
     assert pageableCollection != null;
     assert service != null;
     this.pageableCollection = pageableCollection;

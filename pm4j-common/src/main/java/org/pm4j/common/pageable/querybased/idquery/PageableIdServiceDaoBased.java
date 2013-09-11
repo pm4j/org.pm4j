@@ -5,11 +5,11 @@ import java.util.List;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.QueryParams;
 
-public class PageableIdServiceDaoBased<T_BEAN, T_ID> implements PageableIdService<T_BEAN, T_ID> {
+public class PageableIdServiceDaoBased<T_BEAN, T_ID> implements PageableIdQueryService<T_BEAN, T_ID> {
 
-  private PageableIdDao<T_BEAN, T_ID> dao;
+  private PageableIdQueryDao<T_BEAN, T_ID> dao;
 
-  public PageableIdServiceDaoBased(PageableIdDao<T_BEAN, T_ID> dao) {
+  public PageableIdServiceDaoBased(PageableIdQueryDao<T_BEAN, T_ID> dao) {
     this.dao = dao;
   }
 

@@ -14,21 +14,20 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.pm4j.common.pageable.ItemIdDao;
 import org.pm4j.common.pageable.ModificationHandler;
 import org.pm4j.common.pageable.Modifications;
 import org.pm4j.common.pageable.PageableCollection2;
-import org.pm4j.common.pageable.PageableCollectionFactory;
 import org.pm4j.common.pageable.inmem.PageableInMemCollectionBase;
 import org.pm4j.common.pageable.querybased.PageableQueryCollection;
 import org.pm4j.common.pageable.querybased.PageableQueryService;
-import org.pm4j.common.pageable.querybased.idquery.PageableIdCollectionImpl;
-import org.pm4j.common.pageable.querybased.idquery.PageableIdDao;
-import org.pm4j.common.pageable.querybased.idquery.PageableIdService;
+import org.pm4j.common.pageable.querybased.idquery.PageableIdQueryCollectionImpl;
+import org.pm4j.common.pageable.querybased.idquery.PageableIdQueryDao;
+import org.pm4j.common.pageable.querybased.idquery.PageableIdQueryService;
 import org.pm4j.common.pageable.querybased.idquery.PageableIdServiceDaoBased;
 import org.pm4j.common.query.FilterCompareDefinitionFactory;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.QueryParams;
-import org.pm4j.common.selection.ItemIdConverter;
 import org.pm4j.common.selection.SelectMode;
 import org.pm4j.common.selection.Selection;
 import org.pm4j.common.selection.SelectionHandler;
@@ -90,9 +89,6 @@ public class PmTableImpl2
 
   /** The content this table is based on. */
   private PageablePmBeanCollection<T_ROW_PM, T_ROW_BEAN> pmPageableCollection;
-
-  @Deprecated
-  private PageableCollectionFactory<T_ROW_BEAN> pmPageableBeanCollectionFactory;
 
   /** Defines the row-selection behavior. */
   private SelectMode pmRowSelectMode;
@@ -478,20 +474,6 @@ public class PmTableImpl2
   }
 
   /**
-   * @return the pmPageableBeanCollectionFactory
-   */
-  public PageableCollectionFactory<T_ROW_BEAN> getPmPageableBeanCollectionFactory() {
-    return pmPageableBeanCollectionFactory;
-  }
-
-  /**
-   * @param pmPageableBeanCollectionFactory the pmPageableBeanCollectionFactory to set
-   */
-  public void setPmPageableBeanCollectionFactory(PageableCollectionFactory<T_ROW_BEAN> pmPageableBeanCollectionFactory) {
-    this.pmPageableBeanCollectionFactory = pmPageableBeanCollectionFactory;
-  }
-
-  /**
    * @return The {@link PageableCollection2} that handles the table row PM's to display.
    */
   @Override
@@ -515,20 +497,20 @@ public class PmTableImpl2
   }
 
   @SuppressWarnings("unchecked")
-  protected ItemIdConverter<T_ROW_BEAN, ?> getPmQueryServiceImpl() {
+  protected ItemIdDao<T_ROW_BEAN, ?> getPmQueryServiceImpl() {
     PmTableCfg2 cfg = AnnotationUtil.findAnnotation(this, PmTableCfg2.class);
-    if (cfg != null && cfg.serviceClass() != ItemIdConverter.class) {
+    if (cfg != null && cfg.serviceClass() != ItemIdDao.class) {
       // TODO oboede: add a type based service locator.
       String lookupName = StringUtils.uncapitalize(cfg.serviceClass().getSimpleName());
-      ItemIdConverter<T_ROW_BEAN, ?> service = (ItemIdConverter<T_ROW_BEAN, ?>) getPmConversationImpl().getPmNamedObject(lookupName);
+      ItemIdDao<T_ROW_BEAN, ?> service = (ItemIdDao<T_ROW_BEAN, ?>) getPmConversationImpl().getPmNamedObject(lookupName);
 
       if (service == null) {
         throw new PmRuntimeException(this, "No implementation found for the serviceClass configured in @PmTableCfg. Configured " + service);
       }
       // DAOs are automatically wrapped with a service instance. The table model only uses the service
       // interfaces.
-      if ((service instanceof PageableIdDao) && !(service instanceof PageableIdService)) {
-        service = new PageableIdServiceDaoBased<T_ROW_BEAN, Serializable>((PageableIdDao<T_ROW_BEAN, Serializable>) service);
+      if ((service instanceof PageableIdQueryDao) && !(service instanceof PageableIdQueryService)) {
+        service = new PageableIdServiceDaoBased<T_ROW_BEAN, Serializable>((PageableIdQueryDao<T_ROW_BEAN, Serializable>) service);
       }
 
       return service;
@@ -546,23 +528,17 @@ public class PmTableImpl2
    * @return The collection to use. Never <code>null</code>.
    */
   protected PageablePmBeanCollection<T_ROW_PM, T_ROW_BEAN> getPmPageableCollectionImpl() {
-    // TODO oboede: temp. solution  for the deprecated factory...
-    if (getPmPageableBeanCollectionFactory() != null) {
-      PageableCollection2<T_ROW_BEAN> pageableBeanCollection =  getPmPageableBeanCollectionFactory().create(null, null);
-      return new PageablePmBeanCollection<T_ROW_PM, T_ROW_BEAN>(this, PmTableRow.class, pageableBeanCollection);
-    }
-
     // -- Service based table support --
     @SuppressWarnings("unchecked")
-    ItemIdConverter<T_ROW_BEAN, Serializable> service = (ItemIdConverter<T_ROW_BEAN, Serializable>) getPmQueryServiceImpl();
+    ItemIdDao<T_ROW_BEAN, Serializable> service = (ItemIdDao<T_ROW_BEAN, Serializable>) getPmQueryServiceImpl();
     if (service != null) {
       PageableCollection2<T_ROW_BEAN> pqc = null;
       if (service instanceof PageableQueryService) {
         pqc = new PageableQueryCollection<T_ROW_BEAN, Serializable>((PageableQueryService<T_ROW_BEAN, Serializable>) service);
-      } else if (service instanceof PageableIdService) {
-        PageableIdService<T_ROW_BEAN, Serializable> idService = (PageableIdService<T_ROW_BEAN, Serializable>) service;
+      } else if (service instanceof PageableIdQueryService) {
+        PageableIdQueryService<T_ROW_BEAN, Serializable> idService = (PageableIdQueryService<T_ROW_BEAN, Serializable>) service;
         // TODO oboede: Check constructor signature.
-        pqc = new PageableIdCollectionImpl<T_ROW_BEAN, Serializable>(idService, null);
+        pqc = new PageableIdQueryCollectionImpl<T_ROW_BEAN, Serializable>(idService, null);
       } else {
         throw new PmRuntimeException(this, "No matching result found for the serviceClass configured in @PmTableCfg. Found item was: " + service);
       }
