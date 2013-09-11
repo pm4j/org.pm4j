@@ -3,12 +3,12 @@
 
   <groupId>org.pm4j</groupId>
   <artifactId>pm4j-deprecated</artifactId>
-  <version>0.6.20</version>
+  <version>0.6.21-SNAPSHOT</version>
 
   <parent>
     <groupId>org.pm4j</groupId>
     <artifactId>main</artifactId>
-    <version>0.6.20</version>
+    <version>0.6.21-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
