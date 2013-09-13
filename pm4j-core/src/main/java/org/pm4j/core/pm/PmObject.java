@@ -39,8 +39,11 @@ public interface PmObject extends Comparable<PmObject> {
    *    myPm.oriSelection.shortTitle=Original
    *  </pre>
    *
+   *  @deprecated Please use {@link #getPmTitle()}. For state specific styles please use {@link #getPmStyleClasses()}.
+   *
    * @return The undecorated title string for this item.
    */
+  @Deprecated
   String getPmShortTitle();
 
   /**
