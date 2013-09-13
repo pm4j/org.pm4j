@@ -89,15 +89,6 @@ public abstract class SharedNamedObjectRef<T> {
   }
 
   /**
-   * Sets the references shared named object within the {@link PmConversation} to <code>null</code>.
-   * <p>
-   * The next call {@link #getRef()} will re-create the named object reference within the {@link PmConversation}.
-   */
-  public void clearRef() {
-    pmCtxt.getPmConversation().setPmNamedObject(name, null);
-  }
-
-  /**
    * A factory method used to create the shared named object if it was not found
    * within the related {@link PmConversation}.
    *
