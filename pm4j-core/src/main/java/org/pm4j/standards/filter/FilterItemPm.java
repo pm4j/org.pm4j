@@ -1,8 +1,6 @@
 package org.pm4j.standards.filter;
 
-import java.math.BigDecimal;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Iterator;
 
 import org.pm4j.common.query.CompOp;
@@ -13,25 +11,20 @@ import org.pm4j.core.pm.PmAttrProxy;
 import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmOptionSet;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
+import org.pm4j.core.pm.annotation.PmInject;
+import org.pm4j.core.pm.annotation.PmInject.Mode;
 import org.pm4j.core.pm.annotation.PmOptionCfg;
 import org.pm4j.core.pm.annotation.PmOptionCfg.NullOption;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmLocalizeApi;
-import org.pm4j.core.pm.impl.PmAttrBigDecimalImpl;
-import org.pm4j.core.pm.impl.PmAttrBooleanImpl;
-import org.pm4j.core.pm.impl.PmAttrDateImpl;
-import org.pm4j.core.pm.impl.PmAttrDoubleImpl;
-import org.pm4j.core.pm.impl.PmAttrEnumImpl;
 import org.pm4j.core.pm.impl.PmAttrImpl;
-import org.pm4j.core.pm.impl.PmAttrIntegerImpl;
-import org.pm4j.core.pm.impl.PmAttrLongImpl;
 import org.pm4j.core.pm.impl.PmAttrProxyImpl;
-import org.pm4j.core.pm.impl.PmAttrStringImpl;
 import org.pm4j.core.pm.impl.PmAttrValueChangeDecorator;
 import org.pm4j.core.pm.impl.PmBeanBase;
 import org.pm4j.core.pm.impl.PmInitApi;
 import org.pm4j.core.pm.impl.options.PmOptionImpl;
 import org.pm4j.core.pm.impl.options.PmOptionSetImpl;
+import org.pm4j.standards.filter.FilterSetProvider.FilterByValuePmAttrFactory;
 
 /**
  * <p>
@@ -156,6 +149,9 @@ public abstract class FilterItemPm<T_ITEM extends FilterItem> extends PmBeanBase
     }
   };
 
+  /** Needed for mapping a type to a pm attribute for dynamic switching. */
+  private FilterByValuePmAttrFactory filterByValuePmAttrFactory = new FilterByValuePmAttrFactoryImpl();
+  
   /**
    * Whenever the bean behind the PM changes, we need to transfer the actual filter value to the value field PM.
    */
@@ -173,7 +169,7 @@ public abstract class FilterItemPm<T_ITEM extends FilterItem> extends PmBeanBase
       // CompOp co = bean.getCompOp();
       if (co != null) {
         @SuppressWarnings("unchecked")
-        PmAttr<Object> a = (PmAttr<Object>)makeValueAttrPm(fd, co);
+        PmAttr<Object> a =(PmAttr<Object>)getFilterByValuePmAttrFactory().makeValueAttrPm(this, fd, co);
         if (a != null) {
           a =  PmInitApi.initDynamicPmAttr(a, "filterBy");
           a.setValue(bean.getFilterByValue());
@@ -189,49 +185,17 @@ public abstract class FilterItemPm<T_ITEM extends FilterItem> extends PmBeanBase
   }
 
   /**
-   * Creates a filter attribute type specific PM for entering the attribute value.
-   * <p>
-   * The concrete attribute PM provides:
-   * <ul>
-   *  <li>the type specific attribute provides the string conversion</li>
-   *  <li>validations and</li>
-   *  <li>options</li>
-   * </ul>
-   *
-   * @param fd the filter-by field definition.
-   * @param co the selected compare operator.
-   * @return the corresponding attribute PM.
+   * gets the FilterByValuePmAttrFactory.
+   * @return a factory.
    */
-  @SuppressWarnings({ "rawtypes", "unchecked" })
-  protected PmAttr<?> makeValueAttrPm(FilterCompareDefinition fd, CompOp co) {
-    Class<?> attrType = fd.getAttr().getType();
-    if (String.class.equals(attrType)) {
-      return new PmAttrStringImpl(this);
-    }
-    if (Integer.class.equals(attrType)) {
-      return new PmAttrIntegerImpl(this);
-    }
-    if (Long.class.equals(attrType)) {
-      return new PmAttrLongImpl(this);
-    }
-    if (Boolean.class.equals(attrType)) {
-      return new PmAttrBooleanImpl(this);
-    }
-    if (BigDecimal.class.equals(attrType)) {
-        return new PmAttrBigDecimalImpl(this);
-    }
-    if (Double.class.equals(attrType)) {
-      return new PmAttrDoubleImpl(this);
-    }
-    if (Enum.class.equals(attrType)) {
-      return new PmAttrEnumImpl(this, attrType);
-    }
-    if (Date.class.equals(attrType)) {
-      return new PmAttrDateImpl(this);
-    }
+  protected abstract FilterByValuePmAttrFactory getFilterByValuePmAttrFactory();
 
-    // fall back:
-    return new PmAttrStringImpl(this);
+  /**
+   * sets the FilterByValuePmAttrFactory.
+   * @param factory
+   */
+  public void setFilterByValuePmAttrFactory( FilterByValuePmAttrFactory factory) {
+    filterByValuePmAttrFactory = factory;
   }
-
+  
 }
