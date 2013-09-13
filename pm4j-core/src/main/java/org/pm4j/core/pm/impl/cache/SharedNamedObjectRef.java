@@ -5,15 +5,15 @@ import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.PmObject;
 
 /**
- * A helper that may be used to handle a shared named object instance withing a
+ * A helper that may be used to handle a shared named object instance within a
  * {@link PmConversation}.<br>
  * It may be used by several objects to use only a single shared named object
  * instance.<br>
  * This is useful to get a shared caching service for multiple PM instances
  * (e.g. table rows PM's).
  * <p>
- * This provides a named object identifier and a factory method that is used to
- * cread the requested named object on the fly if it does not yet exist.
+ * This class provides a named object identifier and a factory method that is used to
+ * create the requested named object on the fly if it does not yet exist.
  *
  * @param <T>
  *          type of the handled named object.
@@ -86,6 +86,15 @@ public abstract class SharedNamedObjectRef<T> {
       }
     }
     return namedObj;
+  }
+
+  /**
+   * Sets the references shared named object within the {@link PmConversation} to <code>null</code>.
+   * <p>
+   * The next call {@link #getRef()} will re-create the named object reference within the {@link PmConversation}.
+   */
+  public void clearRef() {
+    pmCtxt.getPmConversation().setPmNamedObject(name, null);
   }
 
   /**
