@@ -22,7 +22,7 @@ public abstract class ItemIdDaoFakeBase<T_ITEM, T_ID> implements ItemIdDao<T_ITE
   public static final String METHOD_GET_ITEM_FOR_ID = "getItemForId";
 
   protected final Map<T_ID, T_ITEM> idToBeanMap = new LinkedHashMap<T_ID, T_ITEM>();
-  protected final CallCounter callCounter = new CallCounter();
+  public final CallCounter callCounter = new CallCounter();
   private InMemQueryEvaluator<T_ITEM> queryEvaluator = new InMemQueryEvaluator<T_ITEM>();
 
   public void setQueryEvaluator(InMemQueryEvaluator<T_ITEM> queryEvaluator) {

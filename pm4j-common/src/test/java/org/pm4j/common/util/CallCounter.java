@@ -35,4 +35,9 @@ public class CallCounter {
     }
   }
 
+  /** Provides a string containing all name-to-call-count map items sorted by name. */
+  @Override
+  public String toString() {
+    return nameToCallCountMap.toString();
+  }
 }

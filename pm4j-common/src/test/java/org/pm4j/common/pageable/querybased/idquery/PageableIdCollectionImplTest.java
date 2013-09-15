@@ -1,7 +1,10 @@
 package org.pm4j.common.pageable.querybased.idquery;
 
+import static junit.framework.Assert.assertEquals;
+
 import java.util.Comparator;
 
+import org.junit.Test;
 import org.pm4j.common.pageable.PageableCollection2;
 import org.pm4j.common.pageable.PageableCollectionTestBase;
 import org.pm4j.common.query.CompOpStringStartsWith;
@@ -36,6 +39,107 @@ public class PageableIdCollectionImplTest extends PageableCollectionTestBase<Pag
   @Override
   protected Bean createItem(String name) {
     return new Bean(name);
+  }
+  
+  @Override
+  public void setUp() {
+    super.setUp();
+    assertEquals("Call count stability check.", "{getItems=1, getItemForId=11, findIds=1}", service.callCounter.toString());
+    service.callCounter.reset();
+  }
+  
+  @Test
+  public void testMethodCallCount() {
+    service.callCounter.reset();
+    collection.getItemsOnPage();
+    assertEquals("One call to get all ids and one to get the page items.", "{getItems=1, findIds=1}", service.callCounter.toString());
+
+    service.callCounter.reset();
+    collection.getItemsOnPage();
+    assertEquals("No additional call on re-getting the current page.", "{}", service.callCounter.toString());
+
+    service.callCounter.reset();
+    collection.setPageIdx(1l);
+    collection.getItemsOnPage();
+    assertEquals("One call to get the items of the next page.", "{getItems=1}", service.callCounter.toString());
+  }
+  
+  @Test @Override
+  public void testItemNavigator() {
+    super.testItemNavigator();
+    assertEquals("Call count stability check.", "{getItems=1, getItemForId=9, findIds=1}", service.callCounter.toString());
+  }
+  
+  @Test @Override
+  public void testSwitchQueryExecOffAndOn() {
+    super.testSwitchQueryExecOffAndOn();
+    assertEquals("Call count stability check.", "{getItemForId=12, findIds=2}", service.callCounter.toString());
+  }
+  
+  @Test @Override
+  public void testItemsOnPage() {
+    super.testItemsOnPage();
+    assertEquals("Call count stability check.", "{getItems=4, findIds=1}", service.callCounter.toString());
+  }
+  
+  @Override
+  public void testSortItems() {
+    super.testSortItems();
+    assertEquals("Call count stability check.", "{getItemForId=24, findIds=4}", service.callCounter.toString());
+  }
+  
+  @Override
+  public void testDefaultSortOrder() {
+    super.testDefaultSortOrder();
+    assertEquals("Call count stability check.", "{getItems=5, getItemForId=30, findIds=5}", service.callCounter.toString());
+  }
+  
+  @Override
+  public void testFilterItems() {
+    super.testFilterItems();
+    assertEquals("Call count stability check.", "{getItemForId=7, findIds=2}", service.callCounter.toString());
+  }
+  
+  @Override
+  public void testSelectItems() {
+    super.testSelectItems();
+    assertEquals("Call count stability check.", "{getItems=1, findIds=1}", service.callCounter.toString());
+  }
+  
+  @Override
+  public void testSelectInvertAndDeselect() {
+    super.testSelectInvertAndDeselect();
+    assertEquals("Call count stability check.", "{getItems=1, findIds=1}", service.callCounter.toString());
+  }
+  
+  @Override
+  public void testAddItem() {
+    super.testAddItem();
+    assertEquals("Call count stability check.", "{getItems=4, getItemForId=8, findIds=2}", service.callCounter.toString());
+  }
+  
+  @Override
+  public void testAddItemToEmptyCollection() {
+    super.testAddItemToEmptyCollection();
+    assertEquals("Call count stability check.", "{findIds=1}", service.callCounter.toString());
+  }
+  
+  @Override
+  public void testAddItemInMultiSelectMode() {
+    super.testAddItemInMultiSelectMode();
+    assertEquals("Call count stability check.", "{getItems=4, getItemForId=8, findIds=2}", service.callCounter.toString());
+  }
+  
+  @Override
+  public void testRemoveItems() {
+    super.testRemoveItems();
+    assertEquals("Call count stability check.", "{getItems=1, getItemForId=8, findIds=2}", service.callCounter.toString());
+  }
+  
+  @Override
+  public void testRemoveOfAddedAndUpdatedItems() {
+    super.testRemoveOfAddedAndUpdatedItems();
+    assertEquals("Call count stability check.", "{getItems=1, getItemForId=12, findIds=2}", service.callCounter.toString());
   }
 
   // --- A fake service implementation that does the job just in memory. ---
