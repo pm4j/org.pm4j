@@ -6,15 +6,21 @@ import java.util.List;
 
 import org.pm4j.common.pageable.querybased.ItemIdDaoFakeBase;
 import org.pm4j.common.query.QueryParams;
-import org.pm4j.common.query.inmem.InMemQueryEvaluator;
 
+/**
+ * A DAO fake that works in memory.
+ *
+ * @param <T_ITEM>
+ * @param <T_ID>
+ * 
+ * @author olaf boede
+ */
 public abstract class PageableIdQueryDaoFakeBase<T_ITEM, T_ID> extends ItemIdDaoFakeBase<T_ITEM, T_ID> implements PageableIdQueryDao<T_ITEM, T_ID> {
 
   public static final String METHOD_FIND_IDS = "findIds";
   public static final String METHOD_GET_ITEMS = "getItems";
   public static final String METHOD_GET_ITEM_COUNT = "getItemCount";
 
-  private InMemQueryEvaluator<T_ITEM> queryEvaluator = new InMemQueryEvaluator<T_ITEM>();
 
   @Override
   public List<T_ID> findIds(QueryParams query, long startIdx, int pageSize) {
@@ -48,20 +54,6 @@ public abstract class PageableIdQueryDaoFakeBase<T_ITEM, T_ID> extends ItemIdDao
   public long getItemCount(QueryParams query) {
     callCounter.incCallCount(METHOD_GET_ITEM_COUNT);
     return getQueryResult(query).size();
-  }
-
-  protected List<T_ITEM> getQueryResult(QueryParams query) {
-    List<T_ITEM> beans = getQueryEvaluator().sort(idToBeanMap.values(), query.getEffectiveSortOrder());
-
-    if (query.getFilterExpression() != null) {
-      beans = getQueryEvaluator().evaluateSubSet(beans, query.getFilterExpression());
-    }
-
-    return beans;
-  }
-
-  protected InMemQueryEvaluator<T_ITEM> getQueryEvaluator() {
-    return queryEvaluator;
   }
 
 }

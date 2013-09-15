@@ -1,17 +1,34 @@
 package org.pm4j.common.pageable.querybased;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.pm4j.common.pageable.ItemIdDao;
+import org.pm4j.common.query.QueryParams;
+import org.pm4j.common.query.inmem.InMemQueryEvaluator;
 import org.pm4j.common.util.CallCounter;
 
+/**
+ * A DAO fake that works in memory.
+ *
+ * @param <T_ITEM>
+ * @param <T_ID>
+ * 
+ * @author olaf boede
+ */
 public abstract class ItemIdDaoFakeBase<T_ITEM, T_ID> implements ItemIdDao<T_ITEM, T_ID> {
 
   public static final String METHOD_GET_ITEM_FOR_ID = "getItemForId";
 
   protected final Map<T_ID, T_ITEM> idToBeanMap = new LinkedHashMap<T_ID, T_ITEM>();
   protected final CallCounter callCounter = new CallCounter();
+  private InMemQueryEvaluator<T_ITEM> queryEvaluator = new InMemQueryEvaluator<T_ITEM>();
+
+  public void setQueryEvaluator(InMemQueryEvaluator<T_ITEM> queryEvaluator) {
+    this.queryEvaluator = queryEvaluator;
+  }
+
 
   @Override
   public abstract T_ID getIdForItem(T_ITEM item);
@@ -31,6 +48,20 @@ public abstract class ItemIdDaoFakeBase<T_ITEM, T_ID> implements ItemIdDao<T_ITE
 
   public void removeAllFakeItems() {
     idToBeanMap.clear();
+  }
+
+  protected List<T_ITEM> getQueryResult(QueryParams query) {
+    List<T_ITEM> beans = getQueryEvaluator().sort(idToBeanMap.values(), query.getEffectiveSortOrder());
+
+    if (query.getFilterExpression() != null) {
+      beans = getQueryEvaluator().evaluateSubSet(beans, query.getFilterExpression());
+    }
+
+    return beans;
+  }
+
+  protected InMemQueryEvaluator<T_ITEM> getQueryEvaluator() {
+    return queryEvaluator;
   }
 
 }
