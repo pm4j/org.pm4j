@@ -5,9 +5,6 @@ import static junit.framework.Assert.assertEquals;
 import org.junit.Test;
 import org.pm4j.common.pageable.PageableCollection2;
 import org.pm4j.common.pageable.PageableCollectionTestBase;
-import org.pm4j.common.query.CompOpStringStartsWith;
-import org.pm4j.common.query.FilterCompareDefinition;
-import org.pm4j.common.query.QueryOptions;
 
 public class PageableIdCollectionImplTest extends PageableCollectionTestBase<PageableCollectionTestBase.Bean> {
 
@@ -22,7 +19,7 @@ public class PageableIdCollectionImplTest extends PageableCollectionTestBase<Pag
         service.addFakeItem(new Bean(++counter, s));
       }
     }
-    return new PageableIdQueryCollectionImpl<Bean, Integer>(service, service.getQueryOptions());
+    return new PageableIdQueryCollectionImpl<Bean, Integer>(service, getQueryOptions());
   }
 
   @Override
@@ -133,20 +130,8 @@ public class PageableIdCollectionImplTest extends PageableCollectionTestBase<Pag
   // --- A fake service implementation that does the job just in memory. ---
 
   static class TestService extends PageableIdQueryServiceFakeBase<Bean, Integer> implements PageableIdQueryService<Bean, Integer> {
-
-    @Override
-    public Integer getIdForItem(Bean item) {
+    @Override public Integer getIdForItem(Bean item) {
       return item.getId();
-    }
-
-    // some in memory fakes ...
-    @Override
-    public QueryOptions getQueryOptions() {
-      QueryOptions options = new QueryOptions();
-      options.addSortOrder(Bean.ATTR_NAME);
-      options.addFilterCompareDefinition(new FilterCompareDefinition(Bean.ATTR_NAME, new CompOpStringStartsWith()));
-
-      return options;
     }
   }
 }

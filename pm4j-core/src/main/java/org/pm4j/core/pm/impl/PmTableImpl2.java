@@ -530,7 +530,7 @@ public class PmTableImpl2
       } else if (service instanceof PageableIdQueryService) {
         PageableIdQueryService<T_ROW_BEAN, Serializable> idService = (PageableIdQueryService<T_ROW_BEAN, Serializable>) service;
         // TODO oboede: Check constructor signature.
-        pqc = new PageableIdQueryCollectionImpl<T_ROW_BEAN, Serializable>(idService, null);
+        pqc = new PageableIdQueryCollectionImpl<T_ROW_BEAN, Serializable>(idService, getQueryOptionsImpl());
       } else {
         throw new PmRuntimeException(this, "No matching result found for the serviceClass configured in @PmTableCfg. Found item was: " + service);
       }
@@ -546,6 +546,15 @@ public class PmTableImpl2
       }
     };
     return new PageablePmBeanCollection<T_ROW_PM, T_ROW_BEAN>(this, PmTableRow.class, pageableBeanCollection);
+  }
+
+  /**
+   * Provides the {@link QueryOptions} to offer for this table.
+   *
+   * @return
+   */
+  protected QueryOptions getQueryOptionsImpl() {
+    throw new PmRuntimeException(this, "Please implement getQueryOptionsImpl()");
   }
 
 

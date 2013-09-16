@@ -3,7 +3,6 @@ package org.pm4j.common.pageable.querybased.idquery;
 import java.util.List;
 
 import org.pm4j.common.pageable.ItemIdService;
-import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.QueryParams;
 
 /**
@@ -27,13 +26,5 @@ public interface PageableIdQueryService<T_BEAN, T_ID> extends ItemIdService<T_BE
    * @return
    */
   long getItemCount(QueryParams query);
-
-  /**
-   * Provides the set of filter definitions and attribute sort orders that can be
-   * processed by this service.
-   *
-   * @return
-   */
-  QueryOptions getQueryOptions();
 
 }
