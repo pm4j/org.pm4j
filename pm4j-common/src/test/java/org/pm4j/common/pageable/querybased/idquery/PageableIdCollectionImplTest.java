@@ -2,18 +2,12 @@ package org.pm4j.common.pageable.querybased.idquery;
 
 import static junit.framework.Assert.assertEquals;
 
-import java.util.Comparator;
-
 import org.junit.Test;
 import org.pm4j.common.pageable.PageableCollection2;
 import org.pm4j.common.pageable.PageableCollectionTestBase;
 import org.pm4j.common.query.CompOpStringStartsWith;
 import org.pm4j.common.query.FilterCompareDefinition;
-import org.pm4j.common.query.QueryAttr;
 import org.pm4j.common.query.QueryOptions;
-import org.pm4j.common.query.SortOrder;
-import org.pm4j.common.query.inmem.InMemSortOrder;
-import org.pm4j.common.util.CompareUtil;
 
 public class PageableIdCollectionImplTest extends PageableCollectionTestBase<PageableCollectionTestBase.Bean> {
 
@@ -28,12 +22,7 @@ public class PageableIdCollectionImplTest extends PageableCollectionTestBase<Pag
         service.addFakeItem(new Bean(++counter, s));
       }
     }
-    return new PageableIdQueryCollectionImpl<Bean, Integer>(service, null);
-  }
-
-  @Override
-  protected SortOrder getOrderByName() {
-    return service.getQueryOptions().getSortOrder("name");
+    return new PageableIdQueryCollectionImpl<Bean, Integer>(service, service.getQueryOptions());
   }
 
   @Override
@@ -143,7 +132,7 @@ public class PageableIdCollectionImplTest extends PageableCollectionTestBase<Pag
 
   // --- A fake service implementation that does the job just in memory. ---
 
-  static class TestService extends PageableIdQueryDaoFakeBase<Bean, Integer> implements PageableIdQueryService<Bean, Integer> {
+  static class TestService extends PageableIdQueryServiceFakeBase<Bean, Integer> implements PageableIdQueryService<Bean, Integer> {
 
     @Override
     public Integer getIdForItem(Bean item) {
@@ -154,16 +143,8 @@ public class PageableIdCollectionImplTest extends PageableCollectionTestBase<Pag
     @Override
     public QueryOptions getQueryOptions() {
       QueryOptions options = new QueryOptions();
-      QueryAttr nameAttr = new QueryAttr("name", String.class);
-
-      options.addSortOrder("name", new InMemSortOrder(new Comparator<Bean>() {
-        @Override
-        public int compare(Bean o1, Bean o2) {
-          return CompareUtil.compare(o1.name, o2.name);
-        }
-      }));
-
-      options.addFilterCompareDefinition(new FilterCompareDefinition(nameAttr, new CompOpStringStartsWith()));
+      options.addSortOrder(Bean.ATTR_NAME);
+      options.addFilterCompareDefinition(new FilterCompareDefinition(Bean.ATTR_NAME, new CompOpStringStartsWith()));
 
       return options;
     }

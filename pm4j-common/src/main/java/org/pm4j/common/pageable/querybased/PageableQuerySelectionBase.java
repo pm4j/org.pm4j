@@ -2,7 +2,7 @@ package org.pm4j.common.pageable.querybased;
 
 import java.io.Serializable;
 
-import org.pm4j.common.pageable.ItemIdDao;
+import org.pm4j.common.pageable.ItemIdService;
 import org.pm4j.common.selection.Selection;
 
 /**
@@ -13,14 +13,14 @@ public abstract class PageableQuerySelectionBase<T_ITEM, T_ID> implements Select
 
   /** The service provider may be <code>null</code> in case of non-serializeable selections. */
   private PageableQueryServiceWithSerialization.SerializeableServiceProvider serviceProvider;
-  transient private ItemIdDao<T_ITEM, T_ID> service;
+  transient private ItemIdService<T_ITEM, T_ID> service;
 
-  public PageableQuerySelectionBase(ItemIdDao<T_ITEM, T_ID> service) {
+  public PageableQuerySelectionBase(ItemIdService<T_ITEM, T_ID> service) {
     assert service != null;
     this.service = service;
 
     // find the (optionally embedded) serializeable service provider.
-    ItemIdDao<T_ITEM, T_ID> s = service;
+    ItemIdService<T_ITEM, T_ID> s = service;
     if (s instanceof CachingPageableQueryService) {
     	s = ((CachingPageableQueryService<T_ITEM, T_ID>)service).getBaseService();
     }
@@ -35,7 +35,7 @@ public abstract class PageableQuerySelectionBase<T_ITEM, T_ID> implements Select
   }
 
   @SuppressWarnings("unchecked")
-  protected ItemIdDao<T_ITEM, T_ID> getService() {
+  protected ItemIdService<T_ITEM, T_ID> getService() {
     if (service == null) {
       if (serviceProvider != null) {
         service = (PageableQueryService<T_ITEM, T_ID>) serviceProvider.getQueryService();

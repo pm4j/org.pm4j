@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.pm4j.common.pageable.ItemIdDao;
+import org.pm4j.common.pageable.ItemIdService;
 
 /**
  * A selection of items that is based on a collection of item id's.
@@ -24,9 +24,9 @@ public class ItemIdBasedSelection<T_ITEM, T_ID> implements Selection<T_ITEM>, Se
   // TODO: preseve the sort order according to some user defined stuff
   //  For large selections an array would be more memory efficient. But it would slow down the contains() functionality...
   final Set<T_ID> ids;
-  private final ItemIdDao<T_ITEM, T_ID> itemIdConverter;
+  private final ItemIdService<T_ITEM, T_ID> itemIdConverter;
 
-  public ItemIdBasedSelection(ItemIdDao<T_ITEM, T_ID> itemIdConverter, Set<T_ID> ids) {
+  public ItemIdBasedSelection(ItemIdService<T_ITEM, T_ID> itemIdConverter, Set<T_ID> ids) {
     this.ids = Collections.unmodifiableSet(ids);
     this.itemIdConverter = itemIdConverter;
   }

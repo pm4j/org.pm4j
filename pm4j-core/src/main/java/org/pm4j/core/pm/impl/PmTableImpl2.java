@@ -14,7 +14,7 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.pm4j.common.pageable.ItemIdDao;
+import org.pm4j.common.pageable.ItemIdService;
 import org.pm4j.common.pageable.ModificationHandler;
 import org.pm4j.common.pageable.Modifications;
 import org.pm4j.common.pageable.PageableCollection2;
@@ -22,9 +22,7 @@ import org.pm4j.common.pageable.inmem.PageableInMemCollectionBase;
 import org.pm4j.common.pageable.querybased.PageableQueryCollection;
 import org.pm4j.common.pageable.querybased.PageableQueryService;
 import org.pm4j.common.pageable.querybased.idquery.PageableIdQueryCollectionImpl;
-import org.pm4j.common.pageable.querybased.idquery.PageableIdQueryDao;
 import org.pm4j.common.pageable.querybased.idquery.PageableIdQueryService;
-import org.pm4j.common.pageable.querybased.idquery.PageableIdServiceDaoBased;
 import org.pm4j.common.query.FilterCompareDefinitionFactory;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.QueryParams;
@@ -497,22 +495,16 @@ public class PmTableImpl2
   }
 
   @SuppressWarnings("unchecked")
-  protected ItemIdDao<T_ROW_BEAN, ?> getPmQueryServiceImpl() {
+  protected ItemIdService<T_ROW_BEAN, ?> getPmQueryServiceImpl() {
     PmTableCfg2 cfg = AnnotationUtil.findAnnotation(this, PmTableCfg2.class);
-    if (cfg != null && cfg.serviceClass() != ItemIdDao.class) {
+    if (cfg != null && cfg.serviceClass() != ItemIdService.class) {
       // TODO oboede: add a type based service locator.
       String lookupName = StringUtils.uncapitalize(cfg.serviceClass().getSimpleName());
-      ItemIdDao<T_ROW_BEAN, ?> service = (ItemIdDao<T_ROW_BEAN, ?>) getPmConversationImpl().getPmNamedObject(lookupName);
+      ItemIdService<T_ROW_BEAN, ?> service = (ItemIdService<T_ROW_BEAN, ?>) getPmConversationImpl().getPmNamedObject(lookupName);
 
       if (service == null) {
         throw new PmRuntimeException(this, "No implementation found for the serviceClass configured in @PmTableCfg. Configured " + service);
       }
-      // DAOs are automatically wrapped with a service instance. The table model only uses the service
-      // interfaces.
-      if ((service instanceof PageableIdQueryDao) && !(service instanceof PageableIdQueryService)) {
-        service = new PageableIdServiceDaoBased<T_ROW_BEAN, Serializable>((PageableIdQueryDao<T_ROW_BEAN, Serializable>) service);
-      }
-
       return service;
     }
     // no service available. Is OK for collection bound tables.
@@ -530,7 +522,7 @@ public class PmTableImpl2
   protected PageablePmBeanCollection<T_ROW_PM, T_ROW_BEAN> getPmPageableCollectionImpl() {
     // -- Service based table support --
     @SuppressWarnings("unchecked")
-    ItemIdDao<T_ROW_BEAN, Serializable> service = (ItemIdDao<T_ROW_BEAN, Serializable>) getPmQueryServiceImpl();
+    ItemIdService<T_ROW_BEAN, Serializable> service = (ItemIdService<T_ROW_BEAN, Serializable>) getPmQueryServiceImpl();
     if (service != null) {
       PageableCollection2<T_ROW_BEAN> pqc = null;
       if (service instanceof PageableQueryService) {

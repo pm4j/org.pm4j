@@ -7,7 +7,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import org.pm4j.common.pageable.ItemIdDao;
+import org.pm4j.common.pageable.ItemIdService;
 import org.pm4j.common.pageable.ModificationHandler;
 import org.pm4j.common.pageable.PageableCollection2;
 import org.pm4j.common.pageable.PageableCollectionUtil2;
@@ -242,7 +242,7 @@ class PageableQueryUtil {
     return itemsOnPage;
   }
 
-  public static <T_ITEM, T_ID> Collection<T_ID> getItemIds(ItemIdDao<T_ITEM, T_ID> service, Selection<T_ITEM> items) {
+  public static <T_ITEM, T_ID> Collection<T_ID> getItemIds(ItemIdService<T_ITEM, T_ID> service, Selection<T_ITEM> items) {
     Collection<T_ID> ids = new ArrayList<T_ID>((int)items.getSize());
     for (T_ITEM i : items) {
       ids.add(service.getIdForItem(i));

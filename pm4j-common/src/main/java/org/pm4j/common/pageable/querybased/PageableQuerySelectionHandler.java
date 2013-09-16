@@ -10,7 +10,7 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.pm4j.common.pageable.ItemIdDao;
+import org.pm4j.common.pageable.ItemIdService;
 import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.selection.SelectMode;
 import org.pm4j.common.selection.Selection;
@@ -197,7 +197,7 @@ public abstract class PageableQuerySelectionHandler<T_ITEM, T_ID> extends Select
 
     private static final long serialVersionUID = 1L;
 
-    public QuerySelectionWithClickedIds(ItemIdDao<T_ITEM, T_ID> service) {
+    public QuerySelectionWithClickedIds(ItemIdService<T_ITEM, T_ID> service) {
       super(service);
     }
 
@@ -228,7 +228,7 @@ public abstract class PageableQuerySelectionHandler<T_ITEM, T_ID> extends Select
      * @param ids the set of selected id's.
      */
     @SuppressWarnings("unchecked")
-    public ItemIdSelection(ItemIdDao<T_ITEM, T_ID> service, Collection<T_ID> ids) {
+    public ItemIdSelection(ItemIdService<T_ITEM, T_ID> service, Collection<T_ID> ids) {
       super(service);
       this.ids = (ids != null) ? Collections.unmodifiableCollection(ids) : Collections.EMPTY_LIST;
     }

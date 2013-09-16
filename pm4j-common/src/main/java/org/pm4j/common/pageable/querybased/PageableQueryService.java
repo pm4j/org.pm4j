@@ -2,7 +2,7 @@ package org.pm4j.common.pageable.querybased;
 
 import java.util.List;
 
-import org.pm4j.common.pageable.ItemIdDao;
+import org.pm4j.common.pageable.ItemIdService;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.QueryParams;
 
@@ -16,7 +16,7 @@ import org.pm4j.common.query.QueryParams;
  *
  * @author olaf boede
  */
-public interface PageableQueryService<T_BEAN, T_ID> extends ItemIdDao<T_BEAN, T_ID> {
+public interface PageableQueryService<T_BEAN, T_ID> extends ItemIdService<T_BEAN, T_ID> {
 
   /**
    * Provides an item subset. E.g. the items for a page to display.

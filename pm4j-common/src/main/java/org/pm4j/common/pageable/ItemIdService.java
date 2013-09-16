@@ -8,7 +8,7 @@ package org.pm4j.common.pageable;
  *
  * @author olaf boede
  */
-public interface ItemIdDao<T_ITEM, T_ID> {
+public interface ItemIdService<T_ITEM, T_ID> {
 
   /**
    * @param item the item to get the identifier for.
