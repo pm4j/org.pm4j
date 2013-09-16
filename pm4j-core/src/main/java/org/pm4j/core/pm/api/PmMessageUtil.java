@@ -137,7 +137,7 @@ public class PmMessageUtil {
                   : PmConstants.MSGKEY_VALIDATION_MISSING_REQUIRED_SELECTION;
     }
 
-    return new PmResourceData(pm, msgKey, pm.getPmShortTitle());
+    return new PmResourceData(pm, msgKey, pm.getPmTitle());
   }
 
   public static List<PmMessage> getPmMessages(PmObject pm) {

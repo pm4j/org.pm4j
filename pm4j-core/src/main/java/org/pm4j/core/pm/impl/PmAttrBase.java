@@ -488,7 +488,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
       } catch (PmConverterException e) {
         PmResourceData resData = e.getResourceData();
         Object[] args = Arrays.copyOf(resData.msgArgs, resData.msgArgs.length+1);
-        args[resData.msgArgs.length] = getPmShortTitle();
+        args[resData.msgArgs.length] = getPmTitle();
         setAndPropagateValueConverterMessage(vc, resData.msgKey, args);
         if (LOG.isDebugEnabled()) {
           LOG.debug("String to value conversion failed in attribute '" + PmUtil.getPmLogString(this) +

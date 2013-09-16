@@ -148,7 +148,7 @@ public abstract class PmObjectBase implements PmObject {
   }
 
   @Override
-  public String getPmShortTitle() {
+  @Deprecated public String getPmShortTitle() {
     return getPmTitleDef().getShortTitle(this);
   }
 

@@ -26,8 +26,9 @@ public interface PmTitleProvider<T> {
    * @param item
    *          An item to get the undecorated title for.
    * @return The undecorated title string for the given item.
+   * @deprecated Please use getPmTitle() instead.
    */
-  String getShortTitle(T item);
+  @Deprecated String getShortTitle(T item);
 
   /**
    * @param item

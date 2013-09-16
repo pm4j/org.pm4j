@@ -41,8 +41,10 @@ public class TitleProviderPmResBased<T extends PmObjectBase> implements PmTitleP
 
   /**
    * {@inheritDoc}
+   * @deprecated Please use getPmTitle() instead.
    */
-  public String getShortTitle(T item) {
+  @Override
+  @Deprecated public String getShortTitle(T item) {
     String s = PmLocalizeApi.findLocalization(item, item.getPmResKey() + PmConstants.RESKEY_POSTFIX_SHORT_TITLE);
 
     return (s != null)

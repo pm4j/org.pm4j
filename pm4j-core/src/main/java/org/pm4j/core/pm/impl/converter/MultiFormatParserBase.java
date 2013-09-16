@@ -63,7 +63,7 @@ public abstract class MultiFormatParserBase<T extends Serializable> {
 
     // no format match
     throw new PmResourceRuntimeException(pmAttr, PmConstants.MSGKEY_VALIDATION_FORMAT_FAILURE,
-                           pmAttr.getPmShortTitle(), getOutputFormat(pmAttr), s);
+                           pmAttr.getPmTitle(), getOutputFormat(pmAttr), s);
   }
 
   /**
