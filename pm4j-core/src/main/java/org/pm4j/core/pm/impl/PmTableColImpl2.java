@@ -286,6 +286,7 @@ public class PmTableColImpl2 extends PmObjectBase implements PmTableCol2 {
     // FIXME oboede: the column annotation needs to be considered asap.
     PmTableColCfg2 annotation = AnnotationUtil.findAnnotation(this, PmTableColCfg2.class);
     if (annotation != null) {
+      annotation.sortable();
 //      myMetaData.colSizeSpec = new ColSizeSpec(
 //          annotation.prefSize(), annotation.minSize(), annotation.maxSize());
 
