@@ -15,6 +15,7 @@ import org.pm4j.common.pageable.PageableCollection2;
 import org.pm4j.common.pageable.PageableCollectionUtil2;
 import org.pm4j.common.pageable.querybased.PageableQueryCollectionBase;
 import org.pm4j.common.pageable.querybased.QueryCollectionModificationHandlerBase;
+import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.selection.Selection;
 import org.pm4j.common.selection.SelectionHandler;
@@ -70,8 +71,8 @@ public class PageableIdQueryCollectionImpl<T_ITEM, T_ID> extends PageableQueryCo
     }
   }
 
-  public PageableIdQueryCollectionImpl(PageableIdQueryService<T_ITEM, T_ID> service, QueryParams query) {
-    super(service.getQueryOptions(), query);
+  public PageableIdQueryCollectionImpl(PageableIdQueryService<T_ITEM, T_ID> service, QueryOptions queryOptions) {
+    super(queryOptions);
     assert service != null;
 
     this.service = service;

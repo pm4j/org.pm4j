@@ -35,16 +35,6 @@ public class PageableQueryCollection<T_ITEM, T_ID extends Serializable> extends 
   private final CachingPageableQueryService<T_ITEM, T_ID>   cachingService;
 
   /**
-   * Creates a service based collection without query restrictions.
-   *
-   * @param service
-   *          the service used to get the data.
-   */
-  public PageableQueryCollection(PageableQueryService<T_ITEM, T_ID> service) {
-    this(service, null);
-  }
-
-  /**
    * @param service
    *          the service used to get the data.
    * @param queryParams
@@ -52,8 +42,8 @@ public class PageableQueryCollection<T_ITEM, T_ID extends Serializable> extends 
    *          sort order.<br>
    *          May be <code>null</code> if there are no query restrictions.
    */
-  public PageableQueryCollection(PageableQueryService<T_ITEM, T_ID> service, QueryParams queryParams) {
-    super(service.getQueryOptions(), queryParams);
+  public PageableQueryCollection(PageableQueryService<T_ITEM, T_ID> service) {
+    super(service.getQueryOptions());
 
     this.service = service;
     this.cachingService = new CachingPageableQueryService<T_ITEM, T_ID>(service);

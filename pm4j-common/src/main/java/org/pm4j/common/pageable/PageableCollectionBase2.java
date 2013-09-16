@@ -23,17 +23,13 @@ public abstract class PageableCollectionBase2<T_ITEM> extends PropertyChangeSupp
 
   /**
    * @param queryOptions
-   *          the set of sort order and filter restricions that can be adjusted by the user.
-   * @param queryParams
-   *          defines the current sort order and filter restricions.
+   *          the set of sort order and filter restrictions that can be adjusted by the user.
    */
-  public PageableCollectionBase2(QueryOptions queryOptions, QueryParams queryParams) {
+  public PageableCollectionBase2(QueryOptions queryOptions) {
     this.queryOptions = (queryOptions != null)
         ? queryOptions
         : new QueryOptions();
-    this.queryParams = (queryParams != null)
-            ? queryParams
-            : new QueryParams(this.queryOptions.getDefaultSortOrder());
+    this.queryParams = new QueryParams(this.queryOptions.getDefaultSortOrder());
     this.pageIdx = 0;
   }
 

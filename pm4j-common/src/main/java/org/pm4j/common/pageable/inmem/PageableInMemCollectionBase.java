@@ -50,7 +50,7 @@ public abstract class PageableInMemCollectionBase<T_ITEM>
   /** The currently active sort order comparator. */
   private Comparator<T_ITEM>             sortOrderComparator;
 
-  private InMemQueryEvaluator<T_ITEM>    inMemQueryEvaluator;
+  private InMemQueryEvaluator<T_ITEM>    inMemQueryEvaluator = new InMemQueryEvaluator<T_ITEM>();
 
   private final InMemModificationHandler modificationHandler;
 
@@ -74,20 +74,20 @@ public abstract class PageableInMemCollectionBase<T_ITEM>
   /**
    * @param objects
    *          the set of objects to iterate over.
+   * @deprecated Please use {@link #PageableInMemCollectionBase(QueryOptions)}.
    */
+  @Deprecated
   public PageableInMemCollectionBase(QueryOptions queryOptions, QueryParams queryParams) {
-    this(new InMemQueryEvaluator<T_ITEM>(), queryOptions, queryParams);
+    this(queryOptions);
+    assert queryParams == null : "queryParams parameter value is no longer supported";
   }
 
   /**
-   * @param objects
-   *          the set of objects to iterate over.
-   * @param query
-   *          defines the current sort order and filter restrictions.
+   * @param queryOptions
+   *          the set of query options offered that's usually offered to the user.
    */
-  public PageableInMemCollectionBase(InMemQueryEvaluator<T_ITEM> inMemQueryEvaluator, QueryOptions queryOptions, QueryParams query) {
-    super(queryOptions, query);
-    this.inMemQueryEvaluator = inMemQueryEvaluator;
+  public PageableInMemCollectionBase(QueryOptions queryOptions) {
+    super(queryOptions);
     this.selectionHandler = new SelectionHandlerWithItemSet<T_ITEM>(this);
 
     // getQuery is used because the super ctor may have created it on the fly (in case of a null parameter)
@@ -154,6 +154,14 @@ public abstract class PageableInMemCollectionBase<T_ITEM>
   public void clearCaches() {
     sortOrderComparator = null;
     objects = null;
+  }
+
+  /**
+   * @param inMemQueryEvaluator the inMemQueryEvaluator to set
+   */
+  public void setInMemQueryEvaluator(InMemQueryEvaluator<T_ITEM> inMemQueryEvaluator) {
+    assert inMemQueryEvaluator != null;
+    this.inMemQueryEvaluator = inMemQueryEvaluator;
   }
 
   private Comparator<T_ITEM> _getSortOrderComparator() {
@@ -279,6 +287,7 @@ public abstract class PageableInMemCollectionBase<T_ITEM>
       return modifications;
     }
   }
+
 
 }
 

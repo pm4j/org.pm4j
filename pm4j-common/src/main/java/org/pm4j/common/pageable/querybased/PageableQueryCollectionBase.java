@@ -26,8 +26,8 @@ public abstract class PageableQueryCollectionBase<T_ITEM, T_ID> extends Pageable
   /** A cached reference to the query parameters that considers the removed item set too. */
   private QueryParams                                       queryParamsWithRemovedItems;
 
-  public PageableQueryCollectionBase(QueryOptions queryOptions, QueryParams queryParams) {
-    super(queryOptions, queryParams);
+  public PageableQueryCollectionBase(QueryOptions queryOptions) {
+    super(queryOptions);
 
     // Uses getQueryParams() because the super ctor may have created it.
     QueryParams myQueryParams = getQueryParams();

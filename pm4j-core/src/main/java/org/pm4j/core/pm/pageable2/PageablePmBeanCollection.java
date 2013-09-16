@@ -125,29 +125,12 @@ public class PageablePmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> exten
    *          the optional query options.
    */
   public PageablePmBeanCollection(PmObject pmCtxt, Class<T_PM> itemPmClass, Collection<T_BEAN> beans, QueryOptions queryOptions) {
-	  this(pmCtxt, itemPmClass, beans, queryOptions, null);
-  }
-
-  /**
-   * Creates a collection backed by a {@link PageableListImpl}.
-   *
-   * @param pmCtxt
-   *          The PM context used to create the PM's for the bean items.
-   * @param beans
-   *          The set of beans to handle.
-   * @param queryOptions
-   *          the optional query options.
-   * @param query
-   *          the used query. Is optional.
-   */
-  public PageablePmBeanCollection(PmObject pmCtxt, Class<T_PM> itemPmClass, Collection<T_BEAN> beans, QueryOptions queryOptions, QueryParams query) {
     this(pmCtxt, itemPmClass,
          new PageableInMemCollectionImpl<T_BEAN>(
-             new InMemPmQueryEvaluator<T_BEAN>(pmCtxt),
              beans,
-             queryOptions,
-             query)
+             queryOptions)
         );
+    ((PageableInMemCollectionImpl<T_BEAN>)this.beanCollection).setInMemQueryEvaluator(new InMemPmQueryEvaluator<T_BEAN>(pmCtxt));
   }
 
   /**
@@ -159,7 +142,7 @@ public class PageablePmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> exten
    *          The set of beans to handle.
    */
   public PageablePmBeanCollection(PmObject pmCtxt, Class<T_PM> itemPmClass, Collection<T_BEAN> beans) {
-    this(pmCtxt, itemPmClass, beans, new QueryOptions(), null);
+    this(pmCtxt, itemPmClass, beans, new QueryOptions());
   }
 
   @Override
