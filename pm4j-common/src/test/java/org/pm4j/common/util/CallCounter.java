@@ -1,11 +1,17 @@
 package org.pm4j.common.util;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
+/**
+ * A call counter intended for test cases.
+ *
+ * @author oboede
+ *
+ */
 public class CallCounter {
 
-  private Map<String, Integer> nameToCallCountMap = new HashMap<String, Integer>();
+  private Map<String, Integer> nameToCallCountMap = new TreeMap<String, Integer>();
 
   public void incCallCount(String callName) {
     Integer count = nameToCallCountMap.get(callName);
