@@ -39,13 +39,11 @@
     <repository>
       <id>artifactory</id>
       <name>artifactory-releases</name>
-      <uniqueVersion>true</uniqueVersion>
       <url>${settings.pm4j.repository.url}</url>
     </repository>
     <snapshotRepository>
       <id>artifactory</id>
       <name>artifactory-snapshots</name>
-      <uniqueVersion>true</uniqueVersion>
       <url>${settings.pm4j.snapshotRepository.url}</url>
     </snapshotRepository>
   </distributionManagement>
