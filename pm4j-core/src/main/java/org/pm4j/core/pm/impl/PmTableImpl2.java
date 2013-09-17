@@ -539,7 +539,7 @@ public class PmTableImpl2
 
     // -- Collection bound table support --
     QueryOptions qo = PmTableUtil2.makeQueryOptionsForInMemoryTable(this);
-    PageableCollection2<T_ROW_BEAN> pageableBeanCollection = new PageableInMemCollectionBase<T_ROW_BEAN>(qo, null) {
+    PageableCollection2<T_ROW_BEAN> pageableBeanCollection = new PageableInMemCollectionBase<T_ROW_BEAN>(qo) {
       @Override
       protected Collection<T_ROW_BEAN> getBackingCollectionImpl() {
         return getPmBeansImpl();
