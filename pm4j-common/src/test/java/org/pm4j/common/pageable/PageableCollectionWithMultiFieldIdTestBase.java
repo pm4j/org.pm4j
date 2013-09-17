@@ -13,6 +13,7 @@ import org.junit.Test;
 import org.pm4j.common.pageable.inmem.ItemNavigatorInMem;
 import org.pm4j.common.query.CompOpStringStartsWith;
 import org.pm4j.common.query.FilterExpression;
+import org.pm4j.common.query.QueryAttr;
 import org.pm4j.common.query.QueryUtil;
 import org.pm4j.common.query.SortOrder;
 import org.pm4j.common.selection.SelectMode;
@@ -45,7 +46,9 @@ public abstract class PageableCollectionWithMultiFieldIdTestBase<T> {
     return QueryUtil.getFilter(collection.getQueryOptions(), "name", CompOpStringStartsWith.NAME, startString);
   }
 
-  protected abstract SortOrder getOrderByName();
+  protected  SortOrder getOrderByName() {
+    return new SortOrder(Bean.ATTR_NAME);
+  }
 
   protected abstract T createItem(String name);
 
@@ -382,6 +385,8 @@ public abstract class PageableCollectionWithMultiFieldIdTestBase<T> {
   }
 
   public static class Bean {
+    public static final QueryAttr ATTR_NAME = new QueryAttr("name", String.class);
+
     public final Integer id1;
     public final Integer id2;
     public final String name;

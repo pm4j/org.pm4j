@@ -21,6 +21,7 @@ import org.pm4j.common.pageable.PageableCollection2;
 import org.pm4j.common.pageable.inmem.PageableInMemCollectionBase;
 import org.pm4j.common.pageable.querybased.PageableQueryCollection;
 import org.pm4j.common.pageable.querybased.PageableQueryService;
+import org.pm4j.common.pageable.querybased.QueryOptionProvider;
 import org.pm4j.common.pageable.querybased.idquery.PageableIdQueryCollectionImpl;
 import org.pm4j.common.pageable.querybased.idquery.PageableIdQueryService;
 import org.pm4j.common.query.FilterCompareDefinitionFactory;
@@ -40,6 +41,7 @@ import org.pm4j.core.pm.PmDefaults;
 import org.pm4j.core.pm.PmElement;
 import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmEvent.ValueChangeKind;
+import org.pm4j.core.pm.PmTable2Test.TablePm;
 import org.pm4j.core.pm.PmEventListener;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmPager2;
@@ -523,14 +525,15 @@ public class PmTableImpl2
     // -- Service based table support --
     @SuppressWarnings("unchecked")
     ItemIdService<T_ROW_BEAN, Serializable> service = (ItemIdService<T_ROW_BEAN, Serializable>) getPmQueryServiceImpl();
+    QueryOptions queryOptions = getQueryOptions(service);
     if (service != null) {
       PageableCollection2<T_ROW_BEAN> pqc = null;
       if (service instanceof PageableQueryService) {
-        pqc = new PageableQueryCollection<T_ROW_BEAN, Serializable>((PageableQueryService<T_ROW_BEAN, Serializable>) service);
+        pqc = new PageableQueryCollection<T_ROW_BEAN, Serializable>((PageableQueryService<T_ROW_BEAN, Serializable>) service, queryOptions);
       } else if (service instanceof PageableIdQueryService) {
         PageableIdQueryService<T_ROW_BEAN, Serializable> idService = (PageableIdQueryService<T_ROW_BEAN, Serializable>) service;
         // TODO oboede: Check constructor signature.
-        pqc = new PageableIdQueryCollectionImpl<T_ROW_BEAN, Serializable>(idService, getQueryOptionsImpl());
+        pqc = new PageableIdQueryCollectionImpl<T_ROW_BEAN, Serializable>(idService, queryOptions);
       } else {
         throw new PmRuntimeException(this, "No matching result found for the serviceClass configured in @PmTableCfg. Found item was: " + service);
       }
@@ -538,8 +541,7 @@ public class PmTableImpl2
     }
 
     // -- Collection bound table support --
-    QueryOptions qo = PmTableUtil2.makeQueryOptionsForInMemoryTable(this);
-    PageableCollection2<T_ROW_BEAN> pageableBeanCollection = new PageableInMemCollectionBase<T_ROW_BEAN>(qo) {
+    PageableCollection2<T_ROW_BEAN> pageableBeanCollection = new PageableInMemCollectionBase<T_ROW_BEAN>(queryOptions) {
       @Override
       protected Collection<T_ROW_BEAN> getBackingCollectionImpl() {
         return getPmBeansImpl();
@@ -549,12 +551,40 @@ public class PmTableImpl2
   }
 
   /**
+   * Reads the {@link QueryOptions} to using the information provided by the given {@link TablePm}
+   * and {@link ItemIdService}.
+   *
+   * @param tablePm
+   * @param service
+   * @return The evaluated {@link QueryOptions} instance. Never <code>null</code>.
+   */
+  protected QueryOptions getQueryOptions(ItemIdService<?, ?> service) {
+    // The getQueryOptionsImpl() defined by the programmer always wins.
+    QueryOptions o = this.getQueryOptionsImpl();
+
+    // The service may provide the query options
+    if ((o == null) && (service instanceof QueryOptionProvider)) {
+      o = ((QueryOptionProvider)service).getQueryOptions();
+    }
+
+    // In case of non service based (in memory) tables the options will be read from the annotations.
+    // TODO oboede: check if that's also a valid option for service based tables.
+    if ((o == null) && (service == null)) {
+      o = PmTableUtil2.makeQueryOptionsForInMemoryTable(this);
+    }
+
+    return (o != null)
+        ? o
+        : new QueryOptions();
+  }
+
+  /**
    * Provides the {@link QueryOptions} to offer for this table.
    *
    * @return
    */
   protected QueryOptions getQueryOptionsImpl() {
-    throw new PmRuntimeException(this, "Please implement getQueryOptionsImpl()");
+    return null;
   }
 
 

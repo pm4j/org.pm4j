@@ -1,6 +1,5 @@
 package org.pm4j.common.pageable.querybased;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -11,6 +10,7 @@ import org.pm4j.common.pageable.ItemIdService;
 import org.pm4j.common.pageable.ModificationHandler;
 import org.pm4j.common.pageable.PageableCollection2;
 import org.pm4j.common.pageable.PageableCollectionUtil2;
+import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.selection.Selection;
 import org.pm4j.common.selection.SelectionHandler;
@@ -26,9 +26,7 @@ import org.pm4j.common.util.collection.ListUtil;
  *
  * @author olaf boede
  */
-// TODO oboede: remove Serializable form the signature. It makes generics declaration all usages too complex.
-// In addition there may be use cases that don't need serialization of keys at all.
-public class PageableQueryCollection<T_ITEM, T_ID extends Serializable> extends PageableQueryCollectionBase<T_ITEM, T_ID> {
+public class PageableQueryCollection<T_ITEM, T_ID> extends PageableQueryCollectionBase<T_ITEM, T_ID> {
 
   final PageableQueryService<T_ITEM, T_ID>                  service;
   private final SelectionHandler<T_ITEM>                    selectionHandler;
@@ -37,13 +35,11 @@ public class PageableQueryCollection<T_ITEM, T_ID extends Serializable> extends 
   /**
    * @param service
    *          the service used to get the data.
-   * @param queryParams
-   *          the set of query parameters that provides data restrictions and
-   *          sort order.<br>
-   *          May be <code>null</code> if there are no query restrictions.
+   * @param queryOptions
+   *          defined the id-attribute as well as the available sort and filter options.
    */
-  public PageableQueryCollection(PageableQueryService<T_ITEM, T_ID> service) {
-    super(service.getQueryOptions());
+  public PageableQueryCollection(PageableQueryService<T_ITEM, T_ID> service, QueryOptions queryOptions) {
+    super(queryOptions);
 
     this.service = service;
     this.cachingService = new CachingPageableQueryService<T_ITEM, T_ID>(service);

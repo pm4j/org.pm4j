@@ -7,13 +7,12 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.util.beanproperty.ReleaseOnPropChangeRef;
 
 /**
- * A proxy service that provides some caching for querys that are already answered.
- * If subsequent queries for one and the same query are reqested, always the result for the first
+ * A proxy service that provides some caching for queries that are already answered.
+ * If subsequent queries for one and the same query are requested, always the result for the first
  * call gets returned.
  * <p>
  * Observes the provided {@link QueryParams}. It resets cached data if the query parameter data
@@ -82,11 +81,6 @@ class CachingPageableQueryService<T_ITEM, T_ID> implements PageableQueryService<
       cache.itemCountCache = baseService.getItemCount(query);
     }
     return cache.itemCountCache;
-  }
-
-  @Override
-  public QueryOptions getQueryOptions() {
-    return baseService.getQueryOptions();
   }
 
   /**

@@ -8,10 +8,13 @@ import java.util.Collection;
 import java.util.List;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.pm4j.common.pageable.PageableCollectionUtil2;
 import org.pm4j.core.pm.annotation.PmBeanCfg;
+import org.pm4j.core.pm.annotation.PmBoolean;
 import org.pm4j.core.pm.annotation.PmFactoryCfg;
+import org.pm4j.core.pm.annotation.PmTableColCfg2;
 import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.impl.PmAttrIntegerImpl;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
@@ -19,6 +22,7 @@ import org.pm4j.core.pm.impl.PmConversationImpl;
 import org.pm4j.core.pm.impl.PmTableColImpl2;
 import org.pm4j.core.pm.impl.PmTableImpl2;
 import org.pm4j.core.pm.impl.PmTableRowImpl;
+import org.pm4j.tools.test.PmAssert;
 
 public class PmTable2Test {
 
@@ -77,10 +81,19 @@ public class PmTable2Test {
         "[d]", myTablePm.getRowPms().toString());
   }
 
+  @Test @Ignore
+  public void testSortByName() {
+    assertEquals("[a, b]", myTablePm.getRowPms().toString());
+    PmAssert.setValue(myTablePm.name.getSortOrderAttr(), PmSortOrder.DESC);
+    assertEquals("[d, c]", myTablePm.getRowPms().toString());
+  }
+
+
   @PmFactoryCfg(beanPmClasses=RowPm.class)
   public static class TablePm extends PmTableImpl2<RowPm, RowBean> {
 
     /** A column with an annotation based filter definition. */
+    @PmTableColCfg2(sortable=PmBoolean.TRUE)
     public final PmTableCol2 name = new PmTableColImpl2(this);
 
     /** A column with a method based filter defintion. */

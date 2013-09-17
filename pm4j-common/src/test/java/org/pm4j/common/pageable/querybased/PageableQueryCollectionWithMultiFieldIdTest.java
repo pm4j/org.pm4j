@@ -1,7 +1,6 @@
 package org.pm4j.common.pageable.querybased;
 
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,14 +9,10 @@ import org.pm4j.common.pageable.PageableCollection2;
 import org.pm4j.common.pageable.PageableCollectionWithMultiFieldIdTestBase;
 import org.pm4j.common.query.CompOpStringStartsWith;
 import org.pm4j.common.query.FilterCompareDefinition;
-import org.pm4j.common.query.QueryAttr;
 import org.pm4j.common.query.QueryAttrMulti;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.QueryParams;
-import org.pm4j.common.query.SortOrder;
 import org.pm4j.common.query.inmem.InMemQueryEvaluator;
-import org.pm4j.common.query.inmem.InMemSortOrder;
-import org.pm4j.common.util.CompareUtil;
 import org.pm4j.common.util.collection.MultiObjectValue;
 
 public class PageableQueryCollectionWithMultiFieldIdTest extends PageableCollectionWithMultiFieldIdTestBase<PageableCollectionWithMultiFieldIdTestBase.Bean> {
@@ -31,12 +26,16 @@ public class PageableQueryCollectionWithMultiFieldIdTest extends PageableCollect
       service.addBean(new Bean(++counter, counter, s));
     }
 
-    return new PageableQueryCollection<Bean, MultiObjectValue>(service);
-  }
+    QueryOptions options = new QueryOptions();
+    options.setIdAttribute(
+        new QueryAttrMulti("identity (pseudo field)")
+          .addPart("id1", Integer.class)
+          .addPart("id2", Integer.class));
 
-  @Override
-  protected SortOrder getOrderByName() {
-    return service.getQueryOptions().getSortOrder("name");
+    options.addSortOrder(Bean.ATTR_NAME);
+    options.addFilterCompareDefinition(new FilterCompareDefinition(Bean.ATTR_NAME, new CompOpStringStartsWith()));
+
+    return new PageableQueryCollection<Bean, MultiObjectValue>(service, options);
   }
 
   @Override
@@ -83,28 +82,6 @@ public class PageableQueryCollectionWithMultiFieldIdTest extends PageableCollect
     }
 
     // some in memory fakes ...
-    @Override
-    public QueryOptions getQueryOptions() {
-      QueryOptions options = new QueryOptions();
-      options.setIdAttribute(
-          new QueryAttrMulti("identity (pseudo field)")
-            .addPart("id1", Integer.class)
-            .addPart("id2", Integer.class));
-
-      QueryAttr nameAttr = new QueryAttr("name", String.class);
-
-      options.addSortOrder("name", new InMemSortOrder(new Comparator<Bean>() {
-        @Override
-        public int compare(Bean o1, Bean o2) {
-          return CompareUtil.compare(o1.name, o2.name);
-        }
-      }));
-
-      options.addFilterCompareDefinition(new FilterCompareDefinition(nameAttr, new CompOpStringStartsWith()));
-
-      return options;
-    }
-
     private List<Bean> getQueryResult(QueryParams query) {
       InMemQueryEvaluator<Bean> evalCtxt = new InMemQueryEvaluator<Bean>();
       List<Bean> beans = evalCtxt.sort(idToBeanMap.values(), query.getEffectiveSortOrder());

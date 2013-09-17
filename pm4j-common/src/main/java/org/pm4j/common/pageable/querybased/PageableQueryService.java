@@ -3,14 +3,13 @@ package org.pm4j.common.pageable.querybased;
 import java.util.List;
 
 import org.pm4j.common.pageable.ItemIdService;
-import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.QueryParams;
 
 /**
  * Provides the data used for the {@link PageableQueryCollection}.
  *
  * @param <T_BEAN>
- *          the type of handled colleciton items.
+ *          the type of handled collection items.
  * @param <T_ID>
  *          the bean identifier type.
  *
@@ -40,11 +39,4 @@ public interface PageableQueryService<T_BEAN, T_ID> extends ItemIdService<T_BEAN
    */
   long getItemCount(QueryParams query);
 
-  /**
-   * Provides the set of filter definitions and attribute sort orders that can be
-   * processed by this service.
-   *
-   * @return
-   */
-  QueryOptions getQueryOptions();
 }

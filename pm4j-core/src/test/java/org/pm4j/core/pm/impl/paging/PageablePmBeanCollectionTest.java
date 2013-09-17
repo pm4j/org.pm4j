@@ -4,7 +4,6 @@ import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 import static org.pm4j.tools.test.PmAssert.setValue;
 
-import java.util.Comparator;
 import java.util.List;
 
 import org.pm4j.common.pageable.PageableCollection2;
@@ -13,10 +12,8 @@ import org.pm4j.common.query.CompOpStringStartsWith;
 import org.pm4j.common.query.FilterCompareDefinition;
 import org.pm4j.common.query.QueryAttr;
 import org.pm4j.common.query.QueryOptions;
-import org.pm4j.common.query.SortOrder;
 import org.pm4j.common.query.inmem.InMemSortOrder;
 import org.pm4j.common.selection.SelectMode;
-import org.pm4j.common.util.CompareUtil;
 import org.pm4j.core.pm.PmAttrString;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmTableCol2;
@@ -69,16 +66,6 @@ public class PageablePmBeanCollectionTest extends PageableCollectionTestBase<Pag
     beanTablePm.setPmRowSelectMode(SelectMode.SINGLE);
 
     return beanTablePm.getPmPageableCollection();
-  }
-
-  @Override
-  protected SortOrder getOrderByName() {
-    return new InMemSortOrder(new Comparator<BeanRowPm>() {
-      @Override
-      public int compare(BeanRowPm o1, BeanRowPm o2) {
-        return CompareUtil.compare(o1.name, o2.name);
-      }
-    });
   }
 
   @Override
