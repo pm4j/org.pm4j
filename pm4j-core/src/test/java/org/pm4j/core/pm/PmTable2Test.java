@@ -96,7 +96,7 @@ public class PmTable2Test {
     @PmTableColCfg2(sortable=PmBoolean.TRUE)
     public final PmTableCol2 name = new PmTableColImpl2(this);
 
-    /** A column with a method based filter defintion. */
+    /** A column with a method based filter definition. */
     public final PmTableCol2 description = new PmTableColImpl2(this);
 
     /** A column with a filter annotation that defines . */
