@@ -28,7 +28,7 @@ import org.pm4j.core.util.reflection.ClassUtil;
  */
 public final class PmTableUtil2 {
 
-  public static class RowPmComparatorAsc<T_ROW_ELEMENT_PM extends PmElement> implements Comparator<T_ROW_ELEMENT_PM> {
+  public static class RowPmComparatorAsc<T_ROW_ELEMENT_PM extends PmObject> implements Comparator<T_ROW_ELEMENT_PM> {
     private final PmTableCol2 sortColumn;
 
     public RowPmComparatorAsc(PmTableCol2 sortColumn) {
@@ -162,16 +162,16 @@ public final class PmTableUtil2 {
    *
    * @param column
    *          The column to find a row cell for.
-   * @param rowElement
+   * @param rowPm
    *          PM of the row that contains the cell.
    * @return The found cell PM.
    * @throws PmRuntimeException
    *           if there is no corresponding cell.
    */
-  public static PmObject getRowCellForTableCol(PmTableCol2 column, PmElement rowElement) {
-    PmObject pm = ((PmTableColImpl2) column).findCorrespondingRowCell(rowElement);
+  public static PmObject getRowCellForTableCol(PmTableCol2 column, PmObject rowPm) {
+    PmObject pm = ((PmTableColImpl2) column).findCorrespondingRowCell(rowPm);
     if (pm == null) {
-      throw new PmRuntimeException(column, "No corresponding table row cell PM found in row: " + rowElement);
+      throw new PmRuntimeException(column, "No corresponding table row cell PM found in row: " + rowPm);
     }
     return pm;
   }
