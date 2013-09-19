@@ -15,7 +15,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class ClassPathResourceFinder {
 
-  private static final Log log = LogFactory.getLog(ClassPathResourceFinder.class);
+  private static final Log LOG = LogFactory.getLog(ClassPathResourceFinder.class);
 
   private boolean lenient = true;
 
@@ -36,7 +36,7 @@ public class ClassPathResourceFinder {
     if (s == null) {
       String msg = "String resource for key '" + key + "' and locale '" + locale + "' not found. Class context: " + forClass;
       if (lenient) {
-        log.warn(msg);
+        LOG.warn(msg);
         s = key;
       } else {
         throw new RuntimeException(msg);
@@ -87,12 +87,14 @@ public class ClassPathResourceFinder {
   private String findResStringInPgk(String pkgDir, Locale locale, String key) {
     String result = null;
     ResourceBundle myResources = null;
+    String bundleName = (StringUtils.isEmpty(pkgDir)) ? resFileBaseName : (pkgDir + "/" + resFileBaseName);
     try {
-      String bundleName = (StringUtils.isEmpty(pkgDir)) ? resFileBaseName : (pkgDir + "/" + resFileBaseName);
-
       myResources = ResourceBundle.getBundle(bundleName, locale, resBundleStrategy);
     } catch (MissingResourceException e) {
-      // ok. resource does not extist. try the next package level.
+      // ok. resource does not exist. try the next package level.
+      if (LOG.isTraceEnabled()) {
+        LOG.trace(e.toString() + " {Bundle name: '" + bundleName + "', locale=" + locale + ", strategy: " + resBundleStrategy + "}");
+      }
     }
 
     if (myResources != null) {
