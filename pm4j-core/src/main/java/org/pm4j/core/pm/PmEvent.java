@@ -102,13 +102,13 @@ public class PmEvent extends EventObject {
    */
   private Map<PostProcessor<?>, Object> postProcessorToPayloadMap = Collections.emptyMap();
 
-  
+
   /**
    * An event constructor without event source specification.
    * <p>
    * In some configurations (rich client UIs) the event source will be read from
-   * the thread local storage. 
-   * 
+   * the thread local storage.
+   *
    * @param pm
    *          the PM this event is related to.
    * @param changeMask
@@ -122,8 +122,8 @@ public class PmEvent extends EventObject {
    * An event constructor without event source specification.
    * <p>
    * In some configurations (rich client UIs) the event source will be read from
-   * the thread local storage. 
-   * 
+   * the thread local storage.
+   *
    * @param pm
    *          the PM this event is related to.
    * @param changeMask
@@ -174,7 +174,7 @@ public class PmEvent extends EventObject {
    *         linked {@link #pm}.
    */
   public boolean isPropagationEvent() {
-    return (changeMask & IS_EVENT_PROPAGATION) != 0;
+    return hasEventMaskBits(IS_EVENT_PROPAGATION);
   }
 
   /**
@@ -185,6 +185,16 @@ public class PmEvent extends EventObject {
   public boolean isInitializationEvent() {
     return (changeMask & ALL_CHANGE_EVENTS) == ALL_CHANGE_EVENTS;
   }
+
+  /**
+   * @return <code>true</code> if the event is caused by re-loading a bean behind the PM.<br>
+   *         This event kind is generated for all components of a PM tree if
+   *         <code>PmBean.reloadPmBean</code> exchanges the content behind the tree.
+   */
+  public boolean isReloadEvent() {
+    return hasEventMaskBits(RELOAD);
+  }
+
 
   /**
    * <code>true</code> if the event {@link #changeMask} contains all bits of the
