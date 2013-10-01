@@ -2,7 +2,6 @@ package org.pm4j.core.pm.impl;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyVetoException;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -50,7 +49,6 @@ import org.pm4j.core.pm.PmEventListener;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmPager2;
 import org.pm4j.core.pm.PmTable2;
-import org.pm4j.core.pm.PmTable2Test.TablePm;
 import org.pm4j.core.pm.PmTableCol2;
 import org.pm4j.core.pm.PmTableGenericRow2;
 import org.pm4j.core.pm.PmTableRow;
@@ -555,7 +553,7 @@ public class PmTableImpl2
   }
 
   /**
-   * Reads the {@link QueryOptions} to using the information provided by the given {@link TablePm}
+   * Reads the {@link QueryOptions} to using the information provided by the given {@link TablePm2}
    * and {@link ItemIdService}.
    *
    * @return The evaluated {@link QueryOptions} instance. Never <code>null</code>.
