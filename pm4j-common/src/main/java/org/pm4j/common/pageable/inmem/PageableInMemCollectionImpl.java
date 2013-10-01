@@ -18,10 +18,6 @@ public class PageableInMemCollectionImpl<T_ITEM> extends PageableInMemCollection
   /** Contains the not filtered set of items in their original sort order. */
   private Collection<T_ITEM>             backingCollection;
 
-  public PageableInMemCollectionImpl(Collection<T_ITEM> objects) {
-    this(objects, null);
-  }
-
   public PageableInMemCollectionImpl(Collection<T_ITEM> objects, QueryOptions queryOptions) {
     super(queryOptions);
     backingCollection = objects != null

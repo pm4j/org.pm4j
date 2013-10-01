@@ -3,6 +3,9 @@ package org.pm4j.core.pm.impl;
 import java.util.Collection;
 import java.util.List;
 
+import org.pm4j.common.query.FilterCompareDefinition;
+import org.pm4j.common.query.FilterCompareDefinitionFactory;
+import org.pm4j.common.query.QueryAttr;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.SortOrder;
 import org.pm4j.common.util.collection.ListUtil;
@@ -19,6 +22,7 @@ import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmSortOrder;
 import org.pm4j.core.pm.PmTable2;
 import org.pm4j.core.pm.PmTableCol2;
+import org.pm4j.core.pm.annotation.PmBoolean;
 import org.pm4j.core.pm.annotation.PmCommandCfg;
 import org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO;
 import org.pm4j.core.pm.annotation.PmTableColCfg2;
@@ -26,7 +30,6 @@ import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmLocalizeApi;
 import org.pm4j.core.pm.api.PmMessageUtil;
 import org.pm4j.core.util.table.ColSizeSpec;
-// FIXME oboede: deprecated enum used
 
 /**
  * Implements the table column PM behavior.
@@ -35,9 +38,14 @@ import org.pm4j.core.util.table.ColSizeSpec;
  */
 public class PmTableColImpl2 extends PmObjectBase implements PmTableCol2 {
 
-  public final PmAttrEnum<PmSortOrder> defaultSortOrderAttr = new SortOrderAttr(this);
-  public final PmCommand defaultCmdSort = new CmdSortPm();
-  private PmSortOrder sortOrder = PmSortOrder.NEUTRAL;
+  /** PM for the column sort order. */
+  public final PmAttrEnum<PmSortOrder> sortOrderAttr = createSortOrderAttrPm();
+
+  /** A command that switches the sort order attribute. */
+  public final PmCommand cmdSort = createCmdSortPm();
+
+  /** Cached sort order option the user may sort the column by. */
+  private SortOrder sortOrderOption;
 
   /**
    * @param pmTable
@@ -54,29 +62,102 @@ public class PmTableColImpl2 extends PmObjectBase implements PmTableCol2 {
 
   @Override
   public PmAttrEnum<PmSortOrder> getSortOrderAttr() {
-    return defaultSortOrderAttr;
+    return sortOrderAttr;
   }
 
   @Override
   public PmCommand getCmdSort() {
-    return defaultCmdSort;
+    return cmdSort;
   }
 
   /**
-   * Creates the PM for the <code>sortOrderAttr</code> attribute.<br>
-   * Concrete subclasses may define here their specific sortOrderAttr PM.
+   * Creates the PM for the {@link #sortOrderAttr} attribute.<br>
+   * Subclasses may define here their specific sortOrderAttr PM.
    *
-   * @return The <code>sortOrderAttr</code> attribute to use.<br>
-   *         Should be not visible if this column is not sortable.
+   * @return The <code>sortOrderAttr</code> attribute to use.
    */
-  protected PmAttrEnum<PmSortOrder> makeSortOrderAttr() {
+  protected PmAttrEnum<PmSortOrder> createSortOrderAttrPm() {
     return new SortOrderAttr(this);
   }
 
-  protected PmCommand makeCmdSort() {
+  /**
+   * Creates the PM for {@link #cmdSort}.<br>
+   * Subclasses may define here their specific command PM.
+   *
+   * @return The command to use.
+   */
+  protected PmCommand createCmdSortPm() {
     return new CmdSortPm();
   }
 
+  /**
+   * Creates column specific filter meta data.
+   */
+  protected FilterCompareDefinition createFilterCompareDefinition(FilterCompareDefinitionFactory fcdf) {
+    FilterCompareDefinition fcd = null;
+    if (getOwnMetaData().filterType != Void.class) {
+      fcd = fcdf.createCompareDefinition(getColQueryAttr());
+    }
+    return fcd;
+  }
+
+  /**
+   * @return The {@link PmTable} that contains this column.
+   */
+  private PmTable2<?> getPmTable() {
+    return (PmTable2<?>)getPmParent();
+  }
+
+  /**
+   * Provides the {@link SortOrder} defined by the {@link QueryOptions}
+   * of the {@link PmTable2}.
+   *
+   * @return The {@link SortOrder} that may be used for this column.<br>
+   *         Is <code>null</code> if this column is not sortable.
+   */
+  public final SortOrder getColSortOrderOption() {
+    if (sortOrderOption == null) {
+      sortOrderOption = getPmQueryOptions().getSortOrder(getColQueryAttrName());
+    }
+    return sortOrderOption;
+  }
+
+  /**
+   * Provides the name of the corresponding {@link QueryAttr}.<br>
+   * The default implementation returns {@link #getPmName()}.
+   * <p>
+   * This name is used to find the matching sort or filter option from the table {@link QueryOptions}.
+   * <p>
+   * In case of in-memory tables it is also used for query option generation.
+   *
+   * @return The corresponding query attribute name.
+   */
+  protected String getColQueryAttrName() {
+    return getPmName();
+  }
+
+  /**
+   * Gets (or creates) the {@link QueryAttr} that addresses the value to filter/sort within this column.
+   *
+   * @return
+   */
+  protected QueryAttr getColQueryAttr() {
+    String name = getColQueryAttrName();
+    return new QueryAttr(name, name, getOwnMetaData().filterType, getPmTitle());
+  }
+
+  /**
+   * @return The {@link QueryOptions} provided by the pageable collection behind the table.
+   */
+  protected QueryOptions getPmQueryOptions() {
+    return getPmTable().getPmPageableCollection().getQueryOptions();
+  }
+
+  /**
+   * A command that switches the sort order attribute.
+   * <p>
+   * Delegates all calls to {@link PmTableColImpl2#sortOrderAttr}.
+   */
   @PmCommandCfg(beforeDo=BEFORE_DO.DO_NOTHING)
   protected class CmdSortPm extends PmCommandImpl {
 
@@ -96,21 +177,15 @@ public class PmTableColImpl2 extends PmObjectBase implements PmTableCol2 {
 
     @Override
     public String getPmIconPath() {
-      String path;
-      PmAttrEnum<PmSortOrder> sortAttr = getSortOrderAttr();
-
-      switch (sortAttr.getValue()) {
-        case ASC: path = "pmSortOrder.ASC_icon"; break;
-        case DESC: path = "pmSortOrder.DESC_icon"; break;
-        case NEUTRAL: path = "pmSortOrder.NEUTRAL_icon"; break;
-        default: throw new PmRuntimeException(this, "Unknown enum value: " + sortAttr.getValue());
-      }
-
+      PmSortOrder so = sortOrderAttr.getValue();
       return PmLocalizeApi.localize(this, isPmEnabled()
-                                          ? path
-                                          : path + "Disabled");
+                                          ? so.resKeyIcon
+                                          : so.resKeyIconDisabled);
     }
 
+    /**
+     * Each do-call performs a round-robin step through the {@link PmSortOrder} value set.
+     */
     @Override
     protected void doItImpl() {
       PmAttrEnum<PmSortOrder> sortAttr = getSortOrderAttr();
@@ -132,46 +207,6 @@ public class PmTableColImpl2 extends PmObjectBase implements PmTableCol2 {
   }
 
   /**
-   * Identifies the corresponding cell PM within the given row.
-   * <p>
-   * The default implementation just looks for a child with a similar name within the given row.
-   *
-   * @param rowPm PM of the row that contains
-   * @return The found cell PM. <code>null</code> if there is no corresponding item.
-   */
-  public PmObject findCorrespondingRowCell(PmObject rowPm) {
-    return PmUtil.findChildPm(rowPm, this.getPmName());
-  }
-
-  /**
-   * @return The {@link PmTable} that contains this column.
-   */
-  private PmTableImpl2<?, ?> getPmTableImpl() {
-    return (PmTableImpl2<?, ?>)getPmParent();
-  }
-
-  public PmSortOrder getSortOrder() {
-    return sortOrder;
-  }
-
-  public void setSortOrder(PmSortOrder sortOrder) {
-    this.sortOrder = sortOrder;
-  }
-
-  /**
-   * The default implementation provides the {@link SortOrder} defined by the {@link QueryOptions}
-   * of the {@link PmTable2}.
-   * <p>
-   * Subclasses may provide here alternate {@link SortOrder}s.
-   *
-   * @return the {@link SortOrder} that may be used for this column.
-   */
-  protected SortOrder getSortOrderQueryOption() {
-    String colName = PmTableColImpl2.this.getPmName();
-    return getPmTableImpl().getPmPageableCollection().getQueryOptions().getSortOrder(colName);
-  }
-
-  /**
    * Default sort order PM attribute class.
    * <p>
    * Changes the value only after successful validation if the table content.
@@ -189,19 +224,18 @@ public class PmTableColImpl2 extends PmObjectBase implements PmTableCol2 {
           if ((event.getValueChangeKind() == ValueChangeKind.SORT_ORDER) &&
               // Checks if the event source is not this column to prevent set value ping-pong games.
               (event.getPm() != PmTableColImpl2.this)) {
-            SortOrder tableSortOrder = getPmTableImpl().getPmPageableCollection().getQueryParams().getSortOrder();
-            SortOrder columnSortOrderOption = getSortOrderQueryOption();
+            SortOrder tableSortOrder = getPmTable().getPmPageableCollection().getQueryParams().getSortOrder();
+            SortOrder columnSortOrderOption = getColSortOrderOption();
             if (tableSortOrder != null &&
-                columnSortOrderOption != null &&
                 SortOrder.bothOrdersUseTheSameAttributeSet(tableSortOrder, columnSortOrderOption)) {
-              PmTableColImpl2.this.sortOrder = tableSortOrder.isAscending() ? PmSortOrder.ASC : PmSortOrder.DESC;
+              setBackingValue(tableSortOrder.isAscending() ? PmSortOrder.ASC : PmSortOrder.DESC);
             } else {
-              PmTableColImpl2.this.sortOrder = PmSortOrder.NEUTRAL;
+              setBackingValue(PmSortOrder.NEUTRAL);
             }
           }
         }
       };
-      PmEventApi.addPmEventListener(getPmTableImpl(), PmEvent.VALUE_CHANGE, tableSortOrderChangeListener);
+      PmEventApi.addPmEventListener(getPmTable(), PmEvent.VALUE_CHANGE, tableSortOrderChangeListener);
     }
 
     @Override
@@ -211,8 +245,8 @@ public class PmTableColImpl2 extends PmObjectBase implements PmTableCol2 {
 
     @Override
     protected boolean isPmEnabledImpl() {
-      return  (getSortOrderQueryOption() != null) &&
-              (getPmTableImpl().getTotalNumOfPmRows() > 1);
+      return  (getColSortOrderOption() != null) &&
+              (getPmTable().getTotalNumOfPmRows() > 1);
     }
 
     /**
@@ -230,10 +264,19 @@ public class PmTableColImpl2 extends PmObjectBase implements PmTableCol2 {
       return isPmEnabledImpl();
     }
 
+    /**
+     * A sort order change is by default not handled as a data change.<br>
+     * This information is usually not persistent.
+     */
+    @Override
+    protected boolean isPmValueChangedImpl() {
+      return false;
+    }
+
     @Override
     protected Collection<PmCommandDecorator> getValueChangeDecorators() {
       return ListUtil.collectionsToList(
-          getPmTableImpl().getPmDecorators(PmTable2.TableChange.SORT),
+          getPmTable().getPmDecorators(PmTable2.TableChange.SORT),
           super.getValueChangeDecorators());
     }
 
@@ -241,7 +284,7 @@ public class PmTableColImpl2 extends PmObjectBase implements PmTableCol2 {
       PmSortOrder sortDirection = getValue();
       SortOrder querySortOrder = null;
       if (sortDirection != PmSortOrder.NEUTRAL) {
-        querySortOrder = getSortOrderQueryOption();
+        querySortOrder = getColSortOrderOption();
         if ((querySortOrder != null) && (sortDirection == PmSortOrder.DESC)) {
           querySortOrder = querySortOrder.getReverseSortOrder();
         }
@@ -252,23 +295,39 @@ public class PmTableColImpl2 extends PmObjectBase implements PmTableCol2 {
     @Override
     protected void afterValueChange(PmSortOrder oldValue, PmSortOrder newValue) {
       SortOrder querySortOrder = getOwnQuerySortOrder();
-      PmTableImpl2<?, ?> pmTable = getPmTableImpl();
+      PmTable2<?> pmTable = getPmTable();
       pmTable.getPmPageableCollection().getQueryParams().setSortOrder(querySortOrder);
 
-      // TODO: move to a listerner within the table implementation.
+      // TODO: move to a listener within the table implementation.
       // fire a value change event.
       PmEventApi.firePmEventIfInitialized(pmTable, new PmEvent(PmTableColImpl2.this, pmTable, PmEvent.VALUE_CHANGE, ValueChangeKind.SORT_ORDER));
     }
+  }
+
+  // ======== Public details layer access definition ======== //
+
+  /** Interface for other PMs. E.g. the table. */
+  private class ColumnDetailsImpl implements ImplDetails {
 
     @Override
-    protected PmSortOrder getBackingValueImpl() {
-      return sortOrder;
+    public String getQueryAttrName() {
+      return PmTableColImpl2.this.getColQueryAttrName();
     }
 
     @Override
-    protected void setBackingValueImpl(PmSortOrder value) {
-      sortOrder = value;
+    public Boolean isSortableConfigured() {
+      return PmTableColImpl2.this.getOwnMetaData().sortable;
     }
+
+    @Override
+    public FilterCompareDefinition getFilterCompareDefinition(FilterCompareDefinitionFactory fcdf) {
+      return PmTableColImpl2.this.createFilterCompareDefinition(fcdf);
+    }
+  }
+
+  @Override
+  public final ImplDetails getPmImplDetails() {
+    return new ColumnDetailsImpl();
   }
 
   // ======== Meta data ======== //
@@ -281,26 +340,21 @@ public class PmTableColImpl2 extends PmObjectBase implements PmTableCol2 {
   @Override
   protected void initMetaData(PmObjectBase.MetaData metaData) {
     super.initMetaData(metaData);
-    MetaData myMetaData = (MetaData) metaData;
+    MetaData md = (MetaData) metaData;
 
-    // FIXME oboede: the column annotation needs to be considered asap.
-    PmTableColCfg2 annotation = AnnotationUtil.findAnnotation(this, PmTableColCfg2.class);
-    if (annotation != null) {
-      annotation.sortable();
-//      myMetaData.colSizeSpec = new ColSizeSpec(
-//          annotation.prefSize(), annotation.minSize(), annotation.maxSize());
+    PmTableColCfg2 a = AnnotationUtil.findAnnotation(this, PmTableColCfg2.class);
+    if (a != null) {
+      if (a.sortable() != PmBoolean.UNDEFINED) {
+        md.sortable = a.sortable() == PmBoolean.TRUE;
+      }
 
-//      if (annotation.sortable() != PmBoolean.UNDEFINED) {
-//        throw new PmRuntimeException(this, "The sortable annotation is not supported by PmTableColImpl2. Please use the table query options.");
-//      }
-//
-//      if (annotation.filterBy().length > 0) {
-//        throw new PmRuntimeException(this, "The filterBy annotation is not supported by PmTableColImpl2. Please use the table query options.");
-//      }
+      md.filterType = a.filterType();
     }
   }
 
   protected static class MetaData extends PmObjectBase.MetaData {
+    private Boolean sortable;
+    private Class<?> filterType = Void.class;
     private ColSizeSpec colSizeSpec = null;
   }
 
@@ -308,5 +362,6 @@ public class PmTableColImpl2 extends PmObjectBase implements PmTableCol2 {
     return (MetaData) getPmMetaData();
   }
 
-
 }
+
+
