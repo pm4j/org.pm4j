@@ -5,6 +5,7 @@ import java.util.Arrays;
 import org.pm4j.common.exception.CheckedExceptionWrapper;
 import org.pm4j.common.expr.Expression.SyntaxVersion;
 import org.pm4j.common.query.FilterCompareDefinitionFactory;
+import org.pm4j.common.query.FilterCompareDefinitionFactoryImpl;
 import org.pm4j.core.pm.annotation.PmCommandCfg;
 import org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO;
 import org.pm4j.core.pm.annotation.PmInject;
@@ -50,7 +51,7 @@ public class PmDefaults implements Cloneable {
   /**
    * The application specific filter compare definition factory. Used for table filters.
    */
-  private FilterCompareDefinitionFactory filterCompareDefinitionFactory = null;
+  private FilterCompareDefinitionFactory filterCompareDefinitionFactory = new FilterCompareDefinitionFactoryImpl.DefaultFactory();
 
   /**
    * The delimiter that is used to terminate multiple format strings in resource string definitions.

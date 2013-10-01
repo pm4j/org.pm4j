@@ -2,10 +2,10 @@ package org.pm4j.core.pm.impl;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyVetoException;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,9 +24,13 @@ import org.pm4j.common.pageable.querybased.PageableQueryService;
 import org.pm4j.common.pageable.querybased.QueryOptionProvider;
 import org.pm4j.common.pageable.querybased.idquery.PageableIdQueryCollectionImpl;
 import org.pm4j.common.pageable.querybased.idquery.PageableIdQueryService;
+import org.pm4j.common.query.FilterCompareDefinition;
 import org.pm4j.common.query.FilterCompareDefinitionFactory;
+import org.pm4j.common.query.QueryAttr;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.QueryParams;
+import org.pm4j.common.query.SortOrder;
+import org.pm4j.common.query.inmem.InMemSortOrder;
 import org.pm4j.common.selection.SelectMode;
 import org.pm4j.common.selection.Selection;
 import org.pm4j.common.selection.SelectionHandler;
@@ -57,6 +61,7 @@ import org.pm4j.core.pm.api.PmValidationApi;
 import org.pm4j.core.pm.impl.pathresolver.PathResolver;
 import org.pm4j.core.pm.impl.pathresolver.PmExpressionPathResolver;
 import org.pm4j.core.pm.pageable2.PageablePmBeanCollection;
+import org.pm4j.core.util.reflection.ClassUtil;
 
 /**
  * A table that presents the content of a set of {@link PmElement}s.
@@ -521,71 +526,63 @@ public class PmTableImpl2
    * @return The collection to use. Never <code>null</code>.
    */
   protected PageablePmBeanCollection<T_ROW_PM, T_ROW_BEAN> getPmPageableCollectionImpl() {
-    // -- Service based table support --
     @SuppressWarnings("unchecked")
-    ItemIdService<T_ROW_BEAN, Serializable> service = (ItemIdService<T_ROW_BEAN, Serializable>) getPmQueryServiceImpl();
-    QueryOptions queryOptions = getQueryOptions(service);
-    if (service != null) {
-      PageableCollection2<T_ROW_BEAN> pqc = null;
-      if (service instanceof PageableQueryService) {
-        pqc = new PageableQueryCollection<T_ROW_BEAN, Serializable>((PageableQueryService<T_ROW_BEAN, Serializable>) service, queryOptions);
-      } else if (service instanceof PageableIdQueryService) {
-        PageableIdQueryService<T_ROW_BEAN, Serializable> idService = (PageableIdQueryService<T_ROW_BEAN, Serializable>) service;
-        // TODO oboede: Check constructor signature.
-        pqc = new PageableIdQueryCollectionImpl<T_ROW_BEAN, Serializable>(idService, queryOptions);
-      } else {
-        throw new PmRuntimeException(this, "No matching result found for the serviceClass configured in @PmTableCfg. Found item was: " + service);
-      }
-      return new PageablePmBeanCollection<T_ROW_PM, T_ROW_BEAN>(this, PmTableRow.class, pqc);
-    }
+    ItemIdService<T_ROW_BEAN, Object> s = (ItemIdService<T_ROW_BEAN, Object>) getPmQueryServiceImpl();
+    QueryOptions qo = getPmQueryOptions();
+    PageableCollection2<T_ROW_BEAN> pc = null;
 
-    // -- Collection bound table support --
-    PageableCollection2<T_ROW_BEAN> pageableBeanCollection = new PageableInMemCollectionBase<T_ROW_BEAN>(queryOptions) {
-      @Override
-      protected Collection<T_ROW_BEAN> getBackingCollectionImpl() {
-        return getPmBeansImpl();
-      }
-    };
-    return new PageablePmBeanCollection<T_ROW_PM, T_ROW_BEAN>(this, PmTableRow.class, pageableBeanCollection);
+    if (s == null) {
+      pc = new PageableInMemCollectionBase<T_ROW_BEAN>(qo) {
+        @Override
+        protected Collection<T_ROW_BEAN> getBackingCollectionImpl() {
+          return getPmBeansImpl();
+        }
+      };
+    }
+    else if (s instanceof PageableQueryService) {
+      pc = new PageableQueryCollection<T_ROW_BEAN, Object>((PageableQueryService<T_ROW_BEAN, Object>) s, qo);
+    }
+    else if (s instanceof PageableIdQueryService) {
+      pc = new PageableIdQueryCollectionImpl<T_ROW_BEAN, Object>((PageableIdQueryService<T_ROW_BEAN, Object>) s, qo);
+    }
+    else {
+      throw new PmRuntimeException(this,
+          "The service type provided by 'getPmQueryServiceImpl()' is not a 'PageableQueryService' and not a 'PageableIdQueryService'. Possibly @PmTableCfg#serviceClass is not well configured. Found serivce: " + s);
+    }
+    return new PageablePmBeanCollection<T_ROW_PM, T_ROW_BEAN>(this, PmTableRow.class, pc);
   }
 
   /**
-   * Reads the {@link QueryOptions} to using the information provided by the given {@link TablePm}
+   * Reads the {@link QueryOptions} to using the information provided by the given {@link TablePm2}
    * and {@link ItemIdService}.
    *
-   * @param tablePm
-   * @param service
    * @return The evaluated {@link QueryOptions} instance. Never <code>null</code>.
    */
-  protected QueryOptions getQueryOptions(ItemIdService<?, ?> service) {
-    // The getQueryOptionsImpl() defined by the programmer always wins.
-    QueryOptions o = this.getQueryOptionsImpl();
-
-    // The service may provide the query options
-    if ((o == null) && (service instanceof QueryOptionProvider)) {
-      o = ((QueryOptionProvider)service).getQueryOptions();
-    }
-
-    // In case of non service based (in memory) tables the options will be read from the annotations.
-    // TODO oboede: check if that's also a valid option for service based tables.
-    if ((o == null) && (service == null)) {
-      o = PmTableUtil2.makeQueryOptionsForInMemoryTable(this);
-    }
-
-    return (o != null)
-        ? o
+  protected QueryOptions getPmQueryOptions() {
+    QueryOptionProvider qop = getPmQueryOptionProvider();
+    return (qop != null)
+        ? qop.getQueryOptions()
         : new QueryOptions();
   }
 
   /**
-   * Provides the {@link QueryOptions} to offer for this table.
+   * If the optionally existing backing query service is an {@link QueryOptionProvider}, this service
+   * will be returned.
+   * <p>
+   * If the there is no backing service an {@link InMemQueryOptionProvider} will be returned.
    *
-   * @return
+   * @return The option provider or <code>null</code>.
    */
-  protected QueryOptions getQueryOptionsImpl() {
-    return null;
+  protected QueryOptionProvider getPmQueryOptionProvider() {
+    ItemIdService<T_ROW_BEAN, ?> service = getPmQueryServiceImpl();
+    if (service != null) {
+      return (service instanceof QueryOptionProvider)
+          ? (QueryOptionProvider)service
+          : null;
+    } else {
+      return new InMemQueryOptionProvider();
+    }
   }
-
 
   /**
    * Used for in-memory tables.<br>
@@ -716,7 +713,97 @@ public class PmTableImpl2
     }
   }
 
+  @Override
+  public PmTable2.ImplDetails getPmImplDetails() {
+    return new TableDetailsImpl();
+  }
+
   // -- support classes --
+
+  /**
+   * Uses the table annotations to generate the {@link QueryOptions} for this table.
+   */
+  public class InMemQueryOptionProvider implements QueryOptionProvider {
+    @Override
+    public QueryOptions getQueryOptions() {
+      QueryOptions options = new QueryOptions();
+
+      // * Read the table definitions
+      PmTableImpl2<?, ?> pmTable= PmTableImpl2.this;
+      MetaData md = PmTableImpl2.this.getOwnMetaDataWithoutPmInitCall();
+
+      // * Read the column definitions
+      FilterCompareDefinitionFactory ff = pmTable.getPmFilterCompareDefinitionFactory();
+      boolean tableSortable = pmTable.getPmImplDetails().isSortable();
+      for (PmTableCol2 col : pmTable.getColumnPms()) {
+        PmTableCol2.ImplDetails d = col.getPmImplDetails();
+        if ((d.isSortableConfigured() == Boolean.TRUE) ||
+            (d.isSortableConfigured() == null && tableSortable)) {
+          SortOrder so = makeColSortOrder(col);
+          options.addSortOrder(d.getQueryAttrName(), so);
+        }
+
+        FilterCompareDefinition fcd = d.getFilterCompareDefinition(ff);
+        if (fcd != null) {
+          options.addFilterCompareDefinition(fcd);
+        }
+      }
+
+      // * The 'defaultSortCol' can only be evaluated after processing the column sort options.
+      if (md.defaultSortColName != null) {
+        String name = StringUtils.substringBefore(md.defaultSortColName, ",");
+        SortOrder so = options.getSortOrder(name);
+        if (so == null) {
+          throw new PmRuntimeException(pmTable, "default sort column '" + md.defaultSortColName + "' is not a sortable column.");
+        }
+        if ("desc".equals(StringUtils.trim(StringUtils.substringAfter(md.defaultSortColName, ",")))) {
+          so = so.getReverseSortOrder();
+        }
+        options.setDefaultSortOrder(so);
+      }
+
+      Comparator<?> initialSortComparator = getInitialSortOrderComparator();
+      if (initialSortComparator != null) {
+        if (options.getDefaultSortOrder() != null) {
+          throw new PmRuntimeException(pmTable, "defaultSortCol and initialBeanSortComparator found in PmTableCfg annotation. Don't know what to sort by.");
+        }
+        options.setDefaultSortOrder(new InMemSortOrder(initialSortComparator));
+      }
+
+      return options;
+    }
+
+    /**
+     * Provides the configured initial sort order comparator.
+     * <p>
+     * May be overridden to provide a domain specific comparator.
+     * @return
+     */
+    protected Comparator<?> getInitialSortOrderComparator() {
+      MetaData md = PmTableImpl2.this.getOwnMetaDataWithoutPmInitCall();
+      return (md.initialBeanSortComparatorClass != Comparator.class)
+          ? (Comparator<?>)ClassUtil.newInstance(md.initialBeanSortComparatorClass)
+          : null;
+    }
+
+    protected QueryAttr getColQueryAttr(PmTableCol2 col) {
+      PmTableCol2.ImplDetails d = col.getPmImplDetails();
+      String name = d.getQueryAttrName();
+      return new QueryAttr(name, name, Void.class, col.getPmTitle());
+    }
+
+    protected SortOrder makeColSortOrder(PmTableCol2 col) {
+      return new SortOrder(getColQueryAttr(col));
+    }
+  }
+
+  protected class TableDetailsImpl implements ImplDetails {
+    @Override
+    public boolean isSortable() {
+      return getOwnMetaDataWithoutPmInitCall().sortable;
+    }
+
+  }
 
   /**
    * Base implementation for a table specific pager.
@@ -817,6 +904,10 @@ public class PmTableImpl2
       if (cfg.numOfPageRows() > 0) {
         myMetaData.numOfPageRowPms = cfg.numOfPageRows();
       }
+
+      myMetaData.sortable = cfg.sortable();
+      myMetaData.initialBeanSortComparatorClass = cfg.initialBeanSortComparator();
+      myMetaData.defaultSortColName = cfg.defaultSortCol();
     }
 
     // -- initialize the optional path resolver for in-memory tables. --
@@ -834,6 +925,10 @@ public class PmTableImpl2
     private SelectMode rowSelectMode = SelectMode.DEFAULT;
     private int numOfPageRowPms = DEFAULT_NUM_OF_PAGE_ROW_PMS;
     private PathResolver valuePathResolver;
+    private boolean sortable;
+    private Class<?> initialBeanSortComparatorClass = Comparator.class;
+    private String defaultSortColName = null;
+
 
     /** May be used to define a different default value. */
     public void setNumOfPageRowPms(int numOfPageRowPms) { this.numOfPageRowPms = numOfPageRowPms; }

@@ -96,4 +96,34 @@ public class FilterCompareDefinitionFactoryImpl implements FilterCompareDefiniti
     return defaultCompOps;
   }
 
+  /**
+   * A default factory that just handles {@link String} and {@link Comparable} values.
+   */
+  public static class DefaultFactory extends FilterCompareDefinitionFactoryImpl {
+
+    /** The set of string compare operators. */
+    public static final CompOp[] STRING_COMPOPS = {
+            new CompOpStringStartsWith(),
+            new CompOpEquals(),
+            new CompOpNotEquals(),
+            new CompOpStringContains(),
+            new CompOpStringNotContains(),
+            new CompOpIsNull() };
+
+    /** The set of compare operators for other {@link Comparable} types. */
+    public static final CompOp[] COMPAREABLE_COMPOPS = {
+            new CompOpEquals(),
+            new CompOpNotEquals(),
+            new CompOpLt(),
+            new CompOpGt(),
+            new CompOpIsNull() };
+
+    /**
+     * Defines compare operators for strings and compareable.
+     */
+    public DefaultFactory() {
+        defineCompOpsForValueType(String.class, STRING_COMPOPS);
+        defineCompOpsForValueType(Comparable.class, COMPAREABLE_COMPOPS);
+    }
+  }
 }
