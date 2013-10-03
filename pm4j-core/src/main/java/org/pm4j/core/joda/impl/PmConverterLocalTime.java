@@ -9,7 +9,7 @@ import org.joda.time.format.DateTimeFormatter;
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.impl.converter.MultiFormatParserBase;
-import org.pm4j.core.pm.impl.converter.PmConverterSerializeableBase;
+import org.pm4j.core.pm.impl.converter.PmConverterBase;
 
 /**
  * Converter for Joda LocalTime type capable to parse different input
@@ -20,7 +20,7 @@ import org.pm4j.core.pm.impl.converter.PmConverterSerializeableBase;
  * 
  */
 public class PmConverterLocalTime
-    extends PmConverterSerializeableBase<LocalTime> {
+    extends PmConverterBase<LocalTime> {
 
   /**
    * Instance of this class.

@@ -1,6 +1,5 @@
 package org.pm4j.core.pm.impl;
 
-import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -23,9 +22,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.pm4j.common.util.collection.ListUtil;
 import org.pm4j.common.util.collection.MapUtil;
-import org.pm4j.core.exception.PmConverterException;
 import org.pm4j.core.exception.PmRuntimeException;
-import org.pm4j.core.pm.PmAspect;
 import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmConversation;
@@ -498,22 +495,6 @@ public abstract class PmObjectBase implements PmObject {
    */
   protected PmConversationImpl getPmConversationImpl() {
     return (PmConversationImpl) getPmConversation();
-  }
-
-  Serializable getPmContentAspect(PmAspect aspect) {
-    switch (aspect) {
-      case TITLE:   return getPmTitle();
-      case TOOLTIP: return getPmTooltip();
-      default: throw new PmRuntimeException(this, "Unsupported PmAspect: " + aspect);
-    }
-  }
-
-  void setPmContentAspect(PmAspect aspect, Serializable value) throws PmConverterException {
-    switch (aspect) {
-//      case TITLE:   this.pmCachedTitle = (String)value;
-//      case TOOLTIP: this.pm;
-      default: throw new PmRuntimeException(this, "Can't set PmAspect: " + aspect);
-    }
   }
 
   /**

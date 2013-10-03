@@ -11,7 +11,7 @@ import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmConversation;
 
-public class PmConverterDate extends PmConverterSerializeableBase<Date> implements MultiFormatConverter {
+public class PmConverterDate extends PmConverterBase<Date> implements MultiFormatConverter {
 
   public static final PmConverterDate INSTANCE = new PmConverterDate();
 

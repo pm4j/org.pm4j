@@ -9,7 +9,7 @@ import org.joda.time.format.DateTimeFormatter;
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.impl.converter.MultiFormatParserBase;
-import org.pm4j.core.pm.impl.converter.PmConverterSerializeableBase;
+import org.pm4j.core.pm.impl.converter.PmConverterBase;
 
 /**
  * Converter for Joda LocalDate type capable to parse different input formats.
@@ -18,7 +18,7 @@ import org.pm4j.core.pm.impl.converter.PmConverterSerializeableBase;
  * @since GLOBE 1.3
  * 
  */
-public class PmConverterLocalDate extends PmConverterSerializeableBase<LocalDate> {
+public class PmConverterLocalDate extends PmConverterBase<LocalDate> {
 
     /**
      * Instance of this class.

@@ -2,11 +2,8 @@ package org.pm4j.core.pm.serialization;
 
 import java.io.Serializable;
 
-import org.pm4j.core.exception.PmConverterException;
-import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmAspect;
 import org.pm4j.core.pm.PmObject;
-import org.pm4j.core.pm.impl.PmUtil;
 
 public class PmContentSetVisitor
 //extends PmVisitorAdapter
@@ -42,11 +39,12 @@ public class PmContentSetVisitor
   private void setAspect(PmObject pm, PmAspect aspect) {
     Serializable value = contentContainer.getAspect(aspect);
     if (value != null || contentContainer.getAspectMap().containsKey(aspect)) {
-      try {
-        PmUtil.setPmContentAspect(pm, aspect, value);
-      } catch (PmConverterException e) {
-        throw new PmRuntimeException(pm, "Unable to set PM aspect '" + aspect + "'.", e);
-      }
+//      try {
+//        // TODO:
+//        // PmUtil.setPmContentAspect(pm, aspect, value);
+//      } catch (PmConverterException e) {
+//        throw new PmRuntimeException(pm, "Unable to set PM aspect '" + aspect + "'.", e);
+//      }
     }
   }
 }

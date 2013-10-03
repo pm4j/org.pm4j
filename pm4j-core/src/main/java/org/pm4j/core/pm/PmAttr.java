@@ -1,7 +1,5 @@
 package org.pm4j.core.pm;
 
-import java.io.Serializable;
-
 import org.pm4j.core.exception.PmConverterException;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.impl.PmAttrImpl;
@@ -182,22 +180,32 @@ public interface PmAttr<T> extends PmObject, PmDataInput {
 	Class<?> getValueType();
 
 	/**
-	 * Converts single values between its attribute type representation and {@link String}
-	 * or {@link Serializable} representation.
+	 * Converts attribute values between its attribute type representation and {@link String}
+	 * representation.
 	 *
 	 * @param <T>
 	 *          The type of the items to convert.
 	 */
 	interface Converter<T> {
 
-		T stringToValue(PmAttr<?> pmAttr, String s) throws PmConverterException;
+	  /**
+	   * Converts the string value representation to the (external) attribute value type.
+	   *
+	   * @param pmAttr
+	   * @param s
+	   * @return
+	   * @throws PmConverterException
+	   */
+	  T stringToValue(PmAttr<?> pmAttr, String s) throws PmConverterException;
 
-		String valueToString(PmAttr<?> pmAttr, T v);
-
-		T serializeableToValue(PmAttr<?> pmAttr, Serializable s) throws PmConverterException;
-
-		Serializable valueToSerializable(PmAttr<?> pmAttr, T v);
-
+	  /**
+	   * Converts a typed attribute value to its string representation.
+	   *
+	   * @param pmAttr
+	   * @param v
+	   * @return
+	   */
+	  String valueToString(PmAttr<?> pmAttr, T v);
 	}
 
   /**

@@ -1,6 +1,5 @@
 package org.pm4j.core.pm.impl;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -61,8 +60,8 @@ public class PmAttrListOfEnumsImpl<T_ENUM extends Enum<?>> extends PmAttrListImp
    * <p>
    * The set can be filtered by defining some filter logic within {@link #isAnOption(Enum)}.
    * <p>
-   * By overriding isExcludeSelectedItemsFromOptionSet() (Standard: true) it's possible to 
-   * include already selected items in the list. 
+   * By overriding isExcludeSelectedItemsFromOptionSet() (Standard: true) it's possible to
+   * include already selected items in the list.
    *
    * @return The set of enums that can be selected by the user.
    */
@@ -79,14 +78,14 @@ public class PmAttrListOfEnumsImpl<T_ENUM extends Enum<?>> extends PmAttrListImp
 
       return optionEnums;
   }
-  
+
   /**
    * Configures, whether already selected items should be excluded from the option set.
    * <p>
    * Override and set to false to include.
    * <p>
    * (Standard: true)
-   * 
+   *
    * @return whether to exclude already selected items from the option set
    */
   protected boolean isExcludeSelectedItemsFromOptionSet() {
@@ -117,16 +116,6 @@ public class PmAttrListOfEnumsImpl<T_ENUM extends Enum<?>> extends PmAttrListImp
       @Override
       public String valueToString(PmAttr<?> pmAttr, Enum<?> v) {
           return v.name();
-      }
-
-      @Override
-      public Serializable valueToSerializable(PmAttr<?> pmAttr, Enum<?> v) {
-          return v;
-      }
-
-      @Override
-      public Enum<?> serializeableToValue(PmAttr<?> pmAttr, Serializable s) {
-          return (Enum<?>) s;
       }
   }
 }

@@ -1,6 +1,5 @@
 package org.pm4j.core.pm.impl.converter;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,36 +45,6 @@ public class PmConverterList<T_ITEM> implements PmAttr.Converter<List<T_ITEM>> {
       sb.append(itemConverter.valueToString(pmAttr, item));
     }
     return sb.toString();
-  }
-
-  @Override
-  public Serializable valueToSerializable(PmAttr<?> pmAttr, List<T_ITEM> v) {
-    if (v == null) {
-      return null;
-    }
-    else {
-      ArrayList<Serializable> serializableList = new ArrayList<Serializable>(v.size());
-      for (T_ITEM item : v) {
-        serializableList.add(itemConverter.valueToSerializable(pmAttr, item));
-      }
-      return serializableList;
-    }
-  }
-
-  @Override
-  public List<T_ITEM> serializeableToValue(PmAttr<?> pmAttr, Serializable s) throws PmConverterException {
-    if (s != null) {
-      @SuppressWarnings("unchecked")
-      ArrayList<Serializable> serializableList = (ArrayList<Serializable>)s;
-      List<T_ITEM> valueList = new ArrayList<T_ITEM>(serializableList.size());
-      for (Serializable item : serializableList) {
-        valueList.add(itemConverter.serializeableToValue(pmAttr, item));
-      }
-      return valueList;
-    }
-    else {
-      return null;
-    }
   }
 
 }

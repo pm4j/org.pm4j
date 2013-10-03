@@ -1,6 +1,5 @@
 package org.pm4j.core.pm.impl;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -11,7 +10,6 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 import org.pm4j.core.exception.PmConverterException;
 import org.pm4j.core.exception.PmRuntimeException;
-import org.pm4j.core.pm.PmAspect;
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmConversation;
@@ -363,15 +361,6 @@ public final class PmUtil {
       return pm.getPmConversation().getPmDefaults().getLogStringBuilder().makeName((PmObjectBase)pm);
     }
   }
-
-
-  public static void setPmContentAspect(PmObject pm, PmAspect aspect, Serializable value) throws PmConverterException {
-    ((PmObjectBase)pm).setPmContentAspect(aspect, value);
-  }
-  public static Serializable getPmContentAspect(PmObject pm, PmAspect aspect) {
-    return ((PmObjectBase)pm).getPmContentAspect(aspect);
-  }
-
 
   // -- internal helper --
 

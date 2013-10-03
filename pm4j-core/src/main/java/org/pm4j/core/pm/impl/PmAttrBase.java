@@ -1,6 +1,5 @@
 package org.pm4j.core.pm.impl;
 
-import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -32,7 +31,6 @@ import org.pm4j.core.exception.PmConverterException;
 import org.pm4j.core.exception.PmResourceData;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.exception.PmValidationException;
-import org.pm4j.core.pm.PmAspect;
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmCommandDecorator;
@@ -1206,34 +1204,11 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     valueChangeDecorators.add(decorator);
   }
 
-  @Override
-  Serializable getPmContentAspect(PmAspect aspect) {
-    switch (aspect) {
-      case VALUE:
-        T_PM_VALUE v = getValue();
-        return getConverter().valueToSerializable(this, v);
-      default:
-        return super.getPmContentAspect(aspect);
-    }
-  }
-
   /**
    * @return The set of decorators to consider on value change.
    */
   protected Collection<PmCommandDecorator> getValueChangeDecorators() {
     return valueChangeDecorators;
-  }
-
-  @Override
-  void setPmContentAspect(PmAspect aspect, Serializable value) throws PmConverterException {
-    PmEventApi.ensureThreadEventSource(this);
-    switch (aspect) {
-      case VALUE:
-        setValue(getConverter().serializeableToValue(this, value));
-        break;
-      default:
-        super.setPmContentAspect(aspect, value);
-    }
   }
 
   /**

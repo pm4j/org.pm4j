@@ -10,7 +10,6 @@ import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.api.PmVisitorApi.VisitHierarchyCallBack;
 import org.pm4j.core.pm.api.PmVisitorApi.VisitResult;
-import org.pm4j.core.pm.impl.PmUtil;
 
 /**
  * Visitor creating a PmContentContainer representing the visited Pm.
@@ -71,7 +70,8 @@ public class PmContentGetVisitorCallBack implements VisitHierarchyCallBack {
       }
 
       if (pm instanceof PmAttr<?>) {
-        Serializable value = PmUtil.getPmContentAspect(pm, PmAspect.VALUE);
+        // TODO:
+        Serializable value = ""; // PmUtil.getPmContentAspect(pm, PmAspect.VALUE);
         if (contentCfg.hasAspect(PmAspect.VALUE) && (value != null )) {
           currentContainer.addAspect(PmAspect.VALUE, value);
         }

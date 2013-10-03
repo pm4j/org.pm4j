@@ -1,7 +1,5 @@
 package org.pm4j.core.pm.impl.converter;
 
-import java.io.Serializable;
-
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -72,18 +70,6 @@ public class PmConverterOptionBased implements PmAttr.Converter<Object> {
     @SuppressWarnings("unchecked")
     Object backingValue = ((PmAttrBase<Object,?>)pmAttr).convertPmValueToBackingValue(pmValue);
     return ObjectUtils.toString(idPath.getValue(backingValue));
-  }
-
-  @Override
-  public Serializable valueToSerializable(PmAttr<?> pmAttr, Object v) {
-    return v != null
-              ? valueToString(pmAttr, v)
-              : null;
-  }
-
-  @Override
-  public Object serializeableToValue(PmAttr<?> pmAttr, Serializable s) {
-    return stringToValue(pmAttr, (String)s);
   }
 
 }

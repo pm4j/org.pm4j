@@ -7,7 +7,7 @@ import org.pm4j.core.pm.PmAttr;
  * 
  * @author olaf boede
  */
-public class PmConverterString extends PmConverterSerializeableBase<String> {
+public class PmConverterString extends PmConverterBase<String> {
 
   public static final PmConverterString INSTANCE = new PmConverterString();
 

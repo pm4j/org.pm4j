@@ -2,7 +2,7 @@ package org.pm4j.core.pm.impl.converter;
 
 import org.pm4j.core.pm.PmAttr;
 
-public class PmConverterBoolean extends PmConverterSerializeableBase<Boolean> {
+public class PmConverterBoolean extends PmConverterBase<Boolean> {
 
   public static final PmConverterBoolean INSTANCE = new PmConverterBoolean();
 

@@ -104,16 +104,6 @@ public class PmAttrEnumImpl<T_ENUM extends Enum<T_ENUM>> extends PmAttrBase<T_EN
     public String valueToString(PmAttr<?> pmAttr, Enum<?> v) {
       return v.name();
     }
-
-    @Override
-    public Serializable valueToSerializable(PmAttr<?> pmAttr, Enum<?> v) {
-      return v;
-    }
-
-    @Override
-    public Enum<?> serializeableToValue(PmAttr<?> pmAttr, Serializable s) {
-      return (Enum<?>)s;
-    }
   }
 
 }

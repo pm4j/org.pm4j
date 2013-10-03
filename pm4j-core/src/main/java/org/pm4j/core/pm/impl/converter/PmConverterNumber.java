@@ -21,7 +21,7 @@ import org.pm4j.core.pm.PmConstants;
  *
  * @param <T> The concrete {@link Number} type to convert.
  */
-public class PmConverterNumber<T extends Number> extends PmConverterSerializeableBase<T> implements MultiFormatConverter {
+public class PmConverterNumber<T extends Number> extends PmConverterBase<T> implements MultiFormatConverter {
 
   private final Constructor<T> numberCtor;
 

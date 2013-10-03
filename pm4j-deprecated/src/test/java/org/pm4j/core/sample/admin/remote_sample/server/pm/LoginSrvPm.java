@@ -1,7 +1,6 @@
 package org.pm4j.core.sample.admin.remote_sample.server.pm;
 
 import org.pm4j.core.exception.PmRuntimeException;
-import org.pm4j.core.pm.PmAspect;
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmAttrString;
 import org.pm4j.core.pm.PmCommand;
@@ -12,14 +11,13 @@ import org.pm4j.core.pm.impl.PmAttrImpl;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
 import org.pm4j.core.pm.impl.PmCommandImpl;
 import org.pm4j.core.pm.impl.PmElementImpl;
-import org.pm4j.core.sample.admin.remote_sample.annotations.PmServerCfg;
 import org.pm4j.core.sample.admin.remote_sample.server.service.Department;
 import org.pm4j.core.sample.admin.remote_sample.server.service.LoginService;
 import org.pm4j.core.sample.admin.remote_sample.shared.LoginState;
 
 
 public class LoginSrvPm extends PmElementImpl {
-  @PmServerCfg(providedAspects={PmAspect.VALUE, PmAspect.OPTIONS})
+//  @PmServerCfg(providedAspects={PmAspect.VALUE, PmAspect.OPTIONS})
   @PmOptionCfg(values="#adminService.departments", id="id", title="name")
   public final PmAttr<Department> department = new PmAttrImpl<Department>(this);
 
