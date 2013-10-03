@@ -12,7 +12,6 @@ import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmEventListener;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.api.PmEventApi;
-import org.pm4j.core.pm.impl.PmOnEventMethodCallDispatcher;
 
 // TODO: check if we can get rid of the duplicate bind concept:
 //  The PbFactory supports a procedural bind() method (but no unbind!)
@@ -225,7 +224,7 @@ public abstract class PbFactoryBase<VIEW, PARENT_VIEW_CTXT, PM extends PmObject>
    * to communicate changes between both sides.
    */
   public class Binding
-            extends PmOnEventMethodCallDispatcher
+            extends PbOnEventMethodCallDispatcher
             implements PbBinding, PmEventListener {
 
     public PM pm;

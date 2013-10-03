@@ -1,19 +1,19 @@
-package org.pm4j.core.pm.impl;
+package org.pm4j.core.pb;
 
 import org.pm4j.core.pm.PmEvent;
 
 /**
  * Provides convenience 'onPmXyzChange' methods that are sometimes easier
  * to use than event listeners instances.
- * 
+ *
  * @author olaf boede
  */
-public class PmOnEventMethodCallDispatcher {
+public class PbOnEventMethodCallDispatcher {
 
   /**
    * Calls the related on...() methods. The set of methods to call is determined
    * by the given <code>eventMask</code> parameter.
-   * 
+   *
    * @param event The event to propagate.
    * @param eventMask Defines the set of on-methods to be called.
    */
@@ -50,7 +50,7 @@ public class PmOnEventMethodCallDispatcher {
       onPmStyleClassChange(event);
     }
   }
-                                                      
+
   /**
    * Is called whenever an event with the flag {@link PmEvent#ENABLEMENT_CHANGE}
    * was fired for this PM.
