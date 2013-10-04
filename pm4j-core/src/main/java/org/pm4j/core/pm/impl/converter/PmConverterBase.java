@@ -1,20 +1,15 @@
 package org.pm4j.core.pm.impl.converter;
 
-import java.io.Serializable;
-
 import org.pm4j.core.pm.PmAttr;
-import org.pm4j.core.pm.PmAttr.Converter;
 
 /**
- * Base class for converters that handle {@link Serializable} values.
- * <p>
- * Provides simple base implementations for some {@link Converter} methods.
+ * Provides a simple base implementations for {@link #valueToString(PmAttr, Object)}.
  *
  * @author olaf boede
  *
  * @param <T> Type of the value to convert.
  */
-public abstract class PmConverterBase<T extends Serializable> implements PmAttr.Converter<T> {
+public abstract class PmConverterBase<T> implements PmAttr.Converter<T> {
 
   /**
    * Just calls the {@link #toString()} method of the given value.
