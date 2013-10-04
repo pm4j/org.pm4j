@@ -2,6 +2,7 @@ package org.pm4j.core.pm.impl;
 
 import java.util.List;
 
+import org.pm4j.common.query.QueryOptions;
 import org.pm4j.core.pm.PmElement;
 import org.pm4j.core.pm.PmPager2.PagerVisibility;
 import org.pm4j.core.pm.PmTable2;
@@ -45,5 +46,16 @@ public final class PmTableUtil2 {
       table.getPmPager().setPagerVisibility(PagerVisibility.WHEN_SECOND_PAGE_EXISTS);
     }
   }
+
+  /**
+   * @deprecated please use the table's in-memory collection support directly.
+   *
+   * @param pmTable
+   * @return
+   */
+  public static QueryOptions makeQueryOptionsForInMemoryTable(PmTableImpl2<?, ?> pmTable) {
+    return pmTable.new InMemQueryOptionProvider().getQueryOptions();
+  }
+
 
 }
