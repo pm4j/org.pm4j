@@ -500,13 +500,19 @@ public abstract class PmObjectBase implements PmObject {
   /**
    * Provides a view technology specific PM adapter for this PM instance.
    * <p>
-   * Implements a lazy init mechanism. This should help to reduce the memory footprint.
+   * Implements a lazy init mechanism.
    *
-   * @return The view adapter or <code>null</code> if none is available (needed) for the view technology.
+   * @return The view adapter or <code>null</code> if none is available (or needed) for the view technology.
    */
   public Object getPmToViewConnector() {
+    // Ensure that pmInit() was called. A domain PM might create its special view connector there.
+    // On the other hand: don't trigger pmInit if some other code (e.g. a constructor) defined a
+    // connector explicitly.
     if (pmToViewConnector == PM_TO_VIEW_CONNECTOR_NOT_YET_INITIALIZED) {
-      pmToViewConnector = getPmConversationImpl().getPmToViewTechnologyConnector().createPmToViewConnector(this);
+      zz_ensurePmInitialization();
+      if (pmToViewConnector == PM_TO_VIEW_CONNECTOR_NOT_YET_INITIALIZED) {
+        pmToViewConnector = getPmConversationImpl().getPmToViewTechnologyConnector().createPmToViewConnector(this);
+      }
     }
     return pmToViewConnector;
   }
