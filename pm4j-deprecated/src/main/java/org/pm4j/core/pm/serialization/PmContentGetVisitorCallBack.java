@@ -8,15 +8,15 @@ import java.util.Deque;
 import org.pm4j.core.pm.PmAspect;
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmObject;
-import org.pm4j.core.pm.api.PmVisitorApi.VisitHierarchyCallBack;
-import org.pm4j.core.pm.api.PmVisitorApi.VisitResult;
+import org.pm4j.core.pm.api.PmVisitorApi.PmVisitHierarchyCallBack;
+import org.pm4j.core.pm.api.PmVisitorApi.PmVisitResult;
 
 /**
  * Visitor creating a PmContentContainer representing the visited Pm.
  * @author DZABEL
  *
  */
-public class PmContentGetVisitorCallBack implements VisitHierarchyCallBack {
+public class PmContentGetVisitorCallBack implements PmVisitHierarchyCallBack {
 
   private PmContentContainer currentContainer, parentContainer, rootPmContainer;
   private final PmContentCfg contentCfg;
@@ -54,7 +54,7 @@ public class PmContentGetVisitorCallBack implements VisitHierarchyCallBack {
   }
 
   @Override
-  public VisitResult visit(PmObject pm) {
+  public PmVisitResult visit(PmObject pm) {
     if (isVisitVisiblePm(pm)) {
       String pmName = pm.getPmName();
       if(isRootPm) {
@@ -77,15 +77,15 @@ public class PmContentGetVisitorCallBack implements VisitHierarchyCallBack {
         }
       }
     }
-    return VisitResult.CONTINUE;
+    return PmVisitResult.CONTINUE;
   }
 
   @Override
-  public VisitResult enterChildren(PmObject parent, Collection<PmObject> pmChildren) {
+  public PmVisitResult enterChildren(PmObject parent, Collection<PmObject> pmChildren) {
     contentStack.push(new Pair(parentContainer, parent));
     parentContainer = currentContainer;
     currentContainer = null;
-    return VisitResult.CONTINUE;
+    return PmVisitResult.CONTINUE;
   }
 
   @Override

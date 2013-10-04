@@ -21,6 +21,7 @@ public class DetailsPmBeanHandlerImpl<T_MASTER_RECORD> extends
 
   @Override
   protected void afterMasterRecordChangeImpl(T_MASTER_RECORD newMasterBean) {
+    // TODO oboede: why is the base implementation not called here? Doku?
     getTypedDetailsPm().setPmBean(newMasterBean);
   }
 

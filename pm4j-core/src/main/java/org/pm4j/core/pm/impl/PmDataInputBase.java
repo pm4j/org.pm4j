@@ -9,9 +9,9 @@ import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmVisitorApi;
-import org.pm4j.core.pm.api.PmVisitorApi.VisitCallBack;
-import org.pm4j.core.pm.api.PmVisitorApi.VisitHint;
-import org.pm4j.core.pm.api.PmVisitorApi.VisitResult;
+import org.pm4j.core.pm.api.PmVisitorApi.PmVisitCallBack;
+import org.pm4j.core.pm.api.PmVisitorApi.PmVisitHint;
+import org.pm4j.core.pm.api.PmVisitorApi.PmVisitResult;
 
 public abstract class PmDataInputBase extends PmObjectBase implements PmDataInput {
 
@@ -72,9 +72,9 @@ public abstract class PmDataInputBase extends PmObjectBase implements PmDataInpu
 
       // Only if the changed flag was set to 'false': Reset the changed states for all sub-PMs.
       if ((changed == false) && (pmInitState == PmInitState.INITIALIZED)) {
-        VisitCallBack v = new VisitCallBack() {
+        PmVisitCallBack v = new PmVisitCallBack() {
           @Override
-          public VisitResult visit(PmObject pm) {
+          public PmVisitResult visit(PmObject pm) {
             if (pm instanceof PmDataInputBase) {
               if (_setPmValueChangedForThisInstanceOnly((PmDataInputBase)pm, changed)) {
                 childrenWithChangedStateChange.add(pm);
@@ -84,16 +84,16 @@ public abstract class PmDataInputBase extends PmObjectBase implements PmDataInpu
               // XXX olaf: the children of this child may get duplicate calls when the visitor proceeds...
               ((PmDataInput) pm).setPmValueChanged(changed);
             }
-            return VisitResult.CONTINUE;
+            return PmVisitResult.CONTINUE;
           }
         };
 
         // If some of the by default skipped PMs should be traversed too: Please override setPmValueChangedImpl().
         PmVisitorApi.visitChildren(this, v,
-            VisitHint.SKIP_NOT_INITIALIZED, // Not yet initialized PMs are not yet changed for sure.
-            VisitHint.SKIP_CONVERSATION,    // Conversations have their own change handling.
-            VisitHint.SKIP_INVISIBLE,       // Invisible parts should not be changed.
-            VisitHint.SKIP_READ_ONLY);      // Read only parts should never be changed.
+            PmVisitHint.SKIP_NOT_INITIALIZED, // Not yet initialized PMs are not yet changed for sure.
+            PmVisitHint.SKIP_CONVERSATION,    // Conversations have their own change handling.
+            PmVisitHint.SKIP_INVISIBLE,       // Invisible parts should not be changed.
+            PmVisitHint.SKIP_READ_ONLY);      // Read only parts should never be changed.
       }
 
       // Inform about changed state changes for all children and this instance.

@@ -8,10 +8,10 @@ import java.util.Set;
 
 import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.PmObject;
-import org.pm4j.core.pm.api.PmVisitorApi.VisitCallBack;
-import org.pm4j.core.pm.api.PmVisitorApi.VisitHierarchyCallBack;
-import org.pm4j.core.pm.api.PmVisitorApi.VisitHint;
-import org.pm4j.core.pm.api.PmVisitorApi.VisitResult;
+import org.pm4j.core.pm.api.PmVisitorApi.PmVisitCallBack;
+import org.pm4j.core.pm.api.PmVisitorApi.PmVisitHierarchyCallBack;
+import org.pm4j.core.pm.api.PmVisitorApi.PmVisitHint;
+import org.pm4j.core.pm.api.PmVisitorApi.PmVisitResult;
 
 /**
  * Visitor implementations. Descends deep first.
@@ -20,8 +20,8 @@ import org.pm4j.core.pm.api.PmVisitorApi.VisitResult;
  */
 public class PmVisitorImpl {
 
-  private final Set<VisitHint> hints;
-  private final VisitCallBack callBack;
+  private final Set<PmVisitHint> hints;
+  private final PmVisitCallBack callBack;
   private PmObject stopOnPmObject = null;
 
   /**
@@ -32,11 +32,11 @@ public class PmVisitorImpl {
    * @param hints
    *          static selections.
    */
-  public PmVisitorImpl(VisitCallBack callBack, VisitHint... hints) {
+  public PmVisitorImpl(PmVisitCallBack callBack, PmVisitHint... hints) {
     assert callBack != null;
     assert hints != null;
     this.callBack = callBack;
-    this.hints = new HashSet<VisitHint>(Arrays.asList(hints));
+    this.hints = new HashSet<PmVisitHint>(Arrays.asList(hints));
   }
 
   /**
@@ -46,22 +46,22 @@ public class PmVisitorImpl {
    *          the PM to visit
    * @return the visit result state.
    */
-  public VisitResult visit(PmObject pm) {
+  public PmVisitResult visit(PmObject pm) {
     assert pm != null;
-    VisitResult hintResult = considerHints(pm);
+    PmVisitResult hintResult = considerHints(pm);
     if (hintResult != null) {
       return hintResult;
     }
 
     // The moment where the elephant...
-    VisitResult result = callBack.visit(pm);
+    PmVisitResult result = callBack.visit(pm);
 
     switch (result) {
       case STOP_VISIT:
         stopOnPmObject = pm;
-        return VisitResult.STOP_VISIT;
+        return PmVisitResult.STOP_VISIT;
       case SKIP_CHILDREN:
-        return VisitResult.SKIP_CHILDREN;
+        return PmVisitResult.SKIP_CHILDREN;
       case CONTINUE:
         return visitChildren(pm);
       default:
@@ -75,13 +75,13 @@ public class PmVisitorImpl {
    * @param pm
    *          the PM to visit.
    */
-  public VisitResult visitChildren(PmObject pm) {
+  public PmVisitResult visitChildren(PmObject pm) {
     assert pm != null;
     Collection<PmObject> children = getChildren(pm);
     if (!children.isEmpty()) {
-      if(callBack instanceof VisitHierarchyCallBack) {
-        VisitHierarchyCallBack vhcb = (VisitHierarchyCallBack)callBack;
-        VisitResult enterResult = vhcb.enterChildren(pm, children);
+      if(callBack instanceof PmVisitHierarchyCallBack) {
+        PmVisitHierarchyCallBack vhcb = (PmVisitHierarchyCallBack)callBack;
+        PmVisitResult enterResult = vhcb.enterChildren(pm, children);
         switch (enterResult) {
         case CONTINUE:
           visitChildrenCollection(children);
@@ -89,9 +89,9 @@ public class PmVisitorImpl {
           break;
         case SKIP_CHILDREN:
           // continue without having the children visited.
-          return VisitResult.CONTINUE;
+          return PmVisitResult.CONTINUE;
         case STOP_VISIT:
-          return VisitResult.STOP_VISIT;
+          return PmVisitResult.STOP_VISIT;
         }
       }
       else {
@@ -99,16 +99,16 @@ public class PmVisitorImpl {
       }
     }
     if (stopOnPmObject != null) {
-      return VisitResult.STOP_VISIT;
+      return PmVisitResult.STOP_VISIT;
     }
 
     // no stop
-    return VisitResult.CONTINUE;
+    return PmVisitResult.CONTINUE;
   }
 
 
   /**
-   * If {@link VisitCallBack} visit returns {@link VisitResult#STOP_VISIT} the
+   * If {@link PmVisitCallBack} visit returns {@link PmVisitResult#STOP_VISIT} the
    * responsible pm child will be returned.
    *
    * @return the visit stopping pm object.
@@ -117,34 +117,34 @@ public class PmVisitorImpl {
     return stopOnPmObject;
   }
 
-  private VisitResult considerHints(PmObject pm) {
+  private PmVisitResult considerHints(PmObject pm) {
 
     if (!PmInitApi.isPmInitialized(pm)) {
-      if (hints.contains(VisitHint.SKIP_NOT_INITIALIZED)) {
-        return VisitResult.SKIP_CHILDREN;
+      if (hints.contains(PmVisitHint.SKIP_NOT_INITIALIZED)) {
+        return PmVisitResult.SKIP_CHILDREN;
       } else {
         PmInitApi.ensurePmInitialization(pm);
       }
     }
 
-    if (hints.contains(VisitHint.SKIP_CONVERSATION)) {
+    if (hints.contains(PmVisitHint.SKIP_CONVERSATION)) {
       if (pm instanceof PmConversation) {
-        return VisitResult.SKIP_CHILDREN;
+        return PmVisitResult.SKIP_CHILDREN;
       }
     }
-    if (hints.contains(VisitHint.SKIP_READ_ONLY)) {
+    if (hints.contains(PmVisitHint.SKIP_READ_ONLY)) {
       if (pm.isPmReadonly()) {
-        return VisitResult.SKIP_CHILDREN;
+        return PmVisitResult.SKIP_CHILDREN;
       }
     }
-    if (hints.contains(VisitHint.SKIP_INVISIBLE)) {
+    if (hints.contains(PmVisitHint.SKIP_INVISIBLE)) {
       if (!pm.isPmVisible()) {
-        return VisitResult.SKIP_CHILDREN;
+        return PmVisitResult.SKIP_CHILDREN;
       }
     }
-    if (hints.contains(VisitHint.SKIP_DISABLED)) {
+    if (hints.contains(PmVisitHint.SKIP_DISABLED)) {
       if (!pm.isPmEnabled()) {
-        return VisitResult.SKIP_CHILDREN;
+        return PmVisitResult.SKIP_CHILDREN;
       }
     }
     return null;
@@ -153,7 +153,7 @@ public class PmVisitorImpl {
   private Collection<PmObject> getChildren(PmObject pm) {
     Collection<PmObject> allChildren = new ArrayList<PmObject>();
     allChildren.addAll(((PmObjectBase) pm).getPmChildren());
-    if (!hints.contains(VisitHint.SKIP_FACTORY_GENERATED_CHILD_PMS)) {
+    if (!hints.contains(PmVisitHint.SKIP_FACTORY_GENERATED_CHILD_PMS)) {
       allChildren.addAll(((PmObjectBase) pm).getFactoryGeneratedChildPms());
     }
     return allChildren;

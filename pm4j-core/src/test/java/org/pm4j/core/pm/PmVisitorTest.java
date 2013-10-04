@@ -11,10 +11,9 @@ import org.junit.Test;
 import org.pm4j.core.pm.annotation.PmBeanCfg;
 import org.pm4j.core.pm.annotation.PmFactoryCfg;
 import org.pm4j.core.pm.api.PmVisitorApi;
-import org.pm4j.core.pm.api.PmVisitorApi.DefaultVisitCallBack;
-import org.pm4j.core.pm.api.PmVisitorApi.VisitCallBack;
-import org.pm4j.core.pm.api.PmVisitorApi.VisitHint;
-import org.pm4j.core.pm.api.PmVisitorApi.VisitResult;
+import org.pm4j.core.pm.api.PmVisitorApi.PmVisitCallBack;
+import org.pm4j.core.pm.api.PmVisitorApi.PmVisitHint;
+import org.pm4j.core.pm.api.PmVisitorApi.PmVisitResult;
 import org.pm4j.core.pm.impl.PmAttrPmListImpl;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
 import org.pm4j.core.pm.impl.PmBeanBase;
@@ -27,11 +26,11 @@ public class PmVisitorTest {
   private final MyRootPm pm = new MyRootPm(new PmConversationImpl());
 
 
-  private final VisitCallBack visitAllCallBack = new DefaultVisitCallBack() {
+  private final PmVisitCallBack visitAllCallBack = new PmVisitCallBack() {
     @Override
-    public VisitResult visit(PmObject pm) {
+    public PmVisitResult visit(PmObject pm) {
       storeVisit(pm);
-      return VisitResult.CONTINUE;
+      return PmVisitResult.CONTINUE;
     }
 
   };
@@ -42,37 +41,37 @@ public class PmVisitorTest {
     calls.add(pm.getPmRelativeName());
   }
 
-  private final VisitCallBack visitAllStrings = new DefaultVisitCallBack() {
+  private final PmVisitCallBack visitAllStrings = new PmVisitCallBack() {
     @Override
-    public VisitResult visit(PmObject pm) {
+    public PmVisitResult visit(PmObject pm) {
       if (pm instanceof PmAttrString) {
         storeVisit(pm);
       }
-      return VisitResult.CONTINUE;
+      return PmVisitResult.CONTINUE;
     }
   };
 
-  private final VisitCallBack visitChildByRelativeName = new DefaultVisitCallBack() {
+  private final PmVisitCallBack visitChildByRelativeName = new PmVisitCallBack() {
     @Override
-    public VisitResult visit(PmObject pm) {
+    public PmVisitResult visit(PmObject pm) {
 
       if ("myChPm1".equals(pm.getPmRelativeName())) {
         storeVisit(pm);
-        return VisitResult.STOP_VISIT;
+        return PmVisitResult.STOP_VISIT;
       }
-      return VisitResult.CONTINUE;
+      return PmVisitResult.CONTINUE;
     }
   };
 
-  private final VisitCallBack visitSkipChildren = new DefaultVisitCallBack() {
+  private final PmVisitCallBack visitSkipChildren = new PmVisitCallBack() {
     @Override
-    public VisitResult visit(PmObject pm) {
+    public PmVisitResult visit(PmObject pm) {
 
       if (pm.getPmRelativeName().contains("myChPm")) {
         storeVisit(pm);
-        return VisitResult.SKIP_CHILDREN;
+        return PmVisitResult.SKIP_CHILDREN;
       }
-      return VisitResult.CONTINUE;
+      return PmVisitResult.CONTINUE;
     }
   };
 
@@ -83,53 +82,53 @@ public class PmVisitorTest {
 
   @Test
   public void testSkipFactoryPms() {
-    PmVisitorApi.visit(pm, visitAllCallBack, VisitHint.SKIP_FACTORY_GENERATED_CHILD_PMS);
+    PmVisitorApi.visit(pm, visitAllCallBack, PmVisitHint.SKIP_FACTORY_GENERATED_CHILD_PMS);
     String expected = "[pmVisitorTest_MyRootPm, myChPm1, myChPm1_disabled, myChPm1_convImpl, myChPm1_readOnly, myChPm1_invisible, myChPm2, myChPm2_disabled, myChPm2_convImpl, myChPm2_readOnly, myChPm2_invisible, myPmList]";
     assertEquals(expected, calls.toString());
   }
 
   @Test
   public void testSkipReadOnly() {
-    PmVisitorApi.visit(pm, visitAllCallBack, VisitHint.SKIP_READ_ONLY,
-        VisitHint.SKIP_FACTORY_GENERATED_CHILD_PMS);
+    PmVisitorApi.visit(pm, visitAllCallBack, PmVisitHint.SKIP_READ_ONLY,
+        PmVisitHint.SKIP_FACTORY_GENERATED_CHILD_PMS);
     String expected = "[pmVisitorTest_MyRootPm, myChPm1, myChPm1_disabled, myChPm1_convImpl, myChPm1_invisible, myChPm2, myChPm2_disabled, myChPm2_convImpl, myChPm2_invisible, myPmList]";
     assertEquals(expected, calls.toString());
   }
 
   @Test
   public void testSkipInvisible() {
-    PmVisitorApi.visit(pm, visitAllCallBack, VisitHint.SKIP_INVISIBLE,
-        VisitHint.SKIP_FACTORY_GENERATED_CHILD_PMS);
+    PmVisitorApi.visit(pm, visitAllCallBack, PmVisitHint.SKIP_INVISIBLE,
+        PmVisitHint.SKIP_FACTORY_GENERATED_CHILD_PMS);
     String expected = "[pmVisitorTest_MyRootPm, myChPm1, myChPm1_disabled, myChPm1_convImpl, myChPm1_readOnly, myChPm2, myChPm2_disabled, myChPm2_convImpl, myChPm2_readOnly, myPmList]";
     assertEquals(expected, calls.toString());
   }
 
   @Test
   public void testSkipDisabled() {
-    PmVisitorApi.visit(pm, visitAllCallBack, VisitHint.SKIP_DISABLED,
-        VisitHint.SKIP_FACTORY_GENERATED_CHILD_PMS);
+    PmVisitorApi.visit(pm, visitAllCallBack, PmVisitHint.SKIP_DISABLED,
+        PmVisitHint.SKIP_FACTORY_GENERATED_CHILD_PMS);
     String expected = "[pmVisitorTest_MyRootPm, myChPm1, myChPm1_convImpl, myChPm1_readOnly, myChPm1_invisible, myChPm2, myChPm2_convImpl, myChPm2_readOnly, myChPm2_invisible, myPmList]";
     assertEquals(expected, calls.toString());
   }
 
   @Test
   public void testSkipConversation() {
-    PmVisitorApi.visit(pm, visitAllCallBack, VisitHint.SKIP_CONVERSATION,
-        VisitHint.SKIP_FACTORY_GENERATED_CHILD_PMS);
+    PmVisitorApi.visit(pm, visitAllCallBack, PmVisitHint.SKIP_CONVERSATION,
+        PmVisitHint.SKIP_FACTORY_GENERATED_CHILD_PMS);
     String expected = "[pmVisitorTest_MyRootPm, myChPm1, myChPm1_disabled, myChPm1_readOnly, myChPm1_invisible, myChPm2, myChPm2_disabled, myChPm2_readOnly, myChPm2_invisible, myPmList]";
     assertEquals(expected, calls.toString());
   }
 
   @Test
   public void testVisitSameType() {
-    PmVisitorApi.visit(pm, visitAllStrings, VisitHint.SKIP_FACTORY_GENERATED_CHILD_PMS);
+    PmVisitorApi.visit(pm, visitAllStrings, PmVisitHint.SKIP_FACTORY_GENERATED_CHILD_PMS);
     String expected = "[myChPm1_invisible, myChPm2_invisible]";
     assertEquals(expected, calls.toString());
   }
 
   @Test
   public void testFilterOnePm() {
-    PmVisitorApi.visit(pm, visitChildByRelativeName, VisitHint.SKIP_FACTORY_GENERATED_CHILD_PMS);
+    PmVisitorApi.visit(pm, visitChildByRelativeName, PmVisitHint.SKIP_FACTORY_GENERATED_CHILD_PMS);
     assertEquals("[myChPm1]", calls.toString());
   }
 

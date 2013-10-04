@@ -9,10 +9,10 @@ import org.pm4j.core.pm.PmAspect;
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.api.PmVisitorApi;
-import org.pm4j.core.pm.api.PmVisitorApi.VisitResult;
+import org.pm4j.core.pm.api.PmVisitorApi.PmVisitResult;
 
 
-public class PmContentSetVisitorCallBack implements PmVisitorApi.VisitHierarchyCallBack {
+public class PmContentSetVisitorCallBack implements PmVisitorApi.PmVisitHierarchyCallBack {
 
   private Deque<PmContentContainer> stack = new LinkedList<PmContentContainer>();
   private PmContentContainer contentContainer;
@@ -24,23 +24,23 @@ public class PmContentSetVisitorCallBack implements PmVisitorApi.VisitHierarchyC
   }
 
   @Override
-  public VisitResult visit(PmObject pm) {
+  public PmVisitResult visit(PmObject pm) {
     PmContentContainer c = contentContainer.getNamedChildContentMap().get(pm.getPmName());
     if (c != null && pm instanceof PmAttr<?>) {
       setAspect(pm, PmAspect.VALUE, c);
     }
-    return VisitResult.CONTINUE;
+    return PmVisitResult.CONTINUE;
   }
 
   @Override
-  public VisitResult enterChildren(PmObject pmParent, Collection<PmObject> pmChildren) {
+  public PmVisitResult enterChildren(PmObject pmParent, Collection<PmObject> pmChildren) {
     PmContentContainer c = contentContainer.getNamedChildContentMap().get(pmParent.getPmName());
     if (c != null) {
       stack.push(c);
       contentContainer = c;
-      return VisitResult.CONTINUE;
+      return PmVisitResult.CONTINUE;
     } else {
-      return VisitResult.SKIP_CHILDREN;
+      return PmVisitResult.SKIP_CHILDREN;
     }
   }
 

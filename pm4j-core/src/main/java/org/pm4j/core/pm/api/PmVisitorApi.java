@@ -10,28 +10,14 @@ import org.pm4j.core.pm.impl.PmVisitorImpl;
  * PM tree visitor functionality.
  *
  * @author DZABEL
+ * @author olaf boede
  */
 public class PmVisitorApi {
 
   /**
-   * If the visitor client is just interested in visit a node, this is the
-   * right base class.
-   */
-  public static abstract class DefaultVisitCallBack implements VisitHierarchyCallBack {
-    @Override
-    public VisitResult enterChildren(PmObject parent, Collection<PmObject> pmChildren) {
-      return VisitResult.CONTINUE;
-    }
-
-    @Override
-    public void leaveChildren(PmObject parent, Collection<PmObject> pmChildren) {
-    }
-  }
-
-  /**
    * Visitor call back interface.
    */
-  public interface VisitCallBack {
+  public interface PmVisitCallBack {
     /**
      * Called by the visitor to do the visit work.
      *
@@ -39,20 +25,20 @@ public class PmVisitorApi {
      *          the current visited PM.
      * @return how the visiting should go on.
      */
-    VisitResult visit(PmObject pm);
+    PmVisitResult visit(PmObject pm);
 
   }
 
   /**
    * Visitor call back interface considering children.
    */
-  public interface VisitHierarchyCallBack extends VisitCallBack{
+  public interface PmVisitHierarchyCallBack extends PmVisitCallBack{
     /**
      * If parents children will be visited, this method is called before visiting all children.
      * @param parent the parent.
      * @return controls if the children should really be visited.
      */
-    VisitResult enterChildren(PmObject pmParent, Collection<PmObject> pmChildren);
+    PmVisitResult enterChildren(PmObject pmParent, Collection<PmObject> pmChildren);
 
     /**
      * If parents children will be visited, this method is called after visiting all children.
@@ -65,7 +51,7 @@ public class PmVisitorApi {
    * Gives the user of the PmVisitCallBack the possibility to affect the PM tree
    * traverse.
    */
-  public enum VisitResult {
+  public enum PmVisitResult {
     /** Continue visiting current PM and children. */
     CONTINUE,
     /** Continue visiting this node, but skip this nodes children. (But visit all siblings of this node.) */
@@ -78,7 +64,7 @@ public class PmVisitorApi {
    * Visit hints for static selections. Skips visit of this node and the node
    * children.
    */
-  public enum VisitHint {
+  public enum PmVisitHint {
     /** Skip visiting not visible pm's */
     SKIP_INVISIBLE,
     /** Skip visiting not enabled pm's */
@@ -101,10 +87,10 @@ public class PmVisitorApi {
    * @param visitCallBack
    *          defines what to be done when visiting the PM.
    * @param hints
-   *          static selection informations. See {@link VisitHint}
+   *          static selection informations. See {@link PmVisitHint}
    * @return the object which explicit stopped the visiting.
    */
-  public static VisitResult visit(PmObject startPm, VisitCallBack visitCallBack, VisitHint... hints) {
+  public static PmVisitResult visit(PmObject startPm, PmVisitCallBack visitCallBack, PmVisitHint... hints) {
     PmVisitorImpl v = new PmVisitorImpl(visitCallBack, hints);
     return v.visit(startPm);
   }
@@ -117,10 +103,10 @@ public class PmVisitorApi {
    * @param visitCallBack
    *          defines what to be done when visiting a PM.
    * @param hints
-   *          static selection informations. See {@link VisitHint}
+   *          static selection informations. See {@link PmVisitHint}
    * @return the visit result state.
    */
-  public static VisitResult visitChildren(PmObject parentPm, VisitCallBack visitCallBack, VisitHint... hints) {
+  public static PmVisitResult visitChildren(PmObject parentPm, PmVisitCallBack visitCallBack, PmVisitHint... hints) {
     PmVisitorImpl v = new PmVisitorImpl(visitCallBack, hints);
     return v.visitChildren(parentPm);
   }

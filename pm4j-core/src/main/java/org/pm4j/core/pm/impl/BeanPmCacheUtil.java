@@ -6,9 +6,9 @@ import java.util.Collections;
 import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.api.PmVisitorApi;
-import org.pm4j.core.pm.api.PmVisitorApi.VisitCallBack;
-import org.pm4j.core.pm.api.PmVisitorApi.VisitHint;
-import org.pm4j.core.pm.api.PmVisitorApi.VisitResult;
+import org.pm4j.core.pm.api.PmVisitorApi.PmVisitCallBack;
+import org.pm4j.core.pm.api.PmVisitorApi.PmVisitHint;
+import org.pm4j.core.pm.api.PmVisitorApi.PmVisitResult;
 
 /**
  * Provides INTERNAL methods for bean factory cache handling.
@@ -35,14 +35,14 @@ public final class BeanPmCacheUtil {
    * @param rootPm The root of the PM tree to handle.
    */
   public static void clearBeanPmCachesOfSubtree(PmObject rootPm) {
-    VisitCallBack callBack = new VisitCallBack() {
+    PmVisitCallBack callBack = new PmVisitCallBack() {
       @Override
-      public VisitResult visit(PmObject pm) {
+      public PmVisitResult visit(PmObject pm) {
         BeanPmCacheUtil.clearBeanPmCache(pm);
-        return VisitResult.CONTINUE;
+        return PmVisitResult.CONTINUE;
       }
     };
-    PmVisitorApi.visit(rootPm, callBack, VisitHint.SKIP_NOT_INITIALIZED);
+    PmVisitorApi.visit(rootPm, callBack, PmVisitHint.SKIP_NOT_INITIALIZED);
   }
 
   public static void removeBeanPm(PmObject factoryOwningPm, PmBean<?> pmToRemove) {
