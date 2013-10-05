@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jodah.typetools;
+package org.pm4j.core.util.reflection;
 
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
@@ -29,12 +29,13 @@ import java.util.WeakHashMap;
 
 /**
  * Enhanced type resolution utilities. Originally based on
- * org.springframework.core.GenericTypeResolver.
- * 
+ * org.springframework.core.GenericTypeResolver and
+ * org.jodah.typetools.TypeResolver
+ *
  * @author Jonathan Halterman
  */
-public final class TypeResolver {
-  private TypeResolver() {
+public final class GenericTypeUtil {
+  private GenericTypeUtil() {
   }
 
   /** An unknown type. */
@@ -64,10 +65,34 @@ public final class TypeResolver {
   }
 
   /**
+   * Reads a the generic type argument.
+   *
+   * @param baseType
+   *          The type that we know that it has a generic type argument that we
+   *          want to read. E.g. Map<K, V>.
+   * @param concreteSubTypeToAnalyze
+   *          The concrete sub-type that provides the argument value to read.
+   *          E.g. HashMap<String, Long>.
+   * @param paramIdx
+   *          Index of the generic type parameter to read. Zero for the first
+   *          parameter.
+   * @return The read generic type parameter.
+   */
+  public static <T, S extends T> Class<?> resolveGenericArgument(Class<T> baseType, Class<S> concreteSubTypeToAnalyze, int paramIdx) {
+    assert paramIdx >= 0;
+
+    Class<?>[] genParams = GenericTypeUtil.resolveRawArguments(baseType, concreteSubTypeToAnalyze);
+    return genParams != null && genParams.length > paramIdx
+        ? genParams[paramIdx]
+        : null;
+  }
+
+
+  /**
    * Returns the raw class representing the type argument for the {@code type}
    * using type variable information from the {@code subType}. If no arguments
    * can be resolved then {@code Unknown.class} is returned.
-   * 
+   *
    * @param type
    *          to resolve argument for
    * @param subType
@@ -88,7 +113,7 @@ public final class TypeResolver {
    * {@code subType}. If {@code genericType} is an instance of class, then
    * {@code genericType} is returned. If no arguments can be resolved then
    * {@code Unknown.class} is returned.
-   * 
+   *
    * @param genericType
    *          to resolve argument for
    * @param subType
@@ -117,7 +142,7 @@ public final class TypeResolver {
    * Arguments for {@code type} that cannot be resolved are returned as
    * {@code Unknown.class}. If no arguments can be resolved then {@code null} is
    * returned.
-   * 
+   *
    * @param type
    *          to resolve arguments for
    * @param subType
@@ -135,7 +160,7 @@ public final class TypeResolver {
    * {@code subType}. Arguments for {@code genericType} that cannot be resolved
    * are returned as {@code Unknown.class}. If no arguments can be resolved then
    * {@code null} is returned.
-   * 
+   *
    * @param genericType
    *          to resolve arguments for
    * @param subType
@@ -164,7 +189,7 @@ public final class TypeResolver {
   /**
    * Returns the generic {@code type} using type variable information from the
    * {@code subType} else {@code null} if the generic type cannot be resolved.
-   * 
+   *
    * @param type
    *          to resolve generic type for
    * @param subType
@@ -201,7 +226,7 @@ public final class TypeResolver {
    * Resolves the raw class for the {@code genericType}, using the type variable
    * information from the {@code subType} else {@link Unknown} if the raw class
    * cannot be resolved.
-   * 
+   *
    * @param type
    *          to resolve raw class for
    * @param subType

@@ -10,8 +10,6 @@ import javax.validation.Validator;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jodah.typetools.TypeResolver;
-import org.jodah.typetools.TypeResolver.Unknown;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmDataInput;
@@ -29,6 +27,8 @@ import org.pm4j.core.pm.api.PmMessageUtil;
 import org.pm4j.core.util.reflection.BeanAttrAccessor;
 import org.pm4j.core.util.reflection.BeanAttrAccessorImpl;
 import org.pm4j.core.util.reflection.ReflectionException;
+import org.pm4j.core.util.reflection.GenericTypeUtil;
+import org.pm4j.core.util.reflection.GenericTypeUtil.Unknown;
 
 public abstract class PmBeanBase<T_BEAN>
       extends PmElementBase
@@ -372,7 +372,7 @@ public abstract class PmBeanBase<T_BEAN>
 
       // evaluate bean class from type of generic parameter of PmBean
       // Class<?> beanClassFromGeneric = ClassUtil.findFirstGenericParameterOfInterface(PmBean.class, this.getClass());
-      Class<?> beanClassFromGeneric = TypeResolver.resolveRawArgument(PmBean.class, this.getClass());
+      Class<?> beanClassFromGeneric = GenericTypeUtil.resolveRawArgument(PmBean.class, this.getClass());
 
       if (beanClassFromAnnotation != null && beanClassFromGeneric != Unknown.class) {
         // annotation parameter PmBeanCfg.beanClass shall override generic parameter of interface PmBean

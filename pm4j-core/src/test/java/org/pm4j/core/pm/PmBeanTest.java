@@ -44,8 +44,7 @@ public class PmBeanTest {
       Assert.assertEquals(true, e.getMessage().startsWith("Unable to access field 'attrWithoutMatchingBeanAttr'"));
     }
   }
-
-
+  
   public static class Bean {
     public int i;
   }

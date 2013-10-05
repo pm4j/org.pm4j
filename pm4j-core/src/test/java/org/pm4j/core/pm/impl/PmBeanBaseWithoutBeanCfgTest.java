@@ -3,16 +3,19 @@ package org.pm4j.core.pm.impl;
 import static junit.framework.Assert.assertSame;
 import static org.junit.Assert.assertEquals;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.pm4j.core.pm.PmObject;
+import org.pm4j.core.pm.PmBeanTest.Bean;
+import org.pm4j.core.pm.PmBeanTest.BeanPm;
 
 /**
- * 
+ *
  * Test without @PmBeanCfg. In this case the bean class is derived from generic
  * parameter.
- * 
+ *
  * @author okossak
- * 
+ *
  */
 public class PmBeanBaseWithoutBeanCfgTest {
 
@@ -27,12 +30,11 @@ public class PmBeanBaseWithoutBeanCfgTest {
     assertSame("bean must be same", domainObject1, domainObjectPm.getPmBean());
   }
 
+
   static class DomainObjectImpl {
   }
 
-  static class DomainObjectPm
-      extends PmBeanImpl<DomainObjectImpl> {
-
+  static class DomainObjectPm extends PmBeanImpl<DomainObjectImpl> {
     /** Constructor */
     DomainObjectPm(PmObject parent) {
       super(parent);

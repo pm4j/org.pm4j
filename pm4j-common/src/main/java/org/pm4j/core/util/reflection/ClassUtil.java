@@ -4,8 +4,6 @@ import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,25 +26,9 @@ public class ClassUtil {
 
   private static final Set<String> EMPTY_STRING_SET = Collections.emptySet();
 
-  public static <T, S extends T> Class<?> findFirstGenericParameterOfInterface(Class<T> pInterface, Class<S> pTypeToAnalyze) {
-    Class<?> returnClass = null;
-
-    Type genericSuperclass = pTypeToAnalyze.getGenericSuperclass();
-    if (genericSuperclass instanceof ParameterizedType) {
-      ParameterizedType parameterizedType = (ParameterizedType)genericSuperclass;
-      Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
-      Type actualTypeArgumentZero = actualTypeArguments[0];
-      if (actualTypeArgumentZero instanceof Class) {
-        returnClass = (Class<?>)actualTypeArgumentZero;
-      }
-    }
-
-    return returnClass;
-  }
-  
   /**
    * Creates an instance of the given class using the default constructor.
-   * 
+   *
    * @param <T>
    *          The instance fieldClass that the calling code expects.
    * @param forClass
@@ -79,7 +61,7 @@ public class ClassUtil {
    * <p>
    * Is a simple helper that just hides the exception code required by the
    * reflection api.
-   * 
+   *
    * @param <T>
    *          The fieldClass of the new instance.
    * @param constructor
@@ -104,7 +86,7 @@ public class ClassUtil {
   /**
    * Checks if there is a public default constructor defined for the given
    * class.
-   * 
+   *
    * @param aClass
    * @return <code>true</code> if there is a public default ctor.
    */
@@ -126,7 +108,7 @@ public class ClassUtil {
    * <p>
    * TODO ob: this method still does not find the best matching constructor.
    * Check the apache commons bean utils for such functionality.
-   * 
+   *
    * @param cls
    *          The class that might contain the matching constructor.
    * @param args
@@ -177,9 +159,9 @@ public class ClassUtil {
    * Searches the matching constructor of the given class <code>cls</code> that
    * has a matching argument set.
    * <p>
-   * 
+   *
    * @see #findConstructor(Class, Class[]) for details.
-   * 
+   *
    * @param cls
    *          The class that might contain the matching constructor.
    * @param args
@@ -202,7 +184,7 @@ public class ClassUtil {
   /**
    * Searches a getter by checking all public getters to return the given
    * fieldValue reference.
-   * 
+   *
    * @param object
    *          The instance to find the value reference in.
    * @param fieldValue
@@ -218,7 +200,7 @@ public class ClassUtil {
   /**
    * Searches a getter by checking all public getters to return the given
    * fieldValue reference.
-   * 
+   *
    * @param object
    *          The instance to find the value reference in.
    * @param fieldValue
@@ -257,7 +239,7 @@ public class ClassUtil {
   /**
    * Searches a field by checking all public fields of the given object to hold
    * the given fieldValue reference.
-   * 
+   *
    * @param object
    *          The instance to find the value reference in.
    * @param fieldValue
@@ -298,7 +280,7 @@ public class ClassUtil {
   /**
    * Searches the name of an attribute by searching for a getter or public field
    * that holds the given fieldValue reference.
-   * 
+   *
    * @param object
    *          The instance to find the value reference in.
    * @param fieldValue
@@ -315,7 +297,7 @@ public class ClassUtil {
   /**
    * Searches the name of an attribute by searching for a getter or public field
    * that holds the given fieldValue reference.
-   * 
+   *
    * @param object
    *          The instance to find the value reference in.
    * @param fieldValue
@@ -348,7 +330,7 @@ public class ClassUtil {
 
   /**
    * Provides the set of all getters defined in the given class.
-   * 
+   *
    * @param forClass
    *          The class to inspect.
    * @return The set of getter method names.
@@ -368,7 +350,7 @@ public class ClassUtil {
    * super-classes.
    * <p>
    * The fields of the super classes appear as first list items.
-   * 
+   *
    * @param inClass
    *          The class to analyze.
    * @return All found fields.
@@ -414,7 +396,7 @@ public class ClassUtil {
   /**
    * Finds a field by name within the given class and its super-classes.<br>
    * Provides private fields too.
-   * 
+   *
    * @param inClass
    *          The class to check for the field.
    * @param fieldName
@@ -440,7 +422,7 @@ public class ClassUtil {
   /**
    * Checks if the given subclass (or one of its intermediate subclasses) has an
    * overridden implementation of the base class implementation.
-   * 
+   *
    * @param baseClass
    *          the base class that provides a default implementation for the
    *          method.
@@ -472,7 +454,7 @@ public class ClassUtil {
   // directly attached to the concrete class declaration.
   /**
    * Finds the generic type parameter of an interface of a given class.
-   * 
+   *
    * @param clsToAnalyze
    *          The class with a generic interface parameter.
    * @param annotatedType
@@ -540,7 +522,7 @@ public class ClassUtil {
 
   /**
    * Provides the bin-package directory the given class is located in.
-   * 
+   *
    * @param forClass
    *          The class to get the directory for.
    * @return The package directory.
