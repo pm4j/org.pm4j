@@ -25,10 +25,10 @@ import org.pm4j.core.pm.annotation.PmTableColCfg2;
 import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.impl.PmAttrIntegerImpl;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
+import org.pm4j.core.pm.impl.PmBeanImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
 import org.pm4j.core.pm.impl.PmTableColImpl2;
 import org.pm4j.core.pm.impl.PmTableImpl2;
-import org.pm4j.core.pm.impl.PmTableRowImpl;
 
 public class PmTable2Test {
 
@@ -147,7 +147,7 @@ public class PmTable2Test {
   }
 
   @PmBeanCfg(beanClass=RowBean.class)
-  public static class RowPm extends PmTableRowImpl<RowBean> {
+  public static class RowPm extends PmBeanImpl<RowBean> {
     public final PmAttrString name = new PmAttrStringImpl(this);
     public final PmAttrString description = new PmAttrStringImpl(this);
     public final PmAttrInteger counter = new PmAttrIntegerImpl(this);

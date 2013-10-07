@@ -2,6 +2,7 @@ package org.pm4j.core.pm.impl;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyVetoException;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -51,7 +52,6 @@ import org.pm4j.core.pm.PmPager2;
 import org.pm4j.core.pm.PmTable2;
 import org.pm4j.core.pm.PmTableCol2;
 import org.pm4j.core.pm.PmTableGenericRow2;
-import org.pm4j.core.pm.PmTableRow;
 import org.pm4j.core.pm.annotation.PmTableCfg2;
 import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
@@ -62,6 +62,7 @@ import org.pm4j.core.pm.impl.pathresolver.PathResolver;
 import org.pm4j.core.pm.impl.pathresolver.PmExpressionPathResolver;
 import org.pm4j.core.pm.pageable2.PageablePmBeanCollection;
 import org.pm4j.core.util.reflection.ClassUtil;
+import org.pm4j.core.util.reflection.GenericTypeUtil;
 
 /**
  * A table that presents the content of a set of {@link PmElement}s.
@@ -79,7 +80,7 @@ import org.pm4j.core.util.reflection.ClassUtil;
  * @author olaf boede
  */
 public class PmTableImpl2
-        <T_ROW_PM extends PmTableRow<T_ROW_BEAN>, T_ROW_BEAN>
+        <T_ROW_PM extends PmBean<T_ROW_BEAN>, T_ROW_BEAN>
         extends PmDataInputBase
         implements PmTable2<T_ROW_PM> {
 
@@ -518,10 +519,8 @@ public class PmTableImpl2
   }
 
   /**
-   * Gets called whenever the internal collection is <code>null</code> and
+   * Gets called whenever the internal {@link #pmPageableCollection} is <code>null</code> and
    * {@link #getPmPageableCollection()} gets called.
-   * <p>
-   * Uses the configured {@link #pmPageableBeanCollectionFactory}.
    *
    * @return The collection to use. Never <code>null</code>.
    */
@@ -549,7 +548,7 @@ public class PmTableImpl2
       throw new PmRuntimeException(this,
           "The service type provided by 'getPmQueryServiceImpl()' is not a 'PageableQueryService' and not a 'PageableIdQueryService'. Possibly @PmTableCfg#serviceClass is not well configured. Found serivce: " + s);
     }
-    return new PageablePmBeanCollection<T_ROW_PM, T_ROW_BEAN>(this, PmTableRow.class, pc);
+    return new PageablePmBeanCollection<T_ROW_PM, T_ROW_BEAN>(this, PmBean.class, pc);
   }
 
   /**
@@ -617,8 +616,7 @@ public class PmTableImpl2
    * <p>
    * Gets called whenever a new {@link #pmPageableCollection} gets assigned:
    * <ul>
-   *  <li>by calling {@link #getPmPageableCollectionImpl()} or </li>
-   *  <li>by a call to {@link #setPmPageableCollection(PageableCollection2, boolean, ValueChangeKind)}.</li>
+   *  <li>by calling {@link #getPmPageableCollectionImpl()}</li>
    * </ul>
    * The default settings applied in this base implementation are:
    * <ul>
@@ -640,16 +638,18 @@ public class PmTableImpl2
     }
   }
 
-  /**
-   * Defines the data set to be presented by the table.<br>
-   * HINT: Please check if you can define {@link #getPmPageableCollectionImpl()} instead.
-   *
-   * @param pageable
-   *          the data set to present. If it is <code>null</code> an empty
-   *          collection will be created internally by the next {@link #getPmPageableCollection()} call.
-   */
-  public void setPmPageableCollection(PageablePmBeanCollection<T_ROW_PM, T_ROW_BEAN> pageable) {
-    setPmPageableCollection(pageable, true, ValueChangeKind.VALUE);
+  @SuppressWarnings("unchecked")
+  protected Class<T_ROW_PM> getPmRowBeanClass() {
+    Type t = GenericTypeUtil.resolveGenericArgument(PmTableImpl2.class, getClass(), 1);
+    if (t == null) {
+      throw new PmRuntimeException(this, "Unable to determine table row bean class. Please check your generics parametes or override getPmRowBeanClass().");
+    }
+
+    try {
+      return (Class<T_ROW_PM>) t;
+    } catch(ClassCastException e) {
+      throw new PmRuntimeException(this, "Unable to determine table row bean class. Please check your generics parametes or override getPmRowBeanClass().", e);
+    }
   }
 
   /**
@@ -659,26 +659,19 @@ public class PmTableImpl2
    * @param pageable
    *          the data set to present. If it is <code>null</code> an empty
    *          collection will be created internally by the next {@link #getPmPageableCollection()} call.
-   * @param preserveSettings Defines if the currently selected items and filter definition should be preserved.
-   * @return <code>true</code> if the data set was new.
    */
-  public void setPmPageableCollection(PageablePmBeanCollection<T_ROW_PM, T_ROW_BEAN> pageable, boolean preserveSettings, ValueChangeKind valueChangeKind) {
+  public void setPmPageableCollection(PageablePmBeanCollection<T_ROW_PM, T_ROW_BEAN> pageable) {
     Selection<T_ROW_PM> selection = null;
 
-    if (preserveSettings) {
-      if (pmPageableCollection != null) {
-        selection = pmPageableCollection.getSelectionHandler().getSelection();
-      }
-    }
-    else {
-      BeanPmCacheUtil.clearBeanPmCache(this);
+    if (pmPageableCollection != null) {
+      selection = pmPageableCollection.getSelectionHandler().getSelection();
     }
 
     _setPageableCollection(pageable);
-    PmEventApi.firePmEventIfInitialized(this, PmEvent.VALUE_CHANGE, valueChangeKind);
+    PmEventApi.firePmEventIfInitialized(this, PmEvent.VALUE_CHANGE, ValueChangeKind.VALUE);
 
     // re-apply the settings to preserve
-    if (preserveSettings && selection != null) {
+    if (selection != null) {
       // ensure that the internal field is set, even it was just reset to null.
       getPmPageableCollection();
       pmPageableCollection.getSelectionHandler().setSelection(selection);

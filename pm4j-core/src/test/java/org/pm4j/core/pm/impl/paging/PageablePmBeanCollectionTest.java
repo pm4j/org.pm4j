@@ -21,10 +21,10 @@ import org.pm4j.core.pm.annotation.PmBeanCfg;
 import org.pm4j.core.pm.annotation.PmFactoryCfg;
 import org.pm4j.core.pm.api.PmFactoryApi;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
+import org.pm4j.core.pm.impl.PmBeanImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
 import org.pm4j.core.pm.impl.PmTableColImpl2;
 import org.pm4j.core.pm.impl.PmTableImpl2;
-import org.pm4j.core.pm.impl.PmTableRowImpl;
 import org.pm4j.core.pm.pageable2.PageablePmBeanCollection;
 
 public class PageablePmBeanCollectionTest extends PageableCollectionTestBase<PageablePmBeanCollectionTest.BeanRowPm> {
@@ -75,7 +75,7 @@ public class PageablePmBeanCollectionTest extends PageableCollectionTestBase<Pag
 
 
   @PmBeanCfg(beanClass=Bean.class)
-  public static class BeanRowPm extends PmTableRowImpl<PageableCollectionTestBase.Bean> {
+  public static class BeanRowPm extends PmBeanImpl<PageableCollectionTestBase.Bean> {
     public final PmAttrString name = new PmAttrStringImpl(this);
 
     @Override
