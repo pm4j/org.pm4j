@@ -120,7 +120,7 @@ public class PageablePmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> exten
    * @param pmCtxt
    *          The PM context used to create the PM's for the bean items.
    * @param beans
-   *          The set of beans to handle.
+   *          The set of beans to handle. May be <code>null</code>.
    * @param queryOptions
    *          the optional query options.
    */

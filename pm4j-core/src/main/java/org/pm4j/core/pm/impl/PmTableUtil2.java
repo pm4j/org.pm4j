@@ -1,11 +1,15 @@
 package org.pm4j.core.pm.impl;
 
+import java.util.Collection;
 import java.util.List;
 
+import org.pm4j.common.pageable.PageableCollection2;
 import org.pm4j.common.query.QueryOptions;
+import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmElement;
 import org.pm4j.core.pm.PmPager2.PagerVisibility;
 import org.pm4j.core.pm.PmTable2;
+import org.pm4j.core.pm.pageable2.PageablePmBeanCollection;
 
 /**
  * Some table related helper functions.
@@ -13,6 +17,23 @@ import org.pm4j.core.pm.PmTable2;
  * @author olaf boede
  */
 public final class PmTableUtil2 {
+
+  /**
+   * Creates a {@link PageableCollection2} that uses the given collection and assigns it to the given {@link PmTable2}.
+   * <p>
+   * In difference to overriding {@link PmTableImpl2#getPmBeansImpl()}, this is a fix assignment. It will only change
+   * the collection reference this method gets called again.
+   *
+   * TODO: Log a warning if getPmBeansImpl or a service is defined.
+   *
+   * @param tablePm The table that should present the given collection.
+   * @param beans The collection. May be <code>null</code>.
+   */
+  public static <T_ROW_PM extends PmBean<T_ROW_BEAN>, T_ROW_BEAN> void setPmBeans(PmTableImpl2<T_ROW_PM, T_ROW_BEAN> tablePm, Collection<T_ROW_BEAN> beans) {
+    Class<T_ROW_PM> beanClass = tablePm.getPmRowBeanClass();
+    QueryOptions qo = tablePm.getPmQueryOptions();
+    tablePm.setPmPageableCollection(new PageablePmBeanCollection<T_ROW_PM, T_ROW_BEAN>(tablePm, beanClass, beans, qo));
+  }
 
   /**
    * Provides the index of the given row object within it's table.
