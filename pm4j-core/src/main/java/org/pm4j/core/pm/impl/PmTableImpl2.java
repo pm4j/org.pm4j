@@ -502,12 +502,19 @@ public class PmTableImpl2
     return ((PageablePmBeanCollection<T_ROW_PM, T_ROW_BEAN>)getPmPageableCollection()).getBeanCollection();
   }
 
+  /**
+   * Provides for service based tables the backing service reference.
+   * <p>
+   * The base implementation provides a reference to the service configured in @PmTable
+   *
+   * @return
+   */
   @SuppressWarnings("unchecked")
   protected ItemIdService<T_ROW_BEAN, ?> getPmQueryServiceImpl() {
-    PmTableCfg2 cfg = AnnotationUtil.findAnnotation(this, PmTableCfg2.class);
-    if (cfg != null && cfg.serviceClass() != ItemIdService.class) {
+    MetaData md = getOwnMetaData();
+    if (md.serviceClass != null) {
       // TODO oboede: add a type based service locator.
-      String lookupName = StringUtils.uncapitalize(cfg.serviceClass().getSimpleName());
+      String lookupName = StringUtils.uncapitalize(md.serviceClass.getSimpleName());
       ItemIdService<T_ROW_BEAN, ?> service = (ItemIdService<T_ROW_BEAN, ?>) getPmConversationImpl().getPmNamedObject(lookupName);
 
       if (service == null) {
@@ -902,16 +909,29 @@ public class PmTableImpl2
       myMetaData.sortable = cfg.sortable();
       myMetaData.initialBeanSortComparatorClass = cfg.initialBeanSortComparator();
       myMetaData.defaultSortColName = cfg.defaultSortCol();
+      myMetaData.serviceClass = (cfg.serviceClass() != ItemIdService.class)
+                                ? cfg.serviceClass()
+                                : null;
+      if (myMetaData.serviceClass != null) {
+        if (StringUtils.isNotBlank(cfg.valuePath())) {
+          throw new PmRuntimeException(this, "PmTableCfg.serviceClass and -.valuePath are specified. From which of these sources the table data be read from?");
+        }
+        if (myMetaData.initialBeanSortComparatorClass != null) {
+          throw new PmRuntimeException(this, "PmTableCfg.serviceClass and -.initialBeanSortComparator are specified. A service (usually database based) can't use a comparator for sort operations.");
+        }
+      }
     }
 
     // -- initialize the optional path resolver for in-memory tables. --
-    String valuePath = ((cfg != null) && StringUtils.isNotEmpty(cfg.valuePath()))
-        ? valuePath = cfg.valuePath()
-        : (getPmParent() instanceof PmBean) && StringUtils.isNotBlank(getPmName())
-            ? "(o)pmBean." + getPmName()
-            : "";
-    if (StringUtils.isNotBlank(valuePath)) {
-      myMetaData.valuePathResolver = PmExpressionPathResolver.parse(valuePath, PmExpressionApi.getSyntaxVersion(this));
+    if (myMetaData.serviceClass == null) {
+      String valuePath = ((cfg != null) && StringUtils.isNotEmpty(cfg.valuePath()))
+          ? valuePath = cfg.valuePath()
+          : (getPmParent() instanceof PmBean) && StringUtils.isNotBlank(getPmName())
+              ? "(o)pmBean." + getPmName()
+              : "";
+      if (StringUtils.isNotBlank(valuePath)) {
+        myMetaData.valuePathResolver = PmExpressionPathResolver.parse(valuePath, PmExpressionApi.getSyntaxVersion(this));
+      }
     }
   }
 
@@ -919,6 +939,8 @@ public class PmTableImpl2
     private SelectMode rowSelectMode = SelectMode.DEFAULT;
     private int numOfPageRowPms = DEFAULT_NUM_OF_PAGE_ROW_PMS;
     private PathResolver valuePathResolver;
+    @SuppressWarnings("rawtypes")
+    private Class<? extends ItemIdService> serviceClass;
     private boolean sortable;
     private Class<?> initialBeanSortComparatorClass = Comparator.class;
     private String defaultSortColName = null;
