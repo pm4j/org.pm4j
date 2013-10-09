@@ -29,19 +29,14 @@ import java.util.WeakHashMap;
 
 /**
  * Enhanced type resolution utilities. Originally based on
- * org.springframework.core.GenericTypeResolver and
- * org.jodah.typetools.TypeResolver
+ * org.springframework.core.GenericTypeResolver
  *
- * @author Jonathan Halterman
+ * @author Juergen Hoeller
+ * @author Rob Harrop
+ * @author oboede
  */
 public final class GenericTypeUtil {
   private GenericTypeUtil() {
-  }
-
-  /** An unknown type. */
-  public static final class Unknown {
-    private Unknown() {
-    }
   }
 
   /** Cache of type variable/argument pairs */
@@ -87,60 +82,11 @@ public final class GenericTypeUtil {
         : null;
   }
 
-
-  /**
-   * Returns the raw class representing the type argument for the {@code type}
-   * using type variable information from the {@code subType}. If no arguments
-   * can be resolved then {@code Unknown.class} is returned.
-   *
-   * @param type
-   *          to resolve argument for
-   * @param subType
-   *          to extract type variable information from
-   * @return type argument for {@code type} else {@link Unknown.class} if no
-   *         type arguments are declared
-   * @throws IllegalArgumentException
-   *           if more or less than one type argument is resolved for the
-   *           {@code type}
-   */
-  public static <T, S extends T> Class<?> resolveRawArgument(Class<T> type, Class<S> subType) {
-    return resolveRawArgument(resolveGenericType(type, subType), subType);
-  }
-
-  /**
-   * Returns the raw class representing the type argument for the
-   * {@code genericType} using type variable information from the
-   * {@code subType}. If {@code genericType} is an instance of class, then
-   * {@code genericType} is returned. If no arguments can be resolved then
-   * {@code Unknown.class} is returned.
-   *
-   * @param genericType
-   *          to resolve argument for
-   * @param subType
-   *          to extract type variable information from
-   * @return type argument for {@code genericType} else {@link Unknown.class} if
-   *         no type arguments are declared
-   * @throws IllegalArgumentException
-   *           if more or less than one type argument is resolved for the
-   *           {@code genericType}
-   */
-  public static Class<?> resolveRawArgument(Type genericType, Class<?> subType) {
-    Class<?>[] arguments = resolveRawArguments(genericType, subType);
-    if (arguments == null)
-      return Unknown.class;
-
-    if (arguments.length != 1)
-      throw new IllegalArgumentException("Expected 1 type argument on generic type " + genericType + " but found "
-          + arguments.length);
-
-    return arguments[0];
-  }
-
   /**
    * Returns an array of raw classes representing type arguments for the
    * {@code type} using type variable information from the {@code subType}.
    * Arguments for {@code type} that cannot be resolved are returned as
-   * {@code Unknown.class}. If no arguments can be resolved then {@code null} is
+   * {@code null}. If no arguments can be resolved then {@code null} is
    * returned.
    *
    * @param type
@@ -150,7 +96,7 @@ public final class GenericTypeUtil {
    * @return array of raw classes representing type arguments for the
    *         {@code type} else {@code null} if no type arguments are declared
    */
-  public static <T, S extends T> Class<?>[] resolveRawArguments(Class<T> type, Class<S> subType) {
+  static <T, S extends T> Class<?>[] resolveRawArguments(Class<T> type, Class<S> subType) {
     return resolveRawArguments(resolveGenericType(type, subType), subType);
   }
 
@@ -158,7 +104,7 @@ public final class GenericTypeUtil {
    * Returns an array of raw classes representing type arguments for the
    * {@code genericType} using type variable information from the
    * {@code subType}. Arguments for {@code genericType} that cannot be resolved
-   * are returned as {@code Unknown.class}. If no arguments can be resolved then
+   * are returned as {@code null}. If no arguments can be resolved then
    * {@code null} is returned.
    *
    * @param genericType
@@ -169,7 +115,7 @@ public final class GenericTypeUtil {
    *         {@code genericType} else {@code null} if no type arguments are
    *         declared
    */
-  public static Class<?>[] resolveRawArguments(Type genericType, Class<?> subType) {
+  private static Class<?>[] resolveRawArguments(Type genericType, Class<?> subType) {
     Class<?>[] result = null;
 
     if (genericType instanceof ParameterizedType) {
@@ -196,7 +142,7 @@ public final class GenericTypeUtil {
    *          to extract type variable information from
    * @return generic {@code type} else {@code null} if it cannot be resolved
    */
-  public static Type resolveGenericType(Class<?> type, Type subType) {
+  private static Type resolveGenericType(Class<?> type, Type subType) {
     Class<?> rawType;
     if (subType instanceof ParameterizedType)
       rawType = (Class<?>) ((ParameterizedType) subType).getRawType();
@@ -224,17 +170,17 @@ public final class GenericTypeUtil {
 
   /**
    * Resolves the raw class for the {@code genericType}, using the type variable
-   * information from the {@code subType} else {@link Unknown} if the raw class
+   * information from the {@code subType} else {@link null} if the raw class
    * cannot be resolved.
    *
    * @param type
    *          to resolve raw class for
    * @param subType
    *          to extract type variable information from
-   * @return raw class for the {@code genericType} else {@link Unknown} if it
+   * @return raw class for the {@code genericType} else {@link null} if it
    *         cannot be resolved
    */
-  public static Class<?> resolveRawClass(Type genericType, Class<?> subType) {
+  private static Class<?> resolveRawClass(Type genericType, Class<?> subType) {
     if (genericType instanceof Class) {
       return (Class<?>) genericType;
     } else if (genericType instanceof ParameterizedType) {
@@ -249,7 +195,7 @@ public final class GenericTypeUtil {
       genericType = genericType == null ? resolveBound(variable) : resolveRawClass(genericType, subType);
     }
 
-    return genericType instanceof Class ? (Class<?>) genericType : Unknown.class;
+    return genericType instanceof Class ? (Class<?>) genericType : null;
   }
 
   private static Map<TypeVariable<?>, Type> getTypeVariableMap(final Class<?> targetType) {
@@ -341,17 +287,17 @@ public final class GenericTypeUtil {
 
   /**
    * Resolves the first bound for the {@code typeVariable}, returning
-   * {@code Unknown.class} if none can be resolved.
+   * {@code null} if none can be resolved.
    */
-  public static Type resolveBound(TypeVariable<?> typeVariable) {
+  private static Type resolveBound(TypeVariable<?> typeVariable) {
     Type[] bounds = typeVariable.getBounds();
     if (bounds.length == 0)
-      return Unknown.class;
+      return null;
 
     Type bound = bounds[0];
     if (bound instanceof TypeVariable)
       bound = resolveBound((TypeVariable<?>) bound);
 
-    return bound == Object.class ? Unknown.class : bound;
+    return bound == Object.class ? null : bound;
   }
 }

@@ -26,9 +26,8 @@ import org.pm4j.core.pm.api.PmFactoryApi;
 import org.pm4j.core.pm.api.PmMessageUtil;
 import org.pm4j.core.util.reflection.BeanAttrAccessor;
 import org.pm4j.core.util.reflection.BeanAttrAccessorImpl;
-import org.pm4j.core.util.reflection.ReflectionException;
 import org.pm4j.core.util.reflection.GenericTypeUtil;
-import org.pm4j.core.util.reflection.GenericTypeUtil.Unknown;
+import org.pm4j.core.util.reflection.ReflectionException;
 
 public abstract class PmBeanBase<T_BEAN>
       extends PmElementBase
@@ -368,13 +367,12 @@ public abstract class PmBeanBase<T_BEAN>
     // evaluate myMetaData.beanClass
     {
       // evaluate bean class from annotation PmBeanCfg
-      Class<?> beanClassFromAnnotation = annotation != null ? annotation.beanClass() : null;
+      Class<?> beanClassFromAnnotation = (annotation != null) ? annotation.beanClass() : null;
 
       // evaluate bean class from type of generic parameter of PmBean
-      // Class<?> beanClassFromGeneric = ClassUtil.findFirstGenericParameterOfInterface(PmBean.class, this.getClass());
-      Class<?> beanClassFromGeneric = GenericTypeUtil.resolveRawArgument(PmBean.class, this.getClass());
+      Class<?> beanClassFromGeneric = GenericTypeUtil.resolveGenericArgument(PmBean.class, this.getClass(), 0);
 
-      if (beanClassFromAnnotation != null && beanClassFromGeneric != Unknown.class) {
+      if ((beanClassFromAnnotation != null) && (beanClassFromGeneric != null)) {
         // annotation parameter PmBeanCfg.beanClass shall override generic parameter of interface PmBean
         myMetaData.beanClass = beanClassFromAnnotation;
 
@@ -394,18 +392,18 @@ public abstract class PmBeanBase<T_BEAN>
           }
         }
 
-      } else if (beanClassFromAnnotation != null && beanClassFromGeneric == Unknown.class) {
+      } else if (beanClassFromAnnotation != null && beanClassFromGeneric == null) {
         // take bean class from PmBeanCfg.beanClass
         myMetaData.beanClass = beanClassFromAnnotation;
 
         // if PmBean.genericParameter is unknown, log warning
         LOG.warn(this.toString() + ": PmBean.genericParameter is unknown");
 
-      } else if (beanClassFromAnnotation == null && beanClassFromGeneric != Unknown.class) {
+      } else if (beanClassFromAnnotation == null && beanClassFromGeneric != null) {
         // if PmBeanCfg.beanClass is Void, take bean class from PmBean.genericParameter
         myMetaData.beanClass = beanClassFromGeneric;
 
-      } else if (beanClassFromAnnotation == null && beanClassFromGeneric == Unknown.class) {
+      } else if (beanClassFromAnnotation == null && beanClassFromGeneric == null) {
         // if PmBeanCfg.beanClass is Void and PmBean.genericParameter is unknown, throw PmRuntimeException
         throw new PmRuntimeException(this, "PmBeanCfg.beanClass and PmBean.genericParameter are both unknown");
       }
