@@ -413,6 +413,7 @@ public class PmTableImpl2
   @Override
   public void resetPmValues() {
     updatePmTable();
+    super.resetPmValues();
   }
 
   /** @deprecated please use {@link #getColumnPms()} */
