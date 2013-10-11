@@ -127,19 +127,6 @@ public class PmDefaults implements Cloneable {
    */
   private SyntaxVersion expressionSyntaxVersion = SyntaxVersion.VERSION_2;
 
-  // TODO olaf: add something to the command that allows to configure that. - An application default may also be useful...
-//  /**
-//   * Defines if the application supports commands that can be undone.
-//   * The related overhead and programming restrictions have'nt to be considered if undo is not needed for an application.
-//   * <p>
-//   * Undoable commands usually have to be cloned before the actually get executed.<br>
-//   * This also implies that any state change, done within a command only affects the clone...
-//   */
-//  public boolean supportUndoableCommands = true;
-
-  @Deprecated
-  private boolean elementsInheritAnnotationsOnlyFromSession = false;
-
   @Override
   public PmDefaults clone() {
     try {
@@ -233,16 +220,6 @@ public class PmDefaults implements Cloneable {
 
   public void setLogStringBuilder(NameBuilder logStringBuilder) {
     this.logStringBuilder = logStringBuilder;
-  }
-
-  @Deprecated
-  public boolean isElementsInheritAnnotationsOnlyFromSession() {
-    return elementsInheritAnnotationsOnlyFromSession;
-  }
-
-  @Deprecated
-  public void setElementsInheritAnnotationsOnlyFromSession(boolean elementsInheritAnnotationsOnlyFromSession) {
-    this.elementsInheritAnnotationsOnlyFromSession = elementsInheritAnnotationsOnlyFromSession;
   }
 
   public PmCommandCfg.BEFORE_DO getBeforeDoCommandDefault() {

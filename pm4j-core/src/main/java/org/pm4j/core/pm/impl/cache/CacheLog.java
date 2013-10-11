@@ -8,11 +8,12 @@ import org.apache.commons.logging.LogFactory;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.impl.PmUtil;
 
-public final class PmCacheLog {
+// TODO oboede: remove the PM dependency.
+public final class CacheLog {
 
-  public static final PmCacheLog INSTANCE = new PmCacheLog();
+  public static final CacheLog INSTANCE = new CacheLog();
 
-  private static final Log LOG = LogFactory.getLog(PmCacheLog.class);
+  private static final Log LOG = LogFactory.getLog(CacheLog.class);
 
   private Map<String, Long> pmCacheHitMap = new ConcurrentHashMap<String, Long>();
   private Map<String, Long> pmCacheInitMap = new ConcurrentHashMap<String, Long>();

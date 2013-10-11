@@ -12,6 +12,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.pm4j.common.cache.CacheStrategy;
+import org.pm4j.common.cache.CacheStrategyNoCache;
 import org.pm4j.common.pageable.ModificationHandler;
 import org.pm4j.common.pageable.Modifications;
 import org.pm4j.common.pageable.ModificationsImpl;
@@ -44,9 +46,12 @@ public abstract class PageableInMemCollectionBase<T_ITEM>
 
   /** The collection type specific selection handler. */
   private final SelectionHandler<T_ITEM> selectionHandler;
-
+  /** The cache strategy used for backing collection. */
+  private CacheStrategy                  cacheStrategy = CacheStrategyNoCache.INSTANCE;
+  /** The cache strategy specific context used to hold the cached value. */
+  private Object                         cacheCtxt;
   /** The current set of filtered and sorted items. */
-  private List<T_ITEM>                   objects;
+  private List<T_ITEM>                   filteredAndSortedObjects;
   /** The currently active sort order comparator. */
   private Comparator<T_ITEM>             sortOrderComparator;
 
@@ -59,7 +64,7 @@ public abstract class PageableInMemCollectionBase<T_ITEM>
   private PropertyChangeListener changeFilterListener = new PropertyChangeListener() {
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-      objects = null;
+      filteredAndSortedObjects = null;
     }
   };
   /** A listener gets called if a query property gets changed that affects the sort order of the items to show. */
@@ -67,12 +72,12 @@ public abstract class PageableInMemCollectionBase<T_ITEM>
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
       sortOrderComparator = null;
-      objects = null;
+      filteredAndSortedObjects = null;
     }
   };
 
   /**
-   * @param objects
+   * @param filteredAndSortedObjects
    *          the set of objects to iterate over.
    * @deprecated Please use {@link #PageableInMemCollectionBase(QueryOptions)}.
    */
@@ -100,10 +105,16 @@ public abstract class PageableInMemCollectionBase<T_ITEM>
   @SuppressWarnings("unchecked")
   @Override
   public final Collection<T_ITEM> getBackingCollection() {
-    Collection<T_ITEM> beans = getBackingCollectionImpl();
-    return beans != null
-        ? beans
-        : Collections.EMPTY_LIST;
+    Object o = cacheStrategy.getCachedValue(cacheCtxt);
+    if (o != CacheStrategy.NO_CACHE_VALUE) {
+      return (Collection<T_ITEM>) o;
+    }
+    else {
+      Collection<T_ITEM> c = getBackingCollectionImpl();
+      return cacheStrategy.setAndReturnCachedValue(cacheCtxt, c != null
+                  ? c
+                  : Collections.EMPTY_LIST);
+    }
   }
 
   /**
@@ -153,7 +164,8 @@ public abstract class PageableInMemCollectionBase<T_ITEM>
   @Override
   public void clearCaches() {
     sortOrderComparator = null;
-    objects = null;
+    filteredAndSortedObjects = null;
+    cacheStrategy.clear(cacheCtxt);
   }
 
   /**
@@ -164,6 +176,16 @@ public abstract class PageableInMemCollectionBase<T_ITEM>
     this.inMemQueryEvaluator = inMemQueryEvaluator;
   }
 
+  /**
+   * @param cacheStrategy The cache strategy used for backing collection.
+   * @param cacheCtxt The cache strategy specific context used to hold the cached value.
+   */
+  public void setCacheStrategy(CacheStrategy cacheStrategy, Object cacheCtxt) {
+    assert cacheStrategy != null;
+    this.cacheStrategy = cacheStrategy;
+    this.cacheCtxt = cacheCtxt;
+  }
+
   private Comparator<T_ITEM> _getSortOrderComparator() {
     if (sortOrderComparator == null) {
       sortOrderComparator = inMemQueryEvaluator.getComparator(getQueryParams().getEffectiveSortOrder());
@@ -172,10 +194,10 @@ public abstract class PageableInMemCollectionBase<T_ITEM>
   }
 
   private List<T_ITEM> _getObjects() {
-    if (objects == null) {
+    if (filteredAndSortedObjects == null) {
       Collection<T_ITEM> backingCollection = getBackingCollection();
       if (!getQueryParams().isExecQuery()) {
-        objects = Collections.emptyList();
+        filteredAndSortedObjects = Collections.emptyList();
       }
       else {
         List<T_ITEM> list = _filter(new ArrayList<T_ITEM>(backingCollection));
@@ -185,7 +207,7 @@ public abstract class PageableInMemCollectionBase<T_ITEM>
           Collections.sort(list, comparator);
         }
 
-        objects = list;
+        filteredAndSortedObjects = list;
       }
 
       // XXX olaf: just moves to the last possible page if necessary.
@@ -194,7 +216,7 @@ public abstract class PageableInMemCollectionBase<T_ITEM>
       PageableCollectionUtil2.ensureCurrentPageInRange(this);
     }
 
-    return objects;
+    return filteredAndSortedObjects;
   }
 
   /** Generates a list of filtered items based on the given list. */
@@ -219,8 +241,8 @@ public abstract class PageableInMemCollectionBase<T_ITEM>
     @Override
     public void addItem(T_ITEM item) {
       getBackingCollection().add(item);
-      if (objects != null) {
-        objects.add(item);
+      if (filteredAndSortedObjects != null) {
+        filteredAndSortedObjects.add(item);
       }
       modifications.registerAddedItem(item);
       PageableInMemCollectionBase.this.firePropertyChange(PageableCollection2.EVENT_ITEM_ADD, null, item);
@@ -261,8 +283,8 @@ public abstract class PageableInMemCollectionBase<T_ITEM>
       for (T_ITEM i : items) {
         // remove the items from the in-memory item list(s).
         getBackingCollection().remove(i);
-        if (objects != null) {
-          objects.remove(i);
+        if (filteredAndSortedObjects != null) {
+          filteredAndSortedObjects.remove(i);
         }
 
         // Removed new items disappear without a trace. They are not part of the removed items.
@@ -287,7 +309,6 @@ public abstract class PageableInMemCollectionBase<T_ITEM>
       return modifications;
     }
   }
-
 
 }
 

@@ -3,13 +3,11 @@ package org.pm4j.core.pm.impl.cache;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.impl.PmUtil;
 
-// FIXME olaf: the session property based storage will cause memory leaks!
-// try to extract a buiness key to identify the cached item!
-public class PmCacheStrategySession extends PmCacheStrategyBase<PmObject> {
+public class CacheStrategyConversation extends CacheStrategyBase<PmObject> {
 
   private final String cacheVarKeyPfx;
 
-  public PmCacheStrategySession(String cacheName, String cacheVarKeyPfx) {
+  public CacheStrategyConversation(String cacheName, String cacheVarKeyPfx) {
     super(cacheName);
     this.cacheVarKeyPfx = "pm.sc." + cacheVarKeyPfx + "_";
   }

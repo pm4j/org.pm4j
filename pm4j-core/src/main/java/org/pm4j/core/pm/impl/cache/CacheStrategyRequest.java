@@ -5,11 +5,11 @@ import org.pm4j.core.pm.impl.PmConversationImpl;
 import org.pm4j.core.pm.impl.PmObjectBase;
 import org.pm4j.core.pm.impl.PmUtil;
 
-public class PmCacheStrategyRequest extends PmCacheStrategyBase<PmObjectBase> {
+public class CacheStrategyRequest extends CacheStrategyBase<PmObjectBase> {
 
   private final String cacheVarKeyPfx;
 
-  public PmCacheStrategyRequest(String cacheName, String cacheVarKeyPfx) {
+  public CacheStrategyRequest(String cacheName, String cacheVarKeyPfx) {
     super(cacheName);
     this.cacheVarKeyPfx = "pm.rc." + cacheVarKeyPfx + "_";
   }
@@ -28,7 +28,6 @@ public class PmCacheStrategyRequest extends PmCacheStrategyBase<PmObjectBase> {
 
   @Override
   protected void clearImpl(PmObjectBase pm) {
-    // TODO: Aus removeAttribute weiterleiten.
     pmConversationImplOf(pm).getPmToViewTechnologyConnector().setRequestAttribute(
         getCacheIdentity(pm), null);
   }

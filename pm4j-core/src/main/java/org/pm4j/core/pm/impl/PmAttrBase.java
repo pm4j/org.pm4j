@@ -23,6 +23,8 @@ import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.pm4j.common.cache.CacheStrategy;
+import org.pm4j.common.cache.CacheStrategyNoCache;
 import org.pm4j.common.expr.Expression.SyntaxVersion;
 import org.pm4j.common.util.CompareUtil;
 import org.pm4j.common.util.GenericsUtil;
@@ -58,10 +60,8 @@ import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmExpressionApi;
 import org.pm4j.core.pm.api.PmLocalizeApi;
 import org.pm4j.core.pm.api.PmMessageUtil;
-import org.pm4j.core.pm.impl.cache.PmCacheStrategy;
-import org.pm4j.core.pm.impl.cache.PmCacheStrategyBase;
-import org.pm4j.core.pm.impl.cache.PmCacheStrategyNoCache;
-import org.pm4j.core.pm.impl.cache.PmCacheStrategyRequest;
+import org.pm4j.core.pm.impl.cache.CacheStrategyBase;
+import org.pm4j.core.pm.impl.cache.CacheStrategyRequest;
 import org.pm4j.core.pm.impl.converter.PmConverterErrorMessage;
 import org.pm4j.core.pm.impl.converter.PmConverterOptionBased;
 import org.pm4j.core.pm.impl.options.GenericOptionSetDef;
@@ -149,7 +149,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     MetaData md = getOwnMetaData();
     Object ov = md.cacheStrategyForOptions.getCachedValue(this);
 
-    if (ov != PmCacheStrategy.NO_CACHE_VALUE) {
+    if (ov != CacheStrategy.NO_CACHE_VALUE) {
       // just return the cache hit (if there was one)
       return (PmOptionSet) ov;
     }
@@ -338,7 +338,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     MetaData md = getOwnMetaData();
     Object ov = md.cacheStrategyForValue.getCachedValue(this);
 
-    if (ov != PmCacheStrategy.NO_CACHE_VALUE) {
+    if (ov != CacheStrategy.NO_CACHE_VALUE) {
       // just return the cache hit (if there was one)
       return (T_PM_VALUE) ov;
     }
@@ -564,6 +564,12 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     return getValueImpl();
   }
 
+  /**
+   *
+   * @return
+   */
+  // TODO oboede: is there a use case that is not covered by overriding getBackingValueImpl()?
+  // Can we make this method final and private?
   protected T_PM_VALUE getValueImpl() {
     try {
       // the method will try to populate pmValue with different approaches
@@ -626,6 +632,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
    * @param value The new value.
    * @return <code>true</code> when the attribute value was really changed.
    */
+  // TODO oboede: make it final or package private? Which functionality is not covered by setBackingValueImpl()?
   protected boolean setValueImpl(SetValueContainer<T_PM_VALUE> value) {
     PmEventApi.ensureThreadEventSource(this);
     MetaData metaData = getOwnMetaData();
@@ -913,7 +920,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
    *
    * @return The default value for this attribute.
    */
-  // FIXME olaf: shouldn't that method return T_BEAN_VALUE ?
+  // XXX olaf kossak: shouldn't that method return T_BEAN_VALUE ?
   //             not yet changed because of the effort to change the meta data handling code...
   // alternatively: add a second method getDefaultBackingValue()...
   protected T_PM_VALUE getDefaultValueImpl() {
@@ -1377,12 +1384,9 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     }
 
     // -- Cache configuration --
-    List<PmCacheCfg> cacheAnnotations = new ArrayList<PmCacheCfg>();
-    AnnotationUtil.findAnnotationsInPmHierarchy(this, PmCacheCfg.class, cacheAnnotations);
-
-    myMetaData.cacheStrategyForOptions = readCacheStrategy(PmCacheCfg.ATTR_OPTIONS, cacheAnnotations, CACHE_STRATEGIES_FOR_OPTIONS);
-    myMetaData.cacheStrategyForValue = readCacheStrategy(PmCacheCfg.ATTR_VALUE, cacheAnnotations, CACHE_STRATEGIES_FOR_VALUE);
-
+    Collection<PmCacheCfg> cacheAnnotations = AnnotationUtil.findAnnotationsInPmHierarchy(this, PmCacheCfg.class, new ArrayList<PmCacheCfg>());
+    myMetaData.cacheStrategyForOptions = AnnotationUtil.evaluateCacheStrategy(this, PmCacheCfg.ATTR_OPTIONS, cacheAnnotations, CACHE_STRATEGIES_FOR_OPTIONS);
+    myMetaData.cacheStrategyForValue = AnnotationUtil.evaluateCacheStrategy(this, PmCacheCfg.ATTR_VALUE, cacheAnnotations, CACHE_STRATEGIES_FOR_VALUE);
   }
 
 
@@ -1460,8 +1464,8 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     private PathResolver                    valueContainingObjPathResolver = PassThroughPathResolver.INSTANCE;
     private String                          formatResKey;
     private String                          defaultValueString;
-    private PmCacheStrategy                 cacheStrategyForOptions = PmCacheStrategyNoCache.INSTANCE;
-    private PmCacheStrategy                 cacheStrategyForValue   = PmCacheStrategyNoCache.INSTANCE;
+    private CacheStrategy                 cacheStrategyForOptions = CacheStrategyNoCache.INSTANCE;
+    private CacheStrategy                 cacheStrategyForValue   = CacheStrategyNoCache.INSTANCE;
     private Converter<?>                    converter;
     private BackingValueAccessStrategy      valueAccessStrategy     = ValueAccessLocal.INSTANCE;
     /** Name of the field configured for JSR 303-validation.<br>
@@ -1486,8 +1490,8 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     public String getFormatResKey() { return formatResKey; }
     public void setFormatResKey(String formatResKey) { this.formatResKey = formatResKey; }
 
-    public PmCacheStrategy getCacheStrategyForOptions() { return cacheStrategyForOptions; }
-    public PmCacheStrategy getCacheStrategyForValue() { return cacheStrategyForValue; }
+    public CacheStrategy getCacheStrategyForOptions() { return cacheStrategyForOptions; }
+    public CacheStrategy getCacheStrategyForValue() { return cacheStrategyForValue; }
 
     public Converter<?> getConverter() { return converter; }
     public void setConverter(Converter<?> converter) { this.converter = converter; }
@@ -1556,7 +1560,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
 
   // ====== Cache strategies ====== //
 
-  private static final PmCacheStrategy CACHE_VALUE_LOCAL = new PmCacheStrategyBase<PmAttrBase<?,?>>("CACHE_VALUE_LOCAL") {
+  private static final CacheStrategy CACHE_VALUE_LOCAL = new CacheStrategyBase<PmAttrBase<?,?>>("CACHE_VALUE_LOCAL") {
     @Override protected Object readRawValue(PmAttrBase<?, ?> pm) {
       return (pm.dataContainer != null)
                 ? pm.dataContainer.cachedValue
@@ -1572,7 +1576,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     }
   };
 
-  private static final PmCacheStrategy CACHE_OPTIONS_LOCAL = new PmCacheStrategyBase<PmAttrBase<?,?>>("CACHE_OPTIONS_LOCAL") {
+  private static final CacheStrategy CACHE_OPTIONS_LOCAL = new CacheStrategyBase<PmAttrBase<?,?>>("CACHE_OPTIONS_LOCAL") {
     @Override protected Object readRawValue(PmAttrBase<?, ?> pm) {
       return (pm.dataContainer != null)
                 ? pm.dataContainer.cachedOptionSet
@@ -1589,18 +1593,18 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   };
 
 
-  private static final Map<CacheMode, PmCacheStrategy> CACHE_STRATEGIES_FOR_VALUE =
+  private static final Map<CacheMode, CacheStrategy> CACHE_STRATEGIES_FOR_VALUE =
     MapUtil.makeFixHashMap(
-      CacheMode.OFF,      PmCacheStrategyNoCache.INSTANCE,
+      CacheMode.OFF,      CacheStrategyNoCache.INSTANCE,
       CacheMode.ON,    CACHE_VALUE_LOCAL,
-      CacheMode.REQUEST,  new PmCacheStrategyRequest("CACHE_VALUE_IN_REQUEST", "v")
+      CacheMode.REQUEST,  new CacheStrategyRequest("CACHE_VALUE_IN_REQUEST", "v")
     );
 
-  private static final Map<CacheMode, PmCacheStrategy> CACHE_STRATEGIES_FOR_OPTIONS =
+  private static final Map<CacheMode, CacheStrategy> CACHE_STRATEGIES_FOR_OPTIONS =
     MapUtil.makeFixHashMap(
-        CacheMode.OFF,      PmCacheStrategyNoCache.INSTANCE,
+        CacheMode.OFF,      CacheStrategyNoCache.INSTANCE,
         CacheMode.ON,    CACHE_OPTIONS_LOCAL,
-        CacheMode.REQUEST,  new PmCacheStrategyRequest("CACHE_OPTIONS_IN_REQUEST", "os")
+        CacheMode.REQUEST,  new CacheStrategyRequest("CACHE_OPTIONS_IN_REQUEST", "os")
       );
 
   // ====== Backing value access strategies ====== //

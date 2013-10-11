@@ -20,6 +20,8 @@ import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.pm4j.common.cache.CacheStrategy;
+import org.pm4j.common.cache.CacheStrategyNoCache;
 import org.pm4j.common.util.collection.ListUtil;
 import org.pm4j.common.util.collection.MapUtil;
 import org.pm4j.core.exception.PmRuntimeException;
@@ -43,11 +45,9 @@ import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmMessageUtil;
 import org.pm4j.core.pm.api.PmValidationApi;
-import org.pm4j.core.pm.impl.cache.PmCacheLog;
-import org.pm4j.core.pm.impl.cache.PmCacheStrategy;
-import org.pm4j.core.pm.impl.cache.PmCacheStrategyBase;
-import org.pm4j.core.pm.impl.cache.PmCacheStrategyNoCache;
-import org.pm4j.core.pm.impl.cache.PmCacheStrategyRequest;
+import org.pm4j.core.pm.impl.cache.CacheLog;
+import org.pm4j.core.pm.impl.cache.CacheStrategyBase;
+import org.pm4j.core.pm.impl.cache.CacheStrategyRequest;
 import org.pm4j.core.pm.impl.inject.DiResolver;
 import org.pm4j.core.pm.impl.inject.DiResolverUtil;
 import org.pm4j.core.pm.impl.title.PmTitleProvider;
@@ -117,7 +117,7 @@ public abstract class PmObjectBase implements PmObject {
   private Object pmToViewConnector = PM_TO_VIEW_CONNECTOR_NOT_YET_INITIALIZED;
 
   /** Logger for cache usage statistics. */
-  protected static final PmCacheLog pmCacheLog = new PmCacheLog();
+  protected static final CacheLog pmCacheLog = new CacheLog();
 
   /**
    * Constructor.
@@ -223,7 +223,7 @@ public abstract class PmObjectBase implements PmObject {
     MetaData metaData = getPmMetaData();
     Object v = metaData.cacheStrategyForVisibility.getCachedValue(this);
 
-    if (v != PmCacheStrategy.NO_CACHE_VALUE) {
+    if (v != CacheStrategy.NO_CACHE_VALUE) {
       // just return the cache hit (if there was one)
       return (Boolean) v;
     }
@@ -259,7 +259,7 @@ public abstract class PmObjectBase implements PmObject {
     MetaData metaData = getPmMetaData();
     Object e = metaData.cacheStrategyForEnablement.getCachedValue(this);
 
-    if (e != PmCacheStrategy.NO_CACHE_VALUE) {
+    if (e != CacheStrategy.NO_CACHE_VALUE) {
       // just return the cache hit (if there was one)
       return (Boolean) e;
     }
@@ -333,10 +333,10 @@ public abstract class PmObjectBase implements PmObject {
 
   @Override
   public final String getPmTitle() {
-    PmCacheStrategy strategy = getPmMetaData().cacheStrategyForTitle;
+    CacheStrategy strategy = getPmMetaData().cacheStrategyForTitle;
     Object title = strategy.getCachedValue(this);
 
-    if (title != PmCacheStrategy.NO_CACHE_VALUE) {
+    if (title != CacheStrategy.NO_CACHE_VALUE) {
       // just return the cache hit (if there was one)
       return (String) title;
     }
@@ -910,12 +910,10 @@ public abstract class PmObjectBase implements PmObject {
     }
 
     // -- Cache configuration --
-    List<PmCacheCfg> cacheAnnotations = new ArrayList<PmCacheCfg>();
-    AnnotationUtil.findAnnotationsInPmHierarchy(this, PmCacheCfg.class, cacheAnnotations);
-
-    metaData.cacheStrategyForTitle = readCacheStrategy(PmCacheCfg.ATTR_TITLE, cacheAnnotations, CACHE_STRATEGIES_FOR_TITLE);
-    metaData.cacheStrategyForVisibility = readCacheStrategy(PmCacheCfg.ATTR_VISIBILITY, cacheAnnotations, CACHE_STRATEGIES_FOR_VISIBILITY);
-    metaData.cacheStrategyForEnablement = readCacheStrategy(PmCacheCfg.ATTR_ENABLEMENT, cacheAnnotations, CACHE_STRATEGIES_FOR_ENABLEMENT);
+    Collection<PmCacheCfg> cacheAnnotations = AnnotationUtil.findAnnotationsInPmHierarchy(this, PmCacheCfg.class, new ArrayList<PmCacheCfg>());
+    metaData.cacheStrategyForTitle = AnnotationUtil.evaluateCacheStrategy(this, PmCacheCfg.ATTR_TITLE, cacheAnnotations, CACHE_STRATEGIES_FOR_TITLE);
+    metaData.cacheStrategyForVisibility = AnnotationUtil.evaluateCacheStrategy(this, PmCacheCfg.ATTR_VISIBILITY, cacheAnnotations, CACHE_STRATEGIES_FOR_VISIBILITY);
+    metaData.cacheStrategyForEnablement = AnnotationUtil.evaluateCacheStrategy(this, PmCacheCfg.ATTR_ENABLEMENT, cacheAnnotations, CACHE_STRATEGIES_FOR_ENABLEMENT);
 
     // -- Check for registered domain specific annotations
     metaData.permissionAnnotations = AnnotationUtil.findAnnotations(this, PmAnnotationApi.getPermissionAnnotations()).toArray(new Annotation[0]);
@@ -968,9 +966,9 @@ public abstract class PmObjectBase implements PmObject {
     public int validationChangeEventMask;
     private Annotation[] permissionAnnotations = {};
 
-    private PmCacheStrategy cacheStrategyForTitle = PmCacheStrategyNoCache.INSTANCE;
-    private PmCacheStrategy cacheStrategyForEnablement = PmCacheStrategyNoCache.INSTANCE;
-    private PmCacheStrategy cacheStrategyForVisibility = PmCacheStrategyNoCache.INSTANCE;
+    private CacheStrategy cacheStrategyForTitle = CacheStrategyNoCache.INSTANCE;
+    private CacheStrategy cacheStrategyForEnablement = CacheStrategyNoCache.INSTANCE;
+    private CacheStrategy cacheStrategyForVisibility = CacheStrategyNoCache.INSTANCE;
 //    private boolean cacheTooltip = false;
     /** An optional factory that is responsible for creating PMs for beans. */
     private BeanPmFactory pmElementFactory;
@@ -1082,21 +1080,7 @@ public abstract class PmObjectBase implements PmObject {
 
   // ====== Cache strategies ====== //
 
-  protected PmCacheStrategy readCacheStrategy(
-      String cacheCfgAttrName,
-      List<PmCacheCfg> cacheAnnotations,
-      Map<CacheMode, PmCacheStrategy> modeToStrategyMap)
-  {
-    CacheMode cacheMode = AnnotationUtil.getCacheModeFromCacheAnnotations(
-        cacheCfgAttrName, cacheAnnotations, CacheMode.OFF);
-    PmCacheStrategy s = modeToStrategyMap.get(cacheMode);
-    if (s == null) {
-      throw new PmRuntimeException(this, "Unable to find cache strategy for CacheMode '" + cacheMode + "'.");
-    }
-    return s;
-  }
-
-  private static final PmCacheStrategy CACHE_TITLE_LOCAL = new PmCacheStrategyBase<PmObjectBase>("CACHE_TITLE_LOCAL") {
+  private static final CacheStrategy CACHE_TITLE_LOCAL = new CacheStrategyBase<PmObjectBase>("CACHE_TITLE_LOCAL") {
     @Override protected Object readRawValue(PmObjectBase pm) {
       return pm.pmCachedTitle;
     }
@@ -1108,7 +1092,7 @@ public abstract class PmObjectBase implements PmObject {
     }
   };
 
-  private static final PmCacheStrategy CACHE_VISIBLE_LOCAL = new PmCacheStrategyBase<PmObjectBase>("CACHE_VISIBLE_LOCAL") {
+  private static final CacheStrategy CACHE_VISIBLE_LOCAL = new CacheStrategyBase<PmObjectBase>("CACHE_VISIBLE_LOCAL") {
     @Override protected Object readRawValue(PmObjectBase pm) {
       return pm.pmVisibleCache;
     }
@@ -1120,7 +1104,7 @@ public abstract class PmObjectBase implements PmObject {
     }
   };
 
-  private static final PmCacheStrategy CACHE_ENABLED_LOCAL = new PmCacheStrategyBase<PmObjectBase>("CACHE_ENABLED_LOCAL") {
+  private static final CacheStrategy CACHE_ENABLED_LOCAL = new CacheStrategyBase<PmObjectBase>("CACHE_ENABLED_LOCAL") {
     @Override protected Object readRawValue(PmObjectBase pm) {
       return pm.pmEnabledCache;
     }
@@ -1132,25 +1116,25 @@ public abstract class PmObjectBase implements PmObject {
     }
   };
 
-  private static final Map<CacheMode, PmCacheStrategy> CACHE_STRATEGIES_FOR_TITLE =
+  private static final Map<CacheMode, CacheStrategy> CACHE_STRATEGIES_FOR_TITLE =
     MapUtil.makeFixHashMap(
-      CacheMode.OFF,      PmCacheStrategyNoCache.INSTANCE,
+      CacheMode.OFF,      CacheStrategyNoCache.INSTANCE,
       CacheMode.ON,    CACHE_TITLE_LOCAL,
-      CacheMode.REQUEST,  new PmCacheStrategyRequest("CACHE_TITLE_IN_REQUEST", "ti")
+      CacheMode.REQUEST,  new CacheStrategyRequest("CACHE_TITLE_IN_REQUEST", "ti")
     );
 
-  private static final Map<CacheMode, PmCacheStrategy> CACHE_STRATEGIES_FOR_ENABLEMENT =
+  private static final Map<CacheMode, CacheStrategy> CACHE_STRATEGIES_FOR_ENABLEMENT =
     MapUtil.makeFixHashMap(
-      CacheMode.OFF,      PmCacheStrategyNoCache.INSTANCE,
+      CacheMode.OFF,      CacheStrategyNoCache.INSTANCE,
       CacheMode.ON,    CACHE_ENABLED_LOCAL,
-      CacheMode.REQUEST,  new PmCacheStrategyRequest("CACHE_ENABLED_IN_REQUEST", "en")
+      CacheMode.REQUEST,  new CacheStrategyRequest("CACHE_ENABLED_IN_REQUEST", "en")
     );
 
-  private static final Map<CacheMode, PmCacheStrategy> CACHE_STRATEGIES_FOR_VISIBILITY =
+  private static final Map<CacheMode, CacheStrategy> CACHE_STRATEGIES_FOR_VISIBILITY =
     MapUtil.makeFixHashMap(
-      CacheMode.OFF,      PmCacheStrategyNoCache.INSTANCE,
+      CacheMode.OFF,      CacheStrategyNoCache.INSTANCE,
       CacheMode.ON,    CACHE_VISIBLE_LOCAL,
-      CacheMode.REQUEST,  new PmCacheStrategyRequest("CACHE_VISIBLE_IN_REQUEST", "vi")
+      CacheMode.REQUEST,  new CacheStrategyRequest("CACHE_VISIBLE_IN_REQUEST", "vi")
     );
 
   // ====== dynamic pm support ====== //

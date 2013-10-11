@@ -68,6 +68,19 @@ public @interface PmCacheCfg {
    */
   CacheMode options() default CacheMode.NOT_SPECIFIED;
 
+  /**
+   * A cache definition is by default only applied for the PM that you annotate.
+   * <p>
+   * In some cases it's useful to define a cache mode for a whole sub tree of PM's.
+   * If you define {@link #cascade()} as <code>true</code> the cache definition
+   * will also be applied for all child PM's.<br>
+   * But: Each recursively defined parent cache aspect definition can be overridden
+   * by a cache aspect definition on child level.
+   *
+   * @return <code>true</code> if the cache definition should also be applied on child PMs.
+   */
+  boolean cascade() default false;
+
   // Name constants for attributes that are found by reflection:
   public static final String ATTR_VISIBILITY = "visibility";
   public static final String ATTR_ENABLEMENT = "enablement";

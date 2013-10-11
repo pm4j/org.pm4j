@@ -6,16 +6,27 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
+import org.pm4j.common.cache.CacheStrategy;
 import org.pm4j.common.exception.CheckedExceptionWrapper;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.annotation.PmCacheCfg;
 import org.pm4j.core.pm.annotation.PmCacheCfg.CacheMode;
 
+/**
+ * Contains algorithms for reading PM annotations.
+ *
+ * @author olaf boede
+ */
 public class AnnotationUtil {
 
+  /** Helper for reflection based method calls. */
   private static final Object[] EMPTY_OBJ_ARRAY = new Object[0];
+  /** Cached cache aspect getter methods. */
+  private static Map<String, Method> cacheAspectToGetterMap = new ConcurrentHashMap<String, Method>();
 
   /**
    * Searches for an annotation within the inheritance tree of a class.
@@ -133,6 +144,54 @@ public class AnnotationUtil {
   }
 
   /**
+   * Searches an annotation within the PM hierarchy. Adds
+   * all found annotations to the given collection. Adds nothing when no
+   * annotation was found in the hierarchy.
+   *
+   * @param annotationClass
+   *          The annotation to find.
+   * @param foundAnnotations
+   *          The set to add the found annotations to. The lowest level
+   *          annotation (e.g. bound to an attribute) is at the first position.
+   *          The highest level annotation (e.g. bound to the root session) is
+   *          at the last position.
+   * @return A reference to the found annotations for inline usage.
+   */
+  static <T extends Annotation> Collection<T> findAnnotationsInPmHierarchy(PmObjectBase pm, Class<T> annotationClass, Collection<T> foundAnnotations) {
+    T cfg = AnnotationUtil.findAnnotation(pm, annotationClass);
+    if (cfg != null) {
+      foundAnnotations.add(cfg);
+    }
+
+    PmObjectBase pmParent = (PmObjectBase) pm.getPmParent();
+    if (pmParent != null &&
+        ! (pm instanceof PmConversation)) {
+      findAnnotationsInPmHierarchy(pmParent, annotationClass, foundAnnotations);
+    }
+
+    return foundAnnotations;
+  }
+
+  /**
+   * Reads and evaluates the cache strategy to use for the given cache aspect of the given PM.
+   *
+   * @param pm
+   * @param cacheCfgAttrName
+   * @param modeToStrategyMap
+   * @return
+   */
+  public static CacheStrategy readCacheStrategy(
+      PmObjectBase pm,
+      String cacheCfgAttrName,
+      Map<CacheMode, CacheStrategy> modeToStrategyMap)
+  {
+    List<PmCacheCfg> cacheAnnotations = new ArrayList<PmCacheCfg>();
+    findAnnotationsInPmHierarchy(pm, PmCacheCfg.class, cacheAnnotations);
+    return AnnotationUtil.evaluateCacheStrategy(pm, cacheCfgAttrName, cacheAnnotations, modeToStrategyMap);
+  }
+
+
+  /**
    * Searches for the first {@link CacheMode} property with the given
    * name within from the given annotation set.<br>
    * The first annotation property that has not the value
@@ -145,70 +204,82 @@ public class AnnotationUtil {
    *                     definition.
    * @return The first found annotation value for the given property or the specified default.
    */
-  public static CacheMode getCacheModeFromCacheAnnotations(
-          String propertyName,
-          Collection<PmCacheCfg> annotations,
-          CacheMode defaultValue) {
-    CacheMode value = defaultValue;
-
-    try {
-      Method m = null;
-      for (PmCacheCfg cfg : annotations) {
-        // use reflection method finder only once:
-        if (m == null) {
-          m = cfg.getClass().getMethod(propertyName);
-        }
-        CacheMode v = (CacheMode)m.invoke(cfg, EMPTY_OBJ_ARRAY);
-        if (v == CacheMode.NOT_SPECIFIED) {
-          v = cfg.all();
-        }
-
-        if (v != CacheMode.NOT_SPECIFIED) {
-          value = v;
+  /**
+   * Evaluates the cache strategy to use for the given cache aspect of the given PM.
+   *
+   * @param pm
+   * @param cacheCfgAttrName
+   * @param cacheAnnotations
+   * @param modeToStrategyMap
+   * @return
+   */
+  public static CacheStrategy evaluateCacheStrategy(
+      PmObjectBase pm,
+      String cacheCfgAttrName,
+      Collection<PmCacheCfg> cacheAnnotations,
+      Map<CacheMode, CacheStrategy> modeToStrategyMap)
+  {
+    CacheMode cacheMode = readCacheModeWithoutParentModes(pm, cacheCfgAttrName);
+    if (cacheMode == CacheMode.NOT_SPECIFIED) {
+      cacheMode = CacheMode.OFF;
+      for (PmCacheCfg cfg : cacheAnnotations) {
+        CacheMode v = readCacheMode(cfg, cacheCfgAttrName);
+        // Only annotations defined for the children will be considered.
+        if ( (v != CacheMode.NOT_SPECIFIED) && cfg.cascade() ) {
+          cacheMode = v;
           break;
         }
+      }
+    }
+
+    CacheStrategy s = modeToStrategyMap.get(cacheMode);
+    if (s == null) {
+      throw new PmRuntimeException(pm, "Unable to find cache strategy for CacheMode '" + cacheMode + "'.");
+    }
+    return s;
+  }
+
+  /**
+   * Reads the specified cache aspect from the given {@link PmCacheCfg}.
+   * Considers the {@link PmCacheCfg#all()} definition if the specified cache aspect
+   * is not defined explicitly.
+   *
+   * @param cfg
+   * @param cacheAspectName
+   * @return The found {@link CacheMode}. Otherwise {@link CacheMode#NOT_SPECIFIED}.
+   */
+  private static CacheMode readCacheMode(PmCacheCfg cfg, String cacheAspectName) {
+    CacheMode cacheMode = CacheMode.NOT_SPECIFIED;
+    try {
+      // use the slow reflection method finder only once:
+      Method getter = cacheAspectToGetterMap.get(cacheAspectName);
+      if (getter == null) {
+        getter = cfg.getClass().getMethod(cacheAspectName);
+        cacheAspectToGetterMap.put(cacheAspectName, getter);
+      }
+
+      cacheMode = (CacheMode)getter.invoke(cfg, EMPTY_OBJ_ARRAY);
+      if (cacheMode == CacheMode.NOT_SPECIFIED) {
+        cacheMode = cfg.all();
       }
     } catch (Exception e) {
       CheckedExceptionWrapper.throwAsRuntimeException(e);
     }
-
-    return value;
+    return cacheMode;
   }
 
   /**
-   * Searches an annotation within the PM hierarchy. Adds
-   * all found annotations to the given collection. Adds nothing when no
-   * annotation was found in the hierarchy.
+   * Looks only for the {@link PmCacheCfg} definition assigned to the given PM.
    *
-   * @param annotationClass
-   *          The annotation to find.
-   * @param foundAnnotations
-   *          The set to add the found annotations to. The lowest level
-   *          annotation (e.g. bound to an attribute) is at the first position.
-   *          The highest level annotation (e.g. bound to the root session) is
-   *          at the last position.
+   * @param pm
+   * @param cacheCfgAttrName
+   * @return The found {@link CacheMode} or {@link CacheMode#NOT_SPECIFIED}.
    */
-  static <T extends Annotation> void findAnnotationsInPmHierarchy(PmObjectBase pm, Class<T> annotationClass, Collection<T> foundAnnotations) {
-    T cfg = AnnotationUtil.findAnnotation(pm, annotationClass);
-    if (cfg != null) {
-      foundAnnotations.add(cfg);
-    }
-
-    // the first case will be removed as soon as on project will be ported to the current implementation state.
-    if (pm.getPmConversation().getPmDefaults().isElementsInheritAnnotationsOnlyFromSession() &&
-        pm instanceof PmElementBase) {
-      PmConversationImpl c = pm.getPmConversationImpl();
-      if (c != pm) {
-        findAnnotationsInPmHierarchy(c, annotationClass, foundAnnotations);
-      }
-    }
-    else {
-      PmObjectBase pmParent = (PmObjectBase) pm.getPmParent();
-      if (pmParent != null &&
-          ! (pm instanceof PmConversation)) {
-        findAnnotationsInPmHierarchy(pmParent, annotationClass, foundAnnotations);
-      }
-    }
+  private static CacheMode readCacheModeWithoutParentModes(PmObjectBase pm, String cacheCfgAttrName) {
+    PmCacheCfg cfg = findAnnotation(pm, PmCacheCfg.class);
+    return (cfg != null)
+        ? readCacheMode(cfg, cacheCfgAttrName)
+        : CacheMode.NOT_SPECIFIED;
   }
 
 }

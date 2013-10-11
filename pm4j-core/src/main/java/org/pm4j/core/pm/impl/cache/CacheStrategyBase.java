@@ -1,12 +1,14 @@
 package org.pm4j.core.pm.impl.cache;
 
+import org.pm4j.common.cache.CacheStrategy;
 import org.pm4j.core.pm.PmObject;
 
-public abstract class PmCacheStrategyBase<PM extends PmObject> implements PmCacheStrategy {
+//TODO oboede: remove the PM dependency.
+public abstract class CacheStrategyBase<PM extends PmObject> implements CacheStrategy {
 
   private String cacheName;
 
-  public PmCacheStrategyBase(String cacheName) {
+  public CacheStrategyBase(String cacheName) {
     this.cacheName = cacheName;
   }
 
@@ -18,13 +20,14 @@ public abstract class PmCacheStrategyBase<PM extends PmObject> implements PmCach
 
 
   @Override @SuppressWarnings("unchecked")
-  public void clear(PmObject pm) {
-    clearImpl((PM)pm);
+  public void clear(Object ctxt) {
+    clearImpl((PM)ctxt);
   }
 
   @Override @SuppressWarnings("unchecked")
-  public Object getCachedValue(PmObject pm) {
-    Object v = readRawValue((PM)pm);
+  public Object getCachedValue(Object ctxt) {
+    PM pm = (PM)ctxt;
+    Object v = readRawValue(pm);
     if (v == null) {
       return NO_CACHE_VALUE;
     } else {
@@ -34,9 +37,10 @@ public abstract class PmCacheStrategyBase<PM extends PmObject> implements PmCach
   }
 
   @Override @SuppressWarnings("unchecked")
-  public Object setAndReturnCachedValue(PmObject pm, Object v) {
+  public Object setAndReturnCachedValue(Object ctxt, Object v) {
+    PM pm = (PM)ctxt;
     logPmCacheInit(pm);
-    writeRawValue((PM)pm, (v != null)
+    writeRawValue(pm, (v != null)
         ? v
         : NULL_VALUE_OBJECT);
     return v;
@@ -48,11 +52,11 @@ public abstract class PmCacheStrategyBase<PM extends PmObject> implements PmCach
   }
 
   protected void logPmCacheHit(PmObject pm) {
-    PmCacheLog.INSTANCE.logPmCacheHit(pm, cacheName);
+    CacheLog.INSTANCE.logPmCacheHit(pm, cacheName);
   }
 
   protected void logPmCacheInit(PmObject pm) {
-    PmCacheLog.INSTANCE.logPmCacheInit(pm, cacheName);
+    CacheLog.INSTANCE.logPmCacheInit(pm, cacheName);
   }
 
 }

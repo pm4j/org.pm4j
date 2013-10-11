@@ -15,6 +15,8 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.pm4j.common.cache.CacheStrategy;
+import org.pm4j.common.cache.CacheStrategyNoCache;
 import org.pm4j.common.pageable.ItemIdService;
 import org.pm4j.common.pageable.ModificationHandler;
 import org.pm4j.common.pageable.Modifications;
@@ -38,6 +40,7 @@ import org.pm4j.common.selection.SelectionHandler;
 import org.pm4j.common.selection.SelectionHandlerUtil;
 import org.pm4j.common.util.beanproperty.PropertyAndVetoableChangeListener;
 import org.pm4j.common.util.collection.ListUtil;
+import org.pm4j.common.util.collection.MapUtil;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmCommand;
@@ -52,12 +55,16 @@ import org.pm4j.core.pm.PmPager2;
 import org.pm4j.core.pm.PmTable2;
 import org.pm4j.core.pm.PmTableCol2;
 import org.pm4j.core.pm.PmTableGenericRow2;
+import org.pm4j.core.pm.annotation.PmCacheCfg;
+import org.pm4j.core.pm.annotation.PmCacheCfg.CacheMode;
 import org.pm4j.core.pm.annotation.PmTableCfg2;
 import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmExpressionApi;
 import org.pm4j.core.pm.api.PmValidationApi;
+import org.pm4j.core.pm.impl.cache.CacheStrategyBase;
+import org.pm4j.core.pm.impl.cache.CacheStrategyRequest;
 import org.pm4j.core.pm.impl.pathresolver.PathResolver;
 import org.pm4j.core.pm.impl.pathresolver.PmExpressionPathResolver;
 import org.pm4j.core.pm.pageable2.PageablePmBeanCollection;
@@ -114,6 +121,17 @@ public class PmTableImpl2
 
   /** A cached reference to the selected master row. */
   private T_ROW_PM masterRowPm;
+
+  /** The set of supported cache strategies. */
+  private static final Map<CacheMode, CacheStrategy> CACHE_STRATEGIES_FOR_IN_MEM_COLLECTION =
+      MapUtil.makeFixHashMap(
+        CacheMode.OFF,      CacheStrategyNoCache.INSTANCE,
+        CacheMode.ON,       new CacheStrategyImMemCollectionReference("CACHE_TABLE_COLLECTION_LOCALLY"),
+        CacheMode.REQUEST,  new CacheStrategyRequest("CACHE_TABLE_COLLECTION_IN_REQUEST", "tc")
+      );
+
+  /** An optionally used cache for in-memory backing collections. */
+  private Object pmInMemCollectionCache;
 
   /**
    * Creates a table PM.
@@ -177,9 +195,9 @@ public class PmTableImpl2
 
   /**
    * Adjusts the row selection mode.<br>
-   * Should be called very early within the livecycle of the table.
+   * Should be called very early within the life cycle of the table.<br>
    * The implementation does currently not fire any change events
-   * sif this method gets called.
+   * when this method gets called.
    *
    * @param rowSelectMode The {@link SelectMode} to be used by this table.
    */
@@ -539,12 +557,14 @@ public class PmTableImpl2
     PageableCollection2<T_ROW_BEAN> pc = null;
 
     if (s == null) {
-      pc = new PageableInMemCollectionBase<T_ROW_BEAN>(qo) {
+      PageableInMemCollectionBase<T_ROW_BEAN> inMemColl = new PageableInMemCollectionBase<T_ROW_BEAN>(qo) {
         @Override
         protected Collection<T_ROW_BEAN> getBackingCollectionImpl() {
           return getPmBeansImpl();
         }
       };
+      inMemColl.setCacheStrategy(getOwnMetaData().inMemCollectionCacheStragegy, this);
+      pc = inMemColl;
     }
     else if (s instanceof PageableQueryService) {
       pc = new PageableQueryCollection<T_ROW_BEAN, Object>((PageableQueryService<T_ROW_BEAN, Object>) s, qo);
@@ -782,7 +802,7 @@ public class PmTableImpl2
      */
     protected Comparator<?> getInitialSortOrderComparator() {
       MetaData md = PmTableImpl2.this.getOwnMetaDataWithoutPmInitCall();
-      return (md.initialBeanSortComparatorClass != Comparator.class)
+      return (md.initialBeanSortComparatorClass != null)
           ? (Comparator<?>)ClassUtil.newInstance(md.initialBeanSortComparatorClass)
           : null;
     }
@@ -798,12 +818,36 @@ public class PmTableImpl2
     }
   }
 
+  /** Caches the backing collection locally in {@link PmTableImpl2#pmInMemCollectionCache}. */
+  protected static class CacheStrategyImMemCollectionReference extends CacheStrategyBase<PmTableImpl2<?, ?>> {
+
+    /** @param cacheName A cache name for reporting only. */
+    public CacheStrategyImMemCollectionReference(String cacheName) {
+      super(cacheName);
+    }
+
+    @Override
+    protected Object readRawValue(PmTableImpl2<?, ?> pm) {
+      return pm.pmInMemCollectionCache;
+    }
+
+    @Override
+    protected void writeRawValue(PmTableImpl2<?, ?> pm, Object value) {
+      pm.pmInMemCollectionCache = value;
+    }
+
+    @Override
+    protected void clearImpl(PmTableImpl2<?, ?> pm) {
+      pm.pmInMemCollectionCache = null;
+    }
+  };
+
+  /** Implements controlled implementation layer access for other PM classes. */
   protected class TableDetailsImpl implements ImplDetails {
     @Override
     public boolean isSortable() {
       return getOwnMetaDataWithoutPmInitCall().sortable;
     }
-
   }
 
   /**
@@ -892,6 +936,8 @@ public class PmTableImpl2
     return new MetaData();
   }
 
+
+
   @Override
   protected void initMetaData(PmDataInputBase.MetaData metaData) {
     super.initMetaData(metaData);
@@ -899,7 +945,6 @@ public class PmTableImpl2
     MetaData myMetaData = (MetaData) metaData;
 
     PmTableCfg2 cfg = AnnotationUtil.findAnnotation(this, PmTableCfg2.class);
-
     if (cfg != null) {
       myMetaData.rowSelectMode = cfg.rowSelectMode();
       if (cfg.numOfPageRows() > 0) {
@@ -907,7 +952,9 @@ public class PmTableImpl2
       }
 
       myMetaData.sortable = cfg.sortable();
-      myMetaData.initialBeanSortComparatorClass = cfg.initialBeanSortComparator();
+      myMetaData.initialBeanSortComparatorClass = (cfg.initialBeanSortComparator() != Comparator.class)
+                                ? cfg.initialBeanSortComparator()
+                                : null;
       myMetaData.defaultSortColName = cfg.defaultSortCol();
       myMetaData.serviceClass = (cfg.serviceClass() != ItemIdService.class)
                                 ? cfg.serviceClass()
@@ -924,6 +971,7 @@ public class PmTableImpl2
 
     // -- initialize the optional path resolver for in-memory tables. --
     if (myMetaData.serviceClass == null) {
+      // Initialize the optional path resolver. --
       String valuePath = ((cfg != null) && StringUtils.isNotEmpty(cfg.valuePath()))
           ? valuePath = cfg.valuePath()
           : (getPmParent() instanceof PmBean) && StringUtils.isNotBlank(getPmName())
@@ -932,6 +980,8 @@ public class PmTableImpl2
       if (StringUtils.isNotBlank(valuePath)) {
         myMetaData.valuePathResolver = PmExpressionPathResolver.parse(valuePath, PmExpressionApi.getSyntaxVersion(this));
       }
+      //
+      myMetaData.inMemCollectionCacheStragegy = AnnotationUtil.readCacheStrategy(this, PmCacheCfg.ATTR_VALUE, CACHE_STRATEGIES_FOR_IN_MEM_COLLECTION);
     }
   }
 
@@ -942,9 +992,9 @@ public class PmTableImpl2
     @SuppressWarnings("rawtypes")
     private Class<? extends ItemIdService> serviceClass;
     private boolean sortable;
-    private Class<?> initialBeanSortComparatorClass = Comparator.class;
+    private Class<?> initialBeanSortComparatorClass = null;
     private String defaultSortColName = null;
-
+    private CacheStrategy inMemCollectionCacheStragegy = CacheStrategyNoCache.INSTANCE;
 
     /** May be used to define a different default value. */
     public void setNumOfPageRowPms(int numOfPageRowPms) { this.numOfPageRowPms = numOfPageRowPms; }
