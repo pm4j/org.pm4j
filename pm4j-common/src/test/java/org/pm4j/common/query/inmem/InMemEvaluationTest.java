@@ -5,6 +5,9 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 import org.pm4j.common.query.CompOpEquals;
+import org.pm4j.common.query.CompOpGe;
+import org.pm4j.common.query.CompOpGt;
+import org.pm4j.common.query.CompOpLe;
 import org.pm4j.common.query.CompOpLt;
 import org.pm4j.common.query.CompOpNotEquals;
 import org.pm4j.common.query.FilterAnd;
@@ -62,6 +65,33 @@ public class InMemEvaluationTest {
     assertTrue("false OR true", ctxt.evaluate(bean, new FilterOr(falseCond(), trueCond())));
     assertFalse("false OR false", ctxt.evaluate(bean, new FilterOr(falseCond(), falseCond())));
     assertTrue("false OR false OR true", ctxt.evaluate(bean, new FilterOr(falseCond(), falseCond(), trueCond())));
+  }
+
+  @Test
+  public void testCompOpGt() {
+    Bean bean = new Bean("b", 3);
+    assertFalse("The value 3 is not greater than 4.", ctxt.evaluate(bean, new FilterCompare(attrI, CompOpGt.class, 4)));
+    assertFalse("The value 3 is not greater than 3.", ctxt.evaluate(bean, new FilterCompare(attrI, CompOpGt.class, 3)));
+    assertTrue("The value 3 is greater than 2.", ctxt.evaluate(bean, new FilterCompare(attrI, CompOpGt.class, 2)));
+    assertTrue("The value 3 is greater than null.", ctxt.evaluate(bean, new FilterCompare(attrI, CompOpGt.class, null)));
+  }
+
+  @Test
+  public void testCompOpGe() {
+    Bean bean = new Bean("b", 3);
+    assertFalse("The value 3 is not greater or equal 4.", ctxt.evaluate(bean, new FilterCompare(attrI, CompOpGe.class, 4)));
+    assertTrue("The value 3 is greater or equal 3.", ctxt.evaluate(bean, new FilterCompare(attrI, CompOpGe.class, 3)));
+    assertTrue("The value 3 is greater or equal 2.", ctxt.evaluate(bean, new FilterCompare(attrI, CompOpGe.class, 2)));
+    assertTrue("The value 3 is greater or equal null.", ctxt.evaluate(bean, new FilterCompare(attrI, CompOpGe.class, null)));
+  }
+
+  @Test
+  public void testCompOpLe() {
+    Bean bean = new Bean("b", 3);
+    assertTrue("The value 3 is less or equal 4.", ctxt.evaluate(bean, new FilterCompare(attrI, CompOpLe.class, 4)));
+    assertTrue("The value 3 is less or equal 3.", ctxt.evaluate(bean, new FilterCompare(attrI, CompOpLe.class, 3)));
+    assertFalse("The value 3 is not less or equal 2.", ctxt.evaluate(bean, new FilterCompare(attrI, CompOpLe.class, 2)));
+    assertFalse("The value 3 is not less or equal null.", ctxt.evaluate(bean, new FilterCompare(attrI, CompOpLe.class, null)));
   }
 
   @Test

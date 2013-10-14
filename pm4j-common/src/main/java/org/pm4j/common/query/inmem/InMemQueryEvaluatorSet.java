@@ -1,9 +1,11 @@
 package org.pm4j.common.query.inmem;
 
 import org.pm4j.common.query.CompOpEquals;
+import org.pm4j.common.query.CompOpGe;
 import org.pm4j.common.query.CompOpGt;
 import org.pm4j.common.query.CompOpIn;
 import org.pm4j.common.query.CompOpIsNull;
+import org.pm4j.common.query.CompOpLe;
 import org.pm4j.common.query.CompOpLt;
 import org.pm4j.common.query.CompOpNotEquals;
 import org.pm4j.common.query.CompOpStringContains;
@@ -31,8 +33,10 @@ public class InMemQueryEvaluatorSet extends QueryEvaluatorSet {
     addExprEvaluator(FilterCompare.class, new InMemExprEvaluatorCompare());
 
     addCompOpEvaluator(CompOpEquals.class, InMemCompOpEvaluators.EQUALS);
+    addCompOpEvaluator(CompOpGe.class, InMemCompOpEvaluators.GE);
     addCompOpEvaluator(CompOpGt.class, InMemCompOpEvaluators.GT);
     addCompOpEvaluator(CompOpIsNull.class, InMemCompOpEvaluators.IS_NULL);
+    addCompOpEvaluator(CompOpLe.class, InMemCompOpEvaluators.LE);
     addCompOpEvaluator(CompOpLt.class, InMemCompOpEvaluators.LT);
     addCompOpEvaluator(CompOpNotEquals.class, InMemCompOpEvaluators.NE);
     addCompOpEvaluator(CompOpStringStartsWith.class, InMemCompOpEvaluators.STRING_STARTS_WITH);

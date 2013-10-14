@@ -5,9 +5,11 @@ import java.util.Collection;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.pm4j.common.query.CompOpEquals;
+import org.pm4j.common.query.CompOpGe;
 import org.pm4j.common.query.CompOpGt;
 import org.pm4j.common.query.CompOpIn;
 import org.pm4j.common.query.CompOpIsNull;
+import org.pm4j.common.query.CompOpLe;
 import org.pm4j.common.query.CompOpLt;
 import org.pm4j.common.query.CompOpNotEquals;
 import org.pm4j.common.query.CompOpStringContains;
@@ -25,6 +27,13 @@ public class InMemCompOpEvaluators {
     }
   };
 
+  public static final InMemCompOpEvaluator GE = new InMemCompOpEvaluatorBase<CompOpGe, Comparable<?>>() {
+    @Override
+    protected boolean evalImpl(InMemQueryEvaluator<?> ctxt, CompOpGe compOp, Comparable<?> o1, Comparable<?> o2) {
+      return CompareUtil.compare(o1, o2) >= 0;
+    }
+  };
+
   public static final InMemCompOpEvaluator GT = new InMemCompOpEvaluatorBase<CompOpGt, Comparable<?>>() {
     @Override
     protected boolean evalImpl(InMemQueryEvaluator<?> ctxt, CompOpGt compOp, Comparable<?> o1, Comparable<?> o2) {
@@ -36,6 +45,13 @@ public class InMemCompOpEvaluators {
     @Override
     protected boolean evalImpl(InMemQueryEvaluator<?> ctxt, CompOpIsNull compOp, Object o1, Object o2) {
       return o1 == null || (o1 instanceof String && StringUtils.isEmpty((String)o1));
+    }
+  };
+
+  public static final InMemCompOpEvaluator LE = new InMemCompOpEvaluatorBase<CompOpLe, Comparable<?>>() {
+    @Override
+    protected boolean evalImpl(InMemQueryEvaluator<?> ctxt, CompOpLe compOp, Comparable<?> o1, Comparable<?> o2) {
+      return CompareUtil.compare(o1, o2) <= 0;
     }
   };
 
