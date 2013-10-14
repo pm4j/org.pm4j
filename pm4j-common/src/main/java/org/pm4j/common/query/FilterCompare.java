@@ -27,7 +27,7 @@ public class FilterCompare implements FilterExpression, Cloneable {
    * operator as a parameter.
    * <p>
    * If you need a stateful compare operator (e.g. with an uppercase value
-   * specificiation) use the constructor taking a {@link CompOp} instance parameter:
+   * specification) use the constructor taking a {@link CompOp} instance parameter:
    * {@link #FilterCompare(QueryAttr, CompOp, Object)}.
    *
    * @param attr the attribute to compare.

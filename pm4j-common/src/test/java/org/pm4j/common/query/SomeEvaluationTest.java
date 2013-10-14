@@ -28,10 +28,12 @@ public class SomeEvaluationTest {
 
 
 
-  class SqlEvalCtxt extends QueryEvaluatorBase {
+  class SqlEvalCtxt {
+
+    private QueryEvaluatorSet evaluatorSet;
 
     public SqlEvalCtxt() {
-      setEvaluatorSet(makeEvaluatorSet());
+      evaluatorSet = makeEvaluatorSet();
     }
 
     public String evaluate(String baseQuery, FilterExpression expr) {
@@ -43,13 +45,12 @@ public class SomeEvaluationTest {
       return stringBuilder.toString();
     }
 
-    @Override
     public SqlExprEvaluator<? extends FilterExpression> getExprEvaluator(FilterExpression expr) {
-      return (SqlExprEvaluator<?>) super.getExprEvaluator(expr);
+      return (SqlExprEvaluator<?>) evaluatorSet.getExprEvaluator(expr);
     }
 
     public SqlCompOpEvaluator<? extends CompOp> getCompOpEvaluator(FilterCompare co) {
-      return (SqlCompOpEvaluator<?>) super.getCompOpEvaluator(co);
+      return (SqlCompOpEvaluator<?>) evaluatorSet.getCompOpEvaluator(co);
     }
 
 

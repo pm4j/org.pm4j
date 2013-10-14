@@ -17,9 +17,10 @@ public class QueryAttr implements Serializable, Cloneable {
   private static final long serialVersionUID = 1L;
 
   private final String   name;
-  private String         path;
+  private /*final*/ String path; // not final because of clone implementation. See cloneWithPathPrefix().
   private final Class<?> type;
   private String         title;
+  private int            hashCode;
 
   /**
    * @param path
@@ -168,7 +169,10 @@ public class QueryAttr implements Serializable, Cloneable {
 
   @Override
   public int hashCode() {
-    return new HashCodeBuilder(11, 47).append(name).append(path).append(type).toHashCode();
+    if (hashCode == 0) {
+      hashCode = new HashCodeBuilder(11, 47).append(name).append(path).append(type).toHashCode();
+    }
+    return hashCode;
   }
 
 }

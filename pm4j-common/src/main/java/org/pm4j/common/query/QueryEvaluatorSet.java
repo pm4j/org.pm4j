@@ -61,7 +61,7 @@ public class QueryEvaluatorSet {
 
     CompOpEvaluator ev = defaultAttrCompOpEvaluatorMap.get(compOpClass);
     if (ev == null) {
-      throw new RuntimeException("Missing compare operator evaluator for operator type: '" + filterCompare.getClass() +
+      throw new RuntimeException("Missing compare operator evaluator for operator type: '" + compOpClass +
           "' evaluator set: " + this);
     }
     return ev;

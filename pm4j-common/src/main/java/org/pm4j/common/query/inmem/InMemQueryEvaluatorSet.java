@@ -6,6 +6,7 @@ import org.pm4j.common.query.CompOpGt;
 import org.pm4j.common.query.CompOpIn;
 import org.pm4j.common.query.CompOpIsNull;
 import org.pm4j.common.query.CompOpLe;
+import org.pm4j.common.query.CompOpLike;
 import org.pm4j.common.query.CompOpLt;
 import org.pm4j.common.query.CompOpNotEquals;
 import org.pm4j.common.query.CompOpStringContains;
@@ -37,6 +38,7 @@ public class InMemQueryEvaluatorSet extends QueryEvaluatorSet {
     addCompOpEvaluator(CompOpGt.class, InMemCompOpEvaluators.GT);
     addCompOpEvaluator(CompOpIsNull.class, InMemCompOpEvaluators.IS_NULL);
     addCompOpEvaluator(CompOpLe.class, InMemCompOpEvaluators.LE);
+    addCompOpEvaluator(CompOpLike.class, InMemCompOpEvaluators.LIKE);
     addCompOpEvaluator(CompOpLt.class, InMemCompOpEvaluators.LT);
     addCompOpEvaluator(CompOpNotEquals.class, InMemCompOpEvaluators.NE);
     addCompOpEvaluator(CompOpStringStartsWith.class, InMemCompOpEvaluators.STRING_STARTS_WITH);

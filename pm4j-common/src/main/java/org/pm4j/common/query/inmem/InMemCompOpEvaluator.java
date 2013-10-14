@@ -17,10 +17,14 @@ public interface InMemCompOpEvaluator extends CompOpEvaluator {
    *
    * @param ctxt
    * @param compOp
-   * @param o1
-   * @param o2
-   * @return
+   *          The compare operator to check.
+   * @param attrValue
+   *          The value found in the object to check.
+   * @param compareToValue
+   *          The restriction value to compare the object value(s) to.
+   * @return <code>true</code> if the <code>attrValue</code> matches the
+   *         <code>compareToValue</code> restriction.
    */
-  boolean eval(InMemQueryEvaluator<?> ctxt, CompOp compOp, Object o1, Object o2);
+  boolean eval(InMemQueryEvaluator<?> ctxt, CompOp compOp, Object attrValue, Object compareToValue);
 
 }

@@ -13,29 +13,29 @@ import org.pm4j.common.query.CompOp;
 public abstract class InMemCompOpEvaluatorBase<T_COMP_OP extends CompOp, T_VALUE> implements InMemCompOpEvaluator {
 
   /**
-   * External operation execution interface method.
-   *
-   * @param ctxt evaluation context information.
-   * @param compOp the compare operation to execute.
-   * @param lhs left hand side value to compare.
-   * @param rhs right hand side value to compare.
-   * @return <code>true</code> if the expression evaluates to <code>true</code>.
+   * Translates the external call to a type specific internal
+   * {@link #evalImpl(InMemQueryEvaluator, CompOp, Object, Object)} call..
    */
   @SuppressWarnings("unchecked")
   @Override
-  public boolean eval(InMemQueryEvaluator<?> ctxt, CompOp compOp, Object lhs, Object rhs) {
-    return evalImpl(ctxt, (T_COMP_OP) compOp, (T_VALUE)lhs, (T_VALUE)rhs);
+  public boolean eval(InMemQueryEvaluator<?> ctxt, CompOp compOp, Object attrValue, Object compareToValue) {
+    return evalImpl(ctxt, (T_COMP_OP) compOp, (T_VALUE)attrValue, (T_VALUE)compareToValue);
   }
 
   /**
    * Type safe implementation evaluation method.
    *
-   * @param ctxt evaluation context information.
-   * @param compOp the compare operation to execute.
-   * @param lhs left hand side value to compare.
-   * @param rhs right hand side value to compare.
-   * @return <code>true</code> if the expression evaluates to <code>true</code>.
+   * @param ctxt
+   *          Evaluation context information.
+   * @param compOp
+   *          The compare operation to execute.
+   * @param attrValue
+   *          The value found in the object to check.
+   * @param compareToValue
+   *          The restriction value to compare the object value(s) to.
+   * @return <code>true</code> if the <code>attrValue</code> matches the
+   *         <code>compareToValue</code> restriction.
    */
-  protected abstract boolean evalImpl(InMemQueryEvaluator<?> ctxt, T_COMP_OP compOp, T_VALUE lhs, T_VALUE rhs);
+  protected abstract boolean evalImpl(InMemQueryEvaluator<?> ctxt, T_COMP_OP compOp, T_VALUE attrValue, T_VALUE compareToValue);
 
 }

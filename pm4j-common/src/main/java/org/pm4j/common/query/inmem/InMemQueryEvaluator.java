@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.pm4j.common.expr.ExprExecCtxt;
 import org.pm4j.common.expr.Expression;
@@ -14,7 +16,6 @@ import org.pm4j.common.query.FilterCompare;
 import org.pm4j.common.query.FilterExpression;
 import org.pm4j.common.query.QueryAttr;
 import org.pm4j.common.query.QueryAttrMulti;
-import org.pm4j.common.query.QueryEvaluatorBase;
 import org.pm4j.common.query.QueryEvaluatorSet;
 import org.pm4j.common.query.SortOrder;
 import org.pm4j.common.util.collection.ListUtil;
@@ -23,19 +24,30 @@ import org.pm4j.common.util.collection.MultiObjectValue;
 /**
  * An algorithm that allows to filter in-memory items based on {@link FilterExpression}s.<br>
  * It also provides algorithms for item sorting based on a given {@link SortOrder}.
+ * <p>
+ * It's a stateful object, because it contains cached values.
  *
  * @param <T_ITEM> the type of handled items.
  *
  * @author olaf boede
  */
-public class InMemQueryEvaluator<T_ITEM> extends QueryEvaluatorBase {
+public class InMemQueryEvaluator<T_ITEM> {
+
+  /** Evaluator set for the set of expressions and compare operators to handle. */
+  private QueryEvaluatorSet evaluatorSet;
+
+  /** Attribute path's are evaluated very often (especially when evaluating long lists). */
+  private Map<QueryAttr, Expression> queryAttrToPathExpressionCache = new HashMap<QueryAttr, Expression>();
+
+  /** A cache that may be used to prevent repeated evaluations. */
+  private Map<String, Map<Object, Object>> cacheKeyToCacheMap = new HashMap<String, Map<Object,Object>>();
 
   public InMemQueryEvaluator() {
-    super(InMemQueryEvaluatorSet.INSTANCE);
+    this(InMemQueryEvaluatorSet.INSTANCE);
   }
 
   public InMemQueryEvaluator(QueryEvaluatorSet evaluatorSet) {
-    super(evaluatorSet);
+    this.evaluatorSet = evaluatorSet;
   }
 
   /**
@@ -128,14 +140,12 @@ public class InMemQueryEvaluator<T_ITEM> extends QueryEvaluatorBase {
     }
   }
 
-  @Override
   protected InMemExprEvaluator getExprEvaluator(FilterExpression expr) {
-    return (InMemExprEvaluator) super.getExprEvaluator(expr);
+    return (InMemExprEvaluator) evaluatorSet.getExprEvaluator(expr);
   }
 
-  @Override
   protected InMemCompOpEvaluator getCompOpEvaluator(FilterCompare compareOperation) {
-    return (InMemCompOpEvaluator) super.getCompOpEvaluator(compareOperation);
+    return (InMemCompOpEvaluator) evaluatorSet.getCompOpEvaluator(compareOperation);
   }
 
   /**
@@ -154,21 +164,46 @@ public class InMemQueryEvaluator<T_ITEM> extends QueryEvaluatorBase {
       return new MultiObjectValue(values);
     }
     else  {
-      // XXX olaf: is called very often in case of long lists. Cache the parsed expressions!
-      String path = attr.getPath();
-      Expression expr = PathExpressionChain.parse(new ParseCtxt(path));
+      Expression expr = queryAttrToPathExpressionCache.get(attr);
+      if (expr == null) {
+        expr = PathExpressionChain.parse(new ParseCtxt(attr.getPath()));
+        queryAttrToPathExpressionCache.put(attr, expr);
+      }
       Object value = expr.exec(new ExprExecCtxt(item));
       return value;
     }
   }
 
+  /**
+   * Provides a named cache.
+   * <p>
+   * Allows to define several comparator specific caches without key restrictions and
+   * side effects to other comparators.
+   *
+   * @param cacheKey An identifier for the cache.
+   * @return A map that can be used as a cache.
+   */
+  public Map<Object, Object> getCache(String cacheKey) {
+    Map<Object, Object> cacheMap = cacheKeyToCacheMap.get(cacheKey);
+    if (cacheMap == null) {
+      cacheMap = new HashMap<Object, Object>();
+      cacheKeyToCacheMap.put(cacheKey, cacheMap);
+    }
+    return cacheMap;
+  }
+
+  /**
+   * Clears all cached items.
+   */
+  public void clearCaches() {
+    cacheKeyToCacheMap.clear();
+    queryAttrToPathExpressionCache.clear();
+  }
 
   /**
    * A comparator that allows to compare based on an {@link InMemQueryEvaluator} an {@link InMemSortOrder}.
    * <p>
    * The {@link InMemQueryEvaluator} provides the attribute values to compare.
-   * <p>
-   * TODO olaf: Add a second version that just works with a {@link SortOrder}.
    *
    * @param <T> the type of items to sort.
    */
@@ -194,6 +229,14 @@ public class InMemQueryEvaluator<T_ITEM> extends QueryEvaluatorBase {
       return sortOrder.getComparator().compare(v1, v2);
     }
 
+  }
+
+
+  /**
+   * @return the evaluatorSet
+   */
+  public QueryEvaluatorSet getEvaluatorSet() {
+    return evaluatorSet;
   }
 
 }
