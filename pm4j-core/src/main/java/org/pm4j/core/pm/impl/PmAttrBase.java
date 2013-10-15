@@ -38,7 +38,6 @@ import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmCommandDecorator;
 import org.pm4j.core.pm.PmConstants;
 import org.pm4j.core.pm.PmDataInput;
-import org.pm4j.core.pm.PmElement;
 import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmMessage;
 import org.pm4j.core.pm.PmMessage.Severity;
@@ -121,8 +120,8 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
    */
   private Object bufferedValue = UNKNOWN_VALUE_INDICATOR;
 
-  /** Shortcut to the next parent element. */
-  private PmElement pmParentElement;
+  /** A cache member. Is only used in case for {@link ValueAccessReflection}. */
+  private PmBean<Object> parentPmBean;
 
   /** The decorators to execute before and after setting the attribute value. */
   private Collection<PmCommandDecorator> valueChangeDecorators = Collections.emptyList();
@@ -130,18 +129,6 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
 
   public PmAttrBase(PmObject pmParent) {
     super(pmParent);
-
-    pmParentElement = (pmParent instanceof PmElement)
-        ? (PmElement)pmParent
-        : PmUtil.getPmParentOfType(pmParent, PmElement.class);
-  }
-
-
-  /**
-   * @return The next parent of type {@link PmElement}.
-   */
-  protected PmElement getPmParentElement() {
-    return pmParentElement;
   }
 
   @Override
@@ -1089,7 +1076,8 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   // ======== Buffered data input support ======== //
 
   public boolean isBufferedPmValueMode() {
-    return getPmParentElement().isBufferedPmValueMode();
+	PmDataInput parentPmCtxt = PmUtil.getPmParentOfType(this, PmDataInput.class);
+    return parentPmCtxt.isBufferedPmValueMode();
   }
 
   @SuppressWarnings("unchecked")
@@ -1699,8 +1687,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
 
     @Override
     public Object getValue(PmAttrBase<?, ?> attr) {
-      @SuppressWarnings("unchecked")
-      Object bean = ((PmBean<Object>)attr.getPmParentElement()).getPmBean();
+      Object bean = getParentPmBean(attr).getPmBean();
       return bean != null
               ? attr.getOwnMetaData().beanAttrAccessor.<Object>getBeanAttrValue(bean)
               : null;
@@ -1708,18 +1695,24 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
 
     @Override
     public void setValue(PmAttrBase<?, ?> attr, Object value) {
-      @SuppressWarnings("unchecked")
-      Object bean = ((PmBean<Object>)attr.getPmParentElement()).getPmBean();
+      Object bean = getParentPmBean(attr).getPmBean();
       if (bean == null) {
         throw new PmRuntimeException(attr, "Unable to access an attribute value for a backing pmBean that is 'null'.");
       }
       attr.getOwnMetaData().beanAttrAccessor.setBeanAttrValue(bean, value);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public Object getPropertyContainingBean(PmAttrBase<?, ?> attr) {
-      return ((PmBean<Object>)attr.getPmParentElement()).getPmBean();
+      return getParentPmBean(attr).getPmBean();
+    }
+
+    @SuppressWarnings("unchecked")
+    private PmBean<Object> getParentPmBean(PmAttrBase<?, ?> attr) {
+      if (attr.parentPmBean == null) {
+        attr.parentPmBean = PmUtil.getPmParentOfType(attr, PmBean.class);
+      }
+      return attr.parentPmBean;
     }
   }
 
