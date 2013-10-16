@@ -3,12 +3,14 @@ package org.pm4j.core.pm.api;
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmCommandDecorator;
+import org.pm4j.core.pm.PmDataInput;
 import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmEvent.ValueChangeKind;
 import org.pm4j.core.pm.PmEventListener;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.impl.PmAttrValueChangeDecorator;
 import org.pm4j.core.pm.impl.PmEventApiHandler;
+import org.pm4j.core.pm.impl.BroadcastPmEventProcessor;
 
 public class PmEventApi {
 
@@ -106,6 +108,16 @@ public class PmEventApi {
 
   public static void firePmEvent(PmObject pm, PmEvent event) {
     PmEventApiHandler.firePmEvent(pm, event, true);
+  }
+
+  /**
+   * Broadcasts events, having the given event mask, to the PM sub-tree having the given root PM.
+   *
+   * @param rootPm Root of the sub tree to inform.
+   * @param eventMask The event mask for the events to fire for all PM's.
+   */
+  public static void broadcastPmEvent(PmDataInput rootPm, int eventMask) {
+    new BroadcastPmEventProcessor(rootPm, eventMask).doIt();
   }
 
   public static void firePmEventIfInitialized(PmObject pm, PmEvent event) {

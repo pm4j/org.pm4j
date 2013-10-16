@@ -465,7 +465,7 @@ public abstract class PmBeanBase<T_BEAN>
     return (MetaData) getPmMetaDataWithoutPmInitCall();
   }
 
-  public static class ValueChangeEventProcessor extends RecursivePmEventProcessor {
+  public static class ValueChangeEventProcessor extends BroadcastPmEventProcessor {
     public ValueChangeEventProcessor(PmDataInput rootPm, boolean isReloadEvent) {
       super(rootPm,
           isReloadEvent

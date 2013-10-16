@@ -14,7 +14,7 @@ import org.pm4j.core.pm.PmEventListener;
 import org.pm4j.core.pm.PmEventListener.PostProcessor;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
-import org.pm4j.core.pm.impl.RecursivePmEventProcessor;
+import org.pm4j.core.pm.impl.BroadcastPmEventProcessor;
 
 public class PmEventApiTest {
 
@@ -65,7 +65,7 @@ public class PmEventApiTest {
     TestListener elemHierarchyListener = new TestListener();
     PmEventApi.addWeakHierarchyListener(myPm, VALUE_CHANGE, elemHierarchyListener);
 
-    new RecursivePmEventProcessor(myPm, VALUE_CHANGE).doIt();
+    new BroadcastPmEventProcessor(myPm, VALUE_CHANGE).doIt();
 
     assertEquals("Each listener in the PM tree gets called once.", 1, attrListener.receivedEvents.size());
     assertEquals("Each listener in the PM tree gets called once.", 1, elementListener.receivedEvents.size());
@@ -126,7 +126,7 @@ public class PmEventApiTest {
 
     // test
 
-    new RecursivePmEventProcessor(myPm, PmEvent.TITLE_CHANGE).doIt();
+    new BroadcastPmEventProcessor(myPm, PmEvent.TITLE_CHANGE).doIt();
     assertEquals("This is my payload.", receivedPostProcessingPayload[0]);
   }
 

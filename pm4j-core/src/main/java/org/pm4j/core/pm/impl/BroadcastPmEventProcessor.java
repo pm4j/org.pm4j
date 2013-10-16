@@ -32,18 +32,18 @@ import org.pm4j.core.pm.api.PmVisitorApi.PmVisitResult;
  *
  * @author olaf boede
  */
-public class RecursivePmEventProcessor {
+public class BroadcastPmEventProcessor {
   protected final PmDataInput rootPm;
   private final int eventMask;
   private final ValueChangeKind changeKind;
   private final Map<PmObject, PmEvent> pmToEventMap = new IdentityHashMap<PmObject, PmEvent>();
   private final List<PmEvent> eventsToPostProcess = new ArrayList<PmEvent>();
 
-  public RecursivePmEventProcessor(PmDataInput rootPm, final int eventMask) {
+  public BroadcastPmEventProcessor(PmDataInput rootPm, final int eventMask) {
     this(rootPm, eventMask, ValueChangeKind.UNKNOWN);
   }
 
-  public RecursivePmEventProcessor(PmDataInput rootPm, final int eventMask, final ValueChangeKind changeKind) {
+  public BroadcastPmEventProcessor(PmDataInput rootPm, final int eventMask, final ValueChangeKind changeKind) {
     this.rootPm = rootPm;
     this.eventMask = eventMask;
     this.changeKind = changeKind;
