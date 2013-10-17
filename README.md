@@ -13,7 +13,9 @@ PM4J can be used for the following technologies
 
 And planned in following technologies
 
- - JAVAX (comming soon)
+ - JAVAFX (comming soon)
+
+This model framework is used in several companies on Enterprise Level.
 
 
 
