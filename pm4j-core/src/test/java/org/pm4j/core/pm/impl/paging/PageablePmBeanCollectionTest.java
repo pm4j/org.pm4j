@@ -59,9 +59,9 @@ public class PageablePmBeanCollectionTest extends PageableCollectionTestBase<Pag
 
     FilterCompareDefinition fcd = new FilterCompareDefinition(attrNameValue, new CompOpStringStartsWith());
     qo.addFilterCompareDefinition(fcd);
-
     qo.addSortOrder("name", new InMemSortOrder(attrNameValue));
 
+    // here PmTableUtil.setPmBeans() is not used because we fake here some query options.
     beanTablePm.setPmPageableCollection(new PageablePmBeanCollection<BeanRowPm, Bean>(beanTablePm, BeanRowPm.class, beans, qo));
     beanTablePm.setPmRowSelectMode(SelectMode.SINGLE);
 

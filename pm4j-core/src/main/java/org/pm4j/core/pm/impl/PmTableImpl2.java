@@ -317,7 +317,7 @@ public class PmTableImpl2
    *
    * @return the query behind this table.
    */
-  public QueryParams getPmQueryParams() {
+  public final QueryParams getPmQueryParams() {
     return getPmPageableCollection().getQueryParams();
   }
 
@@ -516,7 +516,7 @@ public class PmTableImpl2
    * @return The {@link PageableCollection2} that handles the table row beans to display.
    */
   @SuppressWarnings("unchecked")
-  public PageableCollection2<T_ROW_BEAN> getPmPageableBeanCollection() {
+  public final PageableCollection2<T_ROW_BEAN> getPmPageableBeanCollection() {
     return ((PageablePmBeanCollection<T_ROW_PM, T_ROW_BEAN>)getPmPageableCollection()).getBeanCollection();
   }
 
