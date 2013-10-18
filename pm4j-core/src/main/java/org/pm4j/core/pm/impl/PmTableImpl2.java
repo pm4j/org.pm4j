@@ -940,7 +940,7 @@ public class PmTableImpl2
       myMetaData.initialBeanSortComparatorClass = (cfg.initialBeanSortComparator() != Comparator.class)
                                 ? cfg.initialBeanSortComparator()
                                 : null;
-      myMetaData.defaultSortColName = cfg.defaultSortCol();
+      myMetaData.defaultSortColName = StringUtils.defaultIfEmpty(cfg.defaultSortCol(), null);
       myMetaData.serviceClass = (cfg.serviceClass() != ItemIdService.class)
                                 ? cfg.serviceClass()
                                 : null;
