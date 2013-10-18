@@ -243,13 +243,6 @@ public class PmTableImpl2
     return getPmPageableCollection().getSelectionHandler();
   }
 
-  /**
-   * @deprecated please use {@link #getMasterRowPm()}
-   */
-  public final T_ROW_PM getCurrentRowPm() {
-    return getMasterRowPm();
-  }
-
   @Override
   public final T_ROW_PM getMasterRowPm() {
     if (masterRowPm == null) {
@@ -276,14 +269,6 @@ public class PmTableImpl2
 	}
 	return null;
   }
-
-  /**
-   * @deprecated please use {@link #getMasterRowPmBean()}
-   */
-  public final T_ROW_BEAN getCurrentRowPmBean() {
-    return getMasterRowPmBean();
-  }
-
 
   /**
    * Provides the bean behind the master row PM.<br>

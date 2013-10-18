@@ -68,15 +68,4 @@ public final class PmTableUtil2 {
     }
   }
 
-  /**
-   * @deprecated please use the table's in-memory collection support directly.
-   *
-   * @param pmTable
-   * @return
-   */
-  public static QueryOptions makeQueryOptionsForInMemoryTable(PmTableImpl2<?, ?> pmTable) {
-    return pmTable.new InMemQueryOptionProvider().getQueryOptions();
-  }
-
-
 }
