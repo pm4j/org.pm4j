@@ -611,17 +611,10 @@ public class PmTableImpl2
   @SuppressWarnings("unchecked")
   protected Collection<T_ROW_BEAN> getPmBeansImpl() {
     PathResolver valuePathResolver = getOwnMetaData().valuePathResolver;
-    if (valuePathResolver != null) {
-      Collection<T_ROW_BEAN> beans = (Collection<T_ROW_BEAN>) valuePathResolver.getValue(getPmParent());
-      return beans;
-    } else {
-      LOG.warn("The table PM '" + PmUtil.getPmLogString(this) + "' is not bound to any data to represent." +
-          "\nYou may provide table data using the following ways:" +
-          "\n\ta) bind to a Collection by defining a valuePath expresssion within a @PmTableCfg annotation"+
-          "\n\tb) bind to a Collection by overriding getPmBeansImpl()"+
-          "\n\tc) override getPmPageableCollectionImpl() to provide your specific pageable data source.");
-      return Collections.EMPTY_LIST;
-    }
+    Collection<T_ROW_BEAN> beans = (valuePathResolver != null)
+      ? (Collection<T_ROW_BEAN>) valuePathResolver.getValue(getPmParent())
+      : Collections.EMPTY_LIST;
+    return beans;
   }
 
   /**
