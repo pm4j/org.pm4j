@@ -179,9 +179,7 @@ public class NaviLinkImpl implements NaviLink, Cloneable {
     return path;
   }
 
-  /**
-   * @return The set of parameters for the page call.
-   */
+  @Override
   public Map<String, Object> getParams() {
     return params;
   }
@@ -281,18 +279,37 @@ public class NaviLinkImpl implements NaviLink, Cloneable {
     params.put(pName, pValue);
   }
 
+  /**
+   * Deprecated, please use addParam.
+   * @param attrName
+   * @param pValue
+   */
+  @Deprecated
   public void addAttrValueParamIfNotNull(String attrName, Object pValue) {
     if (pValue != null) {
       addAttrValueParam(attrName, pValue);
     }
   }
 
+  /**
+   * Deprecated, please use addParam.
+   * @param attrName
+   * @param pValue
+   * @param compareVal
+   */
+  @Deprecated
   public void addAttrValueParamIfNotEq(String attrName, Object pValue, Object compareVal) {
     if (pValue != null && (! ObjectUtils.equals(pValue, compareVal)) ) {
       addAttrValueParam(attrName, pValue);
     }
   }
 
+  /**
+   * Deprecated, please use addParam.
+   * @param attrName
+   * @param pValue
+   */
+  @Deprecated
   public void addAttrValueParam(String attrName, Object pValue) {
     addParam(attrName, pValue);
   }

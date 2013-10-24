@@ -1,5 +1,8 @@
 package org.pm4j.navi;
 
+import java.util.Collections;
+import java.util.Map;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
@@ -63,4 +66,9 @@ public class NaviRuleLink implements NaviLink {
     return new HashCodeBuilder(3, 13).append(ruleString).toHashCode();
   }
 
+  @Override
+  public Map<String, Object> getParams() {
+    // no parameters for NaviRuleLinks needed.
+    return Collections.emptyMap();
+  }
 }

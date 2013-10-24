@@ -75,5 +75,11 @@ public class UrlInfoTest extends TestCase {
     assertEquals(1, u.getParams().size());
     assertEquals("123", u.getParams().get("p1"));
   }
-
+  
+  public void testBuildUrlString() {
+    UrlInfo u = new UrlInfo("myPage");
+    u.addParam("key1", "val1");
+    u.addParam("key2", "val2");
+    assertEquals("myPage?key1=val1&key2=val2", u.buildUrl());
+  }
 }

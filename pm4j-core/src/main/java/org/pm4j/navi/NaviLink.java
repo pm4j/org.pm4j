@@ -1,5 +1,7 @@
 package org.pm4j.navi;
 
+import java.util.Map;
+
 
 /**
  * A link to a target 'page'.
@@ -68,5 +70,11 @@ public interface NaviLink {
    *         both links are equal.
    */
   boolean isLinkToSamePage(NaviLink other);
+  
 
+  
+  /**
+   * @return The set of parameters for the page call.
+   */
+  Map<String, Object> getParams();
 }
