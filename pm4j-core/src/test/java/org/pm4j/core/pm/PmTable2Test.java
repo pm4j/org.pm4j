@@ -17,12 +17,14 @@ import org.pm4j.common.query.FilterCompareDefinition;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.inmem.InMemSortOrder;
 import org.pm4j.common.util.CompareUtil;
+import org.pm4j.core.pm.PmTable2.UpdateAspect;
 import org.pm4j.core.pm.annotation.PmBeanCfg;
 import org.pm4j.core.pm.annotation.PmBoolean;
 import org.pm4j.core.pm.annotation.PmFactoryCfg;
 import org.pm4j.core.pm.annotation.PmTableCfg2;
 import org.pm4j.core.pm.annotation.PmTableColCfg2;
 import org.pm4j.core.pm.api.PmCacheApi;
+import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
 import org.pm4j.core.pm.impl.PmAttrIntegerImpl;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
 import org.pm4j.core.pm.impl.PmBeanImpl;
@@ -57,6 +59,29 @@ public class PmTable2Test {
   public void testTable() {
     assertEquals(3, myTablePm.getTotalNumOfPmRows());
     assertEquals("[a, b]", myTablePm.getRowPms().toString());
+  }
+
+  @Test
+  public void testReReadCollectionAfterCallingUpdateTablePm() {
+    myTablePm.setNumOfPageRowPms(10);
+    assertEquals("[a, b, c]", myTablePm.getRowPms().toString());
+    editedRowBeanList.add(new RowBean("d", "a d", 44));
+    assertEquals("There is no value change event that informs the table about the change.", 3, myTablePm.getTotalNumOfPmRows());
+    assertEquals("[a, b, c]", myTablePm.getRowPms().toString());
+
+    myTablePm.updatePmTable(UpdateAspect.CLEAR_CHANGES);
+    assertEquals("[a, b, c, d]", myTablePm.getRowPms().toString());
+  }
+
+  @Test
+  public void testReReadCollectionAfterClearingCaches() {
+    myTablePm.setNumOfPageRowPms(10);
+    assertEquals("[a, b, c]", myTablePm.getRowPms().toString());
+    editedRowBeanList.add(new RowBean("d", "a d", 44));
+    assertEquals("[a, b, c]", myTablePm.getRowPms().toString());
+
+    PmCacheApi.clearPmCache(myTablePm, CacheKind.VALUE);
+    assertEquals("[a, b, c, d]", myTablePm.getRowPms().toString());
   }
 
   @Test

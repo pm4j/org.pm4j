@@ -240,7 +240,11 @@ public abstract class PageableInMemCollectionBase<T_ITEM>
      */
     @Override
     public void addItem(T_ITEM item) {
-      getBackingCollection().add(item);
+      try {
+        getBackingCollection().add(item);
+      } catch (UnsupportedOperationException e) {
+        throw new RuntimeException("Please check if you did provide a modifyable collection. Found collection type: " + getBackingCollection().getClass(), e);
+      }
       if (filteredAndSortedObjects != null) {
         filteredAndSortedObjects.add(item);
       }
