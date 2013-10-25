@@ -12,6 +12,7 @@ import org.pm4j.common.query.CompOpIsNull;
 import org.pm4j.common.query.CompOpLe;
 import org.pm4j.common.query.CompOpLt;
 import org.pm4j.common.query.CompOpNotEquals;
+import org.pm4j.common.query.CompOpNotNull;
 import org.pm4j.common.query.CompOpStringContains;
 import org.pm4j.common.query.CompOpStringNotContains;
 import org.pm4j.common.query.CompOpStringStartsWith;
@@ -68,6 +69,15 @@ public class InMemCompOpEvaluators {
     @Override
     protected boolean evalImpl(InMemQueryEvaluator<?> ctxt, CompOpNotEquals compOp, Object attrValue, Object compareToValue) {
       return !ObjectUtils.equals(attrValue, compareToValue);
+    }
+  };
+
+  public static final InMemCompOpEvaluator NOT_NULL = new InMemCompOpEvaluatorBase<CompOpNotNull, Object>() {
+    @Override
+    protected boolean evalImpl(InMemQueryEvaluator<?> ctxt, CompOpNotNull compOp, Object attrValue, Object compareToValue) {
+      return (attrValue instanceof String)
+          ? StringUtils.isNotEmpty((String)attrValue)
+          : attrValue != null;
     }
   };
 
