@@ -31,12 +31,4 @@ public interface PageableQueryService<T_BEAN, T_ID> extends ItemIdService<T_BEAN
    */
   List<T_BEAN> getItems(QueryParams query, long startIdx, int pageSize);
 
-  /**
-   * Provides the number of items that match the given query filter criteria.
-   *
-   * @param query
-   * @return
-   */
-  long getItemCount(QueryParams query);
-
 }

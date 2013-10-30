@@ -1,5 +1,7 @@
 package org.pm4j.common.pageable;
 
+import org.pm4j.common.query.QueryParams;
+
 /**
  * Converts between query or selection items and their corresponding identifiers.
  *
@@ -9,6 +11,14 @@ package org.pm4j.common.pageable;
  * @author olaf boede
  */
 public interface ItemIdService<T_ITEM, T_ID> {
+
+  /**
+   * Provides the number of items that match the given query filter criteria.
+   *
+   * @param query
+   * @return
+   */
+  long getItemCount(QueryParams query);
 
   /**
    * @param item the item to get the identifier for.

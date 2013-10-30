@@ -15,16 +15,27 @@ import org.pm4j.common.query.QueryParams;
  */
 public interface PageableIdQueryService<T_BEAN, T_ID> extends ItemIdService<T_BEAN, T_ID> {
 
-  List<T_ID> findIds(QueryParams query, long startIdx, int pageSize);
-
-  List<T_BEAN> getItems(List<T_ID> ids);
-
   /**
-   * Provides the number of items that match the given query filter criteria.
+   * Finds a set of ID's for the given {@link QueryParams}.
    *
    * @param query
-   * @return
+   *          The query parameter set.
+   * @param startIdx
+   *          The first item to fetch from the result set.
+   * @param pageSize
+   *          The number of items to
+   * @return The list of found IDs.<br>
+   *         If the given query had a sort order definition, the ID's are sorted
+   *         accordingly.
    */
-  long getItemCount(QueryParams query);
+  List<T_ID> findIds(QueryParams query, long startIdx, int pageSize);
+
+  /**
+   * Provides items for the given ID's.
+   *
+   * @param ids The set of ID's. Should not be <code>null</code>.
+   * @return The list of corresponding objects. Sorted according to the order of provided ID's.
+   */
+  List<T_BEAN> getItems(List<T_ID> ids);
 
 }
