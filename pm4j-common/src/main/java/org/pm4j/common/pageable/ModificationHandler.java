@@ -51,7 +51,7 @@ public interface ModificationHandler<T_ITEM> {
   boolean removeSelectedItems();
 
   /**
-   * Clears the registerd item set change information.<br>
+   * Clears the registered item set change information.<br>
    * This gets usually called after saving the modifications.
    * <p>
    * It does <b>not</b> undo the changes!

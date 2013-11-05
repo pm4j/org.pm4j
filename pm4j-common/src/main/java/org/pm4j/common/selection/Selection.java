@@ -38,7 +38,7 @@ public interface Selection<T_ITEM> extends Iterable<T_ITEM>, Serializable {
   /**
    * The set of items can be accessed through an {@link Iterator}.
    * <p>
-   * Please consider this iterater may have some performance impact in case of
+   * Please consider this iterator may have some performance impact in case of
    * lazy load scenarios.
    * <p>
    * Please check if you can use {@link #contains(Object)}, which is much
