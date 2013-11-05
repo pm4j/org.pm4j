@@ -102,6 +102,18 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
 
   private static final Log LOG = LogFactory.getLog(PmAttrBase.class);
 
+  /** The default value converter just passes the instances through. */
+  private static final ValueConverter<Object, Object> DEFAULT_VALUE_CONVERTER = new ValueConverter<Object, Object>() {
+    @Override
+    public Object toExternalValue(PmAttr<Object> a, Object i) {
+      return i;
+    }
+    @Override
+    public Object toInternalValue(PmAttr<Object> a, Object e) {
+      return e;
+    }
+  };
+
   /**
    * Indicates if the value was explicitly set. This information is especially
    * important for the default value logic. Default values may have only effect
@@ -126,6 +138,11 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   /** The decorators to execute before and after setting the attribute value. */
   private Collection<PmCommandDecorator> valueChangeDecorators = Collections.emptyList();
 
+  /** Converts between external and backing values. */
+  private ValueConverter<T_PM_VALUE, T_BEAN_VALUE> valueConverter;
+
+  /** Converts between external value type and its string representation. */
+  private Converter<T_PM_VALUE> stringConverter;
 
   public PmAttrBase(PmObject pmParent) {
     super(pmParent);
@@ -762,30 +779,52 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   /**
    * Gets called whenever a string value needs to be converted to the attribute value type.
    * <p>
-   * The default implementation uses the converter provided by {@link #getConverter()}.
+   * The default implementation uses the converter provided by {@link #getStringConverter()}.
    *
    * @param s The string to convert.
    * @return The converted value.
    * @throws PmConverterException If the given string can't be converted.
+   * 
+   * @deprecated Please use {@link #getConverter()} to define your specific converter.
    */
+  @Deprecated
   protected T_PM_VALUE stringToValueImpl(String s) throws PmConverterException {
-    return (T_PM_VALUE) getConverter().stringToValue(this, s);
+    return (T_PM_VALUE) getStringConverter().stringToValue(this, s);
   }
 
   /**
    * Gets called whenever the attribute value needs to be represented as a string.
    * <p>
-   * The default implementation uses the converter provided by {@link #getConverter()}.
+   * The default implementation uses the converter provided by {@link #getStringConverter()}.
    *
    * @param v A value to convert.
    * @return The string representation.
+   * 
+   * @deprecated Please use {@link #getConverter()} to define your specific converter.
    */
+  @Deprecated
   protected String valueToStringImpl(T_PM_VALUE v) {
-    return getConverter().valueToString(this, v);
+    return getStringConverter().valueToString(this, v);
   }
 
   /**
-   * @return The converter that translates from and to the corresponding string representation.
+   * @return The converter that translates from and to the corresponding string value representation.
+   */
+  public final Converter<T_PM_VALUE> getStringConverter() {
+    if (stringConverter == null) {
+      zz_ensurePmInitialization();
+      stringConverter = getConverter();
+      if (stringConverter == null) {
+        throw new PmRuntimeException(this, "Please ensure that getStringConverterImpl() does not return null.");
+      }
+    }
+    return stringConverter;
+  }
+
+  /**
+   * TODO oboede: rename to getStringConverterImpl().
+   *
+   * @return The converter that translates from and to the corresponding string value representation.
    */
   @SuppressWarnings("unchecked")
   protected Converter<T_PM_VALUE> getConverter() {
@@ -1076,7 +1115,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   // ======== Buffered data input support ======== //
 
   public boolean isBufferedPmValueMode() {
-	PmDataInput parentPmCtxt = PmUtil.getPmParentOfType(this, PmDataInput.class);
+  PmDataInput parentPmCtxt = PmUtil.getPmParentOfType(this, PmDataInput.class);
     return parentPmCtxt.isBufferedPmValueMode();
   }
 
@@ -1093,17 +1132,54 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     bufferedValue = UNKNOWN_VALUE_INDICATOR;
   }
 
-  // ======== Attribute raw data access ======== //
+  // ======== Backing value access ======== //
 
-  @SuppressWarnings("unchecked")
+  /**
+   * @deprecated please use the value converter methods.
+   */
+  @Deprecated
   public T_PM_VALUE convertBackingValueToPmValue(T_BEAN_VALUE backingValue) {
-    return (T_PM_VALUE) backingValue;
+    return getValueConverter().toExternalValue(this, backingValue);
   }
 
-  @SuppressWarnings("unchecked")
-  public T_BEAN_VALUE convertPmValueToBackingValue(T_PM_VALUE pmAttrValue) {
-    return (T_BEAN_VALUE) pmAttrValue;
+  /**
+   * @deprecated please use the value converter methods.
+   */
+  @Deprecated
+  public T_BEAN_VALUE convertPmValueToBackingValue(T_PM_VALUE externalValue) {
+    return getValueConverter().toInternalValue(this, externalValue);
   }
+
+  /**
+   *
+   * @return
+   */
+  public final ValueConverter<T_PM_VALUE, T_BEAN_VALUE> getValueConverter() {
+    if (valueConverter == null) {
+      zz_ensurePmInitialization();
+      valueConverter = getValueConverterImpl();
+      if (valueConverter == null) {
+        throw new PmRuntimeException(this, "Please ensure that getValueConverterImpl() does not return null.");
+      }
+    }
+    return (ValueConverter<T_PM_VALUE, T_BEAN_VALUE>) valueConverter;
+  }
+
+  /**
+   * Provides the value converter used to convert between backing value to external value type.<br>
+   * The default implementation uses the information provided in {@link PmAttrCfg#valueConverter()}.
+   * If nothing is configured there a simple pass-through will be provided.
+   *
+   * @return The converter to use. Should not be <code>null</code>.
+   */
+  @SuppressWarnings("unchecked")
+  protected ValueConverter<T_PM_VALUE, T_BEAN_VALUE> getValueConverterImpl() {
+    return (ValueConverter<T_PM_VALUE, T_BEAN_VALUE>)(
+        (getOwnMetaData().valueConverterClass != ValueConverter.class)
+          ? ClassUtil.newInstance(getOwnMetaData().valueConverterClass)
+          : DEFAULT_VALUE_CONVERTER);
+  }
+
 
   @SuppressWarnings("unchecked")
   public final T_BEAN_VALUE getBackingValue() {
@@ -1339,6 +1415,8 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
         default:
           throw new PmRuntimeException(this, "Unknown annotation kind: " + fieldAnnotation.accessKind());
       }
+
+      myMetaData.valueConverterClass = fieldAnnotation.valueConverter();
     }
 
     // Automatic reflection access is only supported for fix PmAttr fields in a PmBean container:
@@ -1455,6 +1533,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     private CacheStrategy                 cacheStrategyForOptions = CacheStrategyNoCache.INSTANCE;
     private CacheStrategy                 cacheStrategyForValue   = CacheStrategyNoCache.INSTANCE;
     private Converter<?>                    converter;
+    private Class<?>                        valueConverterClass   = ValueConverter.class;
     private BackingValueAccessStrategy      valueAccessStrategy     = ValueAccessLocal.INSTANCE;
     /** Name of the field configured for JSR 303-validation.<br>
      * Is <code>null</code> if there is nothing to validate this way. */

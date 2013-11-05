@@ -3,7 +3,6 @@
  */
 package org.pm4j.core.pm.impl.converter;
 
-import java.io.Serializable;
 import java.text.ParseException;
 import java.util.Locale;
 
@@ -25,11 +24,11 @@ import org.pm4j.core.pm.impl.PmUtil;
  *
  * @param <T> Type of the value to convert.
  */
-public abstract class MultiFormatParserBase<T extends Serializable> {
+public abstract class MultiFormatParserBase<T> {
 
   private static final String DEFAULT_PATTERN = "#0";
 
-  
+
   private static final Log LOG = LogFactory.getLog(MultiFormatParserBase.class);
 
   /** The default separator string used in case of a multi-format resource string specification. */
@@ -56,7 +55,8 @@ public abstract class MultiFormatParserBase<T extends Serializable> {
         // ignore it and try the next format.
         if (LOG.isTraceEnabled()) {
           LOG.trace("Format '" + format + "' not applicable for value '" + s +
-                    "'. Attribute context: " + PmUtil.getPmLogString(pmAttr));
+                    "'. Attribute context: " + PmUtil.getPmLogString(pmAttr) +
+                    "\nCause: " + e.getCause());
         }
       }
     }

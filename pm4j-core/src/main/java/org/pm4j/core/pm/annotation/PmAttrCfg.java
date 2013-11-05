@@ -20,7 +20,10 @@ import org.pm4j.core.pm.PmDataInput;
 @Target({ElementType.TYPE, ElementType.FIELD})
 public @interface PmAttrCfg {
 
-  /** Attribute value restrictions. */
+  /** Attribute value restrictions.
+   * @deprecated experimental feature state.
+   * */
+  @Deprecated
   public static enum Restriction {
     /**
      * The value is required.<br>
@@ -181,6 +184,14 @@ public @interface PmAttrCfg {
     @Deprecated
     SESSIONPROPERTY
   }
+
+  /**
+   * Configures the value converter used to convert between external and backing attribute values.
+   *
+   * @return The converter class to use. It needs to have a public default constructor.
+   */
+  @SuppressWarnings("rawtypes")
+  Class<? extends PmAttr.ValueConverter> valueConverter() default PmAttr.ValueConverter.class;
 
   /**
    * Defines attribute validation strategies.<br>

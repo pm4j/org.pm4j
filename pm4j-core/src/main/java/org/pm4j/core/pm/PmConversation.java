@@ -52,7 +52,14 @@ public interface PmConversation extends PmElement {
   void setPmLocale(Locale locale);
 
   /**
-   * Used for date conversions.
+   * Provides the {@link TimeZone} for this conversation.
+   * <p>
+   * It may be adjusted by calling {@link #setPmTimeZone(TimeZone)}.
+   * <p>
+   * If this conversation has no time zone date, it will ask its parent conversation.
+   * <p>
+   * If no {@link TimeZone} was found in the {@link PmConversation} hierarchy, this method will
+   * provide the result of {@link TimeZone#getDefault()}.
    *
    * @return The time zone that is used within this conversation.<br>
    *         Returns never <code>null</code>.
@@ -60,8 +67,10 @@ public interface PmConversation extends PmElement {
   public TimeZone getPmTimeZone();
 
   /**
-   * @param pmTimeZone The time zone that is used within this conversation.<br>
-   *         Must never be <code>null</code>.
+   * @param pmTimeZone
+   *          The time zone that is used within this conversation.<br>
+   *          <code>null</code> may be passed to re-set a time zone that was set
+   *          before.
    */
   public void setPmTimeZone(TimeZone pmTimeZone);
 

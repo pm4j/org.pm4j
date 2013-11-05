@@ -74,7 +74,7 @@ public class PmLocalizeApiHandler {
   }
 
   public String getOutputFormatString(PmAttrBase<?, ?> pmAttr) {
-    Converter<?> c = pmAttr.getConverter();
+    Converter<?> c = pmAttr.getStringConverter();
     if (c instanceof MultiFormatConverter) {
       return ((MultiFormatConverter)c).getOutputFormat(pmAttr);
     } else {

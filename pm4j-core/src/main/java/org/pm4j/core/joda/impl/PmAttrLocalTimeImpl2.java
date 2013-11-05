@@ -1,25 +1,33 @@
 package org.pm4j.core.joda.impl;
 
+import java.util.TimeZone;
+
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.joda.time.LocalTime;
+import org.joda.time.format.DateTimeFormatter;
 import org.pm4j.common.util.CompareUtil;
 import org.pm4j.core.joda.PmAttrLocalTime;
-import org.pm4j.core.pm.PmAttrTime;
+import org.pm4j.core.pm.PmAttr;
+import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.impl.PmAttrBase;
 import org.pm4j.core.pm.impl.PmObjectBase;
+import org.pm4j.core.pm.impl.PmWithTimeZone;
+import org.pm4j.core.pm.impl.converter.ValueConverterWithTimeZoneBase;
 
 /**
  * PM attribute for a {@link LocalTime}.
- * 
+ *
  * This field can handle multiple input formats to be defined ;-separated in the
  * resources with key suffix "_format" appended to the fields resource key.
- * 
+ *
  * @author Olaf Kossak
  * @since 0.6.12
  */
 public class PmAttrLocalTimeImpl2
     extends PmAttrBase<LocalTime, LocalTime>
-    implements PmAttrLocalTime {
+    implements PmAttrLocalTime, PmWithTimeZone {
 
   /**
    * @param pmParent
@@ -29,14 +37,27 @@ public class PmAttrLocalTimeImpl2
     super(pmParent);
   }
 
-  /**
-   * Custom implementation to compare {@link LocalTime} objects
-   */
+  /** The default implementation provides the result of {@link PmConversation#getPmTimeZone()}. */
+  @Override
+  public TimeZone getPmTimeZone() {
+    return getPmConversation().getPmTimeZone();
+  }
+
+  @Override
+  protected Converter<LocalTime> getConverter() {
+    return LocalTimeStringConverter.INSTANCE;
+  }
+
+  /** Uses {@link PmAttrLocalTime#FORMAT_DEFAULT_RES_KEY}. */
+  @Override
+  protected String getFormatDefaultResKey() {
+    return PmAttrLocalTime.FORMAT_DEFAULT_RES_KEY;
+  }
+
+  /** @deprecated Compare operations base on PMs are no longer supported. That can be done on bean level. */
+  @Deprecated
   @Override
   public int compareTo(PmObject otherPm) {
-    // TODO oboede: should have a default implementation for all attributes that
-    // handles all
-    // cases...
     return CompareUtil.compare(getValue(), ((PmAttrLocalTime) otherPm).getValue());
   }
 
@@ -47,16 +68,51 @@ public class PmAttrLocalTimeImpl2
     return new MetaData(8);
   }
 
-  /** Adjusts the default converter. */
-  @Override
-  protected void initMetaData(PmObjectBase.MetaData metaData) {
-    super.initMetaData(metaData);
-    ((PmAttrBase.MetaData) metaData).setConverterDefault(PmConverterLocalTime.INSTANCE);
+  /**
+   * Converts the external value representation to a PM time zone related value.
+   */
+  public static class ValueConverterWithTimeZone extends ValueConverterWithTimeZoneBase<LocalTime, LocalTime> {
+
+    /** A shared default instance that may be used like a singleton. */
+    public static final ValueConverterWithTimeZone INSTANCE = new ValueConverterWithTimeZone();
+
+    @Override
+    public LocalTime toExternalValue(PmAttr<LocalTime> pmAttr, LocalTime i) {
+      DateTime utcDt = i.toDateTimeToday(getBackingValueDateTimeZone());
+      DateTime tzDt = utcDt.toDateTime(DateTimeZone.forTimeZone(getPmTimeZone(pmAttr)));
+      return tzDt.toLocalTime();
+    }
+
+    @Override
+    public LocalTime toInternalValue(PmAttr<LocalTime> pmAttr, LocalTime e) {
+      DateTime tzDt = e.toDateTimeToday(DateTimeZone.forTimeZone(getPmTimeZone(pmAttr)));
+      DateTime utcDt = tzDt.toDateTime(getBackingValueDateTimeZone());
+      return utcDt.toLocalTime();
+    }
+
+    /** The default implementation provides {@link DateTimeZone#UTC}. */
+    protected DateTimeZone getBackingValueDateTimeZone() {
+      return DateTimeZone.UTC;
+    }
+
   }
 
-  /** Uses {@link PmAttrTime#RESKEY_DEFAULT_FORMAT_PATTERN}. */
-  @Override
-  protected String getFormatDefaultResKey() {
-    return PmAttrTime.RESKEY_DEFAULT_FORMAT_PATTERN;
+  /**
+   * Multi format string converter for Joda {@link LocalTime}.
+   */
+  public static class LocalTimeStringConverter extends JodaStringConverterBase<LocalTime> {
+
+    /** A shared default instance that may be used like a singleton. */
+    public static final LocalTimeStringConverter INSTANCE = new LocalTimeStringConverter();
+
+    @Override
+    protected LocalTime parseJodaType(DateTimeFormatter fmt, String stringValue) {
+      return fmt.parseLocalTime(stringValue);
+    }
+
+    @Override
+    protected String printJodaType(DateTimeFormatter fmt, LocalTime value) {
+      return fmt.print(value);
+    }
   }
 }

@@ -36,7 +36,7 @@ import org.pm4j.navi.NaviHistory;
  *
  * @author olaf boede
  */
-public class PmConversationImpl extends PmElementBase implements PmConversation {
+public class PmConversationImpl extends PmElementBase implements PmConversation, PmWithTimeZone {
 
   private static final Log LOG = LogFactory.getLog(PmConversationImpl.class);
 
@@ -175,10 +175,18 @@ public class PmConversationImpl extends PmElementBase implements PmConversation 
     this.pmLocale = locale;
   }
 
+  @Override
   public TimeZone getPmTimeZone() {
-    return this.pmTimeZone;
+    if (pmTimeZone != null) {
+      return pmTimeZone;
+    }
+    PmConversation parentConversation = getPmParentConversation();
+    return (parentConversation != null)
+        ? parentConversation.getPmTimeZone()
+        : TimeZone.getDefault();
   }
 
+  @Override
   public void setPmTimeZone(TimeZone pmTimeZone) {
     this.pmTimeZone = pmTimeZone;
   }

@@ -41,6 +41,7 @@ public class PmAttrLocalDateImplTest {
         assertEquals(new LocalDate(2012,5,29), datePm.getBackingValue());
     }
 
+    @SuppressWarnings("deprecation")
     @Test
     public void testLocalDateComparison() {
         PmAttrLocalDateImpl datePm1 = new PmAttrLocalDateImpl(conversation);
