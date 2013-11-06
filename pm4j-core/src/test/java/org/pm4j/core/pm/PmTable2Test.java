@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,6 +26,7 @@ import org.pm4j.core.pm.annotation.PmTableCfg2;
 import org.pm4j.core.pm.annotation.PmTableColCfg2;
 import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
+import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.impl.PmAttrIntegerImpl;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
 import org.pm4j.core.pm.impl.PmBeanImpl;
@@ -35,16 +37,20 @@ import org.pm4j.core.pm.impl.PmTableImpl2;
 public class PmTable2Test {
 
   private TablePm myTablePm;
-  private List<RowBean> editedRowBeanList;
+  private List<RowBean> editedRowBeanList = new ArrayList<RowBean>(Arrays.asList(
+      new RowBean("b", "a 'b'", 2),
+      new RowBean("a", "an 'a'", 1),
+      new RowBean("c", "a 'c'", 3)
+  ));
+  private List<RowBean> alternateRowBeanList = new ArrayList<RowBean>(Arrays.asList(
+      new RowBean("b", "new b", 2),
+      new RowBean("a", "new a", 1),
+      new RowBean("c", "new c", 3)
+  ));
+
 
   @Before
   public void setUp() {
-    editedRowBeanList = new ArrayList<RowBean>(Arrays.asList(
-        new RowBean("b", "a 'b'", 2),
-        new RowBean("a", "an 'a'", 1),
-        new RowBean("c", "a 'c'", 3)
-    ));
-
     myTablePm = new TablePm(new PmConversationImpl()) {
       /** We use here an in-memory data table.
        * The table represents the items of the collection provided by this method. */
@@ -110,6 +116,36 @@ public class PmTable2Test {
     PmCacheApi.clearPmCache(myTablePm);
     assertEquals("After an update call the table should display the current content.",
         "[d]", myTablePm.getRowPms().toString());
+  }
+
+  @Test
+  public void testExchangeEqualBeanInBackingCollectionAndFireValueChangeOnParent() {
+    assertEquals(3, myTablePm.getTotalNumOfPmRows());
+    assertEquals("an 'a'", myTablePm.getRowPms().get(0).description.getValue());
+
+    editedRowBeanList = alternateRowBeanList;
+
+    // the table did not yet receive an event that informs about the backing collection change
+    // it provides data from it's page cache.
+    assertEquals("an 'a'", myTablePm.getRowPms().get(0).description.getValue());
+
+    PmEventApi.firePmEvent(myTablePm.getPmParent(), PmEvent.VALUE_CHANGE);
+    assertEquals("new a", myTablePm.getRowPms().get(0).description.getValue());
+  }
+
+  @Test
+  public void testExchangeEqualBeanInBackingCollectionAndCallUpdatePmTable() {
+    assertEquals(3, myTablePm.getTotalNumOfPmRows());
+    assertEquals("an 'a'", myTablePm.getRowPms().get(0).description.getValue());
+
+    editedRowBeanList = alternateRowBeanList;
+
+    // the table did not yet receive an event that informs about the backing collection change
+    // it provides data from it's page cache.
+    assertEquals("an 'a'", myTablePm.getRowPms().get(0).description.getValue());
+
+    myTablePm.updatePmTable(UpdateAspect.CLEAR_CHANGES);
+    assertEquals("new a", myTablePm.getRowPms().get(0).description.getValue());
   }
 
   @Test
@@ -190,6 +226,7 @@ public class PmTable2Test {
     public Integer counter;
 
     public RowBean(String name, String description, int counter) {
+      assert name != null;
       this.name = name;
       this.description = description;
       this.counter = counter;
@@ -199,6 +236,16 @@ public class PmTable2Test {
     @Override
     public String toString() {
       return name;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      return StringUtils.equals(this.name, ((RowBean)obj).name);
+    }
+
+    @Override
+    public int hashCode() {
+      return name.hashCode();
     }
   }
 
