@@ -784,8 +784,8 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
    * @param s The string to convert.
    * @return The converted value.
    * @throws PmConverterException If the given string can't be converted.
-   * 
-   * @deprecated Please use {@link #getConverter()} to define your specific converter.
+   *
+   * @deprecated Please use {@link #getStringConverterImpl()} to define your specific converter.
    */
   @Deprecated
   protected T_PM_VALUE stringToValueImpl(String s) throws PmConverterException {
@@ -799,8 +799,8 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
    *
    * @param v A value to convert.
    * @return The string representation.
-   * 
-   * @deprecated Please use {@link #getConverter()} to define your specific converter.
+   *
+   * @deprecated Please use {@link #getStringConverterImpl()} to define your specific converter.
    */
   @Deprecated
   protected String valueToStringImpl(T_PM_VALUE v) {
@@ -813,7 +813,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   public final Converter<T_PM_VALUE> getStringConverter() {
     if (stringConverter == null) {
       zz_ensurePmInitialization();
-      stringConverter = getConverter();
+      stringConverter = getStringConverterImpl();
       if (stringConverter == null) {
         throw new PmRuntimeException(this, "Please ensure that getStringConverterImpl() does not return null.");
       }
@@ -822,10 +822,24 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   }
 
   /**
+   * A factory method that defines the value string converter to use.
+   * <p>
+   * Corresponding external interface: {@link #getStringConverter()}
+   *
+   * @return The attribute value string converter. Never <code>null</code>.
+   */
+  protected Converter<T_PM_VALUE> getStringConverterImpl() {
+    return getConverter();
+  }
+
+  /**
    * TODO oboede: rename to getStringConverterImpl().
    *
    * @return The converter that translates from and to the corresponding string value representation.
+   *
+   * @deprecated Please use {@link #getStringConverterImpl()}.
    */
+  @Deprecated
   @SuppressWarnings("unchecked")
   protected Converter<T_PM_VALUE> getConverter() {
     Converter<T_PM_VALUE> c = (Converter<T_PM_VALUE>) getOwnMetaData().converter;

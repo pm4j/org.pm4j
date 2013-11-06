@@ -55,7 +55,7 @@ public class PmAttrDateImpl extends PmAttrBase<Date, Date> implements PmAttrDate
   }
 
   @Override
-  protected org.pm4j.core.pm.PmAttr.Converter<Date> getConverter() {
+  protected Converter<Date> getStringConverterImpl() {
     return DateStringConverter.INSTANCE;
   }
 

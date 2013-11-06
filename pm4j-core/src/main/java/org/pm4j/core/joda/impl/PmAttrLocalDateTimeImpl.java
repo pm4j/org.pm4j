@@ -43,7 +43,7 @@ public class PmAttrLocalDateTimeImpl
   }
 
   @Override
-  protected Converter<LocalDateTime> getConverter() {
+  protected Converter<LocalDateTime> getStringConverterImpl() {
     return LocalDateTimeStringConverter.INSTANCE;
   }
 

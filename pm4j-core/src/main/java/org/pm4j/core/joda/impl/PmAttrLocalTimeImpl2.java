@@ -44,7 +44,7 @@ public class PmAttrLocalTimeImpl2
   }
 
   @Override
-  protected Converter<LocalTime> getConverter() {
+  protected Converter<LocalTime> getStringConverterImpl() {
     return LocalTimeStringConverter.INSTANCE;
   }
 

@@ -2,6 +2,8 @@ package org.pm4j.common.pageable;
 
 import java.beans.PropertyChangeEvent;
 
+import org.pm4j.common.pageable.querybased.PageableQueryService;
+
 
 /**
  * Handles add and delete-modifications for a {@link PageableCollection2}.
@@ -44,6 +46,11 @@ public interface ModificationHandler<T_ITEM> {
    * Removes all currently selected items from the collection.
    * <p>
    * Fires a {@link PropertyChangeEvent} {@link PageableCollection2#EVENT_REMOVE_SELECTION}.
+   * <p>
+   * The following behavior is implemented in relation to specific pageable collections:<br>
+   * In case of an in-memory collection, the delete operation will be applied immediately to the backing collection.<br>
+   * In case of {@link PageableQueryService} based collection the delete operation will just mark the selected items
+   * as deleted within the {@link Modifications} object. All deleted items will no longer be retrieved.
    *
    * @return <code>false</code> if the de-selection of the items to delete was prevented by a selection change decorator.
    * @throws UnsupportedOperationException if the collection does not support removed item handling.
