@@ -143,6 +143,19 @@ public class PmTableImpl2
   }
 
   @Override
+  protected void onPmInit() {
+    super.onPmInit();
+    PmEventApi.addPmEventListener(getPmParent(), PmEvent.VALUE_CHANGE, new PmEventListener() {
+      @Override
+      public void handleEvent(PmEvent event) {
+        // The backing context value was changed. All sort, filter and value changes
+        // are no longer valid.
+        updatePmTable();
+      }
+    });
+  }
+
+  @Override
   public List<PmTableCol2> getColumnPms() {
     return PmUtil.getPmChildrenOfType(this, PmTableCol2.class);
   }
@@ -261,13 +274,13 @@ public class PmTableImpl2
    * @return the master row. <code>null</code> if there is no master row.
    */
   protected T_ROW_PM getMasterRowPmImpl() {
-	if (getPmRowSelectMode() == SelectMode.SINGLE) {
-	  Selection<T_ROW_PM> selection = getPmSelectionHandler().getSelection();
-	  if (selection.getSize() == 1) {
-	    return selection.iterator().next();
-	  }
-	}
-	return null;
+    if (getPmRowSelectMode() == SelectMode.SINGLE) {
+      Selection<T_ROW_PM> selection = getPmSelectionHandler().getSelection();
+      if (selection.getSize() == 1) {
+        return selection.iterator().next();
+      }
+    }
+    return null;
   }
 
   /**
@@ -392,6 +405,10 @@ public class PmTableImpl2
         if (mh != null) {
             mh.clearRegisteredModifications();
         }
+        // Ensure that the row PM's will be re-created. Otherwise it can happen that
+        // a row with a stale object reference stays alive.
+        BeanPmCacheUtil.clearBeanPmCachesOfSubtree(PmTableImpl2.this);
+
         break;
       case CLEAR_USER_FILTER:
         clearMasterRowPm();
