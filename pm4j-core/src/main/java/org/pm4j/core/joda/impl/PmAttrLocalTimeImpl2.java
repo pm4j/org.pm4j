@@ -43,11 +43,6 @@ public class PmAttrLocalTimeImpl2
     return getPmConversation().getPmTimeZone();
   }
 
-  @Override
-  protected Converter<LocalTime> getStringConverterImpl() {
-    return LocalTimeStringConverter.INSTANCE;
-  }
-
   /** Uses {@link PmAttrLocalTime#FORMAT_DEFAULT_RES_KEY}. */
   @Override
   protected String getFormatDefaultResKey() {
@@ -65,17 +60,15 @@ public class PmAttrLocalTimeImpl2
   protected PmObjectBase.MetaData makeMetaData() {
     /** Sets the default max length is the length of the time format pattern. */
     // TODO oboede: needs to be derived from the format.
-    return new MetaData(8);
+    MetaData md = new MetaData(8);
+    md.setStringConverterClass(LocalTimeStringConverter.class);
+    return md;
   }
 
   /**
    * Converts the external value representation to a PM time zone related value.
    */
   public static class ValueConverterWithTimeZone extends ValueConverterWithTimeZoneBase<LocalTime, LocalTime> {
-
-    /** A shared default instance that may be used like a singleton. */
-    public static final ValueConverterWithTimeZone INSTANCE = new ValueConverterWithTimeZone();
-
     @Override
     public LocalTime toExternalValue(PmAttr<LocalTime> pmAttr, LocalTime i) {
       DateTime utcDt = i.toDateTimeToday(getBackingValueDateTimeZone());
@@ -101,10 +94,6 @@ public class PmAttrLocalTimeImpl2
    * Multi format string converter for Joda {@link LocalTime}.
    */
   public static class LocalTimeStringConverter extends JodaStringConverterBase<LocalTime> {
-
-    /** A shared default instance that may be used like a singleton. */
-    public static final LocalTimeStringConverter INSTANCE = new LocalTimeStringConverter();
-
     @Override
     protected LocalTime parseJodaType(DateTimeFormatter fmt, String stringValue) {
       return fmt.parseLocalTime(stringValue);

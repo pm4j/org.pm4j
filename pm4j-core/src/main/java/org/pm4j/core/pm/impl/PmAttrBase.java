@@ -1603,6 +1603,26 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
         this.converter = converter;
     }
 
+    /**
+     * Adjusts the default string converter to be used for this attribute.
+     * Users may override this by overriding <code>getStringConverterImpl()</code>.
+     *
+     * @param stringConverterClass The default value converter class used by this attribute.
+     */
+    public void setStringConverterClass(Class<? extends Converter<?>> stringConverterClass) {
+      setConverterDefault((Converter<?>) ClassUtil.newInstance(stringConverterClass));
+    }
+
+    /**
+     * Adjusts the default value converter to be used for this attribute.
+     * Users may override this by annotation or by overriding <code>getValueConverterImpl()</code>.
+     *
+     * @param valueConverterClass The default value converter class used by this attribute.
+     */
+    public void setValueConverterClass(Class<? extends ValueConverter<?, ?>> valueConverterClass) {
+      this.valueConverterClass = valueConverterClass;
+    }
+
     public boolean isRequired() { return required; }
     public void setRequired(boolean required) { this.required = required; }
     public int getMinLen() { return minLen; }
@@ -1622,6 +1642,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     protected int getMaxLenDefault() {
       return maxLenDefault;
     }
+
   }
 
   /**

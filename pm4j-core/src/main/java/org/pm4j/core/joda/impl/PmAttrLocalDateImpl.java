@@ -42,11 +42,6 @@ public class PmAttrLocalDateImpl
     return getPmConversation().getPmTimeZone();
   }
 
-  @Override
-  protected Converter<LocalDate> getStringConverterImpl() {
-    return LocalDateStringConverter.INSTANCE;
-  }
-
   /** Provides {@link PmAttrLocalDate.FORMAT_DEFAULT_RES_KEY}. */
   @Override
   protected String getFormatDefaultResKey() {
@@ -64,16 +59,15 @@ public class PmAttrLocalDateImpl
   protected PmObjectBase.MetaData makeMetaData() {
     /** Sets the default max length is the length of the date format pattern. */
     // TODO oboede: needs to be derived from the format.
-    return new MetaData(11);
+    MetaData md = new MetaData(11);
+    md.setStringConverterClass(LocalDateStringConverter.class);
+    return md;
   }
 
   /**
    * Multi format string converter for Joda {@link LocalDate}.
    */
   public static class LocalDateStringConverter extends JodaStringConverterBase<LocalDate> {
-
-    /** A shared default instance that may be used like a singleton. */
-    public static final LocalDateStringConverter INSTANCE = new LocalDateStringConverter();
 
     @Override
     protected LocalDate parseJodaType(DateTimeFormatter fmt, String stringValue) {
