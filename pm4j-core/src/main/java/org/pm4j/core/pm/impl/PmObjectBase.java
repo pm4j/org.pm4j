@@ -1019,8 +1019,11 @@ public abstract class PmObjectBase implements PmObject {
 
   /**
    * The default implementation always returns zero.
+   *
+   * @deprecated PM based compare operations are no longer supported. Please compare the related data objects.
    */
   @Override
+  @Deprecated
   public int compareTo(PmObject otherPm) {
     return 0;
   }
@@ -1072,9 +1075,9 @@ public abstract class PmObjectBase implements PmObject {
       pmProperties = new ConcurrentHashMap<String, Object>();
     }
     if (value == null) {
-    	pmProperties.remove(propName);
+      pmProperties.remove(propName);
     } else {
-    	pmProperties.put(propName, value);
+      pmProperties.put(propName, value);
     }
   }
 

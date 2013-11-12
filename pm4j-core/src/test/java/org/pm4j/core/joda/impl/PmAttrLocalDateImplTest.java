@@ -2,7 +2,7 @@ package org.pm4j.core.joda.impl;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertTrue;
+import static org.pm4j.tools.test.PmAssert.setValueAsString;
 
 import java.util.Locale;
 
@@ -32,13 +32,8 @@ public class PmAttrLocalDateImplTest {
     }
 
     @Test
-    public void parseSuccess() {
-        PmAttrLocalDateImpl datePm = new PmAttrLocalDateImpl(conversation);
-        datePm.setValueAsString("29/05/2012");
-        assertTrue(datePm.isPmValid());
-        assertEquals(new LocalDate(2012, 5, 29), datePm.getBackingValue());
-        assertEquals("29/05/2012", datePm.getValueAsString());
-        assertEquals(new LocalDate(2012,5,29), datePm.getBackingValue());
+    public void testSetValueAsString() {
+        setValueAsString(new PmAttrLocalDateImpl(conversation), "29/05/2012");
     }
 
     @SuppressWarnings("deprecation")

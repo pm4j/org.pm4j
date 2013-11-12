@@ -307,8 +307,11 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   /**
    * The default implementation compares the results of {@link #getValueLocalized()}
    * according to the collation sequence of the current {@link Locale}.
+   *
+   * @deprecated PM based compare operations are no longer supported. Please compare the related data objects.
    */
   @Override
+  @Deprecated
   public int compareTo(PmObject otherPm) {
     return PmUtil.getAbsoluteName(this).equals(PmUtil.getAbsoluteName(otherPm))
         ? CompareUtil.compare(getValueLocalized(), ((PmAttr<?>)otherPm).getValueLocalized(), getPmConversation().getPmLocale())
