@@ -84,9 +84,11 @@ public class PmAttrStringImpl extends PmAttrBase<String, String> implements PmAt
       myMetaData.trim = annotation.trim();
     }
 
-    myMetaData.setConverterDefault(myMetaData.trim
+    if (myMetaData.getStringConverter() == null) {
+      myMetaData.setStringConverter(myMetaData.trim
           ? PmConverterString.Trimmed.INSTANCE
           : PmConverterString.INSTANCE);
+    }
   }
 
   protected static class MetaData extends PmAttrBase.MetaData {

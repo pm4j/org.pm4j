@@ -1,6 +1,5 @@
 package org.pm4j.core.pm.impl;
 
-import java.io.Serializable;
 import java.lang.reflect.Method;
 
 import org.pm4j.core.pm.PmAttr;
@@ -60,8 +59,6 @@ public class PmAttrEnumImpl<T_ENUM extends Enum<T_ENUM>> extends PmAttrBase<T_EN
     return enumClass;
   }
 
-  // ======== meta data ======== //
-
   @Override
   protected PmOptionSetDef<?> makeOptionSetDef(PmOptionCfg cfg, Method getOptionValuesMethod) {
     // TODO olaf: make a single OS definition for enums.
@@ -70,10 +67,14 @@ public class PmAttrEnumImpl<T_ENUM extends Enum<T_ENUM>> extends PmAttrBase<T_EN
               : new EnumOptionSetDefWithOptionCfg(this, enumClass, cfg, getOptionValuesMethod);
   }
 
+  // ======== meta data ======== //
+
   @Override
   protected PmObjectBase.MetaData makeMetaData() {
     // the default max length.
-    return new MetaData(30);
+    MetaData md = new MetaData(30);
+//    md.setStringConverter(new PmConverterEnum());
+    return md;
   }
 
   @Override
@@ -81,7 +82,10 @@ public class PmAttrEnumImpl<T_ENUM extends Enum<T_ENUM>> extends PmAttrBase<T_EN
     super.initMetaData(metaData);
     MetaData myMetaData = (MetaData) metaData;
 
-    myMetaData.setConverter(new PmConverterEnum());
+    // TODO: the init call places a different string converter.
+    // Because of that is was not possible to move the code to 
+    // makeMetaData(). --> Check!
+    myMetaData.setStringConverter(new PmConverterEnum());
   }
 
   private MetaData getOwnMetaData() {

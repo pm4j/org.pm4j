@@ -110,7 +110,9 @@ public class PmAttrPmRefImpl<T_REFED_PM extends PmBean<?>, T_BEAN>
 
     // XXX olaf: assumes a that the default identifier of domain objects
     //           is named 'id'.
-    myMetaData.setConverterDefault(new PmConverterOptionBased("id"));
+    if (myMetaData.getStringConverter() == null) {
+      myMetaData.setStringConverter(new PmConverterOptionBased("id"));
+    }
   }
 
 }

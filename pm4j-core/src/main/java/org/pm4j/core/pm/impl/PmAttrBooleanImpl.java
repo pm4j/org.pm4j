@@ -43,14 +43,9 @@ public class PmAttrBooleanImpl extends PmAttrBase<Boolean, Boolean> implements P
 
   @Override
   protected PmObjectBase.MetaData makeMetaData() {
-    return new PmAttrBase.MetaData(10);
-  }
-
-  @Override
-  protected void initMetaData(PmObjectBase.MetaData metaData) {
-    super.initMetaData(metaData);
-
-    ((MetaData) metaData).setConverterDefault(PmConverterBoolean.INSTANCE);
+	  MetaData md = new PmAttrBase.MetaData(10);
+	  md.setStringConverter(PmConverterBoolean.INSTANCE);
+	  return md;
   }
 
 }

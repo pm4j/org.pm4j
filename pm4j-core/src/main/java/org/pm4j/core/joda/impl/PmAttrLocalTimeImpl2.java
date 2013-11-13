@@ -61,7 +61,9 @@ public class PmAttrLocalTimeImpl2
     /** Sets the default max length is the length of the time format pattern. */
     // TODO oboede: needs to be derived from the format.
     MetaData md = new MetaData(8);
-    md.setStringConverterClass(LocalTimeStringConverter.class);
+    // Configure the default converters. Is done before <code>initMetaData</code> to allow
+    // annotation based customization.
+    md.setStringConverter(new LocalTimeStringConverter());
     return md;
   }
 

@@ -103,7 +103,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   private static final Log LOG = LogFactory.getLog(PmAttrBase.class);
 
   /** The default value converter just passes the instances through. */
-  private static final ValueConverter<Object, Object> DEFAULT_VALUE_CONVERTER = new ValueConverter<Object, Object>() {
+  public static final ValueConverter<Object, Object> DEFAULT_VALUE_CONVERTER = new ValueConverter<Object, Object>() {
     @Override
     public Object toExternalValue(PmAttr<Object> a, Object i) {
       return i;
@@ -845,7 +845,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   @Deprecated
   @SuppressWarnings("unchecked")
   protected Converter<T_PM_VALUE> getConverter() {
-    Converter<T_PM_VALUE> c = (Converter<T_PM_VALUE>) getOwnMetaData().converter;
+    Converter<T_PM_VALUE> c = (Converter<T_PM_VALUE>) getOwnMetaData().stringConverter;
     if (c == null) {
       throw new PmRuntimeException(this, "Missing value converter.");
     }
@@ -1186,14 +1186,18 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
    * Provides the value converter used to convert between backing value to external value type.<br>
    * The default implementation uses the information provided in {@link PmAttrCfg#valueConverter()}.
    * If nothing is configured there a simple pass-through will be provided.
+   * <p>
+   * To provide a shared state less {@link ValueConverter}, please call
+   * {@link MetaData#setValueConverter(org.pm4j.core.pm.PmAttr.ValueConverter)} within {@link #initMetaData(org.pm4j.core.pm.impl.PmObjectBase.MetaData)}.
    *
    * @return The converter to use. Should not be <code>null</code>.
    */
   @SuppressWarnings("unchecked")
   protected ValueConverter<T_PM_VALUE, T_BEAN_VALUE> getValueConverterImpl() {
+    MetaData md = getOwnMetaData();
     return (ValueConverter<T_PM_VALUE, T_BEAN_VALUE>)(
-        (getOwnMetaData().valueConverterClass != ValueConverter.class)
-          ? ClassUtil.newInstance(getOwnMetaData().valueConverterClass)
+        (md.valueConverter != null)
+          ? md.valueConverter
           : DEFAULT_VALUE_CONVERTER);
   }
 
@@ -1362,7 +1366,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
           makeOptionSetDef(optionCfg, getOptionValuesMethod);
 
     if (myMetaData.optionSetDef != OptionSetDefNoOption.INSTANCE) {
-      myMetaData.setItemConverter(
+      myMetaData.setStringConverter(
           new PmConverterOptionBased(optionCfg != null ? optionCfg.id() : ""));
     }
     // TODO olaf: implement a simplified and more consistent option implementation...
@@ -1433,7 +1437,9 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
           throw new PmRuntimeException(this, "Unknown annotation kind: " + fieldAnnotation.accessKind());
       }
 
-      myMetaData.valueConverterClass = fieldAnnotation.valueConverter();
+      if (fieldAnnotation.valueConverter() != ValueConverter.class) {
+        myMetaData.valueConverter = ClassUtil.newInstance(fieldAnnotation.valueConverter());
+      }
     }
 
     // Automatic reflection access is only supported for fix PmAttr fields in a PmBean container:
@@ -1549,8 +1555,8 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     private String                          defaultValueString;
     private CacheStrategy                 cacheStrategyForOptions = CacheStrategyNoCache.INSTANCE;
     private CacheStrategy                 cacheStrategyForValue   = CacheStrategyNoCache.INSTANCE;
-    private Converter<?>                    converter;
-    private Class<?>                        valueConverterClass   = ValueConverter.class;
+    private Converter<?>                    stringConverter;
+    private ValueConverter<?, ?>            valueConverter;
     private BackingValueAccessStrategy      valueAccessStrategy     = ValueAccessLocal.INSTANCE;
     /** Name of the field configured for JSR 303-validation.<br>
      * Is <code>null</code> if there is nothing to validate this way. */
@@ -1577,51 +1583,21 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     public CacheStrategy getCacheStrategyForOptions() { return cacheStrategyForOptions; }
     public CacheStrategy getCacheStrategyForValue() { return cacheStrategyForValue; }
 
-    public Converter<?> getConverter() { return converter; }
-    public void setConverter(Converter<?> converter) { this.converter = converter; }
+    public Converter<?> getStringConverter() { return stringConverter; }
 
     /**
-     * Multi value attributes (like lists) have specific item converters.
-     * <p>
-     * For single value attributes there is no difference between
-     * {@link #converter} and the <code>itemConverter</code>.
-     *
-     * @param converter The converter for attribute items.
+     * Defines a <b>state less</b> string converter. Converters that need to have PM state information
+     * should be provided by overriding {@link PmAttrBase#getStringConverterImpl()}.
+     * @param converter The state less string converter.
      */
-    public void setItemConverter(Converter<?> converter) { setConverter(converter); }
-
-    /** @see #setItemConverter(org.pm4j.core.pm.PmAttr.Converter) */
-    public Converter<?> getItemConverter() { return getConverter(); }
+    public void setStringConverter(Converter<?> converter) { this.stringConverter = converter; }
 
     /**
-     * If the converter was not explicitly defined by a user annotation, this
-     * method will be used to define a attribute type specific converter.
+     * Defines a <b>state less</b> value converter. Converters that need to have PM state information
+     * should be provided by overriding {@link PmAttrBase#getValueConverterImpl()}.
+     * @param stringConverter The state less value converter.
      */
-    public void setConverterDefault(Converter<?> converter) {
-      assert converter != null;
-      if (this.converter == null)
-        this.converter = converter;
-    }
-
-    /**
-     * Adjusts the default string converter to be used for this attribute.
-     * Users may override this by overriding <code>getStringConverterImpl()</code>.
-     *
-     * @param stringConverterClass The default value converter class used by this attribute.
-     */
-    public void setStringConverterClass(Class<? extends Converter<?>> stringConverterClass) {
-      setConverterDefault((Converter<?>) ClassUtil.newInstance(stringConverterClass));
-    }
-
-    /**
-     * Adjusts the default value converter to be used for this attribute.
-     * Users may override this by annotation or by overriding <code>getValueConverterImpl()</code>.
-     *
-     * @param valueConverterClass The default value converter class used by this attribute.
-     */
-    public void setValueConverterClass(Class<? extends ValueConverter<?, ?>> valueConverterClass) {
-      this.valueConverterClass = valueConverterClass;
-    }
+    public void setValueConverter(ValueConverter<?, ?> vc) { this.valueConverter = vc; }
 
     public boolean isRequired() { return required; }
     public void setRequired(boolean required) { this.required = required; }

@@ -50,15 +50,15 @@ public class PmAttrLongImpl extends PmAttrNumBase<Long> implements PmAttrLong {
 
   @Override
   protected PmObjectBase.MetaData makeMetaData() {
-    return new MetaData();
+	MetaData md = new MetaData();
+	md.setStringConverter(PmConverterLong.INSTANCE);
+	return md;
   }
 
   @Override
   protected void initMetaData(PmObjectBase.MetaData metaData) {
     super.initMetaData(metaData);
     MetaData myMetaData = (MetaData) metaData;
-
-    myMetaData.setConverterDefault(PmConverterLong.INSTANCE);
 
     PmAttrLongCfg annotation = AnnotationUtil.findAnnotation(this, PmAttrLongCfg.class);
     if (annotation != null) {

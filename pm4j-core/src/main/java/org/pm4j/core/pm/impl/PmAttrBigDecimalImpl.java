@@ -26,9 +26,9 @@ import org.pm4j.core.pm.impl.converter.PmConverterBigDecimal;
 public class PmAttrBigDecimalImpl extends PmAttrNumBase<BigDecimal> implements PmAttrBigDecimal {
 
   public static final int MAX_LENGTH_DEFAULT = 80;
-  
+
   private static final Log LOG = LogFactory.getLog(PmAttrBigDecimalImpl.class);
-  
+
   public PmAttrBigDecimalImpl(PmObject pmParent) {
     super(pmParent);
   }
@@ -69,12 +69,70 @@ public class PmAttrBigDecimalImpl extends PmAttrNumBase<BigDecimal> implements P
   protected String getFormatDefaultResKey() {
     return RESKEY_DEFAULT_FLOAT_FORMAT_PATTERN;
   }
-  
+
+  /**
+   * @return rounding mode when converting to pm value. Changing this to a value
+   *         different than RoundingMode.UNNECESSARY will allow to set more
+   *         fraction digits than specified in the format. Those additional
+   *         digits will then be rounded.
+   */
+  public RoundingMode getRoundingMode() {
+    return getOwnMetaDataWithoutPmInitCall().roundingMode;
+  }
+
   // ======== meta data ======== //
 
   @Override
   protected PmObjectBase.MetaData makeMetaData() {
-    return new MetaData();
+	MetaData md = new MetaData();
+	md.setStringConverter(PmConverterBigDecimal.INSTANCE);
+	return md;
+  }
+
+  @Override
+  protected void initMetaData(PmObjectBase.MetaData metaData) {
+    super.initMetaData(metaData);
+    MetaData myMetaData = (MetaData) metaData;
+
+    PmAttrBigDecimalCfg annotation = AnnotationUtil.findAnnotation(this, PmAttrBigDecimalCfg.class);
+    if (annotation != null) {
+      BigDecimal maxValue = myMetaData.maxValue = getMaxValue(annotation);
+      BigDecimal minValue = myMetaData.minValue = getMinValue(annotation);
+
+      if (minValue != null && maxValue != null && minValue.compareTo(maxValue) >= 1) {
+        throw new PmRuntimeException(this, "minValue(" + minValue + ") > maxValue(" + maxValue + ")");
+      }
+      myMetaData.roundingMode = getRoundingMode(annotation);
+    }
+  }
+
+  protected static class MetaData extends PmAttrBase.MetaData {
+
+    private BigDecimal maxValue = null;
+    private BigDecimal minValue = null;
+    private RoundingMode roundingMode = ROUNDINGMODE_DEFAULT;
+
+    public MetaData() {
+      // the max length needs to be evaluated dynamically by calling getMaxLenDefault().
+      super(-1);
+    }
+
+    @Override
+    protected int getMaxLenDefault() {
+      BigDecimal value = getMaxValue();
+      if(value != null) {
+        return value.toString().length();
+      }
+      return MAX_LENGTH_DEFAULT;
+    }
+
+    public BigDecimal getMaxValue() {  return maxValue;  }
+    public BigDecimal getMinValue() { return minValue; }
+    public RoundingMode getRoundingMode() { return roundingMode; }
+  }
+
+  private final MetaData getOwnMetaDataWithoutPmInitCall() {
+    return (MetaData) getPmMetaDataWithoutPmInitCall();
   }
 
   /**
@@ -93,11 +151,11 @@ public class PmAttrBigDecimalImpl extends PmAttrNumBase<BigDecimal> implements P
         if (LOG.isTraceEnabled()) {
           LOG.trace("Error while parsing BigDecimal number: \"" + number +"\"", e);
         }
-      } 
-    } 
+      }
+    }
     return bd;
   }
-  
+
   /**
    * Just to consider deprecated annotation attributes.
    * @param annotation the annotation.
@@ -141,61 +199,6 @@ public class PmAttrBigDecimalImpl extends PmAttrNumBase<BigDecimal> implements P
     }
     return rm;
   }
-  
-  @Override
-  protected void initMetaData(PmObjectBase.MetaData metaData) {
-    super.initMetaData(metaData);
-    MetaData myMetaData = (MetaData) metaData;
-    myMetaData.setConverterDefault(PmConverterBigDecimal.INSTANCE);
 
-    PmAttrBigDecimalCfg annotation = AnnotationUtil.findAnnotation(this, PmAttrBigDecimalCfg.class);
-    if (annotation != null) {
-      BigDecimal maxValue = myMetaData.maxValue = getMaxValue(annotation);
-      BigDecimal minValue = myMetaData.minValue = getMinValue(annotation);
 
-      if (minValue != null && maxValue != null && minValue.compareTo(maxValue) >= 1) {
-        throw new PmRuntimeException(this, "minValue(" + minValue + ") > maxValue(" + maxValue + ")");
-      }
-      myMetaData.roundingMode = getRoundingMode(annotation);
-    }
-  }
-
-  protected static class MetaData extends PmAttrBase.MetaData {
-
-    private BigDecimal maxValue = null;
-    private BigDecimal minValue = null;
-    private RoundingMode roundingMode = ROUNDINGMODE_DEFAULT;
-
-    public MetaData() {
-      // the max length needs to be evaluated dynamically by calling getMaxLenDefault().
-      super(-1);
-    }
-
-    @Override
-    protected int getMaxLenDefault() {
-      BigDecimal value = getMaxValue();
-      if(value != null) {
-        return value.toString().length();
-      }
-      return MAX_LENGTH_DEFAULT;
-    }
-
-    public BigDecimal getMaxValue() {  return maxValue;  }
-    public BigDecimal getMinValue() { return minValue; }
-    public RoundingMode getRoundingMode() { return roundingMode; }
-  }
-
-  private final MetaData getOwnMetaDataWithoutPmInitCall() {
-    return (MetaData) getPmMetaDataWithoutPmInitCall();
-  }
-  
-  /**
-   * @return rounding mode when converting to pm value. Changing this to a value
-   *         different than RoundingMode.UNNECESSARY will allow to set more
-   *         fraction digits than specified in the format. Those additional
-   *         digits will then be rounded.
-   */
-  public RoundingMode getRoundingMode() {
-    return getOwnMetaDataWithoutPmInitCall().roundingMode;
-  }
 }

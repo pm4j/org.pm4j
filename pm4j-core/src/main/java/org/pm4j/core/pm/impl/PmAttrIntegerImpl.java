@@ -50,14 +50,15 @@ public class PmAttrIntegerImpl extends PmAttrNumBase<Integer> implements PmAttrI
 
   @Override
   protected PmObjectBase.MetaData makeMetaData() {
-    return new MetaData();
+	MetaData md = new MetaData();
+	md.setStringConverter(PmConverterInteger.INSTANCE);
+	return md;
   }
 
   @Override
   protected void initMetaData(PmObjectBase.MetaData metaData) {
     super.initMetaData(metaData);
     MetaData myMetaData = (MetaData) metaData;
-    myMetaData.setConverterDefault(PmConverterInteger.INSTANCE);
 
     PmAttrIntegerCfg annotation = AnnotationUtil.findAnnotation(this, PmAttrIntegerCfg.class);
     if (annotation != null) {

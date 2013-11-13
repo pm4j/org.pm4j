@@ -21,7 +21,6 @@ import org.pm4j.core.pm.impl.commands.PmListRemoveItemCommand;
 import org.pm4j.core.pm.impl.converter.PmConverterList;
 import org.pm4j.core.pm.impl.converter.PmConverterOptionBased;
 import org.pm4j.core.pm.impl.pathresolver.ExpressionPathResolver;
-import org.pm4j.core.util.reflection.ClassUtil;
 
 /**
  * Implements an attribute that represents a list of beans as a list of PM's.
@@ -252,35 +251,21 @@ public class PmAttrPmListImpl<T_ITEM_PM extends PmBean<T_BEAN>, T_BEAN> extends 
     MetaData myMetaData = (MetaData) metaData;
 
     PmAttrPmListCfg annotation = AnnotationUtil.findAnnotation(this, PmAttrPmListCfg.class);
-    Class<?> itemConverterClass = Void.class;
     if (annotation != null) {
-      itemConverterClass = annotation.itemConverter();
       myMetaData.provideInvisibleItems = annotation.provideInvisibleItems();
     }
 
-    if (itemConverterClass.equals(Void.class)) {
-      // only generate a default, if there isn't another default defined by
-      // an PmOptionsSet annotation, defined on PmAttr level.
-      if (myMetaData.itemConverter == null) {
-        myMetaData.itemConverter = new PmConverterOptionBased(ExpressionPathResolver.parse("pmKey"));
-      }
-    }
-    else {
-      myMetaData.itemConverter = ClassUtil.newInstance(itemConverterClass);
-    }
-    myMetaData.setConverter(new PmConverterList(myMetaData.itemConverter));
+    Converter<?> itemConverter = new PmConverterOptionBased(ExpressionPathResolver.parse("pmKey"));
+    myMetaData.setStringConverter(new PmConverterList(itemConverter));
   }
 
   protected static class MetaData extends PmAttrBase.MetaData {
-    private Converter<?> itemConverter;
+   // private Converter<?> itemConverter;
     private boolean provideInvisibleItems = false;
 
     public MetaData() {
       super(Integer.MAX_VALUE); // maximum valueAsString characters.
     }
-
-    @Override public Converter<?> getItemConverter()                   {    return itemConverter;    }
-    @Override public void setItemConverter(Converter<?> itemConverter) {    this.itemConverter = itemConverter;    }
   }
 
   private final MetaData getOwnMetaData() {

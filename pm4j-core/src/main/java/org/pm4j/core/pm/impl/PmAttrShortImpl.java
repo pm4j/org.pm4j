@@ -50,14 +50,15 @@ public class PmAttrShortImpl extends PmAttrNumBase<Short> implements PmAttrShort
 
   @Override
   protected PmObjectBase.MetaData makeMetaData() {
-    return new MetaData();
+	MetaData md = new MetaData();
+	md.setStringConverter(PmConverterShort.INSTANCE);
+	return md;
   }
 
   @Override
   protected void initMetaData(PmObjectBase.MetaData metaData) {
     super.initMetaData(metaData);
     MetaData myMetaData = (MetaData) metaData;
-    myMetaData.setConverterDefault(PmConverterShort.INSTANCE);
 
     PmAttrShortCfg annotation = AnnotationUtil.findAnnotation(this, PmAttrShortCfg.class);
     if (annotation != null) {

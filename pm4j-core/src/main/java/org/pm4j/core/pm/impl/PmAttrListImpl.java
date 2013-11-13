@@ -95,7 +95,7 @@ public class PmAttrListImpl<T> extends PmAttrBase<List<T>, List<T>> implements P
    */
   @Override
   protected List<T> getValueImpl() {
-    List<T> beanAttrValue = getBackingValue();    
+    List<T> beanAttrValue = getBackingValue();
     if(beanAttrValue!=null) {
       List<T> pmValue = convertBackingValueToPmValue(beanAttrValue);
       if(pmValue.isEmpty()) {
@@ -106,7 +106,7 @@ public class PmAttrListImpl<T> extends PmAttrBase<List<T>, List<T>> implements P
     }
     return super.getValueImpl();
   }
-  
+
   /**
    * The item-{@link PmAttr.Converter} can be configured using the annotation
    * {@link PmAttrListCfg#itemConverter()} or by overriding this method.
@@ -169,7 +169,7 @@ public class PmAttrListImpl<T> extends PmAttrBase<List<T>, List<T>> implements P
     return new MetaData();
   }
 
-  @Override @SuppressWarnings("unchecked")
+  @SuppressWarnings("unchecked")
   protected void initMetaData(PmObjectBase.MetaData metaData) {
     super.initMetaData(metaData);
     MetaData myMetaData = (MetaData) metaData;
@@ -179,7 +179,10 @@ public class PmAttrListImpl<T> extends PmAttrBase<List<T>, List<T>> implements P
       if (annotation.itemConverter() != Void.class) {
         myMetaData.itemConverter = ClassUtil.newInstance(annotation.itemConverter());
       }
-      myMetaData.setConverter(new PmConverterList<T>((Converter<T>)myMetaData.itemConverter));
+    }
+    
+    if (myMetaData.itemConverter != null) {
+      myMetaData.setStringConverter(new PmConverterList<T>((Converter<T>)myMetaData.itemConverter));
     }
   }
 
@@ -189,9 +192,6 @@ public class PmAttrListImpl<T> extends PmAttrBase<List<T>, List<T>> implements P
     public MetaData() {
       super(Integer.MAX_VALUE); // maximum valueAsString characters.
     }
-
-    @Override public Converter<?> getItemConverter()                   {  return itemConverter;   }
-    @Override public void setItemConverter(Converter<?> itemConverter) {  this.itemConverter = itemConverter;    }
 }
 
   private final MetaData getOwnMetaData() {
