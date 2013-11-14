@@ -260,7 +260,6 @@ public class PmAttrPmListImpl<T_ITEM_PM extends PmBean<T_BEAN>, T_BEAN> extends 
   }
 
   protected static class MetaData extends PmAttrBase.MetaData {
-   // private Converter<?> itemConverter;
     private boolean provideInvisibleItems = false;
 
     public MetaData() {
