@@ -1459,7 +1459,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
         myMetaData.valueAccessStrategy = ValueAccessReflection.INSTANCE;
       }
       catch (ReflectionException e) {
-        if (ClassUtil.isMethodOverridden(PmAttrBase.class, getClass(), "getBackingValueImpl")) {
+        if (ClassUtil.findMethods(getClass(), "getBackingValueImpl").size() > 1) {
           myMetaData.valueAccessStrategy = ValueAccessOverride.INSTANCE;
         } else {
           PmObjectUtil.throwAsPmRuntimeException(this, e);
