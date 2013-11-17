@@ -432,7 +432,24 @@ public abstract class PmObjectBase implements PmObject {
    * @return The class that can be used to find resources (string resources icons...).
    */
   public List<Class<?>> getPmResLoaderCtxtClasses() {
-    return getPmMetaDataWithoutPmInitCall().resLoaderCtxtClasses;
+    MetaData md = getPmMetaDataWithoutPmInitCall();
+    if (md.resLoaderCtxtClasses == null) {
+      // The parent's resource path and the path set of the own inheritance hierarchy.
+      // XXX olaf: This code could be optimized to stop in pm4j base classes.
+      //           But this would break some pm4j unit tests...
+      ArrayList<Class<?>> ownHierarchyClasses = new ArrayList<Class<?>>();
+      for (Class<?> c = getClass(); c != null && c != PmObjectBase.class; c = c.getSuperclass()) {
+        ownHierarchyClasses.add(c);
+      }
+
+      if (md.isSubPm) {
+        md.resLoaderCtxtClasses = new ArrayList<Class<?>>(pmParent.getPmResLoaderCtxtClasses());
+        md.resLoaderCtxtClasses.addAll(ownHierarchyClasses);
+      } else {
+        md.resLoaderCtxtClasses = ownHierarchyClasses;
+      }
+    }
+    return md.resLoaderCtxtClasses;
   }
 
   protected List<PmCommand> getVisiblePmCommands(PmCommand.CommandSet commandSet) {
@@ -849,17 +866,7 @@ public abstract class PmObjectBase implements PmObject {
       }
     }
 
-    metaData.compositeChildName = metaData.isSubPm
-          ? (pmParent.getPmCompositeChildName().length() == 0)
-              ? metaData.name
-              : StringUtils.join(new String[]{ pmParent.getPmCompositeChildName(), metaData.name }, MetaData.NAME_PATH_DELIMITER)
-          : "";
-
-    metaData.relativeName = metaData.isSubPm
-          ? metaData.compositeChildName
-          : StringUtils.replaceChars(
-              StringUtils.uncapitalize(ClassUtils.getShortClassName(getClass())),
-              '.', MetaData.NAME_PATH_DELIMITER);
+    metaData.ensureDerivedNames(this);
 
     if (metaData.resKeyBase == null) {
       metaData.resKeyBase = metaData.isSubPm
@@ -867,22 +874,6 @@ public abstract class PmObjectBase implements PmObject {
             : StringUtils.uncapitalize(ClassUtils.getShortClassName(getClass()));
     }
 
-
-    // The parent's resource path and the path set of the own inheritance hierarchy.
-    // XXX olaf: This code could be optimized to stop in pm4j base classes.
-    //           But this would break some pm4j unit tests...
-    ArrayList<Class<?>> ownHierarchyClasses = new ArrayList<Class<?>>();
-    for (Class<?> c = getClass(); c != null && c != PmObjectBase.class; c = c.getSuperclass()) {
-      ownHierarchyClasses.add(c);
-    }
-
-    if (metaData.isSubPm) {
-      metaData.resLoaderCtxtClasses = new ArrayList<Class<?>>(pmParent.getPmResLoaderCtxtClasses());
-      metaData.resLoaderCtxtClasses.addAll(ownHierarchyClasses);
-    }
-    else {
-      metaData.resLoaderCtxtClasses = ownHierarchyClasses;
-    }
 
     if (metaData.resKey == null) {
       metaData.resKey = metaData.resKeyBase;
@@ -1015,6 +1006,23 @@ public abstract class PmObjectBase implements PmObject {
 
     public boolean isReadOnly() { return readOnly; }
     public void setReadOnly(boolean readOnly) { this.readOnly = readOnly; }
+
+    // TODO: change to a hierarchical name structure. is simpler and faster.
+    void ensureDerivedNames(PmObjectBase pmObject) {
+      compositeChildName = isSubPm
+          ? (pmObject.pmParent.getPmCompositeChildName().length() == 0)
+              ? name
+              : StringUtils.join(new String[]{ pmObject.pmParent.getPmCompositeChildName(), name }, MetaData.NAME_PATH_DELIMITER)
+          : "";
+
+      relativeName = isSubPm
+          ? compositeChildName
+          : StringUtils.replaceChars(
+              StringUtils.uncapitalize(ClassUtils.getShortClassName(pmObject.getClass())),
+              '.', MetaData.NAME_PATH_DELIMITER);
+
+
+    }
   }
 
   /**
