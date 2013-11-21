@@ -1,16 +1,13 @@
 package org.pm4j.core.joda.impl;
 
-import java.util.TimeZone;
-
 import org.joda.time.LocalDate;
-import org.joda.time.format.DateTimeFormatter;
+import org.pm4j.common.converter.string.joda.LocalDateStringConverter;
 import org.pm4j.common.util.CompareUtil;
 import org.pm4j.core.joda.PmAttrLocalDate;
-import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.PmObject;
+import org.pm4j.core.pm.impl.AttrConverterCtxt;
 import org.pm4j.core.pm.impl.PmAttrBase;
 import org.pm4j.core.pm.impl.PmObjectBase;
-import org.pm4j.core.pm.impl.PmWithTimeZone;
 
 /**
  * PM attribute for a {@link LocalDate}.
@@ -23,7 +20,7 @@ import org.pm4j.core.pm.impl.PmWithTimeZone;
  */
 public class PmAttrLocalDateImpl
   extends PmAttrBase<LocalDate, LocalDate>
-  implements PmAttrLocalDate, PmWithTimeZone {
+  implements PmAttrLocalDate {
 
   /**
    * @param pmParent
@@ -33,19 +30,16 @@ public class PmAttrLocalDateImpl
     super(pmParent);
   }
 
-  /**
-   * The default implementation provides the result of
-   * {@link PmConversation#getPmTimeZone()}.
-   */
-  @Override
-  public TimeZone getPmTimeZone() {
-    return getPmConversation().getPmTimeZone();
-  }
-
   /** Provides {@link PmAttrLocalDate.FORMAT_DEFAULT_RES_KEY}. */
   @Override
   protected String getFormatDefaultResKey() {
     return PmAttrLocalDate.FORMAT_DEFAULT_RES_KEY;
+  }
+
+  /** Creates a converter context that provides a specific string parse error message. */
+  @Override
+  protected AttrConverterCtxt makeConverterCtxt() {
+    return new AttrConverterCtxt.UsingFormats(this);
   }
 
   /** @deprecated Compare operations base on PMs are no longer supported. That can be done on bean level. */
@@ -66,20 +60,4 @@ public class PmAttrLocalDateImpl
     return md;
   }
 
-  /**
-   * Multi format string converter for Joda {@link LocalDate}.
-   */
-  public static class LocalDateStringConverter extends JodaStringConverterBase<LocalDate> {
-
-    @Override
-    protected LocalDate parseJodaType(DateTimeFormatter fmt, String stringValue) {
-      return fmt.parseLocalDate(stringValue);
-    }
-
-    @Override
-    protected String printJodaType(DateTimeFormatter fmt, LocalDate value) {
-      return fmt.print(value);
-    }
-
-  }
 }

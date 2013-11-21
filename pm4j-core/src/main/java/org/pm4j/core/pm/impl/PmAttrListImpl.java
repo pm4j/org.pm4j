@@ -5,17 +5,20 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import org.pm4j.common.converter.string.StringConverter;
+import org.pm4j.common.converter.string.StringConverterInteger;
+import org.pm4j.common.converter.string.StringConverterList;
+import org.pm4j.common.converter.string.StringConverterLong;
+import org.pm4j.common.converter.string.StringConverterParseException;
+import org.pm4j.common.converter.string.StringConverterString;
 import org.pm4j.core.exception.PmConverterException;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmAttrList;
+import org.pm4j.core.pm.PmAttrNumber;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmAttrListCfg;
 import org.pm4j.core.pm.annotation.PmOptionCfg.NullOption;
-import org.pm4j.core.pm.impl.converter.PmConverterInteger;
-import org.pm4j.core.pm.impl.converter.PmConverterList;
-import org.pm4j.core.pm.impl.converter.PmConverterLong;
-import org.pm4j.core.pm.impl.converter.PmConverterString;
 import org.pm4j.core.util.reflection.ClassUtil;
 
 /**
@@ -28,19 +31,27 @@ import org.pm4j.core.util.reflection.ClassUtil;
 public class PmAttrListImpl<T> extends PmAttrBase<List<T>, List<T>> implements PmAttrList<T> {
 
   /** Binds to a {@link Collection} of {@link Long}s. */
-  @PmAttrListCfg(itemConverter=PmConverterLong.class)
+  @PmAttrListCfg(itemConverter=StringConverterLong.class)
   public static class Longs extends PmAttrListImpl<Long> {
     public Longs(PmObject pmParent) { super(pmParent); }
+    @Override
+    protected String getFormatDefaultResKey() {
+      return PmAttrNumber.RESKEY_DEFAULT_INTEGER_FORMAT_PATTERN;
+    }
   }
 
   /** Binds to a {@link Collection} of {@link Integer}s. */
-  @PmAttrListCfg(itemConverter=PmConverterInteger.class)
+  @PmAttrListCfg(itemConverter=StringConverterInteger.class)
   public static class Integers extends PmAttrListImpl<Integer> {
     public Integers(PmObject pmParent) { super(pmParent); }
+    @Override
+    protected String getFormatDefaultResKey() {
+      return PmAttrNumber.RESKEY_DEFAULT_INTEGER_FORMAT_PATTERN;
+    }
   }
 
   /** Binds to a {@link Collection} of {@link String}s. */
-  @PmAttrListCfg(itemConverter=PmConverterString.class)
+  @PmAttrListCfg(itemConverter=StringConverterString.class)
   public static class Strings extends PmAttrListImpl<String> {
     public Strings(PmObject pmParent) { super(pmParent); }
   }
@@ -61,10 +72,10 @@ public class PmAttrListImpl<T> extends PmAttrBase<List<T>, List<T>> implements P
   public List<String> getValueAsStringList() {
     List<T> items = getValue();
     if (items != null) {
-      Converter<T> c = getItemConverter();
+      StringConverter<T> c = getItemConverter();
       List<String> stringList = new ArrayList<String>(items.size());
       for (T item : items) {
-        stringList.add(c.valueToString(this, item));
+        stringList.add(c.valueToString(getConverterCtxt(), item));
       }
       return stringList;
     }
@@ -75,11 +86,15 @@ public class PmAttrListImpl<T> extends PmAttrBase<List<T>, List<T>> implements P
 
   @Override @SuppressWarnings("unchecked")
   public void setValueAsStringList(List<String> value) throws PmConverterException {
-    if (value != null) {
-      Converter<T> c = getItemConverter();
+    if (value != null && !value.isEmpty()) {
+      StringConverter<T> c = getItemConverter();
       List<T> items = new ArrayList<T>(value.size());
       for (String s : value) {
-        items.add(c.stringToValue(this, s));
+        try {
+          items.add(c.stringToValue(getConverterCtxt(), s));
+        } catch (StringConverterParseException e) {
+          throw new PmConverterException(this, e);
+        }
       }
       setValue(items);
     }
@@ -113,9 +128,9 @@ public class PmAttrListImpl<T> extends PmAttrBase<List<T>, List<T>> implements P
    *
    * @return The {@link tableCfg.defaultSortCol()Converter} used for the list item values.
    */
-  protected Converter<T> getItemConverter() {
+  protected StringConverter<T> getItemConverter() {
     @SuppressWarnings("unchecked")
-    Converter<T> c = (Converter<T>)getOwnMetaData().itemConverter;
+    StringConverter<T> c = (StringConverter<T>)getOwnMetaData().itemConverter;
     if (c == null) {
       throw new PmRuntimeException(this, "Missing item value converter.");
     }
@@ -180,14 +195,14 @@ public class PmAttrListImpl<T> extends PmAttrBase<List<T>, List<T>> implements P
         myMetaData.itemConverter = ClassUtil.newInstance(annotation.itemConverter());
       }
     }
-    
+
     if (myMetaData.itemConverter != null) {
-      myMetaData.setStringConverter(new PmConverterList<T>((Converter<T>)myMetaData.itemConverter));
+      myMetaData.setStringConverter(new StringConverterList<T>(((StringConverter<T>)myMetaData.itemConverter)));
     }
   }
 
   protected static class MetaData extends PmAttrBase.MetaData {
-    private Converter<?> itemConverter;
+    private StringConverter<?> itemConverter;
 
     public MetaData() {
       super(Integer.MAX_VALUE); // maximum valueAsString characters.

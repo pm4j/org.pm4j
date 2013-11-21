@@ -10,13 +10,13 @@ import java.util.Locale;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.pm4j.common.converter.string.StringConverterBigDecimal;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.exception.PmValidationException;
 import org.pm4j.core.pm.PmAttrBigDecimal;
 import org.pm4j.core.pm.PmConstants;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmAttrBigDecimalCfg;
-import org.pm4j.core.pm.impl.converter.PmConverterBigDecimal;
 
 /**
  * Implements a PM attribute for {@link BigDecimal} values.
@@ -70,23 +70,13 @@ public class PmAttrBigDecimalImpl extends PmAttrNumBase<BigDecimal> implements P
     return RESKEY_DEFAULT_FLOAT_FORMAT_PATTERN;
   }
 
-  /**
-   * @return rounding mode when converting to pm value. Changing this to a value
-   *         different than RoundingMode.UNNECESSARY will allow to set more
-   *         fraction digits than specified in the format. Those additional
-   *         digits will then be rounded.
-   */
-  public RoundingMode getRoundingMode() {
-    return getOwnMetaDataWithoutPmInitCall().roundingMode;
-  }
-
   // ======== meta data ======== //
 
   @Override
   protected PmObjectBase.MetaData makeMetaData() {
-	MetaData md = new MetaData();
-	md.setStringConverter(PmConverterBigDecimal.INSTANCE);
-	return md;
+    MetaData md = new MetaData();
+    md.setStringConverter(StringConverterBigDecimal.INSTANCE);
+    return md;
   }
 
   @Override
@@ -102,20 +92,14 @@ public class PmAttrBigDecimalImpl extends PmAttrNumBase<BigDecimal> implements P
       if (minValue != null && maxValue != null && minValue.compareTo(maxValue) >= 1) {
         throw new PmRuntimeException(this, "minValue(" + minValue + ") > maxValue(" + maxValue + ")");
       }
-      myMetaData.roundingMode = getRoundingMode(annotation);
+      myMetaData.setRoundingMode(getRoundingMode(annotation));
     }
   }
 
-  protected static class MetaData extends PmAttrBase.MetaData {
+  protected static class MetaData extends PmAttrNumBase.MetaData {
 
     private BigDecimal maxValue = null;
     private BigDecimal minValue = null;
-    private RoundingMode roundingMode = ROUNDINGMODE_DEFAULT;
-
-    public MetaData() {
-      // the max length needs to be evaluated dynamically by calling getMaxLenDefault().
-      super(-1);
-    }
 
     @Override
     protected int getMaxLenDefault() {
@@ -128,7 +112,9 @@ public class PmAttrBigDecimalImpl extends PmAttrNumBase<BigDecimal> implements P
 
     public BigDecimal getMaxValue() {  return maxValue;  }
     public BigDecimal getMinValue() { return minValue; }
-    public RoundingMode getRoundingMode() { return roundingMode; }
+
+    @Override
+    protected double getMaxValueAsDouble() { throw new RuntimeException("Not applicable for BigDecimal."); }
   }
 
   private final MetaData getOwnMetaDataWithoutPmInitCall() {
@@ -199,6 +185,5 @@ public class PmAttrBigDecimalImpl extends PmAttrNumBase<BigDecimal> implements P
     }
     return rm;
   }
-
 
 }

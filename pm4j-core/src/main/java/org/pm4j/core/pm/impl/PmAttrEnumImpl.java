@@ -2,7 +2,7 @@ package org.pm4j.core.pm.impl;
 
 import java.lang.reflect.Method;
 
-import org.pm4j.core.pm.PmAttr;
+import org.pm4j.common.converter.string.StringConverterBase;
 import org.pm4j.core.pm.PmAttrEnum;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmOptionCfg;
@@ -83,7 +83,7 @@ public class PmAttrEnumImpl<T_ENUM extends Enum<T_ENUM>> extends PmAttrBase<T_EN
     MetaData myMetaData = (MetaData) metaData;
 
     // TODO: the init call places a different string converter.
-    // Because of that is was not possible to move the code to 
+    // Because of that is was not possible to move the code to
     // makeMetaData(). --> Check!
     myMetaData.setStringConverter(new PmConverterEnum());
   }
@@ -94,20 +94,21 @@ public class PmAttrEnumImpl<T_ENUM extends Enum<T_ENUM>> extends PmAttrBase<T_EN
 
   // ======== converter ======== //
 
-  public static class PmConverterEnum  implements PmAttr.Converter<Enum<?>> {
+  public static class PmConverterEnum extends StringConverterBase<Enum<?>, AttrConverterCtxt> {
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
-    public Enum<?> stringToValue(PmAttr<?> pmAttr, String s) {
-      return s.length() > 0
-                  ? Enum.valueOf(((PmAttrEnumImpl)pmAttr).enumClass, s)
+    protected Enum<?> stringToValueImpl(AttrConverterCtxt ctxt, String s) throws Exception {
+      return (s != null && !s.isEmpty())
+                  ? Enum.valueOf(((PmAttrEnumImpl)ctxt.getPmAttr()).enumClass, s)
                   : null;
     }
 
     @Override
-    public String valueToString(PmAttr<?> pmAttr, Enum<?> v) {
-      return v.name();
+    protected String valueToStringImpl(AttrConverterCtxt ctxt, Enum<?> v) {
+      return (v != null) ? v.name() : null;
     }
+
   }
 
 }

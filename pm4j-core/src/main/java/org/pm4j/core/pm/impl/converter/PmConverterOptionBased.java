@@ -4,11 +4,11 @@ import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.pm4j.core.pm.PmAttr;
+import org.pm4j.common.converter.string.StringConverterBase;
 import org.pm4j.core.pm.PmOption;
 import org.pm4j.core.pm.PmOptionSet;
+import org.pm4j.core.pm.impl.AttrConverterCtxt;
 import org.pm4j.core.pm.impl.PmAttrBase;
-import org.pm4j.core.pm.impl.PmUtil;
 import org.pm4j.core.pm.impl.options.PmOptionSetUtil;
 import org.pm4j.core.pm.impl.pathresolver.ExpressionPathResolver;
 import org.pm4j.core.pm.impl.pathresolver.PathResolver;
@@ -19,7 +19,7 @@ import org.pm4j.core.pm.impl.pathresolver.PathResolver;
  *
  * @author olaf boede
  */
-public class PmConverterOptionBased implements PmAttr.Converter<Object> {
+public class PmConverterOptionBased extends StringConverterBase<Object, AttrConverterCtxt> {
 
   private static final Log log = LogFactory.getLog(PmConverterOptionBased.class);
 
@@ -37,7 +37,8 @@ public class PmConverterOptionBased implements PmAttr.Converter<Object> {
 
   @SuppressWarnings("unchecked")
   @Override
-  public Object stringToValue(PmAttr<?> pmAttr, String s) {
+  protected Object stringToValueImpl(AttrConverterCtxt ctxt, String s) {
+    PmAttrBase<Object, Object> pmAttr = (PmAttrBase<Object, Object>) ctxt.getPmAttr();
     Object value = null;
     PmOptionSet os = pmAttr.getOptionSet();
     if (os == null) {
@@ -49,13 +50,13 @@ public class PmConverterOptionBased implements PmAttr.Converter<Object> {
       PmOption o = os.findOptionForIdString(s);
       if (o != null) {
         value = o.getValue();
-        value = ((PmAttrBase<?, Object>)pmAttr).convertBackingValueToPmValue(value);
+        value = pmAttr.convertBackingValueToPmValue(value);
       }
     }
 
     if (value == null && StringUtils.isNotEmpty(s)) {
       // FIXME olaf: add business scenario specific missing value handling here!
-      log.warn("Can't set value of attribute '" + PmUtil.getPmLogString(pmAttr) +
+      log.warn("Can't set value of attribute '" + ctxt +
           "No option exists for value '" + s + "'. Available option ids : " +
           (os != null
               ? PmOptionSetUtil.getOptionIds(os).toString()
@@ -66,9 +67,10 @@ public class PmConverterOptionBased implements PmAttr.Converter<Object> {
   }
 
   @Override
-  public String valueToString(PmAttr<?> pmAttr, Object pmValue) {
+  protected String valueToStringImpl(AttrConverterCtxt ctxt, Object pmValue) {
     @SuppressWarnings("unchecked")
-    Object backingValue = ((PmAttrBase<Object,?>)pmAttr).convertPmValueToBackingValue(pmValue);
+    PmAttrBase<Object, Object> pmAttr = (PmAttrBase<Object, Object>) ctxt.getPmAttr();
+    Object backingValue = pmAttr.convertPmValueToBackingValue(pmValue);
     return ObjectUtils.toString(idPath.getValue(backingValue));
   }
 

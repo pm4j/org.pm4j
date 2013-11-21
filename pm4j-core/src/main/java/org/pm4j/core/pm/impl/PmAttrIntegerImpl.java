@@ -1,12 +1,12 @@
 package org.pm4j.core.pm.impl;
 
+import org.pm4j.common.converter.string.StringConverterInteger;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.exception.PmValidationException;
 import org.pm4j.core.pm.PmAttrInteger;
 import org.pm4j.core.pm.PmConstants;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmAttrIntegerCfg;
-import org.pm4j.core.pm.impl.converter.PmConverterInteger;
 
 /**
  * Implements a PM attribute for {@link Integer} values.
@@ -46,13 +46,18 @@ public class PmAttrIntegerImpl extends PmAttrNumBase<Integer> implements PmAttrI
     }
   }
 
+  @Override
+  protected String getFormatDefaultResKey() {
+    return RESKEY_DEFAULT_INTEGER_FORMAT_PATTERN;
+  }
+
   // ======== meta data ======== //
 
   @Override
   protected PmObjectBase.MetaData makeMetaData() {
-	MetaData md = new MetaData();
-	md.setStringConverter(PmConverterInteger.INSTANCE);
-	return md;
+    MetaData md = new MetaData();
+    md.setStringConverter(StringConverterInteger.INSTANCE);
+    return md;
   }
 
   @Override
@@ -76,7 +81,7 @@ public class PmAttrIntegerImpl extends PmAttrNumBase<Integer> implements PmAttrI
     private int minValue = Integer.MIN_VALUE;
 
     @Override
-    protected double getMaxValue() {
+    protected double getMaxValueAsDouble() {
       return maxValue;
     }
   }

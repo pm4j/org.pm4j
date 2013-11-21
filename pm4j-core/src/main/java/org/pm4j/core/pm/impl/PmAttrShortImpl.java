@@ -1,12 +1,12 @@
 package org.pm4j.core.pm.impl;
 
+import org.pm4j.common.converter.string.StringConverterShort;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.exception.PmValidationException;
 import org.pm4j.core.pm.PmAttrShort;
 import org.pm4j.core.pm.PmConstants;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmAttrShortCfg;
-import org.pm4j.core.pm.impl.converter.PmConverterShort;
 
 /**
  * PM attribute implementation for {@link Short} values.
@@ -46,13 +46,18 @@ public class PmAttrShortImpl extends PmAttrNumBase<Short> implements PmAttrShort
     }
   }
 
+  @Override
+  protected String getFormatDefaultResKey() {
+    return RESKEY_DEFAULT_INTEGER_FORMAT_PATTERN;
+  }
+
   // ======== meta data ======== //
 
   @Override
   protected PmObjectBase.MetaData makeMetaData() {
-	MetaData md = new MetaData();
-	md.setStringConverter(PmConverterShort.INSTANCE);
-	return md;
+    MetaData md = new MetaData();
+    md.setStringConverter(StringConverterShort.INSTANCE);
+    return md;
   }
 
   @Override
@@ -76,7 +81,7 @@ public class PmAttrShortImpl extends PmAttrNumBase<Short> implements PmAttrShort
     private short minValue = Short.MIN_VALUE;
 
     @Override
-    protected double getMaxValue() {
+    protected double getMaxValueAsDouble() {
       return maxValue;
     }
   }

@@ -12,8 +12,8 @@ import java.util.TimeZone;
 import org.joda.time.LocalTime;
 import org.junit.Before;
 import org.junit.Test;
+import org.pm4j.common.converter.value.joda.LocalTimeTimeZoneConverter;
 import org.pm4j.core.joda.PmAttrLocalTime;
-import org.pm4j.core.joda.impl.PmAttrLocalTimeImpl2.ValueConverterWithTimeZone;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.annotation.PmTitleCfg;
 import org.pm4j.core.pm.impl.PmConversationImpl;
@@ -75,7 +75,7 @@ public class PmAttrLocalTimeTest {
     public PmAttrLocalTimeImpl2 time = new PmAttrLocalTimeImpl2(this);
 
     @PmTitleCfg(title="local time with time zone")
-    @PmAttrCfg(valueConverter = ValueConverterWithTimeZone.class)
+    @PmAttrCfg(valueConverter = LocalTimeTimeZoneConverter.class)
     public PmAttrLocalTimeImpl2 timeWithTzConverter = new PmAttrLocalTimeImpl2(this);
   }
 }

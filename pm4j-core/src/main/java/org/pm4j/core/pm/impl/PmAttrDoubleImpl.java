@@ -2,13 +2,13 @@ package org.pm4j.core.pm.impl;
 
 import java.math.RoundingMode;
 
+import org.pm4j.common.converter.string.StringConverterDouble;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.exception.PmValidationException;
 import org.pm4j.core.pm.PmAttrDouble;
 import org.pm4j.core.pm.PmConstants;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmAttrDoubleCfg;
-import org.pm4j.core.pm.impl.converter.PmConverterDouble;
 
 /**
  * Implements a PM attribute for {@link Double} values.
@@ -60,21 +60,12 @@ public class PmAttrDoubleImpl extends PmAttrNumBase<Double> implements PmAttrDou
     }
   }
 
-  /**
-   * @return rounding mode when converting to pm value. Changing this to a value
-   *         different than RoundingMode.UNNECESSARY will allow to set more
-   *         fraction digits than specified in the format. Those additional
-   *         digits will then be rounded.
-   */
-  public RoundingMode getRoundingMode() {
-    return getOwnMetaDataWithoutPmInitCall().roundingMode;
-  }
   // ======== meta data ======== //
 
   @Override
   protected PmObjectBase.MetaData makeMetaData() {
     MetaData md = new MetaData();
-    md.setStringConverter(PmConverterDouble.INSTANCE);
+    md.setStringConverter(StringConverterDouble.INSTANCE);
     return md;
   }
 
@@ -91,7 +82,7 @@ public class PmAttrDoubleImpl extends PmAttrNumBase<Double> implements PmAttrDou
       if (minValue > maxValue) {
         throw new PmRuntimeException(this, "minValue(" + minValue + ") > maxValue(" + maxValue + ")");
       }
-      myMetaData.roundingMode = getRoundingMode(annotation);
+      myMetaData.setRoundingMode(getRoundingMode(annotation));
     }
   }
 
@@ -99,12 +90,11 @@ public class PmAttrDoubleImpl extends PmAttrNumBase<Double> implements PmAttrDou
   protected static class MetaData extends PmAttrNumBase.MetaData {
     private double maxValue = Double.MAX_VALUE;
     private double minValue = -Double.MAX_VALUE;
-    private RoundingMode roundingMode = ROUNDINGMODE_DEFAULT;
 
     @Override
+    public double getMaxValueAsDouble() { return maxValue; }
     public double getMaxValue() { return maxValue; }
     public double getMinValue() { return minValue; }
-    public RoundingMode getRoundingMode() { return roundingMode; }
   }
 
   private final MetaData getOwnMetaDataWithoutPmInitCall() {

@@ -1,10 +1,10 @@
 package org.pm4j.core.pm.impl;
 
+import org.pm4j.common.converter.string.StringConverterBoolean;
 import org.pm4j.core.pm.PmAttrBoolean;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmOptionSet;
 import org.pm4j.core.pm.api.PmLocalizeApi;
-import org.pm4j.core.pm.impl.converter.PmConverterBoolean;
 import org.pm4j.core.pm.impl.options.PmOptionSetImpl;
 import org.pm4j.core.pm.impl.options.PmOptionSetUtil;
 
@@ -43,9 +43,9 @@ public class PmAttrBooleanImpl extends PmAttrBase<Boolean, Boolean> implements P
 
   @Override
   protected PmObjectBase.MetaData makeMetaData() {
-	  MetaData md = new PmAttrBase.MetaData(10);
-	  md.setStringConverter(PmConverterBoolean.INSTANCE);
-	  return md;
+    MetaData md = new PmAttrBase.MetaData(10);
+    md.setStringConverter(StringConverterBoolean.INSTANCE);
+    return md;
   }
 
 }

@@ -1,12 +1,12 @@
 package org.pm4j.core.pm.impl;
 
+import org.pm4j.common.converter.string.StringConverterLong;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.exception.PmValidationException;
 import org.pm4j.core.pm.PmAttrLong;
 import org.pm4j.core.pm.PmConstants;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmAttrLongCfg;
-import org.pm4j.core.pm.impl.converter.PmConverterLong;
 
 /**
  * Implements a PM attribute for {@link Long} values.
@@ -46,13 +46,18 @@ public class PmAttrLongImpl extends PmAttrNumBase<Long> implements PmAttrLong {
     }
   }
 
+  @Override
+  protected String getFormatDefaultResKey() {
+    return RESKEY_DEFAULT_INTEGER_FORMAT_PATTERN;
+  }
+
   // ======== meta data ======== //
 
   @Override
   protected PmObjectBase.MetaData makeMetaData() {
-	MetaData md = new MetaData();
-	md.setStringConverter(PmConverterLong.INSTANCE);
-	return md;
+    MetaData md = new MetaData();
+    md.setStringConverter(StringConverterLong.INSTANCE);
+    return md;
   }
 
   @Override
@@ -76,7 +81,7 @@ public class PmAttrLongImpl extends PmAttrNumBase<Long> implements PmAttrLong {
     private long minValue = Long.MIN_VALUE;
 
     @Override
-    protected double getMaxValue() {
+    protected double getMaxValueAsDouble() {
       return maxValue;
     }
   }

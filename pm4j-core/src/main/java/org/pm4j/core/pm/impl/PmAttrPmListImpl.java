@@ -6,6 +6,8 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.pm4j.common.converter.string.StringConverter;
+import org.pm4j.common.converter.string.StringConverterList;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmAttrPmList;
 import org.pm4j.core.pm.PmBean;
@@ -18,7 +20,6 @@ import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmFactoryApi;
 import org.pm4j.core.pm.impl.commands.PmListAddItemCommand;
 import org.pm4j.core.pm.impl.commands.PmListRemoveItemCommand;
-import org.pm4j.core.pm.impl.converter.PmConverterList;
 import org.pm4j.core.pm.impl.converter.PmConverterOptionBased;
 import org.pm4j.core.pm.impl.pathresolver.ExpressionPathResolver;
 
@@ -245,7 +246,7 @@ public class PmAttrPmListImpl<T_ITEM_PM extends PmBean<T_BEAN>, T_BEAN> extends 
   }
 
 
-  @Override @SuppressWarnings({ "unchecked", "rawtypes" })
+  @Override
   protected void initMetaData(PmObjectBase.MetaData metaData) {
     super.initMetaData(metaData);
     MetaData myMetaData = (MetaData) metaData;
@@ -255,8 +256,8 @@ public class PmAttrPmListImpl<T_ITEM_PM extends PmBean<T_BEAN>, T_BEAN> extends 
       myMetaData.provideInvisibleItems = annotation.provideInvisibleItems();
     }
 
-    Converter<?> itemConverter = new PmConverterOptionBased(ExpressionPathResolver.parse("pmKey"));
-    myMetaData.setStringConverter(new PmConverterList(itemConverter));
+    StringConverter<Object> itemConverter = new PmConverterOptionBased(ExpressionPathResolver.parse("pmKey"));
+    myMetaData.setStringConverter(new StringConverterList<Object>(itemConverter));
   }
 
   protected static class MetaData extends PmAttrBase.MetaData {

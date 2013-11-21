@@ -3,6 +3,9 @@ package org.pm4j.core.pm;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
+import java.util.Locale;
+
+import org.junit.Before;
 import org.junit.Test;
 import org.pm4j.core.pm.api.PmMessageUtil;
 import org.pm4j.core.pm.impl.PmAttrShortImpl;
@@ -10,10 +13,16 @@ import org.pm4j.core.pm.impl.PmConversationImpl;
 
 public class PmAttrShortTest {
 
+  private MyPm myPm = new MyPm();
+
+  @Before
+  public void setUp() {
+    myPm.setPmLocale(Locale.ENGLISH);
+  }
+
+
   @Test
   public void testValueAccess() {
-    MyPm myPm = new MyPm();
-
     assertNull("Initial value should be null", myPm.shortAttr.getValue());
     assertNull("Initial value as string should be null", myPm.shortAttr.getValueAsString());
 
@@ -26,18 +35,16 @@ public class PmAttrShortTest {
 
   @Test
   public void testInvalidCharacters() {
-    MyPm myPm = new MyPm();
-
     myPm.shortAttr.setValueAsString("abc");
 
     assertEquals("There should be a string conversion error", 1, PmMessageUtil.getPmErrors(myPm.shortAttr).size());
     assertEquals("The error should be a number conversion error.",
-                  PmConstants.MSGKEY_VALIDATION_NUMBER_CONVERSION_FROM_STRING_FAILED, PmMessageUtil.findMostSevereMessage(myPm.shortAttr).getMsgKey());
+                  "Unable to convert the entered string to a numeric value in field \"abc\".", PmMessageUtil.findMostSevereMessage(myPm.shortAttr).getTitle());
   }
 
   @Test
   public void testValueType() {
-    Class<?> t = new MyPm().shortAttr.getValueType();
+    Class<?> t = myPm.shortAttr.getValueType();
     assertEquals(Short.class, t);
   }
 

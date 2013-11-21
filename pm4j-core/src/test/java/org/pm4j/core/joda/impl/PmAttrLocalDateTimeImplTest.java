@@ -12,7 +12,7 @@ import java.util.TimeZone;
 import org.joda.time.LocalDateTime;
 import org.junit.Before;
 import org.junit.Test;
-import org.pm4j.core.joda.impl.PmAttrLocalDateTimeImpl.ValueConverterWithTimeZone;
+import org.pm4j.common.converter.value.joda.LocalDateTimeTimeZoneConverter;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.annotation.PmTitleCfg;
 import org.pm4j.core.pm.impl.PmConversationImpl;
@@ -93,6 +93,16 @@ public class PmAttrLocalDateTimeImplTest {
 
     setValueAsString(d, "01/11/2013 21:00");
     assertEquals("01/11/2013 20:00", d.getBackingValue().toString("dd/MM/yyyy HH:mm"));
+
+    testPm.setPmTimeZone(TimeZone.getTimeZone("Asia/Singapore"));
+    d.setValueAsString("01/11/2013 21:00");
+    assertEquals("01/11/2013 13:00", d.getBackingValue().toString("dd/MM/yyyy HH:mm"));
+    assertEquals("01/11/2013 21:00", d.getValueAsString());
+    assertEquals("01/11/2013 21:00", d.getValueLocalized());
+
+    testPm.setPmTimeZone(TimeZone.getTimeZone("Etc/GMT-1"));
+    assertEquals("01/11/2013 13:00", d.getBackingValue().toString("dd/MM/yyyy HH:mm"));
+    assertEquals("01/11/2013 14:00", d.getValueAsString());
   }
 
   static class TestPm extends PmConversationImpl {
@@ -101,7 +111,7 @@ public class PmAttrLocalDateTimeImplTest {
     public PmAttrLocalDateTimeImpl dateTime = new PmAttrLocalDateTimeImpl(this);
 
     @PmTitleCfg(title="local DateTime with time zone")
-    @PmAttrCfg(valueConverter = ValueConverterWithTimeZone.class)
+    @PmAttrCfg(valueConverter = LocalDateTimeTimeZoneConverter.class)
     public PmAttrLocalDateTimeImpl dateTimeWithTzConverter = new PmAttrLocalDateTimeImpl(this);
   }
 }

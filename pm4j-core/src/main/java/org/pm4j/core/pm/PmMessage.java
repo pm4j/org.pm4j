@@ -84,12 +84,6 @@ public class PmMessage {
       if (arg instanceof SubMessageList) {
         ((SubMessageList)arg).parentMessage = this;
       }
-      // a) Prevent html hacks in strings that may be entered by the user.
-      // b) allow display of special characters such as '<'.
-      // FIXME olaf: does not work for rich clients.
-      else if (arg instanceof String) {
-        arg = StringEscapeUtils.escapeHtml((String) arg);
-      }
 
       newMsgArgs[i] = arg;
     }

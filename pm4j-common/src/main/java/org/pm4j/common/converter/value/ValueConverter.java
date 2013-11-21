@@ -1,7 +1,15 @@
 package org.pm4j.common.converter.value;
 
 
-public interface ValueConverter2 <T_EXTERNAL, T_INTERNAL> {
+/**
+ * An interface for converters that translate between types and/or value ranges.
+ *
+ * @param <T_EXTERNAL> The external value type.
+ * @param <T_INTERNAL> The internal value type.
+ *
+ * @author Olaf Boede
+ */
+public interface ValueConverter <T_EXTERNAL, T_INTERNAL> {
 
     /**
      * Converts a backing attribute value to an external attribute value.

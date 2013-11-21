@@ -1,6 +1,5 @@
 package org.pm4j.core.pm;
 
-import org.pm4j.core.exception.PmConverterException;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.impl.PmAttrImpl;
 
@@ -178,63 +177,6 @@ public interface PmAttr<T> extends PmObject, PmDataInput {
    * @return The value type handled by this attribute PM.
    */
   Class<?> getValueType();
-
-  /**
-   * Converts attribute values between its attribute type representation and {@link String}
-   * representation.
-   *
-   * @param <T>
-   *          The type of the items to convert.
-   */
-  interface Converter<T> {
-
-    /**
-     * Converts the string value representation to the (external) attribute value type.
-     *
-     * @param pmAttr
-     * @param s
-     * @return
-     * @throws PmConverterException
-     */
-    T stringToValue(PmAttr<?> pmAttr, String s) throws PmConverterException;
-
-    /**
-     * Converts a typed attribute value to its string representation.
-     *
-     * @param pmAttr
-     * @param v
-     * @return
-     */
-    String valueToString(PmAttr<?> pmAttr, T v);
-  }
-
-
-  /**
-   * Converts backing attributes from/to and external attribute values.
-   *
-   * @param <T_EXTERNAL> The external attribute value type.
-   * @param <T_INTERNAL> The backing attribute value type.
-   */
-  interface ValueConverter<T_EXTERNAL, T_INTERNAL> {
-
-    /**
-     * Converts a backing attribute value to an external attribute value.
-     *
-     * @param pmAttr The attribute instance the conversation is done for.
-     * @param i The backing value to convert.
-     * @return The corresponding external value.
-     */
-    T_EXTERNAL toExternalValue(PmAttr<T_EXTERNAL> pmAttr, T_INTERNAL i);
-
-    /**
-     * Converts an external attribute value to a backing attribute value.
-     *
-     * @param pmAttr The attribute instance the conversation is done for.
-     * @param e The external value to convert.
-     * @return The corresponding backing value.
-     */
-    T_INTERNAL toInternalValue(PmAttr<T_EXTERNAL> pmAttr, T_EXTERNAL e);
-  }
 
   /**
    * Interface for the internally generated command that gets generated for each value change operation.

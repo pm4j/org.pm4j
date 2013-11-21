@@ -1,18 +1,16 @@
-package org.pm4j.core.joda.impl;
+package org.pm4j.common.converter.string.joda;
 
 import java.text.ParseException;
 import java.util.Locale;
-import java.util.TimeZone;
 
 import org.joda.time.Chronology;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-import org.pm4j.core.pm.PmAttr;
-import org.pm4j.core.pm.PmConversation;
-import org.pm4j.core.pm.impl.PmWithTimeZone;
-import org.pm4j.core.pm.impl.converter.MultiFormatParserBase;
-import org.pm4j.core.pm.impl.converter.PmConverterBase;
+import org.pm4j.common.converter.string.MultiFormatParserBase;
+import org.pm4j.common.converter.string.StringConverterBase;
+import org.pm4j.common.converter.string.StringConverterCtxt;
+import org.pm4j.common.converter.string.StringConverterUtil;
 
 /**
  * Base class for joda date-time converters, capable to parse multiple input formats.
@@ -20,19 +18,16 @@ import org.pm4j.core.pm.impl.converter.PmConverterBase;
  * @param T The joda type to support.
  *
  * @author Harm Gnoyke
- * @author oboede
+ * @author Olaf Boede
  */
-public abstract class JodaStringConverterBase<T> extends PmConverterBase<T> {
+public abstract class JodaStringConverterBase<T> extends StringConverterBase<T, StringConverterCtxt> {
 
   /** A helper instance that supports the multi-format feature. */
   private MultiFormatParserBase<T> multiFormatParser = new MultiFormatParserBase<T>() {
     @Override
-    protected T parseValue(String input, String format, Locale locale, PmAttr<?> pmAttr) throws ParseException {
-      // Each attribute may provide it's specific time zone by implementing WithPmTimeZone.
-      TimeZone tz = (pmAttr instanceof PmWithTimeZone)
-          ? ((PmWithTimeZone) pmAttr).getPmTimeZone()
-          : pmAttr.getPmConversation().getPmTimeZone();
-      DateTimeZone dtz = DateTimeZone.forTimeZone(tz);
+    protected T parseValue(StringConverterCtxt ctxt, String input, String format) throws ParseException {
+      Locale locale = ctxt.getConverterCtxtLocale();
+      DateTimeZone dtz = DateTimeZone.forTimeZone(ctxt.getConverterCtxtTimeZone());
       DateTimeFormatter fmt = getDateTimeFormatter(format, locale, dtz);
       try {
         return parseJodaType(fmt, input);
@@ -63,16 +58,14 @@ public abstract class JodaStringConverterBase<T> extends PmConverterBase<T> {
   protected abstract String printJodaType(DateTimeFormatter fmt, T value);
 
   @Override
-  public T stringToValue(PmAttr<?> pmAttr, String input) {
-    T v = multiFormatParser.parseString(pmAttr, input);
-    return v;
+  protected T stringToValueImpl(StringConverterCtxt ctxt, String input) throws Exception {
+    return multiFormatParser.parseString(ctxt, input);
   }
 
   @Override
-  public String valueToString(PmAttr<?> pmAttr, T v) {
-    String outputFormat = multiFormatParser.getOutputFormat(pmAttr);
-    PmConversation conversation = pmAttr.getPmConversation();
-    Locale locale = conversation.getPmLocale();
+  protected String valueToStringImpl(StringConverterCtxt ctxt, T v) {
+    String outputFormat = StringConverterUtil.getOutputFormat(ctxt);
+    Locale locale = ctxt.getConverterCtxtLocale();
     DateTimeFormatter fmt = DateTimeFormat.forPattern(outputFormat).withLocale(locale);
     return printJodaType(fmt, v);
   }

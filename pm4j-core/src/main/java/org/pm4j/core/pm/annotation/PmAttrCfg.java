@@ -5,6 +5,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.pm4j.common.converter.value.ValueConverter;
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmCommand;
@@ -191,7 +192,7 @@ public @interface PmAttrCfg {
    * @return The converter class to use. It needs to have a public default constructor.
    */
   @SuppressWarnings("rawtypes")
-  Class<? extends PmAttr.ValueConverter> valueConverter() default PmAttr.ValueConverter.class;
+  Class<? extends ValueConverter> valueConverter() default ValueConverter.class;
 
   /**
    * Defines attribute validation strategies.<br>

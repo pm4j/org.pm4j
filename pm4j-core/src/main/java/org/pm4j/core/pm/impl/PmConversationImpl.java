@@ -36,7 +36,7 @@ import org.pm4j.navi.NaviHistory;
  *
  * @author olaf boede
  */
-public class PmConversationImpl extends PmElementBase implements PmConversation, PmWithTimeZone {
+public class PmConversationImpl extends PmElementBase implements PmConversation {
 
   private static final Log LOG = LogFactory.getLog(PmConversationImpl.class);
 

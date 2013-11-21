@@ -25,6 +25,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.pm4j.common.cache.CacheStrategy;
 import org.pm4j.common.cache.CacheStrategyNoCache;
+import org.pm4j.common.converter.string.StringConverter;
+import org.pm4j.common.converter.string.StringConverterParseException;
+import org.pm4j.common.converter.value.ValueConverter;
+import org.pm4j.common.converter.value.ValueConverterDefault;
 import org.pm4j.common.expr.Expression.SyntaxVersion;
 import org.pm4j.common.util.CompareUtil;
 import org.pm4j.common.util.GenericsUtil;
@@ -102,18 +106,6 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
 
   private static final Log LOG = LogFactory.getLog(PmAttrBase.class);
 
-  /** The default value converter just passes the instances through. */
-  public static final ValueConverter<Object, Object> DEFAULT_VALUE_CONVERTER = new ValueConverter<Object, Object>() {
-    @Override
-    public Object toExternalValue(PmAttr<Object> a, Object i) {
-      return i;
-    }
-    @Override
-    public Object toInternalValue(PmAttr<Object> a, Object e) {
-      return e;
-    }
-  };
-
   /**
    * Indicates if the value was explicitly set. This information is especially
    * important for the default value logic. Default values may have only effect
@@ -142,8 +134,14 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   private ValueConverter<T_PM_VALUE, T_BEAN_VALUE> valueConverter;
 
   /** Converts between external value type and its string representation. */
-  private Converter<T_PM_VALUE> stringConverter;
+  private StringConverter<T_PM_VALUE> stringConverter;
 
+  /** A lightweight helper that provides converter operation context information. */
+  private AttrConverterCtxt converterCtxt = makeConverterCtxt();
+
+  /**
+   * @param pmParent The PM hierarchy parent.
+   */
   public PmAttrBase(PmObject pmParent) {
     super(pmParent);
   }
@@ -792,7 +790,11 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
    */
   @Deprecated
   protected T_PM_VALUE stringToValueImpl(String s) throws PmConverterException {
-    return (T_PM_VALUE) getStringConverter().stringToValue(this, s);
+    try {
+      return (T_PM_VALUE) getStringConverter().stringToValue(converterCtxt, s);
+    } catch (StringConverterParseException e) {
+      throw new PmConverterException(this, e);
+    }
   }
 
   /**
@@ -807,13 +809,13 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
    */
   @Deprecated
   protected String valueToStringImpl(T_PM_VALUE v) {
-    return getStringConverter().valueToString(this, v);
+    return getStringConverter().valueToString(converterCtxt, v);
   }
 
   /**
    * @return The converter that translates from and to the corresponding string value representation.
    */
-  public final Converter<T_PM_VALUE> getStringConverter() {
+  public final StringConverter<T_PM_VALUE> getStringConverter() {
     if (stringConverter == null) {
       zz_ensurePmInitialization();
       stringConverter = getStringConverterImpl();
@@ -831,7 +833,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
    *
    * @return The attribute value string converter. Never <code>null</code>.
    */
-  protected Converter<T_PM_VALUE> getStringConverterImpl() {
+  protected StringConverter<T_PM_VALUE> getStringConverterImpl() {
     return getConverter();
   }
 
@@ -844,12 +846,22 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
    */
   @Deprecated
   @SuppressWarnings("unchecked")
-  protected Converter<T_PM_VALUE> getConverter() {
-    Converter<T_PM_VALUE> c = (Converter<T_PM_VALUE>) getOwnMetaData().stringConverter;
+  protected StringConverter<T_PM_VALUE> getConverter() {
+    StringConverter<T_PM_VALUE> c = (StringConverter<T_PM_VALUE>) getOwnMetaData().stringConverter;
     if (c == null) {
       throw new PmRuntimeException(this, "Missing value converter.");
     }
     return c;
+  }
+
+  /** @return The converter operation context. */
+  protected AttrConverterCtxt getConverterCtxt() {
+    return converterCtxt;
+  }
+
+  /** A factory method that provides the attribute type specific converter context reference. */
+  protected AttrConverterCtxt makeConverterCtxt() {
+    return new AttrConverterCtxt(this);
   }
 
   @Override
@@ -1156,7 +1168,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
    */
   @Deprecated
   public T_PM_VALUE convertBackingValueToPmValue(T_BEAN_VALUE backingValue) {
-    return getValueConverter().toExternalValue(this, backingValue);
+    return getValueConverter().toExternalValue(converterCtxt, backingValue);
   }
 
   /**
@@ -1164,7 +1176,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
    */
   @Deprecated
   public T_BEAN_VALUE convertPmValueToBackingValue(T_PM_VALUE externalValue) {
-    return getValueConverter().toInternalValue(this, externalValue);
+    return getValueConverter().toInternalValue(converterCtxt, externalValue);
   }
 
   /**
@@ -1198,7 +1210,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     return (ValueConverter<T_PM_VALUE, T_BEAN_VALUE>)(
         (md.valueConverter != null)
           ? md.valueConverter
-          : DEFAULT_VALUE_CONVERTER);
+          : ValueConverterDefault.INSTANCE);
   }
 
 
@@ -1555,7 +1567,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     private String                          defaultValueString;
     private CacheStrategy                 cacheStrategyForOptions = CacheStrategyNoCache.INSTANCE;
     private CacheStrategy                 cacheStrategyForValue   = CacheStrategyNoCache.INSTANCE;
-    private Converter<?>                    stringConverter;
+    private StringConverter<?>              stringConverter;
     private ValueConverter<?, ?>            valueConverter;
     private BackingValueAccessStrategy      valueAccessStrategy     = ValueAccessLocal.INSTANCE;
     /** Name of the field configured for JSR 303-validation.<br>
@@ -1583,14 +1595,14 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     public CacheStrategy getCacheStrategyForOptions() { return cacheStrategyForOptions; }
     public CacheStrategy getCacheStrategyForValue() { return cacheStrategyForValue; }
 
-    public Converter<?> getStringConverter() { return stringConverter; }
+    public StringConverter<?> getStringConverter() { return stringConverter; }
 
     /**
      * Defines a <b>state less</b> string converter. Converters that need to have PM state information
      * should be provided by overriding {@link PmAttrBase#getStringConverterImpl()}.
      * @param converter The state less string converter.
      */
-    public void setStringConverter(Converter<?> converter) { this.stringConverter = converter; }
+    public void setStringConverter(StringConverter<?> converter) { this.stringConverter = converter; }
 
     /**
      * Defines a <b>state less</b> value converter. Converters that need to have PM state information

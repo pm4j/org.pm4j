@@ -1,12 +1,12 @@
 package org.pm4j.core.pm.impl;
 
 import org.apache.commons.lang.StringUtils;
+import org.pm4j.common.converter.string.StringConverterString;
 import org.pm4j.core.exception.PmValidationException;
 import org.pm4j.core.pm.PmAttrString;
 import org.pm4j.core.pm.PmConstants;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmAttrStringCfg;
-import org.pm4j.core.pm.impl.converter.PmConverterString;
 
 /**
  * Implements a PM attribute for {@link String} values.
@@ -86,8 +86,8 @@ public class PmAttrStringImpl extends PmAttrBase<String, String> implements PmAt
 
     if (myMetaData.getStringConverter() == null) {
       myMetaData.setStringConverter(myMetaData.trim
-          ? PmConverterString.Trimmed.INSTANCE
-          : PmConverterString.INSTANCE);
+          ? StringConverterString.Trimmed.INSTANCE
+          : StringConverterString.INSTANCE);
     }
   }
 

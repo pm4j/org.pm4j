@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
-import org.pm4j.core.pm.PmAttr;
+import org.pm4j.common.converter.string.StringConverterBase;
 import org.pm4j.core.pm.PmOption;
 import org.pm4j.core.pm.PmOptionSet;
 import org.pm4j.core.pm.annotation.PmAttrListCfg;
@@ -105,17 +105,20 @@ public class PmAttrListOfEnumsImpl<T_ENUM extends Enum<?>> extends PmAttrListImp
   }
 
   /** Translates between strings and enums. */
-  public static class Converter implements PmAttr.Converter<Enum<?>> {
+  public static class Converter extends StringConverterBase<Enum<?>, AttrConverterCtxt> {
 
       @Override
       @SuppressWarnings({ "unchecked", "rawtypes" })
-      public Enum<?> stringToValue(PmAttr<?> pmAttr, String s) {
-          return s.length() > 0 ? Enum.valueOf(((PmAttrListOfEnumsImpl) pmAttr).enumClass, s) : null;
+      protected Enum<?> stringToValueImpl(AttrConverterCtxt ctxt, String s) {
+          return (s != null && s.length() > 0)
+              ? Enum.valueOf(((PmAttrListOfEnumsImpl) ctxt.getPmAttr()).enumClass, s)
+              : null;
       }
 
       @Override
-      public String valueToString(PmAttr<?> pmAttr, Enum<?> v) {
-          return v.name();
+      protected String valueToStringImpl(AttrConverterCtxt ctxt, Enum<?> v) {
+          return (v != null) ? v.name() : null;
       }
+
   }
 }
