@@ -15,21 +15,24 @@ public interface PmAttrList<T> extends PmAttr<List<T>> {
    * method will provide the result that the returned value is a list...
    *
    * @return The list value.
+   * @deprecated Is only a JSF component specific workaround. Will be moved to a view connector.
    */
+  @Deprecated
   List<T> getValueAsList();
 
   /**
-   * @see #getValueAsList()
    * @param value
    *          The new list value.
+   * @deprecated Is only a JSF component specific workaround. Will be moved to a view connector.
    */
+  @Deprecated
   void setValueAsList(List<T> value);
 
   /**
    * A string list interface for UI controls that only support string lists.<br>
    * Example: rich:pickList
    * <p>
-   * Attention: Will only work if an {@link PmAttrListCfg#itemConverter()} is
+   * Attention: Will only work if an {@link PmAttrListCfg#itemStringConverter()} is
    * defined.
    *
    * @return The items as a list of strings.
@@ -40,7 +43,7 @@ public interface PmAttrList<T> extends PmAttr<List<T>> {
    * A string list interface for UI controls that only support string lists.<br>
    * Example: rich:pickList
    * <p>
-   * Attention: Will only work if an {@link PmAttrListCfg#itemConverter()} is
+   * Attention: Will only work if an {@link PmAttrListCfg#itemStringConverter()} is
    * defined.
    *
    * @param value The items as a list of strings.

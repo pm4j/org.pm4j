@@ -14,7 +14,7 @@ import org.pm4j.core.pm.api.PmLocalizeApi;
  * Provides context information for string and value converter operations.
  */
 public class AttrConverterCtxt implements StringConverterCtxt {
-  private final PmAttr<?> pmAttr;
+  private final PmAttrBase<?, ?> pmAttr;
 
   public AttrConverterCtxt(PmAttrBase<?, ?> pmAttr) {
     assert pmAttr != null;
@@ -28,7 +28,7 @@ public class AttrConverterCtxt implements StringConverterCtxt {
 
   @Override
   public TimeZone getConverterCtxtTimeZone() {
-    return pmAttr.getPmConversation().getPmTimeZone();
+    return pmAttr.getPmTimeZoneImpl();
   }
 
   @Override

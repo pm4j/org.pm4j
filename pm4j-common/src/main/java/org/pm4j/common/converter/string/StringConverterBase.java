@@ -5,14 +5,14 @@ package org.pm4j.common.converter.string;
  * Provides a simple base implementation for
  * {@link #valueToString(PmAttr, Object)}.
  *
- * @author olaf boede
- *
  * @param <T>
  *          Type of the value to convert.
  * @param <C>
  *          Concrete type of string converter context.<br>
  *          Some converters need to access specific context information. The
  *          generic type <code>C</code> supports such cases.
+ *
+ * @author Olaf Boede
  */
 public abstract class StringConverterBase<T, C extends StringConverterCtxt> implements StringConverter<T> {
 
@@ -24,7 +24,7 @@ public abstract class StringConverterBase<T, C extends StringConverterCtxt> impl
 
   /**
    * Calls {@link #stringToValueImpl(StringConverterCtxt, String)} and supports
-   * exception tanslation
+   * exception translation
    */
   @SuppressWarnings("unchecked")
   @Override

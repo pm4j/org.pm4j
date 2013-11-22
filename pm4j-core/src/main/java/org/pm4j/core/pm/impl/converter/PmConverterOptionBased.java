@@ -4,10 +4,10 @@ import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.pm4j.common.converter.string.StringConverterBase;
 import org.pm4j.core.pm.PmOption;
 import org.pm4j.core.pm.PmOptionSet;
 import org.pm4j.core.pm.impl.AttrConverterCtxt;
+import org.pm4j.core.pm.impl.AttrStringConverterBase;
 import org.pm4j.core.pm.impl.PmAttrBase;
 import org.pm4j.core.pm.impl.options.PmOptionSetUtil;
 import org.pm4j.core.pm.impl.pathresolver.ExpressionPathResolver;
@@ -19,7 +19,7 @@ import org.pm4j.core.pm.impl.pathresolver.PathResolver;
  *
  * @author olaf boede
  */
-public class PmConverterOptionBased extends StringConverterBase<Object, AttrConverterCtxt> {
+public class PmConverterOptionBased extends AttrStringConverterBase<Object> {
 
   private static final Log log = LogFactory.getLog(PmConverterOptionBased.class);
 

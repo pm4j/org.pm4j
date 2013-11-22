@@ -5,6 +5,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.pm4j.common.converter.string.StringConverter;
+
 
 /**
  * PM list attribute constraints.
@@ -18,5 +20,6 @@ public @interface PmAttrListCfg {
   /**
    * @return The converter class for items of the list value.
    */
-  Class<?> itemConverter() default Void.class;
+  @SuppressWarnings("rawtypes")
+  Class<? extends StringConverter> itemStringConverter() default StringConverter.class;
 }

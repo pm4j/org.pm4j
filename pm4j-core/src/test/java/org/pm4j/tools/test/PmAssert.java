@@ -3,7 +3,10 @@ package org.pm4j.tools.test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.junit.Assert;
@@ -14,6 +17,7 @@ import org.pm4j.core.pm.PmMessage;
 import org.pm4j.core.pm.PmMessage.Severity;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.api.PmMessageUtil;
+import org.pm4j.core.pm.impl.PmUtil;
 
 /**
  * A set of junit test support methods.
@@ -24,6 +28,40 @@ public class PmAssert {
 
     private PmAssert() {
     }
+
+    /**
+     * Checks if exactly the given message text(s) exist for the given PM.
+     * <p>
+     * Notice that a {@link org.pm4j.core.pm.PmConversation} will report all messages within its
+     * scope. Any other PM will only report its own messages.
+     *
+     * @param pm
+     *            the PM to check the messages for.
+     * @param expectedMessages
+     *            the set of expected message texts.
+     */
+    // @formatter:off
+    public static void assertMessageText(PmObject pm, String... expectedMessages) {
+        List<PmMessage> messages = PmMessageUtil.getPmMessages(pm);
+        if (messages.size() != expectedMessages.length) {
+            fail("Expected " + expectedMessages.length +
+                    " messages but found " + messages.size() + " messages." +
+                    "\nFound messages: " + messages +
+                    "\nExpected messages: " + Arrays.asList(expectedMessages) +
+                    "\nPM context: " + PmUtil.getAbsoluteName(pm));
+        }
+
+        Set<String> expectedSet = new HashSet<String>(Arrays.asList(expectedMessages));
+        for (PmMessage m : messages) {
+            if (!expectedSet.contains(m.getTitle())) {
+                fail("Unexpected message found." +
+                        "\nFound messages: " + messages +
+                        "\nExpected messages: " + Arrays.asList(expectedMessages) +
+                        "\nPM context: " + PmUtil.getAbsoluteName(pm));
+            }
+        }
+    }
+    // @formatter:on
 
     /**
      * Checks that there are no active {@link PmMessage}s for the given PM (incl. it's sub-PMs).

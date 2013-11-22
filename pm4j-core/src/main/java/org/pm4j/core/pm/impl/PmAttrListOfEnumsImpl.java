@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
-import org.pm4j.common.converter.string.StringConverterBase;
 import org.pm4j.core.pm.PmOption;
 import org.pm4j.core.pm.PmOptionSet;
 import org.pm4j.core.pm.annotation.PmAttrListCfg;
@@ -20,7 +19,7 @@ import org.pm4j.core.pm.impl.options.PmOptionSetImpl;
  *
  * @author olaf boede
  */
-@PmAttrListCfg(itemConverter=PmAttrListOfEnumsImpl.Converter.class)
+@PmAttrListCfg(itemStringConverter=PmAttrListOfEnumsImpl.Converter.class)
 public class PmAttrListOfEnumsImpl<T_ENUM extends Enum<?>> extends PmAttrListImpl<T_ENUM> {
 
   private final Class<T_ENUM> enumClass;
@@ -105,7 +104,7 @@ public class PmAttrListOfEnumsImpl<T_ENUM extends Enum<?>> extends PmAttrListImp
   }
 
   /** Translates between strings and enums. */
-  public static class Converter extends StringConverterBase<Enum<?>, AttrConverterCtxt> {
+  public static class Converter extends AttrStringConverterBase<Enum<?>> {
 
       @Override
       @SuppressWarnings({ "unchecked", "rawtypes" })

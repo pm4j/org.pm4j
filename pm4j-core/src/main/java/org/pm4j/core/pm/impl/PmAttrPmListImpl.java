@@ -8,6 +8,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.pm4j.common.converter.string.StringConverter;
 import org.pm4j.common.converter.string.StringConverterList;
+import org.pm4j.common.converter.value.ValueConverter;
+import org.pm4j.common.converter.value.ValueConverterCtxt;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmAttrPmList;
 import org.pm4j.core.pm.PmBean;
@@ -197,31 +199,6 @@ public class PmAttrPmListImpl<T_ITEM_PM extends PmBean<T_BEAN>, T_BEAN> extends 
     return new ArrayList<T_BEAN>();
   }
 
-  @SuppressWarnings("unchecked")
-  @Override
-  public List<T_ITEM_PM> convertBackingValueToPmValue(Collection<T_BEAN> beanList) {
-    MetaData md = getOwnMetaData();
-    List<T_ITEM_PM> pmValues = (List<T_ITEM_PM>) PmFactoryApi
-          .getPmListForBeans(this,
-                             beanList,
-                             !md.provideInvisibleItems);
-    return pmValues;
-  }
-
-  @Override
-  public Collection<T_BEAN> convertPmValueToBackingValue(List<T_ITEM_PM> rawPmAttrValue) {
-    List<T_ITEM_PM> pmAttrValue = rawPmAttrValue;
-    int listSize = pmAttrValue.size();
-    Collection<T_BEAN> objectList = makeBeanCollection();
-
-    for (int i = 0; i < listSize; ++i) {
-      T_ITEM_PM itemPm = pmAttrValue.get(i);
-      objectList.add(itemPm.getPmBean());
-    }
-
-    return objectList;
-  }
-
   /**
    * In addition to standard checks (required check) it forwards the validation
    * to the list items provided by the parameter.
@@ -236,6 +213,40 @@ public class PmAttrPmListImpl<T_ITEM_PM extends PmBean<T_BEAN>, T_BEAN> extends 
         pm.pmValidate();
       }
     }
+  }
+
+  @Override
+  protected ValueConverter<List<T_ITEM_PM>, Collection<T_BEAN>> getValueConverterImpl() {
+    return new PmListValueConverter();
+  }
+
+  /** Translates all items. */
+  protected class PmListValueConverter implements ValueConverter<List<T_ITEM_PM>, Collection<T_BEAN>> {
+
+    @Override
+    public List<T_ITEM_PM> toExternalValue(ValueConverterCtxt ctxt, Collection<T_BEAN> beanList) {
+      MetaData md = getOwnMetaData();
+      @SuppressWarnings("unchecked")
+      List<T_ITEM_PM> pmValues = (List<T_ITEM_PM>) PmFactoryApi
+            .getPmListForBeans(PmAttrPmListImpl.this,
+                               beanList,
+                               !md.provideInvisibleItems);
+      return pmValues;
+    }
+
+    @Override
+    public Collection<T_BEAN> toInternalValue(ValueConverterCtxt ctxt, List<T_ITEM_PM> pmAttrValue) {
+      int listSize = pmAttrValue.size();
+      Collection<T_BEAN> objectList = makeBeanCollection();
+
+      for (int i = 0; i < listSize; ++i) {
+        T_ITEM_PM itemPm = pmAttrValue.get(i);
+        objectList.add(itemPm.getPmBean());
+      }
+
+      return objectList;
+    }
+
   }
 
   // ======== meta data ======== //

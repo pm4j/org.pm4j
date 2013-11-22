@@ -1,5 +1,7 @@
 package org.pm4j.core.pm.impl;
 
+import org.pm4j.common.converter.value.ValueConverter;
+import org.pm4j.common.converter.value.ValueConverterCtxt;
 import org.pm4j.core.pm.PmAttrPmRef;
 import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmObject;
@@ -64,15 +66,20 @@ public class PmAttrPmRefImpl<T_REFED_PM extends PmBean<?>, T_BEAN>
   // ======== Value handling ======== //
 
   @Override
-  @SuppressWarnings("unchecked")
-  public T_REFED_PM convertBackingValueToPmValue(T_BEAN beanAttrValue) {
-    return (T_REFED_PM) PmFactoryApi.getPmForBean(this, beanAttrValue);
+  protected ValueConverter<T_REFED_PM, T_BEAN> getValueConverterImpl() {
+    return new PmRefValueConverter();
   }
 
   @SuppressWarnings("unchecked")
-  @Override
-  public T_BEAN convertPmValueToBackingValue(T_REFED_PM pmAttrValue) {
-    return (T_BEAN) pmAttrValue.getPmBean();
+  protected class PmRefValueConverter implements ValueConverter<T_REFED_PM, T_BEAN> {
+    @Override
+    public T_REFED_PM toExternalValue(ValueConverterCtxt ctxt, T_BEAN i) {
+      return (T_REFED_PM) PmFactoryApi.getPmForBean(PmAttrPmRefImpl.this, i);
+    }
+    @Override
+    public T_BEAN toInternalValue(ValueConverterCtxt ctxt, T_REFED_PM e) {
+      return (T_BEAN) e.getPmBean();
+    }
   }
 
   /**

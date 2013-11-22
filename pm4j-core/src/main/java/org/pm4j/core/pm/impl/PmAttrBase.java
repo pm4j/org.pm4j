@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
@@ -833,20 +834,8 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
    *
    * @return The attribute value string converter. Never <code>null</code>.
    */
-  protected StringConverter<T_PM_VALUE> getStringConverterImpl() {
-    return getConverter();
-  }
-
-  /**
-   * TODO oboede: rename to getStringConverterImpl().
-   *
-   * @return The converter that translates from and to the corresponding string value representation.
-   *
-   * @deprecated Please use {@link #getStringConverterImpl()}.
-   */
-  @Deprecated
   @SuppressWarnings("unchecked")
-  protected StringConverter<T_PM_VALUE> getConverter() {
+  protected StringConverter<T_PM_VALUE> getStringConverterImpl() {
     StringConverter<T_PM_VALUE> c = (StringConverter<T_PM_VALUE>) getOwnMetaData().stringConverter;
     if (c == null) {
       throw new PmRuntimeException(this, "Missing value converter.");
@@ -869,6 +858,15 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     return  (dataContainer != null &&
              dataContainer.originalValue != UNCHANGED_VALUE_INDICATOR) ||
              super.isPmValueChangedImpl();
+  }
+
+  /**
+   * Sub classes may override this to define their attribute specific time zone.
+   *
+   * @return The externally visible time zone.
+   */
+  protected TimeZone getPmTimeZoneImpl() {
+      return getPmConversation().getPmTimeZone();
   }
 
   @Override

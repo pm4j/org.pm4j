@@ -54,16 +54,6 @@ public interface PmTable2<T_ROW_PM> extends PmObject, PmDataInput {
   List<T_ROW_PM> getRows();
 
   /**
-   * Provides a row representation that may be used by generic a renderer.
-   * <p>
-   * Does not provide any items if the table is not visible.
-   *
-   * @return The set of rows as provides by {@link #getRows()}.<br>
-   *         Each row is encapsulated in a {@link PmTableGenericRow} instance.
-   */
-  List<PmTableGenericRow2<T_ROW_PM>> getGenericRowPms();
-
-  /**
    * @return The number of rows per table page.
    */
   int getNumOfPageRowPms();

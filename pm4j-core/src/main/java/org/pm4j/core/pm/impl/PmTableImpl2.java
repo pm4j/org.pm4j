@@ -3,7 +3,6 @@ package org.pm4j.core.pm.impl;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyVetoException;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -54,7 +53,6 @@ import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmPager2;
 import org.pm4j.core.pm.PmTable2;
 import org.pm4j.core.pm.PmTableCol2;
-import org.pm4j.core.pm.PmTableGenericRow2;
 import org.pm4j.core.pm.annotation.PmCacheCfg;
 import org.pm4j.core.pm.annotation.PmCacheCfg.CacheMode;
 import org.pm4j.core.pm.annotation.PmTableCfg2;
@@ -158,21 +156,6 @@ public class PmTableImpl2
   @Override
   public List<PmTableCol2> getColumnPms() {
     return PmUtil.getPmChildrenOfType(this, PmTableCol2.class);
-  }
-
-  @Override
-  public List<PmTableGenericRow2<T_ROW_PM>> getGenericRowPms() {
-    List<PmTableGenericRow2<T_ROW_PM>> genericRows = null;
-
-    if (genericRows == null) {
-      List<T_ROW_PM> rows = getRowPms();
-      genericRows = new ArrayList<PmTableGenericRow2<T_ROW_PM>>(rows.size());
-      for (T_ROW_PM r : rows) {
-        genericRows.add(new PmTableGenericRowImpl2<T_ROW_PM>(this, r));
-      }
-    }
-
-    return genericRows;
   }
 
   @SuppressWarnings("unchecked")
