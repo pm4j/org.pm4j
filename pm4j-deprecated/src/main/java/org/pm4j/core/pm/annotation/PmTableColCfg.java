@@ -48,8 +48,4 @@ public @interface PmTableColCfg {
    * @return The column filter definitions.
    */
   FilterByCfg[] filterBy() default {};
-
-  Class<?> filterType() default Void.class;
-
-
 }
