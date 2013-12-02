@@ -3,7 +3,6 @@ package org.pm4j.core.pm;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
