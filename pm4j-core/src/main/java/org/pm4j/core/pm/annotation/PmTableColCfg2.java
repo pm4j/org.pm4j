@@ -5,6 +5,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.joda.time.LocalDate;
 import org.pm4j.core.pm.PmTableCol2;
 
 /**
@@ -27,9 +28,12 @@ public @interface PmTableColCfg2 {
   PmBoolean sortable() default PmBoolean.UNDEFINED;
 
   /**
-   * The filter definition used for this column.
+   * This type specification defines the kind of UI control offered to the user
+   * to enter the filter-by compare value for this column. It also affects the set
+   * type specific compare operators.<br>
+   * This is usually value type like {@link String} or {@link LocalDate}.
    *
-   * @return The column filter definitions.
+   * @return The value type the user can filter by.
    */
   Class<?> filterType() default Void.class;
 

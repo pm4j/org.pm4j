@@ -130,7 +130,6 @@ public class PageablePmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> exten
              beans,
              queryOptions)
         );
-    ((PageableInMemCollectionImpl<T_BEAN>)this.beanCollection).setInMemQueryEvaluator(new InMemPmQueryEvaluator<T_BEAN>(pmCtxt));
   }
 
   /**

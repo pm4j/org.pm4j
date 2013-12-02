@@ -55,7 +55,7 @@ public class PageablePmBeanCollectionTest extends PageableCollectionTestBase<Pag
     List<Bean> beans = makeBeans(strings);
 
     QueryOptions qo = new QueryOptions();
-    QueryAttr attrNameValue = new QueryAttr("name", "name.value", String.class);
+    QueryAttr attrNameValue = new QueryAttr("name", String.class);
 
     FilterCompareDefinition fcd = new FilterCompareDefinition(attrNameValue, new CompOpStringStartsWith());
     qo.addFilterCompareDefinition(fcd);
