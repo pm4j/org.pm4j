@@ -57,7 +57,7 @@ public abstract class PmAttrNumBase<T extends Number>
     @Override
     public StringConverterParseException createStringConverterParseException(String valueToConvert, Throwable exception, String... formats) {
       String msg = PmLocalizeApi.localize(getPmAttr(), PmConstants.MSGKEY_VALIDATION_NUMBER_CONVERSION_FROM_STRING_FAILED, valueToConvert);
-      return new StringConverterParseException(msg, this, valueToConvert, formats);
+      return new StringConverterParseException(msg, this, exception, valueToConvert, formats);
     }
   }
 

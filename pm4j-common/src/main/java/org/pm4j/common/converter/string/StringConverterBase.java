@@ -45,6 +45,11 @@ public abstract class StringConverterBase<T, C extends StringConverterCtxt> impl
    * @param s
    * @return
    * @throws Exception
+   *           if the string can't be converted. If the exception is a
+   *           {@link StringConverterParseException} it will be propagated to
+   *           the calling context. If it's a different exception,
+   *           {@link #stringToValue(StringConverterCtxt, String)} will wrap it
+   *           in a {@link StringConverterParseException}.
    */
   protected abstract T stringToValueImpl(C ctxt, String s) throws Exception;
 

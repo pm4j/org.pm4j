@@ -11,12 +11,12 @@ import org.pm4j.core.pm.impl.SetValueContainer;
  */
 public class PmConverterErrorMessage extends PmValidationMessage {
 
-  public PmConverterErrorMessage(PmObject pm, SetValueContainer<?> invalidValue, String msgKey, Object[] msgArgs) {
-    super(pm, invalidValue, msgKey, msgArgs);
+  public PmConverterErrorMessage(PmObject pm, SetValueContainer<?> invalidValue, Throwable cause, String msgKey, Object[] msgArgs) {
+    super(pm, invalidValue, cause, msgKey, msgArgs);
   }
 
-  public PmConverterErrorMessage(PmObject pm, String msgKey, Object... msgArgs) {
-    super(pm, msgKey, msgArgs);
+  public PmConverterErrorMessage(PmObject pm, Throwable cause, String msgKey, Object... msgArgs) {
+    super(pm, cause, msgKey, msgArgs);
   }
 
 }

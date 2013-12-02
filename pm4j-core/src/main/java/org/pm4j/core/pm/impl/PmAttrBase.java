@@ -483,7 +483,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
           setInvalidValue(vc);
           getPmConversationImpl().getPmExceptionHandler().onException(this, e, false);
         } else {
-          setAndPropagateValueConverterMessage(vc, resData.msgKey, resData.msgArgs);
+          setAndPropagateValueConverterMessage(vc, e, resData.msgKey, resData.msgArgs);
           if (LOG.isDebugEnabled()) {
             LOG.debug("String to value conversion failed in attribute '" + PmUtil.getPmLogString(this) + "'. String value: " + text);
           }
@@ -493,7 +493,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
         PmResourceData resData = e.getResourceData();
         Object[] args = Arrays.copyOf(resData.msgArgs, resData.msgArgs.length+1);
         args[resData.msgArgs.length] = getPmTitle();
-        setAndPropagateValueConverterMessage(vc, resData.msgKey, args);
+        setAndPropagateValueConverterMessage(vc, e, resData.msgKey, args);
         if (LOG.isDebugEnabled()) {
           LOG.debug("String to value conversion failed in attribute '" + PmUtil.getPmLogString(this) +
               "'. String value: '" + text +
@@ -1005,7 +1005,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
    *          Values for the user message.
    */
   private void setAndPropagateInvalidValue(SetValueContainer<T_PM_VALUE> invValue, String msgKey, Object... msgArgs) {
-    this.getPmConversationImpl().addPmMessage(new PmValidationMessage(this, invValue, msgKey, msgArgs));
+    getPmConversationImpl().addPmMessage(new PmValidationMessage(this, invValue, null, msgKey, msgArgs));
     setInvalidValue(invValue);
   }
 
@@ -1028,9 +1028,9 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
    * @param msgArgs
    *          Values for the user message.
    */
-  private void setAndPropagateValueConverterMessage(SetValueContainer<T_PM_VALUE> invValue, String msgKey,
+  private void setAndPropagateValueConverterMessage(SetValueContainer<T_PM_VALUE> invValue, Throwable cause, String msgKey,
       Object... msgArgs) {
-    this.getPmConversationImpl().addPmMessage(new PmConverterErrorMessage(this, invValue, msgKey, msgArgs));
+    this.getPmConversationImpl().addPmMessage(new PmConverterErrorMessage(this, invValue, cause, msgKey, msgArgs));
     setInvalidValue(invValue);
   }
 

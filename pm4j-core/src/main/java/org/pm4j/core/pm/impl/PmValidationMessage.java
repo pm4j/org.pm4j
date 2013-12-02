@@ -10,14 +10,18 @@ public class PmValidationMessage extends PmMessage {
 
   private final WeakReference<SetValueContainer<?>> invalidValueRef;
 
-  public PmValidationMessage(PmObject pm, SetValueContainer<?> invalidValue, String msgKey, Object... msgArgs) {
-    super(pm, Severity.ERROR, msgKey, msgArgs);
+  public PmValidationMessage(PmObject pm, SetValueContainer<?> invalidValue, Throwable cause, String msgKey, Object... msgArgs) {
+    super(pm, Severity.ERROR, cause, msgKey, msgArgs);
     invalidValueRef = new WeakReference<SetValueContainer<?>>(invalidValue);
   }
 
-  @SuppressWarnings("unchecked")
   public PmValidationMessage(PmObject pm, String msgKey, Object... msgArgs) {
-    super(pm, Severity.ERROR, msgKey, msgArgs);
+    this(pm, (Throwable)null, msgKey, msgArgs);
+  }
+
+  @SuppressWarnings("unchecked")
+  public PmValidationMessage(PmObject pm, Throwable cause, String msgKey, Object... msgArgs) {
+    super(pm, Severity.ERROR, cause, msgKey, msgArgs);
     if (pm instanceof PmAttr) {
       PmAttr<?> attr = (PmAttr<?>)pm;
       @SuppressWarnings("rawtypes")

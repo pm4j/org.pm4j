@@ -44,7 +44,7 @@ public class AttrConverterCtxt implements StringConverterCtxt {
   @Override
   public StringConverterParseException createStringConverterParseException(String valueToConvert, Throwable exception, String... formats) {
     String msg = PmLocalizeApi.localize(pmAttr, PmConstants.MSGKEY_VALIDATION_CONVERSION_FROM_STRING_FAILED, valueToConvert);
-    return new StringConverterParseException(msg, this, valueToConvert, formats);
+    return new StringConverterParseException(msg, this, exception, valueToConvert, formats);
   }
 
   @Override
@@ -65,7 +65,7 @@ public class AttrConverterCtxt implements StringConverterCtxt {
     @Override
     public StringConverterParseException createStringConverterParseException(String valueToConvert, Throwable exception, String... formats) {
       String msg = PmLocalizeApi.localize(getPmAttr(), PmConstants.MSGKEY_VALIDATION_FORMAT_FAILURE, getPmAttr().getPmTitle(), StringConverterUtil.getOutputFormat(this));
-      return new StringConverterParseException(msg, this, valueToConvert, formats);
+      return new StringConverterParseException(msg, this, exception, valueToConvert, formats);
     }
   }
 }
