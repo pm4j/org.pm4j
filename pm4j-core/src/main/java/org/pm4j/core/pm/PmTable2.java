@@ -41,10 +41,8 @@ public interface PmTable2<T_ROW_PM> extends PmObject, PmDataInput {
   List<PmTableCol2> getColumns();
 
   /**
-   * Provides only the visible rows.<br>
+   * Provides the set of rows displayed on the current page.<br>
    * The provided set may be influenced by filter criteria and paging logic.
-   * <p>
-   * Does not provide any items if the table is not visible.
    *
    * @return The set of table rows to display.
    */
