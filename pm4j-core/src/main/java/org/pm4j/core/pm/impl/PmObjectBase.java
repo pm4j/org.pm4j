@@ -2,11 +2,13 @@ package org.pm4j.core.pm.impl;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -38,6 +40,7 @@ import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmCacheCfg;
 import org.pm4j.core.pm.annotation.PmCacheCfg.CacheMode;
 import org.pm4j.core.pm.annotation.PmFactoryCfg;
+import org.pm4j.core.pm.annotation.PmInit;
 import org.pm4j.core.pm.annotation.PmTitleCfg;
 import org.pm4j.core.pm.annotation.customize.CustomizedAnnotationUtil;
 import org.pm4j.core.pm.annotation.customize.PmAnnotationApi;
@@ -815,8 +818,11 @@ public abstract class PmObjectBase implements PmObject {
             pmInitState = PmInitState.BEFORE_ON_PM_INIT;
             try {
               onPmInit();
+              for (Method method : pmMetaData.initMethods) {
+                 method.invoke(this, new Object[] {});
+              }
             }
-            catch (RuntimeException e) {
+            catch (Exception e) {
               pmInitState = PmInitState.FIELD_BOUND_CHILD_META_DATA_INITIALIZED;
               throw PmRuntimeException.asPmRuntimeException(this, e);
             }
@@ -911,6 +917,51 @@ public abstract class PmObjectBase implements PmObject {
 
     // -- Dependency injection configuration --
     metaData.diResolvers = DiResolverUtil.getDiResolvers(getClass());
+    
+    // -- collect all methods annotated with @PmInit
+    metaData.initMethods = findInitMethods();
+  }
+  
+  /**
+   * @return all methods in the class hierarchy of this PM that are annotated with {@link PmInit}.
+   */
+  private List<Method> findInitMethods() {
+    List<Method> initMethods = ClassUtil.findAnnotatedMethodsTopDown(this.getClass(), PmInit.class);
+    Map<String, Method> nameToMethodMap = new HashMap<String, Method>();
+    
+    for (Iterator<Method> iter = initMethods.listIterator(); iter.hasNext();) {
+      Method method = iter.next();
+      // only no-arg methods are allowed
+      if (method.getParameterTypes().length > 1) {
+        throw new IllegalArgumentException("Methods annotated with '" + PmInit.class
+            + "' can not have parameters. This is not true for '" + method + "'. Please rafactore the method!");
+      }
+      // no static methods are allowed
+      if (Modifier.isStatic(method.getModifiers())) {
+        throw new IllegalArgumentException("Methods annotated with '" + PmInit.class
+            + "' must not be static. This is not true for '" + method 
+            + "'. Please rafactore the method!");
+      }
+      // only public and protected methods are allowed
+      if (!Modifier.isPublic(method.getModifiers()) && !Modifier.isProtected(method.getModifiers())) {
+        throw new IllegalArgumentException("Methods annotated with '" + PmInit.class
+            + "' must be public or protected. This is not true for '" + method
+            + "'. Please change the method visibility!");
+      }
+      // If a sub class overrides an annotated super class init method it must
+      // be ensured that the init method is only called once.
+      if (nameToMethodMap.get(method.getName()) != null) {
+        iter.remove();
+      } else {
+        nameToMethodMap.put(method.getName(), method);
+      }
+      // if onPmInit is annotated, do not call it twice
+      if (method.getName().equals("onPmInit")) { 
+        iter.remove();
+      }
+    }
+    
+    return initMethods;
   }
 
   /**
@@ -981,6 +1032,9 @@ public abstract class PmObjectBase implements PmObject {
      */
     private BeanAttrAccessor[] childFieldAccessorArray = {};
     private Map<String, BeanAttrAccessor> nameToChildAccessorMap = Collections.emptyMap();
+    
+    /** all methods annotated with {@link PmInit} */
+    private List<Method> initMethods;
 
     public String getName() { return name; }
     /* package */ String getAbsoluteName() { return absoluteName; }
