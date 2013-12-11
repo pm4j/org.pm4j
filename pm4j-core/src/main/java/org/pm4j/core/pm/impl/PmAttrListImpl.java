@@ -95,10 +95,10 @@ public class PmAttrListImpl<T> extends PmAttrBase<List<T>, List<T>> implements P
    */
   @Override
   protected List<T> getValueImpl() {
-    List<T> beanAttrValue = getBackingValue();    
+    List<T> beanAttrValue = getBackingValue();
     if(beanAttrValue!=null) {
       List<T> pmValue = convertBackingValueToPmValue(beanAttrValue);
-      if(pmValue.isEmpty()) {
+      if(pmValue.isEmpty() && !isValueChangedBySetValue()) {
         // in case the list is empty the elements from the default list are copied over
         pmValue.addAll(getDefaultValue());
         return pmValue;
@@ -106,7 +106,7 @@ public class PmAttrListImpl<T> extends PmAttrBase<List<T>, List<T>> implements P
     }
     return super.getValueImpl();
   }
-  
+
   /**
    * The item-{@link PmAttr.Converter} can be configured using the annotation
    * {@link PmAttrListCfg#itemConverter()} or by overriding this method.
