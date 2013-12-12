@@ -107,13 +107,13 @@ public class PmAttrListImpl<T> extends PmAttrBase<List<T>, List<T>> implements P
    * In case the list is empty this same list shall be populated with default value(s).
    * This is different from the super implementation which returns a new list instance with default value(s).
    */
-  // FIXME oboede: change consequently to value converter implementation!
+  // TODO oboede: change consequently to value converter implementation!
   @Override
   protected List<T> getValueImpl() {
     List<T> beanAttrValue = getBackingValue();
     if(beanAttrValue!=null) {
       List<T> pmValue = getValueConverter().toExternalValue(getConverterCtxt(), beanAttrValue);
-      if(pmValue.isEmpty()) {
+      if(pmValue.isEmpty() && !isValueChangedBySetValue()) {
         // in case the list is empty the elements from the default list are copied over
         pmValue.addAll(getDefaultValue());
         return pmValue;

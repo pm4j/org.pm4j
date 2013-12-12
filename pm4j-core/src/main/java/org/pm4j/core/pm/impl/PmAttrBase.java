@@ -112,7 +112,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
    * important for the default value logic. Default values may have only effect
    * on values that are not explicitly set.
    */
-  private boolean valueWasSet = false;
+  private boolean valueChangedBySetValue = false;
 
   /**
    * Contains optional attribute data that in most cases doesn't exist for usual
@@ -525,7 +525,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     boolean isWritable = !isPmReadonly();
     if (isWritable) {
       PmCacheApi.clearPmCache(this);
-      this.valueWasSet = false;
+      this.valueChangedBySetValue = false;
     }
     clearPmInvalidValues();
     if (isWritable) {
@@ -593,7 +593,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
       }
 
       // Default values may have only effect if the value was not set by the user:
-      if (valueWasSet) {
+      if (valueChangedBySetValue) {
         return pmValue;
       }
 
@@ -710,7 +710,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
         // From now on the value should be handled as intentionally modified.
         // That means that the default value shouldn't be returned, even if the
         // value was set to <code>null</code>.
-        valueWasSet = true;
+        valueChangedBySetValue = true;
 
         setValueChanged(currentValue, newPmValue);
 
@@ -796,6 +796,15 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     } catch (StringConverterParseException e) {
       throw new PmConverterException(this, e);
     }
+  }
+
+  /**
+   * Indicates if the value was explicitly set. This information is especially
+   * important for the default value logic. Default values may have only effect
+   * on values that are not explicitly set.
+   */
+  protected final boolean isValueChangedBySetValue() {
+    return valueChangedBySetValue;
   }
 
   /**
