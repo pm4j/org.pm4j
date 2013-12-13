@@ -12,6 +12,7 @@ import org.apache.commons.lang.StringUtils;
 import org.junit.Assert;
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmCommand;
+import org.pm4j.core.pm.PmOption;
 import org.pm4j.core.pm.PmCommand.CommandState;
 import org.pm4j.core.pm.PmMessage;
 import org.pm4j.core.pm.PmMessage.Severity;
@@ -232,6 +233,48 @@ public class PmAssert {
                 fail("\"" + pm.getPmRelativeName() + "\" attribute should not be required, i.e. optional.");
             }
         }
+    }
+
+    /**
+     * Checks if the given attribute has the expected option titles.
+     *
+     * @param expectedTitles
+     *            A comma separated string with all expected titles. E.g. "A,B,C".
+     * @param pmAttr
+     *            The attribute to check.
+     */
+    public static void assertOptionTitles(String expectedTitles, PmAttr<?> pmAttr) {
+        StringBuilder sb = new StringBuilder();
+        boolean first = true;
+        for (PmOption o : pmAttr.getOptionSet().getOptions()) {
+            if (!first) {
+                sb.append(",");
+            }
+            sb.append(o.getPmTitle());
+            first = false;
+        }
+        assertEquals(pmAttr.getPmRelativeName() + ": option titles", expectedTitles, sb.toString());
+    }
+
+    /**
+     * Checks if the given attribute has the expected option titles.
+     *
+     * @param expectedIds
+     *            A comma separated string with all expected id's. E.g. "A,B,C".
+     * @param pmAttr
+     *            The attribute to check.
+     */
+    public static void assertOptionIds(String expectedIds, PmAttr<?> pmAttr) {
+        StringBuilder sb = new StringBuilder();
+        boolean first = true;
+        for (PmOption o : pmAttr.getOptionSet().getOptions()) {
+            if (!first) {
+                sb.append(",");
+            }
+            sb.append(o.getIdAsString());
+            first = false;
+        }
+        assertEquals(pmAttr.getPmRelativeName() + ": option ids", expectedIds, sb.toString());
     }
 
     /**
