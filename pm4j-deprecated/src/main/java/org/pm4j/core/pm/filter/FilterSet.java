@@ -6,8 +6,10 @@ import java.util.List;
 /**
  * A set of filter items that may be used to express combined filter criteria.
  *
+ * @deprecated please use {@link org.pm4j.standards.filter.FilterSet}
  * @author olaf boede
  */
+@Deprecated
 public class FilterSet {
 
   private List<FilterItem> filterItems = new ArrayList<FilterItem>();
