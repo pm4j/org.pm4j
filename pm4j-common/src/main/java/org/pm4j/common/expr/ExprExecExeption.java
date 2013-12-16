@@ -44,6 +44,9 @@ public class ExprExecExeption extends RuntimeException {
       for (HistoryItem h : ctxt.getExecHistory()) {
         sb.append("\n  ").append(h.expression)
           .append(" -> ").append(h.value);
+        if (h.value != null) {
+          sb.append(" [Class: ").append(h.value.getClass().getSimpleName()).append("]");
+        }
       }
     }
 
