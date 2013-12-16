@@ -46,6 +46,18 @@ public @interface PmOptionCfg {
   String title() default "";
 
   /**
+   * Path from an item object to the value that provides the backing value from the option bean.<br>
+   * The specification of {@link #value()} and {@link #backingValue()} allows to define an automatic value
+   * converter mechanism.<br>
+   * Examples:<br>
+   *  '' - specifies the found object itself;<br>
+   *  'mySubfield.anotherField' - specifies some related content to use.
+   *
+   * @return The value expression that resolves from the option bean to the backing value.
+   */
+  String backingValue() default "";
+
+  /**
    * Path from an item object to the value that provides the option value.<br>
    * Examples:<br>
    *  '' - specifies the found object itself;<br>
@@ -53,10 +65,7 @@ public @interface PmOptionCfg {
    *
    * @return The value expression.
    */
-  String value() default "";
-
-  /** Internal identifier string for no sort-by definition. */
-  static final String NO_SORT_SPEC = "- No sortBy specified. -";
+  String value() default NOT_SPECIFIED;
 
   /**
    * An expression that defines a value to sort the options by.<br>
@@ -79,7 +88,7 @@ public @interface PmOptionCfg {
    *
    * @return The expression to sort the option by.
    */
-  String sortBy() default NO_SORT_SPEC;
+  String sortBy() default NOT_SPECIFIED;
 
   /**
    * Defines if a <code>null</code> option should be generated or not.
@@ -135,5 +144,7 @@ public @interface PmOptionCfg {
    */
   String nullOptionResKey() default NULL_OPTION_DEFAULT_RESKEY;
 
+  /** Internal identifier string for no sort-by definition. */
+  static final String NOT_SPECIFIED = "- Not specified. -";
 }
 

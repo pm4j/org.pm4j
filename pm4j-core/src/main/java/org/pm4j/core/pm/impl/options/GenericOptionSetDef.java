@@ -24,10 +24,14 @@ public class GenericOptionSetDef extends OptionSetDefBase<PmAttrBase<?,?>> {
   protected PmOption makeOption(PmAttrBase<?,?> forAttr, Object o) {
     Object id = idPath.getValue(o);
     Object title = titlePath.getValue(o);
-    Object value = valuePath.getValue(o);
+    Object backingValue = backingValuePath.getValue(o);
+    Object value = valuePath != null
+              ? valuePath.getValue(o)
+              : null;
     return new PmOptionImpl(
                 ObjectUtils.toString(id, ""),
                 ObjectUtils.toString(title, ""),
+                backingValue,
                 value);
   }
 

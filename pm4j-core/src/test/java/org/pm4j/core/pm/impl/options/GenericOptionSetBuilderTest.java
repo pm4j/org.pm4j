@@ -55,7 +55,7 @@ public class GenericOptionSetBuilderTest extends TestCase {
 
     assertEquals("[1, 2, 3]", PmOptionSetUtil.getOptionIds(os).toString());
     assertEquals("[abc, def, xyz]", PmOptionSetUtil.getOptionTitles(os).toString());
-    assertEquals("[1:abc, 2:def, 3:xyz]", PmOptionSetUtil.getOptionValues(os).toString());
+    assertEquals("[1:abc, 2:def, 3:xyz]", PmOptionSetUtil.getOptionBackingValues(os).toString());
   }
 
   public void testBuildFromAPojoCollectionWithNullOptionForOptionalScalarAttr() {
@@ -64,16 +64,16 @@ public class GenericOptionSetBuilderTest extends TestCase {
 
     assertEquals("[null, 1, 2, 3]", PmOptionSetUtil.getOptionIds(os).toString());
     assertEquals("[, abc, def, xyz]", PmOptionSetUtil.getOptionTitles(os).toString());
-    assertEquals("[null, 1:abc, 2:def, 3:xyz]", PmOptionSetUtil.getOptionValues(os).toString());
+    assertEquals("[null, 1:abc, 2:def, 3:xyz]", PmOptionSetUtil.getOptionBackingValues(os).toString());
   }
 
   public void testBuildFromAPojoCollectionAndUseNameAsOptionValue() {
-    GenericOptionSetBuilder b = new GenericOptionSetBuilder("id", "name", "name", NullOption.DEFAULT, null, PmOptionCfg.NO_SORT_SPEC);
+    GenericOptionSetBuilder b = new GenericOptionSetBuilder("id", "name", "name", NullOption.DEFAULT, null, PmOptionCfg.NOT_SPECIFIED);
     PmOptionSet os = makeOptionSet2(b, testPm.listAttr, pojoCollection);
 
     assertEquals("[1, 2, 3]", PmOptionSetUtil.getOptionIds(os).toString());
     assertEquals("[abc, def, xyz]", PmOptionSetUtil.getOptionTitles(os).toString());
-    assertEquals("[abc, def, xyz]", PmOptionSetUtil.getOptionValues(os).toString());
+    assertEquals("[abc, def, xyz]", PmOptionSetUtil.getOptionBackingValues(os).toString());
   }
 
   public void testBuildFromAPojoCollectionAndGetValueFromSubobjects() {
@@ -82,12 +82,12 @@ public class GenericOptionSetBuilderTest extends TestCase {
         new Item(2, "def", new Item(5, "fife")),
         new Item(3, "xyz", new Item(6, "six")) );
 
-    GenericOptionSetBuilder b = new GenericOptionSetBuilder("id", "name", "subItem.name", NullOption.DEFAULT, null, PmOptionCfg.NO_SORT_SPEC);
+    GenericOptionSetBuilder b = new GenericOptionSetBuilder("id", "name", "subItem.name", NullOption.DEFAULT, null, PmOptionCfg.NOT_SPECIFIED);
     PmOptionSet os = makeOptionSet2(b, testPm.listAttr, pojoCollectionWithSubObjects);
 
     assertEquals("[1, 2, 3]", PmOptionSetUtil.getOptionIds(os).toString());
     assertEquals("[abc, def, xyz]", PmOptionSetUtil.getOptionTitles(os).toString());
-    assertEquals("[four, fife, six]", PmOptionSetUtil.getOptionValues(os).toString());
+    assertEquals("[four, fife, six]", PmOptionSetUtil.getOptionBackingValues(os).toString());
   }
 
   public void testBuildFromAnIntegerCollection() {
@@ -96,7 +96,7 @@ public class GenericOptionSetBuilderTest extends TestCase {
 
     assertEquals("[1, 2, 3]", PmOptionSetUtil.getOptionIds(os).toString());
     assertEquals("[1, 2, 3]", PmOptionSetUtil.getOptionTitles(os).toString());
-    assertEquals("[1, 2, 3]", PmOptionSetUtil.getOptionValues(os).toString());
+    assertEquals("[1, 2, 3]", PmOptionSetUtil.getOptionBackingValues(os).toString());
   }
 
   public void testBuildFromAnArrayOfLongs() {
@@ -107,7 +107,7 @@ public class GenericOptionSetBuilderTest extends TestCase {
 
     assertEquals("[1, 2, 3]", PmOptionSetUtil.getOptionIds(os).toString());
     assertEquals("[1, 2, 3]", PmOptionSetUtil.getOptionTitles(os).toString());
-    assertEquals("[1, 2, 3]", PmOptionSetUtil.getOptionValues(os).toString());
+    assertEquals("[1, 2, 3]", PmOptionSetUtil.getOptionBackingValues(os).toString());
   }
 
   public void testBuildFromBooleanArgumentList() {
@@ -116,7 +116,7 @@ public class GenericOptionSetBuilderTest extends TestCase {
 
     assertEquals("[true, false, true]", PmOptionSetUtil.getOptionIds(os).toString());
     assertEquals("[true, false, true]", PmOptionSetUtil.getOptionTitles(os).toString());
-    assertEquals("[true, false, true]", PmOptionSetUtil.getOptionValues(os).toString());
+    assertEquals("[true, false, true]", PmOptionSetUtil.getOptionBackingValues(os).toString());
   }
 
   // -- helper --

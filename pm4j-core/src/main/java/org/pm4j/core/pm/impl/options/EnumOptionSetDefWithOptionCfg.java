@@ -85,7 +85,7 @@ public class EnumOptionSetDefWithOptionCfg extends OptionSetDefBase<PmAttrEnumIm
       List<PmOption> options = new ArrayList<PmOption>(values.length);
 
       if (shouldMakeNullOption(forAttr)) {
-        options.add(new PmOptionImpl("", getNullOptionTitle(forAttr), null));
+        options.add(new PmOptionImpl("", getNullOptionTitle(forAttr), null, null));
       }
 
       for (Enum<?> e : values) {
@@ -119,7 +119,7 @@ public class EnumOptionSetDefWithOptionCfg extends OptionSetDefBase<PmAttrEnumIm
     Enum<?> e = (Enum<?>)o;
     String resKey = resKeyPfx + e.name();
     String title = PmLocalizeApi.localize(forAttr, resKey);
-    return new PmOptionImpl(e.name(), title, e);
+    return new PmOptionImpl(e.name(), title, e, e);
   }
 
 }

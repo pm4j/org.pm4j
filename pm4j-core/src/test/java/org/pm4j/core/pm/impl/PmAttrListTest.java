@@ -61,8 +61,8 @@ public class PmAttrListTest extends TestCase {
       @Override
       protected PmOptionSet getOptionSetImpl() {
         return new PmOptionSetImpl(
-            new PmOptionImpl(MyEnum.e1.name(), "-e1-", MyEnum.e1),
-            new PmOptionImpl(MyEnum.e2.name(), "-e2-", MyEnum.e2));
+            new PmOptionImpl(MyEnum.e1.name(), "-e1-", MyEnum.e1, MyEnum.e1),
+            new PmOptionImpl(MyEnum.e2.name(), "-e2-", MyEnum.e2, MyEnum.e2));
       }
     };
 }

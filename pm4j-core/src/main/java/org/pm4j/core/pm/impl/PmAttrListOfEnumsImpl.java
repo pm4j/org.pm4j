@@ -50,7 +50,7 @@ public class PmAttrListOfEnumsImpl<T_ENUM extends Enum<?>> extends PmAttrListImp
    * @return The option to display for the value.
    */
   protected PmOption makeEnumOption(T_ENUM value) {
-    return new PmOptionImpl(value.name(), PmLocalizeApi.localizeEnumValue(this, value), value);
+    return new PmOptionImpl(value.name(), PmLocalizeApi.localizeEnumValue(this, value), value, value);
   }
 
 

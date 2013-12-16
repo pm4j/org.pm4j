@@ -29,7 +29,7 @@ class GenericOptionSetBuilder {
 
   private final PathResolver idPath;
   private final PathResolver namePath;
-  private final PathResolver valuePath;
+  private final PathResolver backingValuePath;
   private final NullOption nullOption;
   public final String nullOptionTitleResKey;
   private final PathComparatorFactory sortComparatorFactory;
@@ -39,7 +39,7 @@ class GenericOptionSetBuilder {
    * the generated options.
    */
   public GenericOptionSetBuilder() {
-    this("", "", "", NullOption.DEFAULT, "", PmOptionCfg.NO_SORT_SPEC);
+    this("", "", "", NullOption.DEFAULT, "", PmOptionCfg.NOT_SPECIFIED);
   }
 
   /**
@@ -52,7 +52,7 @@ class GenericOptionSetBuilder {
    *          The path from the item object to the option title attribute.
    */
   public GenericOptionSetBuilder(String idPathString, String namePathString) {
-    this(idPathString, namePathString, "", NullOption.DEFAULT, "", PmOptionCfg.NO_SORT_SPEC);
+    this(idPathString, namePathString, "", NullOption.DEFAULT, "", PmOptionCfg.NOT_SPECIFIED);
   }
 
   /**
@@ -60,7 +60,7 @@ class GenericOptionSetBuilder {
    *          The path from the item object to the option identifier attribute.
    * @param namePathString
    *          The path from the item object to the option title attribute.
-   * @param valuePathString
+   * @param backingValuePathString
    *          The path from the item object to the option value attribute.
    * @param nullOption
    *          Defines if a <code>null</code> option should be generated.
@@ -72,17 +72,17 @@ class GenericOptionSetBuilder {
   public GenericOptionSetBuilder(
       String idPathString,
       String namePathString,
-      String valuePathString,
+      String backingValuePathString,
       NullOption nullOption,
       String nullOptionTitleResKey,
       String sortOrderSpec)
   {
     this.idPath = ExpressionPathResolver.parse(idPathString);
     this.namePath = ExpressionPathResolver.parse(namePathString);
-    this.valuePath = ExpressionPathResolver.parse(valuePathString);
+    this.backingValuePath = ExpressionPathResolver.parse(backingValuePathString);
     this.nullOption = nullOption;
     this.nullOptionTitleResKey = StringUtils.defaultIfEmpty(nullOptionTitleResKey, null);
-    this.sortComparatorFactory = PmOptionCfg.NO_SORT_SPEC.equals(sortOrderSpec)
+    this.sortComparatorFactory = PmOptionCfg.NOT_SPECIFIED.equals(sortOrderSpec)
           ? null
           : PathComparatorFactory.parse(sortOrderSpec, SyntaxVersion.VERSION_2);
   }
@@ -97,11 +97,11 @@ class GenericOptionSetBuilder {
       for (Object o : objects) {
         Object id = idPath.getValue(o);
         Object name = namePath.getValue(o);
-        Object value = valuePath.getValue(o);
+        Object backingValue = backingValuePath.getValue(o);
         list.add(new PmOptionImpl(
             ObjectUtils.toString(id, ""),
             ObjectUtils.toString(name, ""),
-            value));
+            backingValue));
       }
 
       if (sortComparatorFactory != null) {

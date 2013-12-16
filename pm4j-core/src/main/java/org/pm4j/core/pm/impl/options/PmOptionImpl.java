@@ -14,10 +14,12 @@ public class PmOptionImpl implements PmOption {
 
   private String title;
 
-  private Object itemValue;
+  private Object value;
+
+  private Object backingValue;
 
   /** Option enabled flag. */
-  private boolean enabled;
+  private boolean enabled = true;
 
   public PmOptionImpl(Serializable id) {
     this(id, ObjectUtils.toString(id), id);
@@ -27,19 +29,25 @@ public class PmOptionImpl implements PmOption {
     this(id, title, id);
   }
 
-  public PmOptionImpl(Serializable id, String title, boolean enabled) {
-    this(id, title, id, enabled);
+  public PmOptionImpl(Serializable id, String title, Object backingValue) {
+    this(id, title, backingValue, null);
   }
 
-  public PmOptionImpl(Serializable id, String title, Object itemValue) {
-    this(id, title, itemValue, true);
-  }
-
-  public PmOptionImpl(Serializable id, String title, Object itemValue, boolean enabled) {
+  /**
+   * @param id
+   *          The option id. (Will be used as option value's too. See above.)
+   * @param title
+   *          The option title.
+   * @param backingValue
+   *          The backing attribute value that corresponds to this option. May be <code>null</code>.
+   * @param value
+   *          The attribute value that corresponds to this option. May be <code>null</code>.
+   */
+  public PmOptionImpl(Serializable id, String title, Object backingValue, Object value) {
     this.id = id;
     this.title = title;
-    this.itemValue = itemValue;
-    this.enabled = enabled;
+    this.backingValue = backingValue;
+    this.value = value;
   }
 
   public Serializable getId() {
@@ -52,7 +60,19 @@ public class PmOptionImpl implements PmOption {
 
   @SuppressWarnings("unchecked")
   public <T> T getValue() {
-    return (T) itemValue;
+    return (T) value;
+  }
+
+  @SuppressWarnings("unchecked")
+  public <T> T getBackingValue() {
+    return (T) backingValue;
+  }
+
+  /**
+   * @param backingValue the backingValue to set
+   */
+  public void setBackingValue(Object backingValue) {
+    this.backingValue = backingValue;
   }
 
   @Override

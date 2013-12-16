@@ -28,8 +28,8 @@ public final class PmOptionSetUtil {
     if (withNullOption) {
       options.add(new PmOptionImpl("", getNullOptionTitle(pmAttr), null));
     }
-    options.add(new PmOptionImpl(Boolean.TRUE.toString(), PmLocalizeApi.localizeBooleanValue(pmAttr, Boolean.TRUE), Boolean.TRUE));
-    options.add(new PmOptionImpl(Boolean.FALSE.toString(), PmLocalizeApi.localizeBooleanValue(pmAttr, Boolean.FALSE), Boolean.FALSE));
+    options.add(new PmOptionImpl(Boolean.TRUE.toString(), PmLocalizeApi.localizeBooleanValue(pmAttr, Boolean.TRUE), Boolean.TRUE, Boolean.TRUE));
+    options.add(new PmOptionImpl(Boolean.FALSE.toString(), PmLocalizeApi.localizeBooleanValue(pmAttr, Boolean.FALSE), Boolean.FALSE, Boolean.FALSE));
 
     return options;
   }
@@ -47,7 +47,7 @@ public final class PmOptionSetUtil {
       if (v == null) {
         options.add(new PmOptionImpl("", getNullOptionTitle(pmAttr), null));
       }
-      options.add(new PmOptionImpl(v.name(), PmLocalizeApi.localizeEnumValue(pmAttr, v), v));
+      options.add(new PmOptionImpl(v.name(), PmLocalizeApi.localizeEnumValue(pmAttr, v), v, v));
     }
 
     return options;
@@ -78,27 +78,17 @@ public final class PmOptionSetUtil {
               : PmLocalizeApi.localize(forAttr, nullOptionTitleResKey);
   }
 
-//  protected boolean shouldMakeNullOption(PmAttrBase<?,?> forAttr) {
-//    NullOption nopt = (nullOption == NullOption.DEFAULT)
-//                      ? forAttr.getNullOptionDefault()
-//                      : nullOption;
-//
-//    return nopt == NullOption.YES ||
-//          (nopt == NullOption.FOR_OPTIONAL_ATTR &&
-//           ! forAttr.isRequired());
-//  }
-
   /**
-   * Extracts the values from the given option set.
+   * Extracts the backing values from the given option set.
    *
-   * @param os The option set to get the values from.
-   * @return The values for all options.
+   * @param os The option set to get the backing values from.
+   * @return The backing values for all options.
    */
-  public static List<?> getOptionValues(PmOptionSet os) {
+  public static List<?> getOptionBackingValues(PmOptionSet os) {
     List<Object> values = new ArrayList<Object>();
 
     for (PmOption o : os.getOptions()) {
-      values.add(o.getValue());
+      values.add(o.getBackingValue());
     }
 
     return values;

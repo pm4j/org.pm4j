@@ -41,14 +41,41 @@ public class PmOptionSetImpl implements PmOptionSet {
     options.add(pmOption);
   }
 
+  /**
+   * Shortcut method to adds an option just by specifying an id and a value.
+   * <p>
+   * Uses the given id object as option-value and -backing value too.<br>
+   * This means: This shortcut can be used only for simple type attributes where
+   * the value and backing value type are the same and the value can also be
+   * used as an option identifier.
+   *
+   * @param id
+   *          The option id. (Will be used as option value's too. See above.)
+   * @param title
+   *          The option title.
+   * @return The added option.
+   */
   public PmOptionImpl addOption(Serializable id, String title) {
-    PmOptionImpl o = new PmOptionImpl(id, title);
+    PmOptionImpl o = new PmOptionImpl(id, title, id, id);
     addOption(o);
     return o;
   }
 
-  public PmOptionImpl addOption(Serializable id, String title, Object value) {
-    PmOptionImpl o = new PmOptionImpl(id, title, value);
+  /**
+   * Shortcut method to adds an option.
+   *
+   * @param id
+   *          The option id. (Will be used as option value's too. See above.)
+   * @param title
+   *          The option title.
+   * @param backingValue
+   *          The backing attribute value that corresponds to this option. May be <code>null</code>.
+   * @param value
+   *          The attribute value that corresponds to this option. May be <code>null</code>.
+   * @return The added option.
+   */
+  public PmOptionImpl addOption(Serializable id, String title, Object backingValue, Object value) {
+    PmOptionImpl o = new PmOptionImpl(id, title, backingValue, value);
     addOption(o);
     return o;
   }
@@ -86,7 +113,7 @@ public class PmOptionSetImpl implements PmOptionSet {
   }
 
   @Override
-  public PmOption findOptionForId(Serializable id) {
+  public PmOption findOptionForId(Object id) {
     String idString = ObjectUtils.toString(id, NULL_OPTION_ID);
     return findOptionForIdString(idString);
   }
@@ -105,7 +132,7 @@ public class PmOptionSetImpl implements PmOptionSet {
   }
 
   @Override
-  public PmOption getOptionForId(Serializable id) {
+  public PmOption getOptionForId(Object id) {
     PmOption o = findOptionForId(id);
     if (o == null) {
       throw new PmRuntimeException(makeOptIdNotFoundMsg(id, getOptions()));
@@ -152,7 +179,7 @@ public class PmOptionSetImpl implements PmOptionSet {
     this.multiselection = multiselection;
   }
 
-  private String makeOptIdNotFoundMsg(Serializable id, List<PmOption> pmOptions) {
+  private String makeOptIdNotFoundMsg(Object id, List<PmOption> pmOptions) {
     StringBuilder s = new StringBuilder();
     s.append("No option found for id '").append(id).append("'. Availvable ids are: [");
     for (int i=0 ; i<pmOptions.size(); ++i) {

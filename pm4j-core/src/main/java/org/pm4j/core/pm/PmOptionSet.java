@@ -1,6 +1,5 @@
 package org.pm4j.core.pm;
 
-import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -52,8 +51,8 @@ public interface PmOptionSet {
    * @param id
    * @return
    */
-  PmOption findOptionForId(Serializable id);
-  PmOption getOptionForId(Serializable id);
+  PmOption findOptionForId(Object id);
+  PmOption getOptionForId(Object id);
 
   PmOption findOptionForIdString(String idString);
   PmOption getOptionForIdString(String idString);

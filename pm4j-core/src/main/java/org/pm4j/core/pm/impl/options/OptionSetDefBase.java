@@ -39,6 +39,7 @@ public abstract class OptionSetDefBase<T_ATTR extends PmAttrBase<?,?>> implement
   protected final PathResolver idPath;
   protected final PathResolver titlePath;
   protected final PathResolver valuePath;
+  protected final PathResolver backingValuePath;
 
   protected final NullOption nullOption;
   protected final String nullOptionTitleResKey;
@@ -53,10 +54,13 @@ public abstract class OptionSetDefBase<T_ATTR extends PmAttrBase<?,?>> implement
     this.getOptionValuesMethod = getOptionValuesMethod;
     this.idPath = ExpressionPathResolver.parse(cfg.id(), syntaxVersion);
     this.titlePath = ExpressionPathResolver.parse(cfg.title(), syntaxVersion);
-    this.valuePath = ExpressionPathResolver.parse(cfg.value(), syntaxVersion);
+    this.backingValuePath = ExpressionPathResolver.parse(cfg.backingValue(), syntaxVersion);
+    this.valuePath = PmOptionCfg.NOT_SPECIFIED.equals(cfg.value())
+                ? null
+                : ExpressionPathResolver.parse(cfg.value(), syntaxVersion);
     this.nullOption = cfg.nullOption();
     this.nullOptionTitleResKey = StringUtils.defaultIfEmpty(cfg.nullOptionResKey(), null);
-    this.sortComparatorFactory = PmOptionCfg.NO_SORT_SPEC.equals(cfg.sortBy())
+    this.sortComparatorFactory = PmOptionCfg.NOT_SPECIFIED.equals(cfg.sortBy())
                 ? null
                 : PathComparatorFactory.parse(cfg.sortBy(), syntaxVersion);
   }

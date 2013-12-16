@@ -92,7 +92,7 @@ public abstract class FilterItemPm<T_ITEM extends FilterItem> extends PmBeanBase
     protected PmOptionSet getOptionSetImpl() {
       PmOptionSetImpl os = new PmOptionSetImpl();
       for (CompOp compOp : (Iterable<CompOp>)getOptionValues()) {
-        os.addOption(new PmOptionImpl(compOp.getName(), PmLocalizeApi.localize(this, compOp.getName()), compOp));
+        os.addOption(new PmOptionImpl(compOp.getName(), PmLocalizeApi.localize(this, compOp.getName()), compOp, compOp));
       }
 
       return os;
@@ -133,13 +133,13 @@ public abstract class FilterItemPm<T_ITEM extends FilterItem> extends PmBeanBase
 
   /** A proxy attribute in front of the value type specific value attribute. */
   public final PmAttrProxy<Object> filterByValue = new PmAttrProxyImpl<Object>(this) {
-	    @Override
-	    protected void onPmInit() {
-	      super.onPmInit();
-	      if (getPmBean() != null) {
-	        reGenerateFilterByValueAttr();
-	      }
-	    }
+      @Override
+      protected void onPmInit() {
+        super.onPmInit();
+        if (getPmBean() != null) {
+          reGenerateFilterByValueAttr();
+        }
+      }
   };
 
   /** The entered filter values have to be transferred to the filter value. */
@@ -151,7 +151,7 @@ public abstract class FilterItemPm<T_ITEM extends FilterItem> extends PmBeanBase
 
   /** Needed for mapping a type to a pm attribute for dynamic switching. */
   private FilterByValuePmAttrFactory filterByValuePmAttrFactory = new FilterByValuePmAttrFactoryImpl();
-  
+
   /**
    * Whenever the bean behind the PM changes, we need to transfer the actual filter value to the value field PM.
    */
@@ -161,7 +161,7 @@ public abstract class FilterItemPm<T_ITEM extends FilterItem> extends PmBeanBase
   }
 
   protected void reGenerateFilterByValueAttr() {
-	T_ITEM bean = getPmBean();
+  T_ITEM bean = getPmBean();
     FilterCompareDefinition fd = bean.getFilterBy();
     if (fd != null) {
       // TODO olaf: the getValue method is called within pmInit. should not happen...
@@ -197,5 +197,5 @@ public abstract class FilterItemPm<T_ITEM extends FilterItem> extends PmBeanBase
   public void setFilterByValuePmAttrFactory( FilterByValuePmAttrFactory factory) {
     filterByValuePmAttrFactory = factory;
   }
-  
+
 }

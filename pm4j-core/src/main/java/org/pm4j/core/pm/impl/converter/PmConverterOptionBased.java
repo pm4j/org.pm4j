@@ -49,8 +49,11 @@ public class PmConverterOptionBased extends AttrStringConverterBase<Object> {
     else {
       PmOption o = os.findOptionForIdString(s);
       if (o != null) {
-        value = o.getValue();
-        value = pmAttr.convertBackingValueToPmValue(value);
+        if (o.getValue() != null) {
+          value = o.getValue();
+        } else if (o.getBackingValue() != null) {
+          value = pmAttr.convertBackingValueToPmValue(o.getBackingValue());
+        }
       }
     }
 
