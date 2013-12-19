@@ -70,7 +70,7 @@ public class PmAttrPmRefTest extends TestCase {
     @PmFactoryCfg(beanPmClasses=BPm.class)
     public final PmAttrPmRef<BPm> refToB = new PmAttrPmRefImpl<BPm, B>(this) {
       @Override
-      @PmOptionCfg(id="i", title="s", nullOption=NullOption.NO)
+      @PmOptionCfg(id="i", title="s", value="null", backingValue="this", nullOption=NullOption.NO)
       public Iterable<?> getOptionValues() {
         return myServiceLayer.getAllBs();
       }

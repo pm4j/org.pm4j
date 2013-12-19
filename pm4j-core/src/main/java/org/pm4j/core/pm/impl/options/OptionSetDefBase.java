@@ -61,6 +61,8 @@ public abstract class OptionSetDefBase<T_ATTR extends PmAttrBase<?,?>> implement
 
     this.backingValuePath = ExpressionPathResolver.parse(cfg.backingValue(), syntaxVersion);
     // Optimization: if both path expressions are the same, only the backing value path will be resolved.
+    // TODO oboede: do this default only if backing and front-value types are the same!
+    // Currently the programmer has to write value="null" to force the attribute to use it's value converter...
     if (!cfg.backingValue().equals(cfg.value())) {
       this.valuePath = parseOptionalExpr(cfg.value(), syntaxVersion);
     }
