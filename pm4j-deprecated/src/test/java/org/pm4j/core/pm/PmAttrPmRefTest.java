@@ -89,7 +89,7 @@ public class PmAttrPmRefTest extends TestCase {
     APm aPm = PmFactoryApi.getPmForBean(session, a);
 
     assertNull(aPm.refToB.getValue());
-    assertEquals("An extra null option because the value is null.", "[---, one, two]", aPm.refToB.getOptionSet().getOptions().toString());
+    assertEquals("An extra null option because the value is null.", "[, one, two]", aPm.refToB.getOptionSet().getOptions().toString());
 
     aPm.refToB.setValueAsString("1");
     assertEquals("1", aPm.refToB.getValueAsString());
