@@ -22,6 +22,7 @@ import org.pm4j.core.pm.api.PmExpressionApi;
 import org.pm4j.core.pm.impl.PmAttrBase;
 import org.pm4j.core.pm.impl.PmUtil;
 import org.pm4j.core.pm.impl.pathresolver.ExpressionPathResolver;
+import org.pm4j.core.pm.impl.pathresolver.PassThroughPathResolver;
 import org.pm4j.core.pm.impl.pathresolver.PathComparatorFactory;
 import org.pm4j.core.pm.impl.pathresolver.PathResolver;
 import org.pm4j.core.pm.impl.pathresolver.PmExpressionPathResolver;
@@ -34,12 +35,12 @@ import org.pm4j.core.pm.impl.pathresolver.PmExpressionPathResolver;
  */
 public abstract class OptionSetDefBase<T_ATTR extends PmAttrBase<?,?>> implements PmOptionSetDef<T_ATTR> {
 
-  protected final PathResolver optionsPath;
+  protected final PathResolver valuesPath;
   protected final Method getOptionValuesMethod;
   protected final PathResolver idPath;
   protected final PathResolver titlePath;
-  protected final PathResolver valuePath;
-  protected final PathResolver backingValuePath;
+  protected PathResolver valuePath;
+  protected PathResolver backingValuePath;
 
   protected final NullOption nullOption;
   protected final String nullOptionTitleResKey;
@@ -48,16 +49,22 @@ public abstract class OptionSetDefBase<T_ATTR extends PmAttrBase<?,?>> implement
 
   public OptionSetDefBase(PmAttr<?> pmAttr, PmOptionCfg cfg, Method getOptionValuesMethod) {
     SyntaxVersion syntaxVersion = PmExpressionApi.getSyntaxVersion(pmAttr);
-    this.optionsPath = StringUtils.isNotBlank(cfg.values())
-        ? PmExpressionPathResolver.parse(cfg.values(), syntaxVersion)
-        : null;
+    this.valuesPath = PmOptionCfg.NOT_SPECIFIED.equals(cfg.values())
+            ? null
+            :PmExpressionPathResolver.parse(cfg.values(), syntaxVersion);
     this.getOptionValuesMethod = getOptionValuesMethod;
+    if (getOptionValuesMethod != null && !PmOptionCfg.NOT_SPECIFIED.equals(cfg.values())) {
+      throw new PmRuntimeException(pmAttr, "Redundant @PmOptionCfg.values definition. Please specify 'values' if you don't define a method getOptionValues().");
+    }
     this.idPath = ExpressionPathResolver.parse(cfg.id(), syntaxVersion);
     this.titlePath = ExpressionPathResolver.parse(cfg.title(), syntaxVersion);
+
     this.backingValuePath = ExpressionPathResolver.parse(cfg.backingValue(), syntaxVersion);
-    this.valuePath = PmOptionCfg.NOT_SPECIFIED.equals(cfg.value())
-                ? null
-                : ExpressionPathResolver.parse(cfg.value(), syntaxVersion);
+    // Optimization: if both path expressions are the same, only the backing value path will be resolved.
+    if (!cfg.backingValue().equals(cfg.value())) {
+      this.valuePath = parseOptionalExpr(cfg.value(), syntaxVersion);
+    }
+
     this.nullOption = cfg.nullOption();
     this.nullOptionTitleResKey = StringUtils.defaultIfEmpty(cfg.nullOptionResKey(), null);
     this.sortComparatorFactory = PmOptionCfg.NOT_SPECIFIED.equals(cfg.sortBy())
@@ -80,8 +87,8 @@ public abstract class OptionSetDefBase<T_ATTR extends PmAttrBase<?,?>> implement
       }
     }
     else {
-      o = optionsPath != null
-        ? optionsPath.getValue(PmUtil.getPmParentOfType(forAttr, PmElement.class))
+      o = valuesPath != null
+        ? valuesPath.getValue(PmUtil.getPmParentOfType(forAttr, PmElement.class))
         : getOptionValues(forAttr);
   }
 
@@ -115,7 +122,7 @@ public abstract class OptionSetDefBase<T_ATTR extends PmAttrBase<?,?>> implement
   }
 
   /**
-   * Is only called if no {@link #optionsPath} is specified.
+   * Is only called if no {@link #valuesPath} is specified.
    */
   protected Iterable<?> getOptionValues(T_ATTR forAttr) {
     return forAttr.getOptionValues();
@@ -171,6 +178,12 @@ public abstract class OptionSetDefBase<T_ATTR extends PmAttrBase<?,?>> implement
 //      case FOR_OPTIONAL_ATTR: return (!forAttr.isRequired()) && forAttr.getValue() != null;
 //      default: throw new PmRuntimeException(forAttr, "Unknown enum attribute value " + nopt);
 //    }
+  }
+
+  private PathResolver parseOptionalExpr(String pathString, SyntaxVersion syntaxVersion) {
+    return PmOptionCfg.NOT_SPECIFIED.equals(pathString)
+                  ? null
+                  : ExpressionPathResolver.parse(pathString, syntaxVersion);
   }
 
 

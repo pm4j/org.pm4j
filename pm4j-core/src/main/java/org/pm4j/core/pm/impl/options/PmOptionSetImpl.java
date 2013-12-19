@@ -68,14 +68,14 @@ public class PmOptionSetImpl implements PmOptionSet {
    *          The option id. (Will be used as option value's too. See above.)
    * @param title
    *          The option title.
-   * @param backingValue
-   *          The backing attribute value that corresponds to this option. May be <code>null</code>.
    * @param value
    *          The attribute value that corresponds to this option. May be <code>null</code>.
+   * @param backingValue
+   *          The backing attribute value that corresponds to this option. May be <code>null</code>.
    * @return The added option.
    */
-  public PmOptionImpl addOption(Serializable id, String title, Object backingValue, Object value) {
-    PmOptionImpl o = new PmOptionImpl(id, title, backingValue, value);
+  public PmOptionImpl addOption(Serializable id, String title, Object value, Object backingValue) {
+    PmOptionImpl o = new PmOptionImpl(id, title, value, backingValue);
     addOption(o);
     return o;
   }

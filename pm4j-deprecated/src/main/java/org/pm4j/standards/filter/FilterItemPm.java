@@ -92,7 +92,7 @@ public abstract class FilterItemPm<T_ITEM extends FilterItem> extends PmBeanBase
     protected PmOptionSet getOptionSetImpl() {
       PmOptionSetImpl os = new PmOptionSetImpl();
       for (CompOp compOp : (Iterable<CompOp>)getOptionValues()) {
-        os.addOption(new PmOptionImpl(compOp.getName(), PmLocalizeApi.localize(this, compOp.getName()), compOp, compOp));
+        os.addOption(new PmOptionImpl(compOp.getName(), PmLocalizeApi.localize(this, compOp.getName()), compOp));
       }
 
       return os;

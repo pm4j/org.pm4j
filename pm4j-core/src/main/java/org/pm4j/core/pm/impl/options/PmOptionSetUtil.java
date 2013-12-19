@@ -28,8 +28,8 @@ public final class PmOptionSetUtil {
     if (withNullOption) {
       options.add(new PmOptionImpl("", getNullOptionTitle(pmAttr), null));
     }
-    options.add(new PmOptionImpl(Boolean.TRUE.toString(), PmLocalizeApi.localizeBooleanValue(pmAttr, Boolean.TRUE), Boolean.TRUE, Boolean.TRUE));
-    options.add(new PmOptionImpl(Boolean.FALSE.toString(), PmLocalizeApi.localizeBooleanValue(pmAttr, Boolean.FALSE), Boolean.FALSE, Boolean.FALSE));
+    options.add(new PmOptionImpl(Boolean.TRUE.toString(), PmLocalizeApi.localizeBooleanValue(pmAttr, Boolean.TRUE), Boolean.TRUE));
+    options.add(new PmOptionImpl(Boolean.FALSE.toString(), PmLocalizeApi.localizeBooleanValue(pmAttr, Boolean.FALSE), Boolean.FALSE));
 
     return options;
   }
@@ -47,7 +47,7 @@ public final class PmOptionSetUtil {
       if (v == null) {
         options.add(new PmOptionImpl("", getNullOptionTitle(pmAttr), null));
       }
-      options.add(new PmOptionImpl(v.name(), PmLocalizeApi.localizeEnumValue(pmAttr, v), v, v));
+      options.add(new PmOptionImpl(v.name(), PmLocalizeApi.localizeEnumValue(pmAttr, v), v));
     }
 
     return options;

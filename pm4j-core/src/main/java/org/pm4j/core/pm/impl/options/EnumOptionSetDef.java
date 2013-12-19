@@ -85,13 +85,13 @@ public class EnumOptionSetDef implements PmOptionSetDef<PmAttrEnumImpl<?>> {
 
     if (forAttr.getNullOptionDefault() != PmOptionCfg.NullOption.NO &&
         ! forAttr.isRequired()) {
-      options.add(new PmOptionImpl("", getNullOptionTitle(forAttr), null, null));
+      options.add(new PmOptionImpl("", getNullOptionTitle(forAttr), null));
     }
 
     String resKeyPfx = ResKeyUtil.shortResKeyForClass(enumClass) + ".";
     for (Enum<?> e : values) {
       String resKey = resKeyPfx + e.name();
-      options.add(new PmOptionImpl(e.name(), PmLocalizeApi.localize(forAttr, resKey), e, e));
+      options.add(new PmOptionImpl(e.name(), PmLocalizeApi.localize(forAttr, resKey), e));
     }
     return new PmOptionSetImpl(options);
   }

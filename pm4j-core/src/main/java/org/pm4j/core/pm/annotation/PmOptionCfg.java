@@ -27,7 +27,7 @@ public @interface PmOptionCfg {
    * @return Path to the set of objects that is used to build the options.<br>
    *         Example: 'pmBean.allDefinedValues'.
    */
-  String values() default "";
+  String values() default NOT_SPECIFIED;
 
   /**
    * Expression for the path from an item object to its value that provides the option identifier.<br>
@@ -35,7 +35,7 @@ public @interface PmOptionCfg {
    *
    * @return The id value expression.
    */
-  String id() default "";
+  String id() default "this";
 
   /**
    * Path from an item object to the value that provides the option title.<br>
@@ -43,7 +43,7 @@ public @interface PmOptionCfg {
    *
    * @return The title value expression.
    */
-  String title() default "";
+  String title() default "this";
 
   /**
    * Path from an item object to the value that provides the backing value from the option bean.<br>
@@ -55,7 +55,7 @@ public @interface PmOptionCfg {
    *
    * @return The value expression that resolves from the option bean to the backing value.
    */
-  String backingValue() default "";
+  String backingValue() default "this";
 
   /**
    * Path from an item object to the value that provides the option value.<br>

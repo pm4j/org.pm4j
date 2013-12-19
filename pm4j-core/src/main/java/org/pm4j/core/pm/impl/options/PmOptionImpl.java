@@ -29,8 +29,8 @@ public class PmOptionImpl implements PmOption {
     this(id, title, id);
   }
 
-  public PmOptionImpl(Serializable id, String title, Object backingValue) {
-    this(id, title, backingValue, null);
+  public PmOptionImpl(Serializable id, String title, Object value) {
+    this(id, title, value, value);
   }
 
   /**
@@ -38,12 +38,12 @@ public class PmOptionImpl implements PmOption {
    *          The option id. (Will be used as option value's too. See above.)
    * @param title
    *          The option title.
-   * @param backingValue
-   *          The backing attribute value that corresponds to this option. May be <code>null</code>.
    * @param value
    *          The attribute value that corresponds to this option. May be <code>null</code>.
+   * @param backingValue
+   *          The backing attribute value that corresponds to this option. May be <code>null</code>.
    */
-  public PmOptionImpl(Serializable id, String title, Object backingValue, Object value) {
+  public PmOptionImpl(Serializable id, String title, Object value, Object backingValue) {
     this.id = id;
     this.title = title;
     this.backingValue = backingValue;

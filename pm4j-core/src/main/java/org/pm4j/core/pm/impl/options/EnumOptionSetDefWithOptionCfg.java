@@ -65,17 +65,17 @@ public class EnumOptionSetDefWithOptionCfg extends OptionSetDefBase<PmAttrEnumIm
     this.enumClass = enumClass;
     this.resKeyPfx = ResKeyUtil.shortResKeyForClass(enumClass) + ".";
 
-    if (StringUtils.isNotEmpty(optionCfg.values()))
+    if (!PmOptionCfg.NOT_SPECIFIED.equals(optionCfg.values()))
       throw new PmRuntimeException("values() annotation attribute is not yet supported for enum attributes.");
-    if (StringUtils.isNotEmpty(optionCfg.id()))
+    if (!"this".equals(optionCfg.id()))
       throw new PmRuntimeException("id() annotation attribute is not yet supported for enum attributes.");
-    if (StringUtils.isNotEmpty(optionCfg.title()))
+    if (!"this".equals(optionCfg.title()))
       throw new PmRuntimeException("title() annotation attribute is not yet supported for enum attributes.");
   }
 
   @Override
   public PmOptionSet makeOptions(PmAttrEnumImpl<?> forAttr) {
-    if (optionsPath != null ||
+    if (valuesPath != null ||
         getOptionValuesMethod != null) {
       return super.makeOptions(forAttr);
     }
@@ -85,7 +85,7 @@ public class EnumOptionSetDefWithOptionCfg extends OptionSetDefBase<PmAttrEnumIm
       List<PmOption> options = new ArrayList<PmOption>(values.length);
 
       if (shouldMakeNullOption(forAttr)) {
-        options.add(new PmOptionImpl("", getNullOptionTitle(forAttr), null, null));
+        options.add(new PmOptionImpl("", getNullOptionTitle(forAttr), null));
       }
 
       for (Enum<?> e : values) {
@@ -119,7 +119,7 @@ public class EnumOptionSetDefWithOptionCfg extends OptionSetDefBase<PmAttrEnumIm
     Enum<?> e = (Enum<?>)o;
     String resKey = resKeyPfx + e.name();
     String title = PmLocalizeApi.localize(forAttr, resKey);
-    return new PmOptionImpl(e.name(), title, e, e);
+    return new PmOptionImpl(e.name(), title, e);
   }
 
 }

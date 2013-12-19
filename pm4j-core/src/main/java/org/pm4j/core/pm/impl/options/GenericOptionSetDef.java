@@ -27,12 +27,12 @@ public class GenericOptionSetDef extends OptionSetDefBase<PmAttrBase<?,?>> {
     Object backingValue = backingValuePath.getValue(o);
     Object value = valuePath != null
               ? valuePath.getValue(o)
-              : null;
+              : backingValue;
     return new PmOptionImpl(
                 ObjectUtils.toString(id, ""),
                 ObjectUtils.toString(title, ""),
-                backingValue,
-                value);
+                value,
+                backingValue);
   }
 
 
