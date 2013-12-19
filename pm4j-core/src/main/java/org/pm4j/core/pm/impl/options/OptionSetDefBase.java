@@ -22,7 +22,6 @@ import org.pm4j.core.pm.api.PmExpressionApi;
 import org.pm4j.core.pm.impl.PmAttrBase;
 import org.pm4j.core.pm.impl.PmUtil;
 import org.pm4j.core.pm.impl.pathresolver.ExpressionPathResolver;
-import org.pm4j.core.pm.impl.pathresolver.PassThroughPathResolver;
 import org.pm4j.core.pm.impl.pathresolver.PathComparatorFactory;
 import org.pm4j.core.pm.impl.pathresolver.PathResolver;
 import org.pm4j.core.pm.impl.pathresolver.PmExpressionPathResolver;
@@ -68,7 +67,10 @@ public abstract class OptionSetDefBase<T_ATTR extends PmAttrBase<?,?>> implement
     }
 
     this.nullOption = cfg.nullOption();
-    this.nullOptionTitleResKey = StringUtils.defaultIfEmpty(cfg.nullOptionResKey(), null);
+    if (StringUtils.isBlank(cfg.nullOptionResKey())) {
+      throw new PmRuntimeException(pmAttr, "Invalid 'nullOptionResKey' value.");
+    }
+    this.nullOptionTitleResKey = cfg.nullOptionResKey();
     this.sortComparatorFactory = PmOptionCfg.NOT_SPECIFIED.equals(cfg.sortBy())
                 ? null
                 : PathComparatorFactory.parse(cfg.sortBy(), syntaxVersion);

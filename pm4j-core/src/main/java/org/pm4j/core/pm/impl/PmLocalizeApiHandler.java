@@ -35,6 +35,9 @@ public class PmLocalizeApiHandler {
    * @return The localized string or <code>null</code> when no localization is available.
    */
   public String findLocalization(PmObjectBase pm, String key, Object... resStringArgs) {
+    if (key == null) {
+      throw new PmRuntimeException(pm, "Unable to find a resource for a 'null' key.");
+    }
     Locale locale = getLocale(pm);
     String resourceString = resourceStringProvider.findResourceString(locale, pm.getPmResLoaderCtxtClasses(), key);
     return (resourceString != null)

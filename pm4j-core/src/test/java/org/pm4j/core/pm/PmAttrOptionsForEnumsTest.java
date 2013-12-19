@@ -61,7 +61,7 @@ public class PmAttrOptionsForEnumsTest extends TestCase {
   }
 
   public void testEnumOptionsWithDefaultNullOptionTitleResource() {
-    assertEqualOptions("[---, One, Two]", testPm.enumAttrWithoutNullResKey);
+    assertEqualOptions("[, One, Two]", testPm.enumAttrWithoutNullResKey);
   }
 
   public void testEnumOptionsWithoutAdditionalSpec() {

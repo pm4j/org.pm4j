@@ -75,13 +75,13 @@ public class PmAttrOptionsProvidedByGetOptionValuesMethodTest extends TestCase {
   // -- Tests --
 
   public void testAttributeWithExpressionBasedOptions() {
-    assertEqualOptions("[---, a, b]", testPm.attributeWithSimpleOptionSet);
+    assertEqualOptions("[, a, b]", testPm.attributeWithSimpleOptionSet);
     testPm.attributeWithSimpleOptionSet.setValueAsString("1");
     assertEquals("1:a", testPm.attributeWithSimpleOptionSet.getValue().toString());
   }
 
   public void testAttributeWithOptsSortedByNameDesc() {
-    assertEqualOptions("[---, b, a]", testPm.attributeWithOptsSortedByNameDesc);
+    assertEqualOptions("[, b, a]", testPm.attributeWithOptsSortedByNameDesc);
   }
 
   public void testAttributeWithTitledNullOption() {

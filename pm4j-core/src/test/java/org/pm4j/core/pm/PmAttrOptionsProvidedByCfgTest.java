@@ -56,13 +56,13 @@ public class PmAttrOptionsProvidedByCfgTest extends TestCase {
   // -- Tests --
 
   public void testAttributeWithExpressionBasedOptions() {
-    assertEqualOptions("[---, a, b]", testPm.attributeWithExpressionBasedOptions);
+    assertEqualOptions("[, a, b]", testPm.attributeWithExpressionBasedOptions);
     testPm.attributeWithExpressionBasedOptions.setValueAsString("1");
     assertEquals("1:a", testPm.attributeWithExpressionBasedOptions.getValue().toString());
   }
 
   public void testAttributeWithOptsSortedByNameDesc() {
-    assertEqualOptions("[---, 2:b, 1:a]", testPm.attributeWithOptsSortedByNameDesc);
+    assertEqualOptions("[, 2:b, 1:a]", testPm.attributeWithOptsSortedByNameDesc);
   }
 
   public void testAttributeWithTitledNullOption() {

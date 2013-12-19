@@ -6,6 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.pm4j.core.pm.PmAttr;
+import org.pm4j.core.pm.PmConstants;
 import org.pm4j.core.pm.impl.PmAttrBase;
 
 /**
@@ -136,7 +137,7 @@ public @interface PmOptionCfg {
    * The default may be defined for a specific domain package or for the whole
    * application if it is defined within the topmost package of the application.
    */
-  static final String NULL_OPTION_DEFAULT_RESKEY = "nullOptionTitle";
+  static final String NULL_OPTION_DEFAULT_RESKEY = PmConstants.MSGKEY_NULL_OPTION;
 
   /**
    * @return The resource key for the title to display for the <code>null</code>

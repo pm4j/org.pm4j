@@ -45,6 +45,9 @@ public class PmConstants {
   /** A message like: Unable to set value in field "{field-title}": {exception-message} */
   public static final String MSGKEY_SET_VALUE_EXCEPTION                      = "pmAttr_setValueException";
 
+  /** The title that gets displayed when no option is selected. */
+  public static final String MSGKEY_NULL_OPTION                              = "pmAttr_nullOption";
+
   /**
    * A resource key for cached exceptions. The first Parameter of the resource is used to transfer the exception message.
    */
