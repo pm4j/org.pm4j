@@ -15,6 +15,7 @@ import java.util.TreeSet;
 import org.apache.commons.lang.ClassUtils;
 import org.apache.commons.lang.StringUtils;
 import org.pm4j.common.exception.CheckedExceptionWrapper;
+import org.pm4j.common.util.reflection.PrefixUtil;
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmAttrEnum;
 import org.pm4j.core.pm.PmAttrList;
@@ -24,7 +25,6 @@ import org.pm4j.core.pm.impl.PmAttrEnumImpl;
 import org.pm4j.core.pm.impl.PmAttrImpl;
 import org.pm4j.core.pm.impl.PmAttrListImpl;
 import org.pm4j.core.pm.impl.PmBeanBase;
-import org.pm4j.core.util.reflection.PrefixUtil;
 
 /**
  * Helper class that may be used to generate default resource file content.

@@ -21,19 +21,19 @@ import org.pm4j.core.pm.PmAttrEnum;
 import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmSortOrder;
-import org.pm4j.core.pm.PmTable;
-import org.pm4j.core.pm.PmTableCol;
-import org.pm4j.core.pm.PmTableGenericRow;
+import org.pm4j.core.pm.DeprPmTable;
+import org.pm4j.core.pm.DeprPmTableCol;
+import org.pm4j.core.pm.DeprPmTableGenericRow;
 import org.pm4j.core.util.table.ColSizeSpec;
 import org.pm4j.swt.pb.base.PbViewerToPmBase;
 import org.pm4j.swt.util.ColResizeListener;
 
 /**
- * Presentation binder for {@link PmTable} PMs.
+ * Presentation binder for {@link DeprPmTable} PMs.
  *
  * @author olaf boede
  */
-public class PbTable extends PbViewerToPmBase<TableViewer, Table, PmTable> {
+public class PbTable extends PbViewerToPmBase<TableViewer, Table, DeprPmTable> {
 
   private boolean headerVisble = true;
   private int swtStyle;
@@ -50,7 +50,7 @@ public class PbTable extends PbViewerToPmBase<TableViewer, Table, PmTable> {
    * Creates a table viewer. It may have a longer live cycle than the {@link Binding}.
    */
   @Override
-  protected TableViewer makeViewerImpl(Composite parentCtxt, PmTable pmTable) {
+  protected TableViewer makeViewerImpl(Composite parentCtxt, DeprPmTable pmTable) {
     TableViewer viewer = new TableViewer(parentCtxt, swtStyle);
 
     viewer.setContentProvider(new ContentProvider());
@@ -61,14 +61,14 @@ public class PbTable extends PbViewerToPmBase<TableViewer, Table, PmTable> {
   }
 
   @Override
-  protected PbBinding makeBinding(PmTable pm) {
+  protected PbBinding makeBinding(DeprPmTable pm) {
     return new Binding();
   }
 
   /**
    * Handles PM events as well as the SWT modification and focus event.
    */
-  public class Binding extends PbViewerToPmBase<TableViewer, Table, PmTable>.Binding {
+  public class Binding extends PbViewerToPmBase<TableViewer, Table, DeprPmTable>.Binding {
 
     /**
      * Creates the required binding between the viewer and the given pm.
@@ -83,10 +83,10 @@ public class PbTable extends PbViewerToPmBase<TableViewer, Table, PmTable> {
 
       // Setup the columns.
       table.removeAll();
-      List<PmTableCol> columns = ((PmTable)pm).getColumns();
+      List<DeprPmTableCol> columns = ((DeprPmTable)pm).getColumns();
       ColSizeSpec colSpecArr[] = new ColSizeSpec[columns.size()];
       for (int i=0; i<colSpecArr.length; ++i) {
-        PmTableCol colPm = columns.get(i);
+        DeprPmTableCol colPm = columns.get(i);
         makeAndBindTableColumn(viewer, colPm).setData("pm", colPm);
         colSpecArr[i] = colPm.getPmColSize();
       }
@@ -116,7 +116,7 @@ public class PbTable extends PbViewerToPmBase<TableViewer, Table, PmTable> {
      * @param col The PM of the column to add.
      * @return The added STW table column.
      */
-    protected TableColumn makeAndBindTableColumn(TableViewer tableViewer, PmTableCol col) {
+    protected TableColumn makeAndBindTableColumn(TableViewer tableViewer, DeprPmTableCol col) {
       TableColumn column = new TableColumn(tableViewer.getTable(), SWT.LEFT);
       column.setText(col.getPmTitle());
       column.setToolTipText(col.getPmTooltip());
@@ -125,7 +125,7 @@ public class PbTable extends PbViewerToPmBase<TableViewer, Table, PmTable> {
         @Override
         public void handleEvent(Event event) {
           TableColumn col = (TableColumn) event.widget;
-          PmTableCol colPm = (PmTableCol) col.getData("pm");
+          DeprPmTableCol colPm = (DeprPmTableCol) col.getData("pm");
           PmAttrEnum<PmSortOrder> sortOrderAttr = colPm.getSortOrderAttr();
           if (sortOrderAttr.isPmEnabled()) {
             Table table = col.getParent();
@@ -133,7 +133,7 @@ public class PbTable extends PbViewerToPmBase<TableViewer, Table, PmTable> {
             TableColumn prevSortCol = table.getSortColumn();
             if (prevSortCol != col) {
               if (prevSortCol != null) {
-                PmTableCol prevSortColPm = (PmTableCol) prevSortCol.getData("pm");
+                DeprPmTableCol prevSortColPm = (DeprPmTableCol) prevSortCol.getData("pm");
                 prevSortColPm.getSortOrderAttr().setValue(PmSortOrder.NEUTRAL);
               }
 
@@ -166,7 +166,7 @@ public class PbTable extends PbViewerToPmBase<TableViewer, Table, PmTable> {
 
 
   /**
-   * Provides the rows of a {@link PmTable}.
+   * Provides the rows of a {@link DeprPmTable}.
    */
   public static class ContentProvider implements IStructuredContentProvider {
 
@@ -175,7 +175,7 @@ public class PbTable extends PbViewerToPmBase<TableViewer, Table, PmTable> {
     @Override
     public Object[] getElements(Object inputElement) {
       @SuppressWarnings({ "unchecked", "rawtypes" })
-      List<PmTableGenericRow<?>> list = ((PmTable)inputElement).getGenericRows();
+      List<DeprPmTableGenericRow<?>> list = ((DeprPmTable)inputElement).getGenericRows();
       return list != null
           ? list.toArray()
           : EMPTY_ARRAY;
@@ -202,7 +202,7 @@ public class PbTable extends PbViewerToPmBase<TableViewer, Table, PmTable> {
 
     public String getColumnText(Object rowObj, int column_index) {
       String text = null;
-      if (rowObj instanceof PmTableGenericRow) {
+      if (rowObj instanceof DeprPmTableGenericRow) {
         PmObject pm = getCellPm(rowObj, column_index);
 
         if (pm instanceof PmAttr<?>) {
@@ -246,7 +246,7 @@ public class PbTable extends PbViewerToPmBase<TableViewer, Table, PmTable> {
     }
 
     private PmObject getCellPm(Object rowPm, int colIdx) {
-      return ((PmTableGenericRow)rowPm).getCell(colIdx);
+      return ((DeprPmTableGenericRow)rowPm).getCell(colIdx);
     }
 
   }

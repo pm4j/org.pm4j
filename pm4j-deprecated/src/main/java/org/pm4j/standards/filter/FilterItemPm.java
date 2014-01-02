@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.Iterator;
 
 import org.pm4j.common.query.CompOp;
-import org.pm4j.common.query.FilterCompareDefinition;
+import org.pm4j.common.query.filter.FilterDefinition;
 import org.pm4j.common.util.collection.IterableUtil;
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmAttrProxy;
@@ -42,10 +42,10 @@ public abstract class FilterItemPm<T_ITEM extends FilterItem> extends PmBeanBase
    * On value change the attributes <code>compOp</code> and <code>compValue</code> will
    * be reset.
    */
-  public final PmAttr<FilterCompareDefinition> filterBy = new PmAttrImpl<FilterCompareDefinition>(this) {
+  public final PmAttr<FilterDefinition> filterBy = new PmAttrImpl<FilterDefinition>(this) {
 
     @Override
-    protected void afterValueChange(FilterCompareDefinition oldValue, FilterCompareDefinition newValue) {
+    protected void afterValueChange(FilterDefinition oldValue, FilterDefinition newValue) {
       getPmBean().setFilterByValue(null);
       compOp.resetPmValues();
       reGenerateFilterByValueAttr();
@@ -82,7 +82,7 @@ public abstract class FilterItemPm<T_ITEM extends FilterItem> extends PmBeanBase
     @Override
     @PmOptionCfg(id="name", title="name", nullOption=NullOption.NO)
     public Iterable<?> getOptionValues() {
-      FilterCompareDefinition fbd = filterBy.getValue();
+      FilterDefinition fbd = filterBy.getValue();
       return (fbd != null)
           ? fbd.getCompOps()
           : Collections.EMPTY_LIST;
@@ -162,11 +162,11 @@ public abstract class FilterItemPm<T_ITEM extends FilterItem> extends PmBeanBase
 
   protected void reGenerateFilterByValueAttr() {
   T_ITEM bean = getPmBean();
-    FilterCompareDefinition fd = bean.getFilterBy();
+    FilterDefinition fd = bean.getFilterBy();
     if (fd != null) {
       // TODO olaf: the getValue method is called within pmInit. should not happen...
       CompOp co = compOp.getValue();
-      // CompOp co = bean.getCompOp();
+      // DeprCompOp co = bean.getCompOp();
       if (co != null) {
         @SuppressWarnings("unchecked")
         PmAttr<Object> a =(PmAttr<Object>)getFilterByValuePmAttrFactory().makeValueAttrPm(this, fd, co);

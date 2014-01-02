@@ -2,7 +2,7 @@ package org.pm4j.testdomains.user;
 
 import static org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO.CLEAR;
 
-import org.pm4j.core.pm.PmAttrPmRef;
+import org.pm4j.core.pm.DeprPmAttrPmRef;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.annotation.PmCommandCfg;
 import org.pm4j.core.pm.api.PmFactoryApi;
@@ -22,7 +22,7 @@ public class DomainEditSession extends PmConversationImpl.ChildSession<AdminSess
    *
    * @return The model of the domain selection.
    */
-  public PmAttrPmRef<DomainPm> getSelectedDomainRef() {
+  public DeprPmAttrPmRef<DomainPm> getSelectedDomainRef() {
     return getParentSessionImpl().selectedDomain;
   }
 

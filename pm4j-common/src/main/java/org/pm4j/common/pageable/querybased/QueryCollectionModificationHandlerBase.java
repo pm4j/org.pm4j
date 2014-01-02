@@ -5,17 +5,18 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.pm4j.common.pageable.ItemIdService;
-import org.pm4j.common.pageable.ModificationHandler;
-import org.pm4j.common.pageable.Modifications;
-import org.pm4j.common.pageable.ModificationsImpl;
+import org.pm4j.common.modifications.ModificationHandler;
+import org.pm4j.common.modifications.Modifications;
+import org.pm4j.common.modifications.ModificationsImpl;
 import org.pm4j.common.pageable.PageableCollection2;
 import org.pm4j.common.pageable.PageableCollectionBase2;
 import org.pm4j.common.pageable.PageableCollectionUtil2;
-import org.pm4j.common.pageable.querybased.PageableQuerySelectionHandler.ItemIdSelection;
-import org.pm4j.common.query.FilterExpression;
-import org.pm4j.common.query.FilterNot;
+import org.pm4j.common.pageable.QueryService;
+import org.pm4j.common.pageable.querybased.pagequery.ClickedIds;
+import org.pm4j.common.pageable.querybased.pagequery.ItemIdSelection;
 import org.pm4j.common.query.QueryAttr;
+import org.pm4j.common.query.QueryExpr;
+import org.pm4j.common.query.QueryExprNot;
 import org.pm4j.common.selection.Selection;
 import org.pm4j.common.selection.SelectionHandlerUtil;
 import org.pm4j.common.selection.SelectionWithAdditionalItems;
@@ -25,22 +26,22 @@ public class QueryCollectionModificationHandlerBase<T_ITEM, T_ID>  implements Mo
   private ModificationsImpl<T_ITEM> modifications = new ModificationsImpl<T_ITEM>();
   private final PageableCollectionBase2<T_ITEM> pageableCollection;
   /** The service that provides the data to handle. */
-  private ItemIdService<T_ITEM, T_ID> service;
+  private QueryService<T_ITEM, T_ID> service;
 
-  public QueryCollectionModificationHandlerBase(PageableCollectionBase2<T_ITEM> pageableCollection, ItemIdService<T_ITEM, T_ID> service) {
+  public QueryCollectionModificationHandlerBase(PageableCollectionBase2<T_ITEM> pageableCollection, QueryService<T_ITEM, T_ID> service) {
     assert pageableCollection != null;
     assert service != null;
     this.pageableCollection = pageableCollection;
     this.service = service;
   }
 
-  public FilterExpression getRemovedItemsFilterExpr(FilterExpression queryFilterExpr) {
+  public QueryExpr getRemovedItemsFilterExpr(QueryExpr queryFilterExpr) {
     @SuppressWarnings("unchecked")
     ClickedIds<T_ID> ids = modifications.getRemovedItems().isEmpty()
         ? new ClickedIds<T_ID>()
         : ((ItemIdSelection<T_ITEM, T_ID>)modifications.getRemovedItems()).getClickedIds();
     QueryAttr idAttr = pageableCollection.getQueryOptions().getIdAttribute();
-    return new FilterNot(PageableCollectionUtil2.makeSelectionQueryParams(idAttr, queryFilterExpr, ids));
+    return new QueryExprNot(PageableCollectionUtil2.makeSelectionQueryParams(idAttr, queryFilterExpr, ids));
   }
 
   @SuppressWarnings("unchecked")
@@ -100,7 +101,7 @@ public class QueryCollectionModificationHandlerBase<T_ITEM, T_ID>  implements Mo
         throw new IndexOutOfBoundsException("Maximum 1000 rows can be removed within a single save operation.");
       }
 
-      Collection<T_ID> ids = PageableQueryUtil.getItemIds(service, persistentItems);
+      Collection<T_ID> ids = getItemIds(service, persistentItems);
       modifications.setRemovedItems(oldRemovedItemSelection.isEmpty()
           // XXX oboede: here was the cached internal service used. But i suspect that the external service isn't less
           // efficient.
@@ -139,6 +140,14 @@ public class QueryCollectionModificationHandlerBase<T_ITEM, T_ID>  implements Mo
   @Override
   public Modifications<T_ITEM> getModifications() {
     return modifications;
+  }
+
+  private static <T_ITEM, T_ID> Collection<T_ID> getItemIds(QueryService<T_ITEM, T_ID> service, Selection<T_ITEM> items) {
+    Collection<T_ID> ids = new ArrayList<T_ID>((int)items.getSize());
+    for (T_ITEM i : items) {
+      ids.add(service.getIdForItem(i));
+    }
+    return ids;
   }
 
 }

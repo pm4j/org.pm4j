@@ -10,13 +10,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.pm4j.core.pm.annotation.PmBeanCfg;
 import org.pm4j.core.pm.annotation.PmFactoryCfg;
-import org.pm4j.core.pm.filter.FilterBase;
+import org.pm4j.core.pm.filter.DeprFilterBase;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
 import org.pm4j.core.pm.impl.PmBeanBase;
 import org.pm4j.core.pm.impl.PmConversationImpl;
-import org.pm4j.core.pm.impl.PmTableColImpl;
-import org.pm4j.core.pm.impl.PmTableImpl;
-import org.pm4j.core.pm.pageable.PageablePmsForBeans;
+import org.pm4j.core.pm.impl.DeprPmTableColImpl;
+import org.pm4j.core.pm.impl.DeprPmTableImpl;
+import org.pm4j.core.pm.pageable.DeprPageablePmsForBeans;
 
 
 public class PmTableTest {
@@ -35,7 +35,7 @@ public class PmTableTest {
     ));
 
     myTablePm = new MyTablePm(new PmConversationImpl());
-    myTablePm.setPageableCollection(new PageablePmsForBeans<ItemPm, Item>(myTablePm, editedRowBeanList), false);
+    myTablePm.setPageableCollection(new DeprPageablePmsForBeans<ItemPm, Item>(myTablePm, editedRowBeanList), false);
   }
 
   @Test
@@ -78,16 +78,16 @@ public class PmTableTest {
 
 
   @PmFactoryCfg(beanPmClasses=ItemPm.class)
-  public static class MyTablePm extends PmTableImpl<ItemPm> {
+  public static class MyTablePm extends DeprPmTableImpl<ItemPm> {
     public MyTablePm(PmObject pmParent) {
       super(pmParent);
     }
 
-    public final PmTableCol name = new PmTableColImpl(this);
-    public final PmTableCol description = new PmTableColImpl(this);
+    public final DeprPmTableCol name = new DeprPmTableColImpl(this);
+    public final DeprPmTableCol description = new DeprPmTableColImpl(this);
   }
 
-  public static class ItemNameStartsWithFilter extends FilterBase<ItemPm> {
+  public static class ItemNameStartsWithFilter extends DeprFilterBase<ItemPm> {
 
     private String name;
 

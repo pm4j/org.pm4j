@@ -7,8 +7,8 @@ import org.pm4j.common.expr.ExprExecCtxt;
 import org.pm4j.common.expr.Expression;
 import org.pm4j.common.expr.PathExpressionChain;
 import org.pm4j.common.expr.parser.ParseCtxt;
+import org.pm4j.common.util.CloneUtil;
 import org.pm4j.common.util.collection.MultiObjectValue;
-import org.pm4j.core.util.lang.CloneUtil;
 
 
 /**

@@ -2,14 +2,14 @@ package org.pm4j.common.pageable;
 
 import java.util.List;
 
-import org.pm4j.common.pageable.querybased.PageableQueryService;
 import org.pm4j.common.pageable.querybased.idquery.PageableIdQueryService;
-import org.pm4j.common.query.FilterExpression;
+import org.pm4j.common.pageable.querybased.pagequery.PageableQueryService;
+import org.pm4j.common.query.QueryExpr;
 import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.util.collection.ListUtil;
 
 /**
- * The {@link ItemIdService} and it's sub classes are designed to support
+ * The {@link QueryService} and it's sub classes are designed to support
  * pageable table or list models.<br>
  * This utility provides helper methods that make it easier to use these
  * services for other tasks too (e.g. to provide a plain list).
@@ -35,7 +35,7 @@ public class PageableQueryServiceUtil {
    *          The expression that identifies the object to find.
    * @return The corresponding instance. Never <code>null</code>.
    */
-  public static <T> T getItem(ItemIdService<T, ?> s, FilterExpression itemExpr) {
+  public static <T> T getItem(QueryService<T, ?> s, QueryExpr itemExpr) {
     T item = findItem(s, itemExpr);
     if (item == null) {
       throw new IllegalArgumentException("No item found for expression " + itemExpr);
@@ -57,7 +57,7 @@ public class PageableQueryServiceUtil {
    *          The expression that identifies the object to find.
    * @return The found instance or <code>null</code>.
    */
-  public static <T> T findItem(ItemIdService<T, ?> s, FilterExpression itemExpr) {
+  public static <T> T findItem(QueryService<T, ?> s, QueryExpr itemExpr) {
     // Fetches internally max. two items to be able to detect that the expression finds more
     // than one item. In that case an IllegalArgumentException will be thrown.
     List<T> items = findItems(s, itemExpr, 2);
@@ -81,7 +81,7 @@ public class PageableQueryServiceUtil {
    * @return The list of found items. Never <code>null</code>.
    */
   @SuppressWarnings("unchecked")
-  public static <T> List<T> findItems(ItemIdService<T, ?> s, FilterExpression itemExpr, int maxNumOfItems) {
+  public static <T> List<T> findItems(QueryService<T, ?> s, QueryExpr itemExpr, int maxNumOfItems) {
     QueryParams qp = new QueryParams();
     qp.setFilterExpression(itemExpr);
     if (s instanceof PageableQueryService) {

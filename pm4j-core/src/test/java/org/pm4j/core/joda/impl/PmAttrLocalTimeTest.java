@@ -13,10 +13,11 @@ import org.joda.time.LocalTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.pm4j.common.converter.value.joda.LocalTimeTimeZoneConverter;
-import org.pm4j.core.joda.PmAttrLocalTime;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.annotation.PmTitleCfg;
 import org.pm4j.core.pm.impl.PmConversationImpl;
+import org.pm4j.core.pm.joda.PmAttrLocalTime;
+import org.pm4j.core.pm.joda.impl.PmAttrLocalTimeImpl2;
 import org.pm4j.tools.test.PmAssert;
 
 /**

@@ -3,12 +3,12 @@ package org.pm4j.common.pageable;
 import java.awt.print.Pageable;
 import java.util.List;
 
-import org.pm4j.common.pageable.querybased.ClickedIds;
+import org.pm4j.common.pageable.querybased.pagequery.ClickedIds;
 import org.pm4j.common.query.CompOpIn;
-import org.pm4j.common.query.FilterAnd;
-import org.pm4j.common.query.FilterCompare;
-import org.pm4j.common.query.FilterExpression;
-import org.pm4j.common.query.FilterNot;
+import org.pm4j.common.query.QueryExprAnd;
+import org.pm4j.common.query.QueryExprCompare;
+import org.pm4j.common.query.QueryExpr;
+import org.pm4j.common.query.QueryExprNot;
 import org.pm4j.common.query.QueryAttr;
 import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.selection.SelectionHandler;
@@ -311,8 +311,8 @@ public final class PageableCollectionUtil2 {
    *          the set of individually selected/deselected item ids.
    * @return the generated filter restriction that represents the selection.
    */
-  public static <T_ID> FilterExpression makeSelectionQueryParams(QueryAttr idAttr, FilterExpression baseFilterExpr, ClickedIds<T_ID> clickedIds) {
-    FilterExpression idFilterExpr = new FilterCompare(idAttr, new CompOpIn(), clickedIds.getIds());
+  public static <T_ID> QueryExpr makeSelectionQueryParams(QueryAttr idAttr, QueryExpr baseFilterExpr, ClickedIds<T_ID> clickedIds) {
+    QueryExpr idFilterExpr = new QueryExprCompare(idAttr, new CompOpIn(), clickedIds.getIds());
     if (clickedIds.isInvertedSelection()) {
       // no de-select clicks: the original filter provides the complete inverse selection..
       if (clickedIds.getIds().isEmpty()) {
@@ -322,8 +322,8 @@ public final class PageableCollectionUtil2 {
       // Negative filter: use the query and de-select the clicked id's
       // No additional restriction if there are no clicked id's.
       return (baseFilterExpr != null)
-          ? new FilterAnd(baseFilterExpr, new FilterNot(idFilterExpr))
-          : new FilterNot(idFilterExpr);
+          ? new QueryExprAnd(baseFilterExpr, new QueryExprNot(idFilterExpr))
+          : new QueryExprNot(idFilterExpr);
 
     } else {
       // Positive filter: select only the clicked id's.

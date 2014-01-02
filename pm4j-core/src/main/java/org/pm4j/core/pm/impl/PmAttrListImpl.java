@@ -11,6 +11,7 @@ import org.pm4j.common.converter.string.StringConverterList;
 import org.pm4j.common.converter.string.StringConverterLong;
 import org.pm4j.common.converter.string.StringConverterParseException;
 import org.pm4j.common.converter.string.StringConverterString;
+import org.pm4j.common.util.reflection.ClassUtil;
 import org.pm4j.core.exception.PmConverterException;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmAttrList;
@@ -18,7 +19,6 @@ import org.pm4j.core.pm.PmAttrNumber;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmAttrListCfg;
 import org.pm4j.core.pm.annotation.PmOptionCfg.NullOption;
-import org.pm4j.core.util.reflection.ClassUtil;
 
 /**
  * Provides an implementation for PMs that can bind to {@link Collection} values.

@@ -7,7 +7,7 @@ import java.util.Collection;
 import org.apache.commons.lang.ClassUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.pm4j.core.util.reflection.PrefixUtil;
+import org.pm4j.common.util.reflection.PrefixUtil;
 
 public class AttrInfo {
 

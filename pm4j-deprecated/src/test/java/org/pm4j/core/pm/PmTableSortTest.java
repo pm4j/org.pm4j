@@ -12,31 +12,31 @@ import org.junit.Test;
 import org.pm4j.common.util.CompareUtil;
 import org.pm4j.core.pm.annotation.PmBeanCfg;
 import org.pm4j.core.pm.annotation.PmFactoryCfg;
-import org.pm4j.core.pm.annotation.PmTableCfg;
+import org.pm4j.core.pm.annotation.DeprPmTableCfg;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
 import org.pm4j.core.pm.impl.PmBeanBase;
 import org.pm4j.core.pm.impl.PmConversationImpl;
-import org.pm4j.core.pm.impl.PmTableColImpl;
-import org.pm4j.core.pm.impl.PmTableImpl;
-import org.pm4j.core.pm.pageable.PageablePmsForBeans;
+import org.pm4j.core.pm.impl.DeprPmTableColImpl;
+import org.pm4j.core.pm.impl.DeprPmTableImpl;
+import org.pm4j.core.pm.pageable.DeprPageablePmsForBeans;
 
 
 public class PmTableSortTest {
 
   @PmFactoryCfg(beanPmClasses=ItemPm.class)
-  public static class MyTablePm extends PmTableImpl<ItemPm> {
-    public final PmTableCol name = new PmTableColImpl(this);
-    public final PmTableCol description = new PmTableColImpl(this);
+  public static class MyTablePm extends DeprPmTableImpl<ItemPm> {
+    public final DeprPmTableCol name = new DeprPmTableColImpl(this);
+    public final DeprPmTableCol description = new DeprPmTableColImpl(this);
 
     public MyTablePm(PmObject pmParent) { super(pmParent); }
   }
 
-  @PmTableCfg(defaultSortCol="name")
+  @DeprPmTableCfg(defaultSortCol="name")
   public static class MyTablePmWithDefaultSortCol extends MyTablePm {
     public MyTablePmWithDefaultSortCol(PmObject pmParent) { super(pmParent); }
   }
 
-  @PmTableCfg(initialBeanSortComparator = IdxComparator.class)
+  @DeprPmTableCfg(initialBeanSortComparator = IdxComparator.class)
   public static class MyTablePmWithInitialSortOrder extends MyTablePm {
     public MyTablePmWithInitialSortOrder(PmObject pmParent) { super(pmParent); }
   }
@@ -62,13 +62,13 @@ public class PmTableSortTest {
     ));
 
     myTablePm = new MyTablePm(new PmConversationImpl());
-    myTablePm.setPageableCollection(new PageablePmsForBeans<ItemPm, Item>(myTablePm, rowBeanList), false);
+    myTablePm.setPageableCollection(new DeprPageablePmsForBeans<ItemPm, Item>(myTablePm, rowBeanList), false);
 
     myTablePmWithDefaultSortCol = new MyTablePmWithDefaultSortCol(new PmConversationImpl());
-    myTablePmWithDefaultSortCol.setPageableCollection(new PageablePmsForBeans<ItemPm, Item>(myTablePm, rowBeanList), false);
+    myTablePmWithDefaultSortCol.setPageableCollection(new DeprPageablePmsForBeans<ItemPm, Item>(myTablePm, rowBeanList), false);
 
     myTablePmWithInitialSortOrder = new MyTablePmWithInitialSortOrder(new PmConversationImpl());
-    myTablePmWithInitialSortOrder.setPageableCollection(new PageablePmsForBeans<ItemPm, Item>(myTablePm, rowBeanList), false);
+    myTablePmWithInitialSortOrder.setPageableCollection(new DeprPageablePmsForBeans<ItemPm, Item>(myTablePm, rowBeanList), false);
   }
 
   @Test
@@ -90,7 +90,7 @@ public class PmTableSortTest {
         return new SortOrderSpec(name, PmSortOrder.DESC);
       }
     };
-    table.setPageableCollection(new PageablePmsForBeans<ItemPm, Item>(table, rowBeanList), false);
+    table.setPageableCollection(new DeprPageablePmsForBeans<ItemPm, Item>(table, rowBeanList), false);
 
     assertEquals("The table sorts by 'name' in descending order.", "c", table.getRows().get(0).name.getValue());
     assertEquals("The table sorts by 'name' in descending order.", "b", table.getRows().get(1).name.getValue());

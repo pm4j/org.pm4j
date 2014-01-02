@@ -14,8 +14,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.pm4j.common.pageable.PageableCollectionUtil2;
-import org.pm4j.common.query.FilterCompareDefinition;
 import org.pm4j.common.query.QueryOptions;
+import org.pm4j.common.query.filter.FilterDefinition;
 import org.pm4j.common.query.inmem.InMemSortOrder;
 import org.pm4j.common.util.CompareUtil;
 import org.pm4j.core.pm.PmTable2.UpdateAspect;
@@ -165,7 +165,7 @@ public class PmTable2Test {
   @Test
   public void testFilterByDescriptionExists() {
     assertEquals("[a, b]", myTablePm.getRowPms().toString());
-    FilterCompareDefinition fd = getFilterDefinition("description");
+    FilterDefinition fd = getFilterDefinition("description");
     assertEquals(myTablePm.description.getPmTitle(), fd.getAttrTitle());
   }
 
@@ -249,10 +249,10 @@ public class PmTable2Test {
     }
   }
 
-  private FilterCompareDefinition getFilterDefinition(String colName) {
+  private FilterDefinition getFilterDefinition(String colName) {
     QueryOptions qo = myTablePm.getPmPageableBeanCollection().getQueryOptions();
-    List<FilterCompareDefinition> compareDefinitions = qo.getCompareDefinitions();
-    for (FilterCompareDefinition f : compareDefinitions) {
+    List<FilterDefinition> compareDefinitions = qo.getCompareDefinitions();
+    for (FilterDefinition f : compareDefinitions) {
       if (f.getAttr().getName().equals(colName)) {
         return f;
       }

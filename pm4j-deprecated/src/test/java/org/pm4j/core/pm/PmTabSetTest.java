@@ -6,7 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.pm4j.core.pm.impl.PmConversationImpl;
 import org.pm4j.core.pm.impl.PmElementImpl;
-import org.pm4j.core.pm.impl.PmTabSetImpl;
+import org.pm4j.core.pm.impl.DeprPmTabSetImpl;
 
 public class PmTabSetTest {
 
@@ -82,7 +82,7 @@ public class PmTabSetTest {
     }
   }
 
-  public static class MyTabSet extends PmTabSetImpl {
+  public static class MyTabSet extends DeprPmTabSetImpl {
     public final PmElement tab1 = new PmElementImpl(this);
     public final PmElement tab2 = new PmElementImpl(this);
     public final PmElement tab3 = new PmElementImpl(this);

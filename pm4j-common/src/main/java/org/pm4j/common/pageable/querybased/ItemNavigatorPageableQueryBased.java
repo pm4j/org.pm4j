@@ -1,6 +1,8 @@
 package org.pm4j.common.pageable.querybased;
 
-import org.pm4j.common.pageable.ItemNavigator;
+import org.pm4j.common.itemnavigator.ItemNavigator;
+import org.pm4j.common.pageable.querybased.pagequery.PageableQueryCollectionCache;
+import org.pm4j.common.pageable.querybased.pagequery.PageableQueryService;
 import org.pm4j.common.query.QueryParams;
 
 /**

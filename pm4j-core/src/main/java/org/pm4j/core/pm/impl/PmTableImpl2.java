@@ -16,22 +16,22 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.pm4j.common.cache.CacheStrategy;
 import org.pm4j.common.cache.CacheStrategyNoCache;
-import org.pm4j.common.pageable.ItemIdService;
-import org.pm4j.common.pageable.ModificationHandler;
-import org.pm4j.common.pageable.Modifications;
+import org.pm4j.common.modifications.ModificationHandler;
+import org.pm4j.common.modifications.Modifications;
+import org.pm4j.common.pageable.QueryService;
 import org.pm4j.common.pageable.PageableCollection2;
 import org.pm4j.common.pageable.inmem.PageableInMemCollectionBase;
-import org.pm4j.common.pageable.querybased.PageableQueryCollection;
-import org.pm4j.common.pageable.querybased.PageableQueryService;
-import org.pm4j.common.pageable.querybased.QueryOptionProvider;
 import org.pm4j.common.pageable.querybased.idquery.PageableIdQueryCollectionImpl;
 import org.pm4j.common.pageable.querybased.idquery.PageableIdQueryService;
-import org.pm4j.common.query.FilterCompareDefinition;
-import org.pm4j.common.query.FilterCompareDefinitionFactory;
+import org.pm4j.common.pageable.querybased.pagequery.PageableQueryCollection;
+import org.pm4j.common.pageable.querybased.pagequery.PageableQueryService;
 import org.pm4j.common.query.QueryAttr;
+import org.pm4j.common.query.QueryOptionProvider;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.query.SortOrder;
+import org.pm4j.common.query.filter.FilterDefinition;
+import org.pm4j.common.query.filter.FilterDefinitionFactory;
 import org.pm4j.common.query.inmem.InMemSortOrder;
 import org.pm4j.common.selection.SelectMode;
 import org.pm4j.common.selection.Selection;
@@ -40,6 +40,8 @@ import org.pm4j.common.selection.SelectionHandlerUtil;
 import org.pm4j.common.util.beanproperty.PropertyAndVetoableChangeListener;
 import org.pm4j.common.util.collection.ListUtil;
 import org.pm4j.common.util.collection.MapUtil;
+import org.pm4j.common.util.reflection.ClassUtil;
+import org.pm4j.common.util.reflection.GenericTypeUtil;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmCommand;
@@ -66,8 +68,6 @@ import org.pm4j.core.pm.impl.cache.CacheStrategyRequest;
 import org.pm4j.core.pm.impl.pathresolver.PathResolver;
 import org.pm4j.core.pm.impl.pathresolver.PmExpressionPathResolver;
 import org.pm4j.core.pm.pageable2.PageablePmBeanCollection;
-import org.pm4j.core.util.reflection.ClassUtil;
-import org.pm4j.core.util.reflection.GenericTypeUtil;
 
 /**
  * A table that presents the content of a set of {@link PmElement}s.
@@ -313,7 +313,7 @@ public class PmTableImpl2
    *
    * @return the factory.
    */
-  public FilterCompareDefinitionFactory getPmFilterCompareDefinitionFactory() {
+  public FilterDefinitionFactory getPmFilterCompareDefinitionFactory() {
     return getPmConversation().getPmDefaults().getFilterCompareDefinitionFactory();
   }
 
@@ -513,12 +513,12 @@ public class PmTableImpl2
    * @return
    */
   @SuppressWarnings("unchecked")
-  protected ItemIdService<T_ROW_BEAN, ?> getPmQueryServiceImpl() {
+  protected QueryService<T_ROW_BEAN, ?> getPmQueryServiceImpl() {
     MetaData md = getOwnMetaData();
     if (md.serviceClass != null) {
       // TODO oboede: add a type based service locator.
       String lookupName = StringUtils.uncapitalize(md.serviceClass.getSimpleName());
-      ItemIdService<T_ROW_BEAN, ?> service = (ItemIdService<T_ROW_BEAN, ?>) getPmConversationImpl().getPmNamedObject(lookupName);
+      QueryService<T_ROW_BEAN, ?> service = (QueryService<T_ROW_BEAN, ?>) getPmConversationImpl().getPmNamedObject(lookupName);
 
       if (service == null) {
         throw new PmRuntimeException(this, "No implementation found for the serviceClass configured in @PmTableCfg. Configured " + service);
@@ -537,7 +537,7 @@ public class PmTableImpl2
    */
   protected PageablePmBeanCollection<T_ROW_PM, T_ROW_BEAN> getPmPageableCollectionImpl() {
     @SuppressWarnings("unchecked")
-    ItemIdService<T_ROW_BEAN, Object> s = (ItemIdService<T_ROW_BEAN, Object>) getPmQueryServiceImpl();
+    QueryService<T_ROW_BEAN, Object> s = (QueryService<T_ROW_BEAN, Object>) getPmQueryServiceImpl();
     QueryOptions qo = getPmQueryOptions();
     PageableCollection2<T_ROW_BEAN> pc = null;
 
@@ -566,7 +566,7 @@ public class PmTableImpl2
 
   /**
    * Reads the {@link QueryOptions} to using the information provided by the given {@link TablePm2}
-   * and {@link ItemIdService}.
+   * and {@link QueryService}.
    *
    * @return The evaluated {@link QueryOptions} instance. Never <code>null</code>.
    */
@@ -586,7 +586,7 @@ public class PmTableImpl2
    * @return The option provider or <code>null</code>.
    */
   protected QueryOptionProvider getPmQueryOptionProvider() {
-    ItemIdService<T_ROW_BEAN, ?> service = getPmQueryServiceImpl();
+    QueryService<T_ROW_BEAN, ?> service = getPmQueryServiceImpl();
     if (service != null) {
       return (service instanceof QueryOptionProvider)
           ? (QueryOptionProvider)service
@@ -732,7 +732,7 @@ public class PmTableImpl2
       MetaData md = PmTableImpl2.this.getOwnMetaDataWithoutPmInitCall();
 
       // * Read the column definitions
-      FilterCompareDefinitionFactory ff = pmTable.getPmFilterCompareDefinitionFactory();
+      FilterDefinitionFactory ff = pmTable.getPmFilterCompareDefinitionFactory();
       boolean tableSortable = pmTable.getPmImplDetails().isSortable();
       for (PmTableCol2 col : pmTable.getColumnPms()) {
         PmTableCol2.ImplDetails d = col.getPmImplDetails();
@@ -742,7 +742,7 @@ public class PmTableImpl2
           options.addSortOrder(d.getQueryAttrName(), so);
         }
 
-        FilterCompareDefinition fcd = d.getFilterCompareDefinition(ff);
+        FilterDefinition fcd = d.getFilterCompareDefinition(ff);
         if (fcd != null) {
           options.addFilterCompareDefinition(fcd);
         }
@@ -934,7 +934,7 @@ public class PmTableImpl2
                                 ? cfg.initialBeanSortComparator()
                                 : null;
       myMetaData.defaultSortColName = StringUtils.defaultIfEmpty(cfg.defaultSortCol(), null);
-      myMetaData.serviceClass = (cfg.serviceClass() != ItemIdService.class)
+      myMetaData.serviceClass = (cfg.serviceClass() != QueryService.class)
                                 ? cfg.serviceClass()
                                 : null;
       if (myMetaData.serviceClass != null) {
@@ -968,7 +968,7 @@ public class PmTableImpl2
     private int numOfPageRowPms = DEFAULT_NUM_OF_PAGE_ROW_PMS;
     private PathResolver valuePathResolver;
     @SuppressWarnings("rawtypes")
-    private Class<? extends ItemIdService> serviceClass;
+    private Class<? extends QueryService> serviceClass;
     private boolean sortable;
     private Class<?> initialBeanSortComparatorClass = null;
     private String defaultSortColName = null;

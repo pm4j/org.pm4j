@@ -4,13 +4,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A (technology specific) set of {@link FilterExpressionEvaluator}s and {@link CompOp} evaluators.
+ * A (technology specific) set of {@link QueryExprEvaluator}s and {@link CompOp} evaluators.
  *
  * @author olaf boede
  */
 public class QueryEvaluatorSet {
 
-  /** The set of {@link FilterExpression} classes mapped to corresponding evaluator instances. */
+  /** The set of {@link QueryExpr} classes mapped to corresponding evaluator instances. */
   private final Map<Class<?>, Object> exprEvaluatorMap = new HashMap<Class<?>, Object>();
 
   /** The set of {@link CompOp} classes mapped to corresponding evaluator instances. */
@@ -28,7 +28,7 @@ public class QueryEvaluatorSet {
    * @param expr the expression to evaluate.
    * @return a technology specific instance that can evaluate the expression.
    */
-  public Object getExprEvaluator(FilterExpression expr) {
+  public Object getExprEvaluator(QueryExpr expr) {
     Object ev = exprEvaluatorMap.get(expr.getClass());
     if (ev == null) {
       throw new RuntimeException("Missing filter expression evaluator for expression type: " + expr.getClass());
@@ -42,7 +42,7 @@ public class QueryEvaluatorSet {
    * @param expr the compare operator to evaluate.
    * @return a technology specific instance that can evaluate the compare operation.
    */
-  public CompOpEvaluator getCompOpEvaluator(FilterCompare filterCompare) {
+  public CompOpEvaluator getCompOpEvaluator(QueryExprCompare filterCompare) {
     if (filterCompare.getCompOp() == null) {
       throw new RuntimeException("The filter parameter has no CompOp instance. " + filterCompare);
     }
@@ -76,7 +76,7 @@ public class QueryEvaluatorSet {
    * @param evaluator
    *            the evaluator to use to interpret the expression instances
    */
-  public void addExprEvaluator(Class<? extends FilterExpression> exprClass, FilterExpressionEvaluator e) {
+  public void addExprEvaluator(Class<? extends QueryExpr> exprClass, QueryExprEvaluator e) {
     exprEvaluatorMap.put(exprClass, e);
   }
 

@@ -2,7 +2,7 @@ package org.pm4j.core.pm.impl.changehandler;
 
 import java.util.Collection;
 
-import org.pm4j.common.pageable.Modifications;
+import org.pm4j.common.modifications.Modifications;
 import org.pm4j.core.pm.PmCommandDecorator;
 import org.pm4j.core.pm.PmObject;
 

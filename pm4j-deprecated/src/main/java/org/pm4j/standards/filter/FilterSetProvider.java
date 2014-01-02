@@ -3,7 +3,7 @@ package org.pm4j.standards.filter;
 import java.util.List;
 
 import org.pm4j.common.query.CompOp;
-import org.pm4j.common.query.FilterCompareDefinition;
+import org.pm4j.common.query.filter.FilterDefinition;
 import org.pm4j.core.pm.PmAttr;
 
 /**
@@ -23,7 +23,7 @@ public interface FilterSetProvider<T_FILTERSET_BEAN extends FilterSet> {
    *
    * @return The set of filter compare definitions.
    */
-  List<FilterCompareDefinition> getAvailablePmFilterCompareDefinitions();
+  List<FilterDefinition> getAvailablePmFilterCompareDefinitions();
 
   /**
    * Provides the set of currently active filters.
@@ -63,7 +63,7 @@ public interface FilterSetProvider<T_FILTERSET_BEAN extends FilterSet> {
      *            the selected compare operator.
      * @return the corresponding attribute PM.
      */
-    PmAttr<?> makeValueAttrPm(FilterItemPm<?> parentPm, FilterCompareDefinition fd, CompOp co);
+    PmAttr<?> makeValueAttrPm(FilterItemPm<?> parentPm, FilterDefinition fd, CompOp co);
 
     /**
      * Sets enum options to restrict enum lists for special types. 

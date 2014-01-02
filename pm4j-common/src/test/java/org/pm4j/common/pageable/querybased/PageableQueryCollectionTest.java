@@ -7,10 +7,12 @@ import java.util.Map;
 
 import org.pm4j.common.pageable.PageableCollection2;
 import org.pm4j.common.pageable.PageableCollectionTestBase;
-import org.pm4j.common.query.CompOpStringStartsWith;
-import org.pm4j.common.query.FilterCompareDefinition;
+import org.pm4j.common.pageable.querybased.pagequery.PageableQueryCollection;
+import org.pm4j.common.pageable.querybased.pagequery.PageableQueryService;
+import org.pm4j.common.query.CompOpStartsWith;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.QueryParams;
+import org.pm4j.common.query.filter.FilterDefinition;
 import org.pm4j.common.query.inmem.InMemQueryEvaluator;
 
 public class PageableQueryCollectionTest extends PageableCollectionTestBase<PageableCollectionTestBase.Bean> {
@@ -29,7 +31,7 @@ public class PageableQueryCollectionTest extends PageableCollectionTestBase<Page
 
     QueryOptions options = new QueryOptions();
     options.addSortOrder(Bean.ATTR_NAME);
-    options.addFilterCompareDefinition(new FilterCompareDefinition(Bean.ATTR_NAME, new CompOpStringStartsWith()));
+    options.addFilterCompareDefinition(new FilterDefinition(Bean.ATTR_NAME, new CompOpStartsWith()));
 
     return new PageableQueryCollection<Bean, Integer>(service, options);
   }

@@ -4,8 +4,8 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import org.pm4j.common.pageable.PageableCollectionBase2;
-import org.pm4j.common.query.FilterAnd;
-import org.pm4j.common.query.FilterExpression;
+import org.pm4j.common.query.QueryExprAnd;
+import org.pm4j.common.query.QueryExpr;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.selection.Selection;
@@ -73,10 +73,10 @@ public abstract class PageableQueryCollectionBase<T_ITEM, T_ID> extends Pageable
         }
         else {
             QueryParams qParams = getQueryParams().clone();
-            FilterExpression queryFilterExpr = qParams.getFilterExpression();
-            FilterExpression removedItemsFilterExpr = modificationHandler.getRemovedItemsFilterExpr(queryFilterExpr);
+            QueryExpr queryFilterExpr = qParams.getFilterExpression();
+            QueryExpr removedItemsFilterExpr = modificationHandler.getRemovedItemsFilterExpr(queryFilterExpr);
             qParams.setFilterExpression(queryFilterExpr != null
-                ? new FilterAnd(queryFilterExpr, removedItemsFilterExpr)
+                ? new QueryExprAnd(queryFilterExpr, removedItemsFilterExpr)
                 : removedItemsFilterExpr);
             queryParamsWithRemovedItems = qParams;
         }

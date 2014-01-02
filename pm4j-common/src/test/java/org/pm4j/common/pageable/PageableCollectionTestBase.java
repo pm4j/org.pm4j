@@ -10,14 +10,15 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.pm4j.common.itemnavigator.ItemNavigator;
 import org.pm4j.common.pageable.inmem.ItemNavigatorInMem;
-import org.pm4j.common.query.CompOpStringStartsWith;
-import org.pm4j.common.query.FilterCompareDefinition;
-import org.pm4j.common.query.FilterExpression;
+import org.pm4j.common.query.CompOpStartsWith;
+import org.pm4j.common.query.QueryExpr;
 import org.pm4j.common.query.QueryAttr;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.QueryUtil;
 import org.pm4j.common.query.SortOrder;
+import org.pm4j.common.query.filter.FilterDefinition;
 import org.pm4j.common.selection.SelectMode;
 import org.pm4j.common.util.beanproperty.PropertyAndVetoableChangeListener;
 import org.pm4j.common.util.collection.IterableUtil;
@@ -45,14 +46,14 @@ public abstract class PageableCollectionTestBase<T> {
   protected QueryOptions getQueryOptions() {
     QueryOptions options = new QueryOptions();
     options.addSortOrder(Bean.ATTR_NAME);
-    options.addFilterCompareDefinition(new FilterCompareDefinition(Bean.ATTR_NAME, new CompOpStringStartsWith()));
+    options.addFilterCompareDefinition(new FilterDefinition(Bean.ATTR_NAME, new CompOpStartsWith()));
     return options;
   }
 
   /** A default implementation, which may differ for the PM collection test.
    *  There we have to navigate from the attribute to the value too. */
-  private FilterExpression getFilterNameStartsWith(String startString) {
-    return QueryUtil.getFilter(collection.getQueryOptions(), "name", CompOpStringStartsWith.NAME, startString);
+  private QueryExpr getFilterNameStartsWith(String startString) {
+    return QueryUtil.getFilter(collection.getQueryOptions(), "name", CompOpStartsWith.NAME, startString);
   }
 
   protected SortOrder getOrderByName() {

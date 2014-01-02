@@ -7,7 +7,7 @@ import java.util.Map;
 import org.apache.commons.lang.SerializationUtils;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.pm4j.core.pm.PmAspect;
+import org.pm4j.core.pm.DeprPmAspect;
 import org.pm4j.core.pm.PmAttrInteger;
 import org.pm4j.core.pm.PmAttrString;
 import org.pm4j.core.pm.PmObject;
@@ -15,10 +15,10 @@ import org.pm4j.core.pm.api.PmVisitorApi;
 import org.pm4j.core.pm.impl.PmAttrIntegerImpl;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
-import org.pm4j.core.pm.serialization.PmContentCfg;
-import org.pm4j.core.pm.serialization.PmContentChangeCommand;
-import org.pm4j.core.pm.serialization.PmContentContainer;
-import org.pm4j.core.pm.serialization.PmContentGetVisitorCallBack;
+import org.pm4j.core.pm.serialization.DeprPmContentCfg;
+import org.pm4j.core.pm.serialization.DeprPmContentChangeCommand;
+import org.pm4j.core.pm.serialization.DeprPmContentContainer;
+import org.pm4j.core.pm.serialization.DeprPmContentGetVisitorCallBack;
 
 public class PmContentGetVisitorCallBackTest {
 
@@ -50,25 +50,25 @@ public class PmContentGetVisitorCallBackTest {
     pm.myPm2.i.setValue(12);
 
 
-    PmContentGetVisitorCallBack v = new PmContentGetVisitorCallBack();
-    v.getContentCfg().addAspects(PmAspect.VALUE);
+    DeprPmContentGetVisitorCallBack v = new DeprPmContentGetVisitorCallBack();
+    v.getContentCfg().addAspects(DeprPmAspect.VALUE);
     v.getContentContainer().setPmPath("Bla");
     PmVisitorApi.visit(pm, v);
     assertEquals("Bla", v.getContentContainer().getPmPath());
 
     // System.out.println(PmContentContainerToStringUtil.toString(v.getContentContainer()));
 
-    Map<String, PmContentContainer> root = v.getContentContainer().getNamedChildContentMap();
-    assertEquals("myPmRoot_s", root.get("s").getAspect(PmAspect.VALUE));
-    assertEquals(new Integer(1), root.get("i").getAspect(PmAspect.VALUE));
+    Map<String, DeprPmContentContainer> root = v.getContentContainer().getNamedChildContentMap();
+    assertEquals("myPmRoot_s", root.get("s").getAspect(DeprPmAspect.VALUE));
+    assertEquals(new Integer(1), root.get("i").getAspect(DeprPmAspect.VALUE));
 
-    Map<String, PmContentContainer> myPm1 = root.get("myPm1").getNamedChildContentMap();
-    assertEquals("myPm1_s",       myPm1.get("s").getAspect(PmAspect.VALUE));
-    assertEquals(new Integer(11), myPm1.get("i").getAspect(PmAspect.VALUE));
+    Map<String, DeprPmContentContainer> myPm1 = root.get("myPm1").getNamedChildContentMap();
+    assertEquals("myPm1_s",       myPm1.get("s").getAspect(DeprPmAspect.VALUE));
+    assertEquals(new Integer(11), myPm1.get("i").getAspect(DeprPmAspect.VALUE));
 
-    Map<String, PmContentContainer> myPm2 = root.get("myPm2").getNamedChildContentMap();
-    assertEquals("myPm2_s",       myPm2.get("s").getAspect(PmAspect.VALUE));
-    assertEquals(new Integer(12), myPm2.get("i").getAspect(PmAspect.VALUE));
+    Map<String, DeprPmContentContainer> myPm2 = root.get("myPm2").getNamedChildContentMap();
+    assertEquals("myPm2_s",       myPm2.get("s").getAspect(DeprPmAspect.VALUE));
+    assertEquals(new Integer(12), myPm2.get("i").getAspect(DeprPmAspect.VALUE));
   }
 
 
@@ -79,19 +79,19 @@ public class PmContentGetVisitorCallBackTest {
     pm.s.setValue("abc");
     pm.i.setValue(3);
 
-    PmContentGetVisitorCallBack v = new PmContentGetVisitorCallBack();
-    v.getContentCfg().addAspects(PmAspect.VALUE);
+    DeprPmContentGetVisitorCallBack v = new DeprPmContentGetVisitorCallBack();
+    v.getContentCfg().addAspects(DeprPmAspect.VALUE);
     PmVisitorApi.visit(pm, v);
 
     // System.out.println(PmContentContainerToStringUtil.toString(v.getContentContainer()));
 
-    Map<String, PmContentContainer> root = v.getContentContainer().getNamedChildContentMap();
-    assertEquals("abc", root.get("s").getAspect(PmAspect.VALUE));
-    assertEquals(new Integer(3), root.get("i").getAspect(PmAspect.VALUE));
+    Map<String, DeprPmContentContainer> root = v.getContentContainer().getNamedChildContentMap();
+    assertEquals("abc", root.get("s").getAspect(DeprPmAspect.VALUE));
+    assertEquals(new Integer(3), root.get("i").getAspect(DeprPmAspect.VALUE));
 
   }
 
-  private PmContentCfg valueTransferContentCfg = new PmContentCfg(PmAspect.VALUE);
+  private DeprPmContentCfg valueTransferContentCfg = new DeprPmContentCfg(DeprPmAspect.VALUE);
 
   public void testSerializeAndDeserialize() {
     MyPm pm = new MyPm();
@@ -99,7 +99,7 @@ public class PmContentGetVisitorCallBackTest {
     pm.i.setValue(3);
 
 
-    PmContentGetVisitorCallBack v = new PmContentGetVisitorCallBack(valueTransferContentCfg);
+    DeprPmContentGetVisitorCallBack v = new DeprPmContentGetVisitorCallBack(valueTransferContentCfg);
     PmVisitorApi.visit(pm, v);
 
     // System.out.println(PmContentContainerToStringUtil.toString(v.getContentContainer()));
@@ -107,9 +107,9 @@ public class PmContentGetVisitorCallBackTest {
     MyPm pm2 = new MyPm();
 
     byte[] bytes = SerializationUtils.serialize(v.getContentContainer());
-    PmContentContainer contentContainer = (PmContentContainer)SerializationUtils.deserialize(bytes);
+    DeprPmContentContainer contentContainer = (DeprPmContentContainer)SerializationUtils.deserialize(bytes);
 
-    new PmContentChangeCommand(pm2, contentContainer).doIt();
+    new DeprPmContentChangeCommand(pm2, contentContainer).doIt();
 
     assertEquals("abc", pm2.s.getValue());
     assertEquals(new Integer(3), pm2.i.getValue());
@@ -117,10 +117,10 @@ public class PmContentGetVisitorCallBackTest {
     pm2.s.setValue("ab");
     pm2.i.setValue(null);
 
-    v = new PmContentGetVisitorCallBack(valueTransferContentCfg);
+    v = new DeprPmContentGetVisitorCallBack(valueTransferContentCfg);
     PmVisitorApi.visit(pm2, v);
 
-    new PmContentChangeCommand(pm, v.getContentContainer()).doIt();
+    new DeprPmContentChangeCommand(pm, v.getContentContainer()).doIt();
 
     assertEquals("ab", pm.s.getValue());
     assertEquals(null, pm2.i.getValue());

@@ -1,6 +1,6 @@
 package org.pm4j.sample.filebrowser;
 
-import org.pm4j.core.pm.PmTable;
+import org.pm4j.core.pm.DeprPmTable;
 import org.pm4j.core.sample.filebrowser.DirPm;
 import org.pm4j.core.sample.filebrowser.FilePm;
 import org.pm4j.swt.pb.PbTable;
@@ -16,10 +16,10 @@ public class FileBrowser {
     PbTreeWithDetails pv = new PbTreeWithDetails();
 
     pv.getDetailsBinderMap().addKeyToViewMatches(
-        PmTable.class, new PbTable(),
+        DeprPmTable.class, new PbTable(),
         FilePm.class, new PbGridLayout.AllAttrs());
     pv.getDetailsBinderMap().
-          addMatcher(PmTable.class, new PbTable()).
+          addMatcher(DeprPmTable.class, new PbTable()).
           addMatcher(FilePm.class, new PbGridLayout.AllAttrs());
 
     pv.build(s.getShell(), DirPm.makeDirPm("/"));

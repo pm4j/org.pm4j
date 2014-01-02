@@ -14,13 +14,13 @@ import java.util.Set;
 
 import org.pm4j.common.cache.CacheStrategy;
 import org.pm4j.common.cache.CacheStrategyNoCache;
-import org.pm4j.common.pageable.ModificationHandler;
-import org.pm4j.common.pageable.Modifications;
-import org.pm4j.common.pageable.ModificationsImpl;
+import org.pm4j.common.modifications.ModificationHandler;
+import org.pm4j.common.modifications.Modifications;
+import org.pm4j.common.modifications.ModificationsImpl;
 import org.pm4j.common.pageable.PageableCollection2;
 import org.pm4j.common.pageable.PageableCollectionBase2;
 import org.pm4j.common.pageable.PageableCollectionUtil2;
-import org.pm4j.common.query.FilterExpression;
+import org.pm4j.common.query.QueryExpr;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.query.inmem.InMemQueryEvaluator;
@@ -221,7 +221,7 @@ public abstract class PageableInMemCollectionBase<T_ITEM>
 
   /** Generates a list of filtered items based on the given list. */
   private List<T_ITEM> _filter(List<T_ITEM> unfilteredList) {
-    FilterExpression filterExpression = getQueryParams().getFilterExpression();
+    QueryExpr filterExpression = getQueryParams().getFilterExpression();
     if (filterExpression == null) {
       return unfilteredList;
     }

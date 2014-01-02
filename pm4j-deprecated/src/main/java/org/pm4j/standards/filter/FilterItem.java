@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.pm4j.common.query.CompOp;
-import org.pm4j.common.query.FilterCompareDefinition;
+import org.pm4j.common.query.filter.FilterDefinition;
 
 
 /**
@@ -14,8 +14,8 @@ import org.pm4j.common.query.FilterCompareDefinition;
  */
 public class FilterItem {
 
-  private Collection<? extends FilterCompareDefinition> filterByOptions = new ArrayList<FilterCompareDefinition>();
-  private FilterCompareDefinition filterBy;
+  private Collection<? extends FilterDefinition> filterByOptions = new ArrayList<FilterDefinition>();
+  private FilterDefinition filterBy;
   private CompOp compOp;
   private Object filterByValue;
 
@@ -32,11 +32,11 @@ public class FilterItem {
 
   // -- getter/setter --
 
-  public Collection<? extends FilterCompareDefinition> getFilterByOptions() { return filterByOptions; }
-  public void setFilterByOptions(Collection<? extends FilterCompareDefinition> filterByOptions) { this.filterByOptions = filterByOptions; }
+  public Collection<? extends FilterDefinition> getFilterByOptions() { return filterByOptions; }
+  public void setFilterByOptions(Collection<? extends FilterDefinition> filterByOptions) { this.filterByOptions = filterByOptions; }
 
-  public FilterCompareDefinition getFilterBy() { return filterBy; }
-  public void setFilterBy(FilterCompareDefinition filterItemDefinition) { this.filterBy = filterItemDefinition; }
+  public FilterDefinition getFilterBy() { return filterBy; }
+  public void setFilterBy(FilterDefinition filterItemDefinition) { this.filterBy = filterItemDefinition; }
 
   public CompOp getCompOp() { return compOp; }
   public void setCompOp(CompOp compOp) { this.compOp = compOp; }

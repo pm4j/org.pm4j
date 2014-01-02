@@ -3,7 +3,7 @@ package org.pm4j.core.pm.impl.changehandler;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyVetoException;
 
-import org.pm4j.common.pageable.ModificationHandler;
+import org.pm4j.common.modifications.ModificationHandler;
 import org.pm4j.common.pageable.PageableCollection2;
 import org.pm4j.common.selection.Selection;
 import org.pm4j.common.util.beanproperty.PropertyAndVetoableChangeListener;

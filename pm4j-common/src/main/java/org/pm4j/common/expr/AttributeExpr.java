@@ -2,9 +2,9 @@ package org.pm4j.common.expr;
 
 import org.pm4j.common.expr.NameWithModifier.Modifier;
 import org.pm4j.common.expr.parser.ParseCtxt;
-import org.pm4j.core.util.reflection.BeanAttrAccessor;
-import org.pm4j.core.util.reflection.BeanAttrAccessorImpl;
-import org.pm4j.core.util.reflection.ReflectionException;
+import org.pm4j.common.util.reflection.BeanAttrAccessor;
+import org.pm4j.common.util.reflection.BeanAttrAccessorImpl;
+import org.pm4j.common.util.reflection.ReflectionException;
 
 /**
  * A path that uses a public field or getter/setter to resolve the path string.

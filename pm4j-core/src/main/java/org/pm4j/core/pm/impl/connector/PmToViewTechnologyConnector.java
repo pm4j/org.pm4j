@@ -1,6 +1,7 @@
 package org.pm4j.core.pm.impl.connector;
 
 import org.pm4j.core.pm.PmObject;
+import org.pm4j.core.pm.impl.inject.NamedObjectResolver;
 import org.pm4j.navi.NaviHistory;
 import org.pm4j.navi.impl.NaviLinkImpl;
 

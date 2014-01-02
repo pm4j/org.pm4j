@@ -8,9 +8,9 @@ import java.util.Set;
 
 import org.apache.commons.lang.SerializationUtils;
 import org.apache.commons.lang.StringUtils;
+import org.pm4j.common.util.CloneUtil;
+import org.pm4j.common.util.reflection.ClassUtil;
 import org.pm4j.core.pm.PmObject;
-import org.pm4j.core.util.lang.CloneUtil;
-import org.pm4j.core.util.reflection.ClassUtil;
 
 
 public final class NaviUtil {

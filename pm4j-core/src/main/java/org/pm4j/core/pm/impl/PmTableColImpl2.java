@@ -3,11 +3,11 @@ package org.pm4j.core.pm.impl;
 import java.util.Collection;
 import java.util.List;
 
-import org.pm4j.common.query.FilterCompareDefinition;
-import org.pm4j.common.query.FilterCompareDefinitionFactory;
 import org.pm4j.common.query.QueryAttr;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.SortOrder;
+import org.pm4j.common.query.filter.FilterDefinition;
+import org.pm4j.common.query.filter.FilterDefinitionFactory;
 import org.pm4j.common.util.collection.ListUtil;
 import org.pm4j.core.exception.PmResourceData;
 import org.pm4j.core.exception.PmRuntimeException;
@@ -93,8 +93,8 @@ public class PmTableColImpl2 extends PmObjectBase implements PmTableCol2 {
   /**
    * Creates column specific filter meta data.
    */
-  protected FilterCompareDefinition createFilterCompareDefinition(FilterCompareDefinitionFactory fcdf) {
-    FilterCompareDefinition fcd = null;
+  protected FilterDefinition createFilterCompareDefinition(FilterDefinitionFactory fcdf) {
+    FilterDefinition fcd = null;
     if (getOwnMetaData().filterType != Void.class) {
       fcd = fcdf.createCompareDefinition(getColQueryAttr());
     }
@@ -320,7 +320,7 @@ public class PmTableColImpl2 extends PmObjectBase implements PmTableCol2 {
     }
 
     @Override
-    public FilterCompareDefinition getFilterCompareDefinition(FilterCompareDefinitionFactory fcdf) {
+    public FilterDefinition getFilterCompareDefinition(FilterDefinitionFactory fcdf) {
       return PmTableColImpl2.this.createFilterCompareDefinition(fcdf);
     }
   }

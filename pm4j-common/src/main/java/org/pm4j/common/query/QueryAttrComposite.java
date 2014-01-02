@@ -3,7 +3,7 @@ package org.pm4j.common.query;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.pm4j.core.util.lang.CloneUtil;
+import org.pm4j.common.util.CloneUtil;
 
 
 /**

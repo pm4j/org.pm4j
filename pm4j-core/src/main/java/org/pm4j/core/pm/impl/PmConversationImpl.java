@@ -22,10 +22,10 @@ import org.pm4j.core.pm.PmMessage.Severity;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmValidationApi;
-import org.pm4j.core.pm.impl.connector.NamedObjectResolver;
-import org.pm4j.core.pm.impl.connector.NamedObjectResolverChain;
 import org.pm4j.core.pm.impl.connector.PmToNoViewTechnologyConnector;
 import org.pm4j.core.pm.impl.connector.PmToViewTechnologyConnector;
+import org.pm4j.core.pm.impl.inject.NamedObjectResolver;
+import org.pm4j.core.pm.impl.inject.NamedObjectResolverChain;
 import org.pm4j.navi.NaviHistory;
 
 /**

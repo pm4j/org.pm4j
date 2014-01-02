@@ -12,8 +12,8 @@ import org.pm4j.common.expr.ExprExecCtxt;
 import org.pm4j.common.expr.Expression;
 import org.pm4j.common.expr.PathExpressionChain;
 import org.pm4j.common.expr.parser.ParseCtxt;
-import org.pm4j.common.query.FilterCompare;
-import org.pm4j.common.query.FilterExpression;
+import org.pm4j.common.query.QueryExprCompare;
+import org.pm4j.common.query.QueryExpr;
 import org.pm4j.common.query.QueryAttr;
 import org.pm4j.common.query.QueryAttrMulti;
 import org.pm4j.common.query.QueryEvaluatorSet;
@@ -22,7 +22,7 @@ import org.pm4j.common.util.collection.ListUtil;
 import org.pm4j.common.util.collection.MultiObjectValue;
 
 /**
- * An algorithm that allows to filter in-memory items based on {@link FilterExpression}s.<br>
+ * An algorithm that allows to filter in-memory items based on {@link QueryExpr}s.<br>
  * It also provides algorithms for item sorting based on a given {@link SortOrder}.
  * <p>
  * It's a stateful object, because it contains cached values.
@@ -51,7 +51,7 @@ public class InMemQueryEvaluator<T_ITEM> {
   }
 
   /**
-   * Checks if the given item matches the given {@link FilterExpression}.
+   * Checks if the given item matches the given {@link QueryExpr}.
    *
    * @param item
    *          the item to check.
@@ -59,7 +59,7 @@ public class InMemQueryEvaluator<T_ITEM> {
    *          provides the filter criteria to check.
    * @return <code>true</code> if the item matches the filter criteria.
    */
-  public boolean evaluate(Object item, FilterExpression expr) {
+  public boolean evaluate(Object item, QueryExpr expr) {
     InMemExprEvaluator ev = getExprEvaluator(expr);
     return ev.eval(this, item, expr);
   }
@@ -73,7 +73,7 @@ public class InMemQueryEvaluator<T_ITEM> {
    *          the filter to apply. May be <code>null</code>.
    * @return the set of items that match the filter criteria.
    */
-  public List<T_ITEM> evaluateSubSet(Collection<T_ITEM> items, FilterExpression expr) {
+  public List<T_ITEM> evaluateSubSet(Collection<T_ITEM> items, QueryExpr expr) {
     if (items == null) {
       return new ArrayList<T_ITEM>();
     }
@@ -140,11 +140,11 @@ public class InMemQueryEvaluator<T_ITEM> {
     }
   }
 
-  protected InMemExprEvaluator getExprEvaluator(FilterExpression expr) {
+  protected InMemExprEvaluator getExprEvaluator(QueryExpr expr) {
     return (InMemExprEvaluator) evaluatorSet.getExprEvaluator(expr);
   }
 
-  protected InMemCompOpEvaluator getCompOpEvaluator(FilterCompare compareOperation) {
+  protected InMemCompOpEvaluator getCompOpEvaluator(QueryExprCompare compareOperation) {
     return (InMemCompOpEvaluator) evaluatorSet.getCompOpEvaluator(compareOperation);
   }
 

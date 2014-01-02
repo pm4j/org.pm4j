@@ -3,7 +3,7 @@ package org.pm4j.common.pageable.querybased.idquery;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.pm4j.common.pageable.ItemNavigator;
+import org.pm4j.common.itemnavigator.ItemNavigator;
 import org.pm4j.common.selection.Selection;
 
 /**

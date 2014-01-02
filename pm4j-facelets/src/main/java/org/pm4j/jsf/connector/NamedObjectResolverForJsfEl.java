@@ -2,7 +2,7 @@ package org.pm4j.jsf.connector;
 
 import javax.faces.context.FacesContext;
 
-import org.pm4j.core.pm.impl.connector.NamedObjectResolver;
+import org.pm4j.core.pm.impl.inject.NamedObjectResolver;
 
 public class NamedObjectResolverForJsfEl implements NamedObjectResolver {
 

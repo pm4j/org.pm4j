@@ -6,6 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.pm4j.common.pageable.PageableCollectionTestBase.Bean;
 import org.pm4j.common.pageable.querybased.PageableQueryCollectionTest.TestService;
+import org.pm4j.common.pageable.querybased.pagequery.PageableQueryCollectionCache;
 import org.pm4j.common.query.QueryParams;
 
 public class PageableQueryCollectionCacheTest {

@@ -5,7 +5,7 @@ import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.impl.PmExpressionApiHandler;
-import org.pm4j.core.pm.impl.connector.NamedObjectResolver;
+import org.pm4j.core.pm.impl.inject.NamedObjectResolver;
 
 /**
  * An API that allows to resolve values by expressions.

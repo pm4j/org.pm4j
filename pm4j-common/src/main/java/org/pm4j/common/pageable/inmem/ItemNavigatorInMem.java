@@ -3,7 +3,7 @@ package org.pm4j.common.pageable.inmem;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.pm4j.common.pageable.ItemNavigator;
+import org.pm4j.common.itemnavigator.ItemNavigator;
 
 /**
  * A navigator that keeps a collection of selected items in memory.

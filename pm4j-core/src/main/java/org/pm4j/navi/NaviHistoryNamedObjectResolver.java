@@ -2,8 +2,8 @@ package org.pm4j.navi;
 
 import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.impl.PmConversationImpl;
-import org.pm4j.core.pm.impl.connector.NamedObjectResolver;
 import org.pm4j.core.pm.impl.connector.PmToViewTechnologyConnector;
+import org.pm4j.core.pm.impl.inject.NamedObjectResolver;
 
 /**
  * Provides a named object that was stored within the navigation context.

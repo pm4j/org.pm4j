@@ -10,6 +10,10 @@ import javax.validation.Validator;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.pm4j.common.util.reflection.BeanAttrAccessor;
+import org.pm4j.common.util.reflection.BeanAttrAccessorImpl;
+import org.pm4j.common.util.reflection.GenericTypeUtil;
+import org.pm4j.common.util.reflection.ReflectionException;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmDataInput;
@@ -24,10 +28,6 @@ import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.api.PmExpressionApi;
 import org.pm4j.core.pm.api.PmFactoryApi;
 import org.pm4j.core.pm.api.PmMessageUtil;
-import org.pm4j.core.util.reflection.BeanAttrAccessor;
-import org.pm4j.core.util.reflection.BeanAttrAccessorImpl;
-import org.pm4j.core.util.reflection.GenericTypeUtil;
-import org.pm4j.core.util.reflection.ReflectionException;
 
 public abstract class PmBeanBase<T_BEAN>
       extends PmElementBase

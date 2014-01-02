@@ -6,13 +6,13 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.pm4j.common.expr.parser.ParseCtxt;
+import org.pm4j.common.util.reflection.ClassUtil;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmInject;
 import org.pm4j.core.pm.annotation.PmInject.Mode;
 import org.pm4j.core.pm.impl.pathresolver.PathResolver;
 import org.pm4j.core.pm.impl.pathresolver.PmExpressionPathResolver;
-import org.pm4j.core.util.reflection.ClassUtil;
 
 /**
  * DI resolver for fields annotated with {@link PmInject} using {@link PmInject.Mode#EXPRESSION}.

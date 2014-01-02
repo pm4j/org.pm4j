@@ -6,8 +6,8 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.pm4j.common.pageable.ModificationHandler;
-import org.pm4j.common.pageable.Modifications;
+import org.pm4j.common.modifications.ModificationHandler;
+import org.pm4j.common.modifications.Modifications;
 import org.pm4j.core.pm.PmDataInput;
 import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmEventListener;

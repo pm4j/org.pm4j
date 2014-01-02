@@ -16,6 +16,7 @@ import org.pm4j.common.converter.value.joda.LocalDateTimeTimeZoneConverter;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.annotation.PmTitleCfg;
 import org.pm4j.core.pm.impl.PmConversationImpl;
+import org.pm4j.core.pm.joda.impl.PmAttrLocalDateTimeImpl;
 import org.pm4j.tools.test.PmAssert;
 
 /**

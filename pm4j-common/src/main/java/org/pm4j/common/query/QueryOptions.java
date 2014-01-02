@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.pm4j.common.query.filter.FilterDefinition;
+
 
 /**
  * Provides the set of query restrictions that can be used to configure a {@link QueryParams}.
@@ -20,7 +22,7 @@ public class QueryOptions {
 
   private Map<String, SortOrder>        nameToSortOrderMap = new HashMap<String, SortOrder>();
   private SortOrder                     defaultSortOrder;
-  private List<FilterCompareDefinition> filterCompareDefinitions = new ArrayList<FilterCompareDefinition>();
+  private List<FilterDefinition> filterCompareDefinitions = new ArrayList<FilterDefinition>();
 
   /**
    * An optional definition of the ID attribute used for filters related to item ID's.
@@ -99,11 +101,11 @@ public class QueryOptions {
    *
    * @return the filter definition. Returns never <code>null</code>.
    */
-  public List<FilterCompareDefinition> getCompareDefinitions() {
+  public List<FilterDefinition> getCompareDefinitions() {
     return filterCompareDefinitions;
   }
 
-  public void addFilterCompareDefinition(FilterCompareDefinition... definitions) {
+  public void addFilterCompareDefinition(FilterDefinition... definitions) {
     this.filterCompareDefinitions.addAll(Arrays.asList(definitions));
   }
 

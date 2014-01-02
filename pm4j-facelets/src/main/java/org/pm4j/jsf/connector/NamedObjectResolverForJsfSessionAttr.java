@@ -3,7 +3,7 @@ package org.pm4j.jsf.connector;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
 
-import org.pm4j.core.pm.impl.connector.NamedObjectResolver;
+import org.pm4j.core.pm.impl.inject.NamedObjectResolver;
 
 public class NamedObjectResolverForJsfSessionAttr implements NamedObjectResolver {
 

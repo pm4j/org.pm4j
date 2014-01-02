@@ -11,16 +11,16 @@ public class SomeEvaluationTest {
 
   @Test
   public void testBuildSqlAndSerialization() {
-    FilterExpression expr = new FilterAnd(
-        new FilterCompare(new QueryAttr("i", Integer.class), CompOpEquals.class, 1),
-        new FilterCompare(new QueryAttr("j", Integer.class), CompOpEquals.class, 3)
+    QueryExpr expr = new QueryExprAnd(
+        new QueryExprCompare(new QueryAttr("i", Integer.class), CompOpEquals.class, 1),
+        new QueryExprCompare(new QueryAttr("j", Integer.class), CompOpEquals.class, 3)
         );
 
     Assert.assertEquals("select * from x where i=1 and j=3",
                         ctxt.evaluate("select * from x where ", expr));
 
     byte[] bytes = SerializationUtils.serialize(expr);
-    expr = (FilterExpression) SerializationUtils.deserialize(bytes);
+    expr = (QueryExpr) SerializationUtils.deserialize(bytes);
 
     Assert.assertEquals("select * from x where i=1 and j=3",
         ctxt.evaluate("select * from x where ", expr));
@@ -36,7 +36,7 @@ public class SomeEvaluationTest {
       evaluatorSet = makeEvaluatorSet();
     }
 
-    public String evaluate(String baseQuery, FilterExpression expr) {
+    public String evaluate(String baseQuery, QueryExpr expr) {
       StringBuilder stringBuilder = new StringBuilder();
       stringBuilder.append(baseQuery);
 
@@ -45,11 +45,11 @@ public class SomeEvaluationTest {
       return stringBuilder.toString();
     }
 
-    public SqlExprEvaluator<? extends FilterExpression> getExprEvaluator(FilterExpression expr) {
+    public SqlExprEvaluator<? extends QueryExpr> getExprEvaluator(QueryExpr expr) {
       return (SqlExprEvaluator<?>) evaluatorSet.getExprEvaluator(expr);
     }
 
-    public SqlCompOpEvaluator<? extends CompOp> getCompOpEvaluator(FilterCompare co) {
+    public SqlCompOpEvaluator<? extends CompOp> getCompOpEvaluator(QueryExprCompare co) {
       return (SqlCompOpEvaluator<?>) evaluatorSet.getCompOpEvaluator(co);
     }
 
@@ -57,23 +57,23 @@ public class SomeEvaluationTest {
     private QueryEvaluatorSet makeEvaluatorSet() {
       QueryEvaluatorSet set = new QueryEvaluatorSet();
 
-      set.addExprEvaluator(FilterAnd.class, new SqlExprEvaluator<FilterAnd>() {
+      set.addExprEvaluator(QueryExprAnd.class, new SqlExprEvaluator<QueryExprAnd>() {
         @Override
-        protected void buildSql(FilterAnd expr, StringBuilder sb) {
+        protected void buildSql(QueryExprAnd expr, StringBuilder sb) {
           for (int i=0; i<expr.getExpressions().size(); ++i) {
             if (i > 0) {
               sb.append(" and ");
             }
 
-            FilterExpression e = expr.getExpressions().get(i);
+            QueryExpr e = expr.getExpressions().get(i);
             getExprEvaluator(e).build(e, sb);
           }
         }
        });
 
-      set.addExprEvaluator(FilterCompare.class, new SqlExprEvaluator<FilterCompare>() {
+      set.addExprEvaluator(QueryExprCompare.class, new SqlExprEvaluator<QueryExprCompare>() {
         @Override
-        protected void buildSql(FilterCompare expr, StringBuilder sb) {
+        protected void buildSql(QueryExprCompare expr, StringBuilder sb) {
           QueryAttr attr = expr.getAttr();
           sb.append(attr.getName());
           getCompOpEvaluator(expr).build(expr.getCompOp(), expr.getValue(), sb);
@@ -90,9 +90,9 @@ public class SomeEvaluationTest {
       return set;
     }
 
-    abstract class SqlExprEvaluator<T_EXPR extends FilterExpression> implements FilterExpressionEvaluator {
+    abstract class SqlExprEvaluator<T_EXPR extends QueryExpr> implements QueryExprEvaluator {
       @SuppressWarnings("unchecked")
-      public void build(FilterExpression e, StringBuilder sb) {
+      public void build(QueryExpr e, StringBuilder sb) {
         buildSql((T_EXPR)e, sb);
       }
       protected abstract void buildSql(T_EXPR expr, StringBuilder sb);

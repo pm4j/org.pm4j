@@ -8,7 +8,7 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.pm4j.common.pageable.ItemIdService;
+import org.pm4j.common.pageable.QueryService;
 
 
 public abstract class SelectionHandlerWithIdSet<T_ITEM, T_ID> extends SelectionHandlerBase<T_ITEM> {
@@ -19,13 +19,13 @@ public abstract class SelectionHandlerWithIdSet<T_ITEM, T_ID> extends SelectionH
   private final ItemIdBasedSelection<T_ITEM, T_ID> emptySelection;
 
   /** The converter used to get items for the internally handled id's. */
-  private final ItemIdService<T_ITEM, T_ID> itemIdConverter;
+  private final QueryService<T_ITEM, T_ID> itemIdConverter;
 
   /** The current selection. */
   private ItemIdBasedSelection<T_ITEM, T_ID> selection;
 
   @SuppressWarnings("unchecked")
-  public SelectionHandlerWithIdSet(ItemIdService<T_ITEM, T_ID> itemIdConverter) {
+  public SelectionHandlerWithIdSet(QueryService<T_ITEM, T_ID> itemIdConverter) {
     assert itemIdConverter != null;
 
     this.itemIdConverter = itemIdConverter;

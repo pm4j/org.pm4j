@@ -4,14 +4,14 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.pm4j.common.pageable.querybased.PageableQueryService;
+import org.pm4j.common.pageable.querybased.pagequery.PageableQueryService;
 import org.pm4j.common.query.inmem.InMemQueryEvaluator;
 import org.pm4j.common.util.beanproperty.PropertyChangeSupportedBase;
 
 /**
  * Interface for query specifications.
  * <p>
- * It support the definition of {@link FilterExpression}s, {@link SortOrder} and
+ * It support the definition of {@link QueryExpr}s, {@link SortOrder} and
  * additional application specific base query parameters.
  * <p>
  * Technology specific query evaluators read these definitions for their specific
@@ -33,7 +33,7 @@ public class QueryParams extends PropertyChangeSupportedBase implements Cloneabl
 
   private SortOrder sortOrder;
   private SortOrder defaultSortOrder;
-  private FilterExpression filterExpression;
+  private QueryExpr filterExpression;
   private Map<String, Object> baseQueryParams = new HashMap<String, Object>();
   /** A switch to allow/prevent query execution. */
   private boolean execQuery = true;
@@ -129,8 +129,8 @@ public class QueryParams extends PropertyChangeSupportedBase implements Cloneabl
    *
    * @param expr the new expression. May be <code>null</code> if filtering should be switched off.
    */
-  public void setFilterExpression(FilterExpression expr) {
-    FilterExpression old = this.filterExpression;
+  public void setFilterExpression(QueryExpr expr) {
+    QueryExpr old = this.filterExpression;
     this.filterExpression = expr;
 
     firePropertyChange(PROP_EFFECTIVE_FILTER, old, expr);
@@ -141,7 +141,7 @@ public class QueryParams extends PropertyChangeSupportedBase implements Cloneabl
    *
    * @return the current filter expression. May be <code>null</code>.
    */
-  public FilterExpression getFilterExpression() {
+  public QueryExpr getFilterExpression() {
     return filterExpression;
   }
 

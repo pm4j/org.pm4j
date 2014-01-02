@@ -1,17 +1,17 @@
 package org.pm4j.common.query.inmem;
 
-import org.pm4j.common.query.FilterExpression;
-import org.pm4j.common.query.FilterExpressionEvaluator;
+import org.pm4j.common.query.QueryExpr;
+import org.pm4j.common.query.QueryExprEvaluator;
 
 /**
  * Basic interface for in-memory filter expression evaluations.
  *
  * @author olaf boede
  */
-public interface InMemExprEvaluator extends FilterExpressionEvaluator {
+public interface InMemExprEvaluator extends QueryExprEvaluator {
 
   /**
-   * Evaluates a {@link FilterExpression} for a given item to <code>true</code>
+   * Evaluates a {@link QueryExpr} for a given item to <code>true</code>
    * or <code>false</code>.
    *
    * @param ctxt
@@ -23,6 +23,6 @@ public interface InMemExprEvaluator extends FilterExpressionEvaluator {
    *          the filter expression to apply.
    * @return <code>true</code> if the given item did match the filter criteria.
    */
-  boolean eval(InMemQueryEvaluator<?> ctxt, Object item, FilterExpression expr);
+  boolean eval(InMemQueryEvaluator<?> ctxt, Object item, QueryExpr expr);
 
 }

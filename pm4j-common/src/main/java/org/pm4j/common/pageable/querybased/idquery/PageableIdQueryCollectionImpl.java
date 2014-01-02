@@ -10,7 +10,7 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.pm4j.common.pageable.ModificationHandler;
+import org.pm4j.common.modifications.ModificationHandler;
 import org.pm4j.common.pageable.PageableCollection2;
 import org.pm4j.common.pageable.PageableCollectionUtil2;
 import org.pm4j.common.pageable.querybased.PageableQueryCollectionBase;

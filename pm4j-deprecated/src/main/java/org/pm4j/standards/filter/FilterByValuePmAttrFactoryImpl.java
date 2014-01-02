@@ -7,8 +7,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.joda.time.LocalDate;
 import org.pm4j.common.query.CompOp;
-import org.pm4j.common.query.FilterCompareDefinition;
+import org.pm4j.common.query.filter.FilterDefinition;
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.impl.PmAttrBigDecimalImpl;
 import org.pm4j.core.pm.impl.PmAttrBooleanImpl;
@@ -18,6 +19,7 @@ import org.pm4j.core.pm.impl.PmAttrEnumImpl;
 import org.pm4j.core.pm.impl.PmAttrIntegerImpl;
 import org.pm4j.core.pm.impl.PmAttrLongImpl;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
+import org.pm4j.core.pm.joda.impl.PmAttrLocalDateImpl;
 import org.pm4j.standards.filter.FilterSetProvider.FilterByValuePmAttrFactory;
 
 
@@ -25,10 +27,10 @@ import org.pm4j.standards.filter.FilterSetProvider.FilterByValuePmAttrFactory;
 public class FilterByValuePmAttrFactoryImpl implements FilterByValuePmAttrFactory{
    private Map<Class<? extends Enum<?>>, List<Enum<?>>> enumOptions = new HashMap<Class<? extends Enum<?>>, List<Enum<?>>>();
 
-  
+
   @SuppressWarnings({ "rawtypes", "unchecked" })
   @Override
-  public PmAttr<?> makeValueAttrPm(FilterItemPm<?> parentPm, FilterCompareDefinition fd, CompOp co) {
+  public PmAttr<?> makeValueAttrPm(FilterItemPm<?> parentPm, FilterDefinition fd, CompOp co) {
     Class<?> attrType = fd.getAttr().getType();
     if (String.class.equals(attrType)) {
       return new PmAttrStringImpl(parentPm);
@@ -62,14 +64,17 @@ public class FilterByValuePmAttrFactoryImpl implements FilterByValuePmAttrFactor
     if (Date.class.equals(attrType)) {
       return new PmAttrDateImpl(parentPm);
     }
+    if (LocalDate.class.isAssignableFrom(attrType)) {
+      return new PmAttrLocalDateImpl(parentPm);
+    }
     // XXX DZA: LocalDate, LocalTime please add this cases in v0.6
-    
+
     // fall back:
     return new PmAttrStringImpl(parentPm);
   }
-  
+
   /**
-   *   
+   *
    * @param type
    * @return
    */
@@ -77,7 +82,7 @@ public class FilterByValuePmAttrFactoryImpl implements FilterByValuePmAttrFactor
   protected <T extends Enum<?>> List<T> findEnumValueOptionsForType(Class<T> type) {
     return (List<T>)enumOptions.get(type);
   }
-  
+
   @Override
   @SuppressWarnings("unchecked")
   public <T extends Enum<?>> void setEnumOptions(Class<T> type, List<T> enums) {

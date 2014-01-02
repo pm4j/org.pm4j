@@ -13,7 +13,7 @@ import org.pm4j.core.pm.annotation.PmOptionCfg;
 import org.pm4j.core.pm.annotation.PmOptionCfg.NullOption;
 import org.pm4j.core.pm.api.PmFactoryApi;
 import org.pm4j.core.pm.impl.PmAttrIntegerImpl;
-import org.pm4j.core.pm.impl.PmAttrPmRefImpl;
+import org.pm4j.core.pm.impl.DeprPmAttrPmRefImpl;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
 import org.pm4j.core.pm.impl.PmBeanBase;
 import org.pm4j.core.pm.impl.PmConversationImpl;
@@ -68,7 +68,7 @@ public class PmAttrPmRefTest extends TestCase {
   public static class APm extends PmBeanBase<A> {
 
     @PmFactoryCfg(beanPmClasses=BPm.class)
-    public final PmAttrPmRef<BPm> refToB = new PmAttrPmRefImpl<BPm, B>(this) {
+    public final DeprPmAttrPmRef<BPm> refToB = new DeprPmAttrPmRefImpl<BPm, B>(this) {
       @Override
       @PmOptionCfg(id="i", title="s", value="null", backingValue="this", nullOption=NullOption.NO)
       public Iterable<?> getOptionValues() {

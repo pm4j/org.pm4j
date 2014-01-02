@@ -26,6 +26,10 @@ import org.pm4j.common.cache.CacheStrategy;
 import org.pm4j.common.cache.CacheStrategyNoCache;
 import org.pm4j.common.util.collection.ListUtil;
 import org.pm4j.common.util.collection.MapUtil;
+import org.pm4j.common.util.reflection.BeanAttrAccessor;
+import org.pm4j.common.util.reflection.BeanAttrAccessorImpl;
+import org.pm4j.common.util.reflection.BeanAttrArrayList;
+import org.pm4j.common.util.reflection.ClassUtil;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmCommand;
@@ -56,10 +60,6 @@ import org.pm4j.core.pm.impl.inject.DiResolverUtil;
 import org.pm4j.core.pm.impl.title.PmTitleProvider;
 import org.pm4j.core.pm.impl.title.PmTitleProviderValuebased;
 import org.pm4j.core.pm.impl.title.TitleProviderAttrValueBased;
-import org.pm4j.core.util.reflection.BeanAttrAccessor;
-import org.pm4j.core.util.reflection.BeanAttrAccessorImpl;
-import org.pm4j.core.util.reflection.BeanAttrArrayList;
-import org.pm4j.core.util.reflection.ClassUtil;
 
 /**
  * Provides common presentation model base functionality.

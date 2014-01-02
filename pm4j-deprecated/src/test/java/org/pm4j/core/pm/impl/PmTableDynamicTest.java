@@ -6,7 +6,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.PmObject;
-import org.pm4j.core.pm.PmTableCol;
+import org.pm4j.core.pm.DeprPmTableCol;
 
 public class PmTableDynamicTest {
   private int numOfCols = 3;
@@ -20,7 +20,7 @@ public class PmTableDynamicTest {
   @Test
   @Ignore
   public void testDynamicCols() {
-    assertEquals(3, PmUtil.getPmChildrenOfType(tablePm, PmTableCol.class));
+    assertEquals(3, PmUtil.getPmChildrenOfType(tablePm, DeprPmTableCol.class));
     assertEquals(3, tablePm.getColumns().size());
   }
 
@@ -28,7 +28,7 @@ public class PmTableDynamicTest {
 
   }
 
-  public class MyTablePm extends PmTableImpl<MyRowPm> {
+  public class MyTablePm extends DeprPmTableImpl<MyRowPm> {
 
     public MyTablePm(PmObject pmParent) {
       super(pmParent);
@@ -39,7 +39,7 @@ public class PmTableDynamicTest {
       super.onPmInit();
 
       for (int i =0; i<numOfCols;  ++i) {
-        addToPmComposite(""+i, new PmTableColImpl(this));
+        addToPmComposite(""+i, new DeprPmTableColImpl(this));
       }
     }
 

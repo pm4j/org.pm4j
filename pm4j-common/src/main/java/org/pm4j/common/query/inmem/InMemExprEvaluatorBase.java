@@ -1,6 +1,6 @@
 package org.pm4j.common.query.inmem;
 
-import org.pm4j.common.query.FilterExpression;
+import org.pm4j.common.query.QueryExpr;
 
 /**
  * Base class for in memory expression evaluation.<br>
@@ -10,16 +10,16 @@ import org.pm4j.common.query.FilterExpression;
  *
  * @param <T_EXPR> the expression type to handle.
  */
-public abstract class InMemExprEvaluatorBase<T_EXPR extends FilterExpression> implements InMemExprEvaluator {
+public abstract class InMemExprEvaluatorBase<T_EXPR extends QueryExpr> implements InMemExprEvaluator {
 
   @Override
   @SuppressWarnings("unchecked")
-  public boolean eval(InMemQueryEvaluator<?> ctxt, Object item, FilterExpression expr) {
+  public boolean eval(InMemQueryEvaluator<?> ctxt, Object item, QueryExpr expr) {
     return evalImpl(ctxt, item, (T_EXPR)expr);
   }
 
   /**
-   * Type safe signature for {@link InMemExprEvaluator#eval(InMemQueryEvaluator, Object, FilterExpression)}.
+   * Type safe signature for {@link InMemExprEvaluator#eval(InMemQueryEvaluator, Object, QueryExpr)}.
    */
   protected abstract boolean evalImpl(InMemQueryEvaluator<?> ctxt, Object item, T_EXPR expr);
 

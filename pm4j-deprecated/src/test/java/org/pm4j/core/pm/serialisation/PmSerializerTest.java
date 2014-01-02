@@ -13,19 +13,19 @@ import org.pm4j.core.pm.impl.PmAttrIntegerImpl;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
 import org.pm4j.core.pm.impl.PmElementImpl;
-import org.pm4j.core.pm.serialization.PmContentSerializer;
+import org.pm4j.core.pm.serialization.DeprPmContentSerializer;
 
 public class PmSerializerTest {
 
   private MyPmConversation clientSession, serverSession;
-  private PmContentSerializer clientSerializer, serverSerializer;
+  private DeprPmContentSerializer clientSerializer, serverSerializer;
 
   @Before
   public void setUp() throws Exception {
     clientSession = new MyPmConversation();
     serverSession = new MyPmConversation();
-    clientSerializer = new PmContentSerializer();
-    serverSerializer = new PmContentSerializer();
+    clientSerializer = new DeprPmContentSerializer();
+    serverSerializer = new DeprPmContentSerializer();
   }
 
   @Test @Ignore("oboede: re-implement serialization!")

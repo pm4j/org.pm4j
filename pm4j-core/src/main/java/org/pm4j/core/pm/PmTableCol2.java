@@ -1,8 +1,8 @@
 package org.pm4j.core.pm;
 
-import org.pm4j.common.query.FilterCompareDefinition;
-import org.pm4j.common.query.FilterCompareDefinitionFactory;
 import org.pm4j.common.query.QueryAttr;
+import org.pm4j.common.query.filter.FilterDefinition;
+import org.pm4j.common.query.filter.FilterDefinitionFactory;
 import org.pm4j.core.util.table.ColSizeSpec;
 
 /**
@@ -63,12 +63,12 @@ public interface PmTableCol2 extends PmObject {
     Boolean isSortableConfigured();
 
     /**
-     * Filterable columns provide here their {@link FilterCompareDefinition} that may be
+     * Filterable columns provide here their {@link FilterDefinition} that may be
      * used to offer some user filter functionality.
      *
      * @return The compare definition or <code>null</code> if the column is not filterable.
      */
-    FilterCompareDefinition getFilterCompareDefinition(FilterCompareDefinitionFactory fcdf);
+    FilterDefinition getFilterCompareDefinition(FilterDefinitionFactory fcdf);
 
   }
 

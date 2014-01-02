@@ -34,6 +34,10 @@ import org.pm4j.common.expr.Expression.SyntaxVersion;
 import org.pm4j.common.util.CompareUtil;
 import org.pm4j.common.util.GenericsUtil;
 import org.pm4j.common.util.collection.MapUtil;
+import org.pm4j.common.util.reflection.BeanAttrAccessor;
+import org.pm4j.common.util.reflection.BeanAttrAccessorImpl;
+import org.pm4j.common.util.reflection.ClassUtil;
+import org.pm4j.common.util.reflection.ReflectionException;
 import org.pm4j.core.exception.PmConverterException;
 import org.pm4j.core.exception.PmResourceData;
 import org.pm4j.core.exception.PmRuntimeException;
@@ -74,10 +78,6 @@ import org.pm4j.core.pm.impl.options.PmOptionSetDef;
 import org.pm4j.core.pm.impl.pathresolver.PassThroughPathResolver;
 import org.pm4j.core.pm.impl.pathresolver.PathResolver;
 import org.pm4j.core.pm.impl.pathresolver.PmExpressionPathResolver;
-import org.pm4j.core.util.reflection.BeanAttrAccessor;
-import org.pm4j.core.util.reflection.BeanAttrAccessorImpl;
-import org.pm4j.core.util.reflection.ClassUtil;
-import org.pm4j.core.util.reflection.ReflectionException;
 import org.pm4j.navi.NaviLink;
 
 /**

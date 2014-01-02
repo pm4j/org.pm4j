@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.pm4j.common.pageable.querybased.ItemIdServiceFakeBase;
+import org.pm4j.common.pageable.QueryServiceFakeBase;
 import org.pm4j.common.query.QueryParams;
 
 /**
@@ -15,7 +15,7 @@ import org.pm4j.common.query.QueryParams;
  *
  * @author olaf boede
  */
-public abstract class PageableIdQueryServiceFakeBase<T_ITEM, T_ID> extends ItemIdServiceFakeBase<T_ITEM, T_ID> implements PageableIdQueryService<T_ITEM, T_ID> {
+public abstract class PageableIdQueryServiceFakeBase<T_ITEM, T_ID> extends QueryServiceFakeBase<T_ITEM, T_ID> implements PageableIdQueryService<T_ITEM, T_ID> {
 
   public static final String METHOD_FIND_IDS = "findIds";
   public static final String METHOD_GET_ITEMS = "getItems";

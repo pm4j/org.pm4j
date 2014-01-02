@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.pm4j.common.query.FilterCompareDefinition;
-import org.pm4j.core.pm.filter.FilterByDefinition;
+import org.pm4j.common.query.filter.FilterDefinition;
+import org.pm4j.core.pm.filter.DeprFilterByDefinition;
 
 
 /**
@@ -25,7 +25,7 @@ public class FilterSetUtil {
    *          The number of filter items to be generated.
    * @return A new {@link FilterSet}.
    */
-  public static FilterSet makeFilterSet(Collection<? extends FilterCompareDefinition> filterCompareDefinitions, int numOfFilterConditionLines) {
+  public static FilterSet makeFilterSet(Collection<? extends FilterDefinition> filterCompareDefinitions, int numOfFilterConditionLines) {
     FilterSet fs = new FilterSet();
     for (int i=0; i<numOfFilterConditionLines; ++i) {
       FilterItem item = new FilterItem();
@@ -40,9 +40,9 @@ public class FilterSetUtil {
    * condition lines).
    * <p>
    * The first items will be contain the default values of the passed
-   * {@link FilterByDefinition}s.
+   * {@link DeprFilterByDefinition}s.
    * <p>
-   * ATTENTION: If there are more {@link FilterByDefinition}s with defaults than
+   * ATTENTION: If there are more {@link DeprFilterByDefinition}s with defaults than
    * <code>numOfFilterConditionLines</code> some of these defaults will not be
    * applied!
    *
@@ -51,9 +51,9 @@ public class FilterSetUtil {
    * @param numOfFilterConditionLines
    *          The number of filter items to be generated.
    */
-  public static void initializeFilterSetStartingWithDefaultConditions(FilterSet fs, Collection<? extends FilterCompareDefinition> filterByDefinitions, int numOfFilterConditionLines) {
-    List<FilterCompareDefinition> fbdWithDefaults = new ArrayList<FilterCompareDefinition>();
-    for (FilterCompareDefinition fbd : filterByDefinitions) {
+  public static void initializeFilterSetStartingWithDefaultConditions(FilterSet fs, Collection<? extends FilterDefinition> filterByDefinitions, int numOfFilterConditionLines) {
+    List<FilterDefinition> fbdWithDefaults = new ArrayList<FilterDefinition>();
+    for (FilterDefinition fbd : filterByDefinitions) {
       if (fbd.getDefaultCompOp() != null || fbd.getDefaultFilterByValue() != null) {
         fbdWithDefaults.add(fbd);
       }
@@ -63,7 +63,7 @@ public class FilterSetUtil {
       FilterItem item = new FilterItem();
       item.setFilterByOptions(filterByDefinitions);
       if (i<fbdWithDefaults.size()) {
-        FilterCompareDefinition fbd = fbdWithDefaults.get(i);
+        FilterDefinition fbd = fbdWithDefaults.get(i);
         item.setFilterBy(fbd);
         item.setCompOp(fbd.getDefaultCompOp());
         item.setFilterByValue(fbd.getDefaultFilterByValue());
@@ -89,7 +89,7 @@ public class FilterSetUtil {
    *          the number of filters that should finally exist within the given
    *          filter set.
    */
-  public static void fillFilterItems(FilterSet fs, List<FilterCompareDefinition> filterByDefinitions, int numOfFilterConditionLines) {
+  public static void fillFilterItems(FilterSet fs, List<FilterDefinition> filterByDefinitions, int numOfFilterConditionLines) {
     int initialFilterSize = fs.getFilterItems().size();
     for (int i=initialFilterSize; i<numOfFilterConditionLines; ++i) {
 
@@ -97,7 +97,7 @@ public class FilterSetUtil {
       item.setFilterByOptions(filterByDefinitions);
 
       int fbdIdx = i % filterByDefinitions.size();
-      FilterCompareDefinition fbd = filterByDefinitions.get(fbdIdx);
+      FilterDefinition fbd = filterByDefinitions.get(fbdIdx);
       item.setFilterBy(fbd);
       fs.addFilterItem(item);
     }

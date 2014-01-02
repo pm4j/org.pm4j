@@ -3,7 +3,7 @@ package org.pm4j.util.scaffold;
 import java.io.File;
 import java.io.IOException;
 
-import org.pm4j.core.util.reflection.ClassUtil;
+import org.pm4j.common.util.reflection.ClassUtil;
 import org.pm4j.testdomains.user.Domain;
 import org.pm4j.testdomains.user.User;
 import org.pm4j.tools.scaffold.BeanPmGenerator;

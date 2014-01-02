@@ -1,5 +1,7 @@
 package org.pm4j.core.util.reflection;
 
+import org.pm4j.common.util.reflection.BeanAttrUtil;
+
 import junit.framework.TestCase;
 
 public class BeanAttrUtilTest extends TestCase {

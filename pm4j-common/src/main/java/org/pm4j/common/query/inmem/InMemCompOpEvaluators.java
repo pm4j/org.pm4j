@@ -13,9 +13,9 @@ import org.pm4j.common.query.CompOpLe;
 import org.pm4j.common.query.CompOpLt;
 import org.pm4j.common.query.CompOpNotEquals;
 import org.pm4j.common.query.CompOpNotNull;
-import org.pm4j.common.query.CompOpStringContains;
-import org.pm4j.common.query.CompOpStringNotContains;
-import org.pm4j.common.query.CompOpStringStartsWith;
+import org.pm4j.common.query.CompOpContains;
+import org.pm4j.common.query.CompOpNotContains;
+import org.pm4j.common.query.CompOpStartsWith;
 import org.pm4j.common.util.CompareUtil;
 
 // TODO olaf: move to InMemEvaluatorSet to reduce the number of artifacts.
@@ -81,23 +81,23 @@ public class InMemCompOpEvaluators {
     }
   };
 
-  public static final InMemCompOpEvaluator STRING_STARTS_WITH = new InMemCompOpEvaluatorBase<CompOpStringStartsWith, String>() {
+  public static final InMemCompOpEvaluator STRING_STARTS_WITH = new InMemCompOpEvaluatorBase<CompOpStartsWith, String>() {
     @Override
-    protected boolean evalImpl(InMemQueryEvaluator<?> ctxt, CompOpStringStartsWith compOp, String attrValue, String compareToValue) {
+    protected boolean evalImpl(InMemQueryEvaluator<?> ctxt, CompOpStartsWith compOp, String attrValue, String compareToValue) {
       return CompareUtil.indexOf(attrValue, compareToValue, compOp.isIgnoreCase(), compOp.isIgnoreSpaces()) == 0;
     }
   };
 
-  public static final InMemCompOpEvaluator STRING_CONTAINS = new InMemCompOpEvaluatorBase<CompOpStringContains, String>() {
+  public static final InMemCompOpEvaluator STRING_CONTAINS = new InMemCompOpEvaluatorBase<CompOpContains, String>() {
     @Override
-    protected boolean evalImpl(InMemQueryEvaluator<?> ctxt, CompOpStringContains compOp, String attrValue, String compareToValue) {
+    protected boolean evalImpl(InMemQueryEvaluator<?> ctxt, CompOpContains compOp, String attrValue, String compareToValue) {
       return CompareUtil.indexOf(attrValue, compareToValue, compOp.isIgnoreCase(), compOp.isIgnoreSpaces()) != -1;
     }
   };
 
-  public static final InMemCompOpEvaluator STRING_NOT_CONTAINS = new InMemCompOpEvaluatorBase<CompOpStringNotContains, String>() {
+  public static final InMemCompOpEvaluator STRING_NOT_CONTAINS = new InMemCompOpEvaluatorBase<CompOpNotContains, String>() {
     @Override
-    protected boolean evalImpl(InMemQueryEvaluator<?> ctxt, CompOpStringNotContains compOp, String attrValue, String compareToValue) {
+    protected boolean evalImpl(InMemQueryEvaluator<?> ctxt, CompOpNotContains compOp, String attrValue, String compareToValue) {
       return CompareUtil.indexOf(attrValue, compareToValue, compOp.isIgnoreCase(), compOp.isIgnoreSpaces()) == -1;
     }
   };

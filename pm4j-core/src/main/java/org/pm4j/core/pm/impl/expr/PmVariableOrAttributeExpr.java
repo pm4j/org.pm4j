@@ -8,9 +8,9 @@ import org.pm4j.common.expr.NameWithModifier;
 import org.pm4j.common.expr.OptionalExpression;
 import org.pm4j.common.expr.OptionalExpressionBase;
 import org.pm4j.common.expr.parser.ParseCtxt;
-import org.pm4j.core.util.reflection.BeanAttrAccessor;
-import org.pm4j.core.util.reflection.BeanAttrAccessorImpl;
-import org.pm4j.core.util.reflection.ReflectionException;
+import org.pm4j.common.util.reflection.BeanAttrAccessor;
+import org.pm4j.common.util.reflection.BeanAttrAccessorImpl;
+import org.pm4j.common.util.reflection.ReflectionException;
 
 /**
  * An expression that gets initialized by a name that may represent

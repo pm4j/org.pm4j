@@ -10,9 +10,10 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.pm4j.common.itemnavigator.ItemNavigator;
 import org.pm4j.common.pageable.inmem.ItemNavigatorInMem;
-import org.pm4j.common.query.CompOpStringStartsWith;
-import org.pm4j.common.query.FilterExpression;
+import org.pm4j.common.query.CompOpStartsWith;
+import org.pm4j.common.query.QueryExpr;
 import org.pm4j.common.query.QueryAttr;
 import org.pm4j.common.query.QueryUtil;
 import org.pm4j.common.query.SortOrder;
@@ -42,8 +43,8 @@ public abstract class PageableCollectionWithMultiFieldIdTestBase<T> {
 
   /** A default implementation, which may differ for the PM collection test.
    *  There we have to navigate from the attribute to the value too. */
-  private FilterExpression getFilterNameStartsWith(String startString) {
-    return QueryUtil.getFilter(collection.getQueryOptions(), "name", CompOpStringStartsWith.NAME, startString);
+  private QueryExpr getFilterNameStartsWith(String startString) {
+    return QueryUtil.getFilter(collection.getQueryOptions(), "name", CompOpStartsWith.NAME, startString);
   }
 
   protected  SortOrder getOrderByName() {

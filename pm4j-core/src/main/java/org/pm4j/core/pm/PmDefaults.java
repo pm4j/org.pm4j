@@ -4,8 +4,8 @@ import java.util.Arrays;
 
 import org.pm4j.common.exception.CheckedExceptionWrapper;
 import org.pm4j.common.expr.Expression.SyntaxVersion;
-import org.pm4j.common.query.FilterCompareDefinitionFactory;
-import org.pm4j.common.query.FilterCompareDefinitionFactoryImpl;
+import org.pm4j.common.query.filter.FilterDefinitionFactory;
+import org.pm4j.common.query.filter.FilterDefinitionFactoryImpl;
 import org.pm4j.core.pm.annotation.PmCommandCfg;
 import org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO;
 import org.pm4j.core.pm.annotation.PmInject;
@@ -51,7 +51,7 @@ public class PmDefaults implements Cloneable {
   /**
    * The application specific filter compare definition factory. Used for table filters.
    */
-  private FilterCompareDefinitionFactory filterCompareDefinitionFactory = new FilterCompareDefinitionFactoryImpl.DefaultFactory();
+  private FilterDefinitionFactory filterCompareDefinitionFactory = new FilterDefinitionFactoryImpl.DefaultFactory();
 
   /**
    * The delimiter that is used to terminate multiple format strings in resource string definitions.
@@ -238,11 +238,11 @@ public class PmDefaults implements Cloneable {
     this.multiFormatPatternDelimiter = multiFormatPatternDelimiter;
   }
 
-  public FilterCompareDefinitionFactory getFilterCompareDefinitionFactory() {
+  public FilterDefinitionFactory getFilterCompareDefinitionFactory() {
     return filterCompareDefinitionFactory;
   }
 
-  public void setFilterCompareDefinitionFactory(FilterCompareDefinitionFactory filterCompareDefinitionFactory) {
+  public void setFilterCompareDefinitionFactory(FilterDefinitionFactory filterCompareDefinitionFactory) {
     this.filterCompareDefinitionFactory = filterCompareDefinitionFactory;
   }
 

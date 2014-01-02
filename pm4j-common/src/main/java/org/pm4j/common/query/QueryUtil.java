@@ -1,11 +1,12 @@
 package org.pm4j.common.query;
 
 import org.apache.commons.lang.StringUtils;
+import org.pm4j.common.query.filter.FilterDefinition;
 
 public class QueryUtil {
 
-  public static FilterCompareDefinition findFilterDefinitionByName(QueryOptions queryOptions, String name) {
-    for (FilterCompareDefinition d : queryOptions.getCompareDefinitions()) {
+  public static FilterDefinition findFilterDefinitionByName(QueryOptions queryOptions, String name) {
+    for (FilterDefinition d : queryOptions.getCompareDefinitions()) {
       if (StringUtils.equals(d.getAttr().getName(), name)) {
         return d;
       }
@@ -14,7 +15,7 @@ public class QueryUtil {
     return null;
   }
 
-  public static CompOp findCompOp(FilterCompareDefinition d, String opName) {
+  public static CompOp findCompOp(FilterDefinition d, String opName) {
     for (CompOp c : d.getCompOps()) {
       if (StringUtils.equals(c.getName(), opName)) {
         return c;
@@ -24,8 +25,8 @@ public class QueryUtil {
     return null;
   }
 
-  public static FilterExpression getFilter(QueryOptions queryOptions, String predicateName, String compOpName, Object value) {
-    FilterCompareDefinition d = findFilterDefinitionByName(queryOptions, predicateName);
+  public static QueryExpr getFilter(QueryOptions queryOptions, String predicateName, String compOpName, Object value) {
+    FilterDefinition d = findFilterDefinitionByName(queryOptions, predicateName);
     if (d == null) {
       throw new RuntimeException("Missing filter definition for attribute '" + predicateName + "'");
     }
@@ -35,6 +36,6 @@ public class QueryUtil {
       throw new RuntimeException("Missing compare operator definition '" + compOpName + "' in filter definition '" + predicateName + "'.");
     }
 
-    return new FilterCompare(d.getAttr(), c, value);
+    return new QueryExprCompare(d.getAttr(), c, value);
   }
 }

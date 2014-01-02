@@ -10,13 +10,13 @@ import org.pm4j.common.query.CompOpLike;
 import org.pm4j.common.query.CompOpLt;
 import org.pm4j.common.query.CompOpNotEquals;
 import org.pm4j.common.query.CompOpNotNull;
-import org.pm4j.common.query.CompOpStringContains;
-import org.pm4j.common.query.CompOpStringNotContains;
-import org.pm4j.common.query.CompOpStringStartsWith;
-import org.pm4j.common.query.FilterAnd;
-import org.pm4j.common.query.FilterCompare;
-import org.pm4j.common.query.FilterNot;
-import org.pm4j.common.query.FilterOr;
+import org.pm4j.common.query.CompOpContains;
+import org.pm4j.common.query.CompOpNotContains;
+import org.pm4j.common.query.CompOpStartsWith;
+import org.pm4j.common.query.QueryExprAnd;
+import org.pm4j.common.query.QueryExprCompare;
+import org.pm4j.common.query.QueryExprNot;
+import org.pm4j.common.query.QueryExprOr;
 import org.pm4j.common.query.QueryEvaluatorSet;
 
 /**
@@ -29,10 +29,10 @@ public class InMemQueryEvaluatorSet extends QueryEvaluatorSet {
   public static QueryEvaluatorSet INSTANCE = new InMemQueryEvaluatorSet();
 
   public InMemQueryEvaluatorSet() {
-    addExprEvaluator(FilterAnd.class, new InMemExprEvaluatorAnd());
-    addExprEvaluator(FilterNot.class, new InMemExprEvaluatorNot());
-    addExprEvaluator(FilterOr.class, new InMemExprEvaluatorOr());
-    addExprEvaluator(FilterCompare.class, new InMemExprEvaluatorCompare());
+    addExprEvaluator(QueryExprAnd.class, new InMemExprEvaluatorAnd());
+    addExprEvaluator(QueryExprNot.class, new InMemExprEvaluatorNot());
+    addExprEvaluator(QueryExprOr.class, new InMemExprEvaluatorOr());
+    addExprEvaluator(QueryExprCompare.class, new InMemExprEvaluatorCompare());
 
     addCompOpEvaluator(CompOpEquals.class, InMemCompOpEvaluators.EQUALS);
     addCompOpEvaluator(CompOpGe.class, InMemCompOpEvaluators.GE);
@@ -43,9 +43,9 @@ public class InMemQueryEvaluatorSet extends QueryEvaluatorSet {
     addCompOpEvaluator(CompOpLt.class, InMemCompOpEvaluators.LT);
     addCompOpEvaluator(CompOpNotEquals.class, InMemCompOpEvaluators.NE);
     addCompOpEvaluator(CompOpNotNull.class, InMemCompOpEvaluators.NOT_NULL);
-    addCompOpEvaluator(CompOpStringStartsWith.class, InMemCompOpEvaluators.STRING_STARTS_WITH);
-    addCompOpEvaluator(CompOpStringContains.class, InMemCompOpEvaluators.STRING_CONTAINS);
-    addCompOpEvaluator(CompOpStringNotContains.class, InMemCompOpEvaluators.STRING_NOT_CONTAINS);
+    addCompOpEvaluator(CompOpStartsWith.class, InMemCompOpEvaluators.STRING_STARTS_WITH);
+    addCompOpEvaluator(CompOpContains.class, InMemCompOpEvaluators.STRING_CONTAINS);
+    addCompOpEvaluator(CompOpNotContains.class, InMemCompOpEvaluators.STRING_NOT_CONTAINS);
     addCompOpEvaluator(CompOpIn.class, InMemCompOpEvaluators.IN);
   }
 

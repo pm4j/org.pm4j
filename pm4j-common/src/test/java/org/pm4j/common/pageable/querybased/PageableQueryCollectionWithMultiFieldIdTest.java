@@ -7,11 +7,13 @@ import java.util.Map;
 
 import org.pm4j.common.pageable.PageableCollection2;
 import org.pm4j.common.pageable.PageableCollectionWithMultiFieldIdTestBase;
-import org.pm4j.common.query.CompOpStringStartsWith;
-import org.pm4j.common.query.FilterCompareDefinition;
+import org.pm4j.common.pageable.querybased.pagequery.PageableQueryCollection;
+import org.pm4j.common.pageable.querybased.pagequery.PageableQueryService;
+import org.pm4j.common.query.CompOpStartsWith;
 import org.pm4j.common.query.QueryAttrMulti;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.QueryParams;
+import org.pm4j.common.query.filter.FilterDefinition;
 import org.pm4j.common.query.inmem.InMemQueryEvaluator;
 import org.pm4j.common.util.collection.MultiObjectValue;
 
@@ -33,7 +35,7 @@ public class PageableQueryCollectionWithMultiFieldIdTest extends PageableCollect
           .addPart("id2", Integer.class));
 
     options.addSortOrder(Bean.ATTR_NAME);
-    options.addFilterCompareDefinition(new FilterCompareDefinition(Bean.ATTR_NAME, new CompOpStringStartsWith()));
+    options.addFilterCompareDefinition(new FilterDefinition(Bean.ATTR_NAME, new CompOpStartsWith()));
 
     return new PageableQueryCollection<Bean, MultiObjectValue>(service, options);
   }

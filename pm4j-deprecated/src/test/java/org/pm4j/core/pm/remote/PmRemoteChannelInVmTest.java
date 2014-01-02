@@ -63,7 +63,7 @@ public class PmRemoteChannelInVmTest {
       }
     };
 
-    private PmRemoteChannel channel = new PmRemoteChannelInVm(new ServerSessionPm());
+    private DeprPmRemoteChannel channel = new DeprPmRemoteChannelInVm(new ServerSessionPm());
   }
 
 

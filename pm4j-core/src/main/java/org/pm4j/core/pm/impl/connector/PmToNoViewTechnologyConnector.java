@@ -4,6 +4,7 @@ import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.pm4j.core.pm.PmObject;
+import org.pm4j.core.pm.impl.inject.NamedObjectResolver;
 import org.pm4j.navi.NaviHistory;
 import org.pm4j.navi.NaviLink;
 import org.pm4j.navi.impl.NaviLinkImpl;

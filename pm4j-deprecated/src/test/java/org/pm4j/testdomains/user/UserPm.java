@@ -4,7 +4,7 @@ import static org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO.CLEAR;
 
 import org.pm4j.core.pm.PmAttrEnum;
 import org.pm4j.core.pm.PmAttrList;
-import org.pm4j.core.pm.PmAttrPmRef;
+import org.pm4j.core.pm.DeprPmAttrPmRef;
 import org.pm4j.core.pm.PmAttrString;
 import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmCommand;
@@ -18,7 +18,7 @@ import org.pm4j.core.pm.annotation.PmOptionCfg.NullOption;
 import org.pm4j.core.pm.annotation.PmTitleCfg;
 import org.pm4j.core.pm.impl.PmAttrEnumImpl;
 import org.pm4j.core.pm.impl.PmAttrListImpl;
-import org.pm4j.core.pm.impl.PmAttrPmRefImpl;
+import org.pm4j.core.pm.impl.DeprPmAttrPmRefImpl;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
 import org.pm4j.core.pm.impl.PmBeanBase;
 import org.pm4j.core.pm.impl.PmCommandImpl;
@@ -61,7 +61,7 @@ public class UserPm extends PmBeanBase<User> implements PmBean<User> {
    */
   @PmOptionCfg(values="pmBean.domain.users", id="name", title="name", nullOption=NullOption.NO)
   @PmFactoryCfg(beanPmClasses=UserPm.class)
-  public final PmAttrPmRef<UserPm> associate = new PmAttrPmRefImpl<UserPm, User>(this);
+  public final DeprPmAttrPmRef<UserPm> associate = new DeprPmAttrPmRefImpl<UserPm, User>(this);
 
   public final PmAttrList<String> languages = new PmAttrListImpl<String>(this);
 

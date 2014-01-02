@@ -4,6 +4,8 @@ import java.beans.PropertyChangeEvent;
 import java.util.Iterator;
 import java.util.List;
 
+import org.pm4j.common.modifications.ModificationHandler;
+import org.pm4j.common.modifications.Modifications;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.selection.Selection;

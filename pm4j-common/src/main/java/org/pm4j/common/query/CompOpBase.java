@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.pm4j.common.exception.CheckedExceptionWrapper;
-import org.pm4j.core.util.lang.CloneUtil;
+import org.pm4j.common.util.CloneUtil;
 
 /**
  * A basic compare operator implementation.

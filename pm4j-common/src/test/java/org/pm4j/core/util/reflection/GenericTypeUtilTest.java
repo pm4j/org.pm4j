@@ -3,6 +3,7 @@ package org.pm4j.core.util.reflection;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
+import org.pm4j.common.util.reflection.GenericTypeUtil;
 
 public class GenericTypeUtilTest {
 
