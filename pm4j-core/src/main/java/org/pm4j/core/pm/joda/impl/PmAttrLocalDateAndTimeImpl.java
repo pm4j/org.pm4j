@@ -147,7 +147,7 @@ public class PmAttrLocalDateAndTimeImpl extends PmAttrLocalDateTimeImpl {
      * @author okossak
      * @since GLOBE 2.0
      */
-    public class PmAttrLocalTimePart extends PmAttrLocalTimeImpl2 {
+    public class PmAttrLocalTimePart extends PmAttrLocalTimeImpl {
 
         /**
          * @param pmParent

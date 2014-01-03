@@ -2,12 +2,12 @@ package org.pm4j.common.modifications;
 
 import java.beans.PropertyChangeEvent;
 
-import org.pm4j.common.pageable.PageableCollection2;
-import org.pm4j.common.pageable.querybased.pagequery.PageableQueryService;
+import org.pm4j.common.pageable.PageableCollection;
+import org.pm4j.common.pageable.querybased.pagequery.PageQueryService;
 
 
 /**
- * Handles add and delete-modifications for a {@link PageableCollection2}.
+ * Handles add and delete-modifications for a {@link PageableCollection}.
  * <p>
  * The collection needs to be informed about (transient) collection changes
  * to consider them.
@@ -19,11 +19,11 @@ import org.pm4j.common.pageable.querybased.pagequery.PageableQueryService;
 public interface ModificationHandler<T_ITEM> {
 
   /**
-   * Adds an item to this collection.
+   * Registers an added collection item.
    * <p>
    * Usually the new item will be added as the last collection item.
    * <p>
-   * Fires a {@link PropertyChangeEvent} {@link PageableCollection2#EVENT_ITEM_ADD}.
+   * Fires a {@link PropertyChangeEvent} {@link PageableCollection#EVENT_ITEM_ADD}.
    *
    * @param item the item to add.
    * @throws UnsupportedOperationException if the collection does not support additional items.
@@ -33,7 +33,7 @@ public interface ModificationHandler<T_ITEM> {
   /**
    * Registers the passed item as an updated item.
    * <p>
-   * Fires a {@link PropertyChangeEvent} {@link PageableCollection2#EVENT_ITEM_UPDATE}.
+   * Fires a {@link PropertyChangeEvent} {@link PageableCollection#EVENT_ITEM_UPDATE}.
    *
    * @param the
    *          updated item. It should be part of the collection.
@@ -41,16 +41,16 @@ public interface ModificationHandler<T_ITEM> {
    *          indicates if the item should be added or removed from the set of
    *          updated items.
    */
-  void updateItem(T_ITEM item, boolean isUpdated);
+  void registerUpdatedItem(T_ITEM item, boolean isUpdated);
 
   /**
    * Removes all currently selected items from the collection.
    * <p>
-   * Fires a {@link PropertyChangeEvent} {@link PageableCollection2#EVENT_REMOVE_SELECTION}.
+   * Fires a {@link PropertyChangeEvent} {@link PageableCollection#EVENT_REMOVE_SELECTION}.
    * <p>
    * The following behavior is implemented in relation to specific pageable collections:<br>
    * In case of an in-memory collection, the delete operation will be applied immediately to the backing collection.<br>
-   * In case of {@link PageableQueryService} based collection the delete operation will just mark the selected items
+   * In case of {@link PageQueryService} based collection the delete operation will just mark the selected items
    * as deleted within the {@link Modifications} object. All deleted items will no longer be retrieved.
    *
    * @return <code>false</code> if the de-selection of the items to delete was prevented by a selection change decorator.
@@ -64,7 +64,7 @@ public interface ModificationHandler<T_ITEM> {
    * <p>
    * It does <b>not</b> undo the changes!
    */
-  void clearRegisteredModifications();
+  void clear();
 
   /**
    * Provides the registered modifications.

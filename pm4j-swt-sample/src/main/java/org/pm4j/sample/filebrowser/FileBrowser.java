@@ -1,8 +1,8 @@
 package org.pm4j.sample.filebrowser;
 
-import org.pm4j.core.pm.DeprPmTable;
 import org.pm4j.core.sample.filebrowser.DirPm;
 import org.pm4j.core.sample.filebrowser.FilePm;
+import org.pm4j.deprecated.core.pm.DeprPmTable;
 import org.pm4j.swt.pb.PbTable;
 import org.pm4j.swt.pb.PbTreeWithDetails;
 import org.pm4j.swt.pb.composite.PbGridLayout;

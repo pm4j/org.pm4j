@@ -13,7 +13,7 @@ import org.pm4j.core.pm.PmCommandDecorator;
  *
  * @author olaf boede
  */
-class PmCommandDecoratorSetImpl implements PmCommandDecorator.WithExceptionHandling {
+public class PmCommandDecoratorSetImpl implements PmCommandDecorator.WithExceptionHandling {
 
   private Collection<PmCommandDecorator> decorators = Collections.emptyList();
 

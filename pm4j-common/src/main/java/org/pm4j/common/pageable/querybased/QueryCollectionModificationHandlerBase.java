@@ -8,10 +8,9 @@ import java.util.List;
 import org.pm4j.common.modifications.ModificationHandler;
 import org.pm4j.common.modifications.Modifications;
 import org.pm4j.common.modifications.ModificationsImpl;
-import org.pm4j.common.pageable.PageableCollection2;
-import org.pm4j.common.pageable.PageableCollectionBase2;
-import org.pm4j.common.pageable.PageableCollectionUtil2;
-import org.pm4j.common.pageable.QueryService;
+import org.pm4j.common.pageable.PageableCollection;
+import org.pm4j.common.pageable.PageableCollectionBase;
+import org.pm4j.common.pageable.PageableCollectionUtil;
 import org.pm4j.common.pageable.querybased.pagequery.ClickedIds;
 import org.pm4j.common.pageable.querybased.pagequery.ItemIdSelection;
 import org.pm4j.common.query.QueryAttr;
@@ -24,11 +23,11 @@ import org.pm4j.common.selection.SelectionWithAdditionalItems;
 public class QueryCollectionModificationHandlerBase<T_ITEM, T_ID>  implements ModificationHandler<T_ITEM> {
 
   private ModificationsImpl<T_ITEM> modifications = new ModificationsImpl<T_ITEM>();
-  private final PageableCollectionBase2<T_ITEM> pageableCollection;
+  private final PageableCollectionBase<T_ITEM> pageableCollection;
   /** The service that provides the data to handle. */
   private QueryService<T_ITEM, T_ID> service;
 
-  public QueryCollectionModificationHandlerBase(PageableCollectionBase2<T_ITEM> pageableCollection, QueryService<T_ITEM, T_ID> service) {
+  public QueryCollectionModificationHandlerBase(PageableCollectionBase<T_ITEM> pageableCollection, QueryService<T_ITEM, T_ID> service) {
     assert pageableCollection != null;
     assert service != null;
     this.pageableCollection = pageableCollection;
@@ -41,7 +40,7 @@ public class QueryCollectionModificationHandlerBase<T_ITEM, T_ID>  implements Mo
         ? new ClickedIds<T_ID>()
         : ((ItemIdSelection<T_ITEM, T_ID>)modifications.getRemovedItems()).getClickedIds();
     QueryAttr idAttr = pageableCollection.getQueryOptions().getIdAttribute();
-    return new QueryExprNot(PageableCollectionUtil2.makeSelectionQueryParams(idAttr, queryFilterExpr, ids));
+    return new QueryExprNot(PageableCollectionUtil.makeSelectionQueryParams(idAttr, queryFilterExpr, ids));
   }
 
   @SuppressWarnings("unchecked")
@@ -55,7 +54,7 @@ public class QueryCollectionModificationHandlerBase<T_ITEM, T_ID>  implements Mo
 
     // Check for vetos
     try {
-      pageableCollection.fireVetoableChange(PageableCollection2.EVENT_REMOVE_SELECTION, selectedItems, null);
+      pageableCollection.fireVetoableChange(PageableCollection.EVENT_REMOVE_SELECTION, selectedItems, null);
     } catch (PropertyVetoException e) {
       return false;
     }
@@ -110,18 +109,18 @@ public class QueryCollectionModificationHandlerBase<T_ITEM, T_ID>  implements Mo
     }
 
     pageableCollection.clearCaches();
-    pageableCollection.firePropertyChange(PageableCollection2.EVENT_REMOVE_SELECTION, selectedItems, null);
+    pageableCollection.firePropertyChange(PageableCollection.EVENT_REMOVE_SELECTION, selectedItems, null);
     return true;
   }
 
   @Override
   public void addItem(T_ITEM item) {
     modifications.registerAddedItem(item);
-    pageableCollection.firePropertyChange(PageableCollection2.EVENT_ITEM_ADD, null, item);
+    pageableCollection.firePropertyChange(PageableCollection.EVENT_ITEM_ADD, null, item);
   }
 
   @Override
-  public void updateItem(T_ITEM item, boolean isUpdated) {
+  public void registerUpdatedItem(T_ITEM item, boolean isUpdated) {
     // a modification of a new item should not lead to a double-listing within the updated list too.
     if (isUpdated && modifications.getAddedItems().contains(item)) {
       return;
@@ -129,11 +128,11 @@ public class QueryCollectionModificationHandlerBase<T_ITEM, T_ID>  implements Mo
 
     boolean wasUpdated = modifications.getUpdatedItems().contains(item);
     modifications.registerUpdatedItem(item, isUpdated);
-    pageableCollection.firePropertyChange(PageableCollection2.EVENT_ITEM_UPDATE, wasUpdated, isUpdated);
+    pageableCollection.firePropertyChange(PageableCollection.EVENT_ITEM_UPDATE, wasUpdated, isUpdated);
   };
 
   @Override
-  public void clearRegisteredModifications() {
+  public void clear() {
     modifications = new ModificationsImpl<T_ITEM>();
   }
 

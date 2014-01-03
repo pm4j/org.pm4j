@@ -17,7 +17,7 @@ import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.annotation.PmTitleCfg;
 import org.pm4j.core.pm.impl.PmConversationImpl;
 import org.pm4j.core.pm.joda.PmAttrLocalTime;
-import org.pm4j.core.pm.joda.impl.PmAttrLocalTimeImpl2;
+import org.pm4j.core.pm.joda.impl.PmAttrLocalTimeImpl;
 import org.pm4j.tools.test.PmAssert;
 
 /**
@@ -59,7 +59,7 @@ public class PmAttrLocalTimeTest {
 
   @Test
   public void testWithTimeZone() {
-    PmAttrLocalTimeImpl2 t = testPm.timeWithTzConverter;
+    PmAttrLocalTimeImpl t = testPm.timeWithTzConverter;
     t.setBackingValue(new LocalTime(18, 00));
     assertEquals("18:00", t.getValueAsString());
 
@@ -73,10 +73,10 @@ public class PmAttrLocalTimeTest {
   public static class TestPm extends PmConversationImpl {
 
     @PmTitleCfg(title="local time")
-    public PmAttrLocalTimeImpl2 time = new PmAttrLocalTimeImpl2(this);
+    public PmAttrLocalTimeImpl time = new PmAttrLocalTimeImpl(this);
 
     @PmTitleCfg(title="local time with time zone")
     @PmAttrCfg(valueConverter = LocalTimeTimeZoneConverter.class)
-    public PmAttrLocalTimeImpl2 timeWithTzConverter = new PmAttrLocalTimeImpl2(this);
+    public PmAttrLocalTimeImpl timeWithTzConverter = new PmAttrLocalTimeImpl(this);
   }
 }

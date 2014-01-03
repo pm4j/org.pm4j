@@ -3,7 +3,7 @@ package org.pm4j.common.itemnavigator;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.pm4j.common.pageable.inmem.ItemNavigatorInMem;
+import org.pm4j.common.pageable.inmem.InMemCollectionItemNavigator;
 
 /**
  * A navigator over a set of persistent and transient items.
@@ -48,7 +48,7 @@ public class ItemNavigatorWithAdditionalItems<T> implements ItemNavigator<T> {
     assert baseNavigator != null;
     this.baseNavigator = baseNavigator != null
         ? baseNavigator
-        : new ItemNavigatorInMem<T>(null);
+        : new InMemCollectionItemNavigator<T>(null);
   }
 
   @Override

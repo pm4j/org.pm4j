@@ -50,7 +50,9 @@ public class PmInitApi {
             : false;
   }
 
-
+  public static PmInitState getPmInitState(PmObjectBase pm) {
+    return pm.pmInitState;
+  }
 
   /**
    * EXPERIMENTAL STATE: Helper for dynamic PM creation.

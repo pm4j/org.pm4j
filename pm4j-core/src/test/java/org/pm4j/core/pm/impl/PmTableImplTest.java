@@ -6,7 +6,7 @@ import org.junit.Test;
 import org.pm4j.core.pm.PmObject;
 
 /**
- * White box tests for {@link PmTableImpl2}.
+ * White box tests for {@link PmTableImpl}.
  *
  * @author OBOEDE
  */
@@ -25,7 +25,7 @@ public class PmTableImplTest {
 
   }
 
-  static class TablePm extends PmTableImpl2<RowBeanPm, RowBean> {
+  static class TablePm extends PmTableImpl<RowBeanPm, RowBean> {
 
     public TablePm(PmObject pmParent) {
       super(pmParent);

@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.pm4j.common.query.filter.FilterDefinition;
-import org.pm4j.core.pm.filter.DeprFilterByDefinition;
+import org.pm4j.deprecated.core.pm.filter.DeprFilterByDefinition;
 
 
 /**

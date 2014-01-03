@@ -8,7 +8,7 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.pm4j.common.pageable.QueryService;
+import org.pm4j.common.pageable.querybased.QueryService;
 
 
 public abstract class SelectionHandlerWithIdSet<T_ITEM, T_ID> extends SelectionHandlerBase<T_ITEM> {

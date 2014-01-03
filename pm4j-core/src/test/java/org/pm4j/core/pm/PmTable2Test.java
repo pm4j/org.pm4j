@@ -13,17 +13,17 @@ import org.apache.commons.lang.StringUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.pm4j.common.pageable.PageableCollectionUtil2;
+import org.pm4j.common.pageable.PageableCollectionUtil;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.filter.FilterDefinition;
 import org.pm4j.common.query.inmem.InMemSortOrder;
 import org.pm4j.common.util.CompareUtil;
-import org.pm4j.core.pm.PmTable2.UpdateAspect;
+import org.pm4j.core.pm.PmTable.UpdateAspect;
 import org.pm4j.core.pm.annotation.PmBeanCfg;
 import org.pm4j.core.pm.annotation.PmBoolean;
 import org.pm4j.core.pm.annotation.PmFactoryCfg;
-import org.pm4j.core.pm.annotation.PmTableCfg2;
-import org.pm4j.core.pm.annotation.PmTableColCfg2;
+import org.pm4j.core.pm.annotation.PmTableCfg;
+import org.pm4j.core.pm.annotation.PmTableColCfg;
 import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
 import org.pm4j.core.pm.api.PmEventApi;
@@ -31,8 +31,8 @@ import org.pm4j.core.pm.impl.PmAttrIntegerImpl;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
 import org.pm4j.core.pm.impl.PmBeanImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
-import org.pm4j.core.pm.impl.PmTableColImpl2;
-import org.pm4j.core.pm.impl.PmTableImpl2;
+import org.pm4j.core.pm.impl.PmTableColImpl;
+import org.pm4j.core.pm.impl.PmTableImpl;
 
 public class PmTable2Test {
 
@@ -104,7 +104,7 @@ public class PmTable2Test {
     assertEquals("After clearing the PM value caches we see the data change.",
                  4, myTablePm.getTotalNumOfPmRows());
     assertEquals("First page content is not changed.", "[a, b]", myTablePm.getRowPms().toString());
-    PageableCollectionUtil2.navigateToLastPage(myTablePm.getPmPageableCollection());
+    PageableCollectionUtil.navigateToLastPage(myTablePm.getPmPageableCollection());
     assertEquals("After a page switch the new item is visible.", "[c, d]", myTablePm.getRowPms().toString());
 
     // remove an item on the current page.
@@ -170,20 +170,20 @@ public class PmTable2Test {
   }
 
 
-  @PmTableCfg2(defaultSortCol="name")
+  @PmTableCfg(initialSortCol="name")
   @PmFactoryCfg(beanPmClasses=RowPm.class)
-  public static class TablePm extends PmTableImpl2<RowPm, RowBean> {
+  public static class TablePm extends PmTableImpl<RowPm, RowBean> {
 
     /** A column with an annotation based filter definition. */
-    @PmTableColCfg2(sortable=PmBoolean.TRUE)
-    public final PmTableCol2 name = new PmTableColImpl2(this);
+    @PmTableColCfg(sortable=PmBoolean.TRUE)
+    public final PmTableCol name = new PmTableColImpl(this);
 
     /** A column with a method based filter definition. */
-    @PmTableColCfg2(filterType = String.class)
-    public final PmTableCol2 description = new PmTableColImpl2(this);
+    @PmTableColCfg(filterType = String.class)
+    public final PmTableCol description = new PmTableColImpl(this);
 
     /** A column with a filter annotation that defines . */
-    public final PmTableCol2 counter = new PmTableColImpl2(this);
+    public final PmTableCol counter = new PmTableColImpl(this);
 
     /** Defines a page size of two items. */
     public TablePm(PmObject pmParent) {

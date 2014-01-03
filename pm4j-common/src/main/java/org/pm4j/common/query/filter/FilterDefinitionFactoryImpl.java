@@ -57,7 +57,7 @@ public class FilterDefinitionFactoryImpl implements FilterDefinitionFactory {
    * @return the filter definition.
    */
   @Override
-  public FilterDefinition createCompareDefinition(QueryAttr attr) {
+  public FilterDefinition makeFilterDefinition(QueryAttr attr) {
 	  CompOp[] comps = getCompOpsForValueType(attr);
 
 	  if (comps == null) {
@@ -77,7 +77,7 @@ public class FilterDefinitionFactoryImpl implements FilterDefinitionFactory {
    * @return the generated compare definition.
    */
   public FilterDefinition addFilter(QueryOptions queryOptions, QueryAttr attr) {
-    FilterDefinition d = createCompareDefinition(attr);
+    FilterDefinition d = makeFilterDefinition(attr);
     queryOptions.addFilterCompareDefinition(d);
     return d;
   }

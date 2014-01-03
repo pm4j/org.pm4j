@@ -208,12 +208,6 @@ public class PmMessageUtil {
     return messages;
   }
 
-  /** @deprecated Please use {@link #clearSubTreeMessages(PmObject)}. */
-  @Deprecated
-  public static List<PmMessage> clearPmMessages(PmObject pm) {
-    return clearSubTreeMessages(pm);
-  }
-
   /**
    * Provides the messages of a PM sub tree.
    *

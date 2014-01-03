@@ -21,10 +21,10 @@ import org.pm4j.core.pm.PmAttrEnum;
 import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmSortOrder;
-import org.pm4j.core.pm.DeprPmTable;
-import org.pm4j.core.pm.DeprPmTableCol;
-import org.pm4j.core.pm.DeprPmTableGenericRow;
 import org.pm4j.core.util.table.ColSizeSpec;
+import org.pm4j.deprecated.core.pm.DeprPmTable;
+import org.pm4j.deprecated.core.pm.DeprPmTableCol;
+import org.pm4j.deprecated.core.pm.DeprPmTableGenericRow;
 import org.pm4j.swt.pb.base.PbViewerToPmBase;
 import org.pm4j.swt.util.ColResizeListener;
 

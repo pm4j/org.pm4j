@@ -1308,7 +1308,8 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     return null;
   }
 
-  /* package */ void addValueChangeDecorator(PmCommandDecorator decorator) {
+  /** INTERNAL method. */
+  protected void addValueChangeDecorator(PmCommandDecorator decorator) {
     if (valueChangeDecorators.isEmpty()) {
       valueChangeDecorators = new ArrayList<PmCommandDecorator>();
     }

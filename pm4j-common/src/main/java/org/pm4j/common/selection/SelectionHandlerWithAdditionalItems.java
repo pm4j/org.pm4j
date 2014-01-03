@@ -9,13 +9,13 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.pm4j.common.pageable.PageableCollection2;
+import org.pm4j.common.pageable.PageableCollection;
 
 /**
  * Handles in front of another {@link SelectionHandler} selected transient items.
  * <p>
  * It obtains the set of transient items from the modifications of the related
- * {@link PageableCollection2}.
+ * {@link PageableCollection}.
  *
  * @author olaf boede
  *
@@ -27,7 +27,7 @@ public class SelectionHandlerWithAdditionalItems<T_ITEM> extends SelectionHandle
   private SelectionWithAdditionalItems<T_ITEM> emptySelection = new SelectionWithAdditionalItems<T_ITEM>(
                                                                  EmptySelection.<T_ITEM> getEmptySelection(), null);
 
-  private final PageableCollection2<T_ITEM>    baseCollection;
+  private final PageableCollection<T_ITEM>    baseCollection;
   private final SelectionHandler<T_ITEM>       baseSelectionHandler;
 
   /** The set of currently selected items. */
@@ -39,7 +39,7 @@ public class SelectionHandlerWithAdditionalItems<T_ITEM> extends SelectionHandle
    * @param transientItems
    *          a reference to the set of additional transient items to consider.
    */
-  public SelectionHandlerWithAdditionalItems(PageableCollection2<T_ITEM> baseCollection, SelectionHandler<T_ITEM> baseSelectionHandler) {
+  public SelectionHandlerWithAdditionalItems(PageableCollection<T_ITEM> baseCollection, SelectionHandler<T_ITEM> baseSelectionHandler) {
     assert baseCollection != null;
     assert baseSelectionHandler != null;
     assert !baseSelectionHandler.isFirePropertyEvents() : "Event handling of the nested selection handler should be disabled.";

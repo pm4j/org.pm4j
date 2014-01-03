@@ -312,7 +312,7 @@ public abstract class MasterPmSelectionHandlerImpl<T_MASTER_BEAN> implements Mas
    */
   protected void registerDetailsChangeForMasterBean(T_MASTER_BEAN masterBean) {
     if (masterBean != null) {
-      getModificationHandler().updateItem(masterBean, true);
+      getModificationHandler().registerUpdatedItem(masterBean, true);
 
       if (LOG.isDebugEnabled()) {
         LOG.debug("Registered a details change for master bean: " + masterBean);

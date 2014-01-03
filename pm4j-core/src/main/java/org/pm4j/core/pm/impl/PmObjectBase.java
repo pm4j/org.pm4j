@@ -95,14 +95,14 @@ public abstract class PmObjectBase implements PmObject {
    */
   private String pmCachedTitle;
 
-  enum PmInitState {
+  public enum PmInitState {
     NOT_INITIALIZED,
     FIELD_BOUND_CHILD_META_DATA_INITIALIZED,
     BEFORE_ON_PM_INIT,
     INITIALIZED };
 
   /** Helper indicator that prevents double initialization. */
-  PmInitState pmInitState = PmInitState.NOT_INITIALIZED;
+  /* package */ PmInitState pmInitState = PmInitState.NOT_INITIALIZED;
 
   /**
    * An optional cache for the bean to PM association within the current PM hierarchy scope.
@@ -794,9 +794,10 @@ public abstract class PmObjectBase implements PmObject {
   };
 
   /**
+   * INTERNAL method.<br>
    * Initializes this PM runtime instance.
    */
-  /* package */ void zz_ensurePmInitialization() {
+  protected final void zz_ensurePmInitialization() {
     if (pmInitState != PmInitState.INITIALIZED) {
       if (pmInitState == PmInitState.BEFORE_ON_PM_INIT) {
         if (LOG.isDebugEnabled())
@@ -917,18 +918,18 @@ public abstract class PmObjectBase implements PmObject {
 
     // -- Dependency injection configuration --
     metaData.diResolvers = DiResolverUtil.getDiResolvers(getClass());
-    
+
     // -- collect all methods annotated with @PmInit
     metaData.initMethods = findInitMethods();
   }
-  
+
   /**
    * @return all methods in the class hierarchy of this PM that are annotated with {@link PmInit}.
    */
   private List<Method> findInitMethods() {
     List<Method> initMethods = ClassUtil.findAnnotatedMethodsTopDown(this.getClass(), PmInit.class);
     Map<String, Method> nameToMethodMap = new HashMap<String, Method>();
-    
+
     for (Iterator<Method> iter = initMethods.listIterator(); iter.hasNext();) {
       Method method = iter.next();
       // only no-arg methods are allowed
@@ -939,7 +940,7 @@ public abstract class PmObjectBase implements PmObject {
       // no static methods are allowed
       if (Modifier.isStatic(method.getModifiers())) {
         throw new IllegalArgumentException("Methods annotated with '" + PmInit.class
-            + "' must not be static. This is not true for '" + method 
+            + "' must not be static. This is not true for '" + method
             + "'. Please rafactore the method!");
       }
       // only public and protected methods are allowed
@@ -956,11 +957,11 @@ public abstract class PmObjectBase implements PmObject {
         nameToMethodMap.put(method.getName(), method);
       }
       // if onPmInit is annotated, do not call it twice
-      if (method.getName().equals("onPmInit")) { 
+      if (method.getName().equals("onPmInit")) {
         iter.remove();
       }
     }
-    
+
     return initMethods;
   }
 
@@ -1032,7 +1033,7 @@ public abstract class PmObjectBase implements PmObject {
      */
     private BeanAttrAccessor[] childFieldAccessorArray = {};
     private Map<String, BeanAttrAccessor> nameToChildAccessorMap = Collections.emptyMap();
-    
+
     /** all methods annotated with {@link PmInit} */
     private List<Method> initMethods;
 

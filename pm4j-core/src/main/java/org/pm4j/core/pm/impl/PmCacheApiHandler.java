@@ -17,8 +17,8 @@ public class PmCacheApiHandler {
    *          The set of caches to be cleared. If no cacheKind is specified, all
    *          cache kinds will be cleared.
    */
-  public void clearCachedPmValues(PmObject pm, PmCacheApi.CacheKind... cacheKinds) {
-    clearCachedPmValues(pm, PmUtil.cacheKindArrayToSet(cacheKinds));
+  public void clearPmCache(PmObject pm, PmCacheApi.CacheKind... cacheKinds) {
+    clearPmCache(pm, PmUtil.cacheKindArrayToSet(cacheKinds));
   }
 
   /**
@@ -33,7 +33,7 @@ public class PmCacheApiHandler {
    * @param cacheSet
    *          Specification of the cache kinds to clear.
    */
-  public void clearCachedPmValues(PmObject pm, Set<PmCacheApi.CacheKind> cacheSet) {
+  public void clearPmCache(PmObject pm, Set<PmCacheApi.CacheKind> cacheSet) {
     ((PmObjectBase)pm).clearCachedPmValues(cacheSet);
   }
 
@@ -49,13 +49,13 @@ public class PmCacheApiHandler {
    *          The set of caches to be cleared. If no cacheKind is specified, all
    *          cache kinds will be cleared.
    */
-  public void clearCachedPmValuesInCtxtPath(PmObject pm, boolean includeSession, PmCacheApi.CacheKind... cacheKinds) {
+  public void clearPmCacheInCtxtPath(PmObject pm, boolean includeSession, PmCacheApi.CacheKind... cacheKinds) {
     List<PmObject> list = PmUtil.getPmHierarchy(pm, includeSession);
 
     Set<PmCacheApi.CacheKind> cacheKindSet = PmUtil.cacheKindArrayToSet(cacheKinds);
     // ensures a top-down processing order.
     for (int i=list.size()-1; i>=0; --i) {
-      clearCachedPmValues(list.get(i), cacheKindSet);
+      clearPmCache(list.get(i), cacheKindSet);
     }
   }
 

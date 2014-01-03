@@ -18,5 +18,5 @@ public interface FilterDefinitionFactory {
    *          the attribute to create a filter definition for.
    * @return the filter definition.
    */
-  FilterDefinition createCompareDefinition(QueryAttr attr);
+  FilterDefinition makeFilterDefinition(QueryAttr attr);
 }

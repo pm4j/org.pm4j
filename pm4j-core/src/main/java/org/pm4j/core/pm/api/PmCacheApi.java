@@ -39,23 +39,9 @@ public class PmCacheApi {
    * @param cacheKinds
    *          The set of caches to be cleared. If no cacheKind is specified, all
    *          cache kinds will be cleared.
-   * @deprecated Please use {@link #clearPmCache(PmObject, CacheKind...)}
-   */
-  @Deprecated
-  public static void clearCachedPmValues(PmObject pm, CacheKind... cacheKinds) {
-    apiHandler.clearCachedPmValues(pm, cacheKinds);
-  }
-
-  /**
-   * Clears cached content (if there was something cached).<br>
-   * Causes a reload of the content with the next request.
-   *
-   * @param cacheKinds
-   *          The set of caches to be cleared. If no cacheKind is specified, all
-   *          cache kinds will be cleared.
    */
   public static void clearPmCache(PmObject pm, CacheKind... cacheKinds) {
-    apiHandler.clearCachedPmValues(pm, cacheKinds);
+    apiHandler.clearPmCache(pm, cacheKinds);
   }
 
   /**
@@ -71,7 +57,7 @@ public class PmCacheApi {
    *          Specification of the cache kinds to clear.
    */
   public static void clearPmCache(PmObject pm, Set<CacheKind> cacheSet) {
-    apiHandler.clearCachedPmValues(pm, cacheSet);
+    apiHandler.clearPmCache(pm, cacheSet);
   }
 
   /**
@@ -86,8 +72,8 @@ public class PmCacheApi {
    *          The set of caches to be cleared. If no cacheKind is specified, all
    *          cache kinds will be cleared.
    */
-  public static void clearCachedPmValuesInCtxtPath(PmObject pm, boolean includeSession, PmCacheApi.CacheKind... cacheKinds) {
-    apiHandler.clearCachedPmValuesInCtxtPath(pm, includeSession, cacheKinds);
+  public static void clearPmCacheInCtxtPath(PmObject pm, boolean includeSession, PmCacheApi.CacheKind... cacheKinds) {
+    apiHandler.clearPmCacheInCtxtPath(pm, includeSession, cacheKinds);
   }
 
 

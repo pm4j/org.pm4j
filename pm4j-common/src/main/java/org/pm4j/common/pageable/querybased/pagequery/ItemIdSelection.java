@@ -4,15 +4,15 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 
-import org.pm4j.common.pageable.QueryService;
+import org.pm4j.common.pageable.querybased.QueryService;
 import org.pm4j.common.util.collection.ListUtil;
 
 /**
  * A selection that holds the ID's of selected items.
  * <p>
- * It uses a {@link PageableQueryService} instance to retrieve the selected instances from the service.
+ * It uses a {@link PageQueryService} instance to retrieve the selected instances from the service.
  */
-public class ItemIdSelection<T_ITEM, T_ID> extends PageableQuerySelectionHandler.QuerySelectionWithClickedIds<T_ITEM, T_ID> {
+public class ItemIdSelection<T_ITEM, T_ID> extends PageQuerySelectionHandler.QuerySelectionWithClickedIds<T_ITEM, T_ID> {
   private static final long serialVersionUID = 1L;
 
   private final Collection<T_ID> ids;

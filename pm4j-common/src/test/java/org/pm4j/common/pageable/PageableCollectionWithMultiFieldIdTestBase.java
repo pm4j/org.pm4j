@@ -11,7 +11,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.pm4j.common.itemnavigator.ItemNavigator;
-import org.pm4j.common.pageable.inmem.ItemNavigatorInMem;
+import org.pm4j.common.pageable.inmem.InMemCollectionItemNavigator;
 import org.pm4j.common.query.CompOpStartsWith;
 import org.pm4j.common.query.QueryExpr;
 import org.pm4j.common.query.QueryAttr;
@@ -23,13 +23,13 @@ import org.pm4j.common.util.collection.IterableUtil;
 
 /**
  * An abstract test that checks the algorithms that should work for all kinds of
- * {@link PageableCollection2}.
+ * {@link PageableCollection}.
  *
  * @author olaf boede
  */
 public abstract class PageableCollectionWithMultiFieldIdTestBase<T> {
 
-  protected PageableCollection2<T> collection;
+  protected PageableCollection<T> collection;
   protected SortOrder nameSortOrder;
   protected TestPropertyChangeListener pclAdd;
   protected TestPropertyChangeListener pclUpdate;
@@ -39,7 +39,7 @@ public abstract class PageableCollectionWithMultiFieldIdTestBase<T> {
 
 
   /** Needs to be implemented by the concrete test classes. */
-  protected abstract PageableCollection2<T> makePageableCollection(String... strings);
+  protected abstract PageableCollection<T> makePageableCollection(String... strings);
 
   /** A default implementation, which may differ for the PM collection test.
    *  There we have to navigate from the attribute to the value too. */
@@ -70,11 +70,11 @@ public abstract class PageableCollectionWithMultiFieldIdTestBase<T> {
     assertTrue(collection.getModificationHandler().getModifications().isModified());
     assertEquals("[ ]", IterableUtil.shallowCopy(collection.getModificationHandler().getModifications().getRemovedItems()).toString());
 
-    collection.addPropertyChangeListener(PageableCollection2.EVENT_ITEM_ADD, pclAdd = new TestPropertyChangeListener());
-    collection.addPropertyChangeListener(PageableCollection2.EVENT_ITEM_UPDATE, pclUpdate = new TestPropertyChangeListener());
-    collection.addPropertyAndVetoableListener(PageableCollection2.EVENT_REMOVE_SELECTION, pclRemove = new TestPropertyChangeListener());
-    collection.addPropertyChangeListener(PageableCollection2.PROP_PAGE_IDX, pclPageIdx = new TestPropertyChangeListener());
-    collection.addPropertyChangeListener(PageableCollection2.PROP_PAGE_SIZE, pclPageSize = new TestPropertyChangeListener());
+    collection.addPropertyChangeListener(PageableCollection.EVENT_ITEM_ADD, pclAdd = new TestPropertyChangeListener());
+    collection.addPropertyChangeListener(PageableCollection.EVENT_ITEM_UPDATE, pclUpdate = new TestPropertyChangeListener());
+    collection.addPropertyAndVetoableListener(PageableCollection.EVENT_REMOVE_SELECTION, pclRemove = new TestPropertyChangeListener());
+    collection.addPropertyChangeListener(PageableCollection.PROP_PAGE_IDX, pclPageIdx = new TestPropertyChangeListener());
+    collection.addPropertyChangeListener(PageableCollection.PROP_PAGE_SIZE, pclPageSize = new TestPropertyChangeListener());
   }
 
   @Test
@@ -83,7 +83,7 @@ public abstract class PageableCollectionWithMultiFieldIdTestBase<T> {
   }
 
   protected ItemNavigator<T> getItemNavigator() {
-    return new ItemNavigatorInMem<T>(collection.getSelectionHandler().getSelection());
+    return new InMemCollectionItemNavigator<T>(collection.getSelectionHandler().getSelection());
   }
 
   @Test
@@ -356,7 +356,7 @@ public abstract class PageableCollectionWithMultiFieldIdTestBase<T> {
   public void testRemoveOfAddedAndUpdatedItems() {
     collection.getSelectionHandler().setSelectMode(SelectMode.MULTI);
     T updatedItem = collection.getItemsOnPage().get(0);
-    collection.getModificationHandler().updateItem(updatedItem, true);
+    collection.getModificationHandler().registerUpdatedItem(updatedItem, true);
     collection.getModificationHandler().addItem(createItem("added item"));
 
     assertEquals(1, collection.getModifications().getAddedItems().size());

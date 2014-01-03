@@ -11,7 +11,7 @@ import java.util.List;
 import org.junit.Test;
 import org.pm4j.common.query.QueryAttr;
 import org.pm4j.common.query.SortOrder;
-import org.pm4j.core.pm.PmTable2.UpdateAspect;
+import org.pm4j.core.pm.PmTable.UpdateAspect;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.annotation.PmBeanCfg;
 import org.pm4j.core.pm.annotation.PmCacheCfg;
@@ -21,8 +21,8 @@ import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
 import org.pm4j.core.pm.impl.PmBeanImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
-import org.pm4j.core.pm.impl.PmTableColImpl2;
-import org.pm4j.core.pm.impl.PmTableImpl2;
+import org.pm4j.core.pm.impl.PmTableColImpl;
+import org.pm4j.core.pm.impl.PmTableImpl;
 
 public class PmTableCacheTest {
 
@@ -125,9 +125,9 @@ public class PmTableCacheTest {
   }
 
   @PmFactoryCfg(beanPmClasses=MyRowPm.class)
-  public static class MyTablePm extends PmTableImpl2<MyRowPm, MyRowBean> {
+  public static class MyTablePm extends PmTableImpl<MyRowPm, MyRowBean> {
 
-    public final PmTableCol2 s = new PmTableColImpl2(this);
+    public final PmTableCol s = new PmTableColImpl(this);
 
     public MyTablePm(PmObject pmParent) {
       super(pmParent);

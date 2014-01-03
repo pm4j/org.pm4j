@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.pm4j.common.pageable.QueryService;
+import org.pm4j.common.pageable.querybased.QueryService;
 
 /**
  * A selection of items that is based on a collection of item id's.

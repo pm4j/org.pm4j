@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.pm4j.common.pageable.querybased.pagequery.PageableQueryService;
+import org.pm4j.common.pageable.querybased.pagequery.PageQueryService;
 import org.pm4j.common.query.inmem.InMemQueryEvaluator;
 import org.pm4j.common.util.beanproperty.PropertyChangeSupportedBase;
 
@@ -17,7 +17,7 @@ import org.pm4j.common.util.beanproperty.PropertyChangeSupportedBase;
  * Technology specific query evaluators read these definitions for their specific
  * query evaluation.
  * <p>
- * See {@link InMemQueryEvaluator} and {@link PageableQueryService} for usage examples.
+ * See {@link InMemQueryEvaluator} and {@link PageQueryService} for usage examples.
  *
  * @author olaf boede
  */
