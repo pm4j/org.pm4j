@@ -43,9 +43,9 @@ public class InMemQueryEvaluatorSet extends QueryEvaluatorSet {
     addCompOpEvaluator(CompOpLt.class, InMemCompOpEvaluators.LT);
     addCompOpEvaluator(CompOpNotEquals.class, InMemCompOpEvaluators.NE);
     addCompOpEvaluator(CompOpNotNull.class, InMemCompOpEvaluators.NOT_NULL);
-    addCompOpEvaluator(CompOpStartsWith.class, InMemCompOpEvaluators.STRING_STARTS_WITH);
-    addCompOpEvaluator(CompOpContains.class, InMemCompOpEvaluators.STRING_CONTAINS);
-    addCompOpEvaluator(CompOpNotContains.class, InMemCompOpEvaluators.STRING_NOT_CONTAINS);
+    addCompOpEvaluator(CompOpStartsWith.class, InMemCompOpEvaluators.STARTS_WITH);
+    addCompOpEvaluator(CompOpContains.class, InMemCompOpEvaluators.CONTAINS);
+    addCompOpEvaluator(CompOpNotContains.class, InMemCompOpEvaluators.NOT_CONTAINS);
     addCompOpEvaluator(CompOpIn.class, InMemCompOpEvaluators.IN);
   }
 

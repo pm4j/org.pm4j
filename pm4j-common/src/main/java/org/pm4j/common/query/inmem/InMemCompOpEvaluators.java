@@ -81,21 +81,21 @@ public class InMemCompOpEvaluators {
     }
   };
 
-  public static final InMemCompOpEvaluator STRING_STARTS_WITH = new InMemCompOpEvaluatorBase<CompOpStartsWith, String>() {
+  public static final InMemCompOpEvaluator STARTS_WITH = new InMemCompOpEvaluatorBase<CompOpStartsWith, String>() {
     @Override
     protected boolean evalImpl(InMemQueryEvaluator<?> ctxt, CompOpStartsWith compOp, String attrValue, String compareToValue) {
       return CompareUtil.indexOf(attrValue, compareToValue, compOp.isIgnoreCase(), compOp.isIgnoreSpaces()) == 0;
     }
   };
 
-  public static final InMemCompOpEvaluator STRING_CONTAINS = new InMemCompOpEvaluatorBase<CompOpContains, String>() {
+  public static final InMemCompOpEvaluator CONTAINS = new InMemCompOpEvaluatorBase<CompOpContains, String>() {
     @Override
     protected boolean evalImpl(InMemQueryEvaluator<?> ctxt, CompOpContains compOp, String attrValue, String compareToValue) {
       return CompareUtil.indexOf(attrValue, compareToValue, compOp.isIgnoreCase(), compOp.isIgnoreSpaces()) != -1;
     }
   };
 
-  public static final InMemCompOpEvaluator STRING_NOT_CONTAINS = new InMemCompOpEvaluatorBase<CompOpNotContains, String>() {
+  public static final InMemCompOpEvaluator NOT_CONTAINS = new InMemCompOpEvaluatorBase<CompOpNotContains, String>() {
     @Override
     protected boolean evalImpl(InMemQueryEvaluator<?> ctxt, CompOpNotContains compOp, String attrValue, String compareToValue) {
       return CompareUtil.indexOf(attrValue, compareToValue, compOp.isIgnoreCase(), compOp.isIgnoreSpaces()) == -1;

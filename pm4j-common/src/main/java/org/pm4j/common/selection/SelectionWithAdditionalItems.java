@@ -54,6 +54,10 @@ public class SelectionWithAdditionalItems <T_ITEM> implements Selection<T_ITEM> 
     baseSelection.setIteratorBlockSizeHint(readBlockSize);
   }
 
+  /**
+   * @return The set of additional selected items.<br>
+   *         An empty collection of no additional item is selected.
+   */
   public List<T_ITEM> getAdditionalSelectedItems() {
     return additionalSelectedItems;
   }
