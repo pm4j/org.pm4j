@@ -23,7 +23,7 @@ import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmSortOrder;
 import org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO;
 import org.pm4j.core.pm.api.PmEventApi;
-import org.pm4j.core.pm.api.PmMessageUtil;
+import org.pm4j.core.pm.api.PmMessageApi;
 import org.pm4j.core.pm.impl.AnnotationUtil;
 import org.pm4j.core.pm.impl.BeanPmCacheUtil;
 import org.pm4j.core.pm.impl.PmAttrBase;
@@ -241,7 +241,7 @@ public class DeprPmTableImpl
    * @param newRowPm The new row.
    */
   protected void onDeleteRow(T_ROW_ELEMENT_PM deletedRow) {
-    PmMessageUtil.clearSubTreeMessages(deletedRow);
+    PmMessageApi.clearPmTreeMessages(deletedRow);
     getPageableCollection().select(deletedRow, false);
     changedStateRegistry.onDeleteItem(deletedRow);
     if (deletedRow instanceof PmBean) {

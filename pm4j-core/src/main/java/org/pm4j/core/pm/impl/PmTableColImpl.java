@@ -28,7 +28,7 @@ import org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO;
 import org.pm4j.core.pm.annotation.PmTableColCfg;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmLocalizeApi;
-import org.pm4j.core.pm.api.PmMessageUtil;
+import org.pm4j.core.pm.api.PmMessageApi;
 import org.pm4j.core.util.table.ColSizeSpec;
 
 /**
@@ -198,7 +198,7 @@ public class PmTableColImpl extends PmObjectBase implements PmTableCol {
 
       // If the attribute change reports a failure, we need to propagate that as
       // a failed command execution.
-      List<PmMessage> errors = PmMessageUtil.getPmErrors(sortAttr);
+      List<PmMessage> errors = PmMessageApi.getErrors(sortAttr);
       if (!errors.isEmpty()) {
         PmMessage m = errors.get(0);
         throw new PmRuntimeException(this, new PmResourceData(m.getMsgKey(), m.getMsgArgs()));

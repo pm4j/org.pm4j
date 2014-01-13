@@ -17,14 +17,14 @@ import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.PmMessage;
 import org.pm4j.core.pm.PmOption;
 import org.pm4j.core.pm.api.PmFactoryApi;
-import org.pm4j.core.pm.api.PmMessageUtil;
+import org.pm4j.core.pm.api.PmMessageApi;
 import org.pm4j.core.pm.impl.PmConversationImpl;
 import org.pm4j.deprecated.core.testdomains.user.AdminSession;
 import org.pm4j.deprecated.core.testdomains.user.Domain;
 import org.pm4j.deprecated.core.testdomains.user.DomainPm;
 import org.pm4j.deprecated.core.testdomains.user.User;
-import org.pm4j.deprecated.core.testdomains.user.UserPm;
 import org.pm4j.deprecated.core.testdomains.user.User.Salutation;
+import org.pm4j.deprecated.core.testdomains.user.UserPm;
 
 public class UserPmTest {
 
@@ -33,7 +33,7 @@ public class UserPmTest {
   public void testUserModel() {
     PmConversation pmConversation = new AdminSession(null);
     Domain domain = new Domain("testDomain");
-    /*User user1 =*/ domain.addToUsers(new User("Berta"));
+    /* User user1 = */domain.addToUsers(new User("Berta"));
     User user2 = domain.addToUsers(new User("Willi"));
 
     UserPm userPm = PmFactoryApi.getPmForBean(pmConversation, user2);
@@ -44,9 +44,11 @@ public class UserPmTest {
     assertNull(userPm.description.getValue());
     assertEquals(1000, userPm.description.getMaxLen());
 
-    assertEquals("An additional null-option because the current value is null.", "[---, Herr, Frau]", userPm.salutation.getOptionSet().getOptions().toString());
+    assertEquals("An additional null-option because the current value is null.", "[---, Herr, Frau]", userPm.salutation
+        .getOptionSet().getOptions().toString());
     userPm.salutation.setValue(Salutation.MR);
-    assertEquals("The null-option disappears if the value is not null.", "[Herr, Frau]", userPm.salutation.getOptionSet().getOptions().toString());
+    assertEquals("The null-option disappears if the value is not null.", "[Herr, Frau]", userPm.salutation
+        .getOptionSet().getOptions().toString());
     assertEquals(Salutation.MR, userPm.salutation.getValue());
     assertEquals("Herr Willi", userPm.fullName.getValue());
 
@@ -79,7 +81,7 @@ public class UserPmTest {
   @Ignore("olaf: Factory delegation to the conversation is no longer supported. Rewrite this test.")
   public void testUserModelWithDefaultSession() {
     Domain domain = new Domain("testDomain");
-    /*User user1 =*/ domain.addToUsers(new User("Berta"));
+    /* User user1 = */domain.addToUsers(new User("Berta"));
     User user2 = domain.addToUsers(new User("Willi"));
 
     PmConversation pmConversation = new PmConversationImpl(UserPm.class, DomainPm.class);
@@ -150,15 +152,15 @@ public class UserPmTest {
     assertFalse(userPm.name.isPmValid());
     assertEquals(null, userPm.name.getValue());
     assertEquals("Willi", user.getName());
-    PmMessageUtil.clearSubTreeMessages(userPm);
+    PmMessageApi.clearPmTreeMessages(userPm);
 
     userPm.name.setValue("");
     userPm.cmdCommitChanges.doIt();
     assertFalse(userPm.name.isPmValid());
     // FIXME: should return the invalid value...
-//    assertEquals("", userPm.name.getValue());
+    // assertEquals("", userPm.name.getValue());
     assertEquals("Willi", user.getName());
-    PmMessageUtil.clearSubTreeMessages(userPm);
+    PmMessageApi.clearPmTreeMessages(userPm);
 
     userPm.name.setValue("ab");
     userPm.cmdCommitChanges.doIt();
@@ -174,7 +176,7 @@ public class UserPmTest {
     userPm.clearPmInvalidValues();
 
     // FIXME: the invalid value should have been cleaned...
-    //assertEquals("ab", userPm.name.getValue());
+    // assertEquals("ab", userPm.name.getValue());
 
     userPm.name.setValue("ab1234567890");
     userPm.cmdCommitChanges.doIt();
@@ -182,7 +184,7 @@ public class UserPmTest {
     assertEquals(1, messages.size());
     assertEquals(userPm.name, messages.get(0).getPm());
 
-    PmMessageUtil.clearSubTreeMessages(userPm.getPmConversation());
+    PmMessageApi.clearPmTreeMessages(userPm.getPmConversation());
     // FIXME: the invalid value should have been cleaned...
     // assertEquals("ab", userPm.name.getValue());
     assertEquals(0, userPm.getPmConversation().getPmMessages().size());
@@ -191,7 +193,7 @@ public class UserPmTest {
       System.out.println("genType: " + t.toString());
       Class<?> c = t.getClass();
       System.out.println("genType class: " + c.toString());
-      ParameterizedType pt = (ParameterizedType)t;
+      ParameterizedType pt = (ParameterizedType) t;
       for (Type ta : pt.getActualTypeArguments()) {
         System.out.println("type arg: " + ta.toString());
       }
@@ -201,7 +203,7 @@ public class UserPmTest {
     System.out.println("bean class: " + beanCls);
     assertEquals(User.class, beanCls);
 
-// -------
+    // -------
     System.out.println("--- domain ....");
 
     Class<?> cl = DomainPm.class;
@@ -211,12 +213,11 @@ public class UserPmTest {
         Class<?> c = t.getClass();
         System.out.println("genType class: " + c.toString());
         if (t instanceof ParameterizedType) {
-          ParameterizedType pt = (ParameterizedType)t;
+          ParameterizedType pt = (ParameterizedType) t;
           for (Type ta : pt.getActualTypeArguments()) {
             System.out.println("type arg: " + ta.toString());
           }
-        }
-        else {
+        } else {
           System.out.println(" other type: " + t.getClass());
         }
       }
@@ -224,17 +225,16 @@ public class UserPmTest {
       System.out.println(" generic super: " + cl.getGenericSuperclass() + " von " + cl);
       Type genSuper = cl.getGenericSuperclass();
       if (genSuper instanceof Class) {
-        for (Type t : ((Class<?>)genSuper).getGenericInterfaces()) {
+        for (Type t : ((Class<?>) genSuper).getGenericInterfaces()) {
           System.out.println("genType: " + t.toString());
           Class<?> c = t.getClass();
           System.out.println("genType class: " + c.toString());
           if (t instanceof ParameterizedType) {
-            ParameterizedType pt = (ParameterizedType)t;
+            ParameterizedType pt = (ParameterizedType) t;
             for (Type ta : pt.getActualTypeArguments()) {
               System.out.println("type arg: " + ta.toString());
             }
-          }
-          else {
+          } else {
             System.out.println(" other type: " + t.getClass());
           }
         }
@@ -245,18 +245,16 @@ public class UserPmTest {
 
     beanCls = findBeanClass(DomainPm.class);
     System.out.println("bean class: " + beanCls);
-//    assertEquals(User.class, beanCls);
-}
+    // assertEquals(User.class, beanCls);
+  }
 
   Class<?> findBeanClass(Class<?> beanClass) {
     Type pmIf = null;
     for (Type t : beanClass.getGenericInterfaces()) {
       if (t instanceof ParameterizedType) {
-        ParameterizedType pt = (ParameterizedType)t;
+        ParameterizedType pt = (ParameterizedType) t;
         Type rt = pt.getRawType();
-        if (rt instanceof Class<?>
-        && PmBean.class.isAssignableFrom((Class<?>)rt)
-            ) {
+        if (rt instanceof Class<?> && PmBean.class.isAssignableFrom((Class<?>) rt)) {
           pmIf = t;
           break;
         }
@@ -267,7 +265,7 @@ public class UserPmTest {
       return null;
     }
 
-    Type[] typeArgs = ((ParameterizedType)pmIf).getActualTypeArguments();
+    Type[] typeArgs = ((ParameterizedType) pmIf).getActualTypeArguments();
     if (typeArgs.length != 1) {
       return null;
     }

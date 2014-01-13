@@ -28,7 +28,7 @@ import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmLocalizeApi;
-import org.pm4j.core.pm.api.PmMessageUtil;
+import org.pm4j.core.pm.api.PmMessageApi;
 import org.pm4j.core.pm.api.PmValidationApi;
 import org.pm4j.navi.NaviHistory;
 import org.pm4j.navi.NaviLink;
@@ -410,7 +410,7 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
     }
 
     // prevent message duplication:
-    for (PmMessage m : PmMessageUtil.getPmInfos(this)) {
+    for (PmMessage m : PmMessageApi.getInfos(this)) {
       if (m.getMsgKey().equals(key)) {
         return;
       }
@@ -419,10 +419,10 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
     // Does only pass the PM title when it is really used in the message.
     // This prevents a lot of unnecessary warnings.
     if (msgTemplate.indexOf("{0}") != -1) {
-      PmMessageUtil.makeMsg(this, Severity.INFO, key, getPmParent().getPmTitle());
+      PmMessageApi.addMsg(this, Severity.INFO, key, getPmParent().getPmTitle());
     }
     else {
-      PmMessageUtil.makeMsg(this, Severity.INFO, key);
+      PmMessageApi.addMsg(this, Severity.INFO, key);
     }
   }
 
@@ -613,7 +613,7 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
         }
         break;
       case CLEAR:
-        PmMessageUtil.clearSubTreeMessages(getValidationErrorRootPm());
+        PmMessageApi.clearPmTreeMessages(getValidationErrorRootPm());
         break;
       case DO_NOTHING:
         break;

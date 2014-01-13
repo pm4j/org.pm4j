@@ -8,7 +8,7 @@ import org.pm4j.core.pm.PmAttrEnum;
 import org.pm4j.core.pm.PmAttrString;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
-import org.pm4j.core.pm.api.PmMessageUtil;
+import org.pm4j.core.pm.api.PmMessageApi;
 import org.pm4j.navi.NaviLink;
 import org.pm4j.navi.NaviRuleLink;
 import org.pm4j.navi.impl.NaviLinkImpl;
@@ -52,10 +52,10 @@ public class PmCommandImplTest extends TestCase {
     // Command throws an exception that should show a message for the user:
     pm.successKind.setValue(SuccessKind.USER_MSG_EXCEPTION);
     assertEquals(null, pm.cmdDynNaviRule.doItReturnString());
-    assertEquals(1, PmMessageUtil.getPmErrors(pm.getPmConversation()).size());
-    assertEquals(1, PmMessageUtil.getPmErrors(pm.cmdDynNaviRule.getPmConversation()).size());
+    assertEquals(1, PmMessageApi.getErrors(pm.getPmConversation()).size());
+    assertEquals(1, PmMessageApi.getErrors(pm.cmdDynNaviRule.getPmConversation()).size());
 
-    PmMessageUtil.clearSubTreeMessages(pm.getPmConversation());
+    PmMessageApi.clearPmTreeMessages(pm.getPmConversation());
 
     // Command throws an internal exception that can't be handled well.
 
@@ -63,7 +63,7 @@ public class PmCommandImplTest extends TestCase {
     assertEquals("to_error_page", pm.cmdDynNaviRule.doItReturnString());
     // FIXME olaf: The default exception handler should leave an error message somewhere...
     //             (Der Plattform ExceptionHandler schmeisst einfach weiter.)
-    assertEquals(0, PmMessageUtil.getPmErrors(pm.getPmConversation()).size());
+    assertEquals(0, PmMessageApi.getErrors(pm.getPmConversation()).size());
 
   }
 
