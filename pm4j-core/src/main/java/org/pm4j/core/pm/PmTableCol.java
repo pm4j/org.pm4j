@@ -32,16 +32,20 @@ public interface PmTableCol extends PmObject {
    */
   PmCommand getCmdSort();
 
-  // --- PM internal interface ---
+  // --- PM INTERAL interface ---
 
   /**
+   * PLEASE DON'T USE THIS METHOD IN BUSINESS CODE!
+   *
    * @return The details needed for other PMs (e.g. the table implementation).
    */
   ImplDetails getPmImplDetails();
 
   /**
-   * An internal implementation interface that is used to provide column details to other tight coupled
+   * An INTERNAL implementation interface that is used to provide column details to other tight coupled
    * PMs.
+   * <p>
+   * Please don't use it in business code!
    */
   interface ImplDetails {
 
@@ -56,6 +60,11 @@ public interface PmTableCol extends PmObject {
      * @return The query attribute name.
      */
     String getQueryAttrName();
+
+    /**
+     * @return The column {@link QueryAttr} that may be used for sorting and filtering. May be <code>null</code>.
+     */
+    QueryAttr getQueryAttr();
 
     /**
      * @return The supported column sort order. May be defined by annotation or by implementation.

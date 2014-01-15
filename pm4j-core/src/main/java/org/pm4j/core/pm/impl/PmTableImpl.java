@@ -787,6 +787,7 @@ public class PmTableImpl
 
     protected QueryAttr getColQueryAttr(PmTableCol col) {
       PmTableCol.ImplDetails d = col.getPmImplDetails();
+      // PmTableColImpl.getColQueryAttr() should be used!!! (check the title there)
       String name = d.getQueryAttrName();
       return new QueryAttr(name, name, Void.class, col.getPmTitle());
     }

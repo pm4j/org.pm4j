@@ -12,18 +12,22 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.pm4j.common.pageable.PageableCollectionUtil;
+import org.pm4j.common.query.QueryAttr;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.filter.FilterDefinition;
 import org.pm4j.common.query.inmem.InMemSortOrder;
 import org.pm4j.common.util.CompareUtil;
 import org.pm4j.core.pm.PmTable.UpdateAspect;
+import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.annotation.PmBeanCfg;
 import org.pm4j.core.pm.annotation.PmBoolean;
 import org.pm4j.core.pm.annotation.PmFactoryCfg;
 import org.pm4j.core.pm.annotation.PmTableCfg;
 import org.pm4j.core.pm.annotation.PmTableColCfg;
+import org.pm4j.core.pm.annotation.PmTitleCfg;
 import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
 import org.pm4j.core.pm.api.PmEventApi;
@@ -34,7 +38,7 @@ import org.pm4j.core.pm.impl.PmConversationImpl;
 import org.pm4j.core.pm.impl.PmTableColImpl;
 import org.pm4j.core.pm.impl.PmTableImpl;
 
-public class PmTable2Test {
+public class PmTableTest {
 
   private TablePm myTablePm;
   private List<RowBean> editedRowBeanList = new ArrayList<RowBean>(Arrays.asList(
@@ -169,6 +173,14 @@ public class PmTable2Test {
     assertEquals(myTablePm.description.getPmTitle(), fd.getAttrTitle());
   }
 
+  @Test
+  @Ignore("FIXME oboede: path based columns need to be supported.")
+  public void testFilterByPathColumn() {
+    assertEquals("[a, b]", myTablePm.getRowPms().toString());
+    FilterDefinition fd = getFilterDefinition("pathColumn");
+    assertEquals(myTablePm.pathColumn.getPmTitle(), fd.getAttrTitle());
+  }
+
 
   @PmTableCfg(initialSortCol="name")
   @PmFactoryCfg(beanPmClasses=RowPm.class)
@@ -184,6 +196,16 @@ public class PmTable2Test {
 
     /** A column with a filter annotation that defines . */
     public final PmTableCol counter = new PmTableColImpl(this);
+
+    /** A column with a valuePath based attribute. No chance to derive the query attribute from the column name. */
+    @PmTitleCfg(title="PathCol")
+    @PmTableColCfg(filterType=String.class)
+    public final PmTableCol pathColumn = new PmTableColImpl(this) {
+      @Override
+      protected QueryAttr getColQueryAttr() {
+        return new QueryAttr("pathColumn", "name", String.class);
+      };
+    };
 
     /** Defines a page size of two items. */
     public TablePm(PmObject pmParent) {
@@ -212,6 +234,8 @@ public class PmTable2Test {
     public final PmAttrString name = new PmAttrStringImpl(this);
     public final PmAttrString description = new PmAttrStringImpl(this);
     public final PmAttrInteger counter = new PmAttrIntegerImpl(this);
+    @PmAttrCfg(valuePath="pmBean.name")
+    public final PmAttrString pathColumn = new PmAttrStringImpl(this);
 
     /** for debugging */
     @Override

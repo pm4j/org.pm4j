@@ -8,7 +8,7 @@ import org.pm4j.core.pm.impl.PmConversationImpl;
 import org.pm4j.core.pm.impl.PmElementImpl;
 import org.pm4j.core.pm.impl.PmTabSetImpl;
 
-public class PmTabSet2Test {
+public class PmTabSetTest {
 
   private MyTabSet myTabSet;
   private MyCommandDecorator myCommandDecorator;

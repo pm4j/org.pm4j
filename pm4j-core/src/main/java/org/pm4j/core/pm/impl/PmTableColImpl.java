@@ -315,6 +315,11 @@ public class PmTableColImpl extends PmObjectBase implements PmTableCol {
     }
 
     @Override
+    public QueryAttr getQueryAttr() {
+      return PmTableColImpl.this.getColQueryAttr();
+    }
+
+    @Override
     public Boolean isSortableConfigured() {
       return PmTableColImpl.this.getOwnMetaData().sortable;
     }
