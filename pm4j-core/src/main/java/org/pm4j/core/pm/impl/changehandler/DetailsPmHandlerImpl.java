@@ -8,7 +8,7 @@ import org.pm4j.core.pm.PmDataInput;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
-import org.pm4j.core.pm.api.PmMessageUtil;
+import org.pm4j.core.pm.api.PmMessageApi;
 import org.pm4j.core.pm.api.PmValidationApi;
 
 /**
@@ -95,7 +95,7 @@ public class DetailsPmHandlerImpl<T_DETAILS_PM extends PmDataInput, T_MASTER_REC
   protected void afterMasterRecordChangeImpl(T_MASTER_RECORD newMasterBean) {
     // The details area has now a new content to handle. The old messages of
     // that area where related to the record that is no longer active.
-    PmMessageUtil.clearSubTreeMessages(detailsPm);
+    PmMessageApi.clearPmTreeMessages(detailsPm);
     // All cached information within the details area should be refreshed.
     PmCacheApi.clearPmCache(detailsPm, CacheKind.ALL);
   }

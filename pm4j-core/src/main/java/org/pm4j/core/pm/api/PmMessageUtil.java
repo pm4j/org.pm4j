@@ -1,6 +1,5 @@
 package org.pm4j.core.pm.api;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.TreeSet;
@@ -13,9 +12,6 @@ import org.pm4j.core.pm.PmConstants;
 import org.pm4j.core.pm.PmMessage;
 import org.pm4j.core.pm.PmMessage.Severity;
 import org.pm4j.core.pm.PmObject;
-import org.pm4j.core.pm.impl.PmAttrBase;
-import org.pm4j.core.pm.impl.PmConversationImpl;
-import org.pm4j.core.pm.impl.PmUtil;
 
 public class PmMessageUtil {
 
@@ -29,11 +25,11 @@ public class PmMessageUtil {
    * @param resArgs
    *          The arguments for the resource string.
    * @return The generated message.
+   * 
+   * @deprecated use {@link PmMessageApi#addMsg(PmObject, Severity, String, Object...)}
    */
   public static PmMessage makeMsg(PmObject pm, Severity severity, String key, Object... resArgs) {
-    PmMessage msg = new PmMessage(pm, severity, key, resArgs);
-    pm.getPmConversation().addPmMessage(msg);
-    return msg;
+    return PmMessageApi.addMsg(pm, severity, key, resArgs);
   }
 
   /**
@@ -125,23 +121,21 @@ public class PmMessageUtil {
    * message generation.
    *
    * @return The resource data for the required attribute value warning.
+   * 
+   * @deprecated use {@link PmMessageApi#addRequiredMessage(PmAttr)}
    */
   public static PmResourceData makeRequiredWarning(PmAttr<?> pm) {
-    PmAttrBase<?, ?> pmImpl = (PmAttrBase<?, ?>)pm;
-    String msgKey = pmImpl.getPmResKey() + PmConstants.RESKEY_POSTFIX_REQUIRED_MSG;
-    String customMsg = PmLocalizeApi.findLocalization(pmImpl, msgKey);
-
-    if (customMsg == null) {
-      msgKey = (pmImpl.getOptionSet().getOptions().size() == 0)
-                  ? PmConstants.MSGKEY_VALIDATION_MISSING_REQUIRED_VALUE
-                  : PmConstants.MSGKEY_VALIDATION_MISSING_REQUIRED_SELECTION;
-    }
-
-    return new PmResourceData(pm, msgKey, pm.getPmTitle());
+    return PmMessageApi.addRequiredMessage(pm);
   }
 
+  /**
+   * @param pm
+   * @return
+   * 
+   * @deprecated use {@link PmMessageApi#getMessages(PmObject)}
+   */
   public static List<PmMessage> getPmMessages(PmObject pm) {
-    return pm.getPmConversation().getPmMessages(pm, null);
+    return PmMessageApi.getMessages(pm);
   }
 
   /**
@@ -149,7 +143,7 @@ public class PmMessageUtil {
    *         In case of no messages an empty collection.
    */
   public static List<PmMessage> getPmErrors(PmObject pm) {
-    return pm.getPmConversation().getPmMessages(pm, Severity.ERROR);
+    return PmMessageApi.getMessages(pm, Severity.ERROR);
   }
 
   /**
@@ -157,7 +151,7 @@ public class PmMessageUtil {
    *         In case of no messages an empty collection.
    */
   public static List<PmMessage> getPmWarnings(PmObject pm) {
-    return pm.getPmConversation().getPmMessages(pm, Severity.WARN);
+    return PmMessageApi.getMessages(pm, Severity.WARN);
   }
 
   /**
@@ -165,7 +159,7 @@ public class PmMessageUtil {
    *         In case of no messages an empty collection.
    */
   public static List<PmMessage> getPmInfos(PmObject pm) {
-    return pm.getPmConversation().getPmMessages(pm, Severity.INFO);
+    return PmMessageApi.getMessages(pm, Severity.INFO);
   }
 
   /**
@@ -198,14 +192,11 @@ public class PmMessageUtil {
    *
    * @return All messages that are related to this presentation model.<br>
    *         In case of no messages an empty collection.
+   * 
+   * @deprecated use {@link PmMessageApi#clearPmTreeMessages(PmObject)
    */
   public static List<PmMessage> clearSubTreeMessages(PmObject pm) {
-    PmConversationImpl pmConversation = (PmConversationImpl)pm.getPmConversation();
-    List<PmMessage> messages = getSubTreeMessages(pm, Severity.INFO);
-    for (PmMessage m : messages) {
-      pmConversation.clearPmMessage(m);
-    }
-    return messages;
+    return PmMessageApi.clearPmTreeMessages(pm);
   }
 
   /**
@@ -214,19 +205,11 @@ public class PmMessageUtil {
    * @param pm Root of the PM sub tree to check.
    * @param minSeverity The minimal message severity to consider.
    * @return
+   * 
+   * @deprecated use {@link PmMessageApi#getPmTreeMessages(PmObject, Severity)
    */
   public static List<PmMessage> getSubTreeMessages(PmObject pm, Severity minSeverity) {
-    List<PmMessage> messages = new ArrayList<PmMessage>();
-
-    for (PmMessage m : pm.getPmConversation().getPmMessages()) {
-      if (m.getSeverity().ordinal() >= minSeverity.ordinal() &&
-          (m.isMessageFor(pm) ||
-           PmUtil.isChild(pm, m.getPm()))) {
-        messages.add(m);
-      }
-    }
-
-    return messages;
+    return PmMessageApi.getPmTreeMessages(pm, minSeverity);
   }
 
 }

@@ -20,8 +20,6 @@ import org.pm4j.core.pm.impl.PmCommandImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
 import org.pm4j.core.pm.impl.PmElementImpl;
 import org.pm4j.core.pm.impl.PmUtil;
-import org.pm4j.deprecated.core.pm.remote.DeprPmRemoteChannel;
-import org.pm4j.deprecated.core.pm.remote.DeprPmRemoteChannelInVm;
 
 public class PmRemoteChannelInVmTest {
 

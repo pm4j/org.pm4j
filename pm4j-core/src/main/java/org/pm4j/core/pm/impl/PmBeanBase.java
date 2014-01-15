@@ -27,7 +27,7 @@ import org.pm4j.core.pm.annotation.PmValidationCfg;
 import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.api.PmExpressionApi;
 import org.pm4j.core.pm.api.PmFactoryApi;
-import org.pm4j.core.pm.api.PmMessageUtil;
+import org.pm4j.core.pm.api.PmMessageApi;
 
 public abstract class PmBeanBase<T_BEAN>
       extends PmElementBase
@@ -281,7 +281,7 @@ public abstract class PmBeanBase<T_BEAN>
     super.pmValidate();
     if (getPmBean() != null &&
         getOwnMetaData().validateUsesBeanValidation &&
-        PmMessageUtil.getSubTreeMessages(this, Severity.ERROR).size() == 0) {
+        PmMessageApi.getPmTreeMessages(this, Severity.ERROR).size() == 0) {
       Validator validator = PmImplUtil.getBeanValidator();
       if (validator != null) {
         @SuppressWarnings("unchecked")
@@ -482,7 +482,7 @@ public abstract class PmBeanBase<T_BEAN>
       BeanPmCacheUtil.clearBeanPmCachesOfSubtree(rootPm);
 
       // All sub PM messages are no longer relevant.
-      PmMessageUtil.clearSubTreeMessages(rootPm);
+      PmMessageApi.clearPmTreeMessages(rootPm);
 
       // Old cache values are related to the old bean.
       // This cache cleanup can only be done AFTER visiting the tree because

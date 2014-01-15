@@ -24,7 +24,7 @@ import org.pm4j.core.pm.PmEventListener;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmFactoryApi;
-import org.pm4j.core.pm.api.PmMessageUtil;
+import org.pm4j.core.pm.api.PmMessageApi;
 import org.pm4j.core.pm.api.PmValidationApi;
 import org.pm4j.core.pm.impl.BeanPmCacheUtil;
 
@@ -327,13 +327,13 @@ public class PmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> extends Prope
       // clear all messages and references to the set of items to delete.
       for (T_PM p : getItemsOnPage()) {
         if (selection.contains(p)) {
-          PmMessageUtil.clearSubTreeMessages(p);
+          PmMessageApi.clearPmTreeMessages(p);
           BeanPmCacheUtil.removeBeanPm(pmCtxt, p);
         }
       }
       for (T_PM p : getModifications().getUpdatedItems()) {
         if (selection.contains(p)) {
-          PmMessageUtil.clearSubTreeMessages(p);
+          PmMessageApi.clearPmTreeMessages(p);
           BeanPmCacheUtil.removeBeanPm(pmCtxt, p);
         }
       }

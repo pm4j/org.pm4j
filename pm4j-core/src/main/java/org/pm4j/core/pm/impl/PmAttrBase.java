@@ -67,6 +67,7 @@ import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmExpressionApi;
 import org.pm4j.core.pm.api.PmLocalizeApi;
+import org.pm4j.core.pm.api.PmMessageApi;
 import org.pm4j.core.pm.api.PmMessageUtil;
 import org.pm4j.core.pm.impl.cache.CacheStrategyBase;
 import org.pm4j.core.pm.impl.cache.CacheStrategyRequest;
@@ -667,7 +668,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
       // FIXME olaf: read only control should be done within the calling setValueAsString method!
       //             The set operation should not be performed in this case. Check for side effects...
       if (pmValueChanged && isPmReadonly()) {
-        PmMessageUtil.makeMsg(this, Severity.ERROR, PmConstants.MSGKEY_VALIDATION_READONLY);
+        PmMessageApi.addMsg(this, Severity.ERROR, PmConstants.MSGKEY_VALIDATION_READONLY);
         return false;
       }
 
@@ -1085,7 +1086,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   protected void validate(T_PM_VALUE value) throws PmValidationException {
     if (isRequired() &&
         isEmptyValue(value)) {
-      throw new PmValidationException(PmMessageUtil.makeRequiredWarning(this));
+      throw new PmValidationException(PmMessageApi.addRequiredMessage(this));
     }
   }
 

@@ -3,7 +3,7 @@ package org.pm4j.deprecated.core.pm.remote;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.api.PmExpressionApi;
-import org.pm4j.core.pm.api.PmMessageUtil;
+import org.pm4j.core.pm.api.PmMessageApi;
 import org.pm4j.deprecated.core.pm.DeprPmAspect;
 import org.pm4j.deprecated.core.pm.serialization.DeprPmContentCfg;
 import org.pm4j.deprecated.core.pm.serialization.DeprPmContentSerializer;
@@ -42,7 +42,7 @@ public class DeprPmRemoteChannelInVm implements DeprPmRemoteChannel {
     finally {
       // The direct receiver PM on client side should get the content.
       content = serverSerializer.serializeWithPmMessages(serverPm);
-      PmMessageUtil.clearSubTreeMessages(serverPm);
+      PmMessageApi.clearPmTreeMessages(serverPm);
     }
 
     // De-serialize server PM content and messages to the client PM.
