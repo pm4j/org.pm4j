@@ -68,6 +68,7 @@ import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmExpressionApi;
 import org.pm4j.core.pm.api.PmLocalizeApi;
 import org.pm4j.core.pm.api.PmMessageApi;
+import org.pm4j.core.pm.api.PmMessageUtil;
 import org.pm4j.core.pm.impl.cache.CacheStrategyBase;
 import org.pm4j.core.pm.impl.cache.CacheStrategyRequest;
 import org.pm4j.core.pm.impl.converter.PmConverterErrorMessage;
@@ -296,7 +297,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     }
 
     if (!wasValid) {
-      for (PmMessage m : PmMessageApi.getErrors(this)) {
+      for (PmMessage m : PmMessageUtil.getPmErrors(this)) {
         this.getPmConversationImpl()._clearPmMessage(m);
       }
       PmEventApi.firePmEvent(this, getOwnMetaData().validationChangeEventMask);
@@ -514,7 +515,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     }
     catch (RuntimeException e) {
       PmRuntimeException pme = PmRuntimeException.asPmRuntimeException(this, e);
-      PmMessageApi.addExceptionMsg(this, Severity.ERROR, pme);
+      PmMessageUtil.makeExceptionMsg(this, Severity.ERROR, pme);
       LOG.error("setValueAsString failed to set value '" + vc.getStringValue() + "'", pme);
       throw pme;
     }

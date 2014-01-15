@@ -1,16 +1,18 @@
 package org.pm4j.core.pm.api;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.TreeSet;
 
+import org.pm4j.common.util.collection.ArrayUtil;
 import org.pm4j.core.exception.PmResourceData;
+import org.pm4j.core.exception.PmUserMessageException;
 import org.pm4j.core.pm.PmAttr;
+import org.pm4j.core.pm.PmConstants;
 import org.pm4j.core.pm.PmMessage;
 import org.pm4j.core.pm.PmMessage.Severity;
 import org.pm4j.core.pm.PmObject;
 
-/**
- * @deprecated use {@link PmMessageApi} instead
- */
 public class PmMessageUtil {
 
   /**
@@ -41,40 +43,53 @@ public class PmMessageUtil {
    * @param resArgs
    *          The arguments for the resource string.
    * @return The generated message.
-   * 
-   * @deprecated use {@link PmMessageApi#addExceptionMsg(PmObject, Severity, Throwable)}
    */
   public static PmMessage makeExceptionMsg(PmObject pm, Severity severity, Throwable e) {
-    return PmMessageApi.addExceptionMsg(pm, severity, e);
+    PmMessage msg = null;
+    if (e instanceof PmUserMessageException) {
+      // XXX olaf: internalize handling of not internationalized strings: use a standard resource that just provides the message.
+      PmResourceData rd = ((PmUserMessageException) e).getResourceData();
+      msg = (rd != null)
+          ? new PmMessage(pm, severity, rd.msgKey, rd.msgArgs)
+          : new PmMessage(pm, severity, e, PmConstants.MSGKEY_EXCEPTION, e.getMessage());
+    }
+    else {
+      msg = new PmMessage(pm, severity, e, PmConstants.MSGKEY_EXCEPTION, e.getMessage());
+    }
+    pm.getPmConversation().addPmMessage(msg);
+    return msg;
   }
 
   /**
    * Generates an INFO message and propagates it to the PM session
-   * 
    * @param keybase The message resource key
    * @param number depending on the number the postfix 'one' or 'many' is added to keybase
    * @param resArgs The arguments for the resource string.
    * @return The generated message.
-   * 
-   * @deprecated use {@link PmMessageApi#addMsgOneMany(PmObject, String, int, Object...)}
    */
   public static PmMessage makeMsgOneMany(PmObject pm, String keybase, int number, Object... resArgs) {
-    return PmMessageApi.addMsgOneMany(pm, keybase, number, resArgs);
+    return makeMsgOneMany(pm, Severity.INFO, keybase, number, resArgs);
   }
 
   /**
    * Generates a message and propagates it to the PM session
-   * 
    * @param severity Message severity.
    * @param keybase The message resource key
    * @param number depending on the number the postfix 'one' or 'many' is added to keybase
    * @param resArgs The arguments for the resource string.
    * @return The generated message.
-   * 
-   * @deprecated use {@link PmMessageApi#addMsgOneMany(PmObject, Severity, String, int, Object...)}
    */
   public static PmMessage makeMsgOneMany(PmObject pm, Severity severity, String keybase, int number, Object... resArgs) {
-    return PmMessageApi.addMsgOneMany(pm, severity, keybase, number, resArgs);
+    // TODO: change to '_one' and '_many' to prevent naming conflicts.
+    // TODO: add _none
+    String msgKey = keybase + (number > 1 ? "many" : "one");
+
+    Object[] resArgsWithNumber = ArrayUtil.copyOf(resArgs, resArgs.length+1, 1);
+    resArgsWithNumber[0] = number;
+
+    PmMessage msg = new PmMessage(pm, severity, msgKey, resArgsWithNumber);
+    pm.getPmConversation().addPmMessage(msg);
+    return msg;
   }
 
   /**
@@ -85,11 +100,12 @@ public class PmMessageUtil {
    *          The resource key to be searched for.
    * @param msgArgs
    *          Optional message arguments.
-   *          
-   * @deprecated use {@link PmMessageApi#addOptionalInfoMsg(PmObject, String, Object...)}
    */
   public static void makeOptionalInfoMsg(PmObject pm, String key, Object... msgArgs) {
-    PmMessageApi.addOptionalInfoMsg(pm, key, msgArgs);
+    String msgString = PmLocalizeApi.findLocalization(pm, key);
+    if (msgString != null) {
+      PmMessageUtil.makeMsg(pm, Severity.INFO, key, msgArgs);
+    }
   }
 
   /**
@@ -125,31 +141,25 @@ public class PmMessageUtil {
   /**
    * @return Error messages that are related to this presentation model.<br>
    *         In case of no messages an empty collection.
-   *         
-   * @deprecated use {@link PmMessageApi#getErrors(PmObject)}
    */
   public static List<PmMessage> getPmErrors(PmObject pm) {
-    return PmMessageApi.getErrors(pm);
+    return PmMessageApi.getMessages(pm, Severity.ERROR);
   }
 
   /**
    * @return Warning messages that are related to this presentation model.<br>
    *         In case of no messages an empty collection.
-   * 
-   * @deprecated use {@link PmMessageApi#getWarnings(PmObject)}
    */
   public static List<PmMessage> getPmWarnings(PmObject pm) {
-    return PmMessageApi.getWarnings(pm);
+    return PmMessageApi.getMessages(pm, Severity.WARN);
   }
 
   /**
    * @return Info messages that are related to this presentation model.<br>
    *         In case of no messages an empty collection.
-   *         
-   * @deprecated use {@link PmMessageApi#getInfos(PmObject)}
    */
   public static List<PmMessage> getPmInfos(PmObject pm) {
-    return PmMessageApi.getInfos(pm);
+    return PmMessageApi.getMessages(pm, Severity.INFO);
   }
 
   /**
@@ -157,11 +167,19 @@ public class PmMessageUtil {
    *          The PM to get the most severe message for.
    * @return The most severe message for the given PM or <code>null</code> if
    *         there is no message for the given PM.
-   *         
-   * @deprecated use {@link PmMessageApi#findMostSevereMessage(PmObject)}
    */
   public static PmMessage findMostSevereMessage(PmObject pm) {
-    return PmMessageApi.findMostSevereMessage(pm);
+    TreeSet<PmMessage> messages = new TreeSet<PmMessage>(new Comparator<PmMessage>() {
+      @Override
+      public int compare(PmMessage o1, PmMessage o2) {
+        return - o1.getSeverity().compareTo(o2.getSeverity());
+      }
+    });
+    messages.addAll(getPmMessages(pm));
+
+    return messages.isEmpty()
+            ? null
+            : messages.iterator().next();
   }
 
 

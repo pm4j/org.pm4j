@@ -18,6 +18,7 @@ import org.pm4j.core.pm.PmMessage.Severity;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmOption;
 import org.pm4j.core.pm.api.PmMessageApi;
+import org.pm4j.core.pm.api.PmMessageUtil;
 import org.pm4j.core.pm.impl.PmUtil;
 
 /**
@@ -146,7 +147,7 @@ public class PmAssert {
      *            the expexted error message.
      */
     public static void assertSingleErrorMessage(PmObject pm, String expectedMsg) {
-        List<PmMessage> errorMessages = PmMessageApi.getErrors(pm);
+        List<PmMessage> errorMessages = PmMessageUtil.getPmErrors(pm);
         assertEquals("Error message expected but not found: " + expectedMsg, 1, errorMessages.size());
         assertEquals(expectedMsg, errorMessages.get(0).getTitle());
     }

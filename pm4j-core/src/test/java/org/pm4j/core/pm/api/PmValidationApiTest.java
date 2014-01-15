@@ -37,7 +37,7 @@ public class PmValidationApiTest {
     assertFalse(pmConversation.isPmValid());
     assertFalse(PmValidationApi.hasValidAttributes(testPm));
 
-    List<PmMessage> messages = PmMessageApi.getErrors(testPm.i);
+    List<PmMessage> messages = PmMessageUtil.getPmErrors(testPm.i);
     assertEquals(1, messages.size());
     assertEquals(PmConstants.MSGKEY_VALIDATION_MISSING_REQUIRED_VALUE, messages.get(0).getMsgKey());
   }

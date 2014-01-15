@@ -7,7 +7,7 @@ import java.util.Locale;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.pm4j.core.pm.api.PmMessageApi;
+import org.pm4j.core.pm.api.PmMessageUtil;
 import org.pm4j.core.pm.impl.PmAttrShortImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
 
@@ -37,9 +37,9 @@ public class PmAttrShortTest {
   public void testInvalidCharacters() {
     myPm.shortAttr.setValueAsString("abc");
 
-    assertEquals("There should be a string conversion error", 1, PmMessageApi.getErrors(myPm.shortAttr).size());
+    assertEquals("There should be a string conversion error", 1, PmMessageUtil.getPmErrors(myPm.shortAttr).size());
     assertEquals("The error should be a number conversion error.",
-                  "Unable to convert the entered string to a numeric value in field \"abc\".", PmMessageApi.findMostSevereMessage(myPm.shortAttr).getTitle());
+                  "Unable to convert the entered string to a numeric value in field \"abc\".", PmMessageUtil.findMostSevereMessage(myPm.shortAttr).getTitle());
   }
 
   @Test

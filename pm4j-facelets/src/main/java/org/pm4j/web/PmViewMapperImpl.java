@@ -4,6 +4,7 @@ import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmMessage;
 import org.pm4j.core.pm.api.PmMessageApi;
+import org.pm4j.core.pm.api.PmMessageUtil;
 
 @Deprecated
 public class PmViewMapperImpl implements PmViewMapper {
@@ -17,13 +18,13 @@ public class PmViewMapperImpl implements PmViewMapper {
     }
 
     if (PmMessageApi.getMessages(pmAttr).size() > 0) {
-      if (PmMessageApi.getErrors(pmAttr).size() > 0) {
+      if (PmMessageUtil.getPmErrors(pmAttr).size() > 0) {
         result += " error";
       }
-      if (PmMessageApi.getWarnings(pmAttr).size() > 0) {
+      if (PmMessageUtil.getPmWarnings(pmAttr).size() > 0) {
         result += " warn";
       }
-      if (PmMessageApi.getInfos(pmAttr).size() > 0) {
+      if (PmMessageUtil.getPmInfos(pmAttr).size() > 0) {
         result += " info";
       }
     }

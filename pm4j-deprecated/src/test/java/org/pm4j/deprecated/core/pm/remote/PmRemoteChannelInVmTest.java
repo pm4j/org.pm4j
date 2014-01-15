@@ -13,7 +13,7 @@ import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmAttrIntegerCfg;
 import org.pm4j.core.pm.annotation.PmCommandCfg;
 import org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO;
-import org.pm4j.core.pm.api.PmMessageApi;
+import org.pm4j.core.pm.api.PmMessageUtil;
 import org.pm4j.core.pm.impl.PmAttrIntegerImpl;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
 import org.pm4j.core.pm.impl.PmCommandImpl;
@@ -46,7 +46,7 @@ public class PmRemoteChannelInVmTest {
     assertEquals("The client values should not have been changed by the server operation.",
                  "Client says hello!", clientPm.s1.getValue());
     assertEquals("The integer value is too big. There server PM is configured to validate that.",
-                 1, PmMessageApi.getErrors(clientPm.i1).size());
+                 1, PmMessageUtil.getPmErrors(clientPm.i1).size());
   }
 
 

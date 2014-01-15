@@ -31,16 +31,16 @@ public class PmMessageApiTest {
     PmMessage warnMsg = PmMessageApi.addMsg(myPm, Severity.WARN, "warnMsgKey");
     PmMessage errorMsg = PmMessageApi.addMsg(myPm, Severity.ERROR, "errorMsgKey");
 
-    assertEquals(errorMsg, PmMessageApi.findMostSevereMessage(myPm));
+    assertEquals(errorMsg, PmMessageUtil.findMostSevereMessage(myPm));
 
     myPm.clearPmMessages(null, Severity.ERROR);
-    assertEquals(warnMsg, PmMessageApi.findMostSevereMessage(myPm));
+    assertEquals(warnMsg, PmMessageUtil.findMostSevereMessage(myPm));
 
     myPm.clearPmMessages(null, Severity.WARN);
-    assertEquals(infoMsg, PmMessageApi.findMostSevereMessage(myPm));
+    assertEquals(infoMsg, PmMessageUtil.findMostSevereMessage(myPm));
 
     myPm.clearPmMessages(null, null);
-    Assert.assertNull(PmMessageApi.findMostSevereMessage(myPm));
+    Assert.assertNull(PmMessageUtil.findMostSevereMessage(myPm));
   }
 
   /**

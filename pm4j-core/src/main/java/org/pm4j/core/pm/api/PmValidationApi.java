@@ -122,7 +122,7 @@ public final class PmValidationApi {
     };
     PmVisitorApi.visit(startPm, cb);
 
-    return PmMessageApi.getErrors(startPm).isEmpty();
+    return PmMessageUtil.getPmErrors(startPm).isEmpty();
   }
 
   /**

@@ -19,6 +19,7 @@ import org.pm4j.core.pm.annotation.PmAttrCfg.Validate;
 import org.pm4j.core.pm.annotation.PmAttrIntegerCfg;
 import org.pm4j.core.pm.annotation.PmCommandCfg;
 import org.pm4j.core.pm.api.PmMessageApi;
+import org.pm4j.core.pm.api.PmMessageUtil;
 import org.pm4j.core.pm.api.PmValidationApi;
 import org.pm4j.core.pm.impl.PmAttrIntegerImpl;
 import org.pm4j.core.pm.impl.PmCommandImpl;
@@ -51,7 +52,7 @@ public class ValidateAttrValueTest {
     pm.i.setValueAsString("1");
     pm.cmdWithValidation.doIt();
     assertTrue(PmValidationApi.hasValidAttributes(pm));
-    assertEquals(0, PmMessageApi.getErrors(pm).size());
+    assertEquals(0, PmMessageUtil.getPmErrors(pm).size());
 
     pm.i.setValueAsString("abc");
     assertEquals(1, PmMessageApi.getPmTreeMessages(pm.getPmConversation(), Severity.ERROR).size());
@@ -60,20 +61,20 @@ public class ValidateAttrValueTest {
     assertEquals("abc", pm.i.getValueAsString());
     assertEquals(1, PmMessageApi.getPmTreeMessages(pm.getPmConversation(), Severity.ERROR).size());
     assertFalse(PmValidationApi.hasValidAttributes(pm));
-    assertEquals(1, PmMessageApi.getErrors(pm).size());
+    assertEquals(1, PmMessageUtil.getPmErrors(pm).size());
     PmMessageApi.clearPmTreeMessages(pm);
 
     pm.i.setValueAsString("");
     pm.cmdWithValidation.doIt();
     assertEquals(null, pm.i.getValueAsString());
-    assertEquals(1, PmMessageApi.getErrors(pm).size());
+    assertEquals(1, PmMessageUtil.getPmErrors(pm).size());
     PmMessageApi.clearPmTreeMessages(pm);
 
     pm.i.setValueAsString("12");
     pm.cmdWithValidation.doIt();
     assertEquals("12", pm.i.getValueAsString());
     assertTrue(PmValidationApi.hasValidAttributes(pm));
-    assertEquals(0, PmMessageApi.getErrors(pm).size());
+    assertEquals(0, PmMessageUtil.getPmErrors(pm).size());
   }
 
   @Test
