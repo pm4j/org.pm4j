@@ -18,7 +18,7 @@ import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.annotation.PmAttrCfg.Validate;
 import org.pm4j.core.pm.annotation.PmAttrIntegerCfg;
 import org.pm4j.core.pm.annotation.PmCommandCfg;
-import org.pm4j.core.pm.api.PmMessageUtil;
+import org.pm4j.core.pm.api.PmMessageApi;
 import org.pm4j.core.pm.api.PmValidationApi;
 import org.pm4j.core.pm.impl.PmAttrIntegerImpl;
 import org.pm4j.core.pm.impl.PmCommandImpl;
@@ -41,7 +41,7 @@ public class ValidateAttrValueTest {
     assertFalse("An integer attribute can't accept letters.", pm.i.isPmValid());
     assertEquals("The invalid value should be available as 'string' value for display purposes.", "xyz", pm.i.getValueAsString());
 
-    PmMessageUtil.clearSubTreeMessages(pm.i);
+    PmMessageApi.clearPmTreeMessages(pm.i);
     assertTrue("After clearing all messages the attribute should be valid again.", pm.i.isPmValid());
     assertEquals("After clearing the valueAsString should be null again.", null, pm.i.getValueAsString());
   }
@@ -51,29 +51,29 @@ public class ValidateAttrValueTest {
     pm.i.setValueAsString("1");
     pm.cmdWithValidation.doIt();
     assertTrue(PmValidationApi.hasValidAttributes(pm));
-    assertEquals(0, PmMessageUtil.getPmErrors(pm).size());
+    assertEquals(0, PmMessageApi.getMessages(pm, Severity.ERROR).size());
 
     pm.i.setValueAsString("abc");
-    assertEquals(1, PmMessageUtil.getSubTreeMessages(pm.getPmConversation(), Severity.ERROR).size());
+    assertEquals(1, PmMessageApi.getPmTreeMessages(pm.getPmConversation(), Severity.ERROR).size());
     PmCommand.CommandState cmdState = pm.cmdWithValidation.doIt().getCommandState();
     assertEquals(CommandState.BEFORE_DO_RETURNED_FALSE, cmdState);
     assertEquals("abc", pm.i.getValueAsString());
-    assertEquals(1, PmMessageUtil.getSubTreeMessages(pm.getPmConversation(), Severity.ERROR).size());
+    assertEquals(1, PmMessageApi.getPmTreeMessages(pm.getPmConversation(), Severity.ERROR).size());
     assertFalse(PmValidationApi.hasValidAttributes(pm));
-    assertEquals(1, PmMessageUtil.getPmErrors(pm).size());
-    PmMessageUtil.clearSubTreeMessages(pm);
+    assertEquals(1, PmMessageApi.getMessages(pm, Severity.ERROR).size());
+    PmMessageApi.clearPmTreeMessages(pm);
 
     pm.i.setValueAsString("");
     pm.cmdWithValidation.doIt();
     assertEquals(null, pm.i.getValueAsString());
-    assertEquals(1, PmMessageUtil.getPmErrors(pm).size());
-    PmMessageUtil.clearSubTreeMessages(pm);
+    assertEquals(1, PmMessageApi.getMessages(pm, Severity.ERROR).size());
+    PmMessageApi.clearPmTreeMessages(pm);
 
     pm.i.setValueAsString("12");
     pm.cmdWithValidation.doIt();
     assertEquals("12", pm.i.getValueAsString());
     assertTrue(PmValidationApi.hasValidAttributes(pm));
-    assertEquals(0, PmMessageUtil.getPmErrors(pm).size());
+    assertEquals(0, PmMessageApi.getMessages(pm, Severity.ERROR).size());
   }
 
   @Test
@@ -96,14 +96,14 @@ public class ValidateAttrValueTest {
 
   @Test
   public void testValidatingCommandClearsOtherMessages() {
-    PmMessageUtil.makeMsg(pm, Severity.INFO, "hello");
+    PmMessageApi.addMessage(pm, Severity.INFO, "hello");
     assertEquals("A non attribute related message exists.", 1, pm.getPmMessages().size());
 
     pm.cmdWithValidation.doIt();
     System.out.println(pm.getPmMessages());
     assertEquals("A failed validating command execution clears other messages and provides attribute related messages", 1, pm.getPmMessages().size());
 
-    PmMessageUtil.makeMsg(pm, Severity.INFO, "hello");
+    PmMessageApi.addMessage(pm, Severity.INFO, "hello");
 
     pm.i.setValue(3);
     pm.cmdWithValidation.doIt();

@@ -5,7 +5,8 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.pm4j.core.pm.PmMessage;
-import org.pm4j.core.pm.api.PmMessageUtil;
+import org.pm4j.core.pm.PmMessage.Severity;
+import org.pm4j.core.pm.api.PmMessageApi;
 import org.pm4j.deprecated.core.testdomains.user.AdminSession;
 import org.pm4j.deprecated.core.testdomains.user.DomainEditSession;
 
@@ -27,8 +28,7 @@ public class DomainEditSessionTest extends TestCase {
 
     domainEditSession.cmdSave.doIt();
     assertEquals("hello", domainEditSession.getEditedDomain().getPmBean().getName());
-    List<PmMessage> infoMessages = PmMessageUtil.getPmInfos(domainEditSession);
-    System.out.println(infoMessages);
+    List<PmMessage> infoMessages = PmMessageApi.getMessages(domainEditSession, Severity.INFO);
 
     assertEquals(1, infoMessages.size());
 

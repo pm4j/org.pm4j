@@ -12,12 +12,12 @@ import org.apache.commons.lang.StringUtils;
 import org.junit.Assert;
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmCommand;
-import org.pm4j.core.pm.PmOption;
 import org.pm4j.core.pm.PmCommand.CommandState;
 import org.pm4j.core.pm.PmMessage;
 import org.pm4j.core.pm.PmMessage.Severity;
 import org.pm4j.core.pm.PmObject;
-import org.pm4j.core.pm.api.PmMessageUtil;
+import org.pm4j.core.pm.PmOption;
+import org.pm4j.core.pm.api.PmMessageApi;
 import org.pm4j.core.pm.impl.PmUtil;
 
 /**
@@ -43,7 +43,7 @@ public class PmAssert {
      */
     // @formatter:off
     public static void assertMessageText(PmObject pm, String... expectedMessages) {
-        List<PmMessage> messages = PmMessageUtil.getPmMessages(pm);
+        List<PmMessage> messages = PmMessageApi.getMessages(pm);
         if (messages.size() != expectedMessages.length) {
             fail("Expected " + expectedMessages.length +
                     " messages but found " + messages.size() + " messages." +
@@ -146,7 +146,7 @@ public class PmAssert {
      *            the expexted error message.
      */
     public static void assertSingleErrorMessage(PmObject pm, String expectedMsg) {
-        List<PmMessage> errorMessages = PmMessageUtil.getPmErrors(pm);
+        List<PmMessage> errorMessages = PmMessageApi.getMessages(pm, Severity.ERROR);
         assertEquals("Error message expected but not found: " + expectedMsg, 1, errorMessages.size());
         assertEquals(expectedMsg, errorMessages.get(0).getTitle());
     }
@@ -403,7 +403,7 @@ public class PmAssert {
     }
 
     private static String subTreeMessagesToString(String msgPrefix, PmObject pm, Severity minSeverity) {
-        List<PmMessage> mlist = PmMessageUtil.getSubTreeMessages(pm, minSeverity);
+        List<PmMessage> mlist = PmMessageApi.getPmTreeMessages(pm, minSeverity);
         if (mlist.isEmpty()) {
             return "";
         } else {

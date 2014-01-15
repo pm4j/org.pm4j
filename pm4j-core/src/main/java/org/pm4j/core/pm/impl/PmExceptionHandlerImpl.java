@@ -9,7 +9,7 @@ import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmMessage;
 import org.pm4j.core.pm.PmMessage.Severity;
 import org.pm4j.core.pm.PmObject;
-import org.pm4j.core.pm.api.PmMessageUtil;
+import org.pm4j.core.pm.api.PmMessageApi;
 import org.pm4j.navi.NaviLink;
 import org.pm4j.navi.NaviRuleLink;
 
@@ -39,7 +39,7 @@ public class PmExceptionHandlerImpl implements PmExceptionHandler {
       if (throwable instanceof PmUserMessageException) {
         PmResourceData resData = ((PmUserMessageException)throwable).getResourceData();
         if (resData != null) {
-          PmMessage message = PmMessageUtil.makeMsg(pmObject, Severity.ERROR, resData.msgKey, resData.msgArgs);
+          PmMessage message = PmMessageApi.addMessage(pmObject, Severity.ERROR, resData.msgKey, resData.msgArgs);
 
           if (LOG.isInfoEnabled()) {
             LOG.info("Exception with resource key '" + resData.msgKey +

@@ -14,7 +14,7 @@ import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
 
-public class PmMessageUtilTest {
+public class PmMessageApiTest {
 
   private TestPm testPm = new TestPm();
 
@@ -44,7 +44,7 @@ public class PmMessageUtilTest {
   }
 
   /**
-   * Tests the logic that is implemented in {@link PmMessageUtil#makeRequiredWarning(org.pm4j.core.pm.PmAttr)}
+   * Tests the logic that is implemented in {@link PmMessageApi#addRequiredMessage(org.pm4j.core.pm.PmAttr)}
    */
   @Test
   public void testRequiredDefaultMessage() {
@@ -53,7 +53,7 @@ public class PmMessageUtilTest {
   }
 
   /**
-   * Tests the logic that is implemented in {@link PmMessageUtil#makeRequiredWarning(org.pm4j.core.pm.PmAttr)}
+   * Tests the logic that is implemented in {@link PmMessageApi#addRequiredMessage(org.pm4j.core.pm.PmAttr)}
    */
   @Test
   public void testRequiredResourceDefinedSpecialMessage() {

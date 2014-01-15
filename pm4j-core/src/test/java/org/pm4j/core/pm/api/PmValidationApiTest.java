@@ -12,6 +12,7 @@ import org.pm4j.core.pm.PmConstants;
 import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.PmMessage;
 import org.pm4j.core.pm.PmObject;
+import org.pm4j.core.pm.PmMessage.Severity;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.impl.PmAttrIntegerImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
@@ -37,7 +38,7 @@ public class PmValidationApiTest {
     assertFalse(pmConversation.isPmValid());
     assertFalse(PmValidationApi.hasValidAttributes(testPm));
 
-    List<PmMessage> messages = PmMessageUtil.getPmErrors(testPm.i);
+    List<PmMessage> messages = PmMessageApi.getMessages(testPm.i, Severity.ERROR);
     assertEquals(1, messages.size());
     assertEquals(PmConstants.MSGKEY_VALIDATION_MISSING_REQUIRED_VALUE, messages.get(0).getMsgKey());
   }
