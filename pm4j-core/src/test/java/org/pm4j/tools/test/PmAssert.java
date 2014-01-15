@@ -248,7 +248,7 @@ public class PmAssert {
         boolean first = true;
         for (PmOption o : pmAttr.getOptionSet().getOptions()) {
             if (!first) {
-                sb.append(",");
+                sb.append(", ");
             }
             sb.append(o.getPmTitle());
             first = false;
@@ -260,7 +260,7 @@ public class PmAssert {
      * Checks if the given attribute has the expected option titles.
      *
      * @param expectedIds
-     *            A comma separated string with all expected id's. E.g. "A,B,C".
+     *            A comma separated string with all expected id's. E.g. "A, B, C".
      * @param pmAttr
      *            The attribute to check.
      */
@@ -269,7 +269,7 @@ public class PmAssert {
         boolean first = true;
         for (PmOption o : pmAttr.getOptionSet().getOptions()) {
             if (!first) {
-                sb.append(",");
+                sb.append(", ");
             }
             sb.append(o.getIdAsString());
             first = false;
