@@ -50,6 +50,7 @@ import org.pm4j.core.pm.annotation.customize.CustomizedAnnotationUtil;
 import org.pm4j.core.pm.annotation.customize.PmAnnotationApi;
 import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.api.PmEventApi;
+import org.pm4j.core.pm.api.PmMessageApi;
 import org.pm4j.core.pm.api.PmMessageUtil;
 import org.pm4j.core.pm.api.PmValidationApi;
 import org.pm4j.core.pm.impl.cache.CacheLog;
@@ -290,7 +291,7 @@ public abstract class PmObjectBase implements PmObject {
 
   @Override
   public boolean isPmValid() {
-    List<PmMessage> msgList = PmMessageUtil.getSubTreeMessages(this, Severity.ERROR);
+    List<PmMessage> msgList = PmMessageApi.getPmTreeMessages(this, Severity.ERROR);
     return msgList.isEmpty();
   }
 
@@ -1122,7 +1123,7 @@ public abstract class PmObjectBase implements PmObject {
    * @param styleClassSet The container to add the style classes to.
    */
   protected void getPmStyleClassesImpl(Set<String> styleClassSet) {
-    for (PmMessage m : PmMessageUtil.getPmMessages(this)) {
+    for (PmMessage m : PmMessageApi.getMessages(this)) {
       styleClassSet.add(m.getSeverity().getStyleClass());
     }
   }

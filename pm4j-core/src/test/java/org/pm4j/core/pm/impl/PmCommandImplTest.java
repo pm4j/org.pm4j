@@ -8,6 +8,7 @@ import org.pm4j.core.pm.PmAttrEnum;
 import org.pm4j.core.pm.PmAttrString;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
+import org.pm4j.core.pm.api.PmMessageApi;
 import org.pm4j.core.pm.api.PmMessageUtil;
 import org.pm4j.navi.NaviLink;
 import org.pm4j.navi.NaviRuleLink;
@@ -55,7 +56,7 @@ public class PmCommandImplTest extends TestCase {
     assertEquals(1, PmMessageUtil.getPmErrors(pm.getPmConversation()).size());
     assertEquals(1, PmMessageUtil.getPmErrors(pm.cmdDynNaviRule.getPmConversation()).size());
 
-    PmMessageUtil.clearSubTreeMessages(pm.getPmConversation());
+    PmMessageApi.clearPmTreeMessages(pm.getPmConversation());
 
     // Command throws an internal exception that can't be handled well.
 
