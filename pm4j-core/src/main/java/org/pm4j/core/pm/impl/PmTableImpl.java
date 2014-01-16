@@ -146,11 +146,30 @@ public class PmTableImpl
     PmEventApi.addPmEventListener(getPmParent(), PmEvent.VALUE_CHANGE, new PmEventListener() {
       @Override
       public void handleEvent(PmEvent event) {
-        // The backing context value was changed. All sort, filter and value changes
-        // are no longer valid.
-        updatePmTable();
+        onPmParentValueChange(event);
       }
     });
+  }
+
+  /**
+   * This method gets called whenever the PM that embeds the table had a value
+   * change event. The default implementation refreshes all table aspects
+   * (values, selection, sort order, user filters).
+   * <p>
+   * You may change that by overriding this method.
+   * <p>
+   * This method supports the common use case of a table that represents a some
+   * content of a larger data bean. The larger bean is then usually the backing
+   * bean of one of the table PM parents. If that bean gets exchanged, a value
+   * change event will be propagated to the related PM sub-tree. See:
+   * {@link PmBean#setPmBean(Object)}.
+   *
+   * @param parentEvent The event that was received by the parent.
+   */
+  protected void onPmParentValueChange(PmEvent parentEvent) {
+    // The backing context value was changed. All sort, filter and value changes
+    // are no longer valid.
+    updatePmTable();
   }
 
   @Override
