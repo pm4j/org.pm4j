@@ -148,6 +148,7 @@ public abstract class PmBeanBase<T_BEAN>
    *
    * @param bean The new bean behind this PM.
    */
+  //
   @Override
   public void setPmBean(T_BEAN bean) {
     if (doSetPmBean(bean)) {
@@ -347,6 +348,17 @@ public abstract class PmBeanBase<T_BEAN>
     protected final T_BEAN getPmBeanImpl() {
       return super.getPmBeanImpl();
     }
+
+    /** Ensure that nobody sets a bean if this instance is used within an embedded context. */
+    @Override
+    boolean doSetPmBean(T_BEAN bean) {
+      zz_ensurePmInitialization();
+      if (embeddingBeanPm != null) {
+        throw new PmRuntimeException(this, "Unable to set a bean to a nested PmBean. Please assign the bean to the embedding PmBean.");
+      }
+      return super.doSetPmBean(bean);
+    }
+
   }
 
   // ======== meta data ======== //
