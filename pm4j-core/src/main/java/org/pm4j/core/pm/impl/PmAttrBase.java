@@ -1172,26 +1172,25 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   // ======== Backing value access ======== //
 
   /**
-   * @deprecated please use the value converter methods.
+   * Converts the backing attribute value to the external attribute value.
+   * <p>
+   * The default implementation uses the {@link ValueConverter} provided by {@link #getValueConverter()}.
    */
-  @Deprecated
   public T_PM_VALUE convertBackingValueToPmValue(T_BEAN_VALUE backingValue) {
     return getValueConverter().toExternalValue(converterCtxt, backingValue);
   }
 
   /**
-   * @deprecated please use the value converter methods.
+   * Converts the external attribute value to the backing attribute value.
+   * <p>
+   * The default implementation uses the {@link ValueConverter} provided by {@link #getValueConverter()}.
    */
-  @Deprecated
   public T_BEAN_VALUE convertPmValueToBackingValue(T_PM_VALUE externalValue) {
     return getValueConverter().toInternalValue(converterCtxt, externalValue);
   }
 
-  /**
-   *
-   * @return
-   */
-  public final ValueConverter<T_PM_VALUE, T_BEAN_VALUE> getValueConverter() {
+  /** Provides the value converter that translates between backing- and external value. */
+  final ValueConverter<T_PM_VALUE, T_BEAN_VALUE> getValueConverter() {
     if (valueConverter == null) {
       zz_ensurePmInitialization();
       valueConverter = getValueConverterImpl();
@@ -1205,9 +1204,10 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   /**
    * Provides the value converter used to convert between backing value to external value type.<br>
    * The default implementation uses the information provided in {@link PmAttrCfg#valueConverter()}.
-   * If nothing is configured there a simple pass-through will be provided.
+   * If nothing is configured there a simple pass-through converter will be provided.
    * <p>
-   * To provide a shared state less {@link ValueConverter}, please call
+   * Advanced usage:<br>
+   * To provide a shared stateless {@link ValueConverter}, you may call
    * {@link MetaData#setValueConverter(org.pm4j.core.pm.PmAttr.ValueConverter)} within {@link #initMetaData(org.pm4j.core.pm.impl.PmObjectBase.MetaData)}.
    *
    * @return The converter to use. Should not be <code>null</code>.

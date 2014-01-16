@@ -71,10 +71,7 @@ public class PmConverterOptionBased extends AttrStringConverterBase<Object> {
 
   @Override
   protected String valueToStringImpl(AttrConverterCtxt ctxt, Object pmValue) {
-    @SuppressWarnings("unchecked")
-    PmAttrBase<Object, Object> pmAttr = (PmAttrBase<Object, Object>) ctxt.getPmAttr();
-    Object backingValue = pmAttr.convertPmValueToBackingValue(pmValue);
-    return ObjectUtils.toString(idPath.getValue(backingValue));
+    return ObjectUtils.toString(idPath.getValue(pmValue));
   }
 
 }
