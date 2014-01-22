@@ -5,10 +5,14 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
+import org.pm4j.common.converter.string.StringConverter;
+import org.pm4j.common.converter.string.StringConverterCtxt;
+import org.pm4j.common.converter.string.StringConverterParseException;
 import org.pm4j.common.util.collection.MapUtil;
 import org.pm4j.core.pm.PmAttrInteger;
 import org.pm4j.core.pm.PmAttrString;
 import org.pm4j.core.pm.PmConversation;
+import org.pm4j.core.pm.PmOption;
 import org.pm4j.core.pm.annotation.PmBeanCfg;
 import org.pm4j.core.pm.annotation.PmFactoryCfg;
 import org.pm4j.core.pm.annotation.PmInject;
@@ -19,7 +23,6 @@ import org.pm4j.core.pm.impl.PmAttrIntegerImpl;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
 import org.pm4j.core.pm.impl.PmBeanBase;
 import org.pm4j.core.pm.impl.PmConversationImpl;
-import org.pm4j.deprecated.core.pm.DeprPmAttrPmRef;
 import org.pm4j.deprecated.core.pm.impl.DeprPmAttrPmRefImpl;
 
 public class PmAttrPmRefTest extends TestCase {
@@ -32,12 +35,17 @@ public class PmAttrPmRefTest extends TestCase {
   }
 
   public static class B {
-    public int i;
+    public Integer i;
     public String s;
 
     public B(int i, String s) {
       this.i = i;
       this.s = s;
+    }
+
+    @Override
+    public String toString() {
+      return "" + i;
     }
   }
 
@@ -72,12 +80,29 @@ public class PmAttrPmRefTest extends TestCase {
   public static class APm extends PmBeanBase<A> {
 
     @PmFactoryCfg(beanPmClasses=BPm.class)
+
     public final DeprPmAttrPmRef<BPm> refToB = new DeprPmAttrPmRefImpl<BPm, B>(this) {
       @Override
       @PmOptionCfg(id="i", title="s", value="null", backingValue="this", nullOption=NullOption.NO)
       public Iterable<?> getOptionValues() {
         return myServiceLayer.getAllBs();
       }
+
+      // FIXME oboede: the default converter does not work in this case.
+      protected org.pm4j.common.converter.string.StringConverter<BPm> getStringConverterImpl() {
+        return new StringConverter<PmAttrPmRefTest.BPm>() {
+          @Override
+          public String valueToString(StringConverterCtxt ctxt, BPm v) {
+            return v.getPmBean().toString();
+          }
+
+          @Override
+          public BPm stringToValue(StringConverterCtxt ctxt, String s) throws StringConverterParseException {
+            PmOption o = getOptionSet().findOptionForIdString(s);
+            return o != null ? (BPm)(Object)PmFactoryApi.getPmForBean(refToB, o.getBackingValue()) : null;
+          }
+        };
+      };
 
       @PmInject private MyServiceLayer myServiceLayer;
     };
