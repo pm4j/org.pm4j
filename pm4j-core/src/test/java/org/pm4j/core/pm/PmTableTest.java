@@ -15,7 +15,6 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.pm4j.common.pageable.PageableCollectionUtil;
-import org.pm4j.common.query.QueryAttr;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.filter.FilterDefinition;
 import org.pm4j.common.query.inmem.InMemSortOrder;
@@ -199,13 +198,8 @@ public class PmTableTest {
 
     /** A column with a valuePath based attribute. No chance to derive the query attribute from the column name. */
     @PmTitleCfg(title="PathCol")
-    @PmTableColCfg(filterType=String.class)
-    public final PmTableCol pathColumn = new PmTableColImpl(this) {
-      @Override
-      protected QueryAttr getColQueryAttr() {
-        return new QueryAttr("pathColumn", "name", String.class);
-      };
-    };
+    @PmTableColCfg(filterType=String.class, queryAttrPath="name")
+    public final PmTableCol pathColumn = new PmTableColImpl(this);
 
     /** Defines a page size of two items. */
     public TablePm(PmObject pmParent) {

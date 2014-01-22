@@ -810,11 +810,13 @@ public class PmTableImpl
           : null;
     }
 
+    // TODO: get rid of this method.
     protected QueryAttr getColQueryAttr(PmTableCol col) {
       PmTableCol.ImplDetails d = col.getPmImplDetails();
-      // PmTableColImpl.getColQueryAttr() should be used!!! (check the title there)
-      String name = d.getQueryAttrName();
-      return new QueryAttr(name, name, Void.class, col.getPmTitle());
+      return d.getQueryAttr();
+//      // PmTableColImpl.getColQueryAttr() should be used!!! (check the title there)
+//      String name = d.getQueryAttrName();
+//      return new QueryAttr(name, name, Void.class, col.getPmTitle());
     }
 
     protected SortOrder makeColSortOrder(PmTableCol col) {

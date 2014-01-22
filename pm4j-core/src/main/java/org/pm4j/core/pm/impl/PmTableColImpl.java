@@ -3,6 +3,7 @@ package org.pm4j.core.pm.impl;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.pm4j.common.query.QueryAttr;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.SortOrder;
@@ -143,8 +144,10 @@ public class PmTableColImpl extends PmObjectBase implements PmTableCol {
    * @return
    */
   protected QueryAttr getColQueryAttr() {
+    MetaData md = getOwnMetaData();
     String name = getColQueryAttrName();
-    return new QueryAttr(name, name, getOwnMetaData().filterType, getPmTitle());
+    String path = md.queryAttrPath != null ? md.queryAttrPath : name;
+    return new QueryAttr(name, path, md.filterType, getPmTitle());
   }
 
   /**
@@ -355,12 +358,14 @@ public class PmTableColImpl extends PmObjectBase implements PmTableCol {
       }
 
       md.filterType = a.filterType();
+      md.queryAttrPath = StringUtils.defaultIfEmpty(a.queryAttrPath(), null);
     }
   }
 
   protected static class MetaData extends PmObjectBase.MetaData {
     private Boolean sortable;
     private Class<?> filterType = Void.class;
+    private String queryAttrPath;
     private ColSizeSpec colSizeSpec = null;
   }
 

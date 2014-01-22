@@ -6,6 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.joda.time.LocalDate;
+import org.pm4j.common.query.QueryAttr;
 import org.pm4j.core.pm.PmTableCol;
 
 /**
@@ -37,4 +38,14 @@ public @interface PmTableColCfg {
    */
   Class<?> filterType() default Void.class;
 
+  /**
+   * Configures a {@link QueryAttr} path that may be used for filtering and sorting.<br>
+   * By default the attribute name is used as attribute path.
+   * <p>
+   * You may define the column specific {@link QueryAttr} also by overriding
+   * <code>PmTableColImpl.getColQueryAttr()</code>.
+   *
+   * @return The optional path.
+   */
+  String queryAttrPath() default "";
 }
