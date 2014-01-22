@@ -20,10 +20,12 @@ import org.pm4j.common.modifications.ModificationsImpl;
 import org.pm4j.common.pageable.PageableCollection;
 import org.pm4j.common.pageable.PageableCollectionBase;
 import org.pm4j.common.pageable.PageableCollectionUtil;
+import org.pm4j.common.query.QueryEvaluatorSet;
 import org.pm4j.common.query.QueryExpr;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.query.inmem.InMemQueryEvaluator;
+import org.pm4j.common.query.inmem.InMemQueryEvaluatorSet;
 import org.pm4j.common.selection.ItemSetSelection;
 import org.pm4j.common.selection.Selection;
 import org.pm4j.common.selection.SelectionHandler;
@@ -54,9 +56,9 @@ public abstract class InMemCollectionBase<T_ITEM>
   private List<T_ITEM>                   filteredAndSortedObjects;
   /** The currently active sort order comparator. */
   private Comparator<T_ITEM>             sortOrderComparator;
-
-  private InMemQueryEvaluator<T_ITEM>    inMemQueryEvaluator = new InMemQueryEvaluator<T_ITEM>();
-
+  /** Interpreter for filtering query expressions. */
+  private InMemQueryEvaluator<T_ITEM>    inMemQueryEvaluator;
+  /** In-memory specific item set modification handler. */
   private final InMemModificationHandler modificationHandler;
 
 
@@ -78,7 +80,7 @@ public abstract class InMemCollectionBase<T_ITEM>
 
   /**
    * @param filteredAndSortedObjects
-   *          the set of objects to iterate over.
+   *          The set of objects to iterate over.
    * @deprecated Please use {@link #PageableInMemCollectionBase(QueryOptions)}.
    */
   @Deprecated
@@ -89,17 +91,30 @@ public abstract class InMemCollectionBase<T_ITEM>
 
   /**
    * @param queryOptions
-   *          the set of query options offered that's usually offered to the user.
+   *          The set of query options offered that's usually offered to the user.
    */
   public InMemCollectionBase(QueryOptions queryOptions) {
+    this(InMemQueryEvaluatorSet.INSTANCE, queryOptions);
+  }
+
+  /**
+   * @param queryEvaluatorSet
+   *          The set of expression evaluators.<br>
+   *          May not be <code>null</code>.
+   * @param queryOptions
+   *          The set of query options offered that's usually offered to the user.<br>
+   *          May be <code>null</code> if there are no predefined query options.
+   */
+  public InMemCollectionBase(QueryEvaluatorSet queryEvaluatorSet, QueryOptions queryOptions) {
     super(queryOptions);
     this.selectionHandler = new SelectionHandlerWithItemSet<T_ITEM>(this);
 
-    // getQuery is used because the super ctor may have created it on the fly (in case of a null parameter)
+    // getQueryParams() is used because the super ctor may have created it on the fly (in case of a null parameter)
     getQueryParams().addPropertyChangeListener(QueryParams.PROP_EFFECTIVE_FILTER, changeFilterListener);
     getQueryParams().addPropertyChangeListener(QueryParams.PROP_EFFECTIVE_SORT_ORDER, changeSortOrderListener);
 
-    modificationHandler = new InMemModificationHandler();
+    this.modificationHandler = new InMemModificationHandler();
+    this.inMemQueryEvaluator = new InMemQueryEvaluator<T_ITEM>(queryEvaluatorSet);
   }
 
   @SuppressWarnings("unchecked")

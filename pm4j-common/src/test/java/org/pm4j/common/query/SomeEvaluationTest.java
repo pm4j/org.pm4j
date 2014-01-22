@@ -1,5 +1,7 @@
 package org.pm4j.common.query;
 
+import java.io.Serializable;
+
 import junit.framework.Assert;
 
 import org.apache.commons.lang.SerializationUtils;
@@ -19,7 +21,7 @@ public class SomeEvaluationTest {
     Assert.assertEquals("select * from x where i=1 and j=3",
                         ctxt.evaluate("select * from x where ", expr));
 
-    byte[] bytes = SerializationUtils.serialize(expr);
+    byte[] bytes = SerializationUtils.serialize((Serializable)expr);
     expr = (QueryExpr) SerializationUtils.deserialize(bytes);
 
     Assert.assertEquals("select * from x where i=1 and j=3",

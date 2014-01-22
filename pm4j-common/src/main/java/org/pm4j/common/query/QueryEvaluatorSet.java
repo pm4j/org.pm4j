@@ -2,6 +2,7 @@ package org.pm4j.common.query;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * A (technology specific) set of {@link QueryExprEvaluator}s and {@link CompOp} evaluators.
@@ -10,8 +11,13 @@ import java.util.Map;
  */
 public class QueryEvaluatorSet {
 
-  /** The set of {@link QueryExpr} classes mapped to corresponding evaluator instances. */
-  private final Map<Class<?>, Object> exprEvaluatorMap = new HashMap<Class<?>, Object>();
+  /**
+   * The set of {@link QueryExpr} classes mapped to corresponding evaluator instances.
+   * <p>
+   * Is a concurrent map because it gets extended at evaluation time with missing subclass mappings.
+   * That may happen concurrently.
+   */
+  private final Map<Class<?>, Object> exprEvaluatorMap = new ConcurrentHashMap<Class<?>, Object>();
 
   /** The set of {@link CompOp} classes mapped to corresponding evaluator instances. */
   private final Map<Class<?>, CompOpEvaluator> defaultAttrCompOpEvaluatorMap = new HashMap<Class<?>, CompOpEvaluator>();
@@ -22,6 +28,9 @@ public class QueryEvaluatorSet {
   /** {@link QueryAttr} specific {@link CompOp} maps.  */
   private final Map<QueryAttr, Map<Class<?>, CompOpEvaluator>> attrToCompOpEvaluatorMap = new HashMap<QueryAttr, Map<Class<?>, CompOpEvaluator>>();
 
+  /** A lock that may be activated for shared instances to prevent unwanted side effects from calling an add-method. */
+  private boolean locked;
+
   /**
    * Provides the matching evaluator for the given expression.
    *
@@ -29,9 +38,10 @@ public class QueryEvaluatorSet {
    * @return a technology specific instance that can evaluate the expression.
    */
   public Object getExprEvaluator(QueryExpr expr) {
-    Object ev = exprEvaluatorMap.get(expr.getClass());
+    Class<?> exprClass = expr.getClass();
+    Object ev = findExprEvaluator(exprClass);
     if (ev == null) {
-      throw new RuntimeException("Missing filter expression evaluator for expression type: " + expr.getClass());
+      throw new RuntimeException("Missing filter expression evaluator for expression type: " + exprClass);
     }
     return ev;
   }
@@ -77,6 +87,7 @@ public class QueryEvaluatorSet {
    *            the evaluator to use to interpret the expression instances
    */
   public void addExprEvaluator(Class<? extends QueryExpr> exprClass, QueryExprEvaluator e) {
+    assertUnlocked();
     exprEvaluatorMap.put(exprClass, e);
   }
 
@@ -106,6 +117,7 @@ public class QueryEvaluatorSet {
    *          compare operator evaluator (interpreter)
    */
   public void addCompOpEvaluator(Class<? extends QueryAttr> forAttrClass, Class<? extends CompOp> compOpClass, CompOpEvaluator e) {
+    assertUnlocked();
     if (forAttrClass == QueryAttr.class) {
       defaultAttrCompOpEvaluatorMap.put(compOpClass, e);
       return;
@@ -132,12 +144,64 @@ public class QueryEvaluatorSet {
    *          compare operator evaluator (interpreter)
    */
   public void addCompOpEvaluator(QueryAttr forAttr, Class<? extends CompOp> compOpClass, CompOpEvaluator e) {
+    assertUnlocked();
     Map<Class<?>, CompOpEvaluator> map = attrToCompOpEvaluatorMap.get(forAttr);
     if (map == null) {
       map = new HashMap<Class<?>, CompOpEvaluator>();
       attrToCompOpEvaluatorMap.put(forAttr, map);
     }
     map.put(compOpClass, e);
+  }
+
+  /**
+   * Locks this instance. A further call to an add-method will throw an exception.
+   */
+  public QueryEvaluatorSet lock() {
+    locked = true;
+    return this;
+  }
+
+  /**
+   * Throws an exception if the instance is locked.
+   */
+  protected void assertUnlocked() {
+    if (locked) {
+      throw new RuntimeException("This query evaluator set is a shared locked instance. Please create another evaluator set instance if you need a specific one.");
+    }
+  }
+
+  /**
+   * Finds the matching evaluator.<p>
+   * In case of a sub-class that is not directly mapped to an evaluator, the map will be extended to
+   * automatically to improve match speed for the next find operation.
+   *
+   * @param exprClass The expression class or interface to find an evaluator for.
+   * @return The found evaluator or <code>null</code>.
+   */
+  private Object findExprEvaluator(Class<?> exprClass) {
+    Object ev = exprEvaluatorMap.get(exprClass);
+    if (ev != null) {
+      return ev;
+    }
+
+    if (exprClass.getSuperclass() != Object.class) {
+      ev = findExprEvaluator(exprClass.getSuperclass());
+      if (ev != null) {
+        exprEvaluatorMap.put(exprClass, ev);
+        return ev;
+      }
+    }
+
+    for (Class<?> c : exprClass.getInterfaces()) {
+      ev = findExprEvaluator(c);
+      if (ev != null) {
+        exprEvaluatorMap.put(exprClass, ev);
+        return ev;
+      }
+    }
+
+    // not found
+    return null;
   }
 
 }

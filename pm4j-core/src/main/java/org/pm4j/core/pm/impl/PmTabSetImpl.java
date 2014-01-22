@@ -100,6 +100,7 @@ public class PmTabSetImpl extends PmElementImpl implements PmTabSet {
    * <p>
    * Internally this method gets called by the {@link PmTabChangeCommand}.
    */
+  // TODO: rename to beforeSwitch and add an afterSwitch; remove the command reference.
   protected boolean switchToTabPmImpl(PmCommand tabChangeCmd, PmTab fromTab, PmTab toTab) {
     return true;
   }

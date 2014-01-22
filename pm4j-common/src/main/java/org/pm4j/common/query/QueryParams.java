@@ -52,6 +52,18 @@ public class QueryParams extends PropertyChangeSupportedBase implements Cloneabl
     this.defaultSortOrder = defaultSortOrder;
   }
 
+  /**
+   * Copies all parameter values from the given source to this instance.
+   *
+   * @param src The instance to copy the query parameter values from.
+   */
+  public void copyParamValues(QueryParams src) {
+    setSortOrder(src.getSortOrder());
+    setDefaultSortOrder(src.getDefaultSortOrder());
+    setFilterExpression(src.getFilterExpression());
+    setBaseQueryParams(src.baseQueryParams);
+    setExecQuery(src.execQuery);
+  }
 
   /**
    * Sorts the items based on the given {@link SortOrder} definition.
@@ -68,7 +80,7 @@ public class QueryParams extends PropertyChangeSupportedBase implements Cloneabl
 
     SortOrder newEffectiveOrder = getEffectiveSortOrder();
     if (oldEffectiveOrder != null || newEffectiveOrder != null) {
-    	firePropertyChange(PROP_EFFECTIVE_SORT_ORDER, oldEffectiveOrder, newEffectiveOrder);
+      firePropertyChange(PROP_EFFECTIVE_SORT_ORDER, oldEffectiveOrder, newEffectiveOrder);
     }
   }
 
@@ -203,6 +215,12 @@ public class QueryParams extends PropertyChangeSupportedBase implements Cloneabl
   public QueryParams clone() {
     QueryParams clone = (QueryParams) super.clone();
     return clone;
+  }
+
+  private void setBaseQueryParams(Map<String, Object> baseQueryParams) {
+    baseQueryParams = new HashMap<String, Object>(baseQueryParams);
+    // TODO: only fire in case of a real value change. use internal setter method?
+    firePropertyChange(PROP_EFFECTIVE_FILTER, null, null);
   }
 
 }

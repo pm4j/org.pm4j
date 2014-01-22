@@ -1,5 +1,7 @@
 package org.pm4j.common.query;
 
+import java.io.Serializable;
+
 import org.apache.commons.lang.ObjectUtils;
 
 
@@ -10,7 +12,7 @@ import org.apache.commons.lang.ObjectUtils;
  *
  * @author olaf boede
  */
-public class QueryExprNot implements QueryExpr {
+public class QueryExprNot implements QueryExpr, Serializable {
 
   private static final long serialVersionUID = 1L;
   private QueryExpr baseExpression;

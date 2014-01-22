@@ -131,6 +131,9 @@ public class PmTableImpl
   /** An optionally used cache for in-memory backing collections. */
   private Object pmInMemCollectionCache;
 
+  /** An indicator that protects a getter logic based table against concurrent setter logic access. */
+  boolean pmCollectionGetterLogicUsed;
+
   /**
    * Creates a table PM.
    *
@@ -556,29 +559,32 @@ public class PmTableImpl
    */
   protected PmBeanCollection<T_ROW_PM, T_ROW_BEAN> getPmPageableCollectionImpl() {
     @SuppressWarnings("unchecked")
-    QueryService<T_ROW_BEAN, Object> s = (QueryService<T_ROW_BEAN, Object>) getPmQueryServiceImpl();
+    QueryService<T_ROW_BEAN, Object> service = (QueryService<T_ROW_BEAN, Object>) getPmQueryServiceImpl();
     QueryOptions qo = getPmQueryOptions();
     PageableCollection<T_ROW_BEAN> pc = null;
 
-    if (s == null) {
+    if (service == null) {
       InMemCollectionBase<T_ROW_BEAN> inMemColl = new InMemCollectionBase<T_ROW_BEAN>(qo) {
         @Override
         protected Collection<T_ROW_BEAN> getBackingCollectionImpl() {
+          pmCollectionGetterLogicUsed = true; // From now on setPmBeans() shouldn't be called.
           return getPmBeansImpl();
         }
       };
       inMemColl.setCacheStrategy(getOwnMetaData().inMemCollectionCacheStragegy, this);
       pc = inMemColl;
     }
-    else if (s instanceof PageQueryService) {
-      pc = new PageQueryCollection<T_ROW_BEAN, Object>((PageQueryService<T_ROW_BEAN, Object>) s, qo);
+    else if (service instanceof PageQueryService) {
+      pc = new PageQueryCollection<T_ROW_BEAN, Object>((PageQueryService<T_ROW_BEAN, Object>) service, qo);
+      pmCollectionGetterLogicUsed = true; // From now on setPmBeans() shouldn't be called.
     }
-    else if (s instanceof IdQueryService) {
-      pc = new IdQueryCollectionImpl<T_ROW_BEAN, Object>((IdQueryService<T_ROW_BEAN, Object>) s, qo);
+    else if (service instanceof IdQueryService) {
+      pc = new IdQueryCollectionImpl<T_ROW_BEAN, Object>((IdQueryService<T_ROW_BEAN, Object>) service, qo);
+      pmCollectionGetterLogicUsed = true; // From now on setPmBeans() shouldn't be called.
     }
     else {
       throw new PmRuntimeException(this,
-          "The service type provided by 'getPmQueryServiceImpl()' is not a 'PageableQueryService' and not a 'PageableIdQueryService'. Possibly @PmTableCfg#serviceClass is not well configured. Found serivce: " + s);
+          "The service type provided by 'getPmQueryServiceImpl()' is not a 'PageableQueryService' and not a 'PageableIdQueryService'. Possibly @PmTableCfg#serviceClass is not well configured. Found serivce: " + service);
     }
     return new PmBeanCollection<T_ROW_PM, T_ROW_BEAN>(this, PmBean.class, pc);
   }

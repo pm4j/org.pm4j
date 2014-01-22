@@ -1,5 +1,7 @@
 package org.pm4j.common.query;
 
+import java.io.Serializable;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.pm4j.common.exception.CheckedExceptionWrapper;
 import org.pm4j.common.util.reflection.ClassUtil;
@@ -13,7 +15,7 @@ import org.pm4j.common.util.reflection.ClassUtil;
  *
  * @author olaf boede
  */
-public class QueryExprCompare implements QueryExpr, Cloneable {
+public class QueryExprCompare implements QueryExpr, Cloneable, Serializable {
 
   private static final long serialVersionUID = 1L;
   private QueryAttr attr;

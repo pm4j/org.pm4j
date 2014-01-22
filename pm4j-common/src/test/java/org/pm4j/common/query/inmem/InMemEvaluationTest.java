@@ -14,6 +14,7 @@ import org.pm4j.common.query.CompOpNotEquals;
 import org.pm4j.common.query.QueryExprAnd;
 import org.pm4j.common.query.QueryExprCompare;
 import org.pm4j.common.query.QueryExpr;
+import org.pm4j.common.query.QueryExprInMemCondition;
 import org.pm4j.common.query.QueryExprNot;
 import org.pm4j.common.query.QueryExprOr;
 import org.pm4j.common.query.QueryAttr;
@@ -137,6 +138,19 @@ public class InMemEvaluationTest {
         new QueryExprAnd(trueCond(), trueCond())
         );
     assertTrue("(NOT true) OR (true AND true)", ctxt.evaluate(bean, e));
+  }
+
+  @Test
+  public void testInMemCondition() {
+    QueryExpr oddTestExpr = new QueryExprInMemCondition<Integer>() {
+      @Override
+      public boolean eval(Integer item) {
+        return item.intValue() % 2 != 0;
+      }
+    };
+
+    assertTrue("One is odd.", ctxt.evaluate(1, oddTestExpr));
+    assertFalse("Two is not odd.", ctxt.evaluate(2, oddTestExpr));
   }
 
 

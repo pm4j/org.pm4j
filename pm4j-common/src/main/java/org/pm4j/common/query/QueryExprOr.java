@@ -1,5 +1,6 @@
 package org.pm4j.common.query;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -16,7 +17,7 @@ import org.pm4j.common.util.collection.IterableUtil;
  *
  * @author olaf boede
  */
-public class QueryExprOr implements QueryExpr {
+public class QueryExprOr implements QueryExpr, Serializable {
 
   /**
    * A static helper method that joins the given set of expressions to an or-combined expression.
