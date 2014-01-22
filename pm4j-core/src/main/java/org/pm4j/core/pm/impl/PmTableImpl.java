@@ -25,7 +25,6 @@ import org.pm4j.common.pageable.querybased.idquery.IdQueryCollectionImpl;
 import org.pm4j.common.pageable.querybased.idquery.IdQueryService;
 import org.pm4j.common.pageable.querybased.pagequery.PageQueryCollection;
 import org.pm4j.common.pageable.querybased.pagequery.PageQueryService;
-import org.pm4j.common.query.QueryAttr;
 import org.pm4j.common.query.QueryOptionProvider;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.QueryParams;
@@ -763,8 +762,7 @@ public class PmTableImpl
         PmTableCol.ImplDetails d = col.getPmImplDetails();
         if ((d.isSortableConfigured() == Boolean.TRUE) ||
             (d.isSortableConfigured() == null && tableSortable)) {
-          SortOrder so = makeColSortOrder(col);
-          options.addSortOrder(d.getQueryAttrName(), so);
+          options.addSortOrder(d.getQueryAttr());
         }
 
         FilterDefinition fcd = d.getFilterCompareDefinition(ff);
@@ -808,19 +806,6 @@ public class PmTableImpl
       return (md.initialBeanSortComparatorClass != null)
           ? (Comparator<?>)ClassUtil.newInstance(md.initialBeanSortComparatorClass)
           : null;
-    }
-
-    // TODO: get rid of this method.
-    protected QueryAttr getColQueryAttr(PmTableCol col) {
-      PmTableCol.ImplDetails d = col.getPmImplDetails();
-      return d.getQueryAttr();
-//      // PmTableColImpl.getColQueryAttr() should be used!!! (check the title there)
-//      String name = d.getQueryAttrName();
-//      return new QueryAttr(name, name, Void.class, col.getPmTitle());
-    }
-
-    protected SortOrder makeColSortOrder(PmTableCol col) {
-      return new SortOrder(getColQueryAttr(col));
     }
   }
 
