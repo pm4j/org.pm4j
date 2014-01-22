@@ -354,7 +354,12 @@ public abstract class PmBeanBase<T_BEAN>
     boolean doSetPmBean(T_BEAN bean) {
       zz_ensurePmInitialization();
       if (embeddingBeanPm != null) {
-        throw new PmRuntimeException(this, "Unable to set a bean to a nested PmBean. Please assign the bean to the embedding PmBean.");
+        // TODO oboede: throw an exception with the next breaking change delivery.
+        LOG.warn("#####################################################################################\n" +
+                 "# Unable to set a bean to a nested PmBean. Please assign the bean to the embedding PmBean.\n" +
+                 "# The assigned bean will be ignored! \n" +
+                 "#####################################################################################");
+        // throw new PmRuntimeException(this, "Unable to set a bean to a nested PmBean. Please assign the bean to the embedding PmBean.");
       }
       return super.doSetPmBean(bean);
     }
