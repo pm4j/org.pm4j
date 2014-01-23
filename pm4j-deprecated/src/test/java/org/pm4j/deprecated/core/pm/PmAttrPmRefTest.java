@@ -70,7 +70,7 @@ public class PmAttrPmRefTest extends TestCase {
    * This specification isn't required only when the default key attribute
    * name 'id' is used within the domain class.
    */
-  @PmBeanCfg(beanClass=B.class, key="i")
+  @PmBeanCfg(beanClass=B.class)
   public static class BPm extends PmBeanBase<B> {
     public final PmAttrInteger i = new PmAttrIntegerImpl(this);
     public final PmAttrString s = new PmAttrStringImpl(this);

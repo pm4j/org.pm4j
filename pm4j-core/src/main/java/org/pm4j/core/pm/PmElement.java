@@ -1,6 +1,5 @@
 package org.pm4j.core.pm;
 
-import java.io.Serializable;
 
 /**
  * A presentation model that supports a set of attributes.
@@ -10,10 +9,5 @@ import java.io.Serializable;
  * @author olaf boede
  */
 public interface PmElement extends PmDataInput, PmTreeNode {
-
-  /**
-   * @return A key that identifies the element within the session.
-   */
-  Serializable getPmKey();
 
 }

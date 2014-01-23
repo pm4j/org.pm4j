@@ -1,6 +1,5 @@
 package org.pm4j.core.pm.impl;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
 
@@ -10,10 +9,7 @@ import javax.validation.Validator;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.pm4j.common.util.reflection.BeanAttrAccessor;
-import org.pm4j.common.util.reflection.BeanAttrAccessorImpl;
 import org.pm4j.common.util.reflection.GenericTypeUtil;
-import org.pm4j.common.util.reflection.ReflectionException;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmDataInput;
@@ -205,48 +201,6 @@ public abstract class PmBeanBase<T_BEAN>
   }
 
   /**
-   * The default implementation provides a unique identifier
-   * for the memory bean behind this model.
-   */
-  @Override
-  public Serializable getPmKey() {
-    Serializable id = getPmBeanId();
-    return (id != null)
-        ? id
-        : super.getPmKey();
-  }
-
-  /**
-   * FIXME olaf: isn't that something that has only to live in the implementation interface?
-   * <p>
-   * Provides a key that identifies the bean behind this model.<p>
-   * That key is usually the same that is used within the persistence context.
-   * <p>
-   * TODOC: Different requirements for root and owned entities.
-   * <p>
-   * The bean identifier attributes are usually defined using the annotation
-   * {@link PmBeanCfg#key()}.<br>
-   * The default implementation of this method returns an instance that represents
-   * the content of the attribute(s) defined using that annotation.
-   * <p>
-   * If this method returns <code>null</code>, the default implementation assumes that
-   * the bean behind this model is transient.
-   *
-   * @return A key that identifies the bean behind this model.
-   */
-  // TODO olaf: rename or remove.
-  private Serializable getPmBeanId() {
-    // TODO olaf: add support for multi attribute keys.
-    BeanAttrAccessor idAttrAccessor = getOwnMetaDataAndEnsurePmInit().idAttrAccessor;
-    if (idAttrAccessor != null) {
-      return idAttrAccessor.getBeanAttrValue(getPmBean());
-    }
-    else {
-      return null;
-    }
-  }
-
-  /**
    * @return The supported bean class.
    */
   @Override
@@ -432,19 +386,6 @@ public abstract class PmBeanBase<T_BEAN>
       myMetaData.autoCreateBean = annotation.autoCreateBean();
       myMetaData.beanPropertyKey = StringUtils.trimToEmpty(annotation.findBeanExpr());
       myMetaData.setReadOnly(annotation.readOnly());
-
-      if (StringUtils.isNotBlank(annotation.key())) {
-        try {
-          myMetaData.idAttrAccessor = new BeanAttrAccessorImpl(myMetaData.beanClass, annotation.key());
-        }
-        catch (ReflectionException e) {
-          if (annotation.key().equals(PmBeanCfg.DEFAULT_BEAN_ID_ATTR)) {
-            // a specific id is not configured
-          } else {
-            PmObjectUtil.throwAsPmRuntimeException(this, e);
-          }
-        }
-      }
     }
 
     // Check if bean validation can be used:
@@ -469,7 +410,6 @@ public abstract class PmBeanBase<T_BEAN>
     private Class<?> beanClass;
     private boolean autoCreateBean = false;
     private String beanPropertyKey = "";
-    private BeanAttrAccessor idAttrAccessor;
     private boolean validateUsesBeanValidation = true;
 
   }

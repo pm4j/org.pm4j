@@ -1,7 +1,5 @@
 package org.pm4j.req_domain.pm.impl;
 
-import java.io.Serializable;
-
 import org.pm4j.core.pm.PmAttrLong;
 import org.pm4j.core.pm.PmAttrString;
 import org.pm4j.core.pm.annotation.PmBeanCfg;
@@ -37,11 +35,6 @@ public class RequirementPmImpl extends PmBeanBase<Requirement> implements Requir
 
   public PmAttrString getAuthor() {
     return author;
-  }
-
-  @Override
-  public Serializable getPmKey() {
-    return getPmBean().getId();
   }
 
   private class IdPm extends PmAttrLongImpl {

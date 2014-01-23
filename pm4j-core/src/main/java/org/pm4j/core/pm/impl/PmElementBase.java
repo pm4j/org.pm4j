@@ -1,12 +1,10 @@
 package org.pm4j.core.pm.impl;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang.ObjectUtils;
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.PmElement;
@@ -52,14 +50,6 @@ public abstract class PmElementBase
   @Override
   public final boolean isPmEnabled() {
     return super.isPmEnabled();
-  }
-
-  /**
-   * The default implementation provides a unique identifier for this model.
-   */
-  @Override
-  public Serializable getPmKey() {
-    return ObjectUtils.identityToString(this);
   }
 
   @Override

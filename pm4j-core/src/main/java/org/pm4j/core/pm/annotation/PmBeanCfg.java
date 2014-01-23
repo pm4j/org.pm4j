@@ -17,15 +17,10 @@ import org.pm4j.core.pm.api.PmExpressionApi;
 public @interface PmBeanCfg {
 
   /**
-   * The default attribute name, used to get the the bean identity.
-   */
-  public static final String DEFAULT_BEAN_ID_ATTR = "id";
-
-  /**
-   * The bean class parameter is not mandatory anymore, since each class 
-   * implementing {@link #org.pm4j.core.pm.PmBean} declares the bean class by 
+   * The bean class parameter is not mandatory anymore, since each class
+   * implementing {@link #org.pm4j.core.pm.PmBean} declares the bean class by
    * its generic parameter.
-   * 
+   *
    * @return The type of bean that can be handled by this presentation model.
    */
   Class<?> beanClass() default Void.class;
@@ -55,13 +50,6 @@ public @interface PmBeanCfg {
    *         Default value is an empty string.
    */
   String findBeanExpr() default "";
-
-  /**
-   * The identifier attribute(s) of the bean behind the PM.
-   *
-   * @return A comma separated list of attribute names that identifies this instance.
-   */
-  String key() default DEFAULT_BEAN_ID_ATTR;
 
   /**
    * @return <code>true</code> for PMs with attribute values that shouldn't be changed.
