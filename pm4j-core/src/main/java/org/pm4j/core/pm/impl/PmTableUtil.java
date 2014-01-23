@@ -3,10 +3,10 @@ package org.pm4j.core.pm.impl;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.pm4j.common.pageable.PageableCollection;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.QueryParams;
-import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmElement;
 import org.pm4j.core.pm.PmPager.PagerVisibility;
@@ -20,6 +20,8 @@ import org.pm4j.core.pm.impl.pageable.PmBeanCollection;
  */
 public final class PmTableUtil {
 
+  private static Logger LOG = Logger.getLogger(PmTableUtil.class);
+
   /**
    * Creates a {@link PageableCollection} that uses the given collection and assigns it to the given {@link PmTable}.
    * <p>
@@ -31,8 +33,12 @@ public final class PmTableUtil {
    */
   public static <T_ROW_PM extends PmBean<T_ROW_BEAN>, T_ROW_BEAN> void setPmBeans(PmTableImpl<T_ROW_PM, T_ROW_BEAN> tablePm, Collection<T_ROW_BEAN> beans) {
     if (tablePm.pmCollectionGetterLogicUsed) {
-      throw new PmRuntimeException(tablePm, "The table uses getter logic. A mix of getter and setter logic is not supported.\n" +
-                                            "Please use consistently only getter or only setter logic for a table instance.");
+      // TODO oboede:
+      LOG.error("The table uses getter logic. A mix of getter and setter logic is not supported.\n" +
+                "Please use consistently only getter or only setter logic for a table instance.",
+                new RuntimeException());
+//      throw new PmRuntimeException(tablePm, "The table uses getter logic. A mix of getter and setter logic is not supported.\n" +
+//                                            "Please use consistently only getter or only setter logic for a table instance.");
     }
 
     Class<T_ROW_PM> beanClass = tablePm.getPmRowBeanClass();
