@@ -1,21 +1,46 @@
 package org.pm4j.common.pageable.querybased.pagequery;
 
+import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Test;
 import org.pm4j.common.pageable.PageableCollection;
 import org.pm4j.common.pageable.PageableCollectionTestBase;
-import org.pm4j.common.pageable.querybased.pagequery.PageQueryCollection;
-import org.pm4j.common.pageable.querybased.pagequery.PageQueryService;
+import org.pm4j.common.query.CompOpNotEquals;
 import org.pm4j.common.query.CompOpStartsWith;
+import org.pm4j.common.query.QueryExprCompare;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.query.filter.FilterDefinition;
 import org.pm4j.common.query.inmem.InMemQueryEvaluator;
+import org.pm4j.common.util.collection.IterableUtil;
 
 public class PageQueryCollectionTest extends PageableCollectionTestBase<PageableCollectionTestBase.Bean> {
+
+  @Test
+  public void testAllItemsSelection() {
+    PageQueryAllItemsSelection<Bean, Integer> selection = new PageQueryAllItemsSelection<Bean, Integer>(service);
+
+    assertEquals(7L, selection.getSize());
+    assertEquals("[ , a, b, c, d, e, f]", IterableUtil.asCollection(selection).toString());
+
+    QueryParams queryParams = new QueryParams();
+    queryParams.setFilterExpression(new QueryExprCompare(Bean.ATTR_NAME, CompOpNotEquals.class, " "));
+    selection = new PageQueryAllItemsSelection<Bean, Integer>(service, queryParams);
+    assertEquals(6L, selection.getSize());
+    assertEquals("[a, b, c, d, e, f]", IterableUtil.asCollection(selection).toString());
+
+    assertTrue(selection.contains(service.getItemForId(1)));
+    // That's an all-selection limitation: The not-selection check is not yet supported.
+    // assertFalse(selection.contains(createItem(-1, "")));
+  }
+
+  // -- Test infrastructure
 
   TestService service = new TestService();
 
@@ -37,8 +62,8 @@ public class PageQueryCollectionTest extends PageableCollectionTestBase<Pageable
   }
 
   @Override
-  protected Bean createItem(String name) {
-    return new Bean(name);
+  protected Bean createItem(int id, String name) {
+    return new Bean(id, name);
   }
 
   // --- A fake service implementation that does the job just in memory. ---

@@ -13,7 +13,6 @@ import org.pm4j.common.query.QueryParams;
  *
  * @author olaf boede
  */
-// TODO oboede: currently unused.
 public class PageQueryAllItemsSelection<T_ITEM, T_ID> extends PageQuerySelectionBase<T_ITEM, T_ID>{
 
   private static final long serialVersionUID = 1L;

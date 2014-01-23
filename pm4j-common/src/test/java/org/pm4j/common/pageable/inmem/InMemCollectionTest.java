@@ -17,8 +17,8 @@ public class InMemCollectionTest extends PageableCollectionTestBase<PageableColl
   }
 
   @Override
-  protected Bean createItem(String name) {
-    return new Bean(name);
+  protected Bean createItem(int id, String name) {
+    return new Bean(id, name);
   }
 
 }

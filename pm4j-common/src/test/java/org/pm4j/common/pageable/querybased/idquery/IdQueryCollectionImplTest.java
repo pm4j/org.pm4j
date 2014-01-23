@@ -23,8 +23,8 @@ public class IdQueryCollectionImplTest extends PageableCollectionTestBase<Pageab
   }
 
   @Override
-  protected Bean createItem(String name) {
-    return new Bean(name);
+  protected Bean createItem(int id, String name) {
+    return new Bean(id, name);
   }
 
   @Override

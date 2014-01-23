@@ -8,6 +8,7 @@ import java.beans.PropertyVetoException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.pm4j.common.itemnavigator.ItemNavigator;
@@ -60,7 +61,7 @@ public abstract class PageableCollectionTestBase<T> {
     return new SortOrder(Bean.ATTR_NAME);
   }
 
-  protected abstract T createItem(String name);
+  protected abstract T createItem(int id, String name);
 
 
   @Before
@@ -302,7 +303,7 @@ public abstract class PageableCollectionTestBase<T> {
     assertEquals("See setUp(): the initial remove item.", 1L, collection.getModifications().getRemovedItems().getSize());
 
     // add the item
-    T newItem = createItem("hi");
+    T newItem = createItem(1001, "hi");
     collection.getModificationHandler().addItem(newItem);
     assertEquals("New collection size", 7L, collection.getNumOfItems());
     assertEquals("Collection after add", "[a, b, c, d, e, f, hi]", IterableUtil.shallowCopy(collection).toString());
@@ -353,7 +354,7 @@ public abstract class PageableCollectionTestBase<T> {
     assertEquals(0, collection.getModifications().getRemovedItems().getSize());
 
     // add the item
-    T newItem = createItem("hi");
+    T newItem = createItem(1001, "hi");
     collection.getModificationHandler().addItem(newItem);
     assertEquals("New collection size", 1L, collection.getNumOfItems());
     assertEquals("Collection after add", "[hi]", IterableUtil.shallowCopy(collection).toString());
@@ -421,7 +422,7 @@ public abstract class PageableCollectionTestBase<T> {
     collection.getSelectionHandler().setSelectMode(SelectMode.MULTI);
     T updatedItem = collection.getItemsOnPage().get(0);
     collection.getModificationHandler().registerUpdatedItem(updatedItem, true);
-    collection.getModificationHandler().addItem(createItem("added item"));
+    collection.getModificationHandler().addItem(createItem(1002, "added item"));
 
     assertEquals(1, collection.getModifications().getAddedItems().size());
     assertEquals(1, collection.getModifications().getUpdatedItems().size());
@@ -452,8 +453,9 @@ public abstract class PageableCollectionTestBase<T> {
   protected static List<Bean> makeBeans(String... strings) {
     List<Bean> list = new ArrayList<Bean>();
     if (strings != null) {
+      int id = 0;
       for (String s : strings) {
-        list.add(new Bean(s));
+        list.add(new Bean(++id, s));
       }
     }
     return list;
@@ -465,11 +467,6 @@ public abstract class PageableCollectionTestBase<T> {
     public final String name;
     public static final QueryAttr ATTR_ID = new QueryAttr("id", String.class);
     public static final QueryAttr ATTR_NAME = new QueryAttr("name", String.class);
-
-    public Bean(String name) {
-      this.id = null;
-      this.name = name;
-    }
 
     public Bean(int id, String name) {
       this.id = id;
@@ -484,6 +481,19 @@ public abstract class PageableCollectionTestBase<T> {
     public Integer getId() {
       return id;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+      return (obj instanceof Bean)
+              ? ObjectUtils.equals(id, ((Bean)obj).id)
+              : super.equals(obj);
+      }
+
+    @Override
+    public int hashCode() {
+      return ObjectUtils.hashCode(id);
+    }
+
   }
 
   // test helper
@@ -518,3 +528,4 @@ public abstract class PageableCollectionTestBase<T> {
   }
 
 }
+

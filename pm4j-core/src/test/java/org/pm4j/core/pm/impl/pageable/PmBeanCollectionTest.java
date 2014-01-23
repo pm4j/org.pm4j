@@ -68,8 +68,8 @@ public class PmBeanCollectionTest extends PageableCollectionTestBase<PmBeanColle
   }
 
   @Override
-  protected BeanRowPm createItem(String name) {
-    return PmFactoryApi.getPmForBean(beanTablePm, new Bean(name));
+  protected BeanRowPm createItem(int id, String name) {
+    return PmFactoryApi.getPmForBean(beanTablePm, new Bean(id, name));
   }
 
 
