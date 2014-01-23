@@ -115,6 +115,13 @@ public class PageQueryCollection<T_ITEM, T_ID> extends QueryCollectionBase<T_ITE
     return modificationHandler;
   }
 
+  /**
+   * @return The service used to query the data page by page.
+   */
+  public PageQueryService<T_ITEM, T_ID> getService() {
+    return service;
+  }
+
 }
 
 /**

@@ -1,6 +1,5 @@
 package org.pm4j.common.pageable.querybased.pagequery;
 
-import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
 
@@ -15,7 +14,7 @@ import org.pm4j.common.query.QueryParams;
  * @author olaf boede
  */
 // TODO oboede: currently unused.
-public class PageQueryAllItemsSelection<T_ITEM, T_ID extends Serializable> extends PageQuerySelectionBase<T_ITEM, T_ID>{
+public class PageQueryAllItemsSelection<T_ITEM, T_ID> extends PageQuerySelectionBase<T_ITEM, T_ID>{
 
   private static final long serialVersionUID = 1L;
 

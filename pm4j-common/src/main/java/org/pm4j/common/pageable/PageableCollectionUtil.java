@@ -4,13 +4,17 @@ import java.awt.print.Pageable;
 import java.util.List;
 
 import org.pm4j.common.pageable.querybased.pagequery.ClickedIds;
+import org.pm4j.common.pageable.querybased.pagequery.PageQueryAllItemsSelection;
+import org.pm4j.common.pageable.querybased.pagequery.PageQueryCollection;
+import org.pm4j.common.pageable.querybased.pagequery.PageQueryService;
 import org.pm4j.common.query.CompOpIn;
+import org.pm4j.common.query.QueryAttr;
+import org.pm4j.common.query.QueryExpr;
 import org.pm4j.common.query.QueryExprAnd;
 import org.pm4j.common.query.QueryExprCompare;
-import org.pm4j.common.query.QueryExpr;
 import org.pm4j.common.query.QueryExprNot;
-import org.pm4j.common.query.QueryAttr;
 import org.pm4j.common.query.QueryParams;
+import org.pm4j.common.selection.Selection;
 import org.pm4j.common.selection.SelectionHandler;
 
 
@@ -328,6 +332,24 @@ public final class PageableCollectionUtil {
     } else {
       // Positive filter: select only the clicked id's.
       return idFilterExpr;
+    }
+  }
+
+  /**
+   * Provides a selection that contains all items that match the current
+   * query conditions (search restrictions) used for the given collection.
+   *
+   * @param pc The {@link PageableCollection} to get all item from.
+   * @return An {@link Iterable} item selection.
+   */
+  @SuppressWarnings("unchecked")
+  public static <T_ITEM> Selection<T_ITEM> getAllItemsSelection(PageableCollection<T_ITEM> pc) {
+    if (pc instanceof PageQueryCollection) {
+      PageQueryCollection<T_ITEM, ?> pqc = (PageQueryCollection<T_ITEM, ?>) pc;
+      return new PageQueryAllItemsSelection<T_ITEM, Object>((PageQueryService<T_ITEM, Object>) pqc.getService(), pqc.getQueryParams());
+    } else {
+      // TODO oboede:
+      throw new RuntimeException("No all items selection implemented. Please ask TEBA for an enhancement.");
     }
   }
 
