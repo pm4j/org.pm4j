@@ -127,11 +127,18 @@ public class PmAttrBigDecimalTest {
   }
 
   @Test
-  public void testRoundingHalfUp() {
+  public void testRoundingHalfUpThreeDecimalPlaces() {
     myPm.roundingHalfUp.setValueAsString("1.005");
     // the 0.005 will be rounded because of the format and rounding mode
     assertEquals("0.005 will be added because of the format and rounding", "1.01", myPm.roundingHalfUp.getValueAsString());
     assertEquals("Should have been rounded and formatted", new BigDecimal("1.01"), myPm.roundingHalfUp.getValue());
+  }
+
+  @Test
+  public void testRoundingHalfUpFourDecimalPlaces() {
+    myPm.roundingHalfUp.setValueAsString("12.3456");
+    assertEquals("Four decimal places shall be rounded to two", "12.35", myPm.roundingHalfUp.getValueAsString());
+    assertEquals("BigDecimal shall be identical to string value", new BigDecimal("12.35"), myPm.roundingHalfUp.getValue());
   }
 
   @Test
@@ -169,13 +176,6 @@ public class PmAttrBigDecimalTest {
     assertEquals(new BigDecimal(MyPm.READONLY_VALUE), myPm.combination.getValue());    
     assertTrue(myPm.combination.isPmValid());
     assertEquals(MyPm.READONLY_VALUE_ROUNDED, myPm.combination.getValueAsString());
-  }
-
-  @Test
-  public void testAmount() {
-    myPm.amount.setValueAsString("12.3456");
-    assertEquals("12.35", myPm.amount.getValueAsString());
-    assertEquals(new BigDecimal("12.35"), myPm.amount.getValue());
   }
   
   static class MyPm extends PmConversationImpl {
@@ -227,10 +227,6 @@ public class PmAttrBigDecimalTest {
           return new BigDecimal(READONLY_VALUE);
         }
     };
-
-    @PmAttrBigDecimalCfg(roundingMode = RoundingMode.HALF_UP)
-    @PmAttrCfg(formatResKey = "pmAttrNumberTest_twoDecimalPlaces")
-    public final PmAttrBigDecimal amount = new PmAttrBigDecimalImpl(this);
   }
 
 }
