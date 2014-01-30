@@ -97,6 +97,11 @@ public class PmBeanSelectionHandler<T_PM extends PmBean<T_BEAN>, T_BEAN> extends
   }
 
   @Override
+  public Selection<T_PM> getAllItemsSelection() {
+    return new PmBeanSelection<T_PM, T_BEAN>(factoryCtxtPm, baseSelectionHandler.getAllItemsSelection());
+  }
+
+  @Override
   public void addSelectionHandlerCallback(SelectionHandlerCallback callback) {
     baseSelectionHandler.addSelectionHandlerCallback(callback);
   }
