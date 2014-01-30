@@ -3,7 +3,7 @@ package org.pm4j.common.pageable.querybased.pagequery;
 import java.io.Serializable;
 
 import org.pm4j.common.pageable.querybased.QueryService;
-import org.pm4j.common.pageable.querybased.pagequery.PageQueryServiceWithSerialization.SerializeableServiceProvider;
+import org.pm4j.common.pageable.querybased.QueryServiceSerializationSupport;
 import org.pm4j.common.selection.Selection;
 
 /**
@@ -13,7 +13,7 @@ public abstract class PageQuerySelectionBase<T_ITEM, T_ID> implements Selection<
   private static final long serialVersionUID = 1L;
 
   /** The service provider may be <code>null</code> in case of non-serializeable selections. */
-  private PageQueryServiceWithSerialization.SerializeableServiceProvider serviceProvider;
+  private QueryServiceSerializationSupport.SerializeableServiceProvider serviceProvider;
   transient private QueryService<T_ITEM, T_ID> service;
 
   public PageQuerySelectionBase(QueryService<T_ITEM, T_ID> service) {
@@ -23,10 +23,10 @@ public abstract class PageQuerySelectionBase<T_ITEM, T_ID> implements Selection<
     // find the (optionally embedded) serializeable service provider.
     QueryService<T_ITEM, T_ID> s = service;
     if (s instanceof CachingPageQueryService) {
-    	s = ((CachingPageQueryService<T_ITEM, T_ID>)service).getBaseService();
+      s = ((CachingPageQueryService<T_ITEM, T_ID>)service).getBaseService();
     }
-    if (s instanceof PageQueryServiceWithSerialization) {
-      this.serviceProvider = ((PageQueryServiceWithSerialization<T_ITEM, T_ID>)s).getSerializeableServiceProvider();
+    if (s instanceof QueryServiceSerializationSupport) {
+      this.serviceProvider = ((QueryServiceSerializationSupport)s).getSerializeableServiceProvider();
     }
   }
 

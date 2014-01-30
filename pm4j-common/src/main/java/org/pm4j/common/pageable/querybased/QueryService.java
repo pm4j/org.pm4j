@@ -3,12 +3,12 @@ package org.pm4j.common.pageable.querybased;
 import org.pm4j.common.query.QueryParams;
 
 /**
- * Converts between query or selection items and their corresponding identifiers.
+ * Base interface for more concrete query services (PageQueryService and IdQueryService).
  *
  * @param <T_ITEM> the item type.
  * @param <T_ID> the item id type.
  *
- * @author olaf boede
+ * @author Olaf Boede
  */
 public interface QueryService<T_ITEM, T_ID> {
 

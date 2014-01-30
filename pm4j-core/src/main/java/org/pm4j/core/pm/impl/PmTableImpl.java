@@ -529,9 +529,9 @@ public class PmTableImpl
   /**
    * Provides for service based tables the backing service reference.
    * <p>
-   * The base implementation provides a reference to the service configured in @PmTable
+   * The base implementation provides a reference to the service configured in {@link PmTableCfg#queryServiceClass()}.
    *
-   * @return
+   * @return The used service in case of service based tables. <code>null</code> in case of in-memory tables.
    */
   @SuppressWarnings("unchecked")
   protected QueryService<T_ROW_BEAN, ?> getPmQueryServiceImpl() {
