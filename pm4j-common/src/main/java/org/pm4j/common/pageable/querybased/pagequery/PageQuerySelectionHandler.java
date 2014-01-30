@@ -156,6 +156,11 @@ public abstract class PageQuerySelectionHandler<T_ITEM, T_ID> extends SelectionH
     }
   }
 
+  @Override
+  public Selection<T_ITEM> getAllItemsSelection() {
+    return new PageQueryAllItemsSelection<T_ITEM, T_ID>(service, getQueryParams());
+  }
+
   /**
    * Sub classes provide here the query that represents all selectable items.
    *

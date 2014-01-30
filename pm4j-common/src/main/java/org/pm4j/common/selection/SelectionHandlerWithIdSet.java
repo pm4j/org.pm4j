@@ -118,7 +118,7 @@ public abstract class SelectionHandlerWithIdSet<T_ITEM, T_ID> extends SelectionH
     // check for noop:
     if (oldSelection.getSize() == 0 &&
         newSelection.getSize() == 0) {
-    	return true;
+      return true;
     }
 
     try {
@@ -130,6 +130,11 @@ public abstract class SelectionHandlerWithIdSet<T_ITEM, T_ID> extends SelectionH
       LOG.debug("Selection change rejected because of a property change veto.", e);
       return false;
     }
+  }
+
+  @Override
+  public Selection<T_ITEM> getAllItemsSelection() {
+    return new ItemIdBasedSelection<T_ITEM, T_ID>(itemIdConverter, new HashSet<T_ID>(getAllIds()));
   }
 
   private boolean setSelection(Set<T_ID> selectedIds) {

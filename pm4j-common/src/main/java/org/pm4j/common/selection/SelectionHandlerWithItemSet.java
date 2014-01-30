@@ -28,6 +28,7 @@ public class SelectionHandlerWithItemSet<T_ITEM> extends SelectionHandlerBase<T_
   private static final ItemSetSelection<?> EMPTY_SELECTION = new ItemSetSelection<Object>(Collections.EMPTY_SET);
 
   /** The collection to handle selected items for. */
+  // XXX oboede: should be changed to a real collection interface.
   private Iterable<T_ITEM> collection;
 
   /** The set of currently selected items. */
@@ -120,7 +121,7 @@ public class SelectionHandlerWithItemSet<T_ITEM> extends SelectionHandlerBase<T_
     // check for noop:
     if (oldSelection.getSize() == 0 &&
         newSelection.getSize() == 0) {
-    	return true;
+      return true;
     }
 
     try {
@@ -134,6 +135,11 @@ public class SelectionHandlerWithItemSet<T_ITEM> extends SelectionHandlerBase<T_
       }
       return false;
     }
+  }
+
+  @Override
+  public Selection<T_ITEM> getAllItemsSelection() {
+    return new ItemSetSelection<T_ITEM>(new HashSet<T_ITEM>(IterableUtil.asCollection(collection)));
   }
 
 

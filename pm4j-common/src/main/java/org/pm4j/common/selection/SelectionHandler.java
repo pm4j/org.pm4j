@@ -116,6 +116,15 @@ public interface SelectionHandler<T_ITEM> extends PropertyChangeSupported {
    */
   boolean setSelection(Selection<T_ITEM> selection);
 
+  /**
+   * Provides a selection that contains all items.<br>
+   * In case of a filtered context this selection contains only the items the pass the
+   * filter criteria.
+   *
+   * @return The all-items selection. Never <code>null</code>.
+   */
+  Selection<T_ITEM> getAllItemsSelection();
+
   // --- support for domain specific initial selections ---
 
   /**

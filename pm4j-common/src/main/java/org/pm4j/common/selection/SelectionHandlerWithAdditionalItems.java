@@ -226,7 +226,7 @@ public class SelectionHandlerWithAdditionalItems<T_ITEM> extends SelectionHandle
 
     // check for noop:
     if (oldSelection.isEmpty() && newSelection.isEmpty()) {
-    	return true;
+      return true;
     }
 
     try {
@@ -241,6 +241,12 @@ public class SelectionHandlerWithAdditionalItems<T_ITEM> extends SelectionHandle
       }
       return false;
     }
+  }
+
+  @Override
+  public Selection<T_ITEM> getAllItemsSelection() {
+    Selection<T_ITEM> baseSelection = baseSelectionHandler.getAllItemsSelection();
+    return new SelectionWithAdditionalItems<T_ITEM>(baseSelection, getAdditionalItems());
   }
 
   protected List<T_ITEM> getAdditionalItems() {
