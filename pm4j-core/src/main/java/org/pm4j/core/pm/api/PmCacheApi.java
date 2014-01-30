@@ -9,6 +9,11 @@ import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.impl.PmCacheApiHandler;
 
+/**
+ * API for PM aspect cache handling.
+ *
+ * @author Olaf Boede
+ */
 public class PmCacheApi {
 
   /**
@@ -35,6 +40,8 @@ public class PmCacheApi {
   /**
    * Clears cached content (if there was something cached).<br>
    * Causes a reload of the content with the next request.
+   * <p>
+   * The caches of the child PM instances get cleared recursively as well.
    *
    * @param cacheKinds
    *          The set of caches to be cleared. If no cacheKind is specified, all
@@ -50,8 +57,7 @@ public class PmCacheApi {
    * that is a little more efficient, since it can quickly check the set if a
    * specific cache kind is to clear.
    * <p>
-   * Subclasses that need to extend the clear implementation should override
-   * this method.
+   * XXX oboede: is that really needed as part of the public API?
    *
    * @param cacheSet
    *          Specification of the cache kinds to clear.

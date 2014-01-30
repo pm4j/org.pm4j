@@ -126,7 +126,7 @@ public abstract class PageQuerySelectionHandler<T_ITEM, T_ID> extends SelectionH
   @Override
   public boolean setSelection(final Selection<T_ITEM> selectionArg) {
     Selection<T_ITEM> selection;
-    // in case of an empty selection we may get a type withoud 'clicked ids' that's handeled here:
+    // in case of an empty selection we may get a type without 'clicked ids' that's handled here:
     if (selectionArg instanceof QuerySelectionWithClickedIds) {
       selection = selectionArg;
     } else {
@@ -142,7 +142,7 @@ public abstract class PageQuerySelectionHandler<T_ITEM, T_ID> extends SelectionH
 
     // check for noop:
     if (oldSelection.isEmpty() && newSelection.isEmpty()) {
-    	return true;
+      return true;
     }
 
     try {

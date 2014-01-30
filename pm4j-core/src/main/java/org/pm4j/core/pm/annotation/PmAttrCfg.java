@@ -203,15 +203,22 @@ public @interface PmAttrCfg {
   public enum Validate {
 
     /**
-     * Validates the attribute only if {@link PmDataInput#pmValidate()} gets called. This
-     * happens usually when a validating {@link PmCommand} gets executed.
+     * Validates the attribute only if {@link PmDataInput#pmValidate()} gets
+     * called. This happens usually when a validating {@link PmCommand} gets
+     * executed.
      * <p>
-     * This is the default validation strategy
+     * The validation strategy allows to set invalid attribute values until the
+     * user finally triggers an action that validates if all entered values are
+     * OK.<br>
+     * This strategy is very useful if the validation rules considering more
+     * than a single attribute value (E.g. 'A' must be greater that 'B').
+     * <p>
+     * This is the default validation strategy.
      */
     ON_VALIDATE_CALL,
 
     /**
-     * Validates the received value before setting it to the attibute.
+     * Validates the received value before setting it to the attribute.
      * <p>
      * The method <code>PmAttrImpl.validate(value)</code> gets called.<br>
      * This validation is limited, because it can't use bean validation and some

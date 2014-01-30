@@ -678,6 +678,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
         try {
           validate(newPmValue);
         }
+        // TODO: we have to handle other validation exceptions too.
         catch (PmValidationException e) {
           PmResourceData resData = e.getResourceData();
           setAndPropagateInvalidValue(value, resData.msgKey, resData.msgArgs);
@@ -732,7 +733,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
 
         PmEventApi.firePmEvent(this, PmEvent.VALUE_CHANGE);
 
-        // after all post-processing it's really done an available for undo calls.
+        // after all post-processing it's really done and available for undo calls.
         getPmConversation().getPmCommandHistory().commandDone(cmd);
 
         return true;
