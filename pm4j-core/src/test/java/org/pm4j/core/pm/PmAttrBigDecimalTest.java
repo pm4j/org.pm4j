@@ -15,6 +15,7 @@ import org.pm4j.core.pm.annotation.PmAttrBigDecimalCfg;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.impl.PmAttrBigDecimalImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
+import org.pm4j.tools.test.PmAssert;
 
 /**
  * If you modify this test, please consider at least {@link PmAttrDoubleTest}.
@@ -121,18 +122,25 @@ public class PmAttrBigDecimalTest {
   @Test
   public void testRoundingHalfDown() {
     myPm.roundingHalfDown.setValueAsString("1.005");
-    myPm.roundingHalfDown.pmValidate();
     assertEquals("0.005 will be removed because of the format and rounding", "1.00", myPm.roundingHalfDown.getValueAsString());
-    assertEquals("Should not have been changed", new BigDecimal("1.005"), myPm.roundingHalfDown.getValue());
+    assertEquals("Should have been rounded and formatted", new BigDecimal("1.00"), myPm.roundingHalfDown.getValue());
   }
 
   @Test
   public void testRoundingHalfUp() {
     myPm.roundingHalfUp.setValueAsString("1.005");
-    myPm.roundingHalfUp.pmValidate();
     // the 0.005 will be rounded because of the format and rounding mode
     assertEquals("0.005 will be added because of the format and rounding", "1.01", myPm.roundingHalfUp.getValueAsString());
-    assertEquals("Should not have been changed", new BigDecimal("1.005"), myPm.roundingHalfUp.getValue());
+    assertEquals("Should have been rounded and formatted", new BigDecimal("1.01"), myPm.roundingHalfUp.getValue());
+  }
+
+  @Test
+  public void testRoundingUnnecessary() {
+    myPm.roundingUnnecessary.setValueAsString("1.005");
+    // the 0.005 will be rounded because of the format and rounding mode
+    assertEquals("Should not have been changed", "1.005", myPm.roundingUnnecessary.getValueAsString());
+    assertEquals("Should be null", null, myPm.roundingUnnecessary.getValue());
+    PmAssert.assertSingleErrorMessage(myPm.roundingUnnecessary, "Unable to convert the entered string to a numeric value in field \"1.005\".");
   }
 
   @Test
@@ -162,6 +170,13 @@ public class PmAttrBigDecimalTest {
     assertTrue(myPm.combination.isPmValid());
     assertEquals(MyPm.READONLY_VALUE_ROUNDED, myPm.combination.getValueAsString());
   }
+
+  @Test
+  public void testAmount() {
+    myPm.amount.setValueAsString("12.3456");
+    assertEquals("12.35", myPm.amount.getValueAsString());
+    assertEquals(new BigDecimal("12.35"), myPm.amount.getValue());
+  }
   
   static class MyPm extends PmConversationImpl {
     public static final String READONLY_VALUE = "1.515";
@@ -180,6 +195,9 @@ public class PmAttrBigDecimalTest {
     @PmAttrCfg(formatResKey="pmAttrNumberTest_twoDecimalPlaces")
     @PmAttrBigDecimalCfg(roundingMode = RoundingMode.HALF_UP)
     public final PmAttrBigDecimal roundingHalfUp = new PmAttrBigDecimalImpl(this);
+
+    @PmAttrCfg(formatResKey="pmAttrNumberTest_twoDecimalPlaces")
+    public final PmAttrBigDecimal roundingUnnecessary = new PmAttrBigDecimalImpl(this);
     
     @PmAttrCfg(maxLen=6)
     public final PmAttrBigDecimal maxLen6 = new PmAttrBigDecimalImpl(this);
@@ -209,6 +227,10 @@ public class PmAttrBigDecimalTest {
           return new BigDecimal(READONLY_VALUE);
         }
     };
+
+    @PmAttrBigDecimalCfg(roundingMode = RoundingMode.HALF_UP)
+    @PmAttrCfg(formatResKey = "pmAttrNumberTest_twoDecimalPlaces")
+    public final PmAttrBigDecimal amount = new PmAttrBigDecimalImpl(this);
   }
 
 }

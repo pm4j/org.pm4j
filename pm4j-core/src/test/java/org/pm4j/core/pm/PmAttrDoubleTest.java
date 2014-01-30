@@ -121,7 +121,7 @@ public class PmAttrDoubleTest {
     myPm.roundingHalfDown.setValueAsString("1.005");
     myPm.roundingHalfDown.pmValidate();
     assertEquals("0.005 will be removed because of the format and rounding", "1.00", myPm.roundingHalfDown.getValueAsString());
-    assertEquals("Should not have been changed", new Double("1.005"), myPm.roundingHalfDown.getValue());
+    assertEquals("Should have been rounded and formatted", new Double("1.0"), myPm.roundingHalfDown.getValue());
   }
 
   @Test
@@ -130,7 +130,7 @@ public class PmAttrDoubleTest {
     myPm.roundingHalfUp.pmValidate();
     // the 0.005 will be rounded because of the format and rounding mode
     assertEquals("0.005 will be added because of the format and rounding", "1.01", myPm.roundingHalfUp.getValueAsString());
-    assertEquals("Should not have been changed", new Double("1.005"), myPm.roundingHalfUp.getValue());
+    assertEquals("Should have been rounded and formatted", new Double("1.01"), myPm.roundingHalfUp.getValue());
   }
 
 

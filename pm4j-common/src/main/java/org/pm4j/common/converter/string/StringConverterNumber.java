@@ -105,14 +105,23 @@ public class StringConverterNumber<T extends Number> extends StringConverterBase
       if(nf instanceof DecimalFormat) {
         DecimalFormat decimalFormat = (DecimalFormat) nf;
         ParsePosition parsePosition = new ParsePosition(0);
+        // first parse: parameter String to number object
         Object object = decimalFormat.parse(s, parsePosition);
+        // because of DecimalFormat.parse behavior 
+        //number object may have more decimal places than format 
+        
         // make sure that the whole string matches
         if( parsePosition.getIndex() < s.length() ) {
           throw new ParseException("input string does only match in parts", parsePosition.getIndex());
         }
-        // make sure that max and min fraction match
         try {
-          nf.format(object);
+          // verify that parsed number can be formatted back to String
+          // if not, throw ArithmeticException
+          String formattedValue = nf.format(object);
+          
+          // second parse: formatted String to number object
+          // this way number has decimal places according to format 
+          object = nf.parse(formattedValue);
         } catch (ArithmeticException e) {
           throw new ParseException(e.getMessage(), 0);
         }
