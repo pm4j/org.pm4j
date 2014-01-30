@@ -3,12 +3,12 @@
 
   <groupId>org.pm4j</groupId>
   <artifactId>pm4j-swing</artifactId>
-  <version>0.6.63-SNAPSHOT</version>
+  <version>0.6.63</version>
 
   <parent>
     <groupId>org.pm4j</groupId>
     <artifactId>main</artifactId>
-    <version>0.6.63-SNAPSHOT</version>
+    <version>0.6.63</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
