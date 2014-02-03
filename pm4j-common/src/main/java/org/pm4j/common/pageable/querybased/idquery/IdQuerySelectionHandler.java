@@ -1,4 +1,4 @@
-package org.pm4j.common.selection;
+package org.pm4j.common.pageable.querybased.idquery;
 
 import java.beans.PropertyVetoException;
 import java.util.Collection;
@@ -9,27 +9,30 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.pm4j.common.pageable.querybased.QueryService;
+import org.pm4j.common.selection.SelectMode;
+import org.pm4j.common.selection.Selection;
+import org.pm4j.common.selection.SelectionHandlerBase;
 
 
-public abstract class SelectionHandlerWithIdSet<T_ITEM, T_ID> extends SelectionHandlerBase<T_ITEM> {
+public abstract class IdQuerySelectionHandler<T_ITEM, T_ID> extends SelectionHandlerBase<T_ITEM> {
 
-  private static final Log LOG = LogFactory.getLog(SelectionHandlerWithIdSet.class);
+  private static final Log LOG = LogFactory.getLog(IdQuerySelectionHandler.class);
 
   /** Used to provide empty selections. */
-  private final ItemIdBasedSelection<T_ITEM, T_ID> emptySelection;
+  private final IdQuerySelectionBase<T_ITEM, T_ID> emptySelection;
 
   /** The converter used to get items for the internally handled id's. */
   private final QueryService<T_ITEM, T_ID> itemIdConverter;
 
   /** The current selection. */
-  private ItemIdBasedSelection<T_ITEM, T_ID> selection;
+  private IdQuerySelectionBase<T_ITEM, T_ID> selection;
 
   @SuppressWarnings("unchecked")
-  public SelectionHandlerWithIdSet(QueryService<T_ITEM, T_ID> itemIdConverter) {
+  public IdQuerySelectionHandler(QueryService<T_ITEM, T_ID> itemIdConverter) {
     assert itemIdConverter != null;
 
     this.itemIdConverter = itemIdConverter;
-    this.emptySelection = new ItemIdBasedSelection<T_ITEM, T_ID>(itemIdConverter, Collections.EMPTY_SET);
+    this.emptySelection = new IdQuerySelectionBase<T_ITEM, T_ID>(itemIdConverter, Collections.EMPTY_SET);
     this.selection = emptySelection;
   }
 
@@ -123,7 +126,7 @@ public abstract class SelectionHandlerWithIdSet<T_ITEM, T_ID> extends SelectionH
 
     try {
       fireVetoableChange(PROP_SELECTION, oldSelection, newSelection);
-      this.selection = (ItemIdBasedSelection<T_ITEM, T_ID>) newSelection;
+      this.selection = (IdQuerySelectionBase<T_ITEM, T_ID>) newSelection;
       firePropertyChange(PROP_SELECTION, oldSelection, newSelection);
       return true;
     } catch (PropertyVetoException e) {
@@ -134,17 +137,17 @@ public abstract class SelectionHandlerWithIdSet<T_ITEM, T_ID> extends SelectionH
 
   @Override
   public Selection<T_ITEM> getAllItemsSelection() {
-    return new ItemIdBasedSelection<T_ITEM, T_ID>(itemIdConverter, new HashSet<T_ID>(getAllIds()));
+    return new IdQuerySelectionBase<T_ITEM, T_ID>(itemIdConverter, new HashSet<T_ID>(getAllIds()));
   }
 
   private boolean setSelection(Set<T_ID> selectedIds) {
     return setSelection(selectedIds.isEmpty()
         ? emptySelection
-        : new ItemIdBasedSelection<T_ITEM, T_ID>(itemIdConverter, selectedIds));
+        : new IdQuerySelectionBase<T_ITEM, T_ID>(itemIdConverter, selectedIds));
   }
 
   private Set<T_ID> getModifiableIdSet() {
-    return new HashSet<T_ID>(selection.ids);
+    return new HashSet<T_ID>(selection.getIds());
   }
 
 }

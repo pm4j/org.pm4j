@@ -20,7 +20,6 @@ import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.selection.Selection;
 import org.pm4j.common.selection.SelectionHandler;
 import org.pm4j.common.selection.SelectionHandlerWithAdditionalItems;
-import org.pm4j.common.selection.SelectionHandlerWithIdSet;
 import org.pm4j.common.util.collection.ListUtil;
 
 /**
@@ -78,7 +77,7 @@ public class IdQueryCollectionImpl<T_ITEM, T_ID> extends QueryCollectionBase<T_I
     this.service = service;
 
     // Handling of transient and persistent item selection is separated by a handler composition.
-    SelectionHandler<T_ITEM> querySelectionHandler = new SelectionHandlerWithIdSet<T_ITEM, T_ID>(service) {
+    SelectionHandler<T_ITEM> querySelectionHandler = new IdQuerySelectionHandler<T_ITEM, T_ID>(service) {
       @Override
       protected Collection<T_ID> getAllIds() {
         return getIds();
