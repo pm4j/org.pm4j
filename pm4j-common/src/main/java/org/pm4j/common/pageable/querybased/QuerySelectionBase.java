@@ -1,5 +1,8 @@
 package org.pm4j.common.pageable.querybased;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 import org.pm4j.common.pageable.querybased.QueryServiceSerializationSupport.SerializeableServiceProvider;
@@ -7,10 +10,6 @@ import org.pm4j.common.selection.Selection;
 
 /**
  * A selection base class that supports serializable selections.
- * <p>
- * TODO oboede:<br>
- * . support {@link Serializable} services
- * . check service serializibility on serialization.
  *
  * @author Olaf Boede
  */
@@ -66,6 +65,40 @@ public abstract class QuerySelectionBase<T_ITEM, T_ID> implements Selection<T_IT
       }
     }
     return service;
+  }
+
+  /**
+   * In addition to the standard serialization the follwing is implemented here:
+   * <ul>
+   * <li>Check the serialization preconditions.</li>
+   * <li>Handle the option of having a serializable service</li>
+   * </ul> 
+   * 
+   * @param oos
+   * @throws IOException
+   */
+  private void writeObject(ObjectOutputStream oos) throws IOException {
+    oos.defaultWriteObject();
+    if (serviceProvider == null) {
+      if (service instanceof Serializable) {
+        oos.writeObject(service);
+      } else {
+        throw new IOException("Unable to serialize a selection. The query service should either implement QueryServiceSerializationSupport or Serializeable.\n" +
+            "\tFound query service: " + service);
+      }
+    } else {
+      oos.writeObject(null);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  private void readObject(ObjectInputStream ois) throws IOException {
+    try {
+      ois.defaultReadObject();
+      service = (QueryService<T_ITEM, T_ID>) ois.readObject();
+    } catch (ClassNotFoundException e) {
+      throw new IOException(e);
+    }
   }
 
 }

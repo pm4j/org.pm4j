@@ -16,4 +16,11 @@ import org.pm4j.common.selection.Selection;
  */
 @Deprecated
 public interface PageQueryServiceWithSerialization<T_BEAN, T_ID> extends QueryServiceSerializationSupport, PageQueryService<T_BEAN, T_ID> {
+
+  /**
+   * @deprecated Please use {@link QueryServiceSerializationSupport#SerializeableServiceProvider}
+   */
+  static interface SerializeableServiceProvider extends QueryServiceSerializationSupport.SerializeableServiceProvider {
+  }
+
 }
