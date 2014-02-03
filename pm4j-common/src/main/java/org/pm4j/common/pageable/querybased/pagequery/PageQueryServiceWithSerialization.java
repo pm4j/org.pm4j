@@ -20,7 +20,7 @@ public interface PageQueryServiceWithSerialization<T_BEAN, T_ID> extends QuerySe
   /**
    * @deprecated Please use {@link QueryServiceSerializationSupport#SerializeableServiceProvider}
    */
-  static interface SerializeableServiceProvider extends QueryServiceSerializationSupport.SerializeableServiceProvider {
+  static interface SerializeableServiceProvider extends QueryServiceSerializationSupport.SerializeableServiceProvider2 {
   }
 
 }

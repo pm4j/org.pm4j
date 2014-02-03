@@ -5,7 +5,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
-import org.pm4j.common.pageable.querybased.QueryServiceSerializationSupport.SerializeableServiceProvider;
+import org.pm4j.common.pageable.querybased.QueryServiceSerializationSupport.SerializeableServiceProvider2;
 import org.pm4j.common.selection.Selection;
 
 /**
@@ -17,7 +17,7 @@ public abstract class QuerySelectionBase<T_ITEM, T_ID> implements Selection<T_IT
   private static final long serialVersionUID = 1L;
 
   /** The service provider may be <code>null</code> in case of non-serializeable selections. */
-  private QueryServiceSerializationSupport.SerializeableServiceProvider serviceProvider;
+  private QueryServiceSerializationSupport.SerializeableServiceProvider2 serviceProvider;
 
   /** Reference to the service that provides the selected objects.
    * Is transient because most services are not serializable. */
@@ -48,7 +48,7 @@ public abstract class QuerySelectionBase<T_ITEM, T_ID> implements Selection<T_IT
   /**
    * Provides the service reference.<br>
    * After a de-serialization this reference may be <code>null</code>.
-   * In this case a {@link SerializeableServiceProvider} my restore the service reference on the fly.
+   * In this case a {@link SerializeableServiceProvider2} my restore the service reference on the fly.
    *
    * @return
    */

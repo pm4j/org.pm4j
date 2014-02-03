@@ -12,10 +12,11 @@ import org.pm4j.common.selection.Selection;
  * @author Olaf Boede
  */
 public interface QueryServiceSerializationSupport {
+
   /**
    * An interface for serializeable objects that can provide a {@link PageQueryService}.
    */
-  static interface SerializeableServiceProvider extends Serializable {
+  static interface SerializeableServiceProvider2 extends Serializable {
 
     /**
      * @return a reference to the service.
@@ -35,6 +36,6 @@ public interface QueryServiceSerializationSupport {
    *
    * @return
    */
-  SerializeableServiceProvider getSerializeableServiceProvider();
+  SerializeableServiceProvider2 getSerializeableServiceProvider();
 
 }
