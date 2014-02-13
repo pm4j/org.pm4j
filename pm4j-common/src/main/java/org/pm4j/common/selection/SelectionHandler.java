@@ -113,7 +113,11 @@ public interface SelectionHandler<T_ITEM> extends PropertyChangeSupported {
    * @return <code>true</code> if the change was done.<br>
    *         <code>false</code> if the change was rejected by a
    *         {@link VetoableChangeListener}.
+   *
+   * @deprecated Please use the select-methods instead. The handler is responsible for creating the handler type specific selection.<br>
+   *             This method will disappear asap!
    */
+  @Deprecated
   boolean setSelection(Selection<T_ITEM> selection);
 
   /**

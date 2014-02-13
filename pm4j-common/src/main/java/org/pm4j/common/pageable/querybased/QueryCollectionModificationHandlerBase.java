@@ -113,8 +113,26 @@ public class QueryCollectionModificationHandlerBase<T_ITEM, T_ID>  implements Mo
     return true;
   }
 
+  /**
+   * Add and register add are the same for query collections.<br>
+   * The set of added items within the {@link Modifications} is the transient
+   * item storage until the modifications will be persisted at some point.
+   */
   @Override
-  public void addItem(T_ITEM item) {
+  public boolean addItem(T_ITEM item) {
+    // check for vetos before doing the change
+    try {
+      pageableCollection.fireVetoableChange(PageableCollection.EVENT_ITEM_ADD, null, item);
+    } catch (PropertyVetoException e) {
+      return false;
+    }
+
+    registerAddedItem(item);
+    return true;
+  }
+
+  @Override
+  public void registerAddedItem(T_ITEM item) {
     modifications.registerAddedItem(item);
     pageableCollection.firePropertyChange(PageableCollection.EVENT_ITEM_ADD, null, item);
   }

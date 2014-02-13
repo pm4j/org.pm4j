@@ -304,8 +304,13 @@ public class PmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> extends Prope
     }
 
     @Override
-    public void addItem(T_PM item) {
-      getBeanCollectionModificationHandler().addItem(item.getPmBean());
+    public boolean addItem(T_PM item) {
+      return getBeanCollectionModificationHandler().addItem(item.getPmBean());
+    }
+
+    @Override
+    public void registerAddedItem(T_PM item) {
+      getBeanCollectionModificationHandler().registerAddedItem(item.getPmBean());
     }
 
     @Override

@@ -510,7 +510,7 @@ public class PmTableImpl
   public final PageableCollection<T_ROW_PM> getPmPageableCollection() {
     zz_ensurePmInitialization();
     if (pmPageableCollection == null) {
-      _setPageableCollection(getPmPageableCollectionImpl());
+      assignPmPageableCollection(getPmPageableCollectionImpl());
     }
     return pmPageableCollection;
   }
@@ -560,32 +560,35 @@ public class PmTableImpl
     @SuppressWarnings("unchecked")
     QueryService<T_ROW_BEAN, Object> service = (QueryService<T_ROW_BEAN, Object>) getPmQueryServiceImpl();
     QueryOptions qo = getPmQueryOptions();
-    PageableCollection<T_ROW_BEAN> pc = null;
-
-    if (service == null) {
-      InMemCollectionBase<T_ROW_BEAN> inMemColl = new InMemCollectionBase<T_ROW_BEAN>(qo) {
-        @Override
-        protected Collection<T_ROW_BEAN> getBackingCollectionImpl() {
-          pmCollectionGetterLogicUsed = true; // From now on setPmBeans() shouldn't be called.
-          return getPmBeansImpl();
-        }
-      };
-      inMemColl.setCacheStrategy(getOwnMetaData().inMemCollectionCacheStragegy, this);
-      pc = inMemColl;
-    }
-    else if (service instanceof PageQueryService) {
-      pc = new PageQueryCollection<T_ROW_BEAN, Object>((PageQueryService<T_ROW_BEAN, Object>) service, qo);
+    PageableCollection<T_ROW_BEAN> pc = makePmPageableBeanCollection(service, qo);
+    if (service != null) {
       pmCollectionGetterLogicUsed = true; // From now on setPmBeans() shouldn't be called.
-    }
-    else if (service instanceof IdQueryService) {
-      pc = new IdQueryCollectionImpl<T_ROW_BEAN, Object>((IdQueryService<T_ROW_BEAN, Object>) service, qo);
-      pmCollectionGetterLogicUsed = true; // From now on setPmBeans() shouldn't be called.
-    }
-    else {
-      throw new PmRuntimeException(this,
-          "The service type provided by 'getPmQueryServiceImpl()' is not a 'PageableQueryService' and not a 'PageableIdQueryService'. Possibly @PmTableCfg#serviceClass is not well configured. Found serivce: " + service);
     }
     return new PmBeanCollection<T_ROW_PM, T_ROW_BEAN>(this, PmBean.class, pc);
+  }
+
+  /**
+   * Factory method that may be overridden to create a more specific collection.<br>
+   * It will only be called if the table handles in-memory data (if
+   * {@link #getPmQueryServiceImpl()} returns <code>null</code>).
+   *
+   * @return The in-memory collection to be used for this table.
+   */
+  protected PageableCollection<T_ROW_BEAN> makePmPageableBeanCollection(QueryService<T_ROW_BEAN, Object> service, QueryOptions qo) {
+    if (service == null) {
+      return new InMemTableBeanCollection(qo);
+    }
+    if (service instanceof PageQueryService) {
+      return new PageQueryCollection<T_ROW_BEAN, Object>((PageQueryService<T_ROW_BEAN, Object>) service, qo);
+    }
+    if (service instanceof IdQueryService) {
+      return new IdQueryCollectionImpl<T_ROW_BEAN, Object>((IdQueryService<T_ROW_BEAN, Object>) service, qo);
+    }
+    // a different service type:
+    throw new PmRuntimeException(this,
+        "The service type is not a 'PageableQueryService' and not a 'PageableIdQueryService'. Possibly @PmTableCfg#serviceClass is not well configured.\n" +
+        "\tFound serivce: " + service +
+        "\tAlternatively you may override makePmPageableBeanCollection() to support create a your specific collection.");
   }
 
   /**
@@ -641,33 +644,6 @@ public class PmTableImpl
     return beans;
   }
 
-  /**
-   * A post processing method that allow to apply some default settings to a new pageable collection.
-   * <p>
-   * Gets called whenever a new {@link #pmPageableCollection} gets assigned:
-   * <ul>
-   *  <li>by calling {@link #getPmPageableCollectionImpl()}</li>
-   * </ul>
-   * The default settings applied in this base implementation are:
-   * <ul>
-   *  <li>Number of page rows and multi-select setting.</li>
-   *  <li>The reference of the (optional) pager to the collection.</li>
-   * </ul>
-   * Sub classes may override this method to extend this logic.
-   *
-   * @param pageableCollection the collection to initialize.
-   */
-  protected void initPmPageableCollection(PageableCollection<T_ROW_PM> pageableCollection) {
-    SelectionHandler<T_ROW_PM> selectionHandler = pageableCollection.getSelectionHandler();
-    selectionHandler.setSelectMode(getPmRowSelectMode());
-    pageableCollection.setPageSize(getNumOfPageRowPms());
-
-    // XXX olaf: Check - is redundant to the change listener within Pager!
-    if (getPmPager() != null) {
-      getPmPager().setPageableCollection(pageableCollection);
-    }
-  }
-
   @SuppressWarnings("unchecked")
   protected Class<T_ROW_PM> getPmRowBeanClass() {
     Type t = GenericTypeUtil.resolveGenericArgument(PmTableImpl.class, getClass(), 1);
@@ -697,7 +673,7 @@ public class PmTableImpl
       selection = pmPageableCollection.getSelectionHandler().getSelection();
     }
 
-    _setPageableCollection(pageable);
+    assignPmPageableCollection(pageable);
     PmEventApi.firePmEventIfInitialized(this, PmEvent.VALUE_CHANGE, ValueChangeKind.VALUE);
 
     // re-apply the settings to preserve
@@ -717,8 +693,25 @@ public class PmTableImpl
     return null;
   }
 
-  // XXX olaf: combine with init method.
-  private void _setPageableCollection(PmBeanCollection<T_ROW_PM, T_ROW_BEAN> pc) {
+  /**
+   *
+   * A post processing method that allow to apply some default settings to a new pageable collection.
+   * <p>
+   * Gets called whenever a new {@link #pmPageableCollection} gets assigned:
+   * <ul>
+   *  <li>by calling {@link #getPmPageableCollectionImpl()} or</li>
+   *  <li>by calling {@link #setPmPageableCollection(PmBeanCollection)}</li>
+   * </ul>
+   * The default settings applied in this base implementation are:
+   * <ul>
+   *  <li>Number of page rows and multi-select setting.</li>
+   *  <li>The reference of the (optional) pager to the collection.</li>
+   * </ul>
+   * Sub classes may override this method to extend this logic.
+   *
+   * @param pageableCollection the collection to initialize.
+   */
+  protected void assignPmPageableCollection(PmBeanCollection<T_ROW_PM, T_ROW_BEAN> pc) {
     if (this.pmPageableCollection != pc) {
       SelectionHandler<T_ROW_PM> selectionHandler = pc.getSelectionHandler();
       selectionHandler.addPropertyAndVetoableListener(SelectionHandler.PROP_SELECTION, pmTableSelectionChangeListener);
@@ -732,7 +725,14 @@ public class PmTableImpl
 
     this.pmPageableCollection = pc;
     if (pmPageableCollection != null) {
-      initPmPageableCollection(pmPageableCollection);
+      SelectionHandler<T_ROW_PM> selectionHandler = pmPageableCollection.getSelectionHandler();
+      selectionHandler.setSelectMode(getPmRowSelectMode());
+      pmPageableCollection.setPageSize(getNumOfPageRowPms());
+
+      // XXX olaf: Check - is redundant to the change listener within Pager!
+      if (getPmPager() != null) {
+        getPmPager().setPageableCollection(pmPageableCollection);
+      }
     }
   }
 
@@ -742,6 +742,35 @@ public class PmTableImpl
   }
 
   // -- support classes --
+
+  /**
+   * An in-memory collection that uses the table specific context:
+   * <ul>
+   * <li>uses the table value cache strategy, configured in {@link PmCacheCfg#value()}, to control the frequency of <code>getPmBeansImpl()</code> calls.</li>
+   * <li>binds the backing collection to {@link PmTableImpl#getPmBeansImpl()}.</li>
+   * </ul>
+   */
+  protected class InMemTableBeanCollection extends InMemCollectionBase<T_ROW_BEAN> {
+
+    /**
+     * @param queryOptions
+     */
+    public InMemTableBeanCollection(QueryOptions queryOptions) {
+      super(queryOptions);
+      setCacheStrategy(getOwnMetaData().inMemCollectionCacheStragegy, PmTableImpl.this);
+    }
+
+    @Override
+    protected Collection<T_ROW_BEAN> getBackingCollectionImpl() {
+      Collection<T_ROW_BEAN> beans = getPmBeansImpl();
+      if (!beans.isEmpty()) {
+        // After providing some beans using the getter logic setPmBeans() shouldn't be used.
+        // This could cause an inconsistent table model behavior.
+        pmCollectionGetterLogicUsed = true;
+      }
+      return beans;
+    }
+  }
 
   /**
    * Uses the table annotations to generate the {@link QueryOptions} for this table.
@@ -771,14 +800,14 @@ public class PmTableImpl
         }
       }
 
-      // * The 'defaultSortCol' can only be evaluated after processing the column sort options.
-      if (md.defaultSortColName != null) {
-        String name = StringUtils.substringBefore(md.defaultSortColName, ",");
+      // * The 'initialSortCol' can only be evaluated after processing the column sort options.
+      if (md.initialSortColName != null) {
+        String name = StringUtils.substringBefore(md.initialSortColName, ",");
         SortOrder so = options.getSortOrder(name);
         if (so == null) {
-          throw new PmRuntimeException(pmTable, "default sort column '" + md.defaultSortColName + "' is not a sortable column.");
+          throw new PmRuntimeException(pmTable, "initial sort column '" + md.initialSortColName + "' is not a sortable column.");
         }
-        if ("desc".equals(StringUtils.trim(StringUtils.substringAfter(md.defaultSortColName, ",")))) {
+        if ("desc".equals(StringUtils.trim(StringUtils.substringAfter(md.initialSortColName, ",")))) {
           so = so.getReverseSortOrder();
         }
         options.setDefaultSortOrder(so);
@@ -787,7 +816,7 @@ public class PmTableImpl
       Comparator<?> initialSortComparator = getInitialSortOrderComparator();
       if (initialSortComparator != null) {
         if (options.getDefaultSortOrder() != null) {
-          throw new PmRuntimeException(pmTable, "defaultSortCol and initialBeanSortComparator found in PmTableCfg annotation. Don't know what to sort by.");
+          throw new PmRuntimeException(pmTable, "initialSortCol and initialBeanSortComparator found in PmTableCfg annotation. Don't know what to sort by.");
         }
         options.setDefaultSortOrder(new InMemSortOrder(initialSortComparator));
       }
@@ -946,7 +975,7 @@ public class PmTableImpl
       myMetaData.initialBeanSortComparatorClass = (cfg.initialSortComparator() != Comparator.class)
                                 ? cfg.initialSortComparator()
                                 : null;
-      myMetaData.defaultSortColName = StringUtils.defaultIfEmpty(cfg.initialSortCol(), null);
+      myMetaData.initialSortColName = StringUtils.defaultIfEmpty(cfg.initialSortCol(), null);
       myMetaData.serviceClass = (cfg.queryServiceClass() != QueryService.class)
                                 ? cfg.queryServiceClass()
                                 : null;
@@ -984,7 +1013,7 @@ public class PmTableImpl
     private Class<? extends QueryService> serviceClass;
     private boolean sortable;
     private Class<?> initialBeanSortComparatorClass = null;
-    private String defaultSortColName = null;
+    private String initialSortColName = null;
     private CacheStrategy inMemCollectionCacheStragegy = CacheStrategyNoCache.INSTANCE;
 
     /** May be used to define a different default value. */

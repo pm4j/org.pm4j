@@ -19,16 +19,30 @@ import org.pm4j.common.pageable.querybased.pagequery.PageQueryService;
 public interface ModificationHandler<T_ITEM> {
 
   /**
-   * Registers an added collection item.
+   * Adds a new collection item.
    * <p>
    * Usually the new item will be added as the last collection item.
    * <p>
    * Fires a {@link PropertyChangeEvent} {@link PageableCollection#EVENT_ITEM_ADD}.
    *
-   * @param item the item to add.
+   * @param item The item to add.
+   * @return <code>false</code> if the de-selection of the items to delete was prevented by an veto event observer.
    * @throws UnsupportedOperationException if the collection does not support additional items.
    */
-  void addItem(T_ITEM item);
+  boolean addItem(T_ITEM item);
+
+  /**
+   * Registers an already added collection item.
+   * <p>
+   * This method should be called if the item was added not using the {@link ModificationHandler}.
+   * E.g. by adding the item directly to the backing collection.
+   * <p>
+   * Fires a {@link PropertyChangeEvent} {@link PageableCollection#EVENT_ITEM_ADD}.
+   *
+   * @param item The item to add.
+   * @throws UnsupportedOperationException if the collection does not support additional items.
+   */
+  void registerAddedItem(T_ITEM item);
 
   /**
    * Registers the passed item as an updated item.
@@ -53,7 +67,7 @@ public interface ModificationHandler<T_ITEM> {
    * In case of {@link PageQueryService} based collection the delete operation will just mark the selected items
    * as deleted within the {@link Modifications} object. All deleted items will no longer be retrieved.
    *
-   * @return <code>false</code> if the de-selection of the items to delete was prevented by a selection change decorator.
+   * @return <code>false</code> if the de-selection of the items to delete was prevented by an veto event observer.
    * @throws UnsupportedOperationException if the collection does not support removed item handling.
    */
   boolean removeSelectedItems();

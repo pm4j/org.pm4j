@@ -20,7 +20,6 @@ import org.pm4j.common.modifications.ModificationsImpl;
 import org.pm4j.common.pageable.PageableCollection;
 import org.pm4j.common.pageable.PageableCollectionBase;
 import org.pm4j.common.pageable.PageableCollectionUtil;
-import org.pm4j.common.query.QueryEvaluatorSet;
 import org.pm4j.common.query.QueryExpr;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.QueryParams;
@@ -47,7 +46,12 @@ public abstract class InMemCollectionBase<T_ITEM>
   implements InMemCollection<T_ITEM> {
 
   /** The collection type specific selection handler. */
-  private final SelectionHandler<T_ITEM> selectionHandler;
+  private SelectionHandler<T_ITEM>       selectionHandler = new SelectionHandlerWithItemSet<T_ITEM>(this);
+  /** In-memory specific item set modification handler. */
+  private ModificationHandler<T_ITEM>    modificationHandler = new InMemModificationHandler();
+  /** Interpreter for filtering query expressions. */
+  private InMemQueryEvaluator<T_ITEM>    inMemQueryEvaluator = new InMemQueryEvaluator<T_ITEM>(InMemQueryEvaluatorSet.INSTANCE);
+
   /** The cache strategy used for backing collection. */
   private CacheStrategy                  cacheStrategy = CacheStrategyNoCache.INSTANCE;
   /** The cache strategy specific context used to hold the cached value. */
@@ -56,11 +60,6 @@ public abstract class InMemCollectionBase<T_ITEM>
   private List<T_ITEM>                   filteredAndSortedObjects;
   /** The currently active sort order comparator. */
   private Comparator<T_ITEM>             sortOrderComparator;
-  /** Interpreter for filtering query expressions. */
-  private InMemQueryEvaluator<T_ITEM>    inMemQueryEvaluator;
-  /** In-memory specific item set modification handler. */
-  private final InMemModificationHandler modificationHandler;
-
 
   /** A listener gets called if a query property gets changed that affects the effective filter result. */
   private PropertyChangeListener changeFilterListener = new PropertyChangeListener() {
@@ -79,42 +78,15 @@ public abstract class InMemCollectionBase<T_ITEM>
   };
 
   /**
-   * @param filteredAndSortedObjects
-   *          The set of objects to iterate over.
-   * @deprecated Please use {@link #PageableInMemCollectionBase(QueryOptions)}.
-   */
-  @Deprecated
-  public InMemCollectionBase(QueryOptions queryOptions, QueryParams queryParams) {
-    this(queryOptions);
-    assert queryParams == null : "queryParams parameter value is no longer supported";
-  }
-
-  /**
-   * @param queryOptions
-   *          The set of query options offered that's usually offered to the user.
-   */
-  public InMemCollectionBase(QueryOptions queryOptions) {
-    this(InMemQueryEvaluatorSet.INSTANCE, queryOptions);
-  }
-
-  /**
-   * @param queryEvaluatorSet
-   *          The set of expression evaluators.<br>
-   *          May not be <code>null</code>.
    * @param queryOptions
    *          The set of query options offered that's usually offered to the user.<br>
    *          May be <code>null</code> if there are no predefined query options.
    */
-  public InMemCollectionBase(QueryEvaluatorSet queryEvaluatorSet, QueryOptions queryOptions) {
+  public InMemCollectionBase(QueryOptions queryOptions) {
     super(queryOptions);
-    this.selectionHandler = new SelectionHandlerWithItemSet<T_ITEM>(this);
-
     // getQueryParams() is used because the super ctor may have created it on the fly (in case of a null parameter)
     getQueryParams().addPropertyChangeListener(QueryParams.PROP_EFFECTIVE_FILTER, changeFilterListener);
     getQueryParams().addPropertyChangeListener(QueryParams.PROP_EFFECTIVE_SORT_ORDER, changeSortOrderListener);
-
-    this.modificationHandler = new InMemModificationHandler();
-    this.inMemQueryEvaluator = new InMemQueryEvaluator<T_ITEM>(queryEvaluatorSet);
   }
 
   @SuppressWarnings("unchecked")
@@ -246,7 +218,7 @@ public abstract class InMemCollectionBase<T_ITEM>
   }
 
 
-  class InMemModificationHandler implements ModificationHandler<T_ITEM> {
+  protected class InMemModificationHandler implements ModificationHandler<T_ITEM> {
 
     private ModificationsImpl<T_ITEM> modifications = new ModificationsImpl<T_ITEM>();
 
@@ -254,21 +226,37 @@ public abstract class InMemCollectionBase<T_ITEM>
      * Adds the item as the last one.
      */
     @Override
-    public void addItem(T_ITEM item) {
+    public boolean addItem(T_ITEM item) {
+      // check for vetos before doing the change
+      try {
+        fireVetoableChange(PageableCollection.EVENT_ITEM_ADD, null, item);
+      } catch (PropertyVetoException e) {
+        return false;
+      }
+
       try {
         getBackingCollection().add(item);
       } catch (UnsupportedOperationException e) {
         throw new RuntimeException("Please check if you did provide a modifyable collection. Found collection type: " + getBackingCollection().getClass(), e);
       }
-      if (filteredAndSortedObjects != null) {
-        filteredAndSortedObjects.add(item);
-      }
-      modifications.registerAddedItem(item);
-      InMemCollectionBase.this.firePropertyChange(PageableCollection.EVENT_ITEM_ADD, null, item);
+
+      doRegisterAddedItem(item);
+      return true;
     };
 
     @Override
+    public void registerAddedItem(T_ITEM item) {
+      if (!getBackingCollection().contains(item)) {
+        throw new RuntimeException("The new item is not part of the backing collection.\n\tPlease use either addItem() or add the item manually to your collection before calling registerAddedItem().");
+      }
+      doRegisterAddedItem(item);
+    }
+
+    @Override
     public void registerUpdatedItem(T_ITEM item, boolean isUpdated) {
+      // No veto event will be fired here, because the item update is not under control of this
+      // collection.
+
       // a modification of a new item should not lead to a double-listing within the updated list too.
       if (isUpdated && modifications.getAddedItems().contains(item)) {
         return;
@@ -276,7 +264,7 @@ public abstract class InMemCollectionBase<T_ITEM>
 
       boolean wasUpdated = modifications.getUpdatedItems().contains(item);
       modifications.registerUpdatedItem(item, isUpdated);
-      InMemCollectionBase.this.firePropertyChange(PageableCollection.EVENT_ITEM_UPDATE, wasUpdated, isUpdated);
+      firePropertyChange(PageableCollection.EVENT_ITEM_UPDATE, wasUpdated, isUpdated);
     };
 
     @Override
@@ -326,6 +314,14 @@ public abstract class InMemCollectionBase<T_ITEM>
     @Override
     public Modifications<T_ITEM> getModifications() {
       return modifications;
+    }
+
+    private void doRegisterAddedItem(T_ITEM item) {
+      if (filteredAndSortedObjects != null) {
+        filteredAndSortedObjects.add(item);
+      }
+      modifications.registerAddedItem(item);
+      InMemCollectionBase.this.firePropertyChange(PageableCollection.EVENT_ITEM_ADD, null, item);
     }
   }
 

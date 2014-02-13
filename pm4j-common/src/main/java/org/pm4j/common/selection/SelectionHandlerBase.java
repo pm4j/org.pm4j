@@ -1,5 +1,6 @@
 package org.pm4j.common.selection;
 
+import java.beans.VetoableChangeListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -12,6 +13,16 @@ public abstract class SelectionHandlerBase<T_ITEM> extends PropertyChangeSupport
   private List<SelectionHandlerCallback> selectionHandlerCallBacks = new ArrayList<SelectionHandlerCallback>();
   /** A flag that helps to minimize the number of {@link #ensureSelectionState()} calls.  */
   boolean ensureSelectionStateCalled;
+
+  /**
+   * @param selection the new selection to use.
+   * @return <code>true</code> if the change was done.<br>
+   *         <code>false</code> if the change was rejected by a
+   *         {@link VetoableChangeListener}.
+   *
+   * TODO oboede: reduce visiblity to protected as soon as this method disappears from the interface.
+   */
+  public abstract boolean setSelection(Selection<T_ITEM> selection);
 
   @Override
   public void setSelectMode(SelectMode selectMode) {

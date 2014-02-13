@@ -156,9 +156,10 @@ public class QueryEvaluatorSet {
   /**
    * Locks this instance. A further call to an add-method will throw an exception.
    */
-  public QueryEvaluatorSet lock() {
+  @SuppressWarnings("unchecked")
+  public <T extends QueryEvaluatorSet> T lock() {
     locked = true;
-    return this;
+    return (T) this;
   }
 
   /**

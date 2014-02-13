@@ -3,7 +3,6 @@ package org.pm4j.common.pageable.querybased;
 import java.io.Serializable;
 
 import org.pm4j.common.pageable.PageableCollection;
-import org.pm4j.common.pageable.querybased.pagequery.PageQueryService;
 import org.pm4j.common.selection.Selection;
 
 /**
@@ -14,7 +13,7 @@ import org.pm4j.common.selection.Selection;
 public interface QueryServiceSerializationSupport {
 
   /**
-   * An interface for serializeable objects that can provide a {@link PageQueryService}.
+   * An interface for serializeable objects that can provide a {@link QueryService}.
    */
   static interface SerializeableServiceProvider2 extends Serializable {
 
