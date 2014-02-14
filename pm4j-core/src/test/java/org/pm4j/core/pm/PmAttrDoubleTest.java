@@ -152,6 +152,15 @@ public class PmAttrDoubleTest {
     assertEquals("0.123", myPm.formatted.getValueAsString());
   }
 
+  @Test
+  public void testValidateZero() {    
+    myPm.roundingHalfUp.setValueAsString("0.0");
+    myPm.roundingHalfUp.pmValidate();
+    myPm.roundingHalfUp.isPmValid();
+    assertTrue(myPm.roundingHalfUp.isPmValid());
+  }
+
+  
 //  public void testWithMultiFormat() {
 //    TestSession s = new TestSession();
 //    s.setPmLocale(Locale.GERMAN);

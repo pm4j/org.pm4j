@@ -20,7 +20,7 @@ public @interface PmAttrDoubleCfg {
   /**
    * @return minimum value.
    */
-  double minValue() default Double.MIN_VALUE;
+  double minValue() default -Double.MAX_VALUE;
 
   /**
    * @return maximum value.

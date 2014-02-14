@@ -29,6 +29,7 @@ public interface QueryService<T_ITEM, T_ID> {
   /**
    * @param id the identifier to get the item for.
    * @return the item.
+   * TODO: DZABEL, rename to findItemForId, returns null if no item found.
    */
   T_ITEM getItemForId(T_ID id);
 }
