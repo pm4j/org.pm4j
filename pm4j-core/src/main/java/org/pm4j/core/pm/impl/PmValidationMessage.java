@@ -6,8 +6,14 @@ import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmMessage;
 import org.pm4j.core.pm.PmObject;
 
+/**
+ * A specific {@link PmMessage} that is used to show validation error messages.
+ *
+ * @author Olaf Boede
+ */
 public class PmValidationMessage extends PmMessage {
 
+  /** TODO: Docu for invalid value management. */
   private final WeakReference<SetValueContainer<?>> invalidValueRef;
 
   public PmValidationMessage(PmObject pm, SetValueContainer<?> invalidValue, Throwable cause, String msgKey, Object... msgArgs) {

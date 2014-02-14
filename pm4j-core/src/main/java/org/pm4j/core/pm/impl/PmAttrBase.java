@@ -1097,15 +1097,9 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
    * All found violations are reported as error messages in relation to this attribute.
    */
   void performJsr303Validations() {
-    Validator validator = PmImplUtil.getBeanValidator();
-    if (validator != null) {
       Object validationBean = getOwnMetaData().valueAccessStrategy.getPropertyContainingBean(this);
-      if (validationBean != null &&
-          getOwnMetaData().validationFieldName != null) {
-        @SuppressWarnings("unchecked")
-        Set<ConstraintViolation<?>> violations = (Set<ConstraintViolation<?>>)(Object)validator.validateProperty(validationBean, getOwnMetaData().validationFieldName);
-        PmImplUtil.beanConstraintViolationsToPmMessages(this, violations);
-      }
+      if (validationBean != null && getOwnMetaData().validationFieldName != null) {
+        BeanValidationPmUtil.validateProperty(this, validationBean, getOwnMetaData().validationFieldName);
     }
   }
 
@@ -1502,7 +1496,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
 
 
   private void zz_readBeanValidationRestrictions(Class<?> beanClass, PmAttrCfg fieldAnnotation, MetaData myMetaData) {
-    if (PmImplUtil.getBeanValidator() == null)
+    if (BeanValidationPmUtil.getBeanValidator() == null)
       return;
 
     Class<?> srcClass = ((fieldAnnotation != null) &&
@@ -1511,7 +1505,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
           : beanClass;
 
     if (srcClass != null) {
-      BeanDescriptor beanDescriptor = PmImplUtil.getBeanValidator().getConstraintsForClass(srcClass);
+      BeanDescriptor beanDescriptor = BeanValidationPmUtil.getBeanValidator().getConstraintsForClass(srcClass);
 
       if (beanDescriptor != null) {
         myMetaData.validationFieldName = (fieldAnnotation != null) &&

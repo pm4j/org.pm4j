@@ -1,10 +1,6 @@
 package org.pm4j.core.pm.impl;
 
 import java.util.List;
-import java.util.Set;
-
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -237,12 +233,7 @@ public abstract class PmBeanBase<T_BEAN>
     if (getPmBean() != null &&
         getOwnMetaData().validateUsesBeanValidation &&
         PmMessageApi.getPmTreeMessages(this, Severity.ERROR).size() == 0) {
-      Validator validator = PmImplUtil.getBeanValidator();
-      if (validator != null) {
-        @SuppressWarnings("unchecked")
-        Set<ConstraintViolation<?>> violations = (Set<ConstraintViolation<?>>)(Object) validator.validate(getPmBean());
-        PmImplUtil.beanConstraintViolationsToPmMessages(this, violations);
-      }
+      BeanValidationPmUtil.validateBean(this, getPmBean());
     }
   }
 
