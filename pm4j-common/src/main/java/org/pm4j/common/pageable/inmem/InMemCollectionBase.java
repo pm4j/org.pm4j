@@ -307,6 +307,19 @@ public abstract class InMemCollectionBase<T_ITEM>
     }
 
     @Override
+    public void registerRemovedItem(T_ITEM i) {
+      if (modifications.getAddedItems().contains(i)) {
+        // Removed new items disappear without a trace. They are not part of the removed items.
+        modifications.unregisterAddedItem(i);
+      } else {
+        // Get the set of already removed items. It will be extended by this delete operation.
+        Set<T_ITEM> removedItems = new HashSet<T_ITEM>(IterableUtil.asCollection(modifications.getRemovedItems()));
+        removedItems.add(i);
+        modifications.setRemovedItems(new ItemSetSelection<T_ITEM>(removedItems));
+      }
+    }
+
+    @Override
     public void clear() {
       modifications = new ModificationsImpl<T_ITEM>();
     }

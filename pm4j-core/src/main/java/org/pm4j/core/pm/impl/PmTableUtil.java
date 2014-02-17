@@ -33,11 +33,12 @@ public final class PmTableUtil {
    */
   public static <T_ROW_PM extends PmBean<T_ROW_BEAN>, T_ROW_BEAN> void setPmBeans(PmTableImpl<T_ROW_PM, T_ROW_BEAN> tablePm, Collection<T_ROW_BEAN> beans) {
     if (tablePm.pmCollectionGetterLogicUsed) {
-      // TODO oboede:
+      // TODO oboede: Add a separate method for unit tests and throw really an exception here.
       LOG.warn("The table uses getter logic. A mix of getter and setter logic is not supported.\n" +
                 "Please use consistently only getter or only setter logic for a table instance.");
 //      throw new PmRuntimeException(tablePm, "The table uses getter logic. A mix of getter and setter logic is not supported.\n" +
 //                                            "Please use consistently only getter or only setter logic for a table instance.");
+      tablePm.pmCollectionGetterLogicUsed = false;
     }
 
     Class<T_ROW_PM> beanClass = tablePm.getPmRowBeanClass();
@@ -46,6 +47,10 @@ public final class PmTableUtil {
     // Make sure that predefined query parameter values don't disappear.
     // That may happen if the table did set some fix conditions on pmInit.
     QueryParams qp = tablePm.getPmQueryParams();
+
+    // TODO: support internally generated pageable collections.
+//    PageableCollection<T_ROW_BEAN> pc = tablePm.makePmPageableBeanCollection(null, qo);
+
     tablePm.setPmPageableCollection(new PmBeanCollection<T_ROW_PM, T_ROW_BEAN>(tablePm, beanClass, beans, qo));
     tablePm.getPmQueryParams().copyParamValues(qp);
   }

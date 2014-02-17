@@ -113,6 +113,11 @@ public class QueryCollectionModificationHandlerBase<T_ITEM, T_ID>  implements Mo
     return true;
   }
 
+  @Override
+  public void registerRemovedItem(T_ITEM item) {
+    throw new UnsupportedOperationException("registerRemovedItem() is not yet implemented for query based collections.");
+  }
+
   /**
    * Add and register add are the same for query collections.<br>
    * The set of added items within the {@link Modifications} is the transient

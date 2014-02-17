@@ -3,6 +3,7 @@ package org.pm4j.tools.test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -13,11 +14,13 @@ import org.junit.Assert;
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmCommand.CommandState;
+import org.pm4j.core.pm.PmDataInput;
 import org.pm4j.core.pm.PmMessage;
 import org.pm4j.core.pm.PmMessage.Severity;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmOption;
 import org.pm4j.core.pm.api.PmMessageApi;
+import org.pm4j.core.pm.api.PmValidationApi;
 import org.pm4j.core.pm.impl.PmUtil;
 
 /**
@@ -393,6 +396,23 @@ public class PmAssert {
         if (execState != expectedState) {
             String msgPfx = StringUtils.isEmpty(msg) ? cmd.getPmRelativeName() : msg;
             Assert.assertEquals(msgPfx + subTreeMessagesToString(" Messages: ", cmd.getPmConversation(), Severity.WARN), expectedState, execState);
+        }
+    }
+
+    /**
+     * Validates the PM tree having the given root instance. Fails if the subtree has any
+     * messages after the validation call.
+     *
+     * @param pmRoot
+     *            The root of the PM tree to validate.
+     */
+    public static void validateSuccessful(PmDataInput pmRoot) {
+        if (!PmValidationApi.validateSubTree(pmRoot)) {
+            List<String> msgStrings = new ArrayList<String>();
+            for (PmMessage m : PmMessageApi.getPmTreeMessages(pmRoot, Severity.INFO)) {
+                msgStrings.add(m.toString());
+            }
+            Assert.fail("Unexpected messages after validation of " + pmRoot.getPmRelativeName() + ":\n" + StringUtils.join(msgStrings.toArray(), "\n\t"));
         }
     }
 

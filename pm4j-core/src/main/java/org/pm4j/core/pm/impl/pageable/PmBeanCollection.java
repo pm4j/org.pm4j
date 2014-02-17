@@ -346,6 +346,15 @@ public class PmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> extends Prope
       return getBeanCollectionModificationHandler().removeSelectedItems();
     }
 
+    @Override
+    public void registerRemovedItem(T_PM item) {
+      // clear all messages and references to the deleted item.
+      PmMessageApi.clearPmTreeMessages(item);
+      BeanPmCacheUtil.removeBeanPm(pmCtxt, item);
+
+      getBeanCollectionModificationHandler().registerRemovedItem(item.getPmBean());
+    }
+
     private ModificationHandler<T_BEAN> getBeanCollectionModificationHandler() {
       ModificationHandler<T_BEAN> mh = beanCollection.getModificationHandler();
       if (mh == null) {

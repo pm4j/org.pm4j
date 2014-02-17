@@ -49,13 +49,21 @@ public interface ModificationHandler<T_ITEM> {
    * <p>
    * Fires a {@link PropertyChangeEvent} {@link PageableCollection#EVENT_ITEM_UPDATE}.
    *
-   * @param the
-   *          updated item. It should be part of the collection.
+   * @param item
+   *          The updated item. It should be part of the collection.
    * @param isUpdated
-   *          indicates if the item should be added or removed from the set of
+   *          Indicates if the item should be added or removed from the set of
    *          updated items.
    */
   void registerUpdatedItem(T_ITEM item, boolean isUpdated);
+
+  /**
+   * Registers a collection item that was already removed by an external algorithm.
+   *
+   * @param item
+   *          The deleted item. It should already have been deleted from the collection.
+   */
+  void registerRemovedItem(T_ITEM item);
 
   /**
    * Removes all currently selected items from the collection.
