@@ -59,11 +59,13 @@ public interface ModificationHandler<T_ITEM> {
 
   /**
    * Registers a collection item that was already removed by an external algorithm.
+   * <p>
+   * Fires a {@link PropertyChangeEvent} {@link PageableCollection#EVENT_REMOVE_SELECTION}.
    *
    * @param item
    *          The deleted item. It should already have been deleted from the collection.
    */
-  void registerRemovedItem(T_ITEM item);
+  void registerRemovedItems(Iterable<T_ITEM> item);
 
   /**
    * Removes all currently selected items from the collection.

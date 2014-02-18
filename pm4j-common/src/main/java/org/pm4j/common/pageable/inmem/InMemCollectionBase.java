@@ -31,6 +31,7 @@ import org.pm4j.common.selection.SelectionHandler;
 import org.pm4j.common.selection.SelectionHandlerUtil;
 import org.pm4j.common.selection.SelectionHandlerWithItemSet;
 import org.pm4j.common.util.collection.IterableUtil;
+import org.pm4j.common.util.collection.ListUtil;
 
 /**
  * Implements a {@link PageableCollection} based on an {@link List} of items to
@@ -277,7 +278,7 @@ public abstract class InMemCollectionBase<T_ITEM>
 
       // check for vetos before doing the change
       try {
-        InMemCollectionBase.this.fireVetoableChange(PageableCollection.EVENT_REMOVE_SELECTION, items, null);
+        fireVetoableChange(PageableCollection.EVENT_REMOVE_SELECTION, items, null);
       } catch (PropertyVetoException e) {
         return false;
       }
@@ -302,21 +303,31 @@ public abstract class InMemCollectionBase<T_ITEM>
         }
       }
       modifications.setRemovedItems(new ItemSetSelection<T_ITEM>(removedItems));
-      InMemCollectionBase.this.firePropertyChange(PageableCollection.EVENT_REMOVE_SELECTION, items, null);
+      firePropertyChange(PageableCollection.EVENT_REMOVE_SELECTION, items, null);
       return true;
     }
 
     @Override
-    public void registerRemovedItem(T_ITEM i) {
-      if (modifications.getAddedItems().contains(i)) {
-        // Removed new items disappear without a trace. They are not part of the removed items.
-        modifications.unregisterAddedItem(i);
-      } else {
-        // Get the set of already removed items. It will be extended by this delete operation.
-        Set<T_ITEM> removedItems = new HashSet<T_ITEM>(IterableUtil.asCollection(modifications.getRemovedItems()));
-        removedItems.add(i);
-        modifications.setRemovedItems(new ItemSetSelection<T_ITEM>(removedItems));
+    public void registerRemovedItems(Iterable<T_ITEM> items) {
+      for (T_ITEM i : items) {
+        if (modifications.getAddedItems().contains(i)) {
+          // Removed new items disappear without a trace. They are not part of the removed items.
+          modifications.unregisterAddedItem(i);
+        } else {
+          // Get the set of already removed items. It will be extended by this delete operation.
+          Set<T_ITEM> removedItems = new HashSet<T_ITEM>(IterableUtil.asCollection(modifications.getRemovedItems()));
+          removedItems.add(i);
+          modifications.setRemovedItems(new ItemSetSelection<T_ITEM>(removedItems));
+        }
+        // handle optionally existing cached information:
+        if (filteredAndSortedObjects != null) {
+          filteredAndSortedObjects.remove(i);
+        }
       }
+      // all removed items must disappear from any selection.
+      selectionHandler.select(false, items);
+      Selection<T_ITEM> removedItemsSelection = new ItemSetSelection<T_ITEM>(new HashSet<T_ITEM>(ListUtil.toList(items)));
+      firePropertyChange(PageableCollection.EVENT_REMOVE_SELECTION, removedItemsSelection, null);
     }
 
     @Override

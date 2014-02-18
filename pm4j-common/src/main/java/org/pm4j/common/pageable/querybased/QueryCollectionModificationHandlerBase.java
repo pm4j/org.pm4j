@@ -114,8 +114,8 @@ public class QueryCollectionModificationHandlerBase<T_ITEM, T_ID>  implements Mo
   }
 
   @Override
-  public void registerRemovedItem(T_ITEM item) {
-    throw new UnsupportedOperationException("registerRemovedItem() is not yet implemented for query based collections.");
+  public void registerRemovedItems(Iterable<T_ITEM> items) {
+    throw new UnsupportedOperationException("registerRemovedItems() is not yet implemented for query based collections.");
   }
 
   /**

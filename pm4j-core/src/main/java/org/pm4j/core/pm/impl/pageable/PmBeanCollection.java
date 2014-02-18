@@ -319,6 +319,7 @@ public class PmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> extends Prope
     }
 
     // TODO olaf: ensure that the cleanup code also gets called when the bean modification handler gets used.
+    // Task 122206: add internal signatures or a control parameter that allows to control event call backs.
     @Override
     public boolean removeSelectedItems() {
       Selection<T_PM> selection = getSelectionHandler().getSelection();
@@ -347,12 +348,15 @@ public class PmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> extends Prope
     }
 
     @Override
-    public void registerRemovedItem(T_PM item) {
+    public void registerRemovedItems(Iterable<T_PM> items) {
+      List<T_BEAN> beans = new ArrayList<T_BEAN>();
       // clear all messages and references to the deleted item.
-      PmMessageApi.clearPmTreeMessages(item);
-      BeanPmCacheUtil.removeBeanPm(pmCtxt, item);
-
-      getBeanCollectionModificationHandler().registerRemovedItem(item.getPmBean());
+      for (T_PM item : items) {
+        PmMessageApi.clearPmTreeMessages(item);
+        BeanPmCacheUtil.removeBeanPm(pmCtxt, item);
+        beans.add(item.getPmBean());
+      }
+      getBeanCollectionModificationHandler().registerRemovedItems(beans);
     }
 
     private ModificationHandler<T_BEAN> getBeanCollectionModificationHandler() {
