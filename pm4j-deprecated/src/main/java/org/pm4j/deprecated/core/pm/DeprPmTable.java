@@ -65,6 +65,14 @@ public interface DeprPmTable<T_ROW_OBJ> extends PmObject, PmDataInput, DeprFilte
   List<T_ROW_OBJ> getRows();
 
   /**
+   * Provides only the visible rows.<br>
+   * The provided set may be influenced by filter criteria and paging logic.
+   *
+   * @return The set of table rows to display.
+   */
+  List<T_ROW_OBJ> getRowPms();
+
+  /**
    * @return The set of current filter definitions that can be
    *         specified/modified for this table.<br>
    *         Returns never <code>null</code>.
@@ -98,6 +106,11 @@ public interface DeprPmTable<T_ROW_OBJ> extends PmObject, PmDataInput, DeprFilte
    * @return The total size of the un-filtered row set.
    */
   int getTotalNumOfRows();
+
+  /**
+   * @return The row selection mode for this table.
+   */
+  RowSelectMode getPmRowSelectMode();
 
   /**
    * @return The row selection mode for this table.

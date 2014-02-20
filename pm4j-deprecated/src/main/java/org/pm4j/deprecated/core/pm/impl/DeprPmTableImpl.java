@@ -135,6 +135,12 @@ public class DeprPmTableImpl
     return getPageableCollection().getItemsOnPage();
   }
 
+  /** New signature for xhtml compatibility. */
+  @Override
+  public final List<T_ROW_ELEMENT_PM> getRowPms() {
+    return this.getRows();
+  }
+
   @Override
   public List<DeprFilterByDefinition> getFilterByDefinitions() {
     List<DeprFilterByDefinition> list = new ArrayList<DeprFilterByDefinition>();
@@ -254,6 +260,11 @@ public class DeprPmTableImpl
     return getPageableCollection().getNumOfItems();
   }
 
+  /** New signature for xhtml compatibility. */
+  public final RowSelectMode getPmRowSelectMode() {
+    return this.getRowSelectMode();
+  }
+  
   public RowSelectMode getRowSelectMode() {
     if (rowSelectMode == null) {
       DeprPmTableCfg cfg = AnnotationUtil.findAnnotation(this, DeprPmTableCfg.class);
@@ -267,6 +278,10 @@ public class DeprPmTableImpl
     return rowSelectMode;
   }
 
+  public void setPmRowSelectMode(RowSelectMode rowSelectMode) {
+    this.setRowSelectMode(rowSelectMode);
+  }
+  
   /**
    * Adjusts the row selection mode.<br>
    * Should be called very early within the livecycle of the table.
@@ -752,6 +767,11 @@ public class DeprPmTableImpl
    */
   public DeprPmPager getPager() {
     return null;
+  }
+
+  /** New signature for xhtml compatibility. */
+  public final DeprPmPager getPmPager() {
+    return this.getPager();
   }
 
   /**
