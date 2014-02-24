@@ -173,7 +173,10 @@ public interface DeprPmTable<T_ROW_OBJ> extends PmObject, PmDataInput, DeprFilte
     /**
      * @return The pager used for the table.
      */
+    @Deprecated
     DeprPmPager getPager();
+    
+    DeprPmPager getPmPager();
   }
 
 }
