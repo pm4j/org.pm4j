@@ -16,6 +16,7 @@ import org.pm4j.core.pm.impl.inject.DiResolverFactoryPmInjectFieldByExpression;
 import org.pm4j.core.pm.impl.inject.DiResolverFactoryPmInjectFieldByParentOfType;
 import org.pm4j.core.pm.impl.inject.DiResolverFactoryPmInjectSetterByExpression;
 import org.pm4j.core.pm.impl.inject.DiResolverFactoryPmInjectSetterByParentOfType;
+import org.pm4j.core.pm.impl.inject.DiResolverFactoryPmProduces;
 import org.pm4j.core.pm.impl.title.AsteriskAttrTitleProvider;
 import org.pm4j.core.pm.impl.title.PmTitleProvider;
 import org.pm4j.core.pm.impl.title.TitleProviderPmResBased;
@@ -116,6 +117,8 @@ public class PmDefaults implements Cloneable {
    * The default implementation supports {@link PmInject}.
    */
   private DiResolverFactory[] diResolverFactories = {
+      // Producer factories need to be placed in front of injection resolver factories.
+      new DiResolverFactoryPmProduces(),
       new DiResolverFactoryPmInjectFieldByExpression(),
       new DiResolverFactoryPmInjectSetterByExpression(),
       new DiResolverFactoryPmInjectFieldByParentOfType(),
