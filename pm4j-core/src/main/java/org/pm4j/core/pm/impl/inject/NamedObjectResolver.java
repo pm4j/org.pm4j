@@ -12,7 +12,7 @@ public interface NamedObjectResolver {
   /**
    * Searches a named object.
    *
-   * @param name Name of the object to finde.
+   * @param name Name of the object to find.
    * @return The found instance or <code>null</code>.
    */
   Object findObject(String name);

@@ -5,14 +5,20 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.PmObject;
+import org.pm4j.core.pm.impl.inject.NamedObjectResolver;
 
 /**
  * Marks a field to be injected by the PM framework.
  * <p>
- * TODO: define and describe protocol and scope specifications.
+ * Supports reference resolution by
+ * <ul>
+ * <li>name - looks for a corresponding instance using the {@link NamedObjectResolver}s provided by the {@link PmConversation}</li>
+ * <li>parent of type - looks for the nearest parent PM that implements the corresponding type.</li>
+ * </ul>
  *
- * @author olaf boede
+ * @author Olaf Boede
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target( { ElementType.FIELD, ElementType.METHOD })
@@ -23,7 +29,7 @@ public @interface PmInject {
    */
   public enum Mode {
     /**
-     * The expression within the attriute 'value' gets used. If that's not
+     * The expression within the attribute 'value' gets used. If that's not
      * configured the name of the annotate property will be used as the name
      * of a named object to find.
      */
