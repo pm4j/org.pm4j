@@ -17,6 +17,7 @@ import org.junit.Test;
 import org.pm4j.core.pm.annotation.PmBeanCfg;
 import org.pm4j.core.pm.annotation.PmBoolean;
 import org.pm4j.core.pm.annotation.PmValidationCfg;
+import org.pm4j.core.pm.api.PmValidationApi;
 import org.pm4j.core.pm.impl.PmAttrIntegerImpl;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
 import org.pm4j.core.pm.impl.PmBeanImpl;
@@ -62,8 +63,9 @@ public class PmBeanValidationTest {
   }
 
   @PmValidationCfg(useJavaxValidationForBeans=PmBoolean.FALSE)
-  public static class ElementThatSwitchesBeanValidationOff extends PmElementBase  {
-    public ElementThatSwitchesBeanValidationOff(PmObject pmParent) { super(pmParent); }
+  public static class PmWithoutBeanValidation extends PmElementBase  {
+    public final MyBeanPm beanPm = new MyBeanPm(this, null);
+    public PmWithoutBeanValidation(PmObject pmParent) { super(pmParent); }
   }
 
   private PmConversation pmConversation;
@@ -130,5 +132,19 @@ public class PmBeanValidationTest {
     Assert.assertEquals("script expression \"_this.i < _this.j\" didn't evaluate to true", violations.iterator().next().getMessage());
   }
 
+  @Test
+  public void testBeanValidationBasedFieldValidationNotSwitchedOffByAnnotation() {
+    PmWithoutBeanValidation pm = new PmWithoutBeanValidation(pmConversation);
+    pm.beanPm.setPmBean(new MyBean("abcdefgh", null, null));
+    PmValidationApi.validateSubTree(pm);
+    Assert.assertEquals(3, pmConversation.getPmMessages().size());
+  }
 
+  @Test
+  public void testBeanValidationSwitchedOffByAnnotation() {
+    PmWithoutBeanValidation pm = new PmWithoutBeanValidation(pmConversation);
+    pm.beanPm.setPmBean(new MyBean("hi", 2, 1));
+    PmValidationApi.validateSubTree(pm);
+    Assert.assertEquals(0, pmConversation.getPmMessages().size());
+  }
 }
