@@ -1,20 +1,23 @@
 package org.pm4j.core.pm;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
+import org.junit.Before;
+import org.junit.Test;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.annotation.PmInject;
 import org.pm4j.core.pm.annotation.PmInject.Mode;
 import org.pm4j.core.pm.impl.PmConversationImpl;
 import org.pm4j.core.pm.impl.PmElementImpl;
+import org.pm4j.core.pm.impl.PmInitApi;
 
 /**
  * Tests some PmInject variants.
  *
- * @author OBOEDE
- *
+ * @author Olaf Boede
  */
-public class PmInjectTest extends TestCase {
+public class PmInjectTest {
 
   public final class MyPm extends PmElementImpl {
 
@@ -43,12 +46,19 @@ public class PmInjectTest extends TestCase {
 
   }
 
-  public void testInjection() {
-    PmConversation pmConversation = new PmConversationImpl();
+  private PmConversation pmConversation;
+  private MyPm myPm;
+
+  @Before
+  public void setUp() {
+    pmConversation = new PmConversationImpl();
     pmConversation.setPmNamedObject("myProp", "abc");
     pmConversation.setPmNamedObject("myInjectedProp2", "prop2");
-    MyPm myPm = new MyPm(pmConversation);
+    myPm = PmInitApi.ensurePmSubTreeInitialization(new MyPm(pmConversation));
+  }
 
+  @Test
+  public void testInjection() {
     // ensure initialization before accessing injected attributes.
     myPm.isPmVisible();
     assertEquals("abc", myPm.myInjectedProp);
@@ -69,7 +79,6 @@ public class PmInjectTest extends TestCase {
   }
 
   public final class InvalidPm extends PmConversationImpl {
-    @SuppressWarnings("unused")
     @PmInject private String nullNotAllowedProperty;
   }
 
