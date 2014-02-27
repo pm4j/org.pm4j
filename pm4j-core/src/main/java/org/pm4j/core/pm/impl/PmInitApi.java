@@ -10,25 +10,28 @@ import org.pm4j.core.pm.impl.PmObjectBase.PmInitState;
 /**
  * Some PM initialization related methods.
  *
- * @author olaf boede
+ * @author Olaf Boede
  */
 public class PmInitApi {
 
   /**
    * Ensures that the passed PM gets initialized.
    *
-   * @param pm the PM to initialize.
+   * @param pm The PM to initialize.
+   * @return the PM reference again for inline usage.
    */
-  public static void ensurePmInitialization(PmObject pm) {
+  public static <T extends PmObject> T ensurePmInitialization(T pm) {
     ((PmObjectBase)pm).zz_ensurePmInitialization();
+    return pm;
   }
 
   /**
-   * Ensures that the passed PM and all of it's PM childer are initialized.
+   * Ensures that the passed PM and all of it's PM children are initialized.
    *
-   * @param rootPm the root PM of the PM tree part to initialize.
+   * @param rootPm The root PM of the PM tree part to initialize.
+   * @return the PM reference again for inline usage.
    */
-  public static void ensurePmSubTreeInitialization(PmObject rootPm) {
+  public static <T extends PmObject> T ensurePmSubTreeInitialization(T rootPm) {
     PmVisitorApi.visit(rootPm, new PmVisitCallBack() {
       @Override
       public PmVisitResult visit(PmObject pm) {
@@ -36,6 +39,7 @@ public class PmInitApi {
         return PmVisitResult.CONTINUE;
       }
     });
+    return rootPm;
   }
 
   /**
