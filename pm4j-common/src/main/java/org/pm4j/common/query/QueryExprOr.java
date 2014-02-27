@@ -15,7 +15,7 @@ import org.pm4j.common.util.collection.IterableUtil;
  * <p>
  * Limitation: It currently can't be used as a hash map key. Because it is mutable.
  *
- * @author olaf boede
+ * @author Olaf Boede
  */
 public class QueryExprOr implements QueryExpr, Serializable {
 
@@ -42,8 +42,14 @@ public class QueryExprOr implements QueryExpr, Serializable {
    * @param expressions a set of expressions. May be empty.
    * @return the resulting expression. May be <code>null</code> if the given parameter was empty or <code>null</code>.
    */
-  public static QueryExpr joinToAnd(QueryExpr... expressions) {
+  public static QueryExpr joinToOr(QueryExpr... expressions) {
     return joinToOr(Arrays.asList(expressions));
+  }
+
+  /** @deprecated That is a copy-paste bug. Please use {@link #joinToOr(QueryExpr...)}. */
+  @Deprecated
+  public static QueryExpr joinToAnd(QueryExpr... expressions) {
+    return joinToOr(expressions);
   }
 
 
