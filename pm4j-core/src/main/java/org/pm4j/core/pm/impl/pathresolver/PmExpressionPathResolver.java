@@ -68,4 +68,9 @@ public class PmExpressionPathResolver extends PathResolverBase {
     expression.execAssign(ctxt, value);
   }
 
+  @Override
+  public String toString() {
+    return expression.toString();
+  }
+
 }

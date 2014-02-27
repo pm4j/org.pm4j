@@ -46,4 +46,10 @@ public interface PathResolver {
    * @param allowed
    */
   void setNullAllowed(boolean allowed);
+
+  /**
+   * @return the path expression string.
+   */
+  @Override
+  public String toString();
 }

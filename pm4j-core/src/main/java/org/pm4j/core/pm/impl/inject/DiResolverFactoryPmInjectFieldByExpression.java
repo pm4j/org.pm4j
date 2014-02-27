@@ -47,18 +47,23 @@ public class DiResolverFactoryPmInjectFieldByExpression implements DiResolverFac
   }
 
   public static class Resolver implements DiResolver {
-    private Map<Field, PathResolver> fieldInjectionMap;
+    private Map<Field, PathResolver> fieldToPathResolverMap;
 
     public Resolver(Map<Field, PathResolver> fieldInjectionMap) {
-      this.fieldInjectionMap = fieldInjectionMap;
+      this.fieldToPathResolverMap = fieldInjectionMap;
     }
 
     @Override
     public void resolveDi(PmObject pm) {
-      for (Map.Entry<Field, PathResolver> e : fieldInjectionMap.entrySet()) {
+      for (Map.Entry<Field, PathResolver> e : fieldToPathResolverMap.entrySet()) {
         Field f = e.getKey();
         PathResolver r = e.getValue();
-        Object value = r.getValue(pm);
+        Object value = null;
+        try {
+          value = r.getValue(pm);
+        } catch (RuntimeException ex) {
+          throw new PmRuntimeException(pm, "Unable to resolve dependency injection reference to '" + r + "' for field: " + f, ex);
+        }
 
         if (value == null && ! r.isNullAllowed()) {
           throw new PmRuntimeException(pm, "Found value for dependency injection of field '" + f +

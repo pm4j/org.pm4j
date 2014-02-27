@@ -17,7 +17,7 @@ import org.pm4j.core.pm.impl.pathresolver.PmExpressionPathResolver;
 /**
  * DI resolver for setter methods annotated with {@link PmInject} using {@link PmInject.Mode#EXPRESSION}.
  *
- * @author olaf boede
+ * @author Olaf Boede
  */
 public class DiResolverFactoryPmInjectSetterByExpression implements DiResolverFactory {
 
@@ -46,18 +46,23 @@ public class DiResolverFactoryPmInjectSetterByExpression implements DiResolverFa
   }
 
   public static class Resolver implements DiResolver {
-    private Map<Method, PathResolver> fieldInjectionMap;
+    private Map<Method, PathResolver> methodToPathResolverMap;
 
-    public Resolver(Map<Method, PathResolver> fieldInjectionMap) {
-      this.fieldInjectionMap = fieldInjectionMap;
+    public Resolver(Map<Method, PathResolver> methodToPathResolverMap) {
+      this.methodToPathResolverMap = methodToPathResolverMap;
     }
 
     @Override
     public void resolveDi(PmObject pm) {
-      for (Map.Entry<Method, PathResolver> e : fieldInjectionMap.entrySet()) {
+      for (Map.Entry<Method, PathResolver> e : methodToPathResolverMap.entrySet()) {
         Method m = e.getKey();
         PathResolver r = e.getValue();
-        Object value = r.getValue(pm);
+        Object value = null;
+        try {
+          value = r.getValue(pm);
+        } catch (RuntimeException ex) {
+          throw new PmRuntimeException(pm, "Unable to resolve dependency injection reference to '" + r + "' for setter: " + m, ex);
+        }
 
         if (value == null && ! r.isNullAllowed()) {
           throw new PmRuntimeException(pm, "Found value for dependency injection of field '" + m +
