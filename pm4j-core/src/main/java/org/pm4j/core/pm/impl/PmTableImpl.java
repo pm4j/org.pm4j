@@ -763,7 +763,7 @@ public class PmTableImpl
     @Override
     protected Collection<T_ROW_BEAN> getBackingCollectionImpl() {
       Collection<T_ROW_BEAN> beans = getPmBeansImpl();
-      if (!beans.isEmpty()) {
+      if (beans != null && !beans.isEmpty()) {
         // After providing some beans using the getter logic setPmBeans() shouldn't be used.
         // This could cause an inconsistent table model behavior.
         pmCollectionGetterLogicUsed = true;
