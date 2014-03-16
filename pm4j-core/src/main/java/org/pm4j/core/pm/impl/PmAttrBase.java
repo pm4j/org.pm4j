@@ -12,8 +12,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.validation.metadata.BeanDescriptor;
