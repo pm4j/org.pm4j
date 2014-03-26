@@ -534,6 +534,9 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
 //        getOwnMetaData().
 //      }
       setValue(dv);
+      if (dataContainer != null) {
+        dataContainer.originalValue = UNCHANGED_VALUE_INDICATOR;
+      }
     }
 
     // For composite attribute PM's: reset the children.
@@ -786,10 +789,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
    * @param s The string to convert.
    * @return The converted value.
    * @throws PmConverterException If the given string can't be converted.
-   *
-   * @deprecated Please use {@link #getStringConverterImpl()} to define your specific converter.
    */
-  @Deprecated
   protected T_PM_VALUE stringToValueImpl(String s) throws PmConverterException {
     try {
       return (T_PM_VALUE) getStringConverter().stringToValue(converterCtxt, s);
@@ -814,10 +814,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
    *
    * @param v A value to convert.
    * @return The string representation.
-   *
-   * @deprecated Please use {@link #getStringConverterImpl()} to define your specific converter.
    */
-  @Deprecated
   protected String valueToStringImpl(T_PM_VALUE v) {
     return getStringConverter().valueToString(converterCtxt, v);
   }
