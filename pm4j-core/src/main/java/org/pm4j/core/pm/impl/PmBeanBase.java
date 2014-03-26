@@ -21,7 +21,15 @@ import org.pm4j.core.pm.api.PmExpressionApi;
 import org.pm4j.core.pm.api.PmFactoryApi;
 import org.pm4j.core.pm.api.PmMessageApi;
 
-public abstract class PmBeanBase<T_BEAN>
+/**
+ * A PM that handles a bean.
+ *
+ *
+ * @param <T_BEAN> The backing bean type.
+ *
+ * @author Olaf Boede
+ */
+public class PmBeanBase<T_BEAN>
       extends PmElementBase
       implements PmBean<T_BEAN> {
 
