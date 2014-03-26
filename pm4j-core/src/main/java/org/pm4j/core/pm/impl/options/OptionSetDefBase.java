@@ -170,18 +170,17 @@ public abstract class OptionSetDefBase<T_ATTR extends PmAttrBase<?,?>> implement
                       ? forAttr.getNullOptionDefault()
                       : nullOption;
 
-    return nopt == NullOption.YES ||
-            (nopt == NullOption.FOR_OPTIONAL_ATTR &&
-             ! forAttr.isRequired()) ||
-             forAttr.getValue() == null;
-// TODO olaf:
-//                      switch (nopt) {
-//      case YES: return true;
-//      case NO: return forAttr.getValue() != null;
-//      case DEFAULT: // fall through
-//      case FOR_OPTIONAL_ATTR: return (!forAttr.isRequired()) && forAttr.getValue() != null;
-//      default: throw new PmRuntimeException(forAttr, "Unknown enum attribute value " + nopt);
-//    }
+    if (nopt == NullOption.YES ||
+       (nopt == NullOption.FOR_OPTIONAL_ATTR && !forAttr.isRequired())) {
+      return true;
+    }
+
+    // In case of a null value, an option needs to be generated.
+    // TODO: this logic is view layer specific and will be moved to it.
+    // We need to check against the backing value because a getValue() logic may be based
+    // on the option set. Then we have a call cycle.
+    Object backingValue = forAttr.getBackingValue();
+    return backingValue == null;
   }
 
   private PathResolver parseOptionalExpr(String pathString, SyntaxVersion syntaxVersion) {
