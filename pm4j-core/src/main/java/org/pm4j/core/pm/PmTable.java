@@ -71,7 +71,10 @@ public interface PmTable<T_ROW_PM> extends PmObject, PmDataInput {
    * Provides a handler for all selection related operations.
    *
    * @return the {@link SelectionHandler}.
+   *
+   * @deprecated Please use <code>getPmPageableBeanCollection().getSelectionHandler()</code> or <code>getPmPageableCollection().getSelectionHandler()</code>.
    */
+  @Deprecated
   SelectionHandler<T_ROW_PM> getPmSelectionHandler();
 
   /**

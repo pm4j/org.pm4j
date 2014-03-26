@@ -256,6 +256,7 @@ public class PmTableImpl
   }
 
   @Override
+  @Deprecated
   public SelectionHandler<T_ROW_PM> getPmSelectionHandler() {
     return getPmPageableCollection().getSelectionHandler();
   }
