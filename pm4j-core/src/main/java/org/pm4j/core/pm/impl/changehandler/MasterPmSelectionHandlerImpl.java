@@ -210,7 +210,7 @@ public abstract class MasterPmSelectionHandlerImpl<T_MASTER_BEAN> implements Mas
    * Checks if it is allowed to swich to another master record.
    * <p>
    * Validates all registered detail areas by calling
-   * {@link DetailsPmHandler#canSwitchMasterRecord()}.
+   * {@link DetailsPmHandler#beforeMasterRecordChange(Object)}.
    * <p>
    * All details areas get processed, even if the first one is already invalid.
    * This way the user gets all relevant validation messages for the user
@@ -219,17 +219,18 @@ public abstract class MasterPmSelectionHandlerImpl<T_MASTER_BEAN> implements Mas
    * @return <code>true</code> if the switch can be performed.
    */
   public boolean beforeSwitch() {
-    if (getSelectedMasterBean() == null) {
+    T_MASTER_BEAN b = getSelectedMasterBean();
+    if (b == null) {
       return true;
     }
 
-    boolean allDetailsValid = true;
+    boolean allDetailsAgree = true;
     for (DetailsPmHandler dh : detailsHandlers) {
-      if (!dh.canSwitchMasterRecord()) {
-        allDetailsValid = false;
+      if (!dh.beforeMasterRecordChange(b)) {
+        allDetailsAgree = false;
       }
     }
-    return allDetailsValid;
+    return allDetailsAgree;
   }
 
   // FIXME olaf: check if we can simply call beforeSwitch... a duplicate control flow...
@@ -266,12 +267,12 @@ public abstract class MasterPmSelectionHandlerImpl<T_MASTER_BEAN> implements Mas
     return masterSelectionChangeListener;
   }
 
-	/**
-	 * A decorator that prevents a value change if the details area is not valid
-	 * and sets the new details area if the change was executed.<br>
-	 * It also registers the master records that where changed within the details area.
-	 */
-	public class MasterSelectionChangeListener implements PropertyAndVetoableChangeListener {
+  /**
+   * A decorator that prevents a value change if the details area is not valid
+   * and sets the new details area if the change was executed.<br>
+   * It also registers the master records that where changed within the details area.
+   */
+  public class MasterSelectionChangeListener implements PropertyAndVetoableChangeListener {
       private T_MASTER_BEAN changedMasterBean;
 
       @Override
