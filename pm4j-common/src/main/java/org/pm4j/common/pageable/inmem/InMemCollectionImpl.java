@@ -26,10 +26,7 @@ public class InMemCollectionImpl<T_ITEM> extends InMemCollectionBase<T_ITEM> {
   }
 
   public InMemCollectionImpl(InMemQueryEvaluator<T_ITEM> inMemQueryEvaluator, Collection<T_ITEM> objects, QueryOptions queryOptions) {
-    super(queryOptions);
-    backingCollection = objects != null
-       ? objects
-       : new ArrayList<T_ITEM>();
+    this(objects, queryOptions);
     if (inMemQueryEvaluator != null) {
       setInMemQueryEvaluator(inMemQueryEvaluator);
     }

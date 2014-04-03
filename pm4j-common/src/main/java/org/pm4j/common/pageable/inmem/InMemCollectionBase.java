@@ -241,6 +241,11 @@ public abstract class InMemCollectionBase<T_ITEM>
         throw new RuntimeException("Please check if you did provide a modifyable collection. Found collection type: " + getBackingCollection().getClass(), e);
       }
 
+      // synchronize the optionally existing filtered and sorted row object list.
+      if (filteredAndSortedObjects != null) {
+        filteredAndSortedObjects.add(item);
+      }
+
       doRegisterAddedItem(item);
       return true;
     };
@@ -250,6 +255,8 @@ public abstract class InMemCollectionBase<T_ITEM>
       if (!getBackingCollection().contains(item)) {
         throw new RuntimeException("The new item is not part of the backing collection.\n\tPlease use either addItem() or add the item manually to your collection before calling registerAddedItem().");
       }
+      // force recalculation of cached derived information.
+      clearCaches();
       doRegisterAddedItem(item);
     }
 
@@ -341,9 +348,6 @@ public abstract class InMemCollectionBase<T_ITEM>
     }
 
     private void doRegisterAddedItem(T_ITEM item) {
-      if (filteredAndSortedObjects != null) {
-        filteredAndSortedObjects.add(item);
-      }
       modifications.registerAddedItem(item);
       InMemCollectionBase.this.firePropertyChange(PageableCollection.EVENT_ITEM_ADD, null, item);
     }
