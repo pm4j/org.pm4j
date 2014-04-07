@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.pm4j.common.pageable.querybased.NoItemForKeyFoundException;
 import org.pm4j.common.pageable.querybased.QuerySelectionBase;
 import org.pm4j.common.pageable.querybased.QueryService;
 import org.pm4j.common.selection.ItemIdBasedSelection;
@@ -14,7 +15,7 @@ import org.pm4j.common.selection.Selection;
 /**
  * A selection of items that is based on a collection of item id's.
  *
- * @author olaf boede
+ * @author Olaf Boede
  *
  * @param <T_ITEM> type of items to handle.
  * @param <T_ID> type of item id's.
@@ -78,7 +79,13 @@ public class IdQuerySelectionBase<T_ITEM, T_ID>
 
     @Override
     public T_ITEM next() {
-      return getService().getItemForId(idIterator.next());
+      T_ID id = idIterator.next();
+      T_ITEM item = getService().getItemForId(id);
+      if (item == null) {
+        throw new NoItemForKeyFoundException("No item found for ID: " + id + ". It may have been deleted by a concurrent operation." +
+        		"\n\tUsed query service: " + getService());
+      }
+      return item;
     }
 
     @Override

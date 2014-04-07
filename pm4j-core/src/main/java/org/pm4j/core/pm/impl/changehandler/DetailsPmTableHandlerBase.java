@@ -11,7 +11,7 @@ import org.pm4j.core.pm.PmTable;
 import org.pm4j.core.pm.PmTable.UpdateAspect;
 import org.pm4j.core.pm.impl.PmTableImpl;
 
-public class MasterDetailsTableCascadeHandler<T_MASTER_BEAN, T_DETAILS_BEAN> extends DetailsPmHandlerImpl<PmTable<?>, T_MASTER_BEAN> {
+public abstract class DetailsPmTableHandlerBase<T_MASTER_BEAN, T_DETAILS_BEAN> extends DetailsPmHandlerImpl<PmTable<?>, T_MASTER_BEAN> {
 
   private Map<T_MASTER_BEAN, ModificationsImpl<T_DETAILS_BEAN>> masterBeanToDetailsModificationsMap = new HashMap<T_MASTER_BEAN, ModificationsImpl<T_DETAILS_BEAN>>();
 
@@ -22,9 +22,11 @@ public class MasterDetailsTableCascadeHandler<T_MASTER_BEAN, T_DETAILS_BEAN> ext
   /** Reference to the latest master bean. */
   private T_MASTER_BEAN currentMasterBean;
 
-  public MasterDetailsTableCascadeHandler(PmTableImpl<?, ? extends T_DETAILS_BEAN> detailsPm) {
+  public DetailsPmTableHandlerBase(PmTableImpl<?, ? extends T_DETAILS_BEAN> detailsPm) {
     super(detailsPm);
   }
+
+  protected abstract Modifications<T_MASTER_BEAN> getMasterModifications();
 
   /**
    * Provides a master bean to details modifications map.

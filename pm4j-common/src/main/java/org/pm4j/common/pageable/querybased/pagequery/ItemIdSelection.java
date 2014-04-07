@@ -2,9 +2,9 @@ package org.pm4j.common.pageable.querybased.pagequery;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 
+import org.pm4j.common.pageable.querybased.NoItemForKeyFoundException;
 import org.pm4j.common.pageable.querybased.QueryService;
 import org.pm4j.common.util.collection.ListUtil;
 
@@ -84,7 +84,7 @@ public class ItemIdSelection<T_ITEM, T_ID> extends PageQuerySelectionHandler.Que
       // TODO olaf: not yet optimized to read in blocks
       T_ITEM item = getService().getItemForId(id);
       if (item == null) {
-        throw new ConcurrentModificationException("No item found for id '" + id + "'. It may have been deleted by a concurrent operation." +
+        throw new NoItemForKeyFoundException("No item found for id '" + id + "'. It may have been deleted by a concurrent operation." +
                                                   "\n\tUsed query service: " + getService());
       }
       return item;
