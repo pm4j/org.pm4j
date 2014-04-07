@@ -23,7 +23,14 @@ public class StringConverterParseException extends Exception {
   public StringConverterParseException(String messageString, StringConverterCtxt ctxt, Throwable cause, String string, String... formats) {
     super(messageString != null
         ? messageString
-        : "Unable to parse '" + string + "'. Supported formats: + " + Arrays.asList(formats) + " Context: " + ctxt);
+        : "Unable to parse '" + string + "'." +
+           (formats.length > 0
+               ? " Supported formats: " + Arrays.asList(formats)
+               : "") +
+           (cause != null
+               ? "\n Caused by: " + cause.getMessage()
+               : "") +
+           "\n Context: " + ctxt);
     this.messageString = messageString;
     this.ctxt = ctxt;
     this.stringToParse = string;

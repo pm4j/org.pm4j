@@ -157,6 +157,8 @@ public interface PageableCollection<T_ITEM> extends Iterable<T_ITEM>, PropertyCh
 
   /**
    * Provides the current selection.
+   * <p>
+   * Is a short cut method for <code>getSelectionHandler().getSelection()</code>.
    *
    * @return the current selection state. Never <code>null</code>.
    */
@@ -173,6 +175,8 @@ public interface PageableCollection<T_ITEM> extends Iterable<T_ITEM>, PropertyCh
 
   /**
    * Provides the registered modifications.
+   * <p>
+   * Is a short cut method for <code>getModificationHandler().getModifications()</code>.
    *
    * @return the modification set. Never <code>null</code>.
    */

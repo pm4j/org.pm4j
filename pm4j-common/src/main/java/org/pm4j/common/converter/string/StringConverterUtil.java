@@ -1,6 +1,10 @@
 package org.pm4j.common.converter.string;
 
+import java.util.Locale;
+import java.util.TimeZone;
+
 import org.apache.commons.lang.StringUtils;
+import org.pm4j.common.exception.CheckedExceptionWrapper;
 
 /**
  * String converter helper methods.
@@ -42,6 +46,42 @@ public class StringConverterUtil {
     String allFormatsString = StringUtils.defaultString(ctxt.getConverterCtxtFormatString());
     String[] formats = StringUtils.split(allFormatsString, formatSplitString);
     return formats;
+  }
+
+  public static <T> String convertToString(StringConverter<T> converter, T value) {
+    return converter.valueToString(new StringConverterCtxtImpl(null, Locale.getDefault(), TimeZone.getDefault()), value);
+  }
+
+  public static <T> String convertToString(StringConverter<T> converter, T value, String format) {
+    return converter.valueToString(new StringConverterCtxtImpl(format, Locale.getDefault(), TimeZone.getDefault()), value);
+  }
+
+  public static <T> String convertToString(StringConverter<T> converter, T value, String format, Locale locale) {
+    return converter.valueToString(new StringConverterCtxtImpl(format, locale, TimeZone.getDefault()), value);
+  }
+
+  public static <T> String convertToString(StringConverter<T> converter, T value, String format, Locale locale, TimeZone timeZone) {
+    return converter.valueToString(new StringConverterCtxtImpl(format, locale, timeZone), value);
+  }
+
+  public static <T> T convertToValue(StringConverter<T> converter, String string) {
+    return convertToValue(converter, string, null, Locale.getDefault(), TimeZone.getDefault());
+  }
+
+  public static <T> T convertToValue(StringConverter<T> converter, String string, String format) {
+    return convertToValue(converter, string, format, Locale.getDefault(), TimeZone.getDefault());
+  }
+
+  public static <T> T convertToValue(StringConverter<T> converter, String string, String format, Locale locale) {
+    return convertToValue(converter, string, format, locale, TimeZone.getDefault());
+  }
+
+  public static <T> T convertToValue(StringConverter<T> converter, String string, String format, Locale locale, TimeZone timeZone) {
+    try {
+      return converter.stringToValue(new StringConverterCtxtImpl(format, locale, timeZone), string);
+    } catch (StringConverterParseException e) {
+      throw new CheckedExceptionWrapper(e);
+    }
   }
 
 }
