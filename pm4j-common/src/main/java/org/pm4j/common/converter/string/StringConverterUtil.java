@@ -48,16 +48,23 @@ public class StringConverterUtil {
     return formats;
   }
 
+  /**
+   * Provides a string for the given value.
+   *
+   * @param converter The {@link StringConverter} to use.
+   * @param value The value to convert.
+   * @return the string representation.
+   */
   public static <T> String convertToString(StringConverter<T> converter, T value) {
-    return converter.valueToString(new StringConverterCtxtImpl(null, Locale.getDefault(), TimeZone.getDefault()), value);
+    return converter.valueToString(new StringConverterCtxtImpl(), value);
   }
 
   public static <T> String convertToString(StringConverter<T> converter, T value, String format) {
-    return converter.valueToString(new StringConverterCtxtImpl(format, Locale.getDefault(), TimeZone.getDefault()), value);
+    return converter.valueToString(new StringConverterCtxtImpl(format), value);
   }
 
   public static <T> String convertToString(StringConverter<T> converter, T value, String format, Locale locale) {
-    return converter.valueToString(new StringConverterCtxtImpl(format, locale, TimeZone.getDefault()), value);
+    return converter.valueToString(new StringConverterCtxtImpl(format, locale), value);
   }
 
   public static <T> String convertToString(StringConverter<T> converter, T value, String format, Locale locale, TimeZone timeZone) {
@@ -65,15 +72,15 @@ public class StringConverterUtil {
   }
 
   public static <T> T convertToValue(StringConverter<T> converter, String string) {
-    return convertToValue(converter, string, null, Locale.getDefault(), TimeZone.getDefault());
+    return convertToValue(converter, string, null, null, null);
   }
 
   public static <T> T convertToValue(StringConverter<T> converter, String string, String format) {
-    return convertToValue(converter, string, format, Locale.getDefault(), TimeZone.getDefault());
+    return convertToValue(converter, string, format, null, null);
   }
 
   public static <T> T convertToValue(StringConverter<T> converter, String string, String format, Locale locale) {
-    return convertToValue(converter, string, format, locale, TimeZone.getDefault());
+    return convertToValue(converter, string, format, locale, null);
   }
 
   public static <T> T convertToValue(StringConverter<T> converter, String string, String format, Locale locale, TimeZone timeZone) {
