@@ -1,9 +1,11 @@
 package org.pm4j.common.converter.string;
 
+import java.util.Locale;
+import java.util.TimeZone;
+
 
 /**
- * Provides a simple base implementation for
- * {@link #valueToString(PmAttr, Object)}.
+ * Provides common logic that may be used to implement type specific converters.
  *
  * @param <T>
  *          Type of the value to convert.
@@ -24,7 +26,7 @@ public abstract class StringConverterBase<T, C extends StringConverterCtxt> impl
 
   /**
    * Calls {@link #stringToValueImpl(StringConverterCtxt, String)} and supports
-   * exception translation
+   * exception translation.
    */
   @SuppressWarnings("unchecked")
   @Override
@@ -41,9 +43,9 @@ public abstract class StringConverterBase<T, C extends StringConverterCtxt> impl
   /**
    * Specific string parse implementation.
    *
-   * @param ctxt
-   * @param s
-   * @return
+   * @param ctxt Provides context information about formats, {@link Locale} and {@link TimeZone}.
+   * @param s The string to convert.
+   * @return The converted value.
    * @throws Exception
    *           if the string can't be converted. If the exception is a
    *           {@link StringConverterParseException} it will be propagated to
@@ -55,10 +57,6 @@ public abstract class StringConverterBase<T, C extends StringConverterCtxt> impl
 
   /**
    * The default implementation just calls the {@link #toString()} method of the given value.
-   * <p>
-   * This solution works if the {@link #toString()} implementation provides the
-   * information needed for the {@link #stringToValue(PmAttr, String)} method
-   * call.
    */
   protected String valueToStringImpl(C ctxt, T v) {
     return (v != null)
