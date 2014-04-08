@@ -59,30 +59,95 @@ public class StringConverterUtil {
     return converter.valueToString(new StringConverterCtxtImpl(), value);
   }
 
+  /**
+   * Provides a string for the given value.
+   *
+   * @param converter The {@link StringConverter} to use.
+   * @param value The value to convert.
+   * @param format The format to be used. Is converter specific.
+   * @return the string representation.
+   */
   public static <T> String convertToString(StringConverter<T> converter, T value, String format) {
     return converter.valueToString(new StringConverterCtxtImpl(format), value);
   }
 
+  /**
+   * Provides a string for the given value.
+   *
+   * @param converter The {@link StringConverter} to use.
+   * @param value The value to convert.
+   * @param format The format to use. Is converter specific.
+   * @param locale The {@link Locale} to use. (Not used by all converters.)
+   * @return the string representation.
+   */
   public static <T> String convertToString(StringConverter<T> converter, T value, String format, Locale locale) {
     return converter.valueToString(new StringConverterCtxtImpl(format, locale), value);
   }
 
+  /**
+   * Provides a string for the given value.
+   *
+   * @param converter The {@link StringConverter} to use.
+   * @param value The value to convert.
+   * @param format The format to use. Is converter specific.
+   * @param locale The {@link Locale} to use. (Not used by all converters.)
+   * @param timeZone The {@link TimeZone} to use. (Not used by all converters.)
+   * @return the string representation.
+   */
   public static <T> String convertToString(StringConverter<T> converter, T value, String format, Locale locale, TimeZone timeZone) {
     return converter.valueToString(new StringConverterCtxtImpl(format, locale, timeZone), value);
   }
 
+  /**
+   * Provides a value for a given string.
+   *
+   * @param converter The {@link StringConverter} to use.
+   * @param string The {@link String} to convert.
+   * @return the converted value.
+   * @throws RuntimeException if the string can't be converted.
+   */
   public static <T> T convertToValue(StringConverter<T> converter, String string) {
     return convertToValue(converter, string, null, null, null);
   }
 
+  /**
+   * Provides a value for a given string.
+   *
+   * @param converter The {@link StringConverter} to use.
+   * @param string The {@link String} to convert.
+   * @param format The format to use. Is converter specific.
+   * @return the converted value.
+   * @throws RuntimeException if the string can't be converted.
+   */
   public static <T> T convertToValue(StringConverter<T> converter, String string, String format) {
     return convertToValue(converter, string, format, null, null);
   }
 
+  /**
+   * Provides a value for a given string.
+   *
+   * @param converter The {@link StringConverter} to use.
+   * @param string The {@link String} to convert.
+   * @param format The format to use. Is converter specific.
+   * @param locale The {@link Locale} to use. (Not used by all converters.)
+   * @return the converted value.
+   * @throws RuntimeException if the string can't be converted.
+   */
   public static <T> T convertToValue(StringConverter<T> converter, String string, String format, Locale locale) {
     return convertToValue(converter, string, format, locale, null);
   }
 
+  /**
+   * Provides a value for a given string.
+   *
+   * @param converter The {@link StringConverter} to use.
+   * @param string The {@link String} to convert.
+   * @param format The format to use. Is converter specific.
+   * @param locale The {@link Locale} to use. (Not used by all converters.)
+   * @param timeZone The {@link TimeZone} to use. (Not used by all converters.)
+   * @return the converted value.
+   * @throws RuntimeException if the string can't be converted.
+   */
   public static <T> T convertToValue(StringConverter<T> converter, String string, String format, Locale locale, TimeZone timeZone) {
     try {
       return converter.stringToValue(new StringConverterCtxtImpl(format, locale, timeZone), string);
