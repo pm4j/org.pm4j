@@ -10,7 +10,7 @@ import java.util.Collection;
  * Custom annotation handlers are configured one for the lifetime of the
  * application (Java VM).
  *
- * @author olaf boede
+ * @author Olaf Boede
  */
 public class PmAnnotationApi {
 
@@ -35,6 +35,17 @@ public class PmAnnotationApi {
     assert handler != null;
 
     CustomizedAnnotationUtil.annotationClassToPermissionHandlerMap.put(annotationType, handler);
+  }
+
+  /**
+   * Un-registers a custom {@link PermissionAnnotationHandler} for a given custom
+   * annotation.
+   *
+   * @param annotationType
+   *          the custom permission annotation to support.
+   */
+  public static <T extends Annotation> void removePermissionAnnotationHandler(Class<?> annotationType) {
+    CustomizedAnnotationUtil.annotationClassToPermissionHandlerMap.remove(annotationType);
   }
 
   /**

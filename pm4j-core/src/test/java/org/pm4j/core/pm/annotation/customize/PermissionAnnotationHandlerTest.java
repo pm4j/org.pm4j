@@ -7,6 +7,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.pm4j.core.pm.PmAttrString;
@@ -53,6 +54,11 @@ public class PermissionAnnotationHandlerTest {
   @Before
   public void setUp() {
     PmAnnotationApi.addPermissionAnnotationHandler(MyPermissionCfg.class, new MyHandler());
+  }
+
+  @After
+  public void tearDown() {
+    PmAnnotationApi.removePermissionAnnotationHandler(MyPermissionCfg.class);
   }
 
   @Test
