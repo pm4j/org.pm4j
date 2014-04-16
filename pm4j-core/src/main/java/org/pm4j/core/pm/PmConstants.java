@@ -1,7 +1,12 @@
 package org.pm4j.core.pm;
 
 
-public class PmConstants {
+/**
+ * The set of common pm4j resource string constants.
+ *
+ * @author Olaf Boede
+ */
+public final class PmConstants {
 
   /**
    * Post fix for tool tip resource keys.
