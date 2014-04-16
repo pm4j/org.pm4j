@@ -1,12 +1,7 @@
 package org.pm4j.common.query;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.pm4j.common.exception.CheckedExceptionWrapper;
-import org.pm4j.common.util.CloneUtil;
 
 /**
  * A basic compare operator implementation.
@@ -30,7 +25,6 @@ public abstract class CompOpBase<T_VALUE> implements CompOp {
 
   private String name;
   private ValueNeeded valueNeeded = ValueNeeded.OPTIONAL;
-  private List<ValueOption> valueOptions = new ArrayList<ValueOption>();
 
   public CompOpBase(String name) {
     this.name = name;
@@ -40,10 +34,7 @@ public abstract class CompOpBase<T_VALUE> implements CompOp {
   @Override
   public CompOp clone() {
     try {
-      CompOpBase<T_VALUE> clone = (CompOpBase<T_VALUE>) super.clone();
-      clone.valueOptions = CloneUtil.cloneList(this.valueOptions);
-
-      return clone;
+      return (CompOpBase<T_VALUE>) super.clone();
     } catch (CloneNotSupportedException e) {
       throw new CheckedExceptionWrapper(e);
     }
@@ -61,15 +52,6 @@ public abstract class CompOpBase<T_VALUE> implements CompOp {
 
   protected void setValueNeeded(ValueNeeded valueNeeded) {
     this.valueNeeded = valueNeeded;
-  }
-
-  @Override
-  public Collection<ValueOption> getValueOptions() {
-    return valueOptions;
-  }
-
-  public void addValueOption(ValueOption valueOption) {
-    valueOptions.add(valueOption);
   }
 
   @SuppressWarnings("unchecked")
@@ -108,7 +90,6 @@ public abstract class CompOpBase<T_VALUE> implements CompOp {
           .append(ignoreCase, rhs.ignoreCase)
           .append(ignoreSpaces, rhs.ignoreSpaces)
           .append(valueNeeded, rhs.valueNeeded)
-          .append(valueOptions, rhs.valueOptions)
           .isEquals();
   }
 

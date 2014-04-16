@@ -5,8 +5,7 @@ import org.apache.commons.lang.StringUtils;
 /**
  * A like compare operator.
  *
- * @author OBOEDE
- *
+ * @author Olaf Boede
  */
 public class CompOpLike extends CompOpBase<String> {
 

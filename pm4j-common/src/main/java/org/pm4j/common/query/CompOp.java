@@ -1,7 +1,6 @@
 package org.pm4j.common.query;
 
 import java.io.Serializable;
-import java.util.Collection;
 
 import org.pm4j.common.exception.CheckedExceptionWrapper;
 
@@ -23,20 +22,6 @@ public interface CompOp extends Cloneable, Serializable {
    * @return The value-required definition.
    */
   ValueNeeded getValueNeeded();
-
-  /**
-   * For each compare operator a different set of selectable value options may apply.
-   *
-   * @return The set of selectable value options.
-   */
-  Collection<ValueOption> getValueOptions();
-
-  /**
-   * Adds a compare operator specific value option.
-   *
-   * @param valueOption the new value option.
-   */
-  void addValueOption(ValueOption valueOption);
 
   /**
    * Checks if a filter definition with the given value is a filter condition
