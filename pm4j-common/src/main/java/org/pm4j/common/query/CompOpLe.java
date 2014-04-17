@@ -8,7 +8,7 @@ package org.pm4j.common.query;
  *
  * @author olaf boede
  */
-public class CompOpLe extends CompOpBase<Object> {
+public class CompOpLe extends CompOpBase<Comparable<?>> {
 
   private static final long serialVersionUID = 1L;
   public static final String NAME = "compOpLe";
@@ -18,7 +18,7 @@ public class CompOpLe extends CompOpBase<Object> {
   }
 
   @Override
-  protected boolean isEffectiveFilterValueImpl(Object filterValue) {
+  protected boolean isEffectiveFilterValueImpl(Comparable<?> filterValue) {
     return filterValue != null;
   }
 

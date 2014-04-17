@@ -2,6 +2,11 @@ package org.pm4j.common.query;
 
 import org.apache.commons.lang.StringUtils;
 
+/**
+ * Checks for a substring mismatch.
+ *
+ * @author Olaf Boede
+ */
 public class CompOpNotContains extends CompOpBase<String> {
 
   private static final long serialVersionUID = 1L;

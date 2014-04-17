@@ -6,9 +6,9 @@ package org.pm4j.common.query;
  * <p>
  * Corresponding evaluators provide technology specific logic.
  *
- * @author olaf boede
+ * @author Olaf Boede
  */
-public class CompOpGe extends CompOpBase<Object> {
+public class CompOpGe extends CompOpBase<Comparable<?>> {
 
   private static final long serialVersionUID = 1L;
   public static final String NAME = "compOpGe";
@@ -18,7 +18,7 @@ public class CompOpGe extends CompOpBase<Object> {
   }
 
   @Override
-  protected boolean isEffectiveFilterValueImpl(Object filterValue) {
+  protected boolean isEffectiveFilterValueImpl(Comparable<?> filterValue) {
     return filterValue != null;
   }
 

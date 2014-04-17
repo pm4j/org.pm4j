@@ -8,9 +8,9 @@ import java.util.Collection;
  * <p>
  * Corresponding evaluators provide technology specific logic.
  *
- * @author olaf boede
+ * @author Olaf Boede
  */
-public class CompOpIn extends CompOpBase<Object> {
+public class CompOpIn extends CompOpBase<Collection<?>> {
 
   private static final long serialVersionUID = 1L;
   public static final String NAME = "compOpIn";
@@ -20,9 +20,9 @@ public class CompOpIn extends CompOpBase<Object> {
   }
 
   @Override
-  protected boolean isEffectiveFilterValueImpl(Object filterValue) {
-    return (filterValue instanceof Collection) &&
-           ((Collection<?>)filterValue).size() > 0;
+  protected boolean isEffectiveFilterValueImpl(Collection<?> filterValue) {
+    return (filterValue != null) &&
+           (filterValue.size() > 0);
   }
 
   @Override

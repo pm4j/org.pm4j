@@ -2,6 +2,11 @@ package org.pm4j.common.query;
 
 import org.apache.commons.lang.StringUtils;
 
+/**
+ * Checks for a substring match.
+ *
+ * @author Olaf Boede
+ */
 public class CompOpContains extends CompOpBase<String> {
 
   private static final long serialVersionUID = 1L;
