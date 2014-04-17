@@ -110,4 +110,18 @@ public class ModificationsImpl<T_ITEM> implements Modifications<T_ITEM> {
     }
   }
 
+  @Override
+  public String toString() {
+    if (!isModified()) {
+      return "Modifications{}";
+    } else {
+      StringBuilder sb = new StringBuilder("Modifications{");
+      sb.append("added: " + addedItems.size());
+      sb.append(", updated: " + updatedItems.size());
+      sb.append(", removed: " + removedItems.getSize());
+      sb.append("}");
+      return sb.toString();
+    }
+  }
+
 }

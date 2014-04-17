@@ -239,7 +239,10 @@ public class DeprMasterPmTableHandlerImpl<T_MASTER_BEAN> implements MasterPmHand
    * @return <code>true</code> if the switch can be performed.
    */
   protected boolean canSwitch() {
-    if (masterTablePm.getCurrentRowPm() == null) {
+    @SuppressWarnings("unchecked")
+    PmBean<Object> rowPm = (PmBean<Object>) masterTablePm.getCurrentRowPm();
+
+    if (rowPm == null) {
       return true;
     }
 
@@ -248,7 +251,7 @@ public class DeprMasterPmTableHandlerImpl<T_MASTER_BEAN> implements MasterPmHand
     }
 
     for (DetailsPmHandler dh : detailsHandlers) {
-      if (!dh.canSwitchMasterRecord()) {
+      if (!dh.beforeMasterRecordChange(rowPm.getPmBean())) {
         return false;
       }
     }

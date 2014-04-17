@@ -12,13 +12,14 @@ import org.pm4j.core.pm.api.PmMessageApi;
 import org.pm4j.core.pm.api.PmValidationApi;
 
 /**
- * Default details handler implementation.
+ * A details handler that allows a master record switch only if the details area is valid.
  * <p>
- * It allows a master record switch only if the details area is valid.
+ * It clears all details area related messages and cache states after a master record selection change.
  * <p>
- * It clears all messages after a master record selection change.
+ * It has a set of {@link PmCommandDecorator}s that may be used to plug-in additional logic
+ * (see {@link #addDecorator(PmCommandDecorator)}.
  *
- * @author olaf boede
+ * @author Olaf Boede
  *
  * @param <T_DETAILS_PM>
  *          Type of the supported details PM.
@@ -29,68 +30,74 @@ public class DetailsPmHandlerImpl<T_DETAILS_PM extends PmDataInput, T_MASTER_REC
   private final T_DETAILS_PM detailsPm;
 
   /** Additional decorators to apply on {@link #canSwitchMasterRecord()} and {@link #afterMasterRecordChange(Object)}. */
-  private List<PmCommandDecorator> decorators = new ArrayList<PmCommandDecorator>();
+  private final List<PmCommandDecorator> decorators = new ArrayList<PmCommandDecorator>();
 
   /**
    * @param detailsPm The details PM to handle.
    */
   public DetailsPmHandlerImpl(T_DETAILS_PM detailsPm) {
+    assert detailsPm != null;
     this.detailsPm = detailsPm;
   }
 
-  @Override
-  public final PmObject getDetailsPm() {
-    return detailsPm;
-  }
-  
-  /**
-   * Provides type save access to the handled details PM. 
-   * 
-   * @return the handled details PM. Never <code>null</code>.
-   */
-  public final T_DETAILS_PM getTypedDetailsPm() {
-    return detailsPm;
-  }
-
-  @Override
-  public void addDecorator(PmCommandDecorator decorator) {
-    decorators.add(decorator);
-  }
-
-  @Override
-  public boolean canSwitchMasterRecord() {
-    if (!PmValidationApi.validateSubTree((PmDataInput)detailsPm)) {
-      return false;
-    }
-
+  /** Calls <code>beforeDo</code> for all decorators and {@link #beforeMasterRecordChangeImpl(Object)}. */
+  @SuppressWarnings("unchecked")
+  public final boolean beforeMasterRecordChange(Object oldMasterRecord) {
     for (PmCommandDecorator d : decorators) {
-      // TODO olaf: preserve the original command to allow deferred execution.
       if (!d.beforeDo(null)) {
         return false;
       }
     }
-
-    return true;
+    return beforeMasterRecordChangeImpl((T_MASTER_RECORD) oldMasterRecord);
   }
 
   /**
-   * Just calls the type safe method {@link #afterMasterRecordChangeImpl(Object)}.
+   * Defines the checks and logic to be applied before the master selection may be switched
+   * from the given master record to another one.<br>
+   * The record switch may be prevented by returning <code>false</code>.
+   * <p>
+   * The default implementation validates the details PM and prevents the switch if the details
+   * area is not valid.
+   *
+   * @param oldMasterBean The master bean to deselect.
+   * @return <code>true</code> if this handler agrees to the switch. <code>false</code> prevents the switch.
+   */
+  protected boolean beforeMasterRecordChangeImpl(T_MASTER_RECORD oldMasterBean) {
+    if (!canSwitchMasterRecord()) {
+      return false;
+    }
+    for (PmCommandDecorator d : decorators) {
+      if (!d.beforeDo(null)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  @Override
+  @Deprecated
+  public boolean canSwitchMasterRecord() {
+    return PmValidationApi.validateSubTree((PmDataInput)detailsPm);
+  }
+
+  /**
+   * Calls {@link #afterMasterRecordChangeImpl(Object)} and calls the <code>afterDo()</code> method for
+   * each configured decorator.
    */
   @SuppressWarnings("unchecked")
   @Override
   public final void afterMasterRecordChange(Object newMasterBean) {
     afterMasterRecordChangeImpl((T_MASTER_RECORD) newMasterBean);
     for (PmCommandDecorator d : decorators) {
-      d.afterDo(null);
+        d.afterDo(null);
     }
   }
 
   /**
    * The default implementation just clears the details PM.
    * <br>
-   * The default implementation does not set some master record related content to the details
-   * area.
-   * This may be done within a more concrete sub class or within the details area itself.
+   * More specific details hander implementations may add here their details area specific
+   * logic.
    */
   protected void afterMasterRecordChangeImpl(T_MASTER_RECORD newMasterBean) {
     // The details area has now a new content to handle. The old messages of
@@ -100,4 +107,26 @@ public class DetailsPmHandlerImpl<T_DETAILS_PM extends PmDataInput, T_MASTER_REC
     PmCacheApi.clearPmCache(detailsPm, CacheKind.ALL);
   }
 
+  /**
+   * Adds a decorator to consider in {@link #beforeMasterRecordChange(Object)} and {@link #afterMasterRecordChange(Object)}.
+   *
+   * @param decorator
+   */
+  public final void addDecorator(PmCommandDecorator decorator) {
+    decorators.add(decorator);
+  }
+
+  @Override
+  public final PmObject getDetailsPm() {
+    return detailsPm;
+  }
+
+  /**
+   * Provides type save access to the handled details PM.
+   *
+   * @return the handled details PM. Never <code>null</code>.
+   */
+  protected final T_DETAILS_PM getTypedDetailsPm() {
+    return detailsPm;
+  }
 }

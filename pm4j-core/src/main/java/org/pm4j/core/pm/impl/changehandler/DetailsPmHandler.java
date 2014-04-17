@@ -1,13 +1,12 @@
 package org.pm4j.core.pm.impl.changehandler;
 
-import org.pm4j.core.pm.PmCommandDecorator;
 import org.pm4j.core.pm.PmObject;
 
 /**
  * Master-details handling can be very details PM specific.<br>
  * Implementations of this handler may consider this.
  *
- * @author olaf boede
+ * @author Olaf Boede
  *
  * @param <T_DETAILS_PM>
  *          Type of the supported details PM.
@@ -21,16 +20,18 @@ public interface DetailsPmHandler {
    */
   PmObject getDetailsPm();
 
-  /**
-   * The details handler can prevent a master record switch by returning here
-   * <code>false</code>.
-   * <p>
-   * A typical implementation: The master record can only be switched if the
-   * details area is valid.
-   *
-   * @return <code>true</code> if the master record can be switched.
-   */
+  /** @deprecated Please use {@link #beforeMasterRecordChange(Object)}. */
+  @Deprecated
   boolean canSwitchMasterRecord();
+
+  /**
+   * Performs the checks and logic to be applied before the master selection may be switched
+   * from the given master record to another one.
+   *
+   * @param oldMasterBean The master record to deselect.
+   * @return <code>true</code> if this handler agrees to the switch. <code>false</code> prevents the switch.
+   */
+  boolean beforeMasterRecordChange(Object oldMasterBean);
 
   /**
    * Gets called after a master record selection change.
@@ -44,12 +45,5 @@ public interface DetailsPmHandler {
    *          The new master record. May be <code>null</code>.
    */
   void afterMasterRecordChange(Object newMasterBean);
-
-  /**
-   * Adds a decorator to consider in {@link #canSwitchMasterRecord()} and {@link #afterMasterRecordChange(Object)}.
-   *
-   * @param decorator
-   */
-  void addDecorator(PmCommandDecorator decorator);
 
 }
