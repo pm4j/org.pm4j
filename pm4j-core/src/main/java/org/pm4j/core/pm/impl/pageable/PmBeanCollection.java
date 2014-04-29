@@ -17,9 +17,11 @@ import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.selection.Selection;
 import org.pm4j.common.selection.SelectionHandler;
 import org.pm4j.common.util.beanproperty.PropertyChangeSupportedBase;
+import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmDataInput;
 import org.pm4j.core.pm.PmEvent;
+import org.pm4j.core.pm.PmEvent.ValueChangeKind;
 import org.pm4j.core.pm.PmEventListener;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.api.PmEventApi;
@@ -80,6 +82,7 @@ public class PmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> extends Prope
       @Override
       public void propertyChange(PropertyChangeEvent evt) {
         firePropertyChange(PageableCollection.EVENT_ITEM_ADD, null, PmFactoryApi.getPmForBean(pmCtxt, evt.getNewValue()));
+        PmEventApi.firePmEvent(pmCtxt, PmEvent.VALUE_CHANGE, ValueChangeKind.ADD_ITEM);
       }
     });
 
@@ -88,6 +91,7 @@ public class PmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> extends Prope
       public void propertyChange(PropertyChangeEvent evt) {
         // propagates the changed flag value change.
         firePropertyChange(PageableCollection.EVENT_ITEM_UPDATE, evt.getOldValue(), evt.getNewValue());
+        PmEventApi.firePmEvent(pmCtxt, PmEvent.VALUE_CHANGE);
       }
     });
 
@@ -96,6 +100,7 @@ public class PmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> extends Prope
       public void propertyChange(PropertyChangeEvent evt) {
         Selection<T_PM> deletedItemSelection = new PmBeanSelection<T_PM, T_BEAN>(pmCtxt, (Selection<T_BEAN>) evt.getOldValue());
         firePropertyChange(PageableCollection.EVENT_REMOVE_SELECTION, deletedItemSelection, null);
+        PmEventApi.firePmEvent(pmCtxt, PmEvent.VALUE_CHANGE, ValueChangeKind.DELETE_ITEM);
       }
     });
 
@@ -103,6 +108,7 @@ public class PmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> extends Prope
       @Override
       public void propertyChange(PropertyChangeEvent evt) {
         firePropertyChange(PageableCollection.PROP_PAGE_IDX, evt.getOldValue(), evt.getNewValue());
+        // TODO: check which kind of PM change event should be fired here.
       }
     });
 
@@ -110,6 +116,7 @@ public class PmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> extends Prope
       @Override
       public void propertyChange(PropertyChangeEvent evt) {
         firePropertyChange(PageableCollection.PROP_PAGE_SIZE, evt.getOldValue(), evt.getNewValue());
+        // TODO: check which kind of PM change event should be fired here.
       }
     });
   }
@@ -390,6 +397,11 @@ public class PmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> extends Prope
     @Override
     public Modifications<T_PM> getModifications() {
       return modifications;
+    }
+
+    @Override
+    public void setModifications(Modifications<T_PM> modifications) {
+      throw new PmRuntimeException(pmCtxt, "Exchanging PmBeanCollection modifications is not yet supported.");
     }
 
     /** Provides PM type specific modifications based on the backing bean collection. */

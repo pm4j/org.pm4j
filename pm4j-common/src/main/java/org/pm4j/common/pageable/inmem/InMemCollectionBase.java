@@ -347,6 +347,12 @@ public abstract class InMemCollectionBase<T_ITEM>
       return modifications;
     }
 
+    @Override
+    public void setModifications(Modifications<T_ITEM> modifications) {
+      assert modifications != null;
+      this.modifications = (ModificationsImpl<T_ITEM>) modifications;
+    }
+
     private void doRegisterAddedItem(T_ITEM item) {
       modifications.registerAddedItem(item);
       InMemCollectionBase.this.firePropertyChange(PageableCollection.EVENT_ITEM_ADD, null, item);

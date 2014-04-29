@@ -103,13 +103,15 @@ public abstract class MasterPmSelectionHandlerImpl<T_MASTER_BEAN> implements Mas
     // Observe master table content change events.
     // After complete processing of the masterPm value change event the details PMs
     // will get a message about the potential master record change.
-    // This prevents conflicts between the changed state handling and the master record
+    // This timing prevents conflicts between the changed state handling and the master record
     // selection change logic.
-    PmEventApi.addPmEventListener(masterPm, PmEvent.VALUE_CHANGE, new PmEventListener() {
+    PmEventApi.addPmEventListener(masterPm, PmEvent.ALL_CHANGE_EVENTS, new PmEventListener() {
       PostProcessor<Object> postProcessor = new PostProcessor<Object>() {
         @Override
         public void postProcess(PmEvent event, Object postProcessPayload) {
-          afterMasterSelectionChange();
+          if (event.isInitializationEvent() || event.isReloadEvent()) {
+            afterMasterSelectionChange();
+          }
         }
       };
 
@@ -137,6 +139,7 @@ public abstract class MasterPmSelectionHandlerImpl<T_MASTER_BEAN> implements Mas
 
     for (DetailsPmHandler dh : detailsHandlers) {
       PmEventApi.addHierarchyListener(dh.getDetailsPm(), PmEvent.VALUE_CHANGE, el);
+      dh.startObservers();
     }
 
     // adjust the details areas by informing them about the initial master bean.

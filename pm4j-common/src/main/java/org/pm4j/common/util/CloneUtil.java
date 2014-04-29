@@ -88,8 +88,15 @@ public final class CloneUtil {
     throw new IllegalArgumentException("Can't clone type: " + ori.getClass());
   }
 
+  /**
+   * Invokes the clone method of the given object.<br>
+   * Throws a runtime exception if clone is no supported for the given instance.
+   *
+   * @param ori The instance to clone.
+   * @return the clone.
+   */
   @SuppressWarnings("unchecked")
-  public static <T extends Cloneable> T clone(T ori) {
+  public static <T> T clone(T ori) {
     if (ori == null) {
       return null;
     }

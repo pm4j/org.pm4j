@@ -1,6 +1,7 @@
 package org.pm4j.core.pm;
 
 import static org.junit.Assert.assertEquals;
+import static org.pm4j.common.pageable.PageableCollection.EVENT_REMOVE_SELECTION;
 import static org.pm4j.tools.test.PmAssert.setValue;
 
 import java.util.ArrayList;
@@ -14,10 +15,12 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.pm4j.common.pageable.PageableCollection;
 import org.pm4j.common.pageable.PageableCollectionUtil;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.filter.FilterDefinition;
 import org.pm4j.common.query.inmem.InMemSortOrder;
+import org.pm4j.common.selection.SelectMode;
 import org.pm4j.common.util.CompareUtil;
 import org.pm4j.core.pm.PmTable.UpdateAspect;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
@@ -36,10 +39,14 @@ import org.pm4j.core.pm.impl.PmBeanImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
 import org.pm4j.core.pm.impl.PmTableColImpl;
 import org.pm4j.core.pm.impl.PmTableImpl;
+import org.pm4j.tools.test.RecordingPmEventListener;
+import org.pm4j.tools.test.RecordingPropertyChangeListener;
 
 public class PmTableTest {
 
   private TablePm myTablePm;
+  private RecordingPmEventListener valueChangeEventListener = new RecordingPmEventListener();
+
   private List<RowBean> editedRowBeanList = new ArrayList<RowBean>(Arrays.asList(
       new RowBean("b", "a 'b'", 2),
       new RowBean("a", "an 'a'", 1),
@@ -62,6 +69,7 @@ public class PmTableTest {
         return editedRowBeanList;
       }
     };
+    PmEventApi.addPmEventListener(myTablePm, PmEvent.VALUE_CHANGE, valueChangeEventListener);
   }
 
   @Test
@@ -180,6 +188,49 @@ public class PmTableTest {
     assertEquals(myTablePm.pathColumn.getPmTitle(), fd.getAttrTitle());
   }
 
+  @Test
+  public void testRemoveFirstItemOnPmCollectionLevel() {
+    PageableCollection<RowPm> pc = myTablePm.getPmPageableCollection();
+    pc.getSelectionHandler().setSelectMode(SelectMode.SINGLE);
+    assertEquals("[a, b]", myTablePm.getRowPms().toString());
+    RecordingPropertyChangeListener deletePropertyChangeListener = new RecordingPropertyChangeListener();
+    RecordingPropertyChangeListener deleteBeanPropertyChangeListener = new RecordingPropertyChangeListener();
+    pc.addPropertyAndVetoableListener(EVENT_REMOVE_SELECTION, deletePropertyChangeListener);
+    myTablePm.getPmPageableBeanCollection().addPropertyAndVetoableListener(EVENT_REMOVE_SELECTION, deleteBeanPropertyChangeListener);
+
+    pc.getSelectionHandler().select(true, myTablePm.getRowPms().get(0));
+    pc.getModificationHandler().removeSelectedItems();
+
+    assertEquals("[b, c]", myTablePm.getRowPms().toString());
+    assertEquals(1L, pc.getModifications().getRemovedItems().getSize());
+    assertEquals(1, deletePropertyChangeListener.getNumOfPropertyChangesCalls());
+    assertEquals(1, deletePropertyChangeListener.getNumOfVetoableChangesCalls());
+    assertEquals(1, deleteBeanPropertyChangeListener.getNumOfPropertyChangesCalls());
+    assertEquals(1, deleteBeanPropertyChangeListener.getNumOfVetoableChangesCalls());
+    assertEquals(1, valueChangeEventListener.getCallCount());
+  }
+
+  @Test
+  public void testRemoveFirstItemOnPmBeanCollectionLevel() {
+    PageableCollection<RowBean> pc = myTablePm.getPmPageableBeanCollection();
+    pc.getSelectionHandler().setSelectMode(SelectMode.SINGLE);
+    assertEquals("[a, b]", myTablePm.getRowPms().toString());
+    RecordingPropertyChangeListener deletePropertyChangeListener = new RecordingPropertyChangeListener();
+    RecordingPropertyChangeListener deleteBeanPropertyChangeListener = new RecordingPropertyChangeListener();
+    pc.addPropertyAndVetoableListener(EVENT_REMOVE_SELECTION, deletePropertyChangeListener);
+    myTablePm.getPmPageableBeanCollection().addPropertyAndVetoableListener(EVENT_REMOVE_SELECTION, deleteBeanPropertyChangeListener);
+
+    pc.getSelectionHandler().select(true, myTablePm.getRowPms().get(0).getPmBean());
+    pc.getModificationHandler().removeSelectedItems();
+
+    assertEquals("[b, c]", myTablePm.getRowPms().toString());
+    assertEquals(1L, pc.getModifications().getRemovedItems().getSize());
+    assertEquals(1, deletePropertyChangeListener.getNumOfPropertyChangesCalls());
+    assertEquals(1, deletePropertyChangeListener.getNumOfVetoableChangesCalls());
+    assertEquals(1, deleteBeanPropertyChangeListener.getNumOfPropertyChangesCalls());
+    assertEquals(1, deleteBeanPropertyChangeListener.getNumOfVetoableChangesCalls());
+    assertEquals(1, valueChangeEventListener.getCallCount());
+  }
 
   @PmTableCfg(initialSortCol="name")
   @PmFactoryCfg(beanPmClasses=RowPm.class)

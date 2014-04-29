@@ -5,17 +5,18 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import org.pm4j.common.exception.CheckedExceptionWrapper;
 import org.pm4j.common.selection.EmptySelection;
 import org.pm4j.common.selection.Selection;
 
 /**
  * A basic {@link Modifications} implementation that supports add- and update change handling.
  *
- * @author olaf boede
+ * @author Olaf Boede
  *
  * @param <T_ITEM> type of collection items.
  */
-public class ModificationsImpl<T_ITEM> implements Modifications<T_ITEM> {
+public class ModificationsImpl<T_ITEM> implements Modifications<T_ITEM>, Cloneable {
 
   /** The ordered set of (manually) added items. Ordered according to the sequence of {@link #registerAddedItem(Object)} calls. */
   private List<T_ITEM> addedItems = Collections.emptyList();
@@ -50,7 +51,7 @@ public class ModificationsImpl<T_ITEM> implements Modifications<T_ITEM> {
   /**
    * A pm4j internal functionality that's public only for technical reasons. Please don't call it!
    * <p>
-   * Removes the given item from the list of added items explicitely.
+   * Removes the given item from the list of added items explicitly.
    *
    * @param item the item to remove.
    */
@@ -107,6 +108,16 @@ public class ModificationsImpl<T_ITEM> implements Modifications<T_ITEM> {
     }
     if (!itemsToRemoveFromCollection.isEmpty()) {
       collection.removeAll(itemsToRemoveFromCollection);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public ModificationsImpl<T_ITEM> clone() {
+    try {
+      return (ModificationsImpl<T_ITEM>) super.clone();
+    } catch (CloneNotSupportedException e) {
+      throw new CheckedExceptionWrapper(e);
     }
   }
 

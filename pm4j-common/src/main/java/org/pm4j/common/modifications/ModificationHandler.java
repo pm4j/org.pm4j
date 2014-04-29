@@ -97,4 +97,9 @@ public interface ModificationHandler<T_ITEM> {
    */
   Modifications<T_ITEM> getModifications();
 
+  /**
+   * FOR INTERNAL USE ONLY!
+   */
+  void setModifications(Modifications<T_ITEM> modifications);
+
 }

@@ -12,6 +12,11 @@ import org.pm4j.core.pm.impl.PmAttrValueChangeDecorator;
 import org.pm4j.core.pm.impl.PmEventApiHandler;
 import org.pm4j.core.pm.impl.BroadcastPmEventProcessor;
 
+/**
+ * Defines methods that allow to register and un-register event listeners for PM events.
+ *
+ * @author Olaf Boede
+ */
 public class PmEventApi {
 
   private static PmEventApiHandler apiHandler = new PmEventApiHandler();
@@ -31,9 +36,30 @@ public class PmEventApi {
    *          The attribute to attach the decorator to.
    * @param decorator
    *          The decorator to use.
+   * @return the decorator for fluent programming style usage.
    */
-  public static void addValueChangeDecorator(PmAttr<?> pmAttr, PmCommandDecorator decorator) {
+  public static <T extends PmCommandDecorator> T addValueChangeDecorator(PmAttr<?> pmAttr, T decorator) {
     apiHandler.addValueChangeDecorator(pmAttr, decorator);
+    return decorator;
+  }
+
+  /**
+   * The provided <tt>listener</tt> will receive {@link PmEvent} events whenever
+   * something happens that affects the given item.
+   *
+   * @param pm
+   *          The PM to observe
+   * @param eventMask
+   *          A bit-mask that defines the kind of observed events. See the event
+   *          kind constants in {@link PmEvent}.
+   * @param listener
+   *          The listener that wants to get informed whenever the title
+   *          changes.
+   * @return the listener for fluent programming style,
+   */
+  public static <T extends PmEventListener> T addPmEventListener(PmObject pm, int eventMask, T listener) {
+    apiHandler.addPmEventListener(pm, eventMask, listener);
+    return listener;
   }
 
   /**
@@ -51,21 +77,52 @@ public class PmEventApi {
    * @param listener
    *          The listener that wants to get informed whenever the title
    *          changes.
+   * @return the listener for fluent programming style,
    */
-  public static void addPmEventListener(PmObject pm, int eventMask, PmEventListener listener) {
-    apiHandler.addPmEventListener(pm, eventMask, listener);
-  }
-
-  public static void addWeakPmEventListener(PmObject pm, int eventMask, PmEventListener listener) {
+  public static <T extends PmEventListener> T addWeakPmEventListener(PmObject pm, int eventMask, T listener) {
     apiHandler.addWeakPmEventListener(pm, eventMask, listener);
+    return listener;
   }
 
-  public static void addHierarchyListener(PmObject hierachyRootPm, int eventMask, PmEventListener listener) {
+  /**
+   * The provided <tt>listener</tt> will receive {@link PmEvent} events whenever
+   * something happens that affects the given item or one of its child PM's.
+   *
+   * @param pm
+   *          The root of the PM tree to observe
+   * @param eventMask
+   *          A bit-mask that defines the kind of observed events. See the event
+   *          kind constants in {@link PmEvent}.
+   * @param listener
+   *          The listener that wants to get informed whenever the title
+   *          changes.
+   * @return the listener for fluent programming style,
+   */
+  public static <T extends PmEventListener> T addHierarchyListener(PmObject hierachyRootPm, int eventMask, T listener) {
     apiHandler.addPmEventListener(hierachyRootPm, eventMask | PmEvent.IS_EVENT_PROPAGATION, listener);
+    return listener;
   }
 
-  public static void addWeakHierarchyListener(PmObject hierachyRootPm, int eventMask, PmEventListener listener) {
+  /**
+   * The provided <tt>listener</tt> will receive {@link PmEvent} events whenever
+   * something happens that affects the given item or one of its child PM's.
+   * <p>
+   * This call generates only a weak reference to the listener. The calling code
+   * has to ensure the intended live time of the listener.
+   *
+   * @param pm
+   *          The root of the PM tree to observe
+   * @param eventMask
+   *          A bit-mask that defines the kind of observed events. See the event
+   *          kind constants in {@link PmEvent}.
+   * @param listener
+   *          The listener that wants to get informed whenever the title
+   *          changes.
+   * @return the listener for fluent programming style,
+   */
+  public static <T extends PmEventListener> T addWeakHierarchyListener(PmObject hierachyRootPm, int eventMask, T listener) {
     apiHandler.addWeakPmEventListener(hierachyRootPm, eventMask | PmEvent.IS_EVENT_PROPAGATION, listener);
+    return listener;
   }
 
   /**

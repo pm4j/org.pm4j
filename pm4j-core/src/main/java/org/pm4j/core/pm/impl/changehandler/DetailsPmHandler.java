@@ -46,4 +46,9 @@ public interface DetailsPmHandler {
    */
   void afterMasterRecordChange(Object newMasterBean);
 
+  /**
+   * Gets called when the instances to observe are initialized.
+   */
+  void startObservers();
+
 }

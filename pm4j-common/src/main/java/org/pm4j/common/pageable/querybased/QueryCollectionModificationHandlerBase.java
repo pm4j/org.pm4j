@@ -20,6 +20,14 @@ import org.pm4j.common.selection.Selection;
 import org.pm4j.common.selection.SelectionHandlerUtil;
 import org.pm4j.common.selection.SelectionWithAdditionalItems;
 
+/**
+ * Modification handler for query service based collections.
+ *
+ * @author Olaf Boede
+ *
+ * @param <T_ITEM> Type of collection items.
+ * @param <T_ID> Item identifier type.
+ */
 public class QueryCollectionModificationHandlerBase<T_ITEM, T_ID>  implements ModificationHandler<T_ITEM> {
 
   private ModificationsImpl<T_ITEM> modifications = new ModificationsImpl<T_ITEM>();
@@ -162,6 +170,12 @@ public class QueryCollectionModificationHandlerBase<T_ITEM, T_ID>  implements Mo
   @Override
   public Modifications<T_ITEM> getModifications() {
     return modifications;
+  }
+
+  @Override
+  public void setModifications(Modifications<T_ITEM> modifications) {
+    assert modifications != null;
+    this.modifications = (ModificationsImpl<T_ITEM>) modifications;
   }
 
   private static <T_ITEM, T_ID> Collection<T_ID> getItemIds(QueryService<T_ITEM, T_ID> service, Selection<T_ITEM> items) {

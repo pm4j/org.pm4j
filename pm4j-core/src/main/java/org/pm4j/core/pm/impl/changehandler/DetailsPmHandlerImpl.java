@@ -40,6 +40,10 @@ public class DetailsPmHandlerImpl<T_DETAILS_PM extends PmDataInput, T_MASTER_REC
     this.detailsPm = detailsPm;
   }
 
+  @Override
+  public void startObservers() {
+  }
+
   /** Calls <code>beforeDo</code> for all decorators and {@link #beforeMasterRecordChangeImpl(Object)}. */
   @SuppressWarnings("unchecked")
   public final boolean beforeMasterRecordChange(Object oldMasterRecord) {
