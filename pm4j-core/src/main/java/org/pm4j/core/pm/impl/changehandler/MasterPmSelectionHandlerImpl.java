@@ -301,7 +301,9 @@ public abstract class MasterPmSelectionHandlerImpl<T_MASTER_BEAN> implements Mas
      */
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-      registerDetailsChangeForMasterBean(changedMasterBean);
+      if (changedMasterBean != null) {
+        registerDetailsChangeForMasterBean(changedMasterBean);
+      }
       afterMasterSelectionChange();
 
       changedMasterBean = null;

@@ -2,10 +2,12 @@ package org.pm4j.core.pm.impl.pageable;
 
 import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
+import static org.pm4j.common.pageable.PageableCollection.EVENT_ITEM_UPDATE;
 import static org.pm4j.tools.test.PmAssert.setValue;
 
 import java.util.List;
 
+import org.junit.Test;
 import org.pm4j.common.pageable.PageableCollection;
 import org.pm4j.common.pageable.PageableCollectionTestBase;
 import org.pm4j.common.query.CompOpStartsWith;
@@ -25,10 +27,29 @@ import org.pm4j.core.pm.impl.PmBeanImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
 import org.pm4j.core.pm.impl.PmTableColImpl;
 import org.pm4j.core.pm.impl.PmTableImpl;
+import org.pm4j.tools.test.RecordingPropertyChangeListener;
 
 public class PmBeanCollectionTest extends PageableCollectionTestBase<PmBeanCollectionTest.BeanRowPm> {
 
   private BeanTablePm beanTablePm  = new BeanTablePm(new PmConversationImpl());
+
+  @Test
+  public void testUpdateEventPropagation() {
+    PageableCollection<BeanRowPm> pmPc = beanTablePm.getPmPageableCollection();
+    PageableCollection<Bean> beanPc = beanTablePm.getPmPageableBeanCollection();
+    RecordingPropertyChangeListener pclPmUpdates = pmPc.addPropertyAndVetoableListener(EVENT_ITEM_UPDATE, new RecordingPropertyChangeListener());
+    RecordingPropertyChangeListener pclBeanUpdates = beanPc.addPropertyAndVetoableListener(EVENT_ITEM_UPDATE, new RecordingPropertyChangeListener());
+
+    Bean firstBean = beanPc.getItemsOnPage().get(0);
+
+    beanPc.getModificationHandler().registerUpdatedItem(firstBean, true);
+
+    assertEquals(1, beanPc.getModifications().getUpdatedItems().size());
+    assertEquals(1, pclBeanUpdates.getNumOfPropertyChangesCalls());
+
+    assertEquals(1, pclPmUpdates.getNumOfPropertyChangesCalls());
+    assertEquals(1, pmPc.getModifications().getUpdatedItems().size());
+  }
 
   /**
    * Extends the basic add test with an update after add. This can be tested

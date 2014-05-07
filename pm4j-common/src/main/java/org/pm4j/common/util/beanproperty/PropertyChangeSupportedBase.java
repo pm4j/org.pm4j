@@ -12,7 +12,7 @@ import org.pm4j.common.exception.CheckedExceptionWrapper;
 /**
  * Provides some property change support.
  *
- * @author olaf boede
+ * @author Olaf Boede
  */
 public class PropertyChangeSupportedBase implements PropertyChangeSupported, Cloneable {
 
@@ -24,8 +24,9 @@ public class PropertyChangeSupportedBase implements PropertyChangeSupported, Clo
   private boolean firePropertyEvents = true;
 
   @Override
-  public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+  public <T extends PropertyChangeListener> T addPropertyChangeListener(String propertyName, T listener) {
     getPcs().addPropertyChangeListener(propertyName, listener);
+    return listener;
   }
 
   @Override
@@ -46,8 +47,9 @@ public class PropertyChangeSupportedBase implements PropertyChangeSupported, Clo
   }
 
   @Override
-  public void addVetoableChangeListener(String propertyName, VetoableChangeListener listener) {
+  public <T extends VetoableChangeListener> T addVetoableChangeListener(String propertyName, T listener) {
     getVpcs().addVetoableChangeListener(propertyName, listener);
+    return listener;
   }
 
   @Override
@@ -56,9 +58,10 @@ public class PropertyChangeSupportedBase implements PropertyChangeSupported, Clo
   }
 
   @Override
-  public void addPropertyAndVetoableListener(String propertyName, PropertyAndVetoableChangeListener listener) {
+  public <T extends PropertyAndVetoableChangeListener> T addPropertyAndVetoableListener(String propertyName, T listener) {
     addPropertyChangeListener(propertyName, listener);
     addVetoableChangeListener(propertyName, listener);
+    return listener;
   }
 
   @Override
@@ -102,15 +105,15 @@ public class PropertyChangeSupportedBase implements PropertyChangeSupported, Clo
    */
   @Override
   protected PropertyChangeSupportedBase clone() {
-	try {
-		PropertyChangeSupportedBase clone = (PropertyChangeSupportedBase) super.clone();
-		clone.pcs = null;
-		clone.vpcs = null;
-		clone.fireVetoEvents = true;
-		return clone;
-	} catch (CloneNotSupportedException e) {
-		throw new CheckedExceptionWrapper(e);
-	}
+  try {
+    PropertyChangeSupportedBase clone = (PropertyChangeSupportedBase) super.clone();
+    clone.pcs = null;
+    clone.vpcs = null;
+    clone.fireVetoEvents = true;
+    return clone;
+  } catch (CloneNotSupportedException e) {
+    throw new CheckedExceptionWrapper(e);
+  }
   }
 
   private PropertyChangeSupport getPcs() {

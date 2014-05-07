@@ -3,6 +3,11 @@ package org.pm4j.common.util.beanproperty;
 import java.beans.PropertyChangeListener;
 import java.beans.VetoableChangeListener;
 
+/**
+ * An interface for classes that support property change events.
+ *
+ * @author Olaf Boede
+ */
 public interface PropertyChangeSupported {
 
   /**
@@ -11,7 +16,7 @@ public interface PropertyChangeSupported {
    * @param propertyName identifier of the property to listen to.
    * @param listener the listener to add.
    */
-  void addPropertyChangeListener(String propertyName, PropertyChangeListener listener);
+  <T extends PropertyChangeListener> T addPropertyChangeListener(String propertyName, T listener);
 
   /**
    * Removes a property change listener.
@@ -27,7 +32,7 @@ public interface PropertyChangeSupported {
    * @param propertyName identifier of the property to listen to.
    * @param listener the listener to add.
    */
-  void addVetoableChangeListener(String propertyName, VetoableChangeListener listener);
+  <T extends VetoableChangeListener> T addVetoableChangeListener(String propertyName, T listener);
 
   /**
    * Removes a property change listener.
@@ -72,7 +77,7 @@ public interface PropertyChangeSupported {
    * @param propertyName identifier of the property to listen to.
    * @param listener the listener to add.
    */
-  void addPropertyAndVetoableListener(String propertyName, PropertyAndVetoableChangeListener listener);
+  <T extends PropertyAndVetoableChangeListener> T addPropertyAndVetoableListener(String propertyName, T listener);
 
   /**
    * Removes the given listener from the set of property change and veto listeners.
