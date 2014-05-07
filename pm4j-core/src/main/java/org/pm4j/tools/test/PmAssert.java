@@ -211,6 +211,34 @@ public class PmAssert {
     }
 
     /**
+     * Checks if each of the given PM's is marked as changed.
+     *
+     * @param pms
+     *            the PMs to check.
+     */
+    public static void assertChanged(PmDataInput... pms) {
+        for (PmDataInput pm : pms) {
+            if (!pm.isPmValueChanged()) {
+                fail(pm.getPmRelativeName() + " should be in a changed state.");
+            }
+        }
+    }
+
+    /**
+     * Checks if each of the given PM's is not marked as changed.
+     *
+     * @param pms
+     *            the PMs to check.
+     */
+    public static void assertNotChanged(PmDataInput... pms) {
+        for (PmDataInput pm : pms) {
+            if (pm.isPmValueChanged()) {
+                fail(pm.getPmRelativeName() + " should not be in a changed state.");
+            }
+        }
+    }
+
+    /**
      * Checks if the given set of {@link PmAttr}s is required.
      *
      * @param pms
