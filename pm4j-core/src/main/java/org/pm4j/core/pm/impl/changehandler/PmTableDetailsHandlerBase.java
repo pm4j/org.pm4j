@@ -22,14 +22,6 @@ import org.pm4j.core.pm.impl.PmTableImpl;
  * @param <T_MASTER_BEAN> The type of master beans.
  * @param <T_DETAILS_BEAN> The type of details beans.
  */
-// DetailsTableHandler
-
-// DetailsHandler
-// DetailsHandlerImpl
-// PmBeanDetailsHandler       DetailsBeanHandlerImpl  DetailsPmBeanHandlerImpl   
-// PmTableDetailsHandlerBase  DetailsTableHandlerBase DetailsPmTableHandlerBase  ExtendedPmTableDetailsHandlerBase
-// PmTableToTableDetailsHandler      DetailsTableHandlerImpl DetailsPmTableHandlerImpl  ExtendedPmTableDetailsHandlerImpl
-
 public abstract class PmTableDetailsHandlerBase<T_MASTER_BEAN, T_DETAILS_BEAN> extends DetailsPmHandlerImpl<PmTable<?>, T_MASTER_BEAN> {
 
   private Map<T_MASTER_BEAN, Modifications<T_DETAILS_BEAN>> masterBeanToDetailsModificationsMap = new HashMap<T_MASTER_BEAN, Modifications<T_DETAILS_BEAN>>();
@@ -104,8 +96,6 @@ public abstract class PmTableDetailsHandlerBase<T_MASTER_BEAN, T_DETAILS_BEAN> e
 
     PmTableImpl<?, T_DETAILS_BEAN> detailsTablePm = getDetailsTable();
     detailsTablePm.clearMasterRowPm();
-    // the next getSelection call ensures then the minimal selection state.
-    detailsTablePm.getPmPageableCollection().getSelectionHandler().ensureSelectionStateRequired();
     // Resets changed states and selections from the details table.<br>
     // But preserves it's sort order and filter settings.
     detailsTablePm.updatePmTable(UpdateAspect.CLEAR_CHANGES, UpdateAspect.CLEAR_SELECTION);
@@ -114,6 +104,8 @@ public abstract class PmTableDetailsHandlerBase<T_MASTER_BEAN, T_DETAILS_BEAN> e
     if (knownOldDetailsModifications != null) {
       detailsTablePm.getPmPageableBeanCollection().getModificationHandler().setModifications(knownOldDetailsModifications);
     }
+    // the next getSelection call ensures then the minimal selection state.
+    detailsTablePm.getPmPageableCollection().getSelectionHandler().ensureSelectionStateRequired();
   }
 
   /**

@@ -188,11 +188,12 @@ public abstract class MasterPmSelectionHandlerImpl<T_MASTER_BEAN> implements Mas
    * selected table row.
    */
   public void afterMasterSelectionChange() {
+    T_MASTER_BEAN selectedMasterBean = getSelectedMasterBean();
+
     if (LOG.isDebugEnabled() && getMasterBeanModifications().isModified()) {
-      LOG.debug("Propagate successful master-details change for " + PmUtil.getPmLogString(masterPm));
+      LOG.debug("Master record selection changed to " + selectedMasterBean + ". MasterPm: " + PmUtil.getPmLogString(masterPm));
     }
 
-    T_MASTER_BEAN selectedMasterBean = getSelectedMasterBean();
     for (DetailsPmHandler dh : detailsHandlers) {
       dh.afterMasterRecordChange(selectedMasterBean);
     }

@@ -271,8 +271,10 @@ public abstract class InMemCollectionBase<T_ITEM>
       }
 
       boolean wasUpdated = modifications.getUpdatedItems().contains(item);
-      modifications.registerUpdatedItem(item, isUpdated);
-      firePropertyChange(PageableCollection.EVENT_ITEM_UPDATE, wasUpdated, isUpdated);
+      if (wasUpdated != isUpdated) {
+        modifications.registerUpdatedItem(item, isUpdated);
+        firePropertyChange(PageableCollection.EVENT_ITEM_UPDATE, wasUpdated, isUpdated);
+      }
     };
 
     @Override

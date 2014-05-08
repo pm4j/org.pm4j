@@ -145,17 +145,19 @@ public class PmTableImpl
   @Override
   protected void onPmInit() {
     super.onPmInit();
-    PmEventApi.addPmEventListener(getPmParent(), PmEvent.VALUE_CHANGE, new PmEventListener() {
+    PmEventApi.addPmEventListener(this, PmEvent.VALUE_CHANGE, new PmEventListener() {
       @Override
       public void handleEvent(PmEvent event) {
-        onPmParentValueChange(event);
+        if (event.isInitializationEvent() || event.isReloadEvent()) {
+          onPmDataExchangeEvent(event);
+        }
       }
     });
   }
 
   /**
-   * This method gets called whenever the PM that embeds the table had a value
-   * change event. The default implementation refreshes all table aspects
+   * This method gets called whenever the PM observes an initialization or reload event.
+   * The default implementation refreshes all table aspects
    * (values, selection, sort order, user filters).
    * <p>
    * You may change that by overriding this method.
@@ -168,7 +170,7 @@ public class PmTableImpl
    *
    * @param parentEvent The event that was received by the parent.
    */
-  protected void onPmParentValueChange(PmEvent parentEvent) {
+  protected void onPmDataExchangeEvent(PmEvent parentEvent) {
     // The backing context value was changed. All sort, filter and value changes
     // are no longer valid.
     updatePmTable();
@@ -407,7 +409,7 @@ public class PmTableImpl
         PmCacheApi.clearPmCache(this);
         ModificationHandler<T_ROW_PM> mh = getPmPageableCollection().getModificationHandler();
         // a null check for very specific read-only collections
-        if (mh != null) {
+        if (mh != null && mh.getModifications().isModified()) {
             mh.clear();
         }
         // Ensure that the row PM's will be re-created. Otherwise it can happen that

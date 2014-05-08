@@ -158,8 +158,10 @@ public class QueryCollectionModificationHandlerBase<T_ITEM, T_ID>  implements Mo
     }
 
     boolean wasUpdated = modifications.getUpdatedItems().contains(item);
-    modifications.registerUpdatedItem(item, isUpdated);
-    pageableCollection.firePropertyChange(PageableCollection.EVENT_ITEM_UPDATE, wasUpdated, isUpdated);
+    if (wasUpdated != isUpdated) {
+      modifications.registerUpdatedItem(item, isUpdated);
+      pageableCollection.firePropertyChange(PageableCollection.EVENT_ITEM_UPDATE, wasUpdated, isUpdated);
+    }
   };
 
   @Override

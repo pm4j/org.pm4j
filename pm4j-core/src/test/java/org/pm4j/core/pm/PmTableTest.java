@@ -140,7 +140,7 @@ public class PmTableTest {
     // it provides data from it's page cache.
     assertEquals("an 'a'", myTablePm.getRowPms().get(0).description.getValue());
 
-    PmEventApi.firePmEvent(myTablePm.getPmParent(), PmEvent.VALUE_CHANGE);
+    PmEventApi.firePmEvent(myTablePm, PmEvent.ALL_CHANGE_EVENTS);
     assertEquals("new a", myTablePm.getRowPms().get(0).description.getValue());
   }
 

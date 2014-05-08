@@ -389,7 +389,7 @@ public class PmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> extends Prope
       BeanPmCacheUtil.clearBeanPmCachesOfSubtree(pmCtxt);
 
       ModificationHandler<T_BEAN> mh = beanCollection.getModificationHandler();
-      if (mh != null) {
+      if (mh != null && mh.getModifications().isModified()) {
         mh.clear();
       }
     }
@@ -438,7 +438,16 @@ public class PmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> extends Prope
       @Override
       public void handleEvent(PmEvent event) {
         PmDataInput itemPm = findChildItemToObserve(event.pm);
-        if (itemPm != null) {
+        // TODO oboede: Un-register of an update change is currently not possible.
+        //
+        // The item (the row-PM) must not be in a changed state if a change in a details area
+        // was found.
+        // A details area change is also registered as an update within the modification handler.
+        //
+        // Alternatively we might mark the row-PM as changed within the master-details handler.
+        //
+        // Solution approach: Modifications allow to distinguish between direct master row and details modifications.
+        if (itemPm != null && itemPm.isPmValueChanged()) {
           modificationHandler.registerUpdatedItem((T_PM) itemPm, itemPm.isPmValueChanged());
         }
       }
