@@ -3,8 +3,9 @@ package org.pm4j.core.pm.impl.changehandler;
 import java.util.Collection;
 
 import org.pm4j.common.modifications.Modifications;
-import org.pm4j.core.pm.PmCommandDecorator;
 import org.pm4j.core.pm.PmObject;
+import org.pm4j.core.pm.PmTable;
+import org.pm4j.core.pm.impl.PmTableUtil;
 
 /**
  * Interface for handlers that observes changes within some details area. The
@@ -19,9 +20,19 @@ import org.pm4j.core.pm.PmObject;
  *
  * @author olaf boede
  */
-// TODO olaf the handler should offer/support a command decorator but it shouldn't be one.
-// It's not clear what 'before/afterDo' means for a master handler.
-public interface MasterPmHandler extends PmCommandDecorator {
+public interface MasterPmHandler {
+
+  /**
+   * Gets called before a master record selection change.
+   *
+   * @return <code>true</code> if the selection change can be performed.
+   */
+  boolean beforeMasterSelectionChange();
+
+  /**
+   * Gets called after master record selection change.
+   */
+  void afterMasterSelectionChange();
 
   /**
    * Provides the complete set of master record changes.

@@ -17,7 +17,7 @@ import org.pm4j.core.pm.impl.PmTableImpl;
  *
  * @author olaf boede
  */
-public class MasterPmTable2HandlerImpl<T_MASTER_BEAN> extends MasterPmSelectionHandlerImpl<T_MASTER_BEAN> {
+public class MasterPmTableHandlerImpl<T_MASTER_BEAN> extends MasterPmHandlerImpl<T_MASTER_BEAN> {
 
   /**
    * @param masterPm
@@ -25,7 +25,7 @@ public class MasterPmTable2HandlerImpl<T_MASTER_BEAN> extends MasterPmSelectionH
    * @param detailsHandlers
    *          the dependent detail area handlers.
    */
-  public MasterPmTable2HandlerImpl(PmTableImpl<?, T_MASTER_BEAN> masterPm, DetailsPmHandler[] detailsHandlers) {
+  public MasterPmTableHandlerImpl(PmTableImpl<?, T_MASTER_BEAN> masterPm, DetailsPmHandler[] detailsHandlers) {
     super(masterPm, masterPm.getPmPageableBeanCollection().getSelectionHandler(), detailsHandlers);
   }
 

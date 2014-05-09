@@ -14,21 +14,19 @@ import org.pm4j.common.modifications.Modifications;
 import org.pm4j.common.selection.Selection;
 import org.pm4j.common.selection.SelectionHandler;
 import org.pm4j.common.util.beanproperty.PropertyAndVetoableChangeListener;
-import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmDataInput;
 import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmEventListener;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.api.PmEventApi;
-import org.pm4j.core.pm.impl.PmAspectChangeCommandImpl;
 import org.pm4j.core.pm.impl.PmUtil;
 
 /**
- * A master-details handler for tables with an associated details PM that displays
- * additional information for the currently selected master table row. <br>
+ * A master-details handler for a master record selection with an associated details PM that displays
+ * additional information for the currently selected master record. <br>
  * It supports the following functionality:
  * <ul>
- * <li>Listens for master table 'selection change' events.</li>
+ * <li>Listens for master record 'selection change' events.</li>
  * <li>Prevents the selection change if the details area is not valid.</li>
  * <li>Registers details area changes. See {@link #isChangeRegistered()}
  * and {@link #getChangedMasterBeans()}</li>
@@ -37,11 +35,11 @@ import org.pm4j.core.pm.impl.PmUtil;
  * @param <T_MASTER_BEAN>
  *          Type of beans handled by the master PM.
  *
- * @author olaf boede
+ * @author Olaf Boede
  */
-public abstract class MasterPmSelectionHandlerImpl<T_MASTER_BEAN> implements MasterPmHandler {
+public abstract class MasterPmHandlerImpl<T_MASTER_BEAN> implements MasterPmHandler {
 
-  private static final Log    LOG                = LogFactory.getLog(MasterPmSelectionHandlerImpl.class);
+  private static final Log    LOG                = LogFactory.getLog(MasterPmHandlerImpl.class);
 
   private final PmObject masterPm;
   private final SelectionHandler<T_MASTER_BEAN> selectionHandler;
@@ -56,7 +54,7 @@ public abstract class MasterPmSelectionHandlerImpl<T_MASTER_BEAN> implements Mas
    *          The table PM to observe.
    * @param detailsHandler A handler for the details PM
    */
-  public MasterPmSelectionHandlerImpl(PmObject masterPm, SelectionHandler<T_MASTER_BEAN> selectionHandler, DetailsPmHandler... detailsHandlers) {
+  public MasterPmHandlerImpl(PmObject masterPm, SelectionHandler<T_MASTER_BEAN> selectionHandler, DetailsPmHandler... detailsHandlers) {
     assert masterPm != null;
     assert selectionHandler != null;
 
@@ -187,6 +185,29 @@ public abstract class MasterPmSelectionHandlerImpl<T_MASTER_BEAN> implements Mas
    * {@link DetailsPmHandler#afterMasterRecordChange(Object)} with the new
    * selected table row.
    */
+  // TODO oboede: delegates to a property change listener.
+  // This was only needed for the deprecated tables. Now we should get rid of this!
+  @Override
+  public boolean beforeMasterSelectionChange() {
+    PropertyAndVetoableChangeListener l = getMasterSelectionChangeListener();
+    try {
+      l.vetoableChange(new PropertyChangeEvent(getMasterPm(), SelectionHandler.PROP_SELECTION, null, null));
+      return true;
+    } catch (PropertyVetoException e) {
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Selection change for " + getMasterPm().getPmRelativeName() + " was prevented by a veto: "
+            + e.getMessage());
+      }
+      return false;
+    }
+  }
+
+  /**
+   * Re-adjusts the details area by calling
+   * {@link DetailsPmHandler#afterMasterRecordChange(Object)} with the new
+   * selected table row.
+   */
+  @Override
   public void afterMasterSelectionChange() {
     T_MASTER_BEAN selectedMasterBean = getSelectedMasterBean();
 
@@ -222,7 +243,7 @@ public abstract class MasterPmSelectionHandlerImpl<T_MASTER_BEAN> implements Mas
    *
    * @return <code>true</code> if the switch can be performed.
    */
-  public boolean beforeSwitch() {
+  private boolean beforeSwitch() {
     T_MASTER_BEAN b = getSelectedMasterBean();
     if (b == null) {
       return true;
@@ -235,33 +256,6 @@ public abstract class MasterPmSelectionHandlerImpl<T_MASTER_BEAN> implements Mas
       }
     }
     return allDetailsAgree;
-  }
-
-  // FIXME olaf: check if we can simply call beforeSwitch... a duplicate control flow...
-  @Override
-  public boolean beforeDo(PmCommand cmd) {
-    PropertyAndVetoableChangeListener l = getMasterSelectionChangeListener();
-    try {
-      Object oldValue = null, newValue = null;
-      if (cmd instanceof PmAspectChangeCommandImpl) {
-        oldValue = ((PmAspectChangeCommandImpl) cmd).getOldValue();
-        newValue = ((PmAspectChangeCommandImpl) cmd).getNewValue();
-      }
-
-      l.vetoableChange(new PropertyChangeEvent(getMasterPm(), SelectionHandler.PROP_SELECTION, oldValue, newValue));
-      return true;
-    } catch (PropertyVetoException e) {
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("Selection change for " + getMasterPm().getPmRelativeName() + " was prevented by a veto: "
-            + e.getMessage());
-      }
-      return false;
-    }
-  }
-
-  @Override
-  public void afterDo(PmCommand cmd) {
-    afterMasterSelectionChange();
   }
 
   private PropertyAndVetoableChangeListener getMasterSelectionChangeListener() {

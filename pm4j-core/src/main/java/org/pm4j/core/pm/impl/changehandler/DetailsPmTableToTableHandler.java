@@ -11,11 +11,11 @@ import org.pm4j.core.pm.impl.PmTableImpl;
  * @param <T_MASTER_BEAN> The master bean type.
  * @param <T_DETAILS_BEAN> The details bean type.
  */
-public class PmTableToTableDetailsHandler<T_MASTER_BEAN, T_DETAILS_BEAN> extends PmTableDetailsHandlerBase<T_MASTER_BEAN, T_DETAILS_BEAN>{
+public class DetailsPmTableToTableHandler<T_MASTER_BEAN, T_DETAILS_BEAN> extends DetailsPmTableHandlerBase<T_MASTER_BEAN, T_DETAILS_BEAN>{
 
   private final PmTableImpl<?, ? extends T_MASTER_BEAN> masterTablePm;
 
-  public PmTableToTableDetailsHandler(PmTableImpl<?, ? extends T_MASTER_BEAN> masterTablePm, PmTableImpl<?, ? extends T_DETAILS_BEAN> detailsTablePm) {
+  public DetailsPmTableToTableHandler(PmTableImpl<?, ? extends T_MASTER_BEAN> masterTablePm, PmTableImpl<?, ? extends T_DETAILS_BEAN> detailsTablePm) {
     super(detailsTablePm);
     assert masterTablePm != null : "masterTablePm should not be null";
 

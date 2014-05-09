@@ -144,7 +144,7 @@ public class DeprMasterPmTableHandlerImpl<T_MASTER_BEAN> implements MasterPmHand
 
   @Override
   public void startObservers() {
-    masterTablePm.addDecorator(this, TableChange.SELECTION);
+    masterTablePm.addDecorator(getMasterSelectionChangeDecorator(), TableChange.SELECTION);
     PmEventApi.addPmEventListener(masterTablePm, PmEvent.VALUE_CHANGE, makeTableValueChangeListener());
   }
 
@@ -285,13 +285,13 @@ public class DeprMasterPmTableHandlerImpl<T_MASTER_BEAN> implements MasterPmHand
   }
 
   @Override
-  public boolean beforeDo(PmCommand cmd) {
-    return getMasterSelectionChangeDecorator().beforeDo(cmd);
+  public final boolean beforeMasterSelectionChange() {
+    return getMasterSelectionChangeDecorator().beforeDo(null);
   }
 
   @Override
-  public void afterDo(PmCommand cmd) {
-    getMasterSelectionChangeDecorator().afterDo(cmd);
+  public final void afterMasterSelectionChange() {
+    getMasterSelectionChangeDecorator().afterDo(null);
   }
 
   private PmCommandDecorator getMasterSelectionChangeDecorator() {
