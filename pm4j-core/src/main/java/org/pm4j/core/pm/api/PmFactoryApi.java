@@ -19,7 +19,7 @@ public class PmFactoryApi {
    * <code>null</code>.
    *
    * @param bean
-   *          The bean to get the presentation model for.
+   *          The bean to get the presentation model for. May be <code>null</code>.
    * @return The presentation model for the given bean.
    */
   public static <T, T_PM extends PmBean<T>> T_PM getPmForBean(PmObject pmCtxt, T bean) {
