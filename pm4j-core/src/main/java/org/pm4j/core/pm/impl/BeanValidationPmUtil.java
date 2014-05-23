@@ -22,9 +22,10 @@ import org.pm4j.core.pm.PmObject;
  */
 public class BeanValidationPmUtil {
 
+  private static Log LOG = LogFactory.getLog(BeanValidationPmUtil.class);
+
   /** The optional JSR-303 bean validator to be considered. */
   private static Validator beanValidator = getBeanValidator();
-  private static Log LOG = LogFactory.getLog(BeanValidationPmUtil.class);
 
   /**
    * Triggers a bean validation call for the given bean property and reports the found validations
