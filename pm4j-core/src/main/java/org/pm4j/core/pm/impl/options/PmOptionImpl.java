@@ -58,6 +58,11 @@ public class PmOptionImpl implements PmOption {
     return title;
   }
 
+  @Override
+  public String getTitle() {
+    return title;
+  }
+
   @SuppressWarnings("unchecked")
   public <T> T getValue() {
     return (T) value;

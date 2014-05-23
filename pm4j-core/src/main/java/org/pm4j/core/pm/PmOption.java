@@ -41,6 +41,13 @@ public interface PmOption {
 
   /**
    * @return The localized title.
+   * @deprecated Please use {@link #getTitle()}.
    */
+  @Deprecated
   String getPmTitle();
+
+  /**
+   * @return The localized title.
+   */
+  String getTitle();
 }

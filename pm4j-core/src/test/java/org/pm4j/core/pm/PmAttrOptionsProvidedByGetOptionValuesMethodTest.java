@@ -34,10 +34,9 @@ public class PmAttrOptionsProvidedByGetOptionValuesMethodTest extends TestCase {
      * An example that extends the option configuration shown above by sorting the options by the
      * values provided by 'getTitle()' in descending order.
      */
-    @PmOptionCfg(values="#myItemService.itemOpts", id="id", sortBy="title desc")
+    @PmOptionCfg(id="id", title="name", sortBy="title desc")
     public final PmAttr<Item> attributeWithOptsSortedByNameDesc = new PmAttrImpl<Item>(this) {
       @Override
-      @PmOptionCfg(id="id", title="name", sortBy="title desc")
       public Iterable<?> getOptionValues() {
         return myItemService.getItemOpts();
       }

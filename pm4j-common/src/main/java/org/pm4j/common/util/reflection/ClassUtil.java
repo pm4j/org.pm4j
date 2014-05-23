@@ -14,12 +14,16 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.pm4j.common.exception.CheckedExceptionWrapper;
 
 /**
  * Some functions that make it easier to use of some reflection features.
  */
 public class ClassUtil {
+
+  private static final Log LOG = LogFactory.getLog(ClassUtil.class);
 
   private static final Class<?>[] EMPTY_CLASS_ARRAY = {};
 
@@ -403,18 +407,29 @@ public class ClassUtil {
    * @param fieldName
    *          Name of the field to find.
    * @return The found field or <code>null</code> if not found.
+   * @deprecated is buggy. will not be replaced.
    */
+  @Deprecated
   public static Field findField(Class<?> inClass, String fieldName) {
-    Class<?> c = inClass;
-    while (c != null) {
-      try {
-        return inClass.getDeclaredField(fieldName);
-      } catch (SecurityException e) {
-        throw new RuntimeException("Security does not allow to access field '" + fieldName + "' of class " + c, e);
-      } catch (NoSuchFieldException e) {
-        // Ok. Not declared by the checked class.
+    try {
+      return inClass.getField(fieldName);
+    } catch(NoSuchFieldException e) {
+      // no direct catch to prevent too much control flow changes for now.
+    }
+
+    // FIXME oboede: Now the old buggy mechanism to preserve some buggy screen expressions for a while.
+    // The following code should be removed asap.
+    try {
+      Field f = inClass.getDeclaredField(fieldName);
+      if (f != null) {
+        LOG.warn( "!!! Non public field accessed by path. Please make the field public or provide getter/setter.\n"+
+                  "  The illegally accessed field: " + f);
       }
-      c = c.getSuperclass();
+      return f;
+    } catch (SecurityException e) {
+      throw new RuntimeException("Security does not allow to access field '" + fieldName + "' of class " + inClass, e);
+    } catch (NoSuchFieldException e) {
+      // Ok. Not declared by the checked class.
     }
     // not found
     return null;
@@ -432,13 +447,13 @@ public class ClassUtil {
     File f = new File(classFileUrl.getFile());
     return f.getParentFile();
   }
-  
-  
+
+
   /**
    * Walks up the class hierarchy starting with the given class to find all
    * methods with a particular annotation. Methods that are declared deeper in
    * the class hierarchy will be returned first.
-   * 
+   *
    * @param type
    *          start point in the class hierarchy
    * @param annotation
@@ -472,7 +487,7 @@ public class ClassUtil {
    * Walks down the class hierarchy from java.lang Object to the given class to
    * find all methods with a particular annotation. Methods that are declared
    * higher in the class hierarchy will be returned first.
-   * 
+   *
    * @param type
    *          finish point in the class hierarchy
    * @param annotation
