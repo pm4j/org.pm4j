@@ -3,7 +3,7 @@
 
   <groupId>org.pm4j</groupId>
   <artifactId>main</artifactId>
-  <version>0.7.6-SNAPSHOT</version>
+  <version>0.7.6</version>
   <packaging>pom</packaging>
 
   <name>pm4j parent pom</name>
@@ -32,7 +32,7 @@
 
   <scm>
     <developerConnection>scm:git:https://github.com/pm4j/org.pm4j.git</developerConnection>
-    <tag>HEAD</tag>
+    <tag>v0.7.6</tag>
   </scm>
 
   <distributionManagement>
