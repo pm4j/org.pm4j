@@ -432,27 +432,32 @@ public abstract class PmObjectBase implements PmObject {
    * The standard class has to provide a way to get a domain context class.
    * In case of standard attributes that is done by providing the parent element class.
    *
-   * @return The class that can be used to find resources (string resources icons...).
+   * @return Classes that can be used to find resources (string resources icons...).
    */
+  // TODO oboede: make it final after removing overrides in domain code.
   public List<Class<?>> getPmResLoaderCtxtClasses() {
     MetaData md = getPmMetaDataWithoutPmInitCall();
     if (md.resLoaderCtxtClasses == null) {
-      // The parent's resource path and the path set of the own inheritance hierarchy.
-      // XXX olaf: This code could be optimized to stop in pm4j base classes.
-      //           But this would break some pm4j unit tests...
-      ArrayList<Class<?>> ownHierarchyClasses = new ArrayList<Class<?>>();
-      for (Class<?> c = getClass(); c != null && c != PmObjectBase.class; c = c.getSuperclass()) {
-        ownHierarchyClasses.add(c);
-      }
-
-      if (md.isSubPm) {
-        md.resLoaderCtxtClasses = new ArrayList<Class<?>>(pmParent.getPmResLoaderCtxtClasses());
-        md.resLoaderCtxtClasses.addAll(ownHierarchyClasses);
-      } else {
-        md.resLoaderCtxtClasses = ownHierarchyClasses;
+      synchronized(md) {
+        if (md.resLoaderCtxtClasses == null) {
+          md.resLoaderCtxtClasses = Collections.unmodifiableList(getPmResLoaderCtxtClassesImpl());
+        }
       }
     }
     return md.resLoaderCtxtClasses;
+  }
+  
+  // TODO oboede: publish as protected method after split of custom and internal implementation.
+  private List<Class<?>> getPmResLoaderCtxtClassesImpl() {
+    // The parent's resource path and the path set of the own inheritance hierarchy.
+    ArrayList<Class<?>> resClasses = getPmMetaDataWithoutPmInitCall().isSubPm
+          ? new ArrayList<Class<?>>(pmParent.getPmResLoaderCtxtClasses())
+          : new ArrayList<Class<?>>();
+    // Own class/package structure will be considered after the embedding context.
+    for (Class<?> c = getClass(); c != null && c != PmObjectBase.class; c = c.getSuperclass()) {
+      resClasses.add(c);
+    }
+    return resClasses;
   }
 
   protected List<PmCommand> getVisiblePmCommands(PmCommand.CommandSet commandSet) {
