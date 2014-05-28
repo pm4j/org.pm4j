@@ -157,16 +157,12 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     }
     else {
       try {
-        PmOptionSet os = getOptionSetImpl();
-        // TODO: ensure that there is an option for the current value.
-
-        md.cacheStrategyForOptions.setAndReturnCachedValue(this, os);
-        return os;
+        return md.cacheStrategyForOptions.setAndReturnCachedValue(this, getOptionSetImpl());
       }
       catch (RuntimeException e) {
         PmRuntimeException forwardedEx = PmRuntimeException.asPmRuntimeException(this, e);
-        // TODO olaf: Logging is required here for JSF. Make it configurable for other
-        // UI frameworks with better exception handling.
+        // TODO olaf: Logging is required here for JSF.
+        //  Move to AttrToJsfViewConnectorWithValueChangeListener.
         LOG.error("getOptionSet failed", forwardedEx);
         throw forwardedEx;
       }
@@ -364,8 +360,8 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
       }
       catch (RuntimeException e) {
         PmRuntimeException forwardedEx = PmRuntimeException.asPmRuntimeException(this, e);
-        // TODO olaf: Logging is required here for JSF. Make it configurable for other
-        // UI frameworks with better exception handling.
+        // TODO olaf: Logging is required here for JSF.
+        //  Move to AttrToJsfViewConnectorWithValueChangeListener.
         LOG.error("getValue failed", forwardedEx);
         throw forwardedEx;
       }
@@ -374,6 +370,8 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
 
   @Override
   public final void setValue(T_PM_VALUE value) {
+    // TODO olaf: Lazy behavior is required here for JSF. Usually an exception should be thrown.
+    //  Move to AttrToJsfViewConnectorWithValueChangeListener.
     if (!isPmReadonly()) {
       SetValueContainer<T_PM_VALUE> vc = SetValueContainer.makeWithPmValue(this, value);
       setValueImpl(vc);
@@ -403,7 +401,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
         value = getValue();
       }
 
-      return value != null
+      return (value != null || isConvertingNullValueImpl())
                 ? valueToStringImpl(value)
                 : null;
     }
@@ -473,7 +471,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
 
       clearPmInvalidValues();
       try {
-        vc.setPmValue(StringUtils.isNotBlank(text)
+        vc.setPmValue(StringUtils.isNotBlank(text) || isConvertingNullValueImpl()
                           ? stringToValueImpl(text)
                           : null);
       } catch (PmRuntimeException e) {
@@ -586,9 +584,9 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
 
       T_BEAN_VALUE beanAttrValue = getBackingValue();
 
-      // return the converted beanAttrValue if it has #isEmptyValue() set to false.
-      if (beanAttrValue != null) {
+      if (beanAttrValue != null || isConvertingNullValueImpl()) {
         pmValue = convertBackingValueToPmValue(beanAttrValue);
+        // return the converted value if it is not an "empty value".
         if(!isEmptyValue(pmValue)) {
           return pmValue;
         }
@@ -704,7 +702,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
           LOG.debug("Changing PM value of '" + PmUtil.getPmLogString(this) + "' from '" + currentValue + "' to '" + newPmValue + "'.");
         }
 
-        T_BEAN_VALUE beanAttrValue = (newPmValue != null)
+        T_BEAN_VALUE beanAttrValue = (newPmValue != null || isConvertingNullValueImpl())
                         ? convertPmValueToBackingValue(newPmValue)
                         : null;
         setBackingValue(beanAttrValue);
@@ -1211,6 +1209,28 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
           : ValueConverterDefault.INSTANCE);
   }
 
+  /**
+   * Defines if <code>null</code> values passed to the converter methods.
+   * <p>
+   * Override this method if your <code>null</code> values should be converted to
+   * a not-<code>null</code> value.
+   * <p>
+   * By default <code>null</code> values will not be passed to converters. But
+   * in some very special cases domain code wants to convert a null to some real
+   * value (e.g. false).<br>
+   * In that special situation this method should be return
+   * <code>true</code> and the corresponding converter methods should provide
+   * the algorithm to handle null-to-value and value-to-null translations.
+   *
+   * @see {@link #stringToValueImpl(String)}
+   * @see {@link #valueToStringImpl(Object)}
+   * @see {@link #getValueConverterImpl()}
+   * @see {@link #convertBackingValueToPmValue(Object)}
+   * @see {@link #convertPmValueToBackingValue(Object)}
+   */
+  protected boolean isConvertingNullValueImpl() {
+    return false;
+  }
 
   @SuppressWarnings("unchecked")
   public final T_BEAN_VALUE getBackingValue() {
@@ -1564,8 +1584,8 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     private PathResolver                    valueContainingObjPathResolver = PassThroughPathResolver.INSTANCE;
     private String                          formatResKey;
     private String                          defaultValueString;
-    private CacheStrategy                 cacheStrategyForOptions = CacheStrategyNoCache.INSTANCE;
-    private CacheStrategy                 cacheStrategyForValue   = CacheStrategyNoCache.INSTANCE;
+    private CacheStrategy                   cacheStrategyForOptions = CacheStrategyNoCache.INSTANCE;
+    private CacheStrategy                   cacheStrategyForValue   = CacheStrategyNoCache.INSTANCE;
     private StringConverter<?>              stringConverter;
     private ValueConverter<?, ?>            valueConverter;
     private BackingValueAccessStrategy      valueAccessStrategy     = ValueAccessLocal.INSTANCE;

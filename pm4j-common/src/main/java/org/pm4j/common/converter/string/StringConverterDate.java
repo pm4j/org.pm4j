@@ -20,6 +20,9 @@ public class StringConverterDate extends StringConverterBase<Date, StringConvert
 
     @Override
     protected Date parseValue(StringConverterCtxt ctxt, String s, String format) throws ParseException {
+      if (s == null) {
+        return null;
+      }
       SimpleDateFormat sdf = new SimpleDateFormat(format, ctxt.getConverterCtxtLocale());
       sdf.setTimeZone(ctxt.getConverterCtxtTimeZone());
 

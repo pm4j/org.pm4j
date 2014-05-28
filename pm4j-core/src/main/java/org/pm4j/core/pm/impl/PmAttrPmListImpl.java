@@ -28,7 +28,7 @@ import org.pm4j.core.pm.impl.pathresolver.ExpressionPathResolver;
 /**
  * Implements an attribute that represents a list of beans as a list of PM's.
  *
- * @author olaf boede
+ * @author Olaf Boede
  *
  * @param <T_BEAN> type of backing list items.
  * @param <T_ITEM_PM> type PM used to present a bean item.
@@ -225,6 +225,9 @@ public class PmAttrPmListImpl<T_ITEM_PM extends PmBean<T_BEAN>, T_BEAN> extends 
 
     @Override
     public List<T_ITEM_PM> toExternalValue(ValueConverterCtxt ctxt, Collection<T_BEAN> beanList) {
+      if (beanList == null) {
+        return null;
+      }
       MetaData md = getOwnMetaData();
       @SuppressWarnings("unchecked")
       List<T_ITEM_PM> pmValues = (List<T_ITEM_PM>) PmFactoryApi
@@ -236,6 +239,9 @@ public class PmAttrPmListImpl<T_ITEM_PM extends PmBean<T_BEAN>, T_BEAN> extends 
 
     @Override
     public Collection<T_BEAN> toInternalValue(ValueConverterCtxt ctxt, List<T_ITEM_PM> pmAttrValue) {
+      if (pmAttrValue == null) {
+        return null;
+      }
       int listSize = pmAttrValue.size();
       Collection<T_BEAN> objectList = makeBeanCollection();
 

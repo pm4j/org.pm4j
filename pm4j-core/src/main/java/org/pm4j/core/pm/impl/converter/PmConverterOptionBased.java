@@ -17,7 +17,7 @@ import org.pm4j.core.pm.impl.pathresolver.PathResolver;
  * A converter that uses the option set of the attribute in combination
  * with a path that points to the option-id.
  *
- * @author olaf boede
+ * @author Olaf Boede
  */
 public class PmConverterOptionBased extends AttrStringConverterBase<Object> {
 
@@ -71,7 +71,9 @@ public class PmConverterOptionBased extends AttrStringConverterBase<Object> {
 
   @Override
   protected String valueToStringImpl(AttrConverterCtxt ctxt, Object pmValue) {
-    return ObjectUtils.toString(idPath.getValue(pmValue));
+    return (pmValue != null)
+            ? ObjectUtils.toString(idPath.getValue(pmValue))
+            : null;
   }
 
 }

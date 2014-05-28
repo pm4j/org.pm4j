@@ -25,8 +25,8 @@ import org.pm4j.core.pm.joda.PmAttrLocalDate;
  *
  * @author Olaf Boede
  */
-public class PmAttrLocalDateOnLocalDateTime 
-    extends PmAttrBase<LocalDate, LocalDateTime> 
+public class PmAttrLocalDateOnLocalDateTime
+    extends PmAttrBase<LocalDate, LocalDateTime>
     implements PmAttrLocalDate {
 
   /**
@@ -61,12 +61,16 @@ public class PmAttrLocalDateOnLocalDateTime
   public static class DefaultValueConverter implements ValueConverter<LocalDate, LocalDateTime> {
     @Override
     public LocalDate toExternalValue(ValueConverterCtxt ctxt, LocalDateTime i) {
-            return i.toLocalDate();
+            return (i != null)
+                ? i.toLocalDate()
+                : null;
     }
 
     @Override
     public LocalDateTime toInternalValue(ValueConverterCtxt ctxt, LocalDate e) {
-      return e.toLocalDateTime(new LocalTime(0, 0, 0));
+      return (e != null)
+          ? e.toLocalDateTime(new LocalTime(0, 0, 0))
+          : null;
     }
   }
 
@@ -77,6 +81,9 @@ public class PmAttrLocalDateOnLocalDateTime
   public static class ValueConverterWithTimeZone extends JodaTimeZoneConverterBase<LocalDate, LocalDateTime> {
     @Override
     public LocalDate toExternalValue(ValueConverterCtxt ctxt, LocalDateTime i) {
+      if (i == null) {
+        return null;
+      }
       DateTime intDt = i.toDateTime(getInternalValueDateTimeZone(ctxt));
       DateTime extDt = intDt.withZone(getExternalValueDateTimeZone(ctxt));
       return extDt.toLocalDate();
@@ -84,6 +91,9 @@ public class PmAttrLocalDateOnLocalDateTime
 
     @Override
     public LocalDateTime toInternalValue(ValueConverterCtxt ctxt, LocalDate e) {
+      if (e == null) {
+        return null;
+      }
       DateTime extDt = e.toDateMidnight(getExternalValueDateTimeZone(ctxt)).toDateTime();
       return extDt.toDateTime(getInternalValueDateTimeZone(ctxt)).toLocalDateTime();
     }

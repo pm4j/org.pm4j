@@ -78,11 +78,15 @@ public class DeprPmAttrPmRefImpl<T_REFED_PM extends PmBean<?>, T_BEAN>
   protected class PmRefValueConverter implements ValueConverter<T_REFED_PM, T_BEAN> {
     @Override
     public T_REFED_PM toExternalValue(ValueConverterCtxt ctxt, T_BEAN i) {
-      return (T_REFED_PM) PmFactoryApi.getPmForBean(DeprPmAttrPmRefImpl.this, i);
+      return (i != null)
+          ? (T_REFED_PM) PmFactoryApi.getPmForBean(DeprPmAttrPmRefImpl.this, i)
+          : null;
     }
     @Override
     public T_BEAN toInternalValue(ValueConverterCtxt ctxt, T_REFED_PM e) {
-      return (T_BEAN) e.getPmBean();
+      return (e != null)
+          ? (T_BEAN) e.getPmBean()
+          : null;
     }
   }
 

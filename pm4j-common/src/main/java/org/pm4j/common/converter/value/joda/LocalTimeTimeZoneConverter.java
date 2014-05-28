@@ -13,6 +13,9 @@ public class LocalTimeTimeZoneConverter extends JodaTimeZoneConverterBase<LocalT
 
   @Override
   public LocalTime toExternalValue(ValueConverterCtxt ctxt, LocalTime i) {
+    if (i == null) {
+      return null;
+    }
     DateTime internalDt = i.toDateTimeToday(getInternalValueDateTimeZone(ctxt));
     DateTime externalDt = internalDt.toDateTime(getExternalValueDateTimeZone(ctxt));
     return externalDt.toLocalTime();
@@ -20,6 +23,9 @@ public class LocalTimeTimeZoneConverter extends JodaTimeZoneConverterBase<LocalT
 
   @Override
   public LocalTime toInternalValue(ValueConverterCtxt ctxt, LocalTime e) {
+    if (e == null) {
+      return null;
+    }
     DateTime externalDt = e.toDateTimeToday(getExternalValueDateTimeZone(ctxt));
     DateTime internalDt = externalDt.toDateTime(getInternalValueDateTimeZone(ctxt));
     return internalDt.toLocalTime();

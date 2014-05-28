@@ -42,7 +42,7 @@ public @interface PmAttrCfg {
      */
     READ_ONLY,
     /**
-     * No required or read-only declard by this annotation.<br>
+     * No required or read-only declared by this annotation.<br>
      * But: The result of the methods isRequiredImpl, isPmEnabledImpl, isPmReadOnly etc. may
      * dynamically define specific attribute restrictions.
      */
@@ -51,8 +51,7 @@ public @interface PmAttrCfg {
 
   /**
    * @return An optional expression that describes how to access the attribute value.
-   *         <p>
-   *         TODO: document the format and provide an example.
+   * @see {@link https://github.com/pm4j/org.pm4j/wiki/Resolving-path-expressions}
    */
   String valuePath() default "";
 
@@ -189,7 +188,8 @@ public @interface PmAttrCfg {
   /**
    * Configures the value converter used to convert between external and backing attribute values.
    *
-   * @return The converter class to use. It needs to have a public default constructor.
+   * @return The converter class to use.<br>
+   *         <b>Important:</b> It needs to have a public default constructor.
    */
   @SuppressWarnings("rawtypes")
   Class<? extends ValueConverter> valueConverter() default ValueConverter.class;

@@ -12,6 +12,9 @@ import org.pm4j.common.converter.value.ValueConverterCtxt;
 public class LocalDateTimeTimeZoneConverter extends JodaTimeZoneConverterBase<LocalDateTime, LocalDateTime> {
     @Override
     public LocalDateTime toExternalValue(ValueConverterCtxt ctxt, LocalDateTime i) {
+      if (i == null) {
+        return null;
+      }
       DateTime internalDt = i.toDateTime(getInternalValueDateTimeZone(ctxt));
       DateTime externalDt = internalDt.toDateTime(getExternalValueDateTimeZone(ctxt));
       return externalDt.toLocalDateTime();
@@ -19,6 +22,9 @@ public class LocalDateTimeTimeZoneConverter extends JodaTimeZoneConverterBase<Lo
 
     @Override
     public LocalDateTime toInternalValue(ValueConverterCtxt ctxt, LocalDateTime e) {
+      if (e == null) {
+        return null;
+      }
       DateTime externalDt = e.toDateTime(getExternalValueDateTimeZone(ctxt));
       DateTime internalDt = externalDt.toDateTime(getInternalValueDateTimeZone(ctxt));
       return internalDt.toLocalDateTime();

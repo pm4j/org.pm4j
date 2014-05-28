@@ -59,11 +59,16 @@ public abstract class JodaStringConverterBase<T> extends StringConverterBase<T, 
 
   @Override
   protected T stringToValueImpl(StringConverterCtxt ctxt, String input) throws Exception {
-    return multiFormatParser.parseString(ctxt, input);
+    return (input != null)
+        ? multiFormatParser.parseString(ctxt, input)
+        : null;
   }
 
   @Override
   protected String valueToStringImpl(StringConverterCtxt ctxt, T v) {
+    if (v == null) {
+      return null;
+    }
     String outputFormat = StringConverterUtil.getOutputFormat(ctxt);
     Locale locale = ctxt.getConverterCtxtLocale();
     DateTimeFormatter fmt = DateTimeFormat.forPattern(outputFormat).withLocale(locale);

@@ -22,6 +22,9 @@ public class StringConverterList<T_ITEM> implements StringConverter<List<T_ITEM>
 
   @Override
   public List<T_ITEM> stringToValue(StringConverterCtxt ctxt, String s) throws StringConverterParseException {
+    if (s == null) {
+      return null;
+    }
     String[] strings = s.split(stringSeparator);
     List<T_ITEM> list = new ArrayList<T_ITEM>(strings.length);
 
@@ -34,6 +37,9 @@ public class StringConverterList<T_ITEM> implements StringConverter<List<T_ITEM>
 
   @Override
   public String valueToString(StringConverterCtxt ctxt, List<T_ITEM> v) {
+    if (v == null) {
+      return null;
+    }
     StringBuilder sb = new StringBuilder(100);
     for (T_ITEM item : v) {
       if (sb.length() > 0) {
