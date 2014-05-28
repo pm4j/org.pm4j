@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -46,6 +45,7 @@ import org.pm4j.core.pm.PmCommandDecorator;
 import org.pm4j.core.pm.PmConstants;
 import org.pm4j.core.pm.PmDataInput;
 import org.pm4j.core.pm.PmEvent;
+import org.pm4j.core.pm.PmEventListener;
 import org.pm4j.core.pm.PmMessage;
 import org.pm4j.core.pm.PmMessage.Severity;
 import org.pm4j.core.pm.PmObject;
@@ -144,6 +144,20 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
    */
   public PmAttrBase(PmObject pmParent) {
     super(pmParent);
+    // load/reload new data:
+    PmEventApi.addPmEventListener(this, PmEvent.VALUE_CHANGE, new PmEventListener() {
+      @Override
+      public void handleEvent(PmEvent event) {
+        if (event.isInitializationEvent() || event.isReloadEvent()) {
+          //SvalueChangedBySetValue = false;
+          // TODO: change setPmValueChanged control flow to an event base mechanism.
+          // The recursive strategy does not work always. Especially if the programmer
+          // relies on the effect of a broadcast.
+          setPmValueChanged(false);
+        }
+      }
+    });
+
   }
 
   @Override
@@ -537,11 +551,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
       }
     }
 
-    // For composite attribute PM's: reset the children.
-    List<PmDataInput> children = PmUtil.getPmChildrenOfType(this, PmDataInput.class);
-    for (PmDataInput child : children) {
-      child.resetPmValues();
-    }
+    super.resetPmValues();
   }
 
   @Override
@@ -878,6 +888,9 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     setValueChanged(UNKNOWN_VALUE_INDICATOR, newChangedState
             ? CHANGED_VALUE_INDICATOR
             : UNCHANGED_VALUE_INDICATOR);
+    if (newChangedState == false) {
+      valueChangedBySetValue = false;
+    }
     super.setPmValueChangedImpl(newChangedState);
   }
 

@@ -49,8 +49,8 @@ public abstract class PmDataInputBase extends PmObjectBase implements PmDataInpu
 
       if (PmInitApi.isPmInitialized(d) && // a not initialized PM can't have a change.
           d.isPmVisible() && !d.isPmReadonly() && // invisible and readonly too.
-    	    (!(d instanceof PmConversation)) && // a sub-conversation does not influence the changed state
-    	    d.isPmValueChanged()) {
+          (!(d instanceof PmConversation)) && // a sub-conversation does not influence the changed state
+          d.isPmValueChanged()) {
         return true;
       }
     }

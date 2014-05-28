@@ -2,12 +2,14 @@ package org.pm4j.core.pm;
 
 import static org.junit.Assert.assertEquals;
 import static org.pm4j.tools.test.PmAssert.assertNoMessagesInSubTree;
+import static org.pm4j.tools.test.PmAssert.setValueAsString;
 
 import java.util.Locale;
 
 import org.junit.Ignore;
 import org.junit.Test;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
+import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.impl.PmAttrIntegerImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
 
@@ -59,6 +61,27 @@ public class PmAttrIntegerTest {
   }
 
   @Test
+  public void testDefaultValueAndResetValue() {
+    assertEquals(null, pm.withDefaultValue.getBackingValue());
+    assertEquals("3", pm.withDefaultValue.getValueAsString());
+    assertEquals(new Integer(3), pm.withDefaultValue.getBackingValue());
+    setValueAsString(pm.withDefaultValue, "4");
+    setValueAsString(pm.withDefaultValue, null);
+    pm.withDefaultValue.resetPmValues();
+    assertEquals(new Integer(3), pm.withDefaultValue.getBackingValue());
+    assertEquals("3", pm.withDefaultValue.getValueAsString());
+  }
+
+  @Test
+  public void testDefaultValueAndReactivateDefaultOnAllChangeEvent() {
+    assertEquals(null, pm.withDefaultValue.getBackingValue());
+    assertEquals("3", pm.withDefaultValue.getValueAsString());
+    setValueAsString(pm.withDefaultValue, null);
+    PmEventApi.firePmEvent(pm.withDefaultValue, PmEvent.ALL_CHANGE_EVENTS);
+    assertEquals("3", pm.withDefaultValue.getValueAsString());
+  }
+
+  @Test
   public void testNullToValueConversion() {
     pm.withNullConverter.setValueAsString("1");
     assertEquals(1, pm.withNullConverter.getBackingValue().intValue());
@@ -73,6 +96,10 @@ public class PmAttrIntegerTest {
     @PmAttrCfg(formatResKey="pmAttrIntegerTest.multiFormatTestFormat")
     public final PmAttrIntegerImpl i = new PmAttrIntegerImpl(this);
 
+    @PmAttrCfg(defaultValue="3")
+    public final PmAttrIntegerImpl withDefaultValue = new PmAttrIntegerImpl(this);
+
+    /** A very special attribute that translates <code>null</code> to zero. */
     public final PmAttrIntegerImpl withNullConverter = new PmAttrIntegerImpl(this) {
       @Override
       protected boolean isConvertingNullValueImpl() {
