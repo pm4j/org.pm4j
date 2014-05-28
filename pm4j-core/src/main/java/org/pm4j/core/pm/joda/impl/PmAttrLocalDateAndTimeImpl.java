@@ -82,7 +82,7 @@ public class PmAttrLocalDateAndTimeImpl extends PmAttrLocalDateTimeImpl {
     }
 
     /**
-     * Inner class for date part.
+     * Inner class for date part. Is required, when timePart has a value, but datePart is null.
      *
      * @author okossak
      * @since GLOBE 2.0
@@ -99,12 +99,12 @@ public class PmAttrLocalDateAndTimeImpl extends PmAttrLocalDateTimeImpl {
 
         @Override
         protected LocalDate getBackingValueImpl() {
-            return PmAttrLocalDateAndTimeImpl.this.localStore.getDate();
+            return localStore.getDate();
         }
 
         @Override
         protected void setBackingValueImpl(LocalDate newValue) {
-            PmAttrLocalDateAndTimeImpl.this.localStore.setDate(newValue);
+            localStore.setDate(newValue);
         }
 
         @Override
@@ -118,6 +118,13 @@ public class PmAttrLocalDateAndTimeImpl extends PmAttrLocalDateTimeImpl {
         @Override
         protected boolean isPmEnabledImpl() {
             return PmAttrLocalDateAndTimeImpl.this.isPmEnabled();
+        }
+
+        @Override
+        protected boolean isRequiredImpl() {
+          return super.isRequiredImpl() 
+              || (   (localStore.getDate() == null)
+                  && (localStore.getTime() != null));
         }
 
         @Override
@@ -142,7 +149,7 @@ public class PmAttrLocalDateAndTimeImpl extends PmAttrLocalDateTimeImpl {
     }
 
     /**
-     * Inner class for time part.
+     * Inner class for time part. Is required, when datePart has a value, but timePart is null.
      *
      * @author okossak
      * @since GLOBE 2.0
@@ -159,12 +166,12 @@ public class PmAttrLocalDateAndTimeImpl extends PmAttrLocalDateTimeImpl {
 
         @Override
         protected LocalTime getBackingValueImpl() {
-            return PmAttrLocalDateAndTimeImpl.this.localStore.getTime();
+            return localStore.getTime();
         }
 
         @Override
         protected void setBackingValueImpl(LocalTime newValue) {
-            PmAttrLocalDateAndTimeImpl.this.localStore.setTime(newValue);
+            localStore.setTime(newValue);
         }
 
         @Override
@@ -180,6 +187,13 @@ public class PmAttrLocalDateAndTimeImpl extends PmAttrLocalDateTimeImpl {
             return PmAttrLocalDateAndTimeImpl.this.isPmEnabled();
         }
 
+        @Override
+        protected boolean isRequiredImpl() {
+          return super.isRequiredImpl() 
+              || (   (localStore.getTime() == null)
+                  && (localStore.getDate() != null));
+        }
+        
         @Override
         protected void getPmStyleClassesImpl(Set<String> styleClassSet) {
             // the part inherits its style classes from the date time object
