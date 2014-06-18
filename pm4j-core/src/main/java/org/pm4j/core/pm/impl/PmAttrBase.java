@@ -106,13 +106,6 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   private static final Log LOG = LogFactory.getLog(PmAttrBase.class);
 
   /**
-   * Indicates if the value was explicitly set. This information is especially
-   * important for the default value logic. Default values may have only effect
-   * on values that are not explicitly set.
-   */
-  private boolean valueChangedBySetValue = false;
-
-  /**
    * Contains optional attribute data that in most cases doesn't exist for usual
    * bean attributes.
    */
@@ -587,7 +580,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
       }
 
       // Default values may have only effect if the value was not set by the user:
-      if (valueChangedBySetValue) {
+      if (isPmValueChanged()) {
         return pmValue;
       }
 
@@ -702,11 +695,6 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
         setBackingValue(beanAttrValue);
         metaData.cacheStrategyForValue.setAndReturnCachedValue(this, newPmValue);
 
-        // From now on the value should be handled as intentionally modified.
-        // That means that the default value shouldn't be returned, even if the
-        // value was set to <code>null</code>.
-        valueChangedBySetValue = true;
-
         setValueChanged(currentValue, newPmValue);
 
         // optional after-set validation done before afterChange calls. See: Validate.AFTER_SET.
@@ -745,9 +733,21 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
    * <p>
    * It may be overridden for application specific needs.<br>
    * It may prevent the change to be applied by returning <code>false</code>.
+   * <p>
+   * <b>PLEASE NOTE</b>: If an attribute value change should cause a parallel
+   * change of some other data, the related code should <b>not</b> be located
+   * here.<br>
+   * Please use the methods {@link #afterValueChange(Object, Object)} or
+   * {@link #setBackingValueImpl(Object)} to adjust other data.
+   * <p>
+   * Reason: A <code>beforeValueChange</code> call does only report the
+   * intention to change the value. It's final execution may still be prevented
+   * by another value change decorator.
    *
-   * @param oldValue The old (current) attribute value.
-   * @param newValue The new value that should be applied.
+   * @param oldValue
+   *          The old (current) attribute value.
+   * @param newValue
+   *          The new value that should be applied.
    * @return A return value <code>false</code> will prevent the value change.
    */
   protected boolean beforeValueChange(T_PM_VALUE oldValue, T_PM_VALUE newValue) {
@@ -788,15 +788,6 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     } catch (StringConverterParseException e) {
       throw new PmConverterException(this, e);
     }
-  }
-
-  /**
-   * Indicates if the value was explicitly set. This information is especially
-   * important for the default value logic. Default values may have only effect
-   * on values that are not explicitly set.
-   */
-  protected final boolean isValueChangedBySetValue() {
-    return valueChangedBySetValue;
   }
 
   /**
@@ -872,9 +863,6 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     setValueChanged(UNKNOWN_VALUE_INDICATOR, newChangedState
             ? CHANGED_VALUE_INDICATOR
             : UNCHANGED_VALUE_INDICATOR);
-    if (newChangedState == false) {
-      valueChangedBySetValue = false;
-    }
     super.setPmValueChangedImpl(newChangedState);
   }
 

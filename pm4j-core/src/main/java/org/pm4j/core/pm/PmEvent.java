@@ -46,6 +46,10 @@ public class PmEvent extends EventObject {
   /** Indicator for an event that gets propagated to the parent hierarchy. */
   public static final int IS_EVENT_PROPAGATION = 1 << 31;
 
+  /**
+   * This event gets fired on a PM tree (part) when its content was replaces.<br>
+   * E.g. the backing bean of a PmBean was exchanged.
+   */
   public static final int ALL_CHANGE_EVENTS =
     VALUE_CHANGE | TITLE_CHANGE | TOOLTIP_CHANGE |
     VISIBILITY_CHANGE | ENABLEMENT_CHANGE |
@@ -189,7 +193,8 @@ public class PmEvent extends EventObject {
   /**
    * @return <code>true</code> if the event is caused by re-loading a bean behind the PM.<br>
    *         This event kind is generated for all components of a PM tree if
-   *         <code>PmBean.reloadPmBean</code> exchanges the content behind the tree.
+   *         <code>PmBean.reloadPmBean</code> exchanges the content behind the tree.<br>
+   *         That usually happens on saving and re-displaying a record.
    */
   public boolean isReloadEvent() {
     return hasEventMaskBits(RELOAD);

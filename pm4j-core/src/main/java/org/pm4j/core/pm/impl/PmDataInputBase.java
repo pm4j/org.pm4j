@@ -3,6 +3,7 @@ package org.pm4j.core.pm.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.PmDataInput;
 import org.pm4j.core.pm.PmEvent;
@@ -29,11 +30,35 @@ public abstract class PmDataInputBase extends PmObjectBase implements PmDataInpu
       @Override
       public void handleEvent(PmEvent event) {
         if (event.isInitializationEvent() || event.isReloadEvent()) {
-          setPmValueChanged(false);
+          onPmDataExchangeEvent(event);
         }
       }
     });
   }
+
+  /**
+   * This method gets called whenever the PM observes an initialization or
+   * reload event. The default implementation resets the changed state for this
+   * PM only. It does not
+   * <code>setPmValueChanged(false)</code>.
+   * <p>
+   * You may change that by overriding this method.
+   * <p>
+   * This method supports the common use case of a PM that represents a some
+   * content of a data bean. The bean is then usually the backing bean of one of
+   * the PM parents. If that bean gets exchanged, a value change event will be
+   * propagated to the related PM sub-tree. See:
+   * {@link PmBean#setPmBean(Object)}.
+   *
+   * @param parentEvent
+   *          The event that was received by the parent.
+   */
+  protected void onPmDataExchangeEvent(PmEvent parentEvent) {
+    // This kind event gets recursively applied to a PM tree (part). Because of that we don't need to
+    // handle the child PMs.
+    _setPmValueChangedForThisInstanceOnly(this, false);
+  }
+
 
   /**
    * Implements the fix framework behavior.<br>
@@ -48,19 +73,36 @@ public abstract class PmDataInputBase extends PmObjectBase implements PmDataInpu
            isPmValueChangedImpl();
   }
 
+  /**
+   * Returns <code>true</code> if this PM or one of its child PMs reports value change.
+   * Several implementations such as {@link PmAttrBase} provide basic mechanisms to observe
+   * user changes.
+   * <p>
+   * If the changed state of your PM is not relevant to report changes, you may override this method
+   * and return simply <code>false</code>.
+   * This may be the case for fields that just control a view state, like a display language field
+   * that never gets stored.
+   * <p>
+   * If you need to influence that state manually, you may use {@link #setPmValueChanged(boolean)}.
+   * Please do that carefully, because you overrule the existing mechanisms.
+   *
+   * @return <code>true</code> if the PM or one of it's sub-PMs reports a relevant value change.
+   */
   protected boolean isPmValueChangedImpl() {
+    // If a programmer has marked this instance explicitly as changed by calling
+    // setPmValueChanged(true), this will be considered first.
     if (pmExpliciteChangedFlag) {
       return true;
     }
 
-    // XXX olaf: the tree related question should be factored out to a utiltiy.
+    // Ask all children if at least one of them reports a value change.
     List<PmDataInput> items = PmUtil.getPmChildrenOfType(this, PmDataInput.class);
     for (int i = 0; i < items.size(); ++i) {
       PmDataInput d = items.get(i);
 
       if (PmInitApi.isPmInitialized(d) && // a not initialized PM can't have a change.
-          d.isPmVisible() && !d.isPmReadonly() && // invisible and readonly too.
-          (!(d instanceof PmConversation)) && // a sub-conversation does not influence the changed state
+          !d.isPmReadonly() && // readonly too.
+          (!(d instanceof PmConversation)) && // a sub-conversation does not influence the changed state.
           d.isPmValueChanged()) {
         return true;
       }

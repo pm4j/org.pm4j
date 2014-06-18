@@ -142,19 +142,6 @@ public class PmTableImpl
     super(pmParent);
   }
 
-  @Override
-  protected void onPmInit() {
-    super.onPmInit();
-    PmEventApi.addPmEventListener(this, PmEvent.VALUE_CHANGE, new PmEventListener() {
-      @Override
-      public void handleEvent(PmEvent event) {
-        if (event.isInitializationEvent() || event.isReloadEvent()) {
-          onPmDataExchangeEvent(event);
-        }
-      }
-    });
-  }
-
   /**
    * This method gets called whenever the PM observes an initialization or reload event.
    * The default implementation refreshes all table aspects
@@ -168,12 +155,21 @@ public class PmTableImpl
    * change event will be propagated to the related PM sub-tree. See:
    * {@link PmBean#setPmBean(Object)}.
    *
-   * @param parentEvent The event that was received by the parent.
+   * @param event The event.
    */
-  protected void onPmDataExchangeEvent(PmEvent parentEvent) {
-    // The backing context value was changed. All sort, filter and value changes
-    // are no longer valid.
-    updatePmTable();
+  @Override
+  protected void onPmDataExchangeEvent(PmEvent event) {
+    super.onPmDataExchangeEvent(event);
+
+    if (event.isReloadEvent()) {
+      // A reload of handled data. Changes and selections are no longer valid.
+      // But sort order and user filter stay as they are.
+      updatePmTable(UpdateAspect.CLEAR_CHANGES, UpdateAspect.CLEAR_SELECTION);
+    } else {
+      // Completely new data context. All changes, sort order, filters and value changes
+      // are no longer valid.
+      updatePmTable();
+    }
   }
 
   @Override
@@ -396,11 +392,11 @@ public class PmTableImpl
         clearMasterRowPm();
         // In case of a clear call we do not handle vetos.
         // TODO olaf: Write unit tests to verify that that's not problem in all master details cases.
-        SelectionHandlerUtil.forceSelectAll(getPmSelectionHandler(), false);
+        SelectionHandlerUtil.forceSelectAll(getPmPageableCollection().getSelectionHandler(), false);
 
         // Ensure that the minimal standard selection gets re-created on next get-selection request.
         // TODO: can be part of selectAll(false). Every selection that leads to a no-Selection.
-        getPmSelectionHandler().ensureSelectionStateRequired();
+        getPmPageableCollection().getSelectionHandler().ensureSelectionStateRequired();
         break;
       case CLEAR_SORT_ORDER:
         getPmQueryParams().setSortOrder(getPmPageableBeanCollection().getQueryOptions().getDefaultSortOrder());
@@ -432,7 +428,7 @@ public class PmTableImpl
     if (cacheSet.contains(CacheKind.VALUE)) {
       getPmPageableCollection().clearCaches();
       clearMasterRowPm();
-      getPmSelectionHandler().ensureSelectionStateRequired();
+      getPmPageableCollection().getSelectionHandler().ensureSelectionStateRequired();
     }
   }
 
@@ -669,6 +665,7 @@ public class PmTableImpl
    *          the data set to present. If it is <code>null</code> an empty
    *          collection will be created internally by the next {@link #getPmPageableCollection()} call.
    */
+  @SuppressWarnings("deprecation")
   public void setPmPageableCollection(PmBeanCollection<T_ROW_PM, T_ROW_BEAN> pageable) {
     Selection<T_ROW_PM> selection = null;
 
@@ -683,6 +680,7 @@ public class PmTableImpl
     if (selection != null) {
       // ensure that the internal field is set, even it was just reset to null.
       getPmPageableCollection();
+      // XXX oboede: Move that method to a utility that is not visible for the programmer.
       pmPageableCollection.getSelectionHandler().setSelection(selection);
     }
   }

@@ -62,11 +62,16 @@ public class PmAttrIntegerTest {
 
   @Test
   public void testDefaultValueAndResetValue() {
+    // The default value will only be applied on getValue/getValueAsString/resetPmValues calls.
     assertEquals(null, pm.withDefaultValue.getBackingValue());
     assertEquals("3", pm.withDefaultValue.getValueAsString());
     assertEquals(new Integer(3), pm.withDefaultValue.getBackingValue());
     setValueAsString(pm.withDefaultValue, "4");
+    // In changed state the default value will not re-appear. The user manually changed the
+    // value to 'null'.
     setValueAsString(pm.withDefaultValue, null);
+
+    // resetPmValues resets every attribute value to its default.
     pm.withDefaultValue.resetPmValues();
     assertEquals(new Integer(3), pm.withDefaultValue.getBackingValue());
     assertEquals("3", pm.withDefaultValue.getValueAsString());
@@ -77,6 +82,7 @@ public class PmAttrIntegerTest {
     assertEquals(null, pm.withDefaultValue.getBackingValue());
     assertEquals("3", pm.withDefaultValue.getValueAsString());
     setValueAsString(pm.withDefaultValue, null);
+    // An all change event resets the changed state of the attribute.
     PmEventApi.firePmEvent(pm.withDefaultValue, PmEvent.ALL_CHANGE_EVENTS);
     assertEquals("3", pm.withDefaultValue.getValueAsString());
   }
