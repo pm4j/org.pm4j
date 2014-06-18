@@ -212,6 +212,7 @@ public abstract class PmObjectBase implements PmObject {
 
   @Override
   public void setPmParent(PmObject pmParent) {
+    assert pmInitState == PmInitState.NOT_INITIALIZED;
     if (this.pmParent != null)
       throw new PmRuntimeException(this, "pmParent is already set.");
     if (pmParent == this)
@@ -446,7 +447,7 @@ public abstract class PmObjectBase implements PmObject {
     }
     return md.resLoaderCtxtClasses;
   }
-  
+
   // TODO oboede: publish as protected method after split of custom and internal implementation.
   private List<Class<?>> getPmResLoaderCtxtClassesImpl() {
     // The parent's resource path and the path set of the own inheritance hierarchy.

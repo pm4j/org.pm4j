@@ -280,6 +280,13 @@ public class PmConversationImpl extends PmElementBase implements PmConversation 
   }
 
   @Override
+  public void setPmParent(PmObject pmParent) {
+    super.setPmParent(pmParent);
+    // reset the parent conversation to make sure that it gets recalculated.
+    pmParentConversation = this;
+  }
+
+  @Override
   public PmConversation getPmParentConversation() {
     if (pmParentConversation == this) {
       pmParentConversation = getPmParent() != null
