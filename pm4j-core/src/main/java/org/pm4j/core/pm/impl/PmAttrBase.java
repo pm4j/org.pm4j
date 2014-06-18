@@ -45,7 +45,6 @@ import org.pm4j.core.pm.PmCommandDecorator;
 import org.pm4j.core.pm.PmConstants;
 import org.pm4j.core.pm.PmDataInput;
 import org.pm4j.core.pm.PmEvent;
-import org.pm4j.core.pm.PmEventListener;
 import org.pm4j.core.pm.PmMessage;
 import org.pm4j.core.pm.PmMessage.Severity;
 import org.pm4j.core.pm.PmObject;
@@ -144,20 +143,6 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
    */
   public PmAttrBase(PmObject pmParent) {
     super(pmParent);
-    // load/reload new data:
-    PmEventApi.addPmEventListener(this, PmEvent.VALUE_CHANGE, new PmEventListener() {
-      @Override
-      public void handleEvent(PmEvent event) {
-        if (event.isInitializationEvent() || event.isReloadEvent()) {
-          //SvalueChangedBySetValue = false;
-          // TODO: change setPmValueChanged control flow to an event base mechanism.
-          // The recursive strategy does not work always. Especially if the programmer
-          // relies on the effect of a broadcast.
-          setPmValueChanged(false);
-        }
-      }
-    });
-
   }
 
   @Override
@@ -536,7 +521,6 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     boolean isWritable = !isPmReadonly();
     if (isWritable) {
       PmCacheApi.clearPmCache(this);
-      this.valueChangedBySetValue = false;
     }
     clearPmInvalidValues();
     if (isWritable) {
@@ -550,7 +534,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
         dataContainer.originalValue = UNCHANGED_VALUE_INDICATOR;
       }
     }
-
+    
     super.resetPmValues();
   }
 

@@ -31,6 +31,8 @@ public interface PmDataInput extends PmObject {
 
   /**
    * Resets the values of editable attributes to their default value.
+   * <p>
+   * Switches the changed state to <code>false</code>.
    */
   void resetPmValues();
 

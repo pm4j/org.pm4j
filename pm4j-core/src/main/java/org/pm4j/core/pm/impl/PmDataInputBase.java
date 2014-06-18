@@ -6,6 +6,7 @@ import java.util.List;
 import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.PmDataInput;
 import org.pm4j.core.pm.PmEvent;
+import org.pm4j.core.pm.PmEventListener;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmVisitorApi;
@@ -22,6 +23,16 @@ public abstract class PmDataInputBase extends PmObjectBase implements PmDataInpu
 
   public PmDataInputBase(PmObject parentPm) {
     super(parentPm);
+
+    // load/reload new data leads to an unchanged state.
+    PmEventApi.addPmEventListener(this, PmEvent.VALUE_CHANGE, new PmEventListener() {
+      @Override
+      public void handleEvent(PmEvent event) {
+        if (event.isInitializationEvent() || event.isReloadEvent()) {
+          setPmValueChanged(false);
+        }
+      }
+    });
   }
 
   /**
@@ -118,7 +129,7 @@ public abstract class PmDataInputBase extends PmObjectBase implements PmDataInpu
    * @param newChangedState
    * @return <code>true</code> if the changed state of the PM was changed by this call.
    */
-  private boolean _setPmValueChangedForThisInstanceOnly(PmDataInputBase pm, boolean newChangedState) {
+  boolean _setPmValueChangedForThisInstanceOnly(PmDataInputBase pm, boolean newChangedState) {
     boolean wasChanged = pm.isPmValueChanged();
 
     pm.pmExpliciteChangedFlag = newChangedState;
@@ -132,6 +143,7 @@ public abstract class PmDataInputBase extends PmObjectBase implements PmDataInpu
     for (PmDataInput d : PmUtil.getPmChildrenOfType(this, PmDataInput.class)) {
       d.resetPmValues();
     }
+    setPmValueChanged(false);
   }
 
   /**
