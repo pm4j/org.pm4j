@@ -36,7 +36,7 @@ public class PmExpressionApiHandler {
 
     if (result == null) {
       // prevent double initialization:
-      synchronized(PmUtil.getRootSession(pm)) {
+      synchronized(PmUtil.getRootConversation(pm)) {
         result = _findNamedObjectImpl(pm, objName);
         if (result == null) {
           PmConversationImpl s = (PmConversationImpl)pm.getPmConversation();

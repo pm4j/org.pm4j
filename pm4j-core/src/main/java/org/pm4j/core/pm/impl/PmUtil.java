@@ -67,12 +67,18 @@ public final class PmUtil {
    *          The PM to get the root session for.
    * @return The root session instance.
    */
-  public static PmConversation getRootSession(PmObject pm) {
+  public static PmConversation getRootConversation(PmObject pm) {
     PmConversation s = pm.getPmConversation();
     while (s.getPmParentConversation() != null) {
       s = s.getPmParentConversation();
     }
     return s;
+  }
+
+  /** @deprecated Please use {@link #getRootConversation(PmObject)} */
+  @Deprecated
+  public static PmConversation getRootSession(PmObject pm) {
+    return getRootConversation(pm);
   }
 
   /**
