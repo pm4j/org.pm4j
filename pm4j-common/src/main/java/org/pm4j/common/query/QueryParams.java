@@ -19,7 +19,7 @@ import org.pm4j.common.util.beanproperty.PropertyChangeSupportedBase;
  * <p>
  * See {@link InMemQueryEvaluator} and {@link PageQueryService} for usage examples.
  *
- * @author olaf boede
+ * @author Olaf Boede
  */
 public class QueryParams extends PropertyChangeSupportedBase implements Cloneable, Serializable {
 
@@ -54,15 +54,19 @@ public class QueryParams extends PropertyChangeSupportedBase implements Cloneabl
 
   /**
    * Copies all parameter values from the given source to this instance.
+   * <p>
+   * Fires the change events {@link #PROP_EFFECTIVE_FILTER} and {@link #PROP_EFFECTIVE_FILTER}.
    *
    * @param src The instance to copy the query parameter values from.
    */
   public void copyParamValues(QueryParams src) {
+    // TODO oboede: smart fire of filter change is not yet implemented.
+    this.filterExpression = src.getFilterExpression();
+    this.baseQueryParams = new HashMap<String, Object>(src.baseQueryParams);
     setSortOrder(src.getSortOrder());
     setDefaultSortOrder(src.getDefaultSortOrder());
-    setFilterExpression(src.getFilterExpression());
-    setBaseQueryParams(src.baseQueryParams);
-    setExecQuery(src.execQuery);
+    this.execQuery = src.isExecQuery();
+    firePropertyChange(PROP_EFFECTIVE_FILTER, null, null);
   }
 
   /**
@@ -215,12 +219,6 @@ public class QueryParams extends PropertyChangeSupportedBase implements Cloneabl
   public QueryParams clone() {
     QueryParams clone = (QueryParams) super.clone();
     return clone;
-  }
-
-  private void setBaseQueryParams(Map<String, Object> baseQueryParams) {
-    baseQueryParams = new HashMap<String, Object>(baseQueryParams);
-    // TODO: only fire in case of a real value change. use internal setter method?
-    firePropertyChange(PROP_EFFECTIVE_FILTER, null, null);
   }
 
 }
