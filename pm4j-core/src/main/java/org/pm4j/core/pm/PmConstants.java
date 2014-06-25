@@ -42,7 +42,9 @@ public final class PmConstants {
   public static final String MSGKEY_VALIDATION_FORMAT_FAILURE                = "pmAttr_validationFormatFailure";
   public static final String MSGKEY_VALIDATION_MISSING_REQUIRED_VALUE        = "pmAttr_validationMissingRequiredValue";
   public static final String MSGKEY_VALIDATION_MISSING_REQUIRED_SELECTION    = "pmAttr_validationMissingRequiredSelection";
+  /** Default message: Please enter at least {0} characters in field "{1}". */
   public static final String MSGKEY_VALIDATION_VALUE_TOO_SHORT               = "pmAttr_validationValueTooShort";
+  /** Default message: Please enter maximal {0} characters in field "{1}". */
   public static final String MSGKEY_VALIDATION_VALUE_TOO_LONG                = "pmAttr_validationValueTooLong";
   public static final String MSGKEY_VALIDATION_VALUE_TOO_LOW                 = "pmAttr_validationValueTooLow";
   public static final String MSGKEY_VALIDATION_VALUE_TOO_HIGH                = "pmAttr_validationValueTooHigh";

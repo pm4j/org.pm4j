@@ -106,6 +106,13 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   private static final Log LOG = LogFactory.getLog(PmAttrBase.class);
 
   /**
+   * Indicates if the value was explicitly set. This information is especially
+   * important for the default value logic. Default values may have only effect
+   * on values that are not explicitly set.
+   */
+  private boolean valueChangedBySetValue = false;
+
+  /**
    * Contains optional attribute data that in most cases doesn't exist for usual
    * bean attributes.
    */
@@ -580,7 +587,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
       }
 
       // Default values may have only effect if the value was not set by the user:
-      if (isPmValueChanged()) {
+      if (valueChangedBySetValue) {
         return pmValue;
       }
 
@@ -695,6 +702,11 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
         setBackingValue(beanAttrValue);
         metaData.cacheStrategyForValue.setAndReturnCachedValue(this, newPmValue);
 
+        // From now on the value should be handled as intentionally modified.
+        // That means that the default value shouldn't be returned, even if the
+        // value was set to <code>null</code>.
+        valueChangedBySetValue = true;
+
         setValueChanged(currentValue, newPmValue);
 
         // optional after-set validation done before afterChange calls. See: Validate.AFTER_SET.
@@ -771,6 +783,15 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
    * @see PmEventApi#addPmEventListener(PmObject, int, org.pm4j.core.pm.PmEventListener)
    */
   protected void afterValueChange(T_PM_VALUE oldValue, T_PM_VALUE newValue) {
+  }
+
+  /**
+   * Indicates if the value was explicitly set. This information is especially
+   * important for the default value logic. Default values may have only effect
+   * on values that are not explicitly set.
+   */
+  protected final boolean isValueChangedBySetValue() {
+    return valueChangedBySetValue;
   }
 
   /**
@@ -863,6 +884,9 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     setValueChanged(UNKNOWN_VALUE_INDICATOR, newChangedState
             ? CHANGED_VALUE_INDICATOR
             : UNCHANGED_VALUE_INDICATOR);
+    if (newChangedState == false) {
+      valueChangedBySetValue = false;
+    }
     super.setPmValueChangedImpl(newChangedState);
   }
 

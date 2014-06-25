@@ -113,7 +113,7 @@ public class PmAttrListImpl<T> extends PmAttrBase<List<T>, List<T>> implements P
     List<T> beanAttrValue = getBackingValue();
     if(beanAttrValue!=null) {
       List<T> pmValue = getValueConverter().toExternalValue(getConverterCtxt(), beanAttrValue);
-      if(pmValue.isEmpty() && !isPmValueChanged()) {
+      if(pmValue.isEmpty() && !isValueChangedBySetValue()) {
         // in case the list is empty the elements from the default list are copied over
         pmValue.addAll(getDefaultValue());
         return pmValue;
