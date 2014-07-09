@@ -3,7 +3,7 @@
 
   <groupId>org.pm4j</groupId>
   <artifactId>main</artifactId>
-  <version>0.7.13-SNAPSHOT</version>
+  <version>0.7.11-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>pm4j parent pom</name>
