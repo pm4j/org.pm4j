@@ -60,7 +60,7 @@ public class BeanPmCacheTest {
     System.gc();
 
     // finalization gets called by a parallel thread after the synchronous gc() call.
-    Thread.sleep(3);
+    Thread.sleep(100);
 
     Assert.assertFalse("MyBean should not have been finalized.", MyBean.finalizeWasCalled);
     Assert.assertTrue("MyBeanPm should have been finalized.", MyBeanPm.finalizeWasCalled);
