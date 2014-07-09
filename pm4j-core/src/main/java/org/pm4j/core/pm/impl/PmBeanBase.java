@@ -7,6 +7,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.pm4j.common.util.reflection.GenericTypeUtil;
 import org.pm4j.core.exception.PmRuntimeException;
+import org.pm4j.core.exception.PmValidationException;
 import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmDataInput;
 import org.pm4j.core.pm.PmEvent;
@@ -231,18 +232,29 @@ public class PmBeanBase<T_BEAN>
   }
 
   /**
-   * Validates all sub-PMs.<br>
-   * It the validation of all sub-PM's did not provide an error it performs a bean-validation on
+   * {@link PmBeanBase} validator logic.<br>
+   * Validates all sub-PMs first.<br>
+   * If the validation of all sub-PM's did not provide an error it performs a bean-validation on
    * the bean provided by {@link #getPmBean()}.
    */
-  @Override
-  public void pmValidate() {
-    super.pmValidate();
-    if (getPmBean() != null &&
-        getOwnMetaData().validateUsesBeanValidation &&
-        PmMessageApi.getPmTreeMessages(this, Severity.ERROR).size() == 0) {
-      BeanValidationPmUtil.validateBean(this, getPmBean());
+  static class BeanPmValidator<T_BEAN> extends ObjectValidator<PmBeanBase<T_BEAN>> {
+
+    @Override
+    protected void validateImpl(PmBeanBase<T_BEAN> pm) throws PmValidationException {
+      super.validateImpl(pm);
+      if (pm.getPmBean() != null &&
+          pm.getOwnMetaData().validateUsesBeanValidation &&
+          // To prevent double problem reports, the bean validation
+          // is triggered only if the PM logic did not find problems.
+          PmMessageApi.getPmTreeMessages(pm, Severity.ERROR).size() == 0) {
+        BeanValidationPmUtil.validateBean(pm, pm.getPmBean());
+      }
     }
+  }
+
+  @Override
+  protected Validator makePmValidator() {
+    return new BeanPmValidator<T_BEAN>();
   }
 
   private void checkBeanClass(Object bean) {

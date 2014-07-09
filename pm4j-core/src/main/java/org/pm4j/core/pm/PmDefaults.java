@@ -83,17 +83,6 @@ public class PmDefaults implements Cloneable {
   private PmCommandCfg.BEFORE_DO beforeDoCommandDefault = BEFORE_DO.VALIDATE;
 
   /**
-   * The event mask to be fired on validation state changes.<br>
-   * Is configurable to support information about changing style classes,
-   * tooltips etc.<br>
-   * This allows to fire only a single event with an event mask that
-   * informs all relevant listeners.
-   */
-  public int validationChangeEventMask = PmEvent.VALIDATION_STATE_CHANGE
-                                       | PmEvent.STYLECLASS_CHANGE
-                                       | PmEvent.TOOLTIP_CHANGE;
-
-  /**
    * Defines, if validation error messages should be added to the tool tip text of
    * the affected attributes.
    */

@@ -188,23 +188,11 @@ public abstract class PmDataInputBase extends PmObjectBase implements PmDataInpu
     setPmValueChanged(false);
   }
 
-  /**
-   * The default implementation validates the attributes.
-   * <p>
-   * Subclasses may override this to provide some more specific logic.
-   * <p>
-   * Important for overriding: Don't forget to call
-   * <code>super.pmValidate()</code> to ensure attribute validation.
-   */
   @Override
-  public void pmValidate() {
-    if (isPmVisible() && !isPmReadonly()) {
-      for (PmDataInput d : PmUtil.getPmChildrenOfType(this, PmDataInput.class)) {
-        if (d.isPmVisible() && !d.isPmReadonly()) {
-          d.pmValidate();
-        }
-      }
-    }
+  protected Validator makePmValidator() {
+    return isDeprValidation()
+        ? new DeprDataInputValidator<PmDataInputBase>()
+        : new ObjectValidator<PmDataInputBase>();
   }
 
   // ======== Buffered data input support ======== //

@@ -64,24 +64,6 @@ public class PmAttrLocalDateAndTimeImpl extends PmAttrLocalDateTimeImpl {
     }
 
     /**
-     * Validates the value of this PM. Includes validation of date and time part.
-     *
-     * @throws PmValidationException
-     *             in case of validation error
-     */
-    @Override
-    public void pmValidate() {
-        // validate date and time part first
-        this.datePart.pmValidate();
-        this.timePart.pmValidate();
-
-        // if parts have NO validation errors, then validate date time object
-        if (this.datePart.isPmValid() && this.timePart.isPmValid()) {
-            super.pmValidate();
-        }
-    }
-
-    /**
      * Inner class for date part. Is required, when timePart has a value, but datePart is null.
      *
      * @author okossak
@@ -122,7 +104,7 @@ public class PmAttrLocalDateAndTimeImpl extends PmAttrLocalDateTimeImpl {
 
         @Override
         protected boolean isRequiredImpl() {
-          return super.isRequiredImpl() 
+          return super.isRequiredImpl()
               || (   (localStore.getDate() == null)
                   && (localStore.getTime() != null));
         }
@@ -189,11 +171,11 @@ public class PmAttrLocalDateAndTimeImpl extends PmAttrLocalDateTimeImpl {
 
         @Override
         protected boolean isRequiredImpl() {
-          return super.isRequiredImpl() 
+          return super.isRequiredImpl()
               || (   (localStore.getTime() == null)
                   && (localStore.getDate() != null));
         }
-        
+
         @Override
         protected void getPmStyleClassesImpl(Set<String> styleClassSet) {
             // the part inherits its style classes from the date time object

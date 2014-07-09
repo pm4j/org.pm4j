@@ -31,6 +31,7 @@ import org.pm4j.common.util.reflection.BeanAttrAccessorImpl;
 import org.pm4j.common.util.reflection.BeanAttrArrayList;
 import org.pm4j.common.util.reflection.ClassUtil;
 import org.pm4j.core.exception.PmRuntimeException;
+import org.pm4j.core.exception.PmValidationException;
 import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmConversation;
@@ -312,7 +313,8 @@ public abstract class PmObjectBase implements PmObject {
    * @return <code>true</code> if the PM is in read-only state.
    */
   protected boolean isPmReadonlyImpl() {
-    return getPmMetaData().readOnly;
+    return getPmMetaData().readOnly ||
+           (pmParent != null && pmParent.isPmReadonly());
   }
 
   /**
@@ -577,6 +579,124 @@ public abstract class PmObjectBase implements PmObject {
     return getPmMetaData().pmElementFactory;
   }
 
+  // ======== Validation ======== //
+
+  /**
+   * PM validator interface.
+   *
+   * @param <T> The type of PM to validate.
+   */
+  static interface Validator {
+
+    /**
+     * Validates the given PM.<br>
+     * The validation results are reported as {@link PmMessage}s.
+     *
+     * @param pm The PM to validate.
+     */
+    void validate(PmObject pm);
+  }
+
+  /**
+   * Factory method that generates a type specific PM validator.
+   * @return The validator.
+   */
+  protected Validator makePmValidator() {
+    return new ObjectValidator<PmObjectBase>();
+  }
+
+  /**
+   * Temporary switch that allows to keep old validation logic alive for a limited time.<br>
+   * Gets called only once on meta data generation.<br>
+   * TODO oboede: remove asap.
+   *
+   * @return <code>true</code> if the old logic should be applied for this PM and its children.
+   */
+  protected boolean isDeprValidation() {
+    return pmParent != null
+        ? pmParent.isDeprValidation()
+        : true;
+  }
+
+  /**
+   * Delegates to the validator created by {@link #makePmValidator()}.
+   */
+  @Override
+  public void pmValidate() {
+    getPmMetaData().validator.validate(this);
+  }
+
+  /**
+   * General validation logic implementations for a {@link PmObject}.
+   * <p>
+   * Delegates the type specific logic to {@link #validateImpl(PmObjectBase)}.
+   *
+   * @param <T> The PM type to validate.
+   */
+  static class ObjectValidator<T extends PmObjectBase> implements Validator {
+
+    /**
+     * Calls {@link #validateImpl(PmObjectBase)}. Translates catched {@link PmValidationException}s
+     * to {@link PmMessage}s. For other exceptions {@link PmExceptionHandler#onExceptionInPmValidation(PmObject, RuntimeException)}
+     * gets called.
+     * <p>
+     * If the valid-state of this PM was changed, a {@link PmEvent#VALIDATION_STATE_CHANGE} gets fired.
+     */
+    @Override
+    public final void validate(PmObject pm) {
+      @SuppressWarnings("unchecked")
+      T ipm = (T) pm;
+      if (shouldValidate(ipm)) {
+        boolean wasValid = ipm.isPmValid();
+        try {
+          validateImpl(ipm);
+        } catch (PmValidationException e) {
+          // XXX: severity will be configurable when we implement the warning concept.
+          PmMessageApi.addMessage(ipm, Severity.ERROR, e.getResourceData().msgKey, e.getResourceData().msgArgs);
+        } catch (RuntimeException e) {
+          ipm.getPmConversationImpl().getPmExceptionHandler().onExceptionInPmValidation(pm, e);
+        }
+        boolean isValid = ipm.isPmValid();
+        if (isValid != wasValid) {
+          PmEventApi.firePmEvent(ipm, PmEvent.VALIDATION_STATE_CHANGE);
+        }
+      }
+
+    }
+
+    /** Provides the set of child PMs to validate too. */
+    protected Collection<PmObject> getChildrenToValidate(T pm) {
+      return PmUtil.getPmChildren(pm);
+    }
+
+    /**
+     * Defines if {@link #validateImpl(PmObjectBase)} should be called for this PM.
+     *
+     * @param pm The PM to check.
+     * @return <code>true</code> if the given PM should be validated.
+     */
+    protected boolean shouldValidate(T pm) {
+      // XXX oboede: Logic will be extended for the task 'validation on read'
+      return !pm.isPmReadonly();
+    }
+
+    /**
+     * The type specific validation implementation.
+     *
+     * @param pm
+     *          The PM to validate.
+     * @throws PmValidationException
+     *           Will be thrown if a validation failed.<br>
+     *           Alternatively
+     *           {@link PmMessageApi#addMessage(PmObject, Severity, String, Object...)}
+     *           may be used to generate multiple messages.
+     */
+    protected void validateImpl(T pm) throws PmValidationException {
+      for (PmObject d : getChildrenToValidate(pm)) {
+        d.pmValidate();
+      }
+    }
+  }
 
   // ======== Static data ======== //
 
@@ -927,6 +1047,11 @@ public abstract class PmObjectBase implements PmObject {
 
     // -- collect all methods annotated with @PmInit
     metaData.initMethods = findInitMethods();
+
+    // -- validator strategy --
+    metaData.deprValidation = isDeprValidation();
+    metaData.validator = makePmValidator();
+    assert metaData.validator != null;
   }
 
   /**
@@ -984,7 +1109,6 @@ public abstract class PmObjectBase implements PmObject {
     /** Initializes the some attributes based on PM-default settings. */
     protected void init(PmDefaults pmDefaults) {
       this.addErrorMessagesToTooltip = pmDefaults.addErrorMessagesToTooltip;
-      this.validationChangeEventMask = pmDefaults.validationChangeEventMask;
     }
 
     private String name;
@@ -1005,14 +1129,8 @@ public abstract class PmObjectBase implements PmObject {
     private boolean tooltipUsesTitle = false;
     private boolean addErrorMessagesToTooltip;
 
-    /**
-     * The event mask to be fired on validation state changes.<br>
-     * Is configurable to support information about changing style classes,
-     * tooltips etc.<br>
-     * This allows to fire only a single event with an event mask that
-     * informs all relevant listeners.
-     */
-    public int validationChangeEventMask;
+    boolean deprValidation;
+    private Validator validator;
     private Annotation[] permissionAnnotations = {};
 
     private CacheStrategy cacheStrategyForTitle = CacheStrategyNoCache.INSTANCE;
@@ -1068,6 +1186,12 @@ public abstract class PmObjectBase implements PmObject {
     public boolean isReadOnly() { return readOnly; }
     public void setReadOnly(boolean readOnly) { this.readOnly = readOnly; }
 
+    /** @return The {@link Validator} for this PM. */
+    public Validator getValidator() { return validator; }
+
+    /** @param validator The {@link Validator} for this PM. */
+    public void setValidator(Validator validator) { this.validator = validator; }
+
     // TODO: change to a hierarchical name structure. is simpler and faster.
     void ensureDerivedNames(PmObjectBase pmObject) {
       compositeChildName = isSubPm
@@ -1084,6 +1208,7 @@ public abstract class PmObjectBase implements PmObject {
 
 
     }
+
   }
 
   /**

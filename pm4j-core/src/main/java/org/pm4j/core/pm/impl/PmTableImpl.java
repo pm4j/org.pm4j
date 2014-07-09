@@ -61,7 +61,6 @@ import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmExpressionApi;
-import org.pm4j.core.pm.api.PmValidationApi;
 import org.pm4j.core.pm.impl.cache.CacheStrategyBase;
 import org.pm4j.core.pm.impl.cache.CacheStrategyRequest;
 import org.pm4j.core.pm.impl.pageable.PmBeanCollection;
@@ -246,11 +245,6 @@ public class PmTableImpl
     if (pmPageableCollection != null) {
       pmPageableCollection.setPageSize(numOfPageRows);
     }
-  }
-
-  @Override
-  protected boolean isPmReadonlyImpl() {
-    return super.isPmReadonlyImpl() || getPmParent().isPmReadonly();
   }
 
   @Override
@@ -491,16 +485,26 @@ public class PmTableImpl
   }
 
   /**
-   * Validates the changed row items only.
+   * {@link PmTable} validation logic.
    */
-  @Override
-  public void pmValidate() {
-    Modifications<T_ROW_PM> m = getPmPageableCollection().getModifications();
-    List<T_ROW_PM> changes = ListUtil.collectionsToList(m.getAddedItems(), m.getUpdatedItems());
-    for (T_ROW_PM itemPm : changes) {
-      PmValidationApi.validateSubTree(itemPm);
+  static class TableValidator extends ObjectValidator<PmTableImpl<PmBean<?>, ?>> {
+
+    @SuppressWarnings("unchecked")
+    @Override
+    protected Collection<PmObject> getChildrenToValidate(PmTableImpl<PmBean<?>, ?> pm) {
+      Modifications<PmBean<?>> m = pm.getPmPageableCollection().getModifications();
+      List<PmBean<?>> changedItems = ListUtil.collectionsToList(m.getAddedItems(), m.getUpdatedItems());
+      return (Collection<PmObject>) (Object) changedItems;
     }
   }
+
+  @Override
+  protected Validator makePmValidator() {
+    return isDeprValidation()
+        ? new DeprTableValidator()
+        : new TableValidator();
+  }
+
 
   /**
    * @return The {@link PageableCollection} that handles the table row PM's to display.

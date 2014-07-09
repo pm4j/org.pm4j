@@ -216,4 +216,13 @@ public interface PmObject extends Comparable<PmObject> {
   @Override
   int compareTo(PmObject otherPm);
 
+  /**
+   * Validates this PM.<br>
+   * Generates error messages in case of validation problems.<br>
+   * Fires {@link PmEvent#VALIDATION_STATE_CHANGE} events in case of a change
+   * of the valid-state.
+   */
+  // TODO olaf: move public interface to validation API. Change to protected implementation method.
+  void pmValidate();
+
 }

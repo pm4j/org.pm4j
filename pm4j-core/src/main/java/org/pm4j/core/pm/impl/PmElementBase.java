@@ -61,15 +61,20 @@ public abstract class PmElementBase
 
   @Override
   protected boolean isPmReadonlyImpl() {
-    if (super.isPmReadonlyImpl()) {
-      return true;
-    }
-    else {
-      PmObject ctxt = getPmParent();
-      return (ctxt != null &&
-              ctxt.isPmReadonly()) ||
-             !isPmEnabled();
-    }
+    return super.isPmReadonlyImpl()
+           || !isPmEnabled();
+      // FIXME 00112472 oboede: this is a kind of bug. can lead to circular
+      // enabled/readonly calls
+      // current feature: setPmEnabled(false) or isPmEnabledImpl() make an area
+      // read-only.
+      //
+      // This logic may be usedful for tabs but not for every PmContainer.
+      //
+      // We can get rid of that by finding all
+      // subclasses implementing isPmEnabledImpl().
+      // All found logic needs to be switched to isPmReadonlyImpl().
+      // After that step this method should be deleted.
+      // The tab case should be added to the base class (each PmObject may be a tab).
   }
 
   // ==== PmTreeNode implementation ==== //

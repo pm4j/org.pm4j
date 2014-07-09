@@ -264,7 +264,7 @@ public class DeprPmTableImpl
   public final RowSelectMode getPmRowSelectMode() {
     return this.getRowSelectMode();
   }
-  
+
   public RowSelectMode getRowSelectMode() {
     if (rowSelectMode == null) {
       DeprPmTableCfg cfg = AnnotationUtil.findAnnotation(this, DeprPmTableCfg.class);
@@ -281,7 +281,7 @@ public class DeprPmTableImpl
   public void setPmRowSelectMode(RowSelectMode rowSelectMode) {
     this.setRowSelectMode(rowSelectMode);
   }
-  
+
   /**
    * Adjusts the row selection mode.<br>
    * Should be called very early within the livecycle of the table.
@@ -325,15 +325,10 @@ public class DeprPmTableImpl
 
   @Override
   protected boolean isPmReadonlyImpl() {
-    if (super.isPmReadonlyImpl()) {
-      return true;
-    }
-    else {
-      PmObject ctxt = getPmParent();
-      return (ctxt != null &&
-              ctxt.isPmReadonly()) ||
-             !isPmEnabled();
-    }
+    return super.isPmReadonlyImpl() ||
+           // XXX oboede: is not really good, but will not be changed for
+           // deprecated tables.
+           !isPmEnabled();
   }
 
   @Override

@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -228,25 +229,37 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
    * Please notice that the result of the external {@link #isRequired()} method
    * is influenced by the {@link #isPmEnabled()} result: A disabled attribute is
    * automatically NOT required.
+   * <p>
+   * The default implementation provides for attributes that are embedded in another
+   * attribute the required state of the embedding parent attribute.
    *
    * @return <code>true</code> if the attribute is required.
    */
   protected boolean isRequiredImpl() {
+  boolean required = false;
     MetaData md = getOwnMetaData();
 
     switch (md.valueRestriction) {
-      case REQUIRED:            return true;
-      case REQUIRED_IF_VISIBLE: return isPmVisible();
-      case READ_ONLY:           return false;
-      case NONE:                return md.required; // fall back for old annotation attribute
-      default:         throw new PmRuntimeException(this, "Unknown enum value found.");
+      case REQUIRED:            required = true; break;
+      case REQUIRED_IF_VISIBLE: required = isPmVisible(); break;
+      case READ_ONLY:           required = false; break;
+      default:                  required = md.required; break;
     }
+    // Required embedded attributes get only really required if their embedding
+    // attribute is also required.
+    if (md.embeddedAttr && !md.deprValidation) {
+      required &= ((PmAttr<?>)getPmParent()).isRequired();
+    }
+    return required;
   }
 
   @Override
   protected boolean isPmReadonlyImpl() {
     return super.isPmReadonlyImpl() ||
-           getPmParent().isPmReadonly();
+           // A disabled parent attribute switches each child attibute to be read-only.
+           // Is not implemented in isPmEnabledImpl() to preserve the contract that
+           // the domain developer 'owns' that method completely.
+           (getOwnMetaData().embeddedAttr && !getPmParent().isPmEnabled());
   }
 
   @Override
@@ -293,7 +306,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
       for (PmMessage m : PmMessageApi.getMessages(this, Severity.ERROR)) {
         this.getPmConversationImpl()._clearPmMessage(m);
       }
-      PmEventApi.firePmEvent(this, getOwnMetaData().validationChangeEventMask);
+      PmEventApi.firePmEvent(this, PmEvent.VALIDATION_STATE_CHANGE);
     }
   }
 
@@ -534,7 +547,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
         dataContainer.originalValue = UNCHANGED_VALUE_INDICATOR;
       }
     }
-    
+
     super.resetPmValues();
   }
 
@@ -986,9 +999,6 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
    *
    * @return The default value for this attribute.
    */
-  // XXX olaf kossak: shouldn't that method return T_BEAN_VALUE ?
-  //             not yet changed because of the effort to change the meta data handling code...
-  // alternatively: add a second method getDefaultBackingValue()...
   protected T_PM_VALUE getDefaultValueImpl() {
     MetaData md = getOwnMetaData();
     T_PM_VALUE defaultValue = null;
@@ -1030,7 +1040,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
    */
   private void setInvalidValue(SetValueContainer<T_PM_VALUE> invValue) {
     zz_getDataContainer().invalidValue = invValue;
-    PmEventApi.firePmEvent(this, getOwnMetaData().validationChangeEventMask);
+    PmEventApi.firePmEvent(this, PmEvent.VALIDATION_STATE_CHANGE);
   }
 
   /**
@@ -1089,7 +1099,30 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   protected void validate(T_PM_VALUE value) throws PmValidationException {
     if (isRequired() &&
         isEmptyValue(value)) {
-      throw new PmValidationException(PmMessageApi.addRequiredMessage(this));
+      if (isDeprValidation()) {
+        throw new PmValidationException(PmMessageApi.addRequiredMessage(this));
+      } else {
+        // if all required sub-attrs report a required warning, this
+        // should be replaced by a required warning for the main attr
+        List<PmMessage> childReqMsgs = new ArrayList<PmMessage>();
+        int reqChildCount = 0;
+        for (PmAttr<?> c : PmUtil.getPmChildrenOfType(this, PmAttr.class)) {
+          if (c.isRequired()) {
+            ++reqChildCount;
+            for (PmMessage m : PmMessageApi.getMessages(c, Severity.ERROR)) {
+              if (PmConstants.MSGKEY_VALIDATION_MISSING_REQUIRED_VALUE.equals(m.getMsgKey())) {
+                childReqMsgs.add(m);
+              }
+            }
+          }
+        }
+        if (reqChildCount == childReqMsgs.size()) {
+          for (PmMessage m : childReqMsgs) {
+            getPmConversationImpl().clearPmMessage(m);
+          }
+          throw new PmValidationException(PmMessageApi.addRequiredMessage(this));
+        }
+      }
     }
   }
 
@@ -1105,38 +1138,49 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     }
   }
 
-  @Override
-  public void pmValidate() {
-    if (isPmVisible() &&
-        isPmEnabled()) {
-      // A validation can only be performed if the last setValue() did not generate a converter exception.
-      // Otherwise the attribute will simply stay in its value converter error state.
-      if (!hasPmConverterErrors()) {
-        boolean wasValid = isPmValid();
-        PmConversationImpl conversation = getPmConversationImpl();
-        conversation.clearPmMessages(this, null);
-        try {
-          validate(getValue());
-          performJsr303Validations();
-        }
-        catch (PmValidationException e) {
-          PmResourceData exResData = e.getResourceData();
-          PmValidationMessage msg = new PmValidationMessage(this, exResData.msgKey, exResData.msgArgs);
-          conversation.addPmMessage(msg);
-        }
-        catch (RuntimeException e) {
-          conversation.getPmExceptionHandler().onExceptionInPmValidation(this, e);
-        }
+  /**
+   * Attribute validation logic.
+   *
+   * @param <T> The attribute PM type.
+   */
+  static class AttrValidator<T extends PmAttrBase<?, ?>> extends ObjectValidator<T> {
 
-        boolean isValid = isPmValid();
-        if (isValid != wasValid) {
-          PmEventApi.firePmEvent(this, getOwnMetaData().validationChangeEventMask);
-        }
+    @Override
+    protected boolean shouldValidate(T pm) {
+      // visibility is considered here to support attribute exchange via visibility switch.
+      return pm.isPmVisible() &&
+             pm.isPmEnabled() &&
+             // A validation can only be performed if the last setValue() did not generate a converter exception.
+             // Otherwise the attribute will simply stay in its value converter error state.
+             !pm.hasPmConverterErrors();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    protected void validateImpl(T pm) throws PmValidationException {
+      // TODO: move to common logic? Problem to solve: converter messages need to be preserved.
+      // Clears all messages, inclusive converter messages.
+      pm.getPmConversationImpl().clearPmMessages(pm, null);
+
+      // Validates sub PMs.
+      super.validateImpl(pm);
+
+      // Start further attribute validation only if attribute parts are valid.
+      if (pm.isPmValid()) {
+        ((PmAttrBase<Object, ?>)pm).validate((Object)pm.getValue());
+        pm.performJsr303Validations();
       }
     }
   }
 
-  private boolean hasPmConverterErrors() {
+  @Override
+  protected Validator makePmValidator() {
+    return isDeprValidation()
+        ? new DeprAttrValidator<Object>()
+        : new AttrValidator<PmAttrBase<?,?>>();
+  }
+
+  boolean hasPmConverterErrors() {
     for (PmMessage m : getPmConversation().getPmMessages(this, Severity.ERROR)) {
       if (m instanceof PmConverterErrorMessage) {
         return true;
@@ -1376,6 +1420,8 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
           ? ((PmBean)getPmParent()).getPmBeanClass()
           : null;
 
+    myMetaData.embeddedAttr = getPmParent() instanceof PmAttr;
+
     PmAttrCfg fieldAnnotation = AnnotationUtil.findAnnotation(this, PmAttrCfg.class);
 
     zz_readBeanValidationRestrictions(beanClass, fieldAnnotation, myMetaData);
@@ -1589,6 +1635,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     private boolean                         required;
     private Restriction                     valueRestriction        = Restriction.NONE;
     private boolean                         primitiveType;
+    private boolean                         embeddedAttr;
     private PathResolver                    valuePathResolver;
     private PathResolver                    valueContainingObjPathResolver = PassThroughPathResolver.INSTANCE;
     private String                          formatResKey;
@@ -1605,6 +1652,11 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     private int                             maxLen                  = -1;
     private int                             minLen                  = 0;
     private int                             maxLenDefault;
+
+    /** Creates meta data using a maxDefaultLen of 255. */
+    public MetaData() {
+      this(255);
+    }
 
     /**
      * @param maxDefaultLen the attribute type specific maximum number of characters.
@@ -1657,6 +1709,13 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
      */
     protected int getMaxLenDefault() {
       return maxLenDefault;
+    }
+
+    /**
+     * @return <code>true</code> if the attribute is child of another attr.
+     */
+    public boolean isEmbeddedAttr() {
+      return embeddedAttr;
     }
 
   }
