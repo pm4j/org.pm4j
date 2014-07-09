@@ -190,7 +190,7 @@ public abstract class PmDataInputBase extends PmObjectBase implements PmDataInpu
 
   @Override
   protected Validator makePmValidator() {
-    return isDeprValidation()
+    return getPmMetaDataWithoutPmInitCall().deprValidation
         ? new DeprDataInputValidator<PmDataInputBase>()
         : new ObjectValidator<PmDataInputBase>();
   }

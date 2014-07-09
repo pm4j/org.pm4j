@@ -15,7 +15,7 @@ import org.pm4j.core.pm.impl.PmUtil;
 
 /**
  * API to deal with messages.
- * 
+ *
  * @author sdolke
  *
  */
@@ -23,7 +23,7 @@ public class PmMessageApi {
 
   /**
    * Generates a message and propagates it to the PM conversation.
-   * 
+   *
    * @param severity
    *          Message severity.
    * @param key
@@ -49,10 +49,10 @@ public class PmMessageApi {
    * When a custom resource key with the postfix
    * {@link #RESKEY_POSTFIX_REQUIRED_MSG} is provided, that key will be used for
    * message generation.
-   * 
+   *
    * @return The resource data for the required attribute value warning.
    */
-  public static PmResourceData addRequiredMessage(PmAttr<?> pm) {
+  public static PmResourceData makeRequiredMessageResData(PmAttr<?> pm) {
     PmAttrBase<?, ?> pmImpl = (PmAttrBase<?, ?>) pm;
     String msgKey = pmImpl.getPmResKey() + PmConstants.RESKEY_POSTFIX_REQUIRED_MSG;
     String customMsg = PmLocalizeApi.findLocalization(pmImpl, msgKey);
@@ -63,6 +63,12 @@ public class PmMessageApi {
     }
 
     return new PmResourceData(pm, msgKey, pm.getPmTitle());
+  }
+
+  /** @deprecated Please use {@link #makeRequiredMessageResData(PmAttr)}. */
+  @Deprecated
+  public static PmResourceData addRequiredMessage(PmAttr<?> pm) {
+      return makeRequiredMessageResData(pm);
   }
 
   /**
@@ -89,7 +95,7 @@ public class PmMessageApi {
    * <p>
    * Any invalid attribute values within the PM scope are also cleaned by
    * cleaning the corresponding error messages.
-   * 
+   *
    * @return All messages that are related to this presentation model.<br>
    *         In case of no messages an empty collection.
    */
@@ -106,7 +112,7 @@ public class PmMessageApi {
 
   /**
    * Provides the messages of a PM sub tree.
-   * 
+   *
    * @param pm
    *          Root of the PM sub tree to check.
    * @param minSeverity

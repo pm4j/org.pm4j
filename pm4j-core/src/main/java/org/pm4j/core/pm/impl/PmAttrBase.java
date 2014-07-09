@@ -219,6 +219,14 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
    */
   @Override
   public final boolean isRequired() {
+    // Required embedded attributes get only really required if their embedding
+    // attribute is also required.
+    MetaData md = getOwnMetaData();
+    if (md.embeddedAttr && !md.deprValidation &&
+        !((PmAttr<?>)getPmParent()).isRequired()) {
+      return false;
+    }
+
     return isPmEnabled() &&
            isRequiredImpl();
   }
@@ -244,11 +252,6 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
       case REQUIRED_IF_VISIBLE: required = isPmVisible(); break;
       case READ_ONLY:           required = false; break;
       default:                  required = md.required; break;
-    }
-    // Required embedded attributes get only really required if their embedding
-    // attribute is also required.
-    if (md.embeddedAttr && !md.deprValidation) {
-      required &= ((PmAttr<?>)getPmParent()).isRequired();
     }
     return required;
   }
@@ -1097,32 +1100,10 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
    * @param value The value to validate.
    */
   protected void validate(T_PM_VALUE value) throws PmValidationException {
-    if (isRequired() &&
+    if (getOwnMetaData().deprValidation &&
+        isRequired() &&
         isEmptyValue(value)) {
-      if (isDeprValidation()) {
-        throw new PmValidationException(PmMessageApi.addRequiredMessage(this));
-      } else {
-        // if all required sub-attrs report a required warning, this
-        // should be replaced by a required warning for the main attr
-        List<PmMessage> childReqMsgs = new ArrayList<PmMessage>();
-        int reqChildCount = 0;
-        for (PmAttr<?> c : PmUtil.getPmChildrenOfType(this, PmAttr.class)) {
-          if (c.isRequired()) {
-            ++reqChildCount;
-            for (PmMessage m : PmMessageApi.getMessages(c, Severity.ERROR)) {
-              if (PmConstants.MSGKEY_VALIDATION_MISSING_REQUIRED_VALUE.equals(m.getMsgKey())) {
-                childReqMsgs.add(m);
-              }
-            }
-          }
-        }
-        if (reqChildCount == childReqMsgs.size()) {
-          for (PmMessage m : childReqMsgs) {
-            getPmConversationImpl().clearPmMessage(m);
-          }
-          throw new PmValidationException(PmMessageApi.addRequiredMessage(this));
-        }
-      }
+      throw new PmValidationException(PmMessageApi.makeRequiredMessageResData(this));
     }
   }
 
@@ -1165,6 +1146,35 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
       // Validates sub PMs.
       super.validateImpl(pm);
 
+      // In case of a required composite attribute:
+      // If all required sub-PMs report a 'required' error only a single required
+      // message will be shown for the whole attribue.
+      if (pm.isRequired() && PmAttrUtil.isEmptyValue(pm, pm.getValue())) {
+        // if all required sub-attrs report a required warning, this
+        // should be replaced by a required warning for the main attr
+        List<PmMessage> childReqMsgs = new ArrayList<PmMessage>();
+        int reqChildCount = 0;
+        for (PmAttr<?> c : PmUtil.getPmChildrenOfType(pm, PmAttr.class)) {
+          if (c.isRequired()) {
+            ++reqChildCount;
+            for (PmMessage m : PmMessageApi.getMessages(c, Severity.ERROR)) {
+              // XXX oboede: is only a fragile resource key based
+              // identification.
+              if (PmConstants.MSGKEY_VALIDATION_MISSING_REQUIRED_VALUE.equals(m.getMsgKey())) {
+                childReqMsgs.add(m);
+              }
+            }
+          }
+        }
+        if (reqChildCount == childReqMsgs.size()) {
+          PmConversationImpl convPm = pm.getPmConversationImpl();
+          for (PmMessage m : childReqMsgs) {
+            convPm.clearPmMessage(m);
+          }
+          throw new PmValidationException(PmMessageApi.makeRequiredMessageResData(pm));
+        }
+      }
+
       // Start further attribute validation only if attribute parts are valid.
       if (pm.isPmValid()) {
         ((PmAttrBase<Object, ?>)pm).validate((Object)pm.getValue());
@@ -1175,7 +1185,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
 
   @Override
   protected Validator makePmValidator() {
-    return isDeprValidation()
+    return getOwnMetaDataWithoutPmInitCall().deprValidation
         ? new DeprAttrValidator<Object>()
         : new AttrValidator<PmAttrBase<?,?>>();
   }

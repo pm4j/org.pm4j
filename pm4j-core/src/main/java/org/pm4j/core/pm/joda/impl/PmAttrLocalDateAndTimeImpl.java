@@ -1,7 +1,5 @@
 package org.pm4j.core.pm.joda.impl;
 
-import java.util.Set;
-
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 import org.joda.time.LocalTime;
@@ -9,11 +7,15 @@ import org.pm4j.core.exception.PmValidationException;
 import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmEventListener;
 import org.pm4j.core.pm.PmObject;
+import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmLocalizeApi;
+import org.pm4j.core.pm.api.PmMessageApi;
 
 /**
- * A {@link LocalDateTime} attributes that has embedded sub models for the date- and the time- part.
+ * A {@link LocalDateTime} attribute that has embedded sub models for the date- and the time- part.
+ * <p>
+ * TODO oboede: missing support for default/optional time part.
  *
  * @author Olaf Kossak
  * @author Olaf Boede
@@ -45,6 +47,12 @@ public class PmAttrLocalDateAndTimeImpl extends PmAttrLocalDateTimeImpl {
         });
     }
 
+    /** Does not work with the deprecated attribute validation logic. */
+    @Override
+    protected boolean isDeprValidation() {
+      return false;
+    }
+
     /**
      * Factory method to create date part, can be redefined.
      *
@@ -64,11 +72,12 @@ public class PmAttrLocalDateAndTimeImpl extends PmAttrLocalDateTimeImpl {
     }
 
     /**
-     * Inner class for date part. Is required, when timePart has a value, but datePart is null.
+     * Inner class for date part.
      *
      * @author okossak
      * @since GLOBE 2.0
      */
+    @PmAttrCfg(required=true)
     public class PmAttrLocalDatePart extends PmAttrLocalDateImpl {
 
         /**
@@ -89,6 +98,7 @@ public class PmAttrLocalDateAndTimeImpl extends PmAttrLocalDateTimeImpl {
             localStore.setDate(newValue);
         }
 
+        // TODO: move to project specific implementation.
         @Override
         protected String getPmTitleImpl() {
             // the title is used for validation error messages
@@ -98,24 +108,14 @@ public class PmAttrLocalDateAndTimeImpl extends PmAttrLocalDateTimeImpl {
         }
 
         @Override
-        protected boolean isPmEnabledImpl() {
-            return PmAttrLocalDateAndTimeImpl.this.isPmEnabled();
+        protected void validate(LocalDate value) throws PmValidationException {
+          super.validate(value);
+          if (value == null && timePart.getValue() != null) {
+            throw new PmValidationException(PmMessageApi.makeRequiredMessageResData(this));
+          }
         }
 
-        @Override
-        protected boolean isRequiredImpl() {
-          return super.isRequiredImpl()
-              || (   (localStore.getDate() == null)
-                  && (localStore.getTime() != null));
-        }
-
-        @Override
-        protected void getPmStyleClassesImpl(Set<String> styleClassSet) {
-            // the part inherits its style classes from the date time object
-            super.getPmStyleClassesImpl(styleClassSet);
-            styleClassSet.addAll(PmAttrLocalDateAndTimeImpl.this.getPmStyleClasses());
-        }
-
+        // XXX oboede: double check if that is really necessary
         @Override
         public void clearPmInvalidValues() {
             // In method LocalDateTimeAttrPm.pmValidate() the date part and time part get
@@ -131,11 +131,12 @@ public class PmAttrLocalDateAndTimeImpl extends PmAttrLocalDateTimeImpl {
     }
 
     /**
-     * Inner class for time part. Is required, when datePart has a value, but timePart is null.
+     * Inner class for time part.
      *
      * @author okossak
      * @since GLOBE 2.0
      */
+    @PmAttrCfg(required=true)
     public class PmAttrLocalTimePart extends PmAttrLocalTimeImpl {
 
         /**
@@ -157,6 +158,15 @@ public class PmAttrLocalDateAndTimeImpl extends PmAttrLocalDateTimeImpl {
         }
 
         @Override
+        protected void validate(LocalTime value) throws PmValidationException {
+          super.validate(value);
+          if (value == null && datePart.getValue() != null) {
+            throw new PmValidationException(PmMessageApi.makeRequiredMessageResData(this));
+          }
+        }
+
+        // TODO: move to project specific implementation.
+        @Override
         protected String getPmTitleImpl() {
             // the title is used for validation error messages
             // it is assembled by a localized title for the date time object
@@ -164,25 +174,7 @@ public class PmAttrLocalDateAndTimeImpl extends PmAttrLocalDateTimeImpl {
             return PmAttrLocalDateAndTimeImpl.this.getPmTitle() + " / " + PmLocalizeApi.localize(this, "pmAttrDateTime_timePart");
         }
 
-        @Override
-        protected boolean isPmEnabledImpl() {
-            return PmAttrLocalDateAndTimeImpl.this.isPmEnabled();
-        }
-
-        @Override
-        protected boolean isRequiredImpl() {
-          return super.isRequiredImpl()
-              || (   (localStore.getTime() == null)
-                  && (localStore.getDate() != null));
-        }
-
-        @Override
-        protected void getPmStyleClassesImpl(Set<String> styleClassSet) {
-            // the part inherits its style classes from the date time object
-            super.getPmStyleClassesImpl(styleClassSet);
-            styleClassSet.addAll(PmAttrLocalDateAndTimeImpl.this.getPmStyleClasses());
-        }
-
+        // XXX oboede: double check if that is really necessary
         @Override
         public void clearPmInvalidValues() {
             // In method LocalDateTimeAttrPm.pmValidate() the date part and time part get

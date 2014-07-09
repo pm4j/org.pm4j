@@ -127,6 +127,19 @@ public class PmMessage {
   }
 
   /**
+   * Constructor {@link PmResourceData} based messages.
+   *
+   * @param pm
+   *          The PM this message is related to.
+   * @param severity
+   *          Message severity.
+   * @param msgResourceData Message resource data.
+   */
+  public PmMessage(PmObject pm, Severity severity, PmResourceData msgResourceData) {
+    this(pm, severity, msgResourceData.msgKey, msgResourceData.msgArgs);
+  }
+
+  /**
    * @return The related PM instance. Is never <code>null</code>.
    */
   public PmObject getPm() {

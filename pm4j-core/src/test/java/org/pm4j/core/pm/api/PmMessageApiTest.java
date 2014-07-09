@@ -44,7 +44,7 @@ public class PmMessageApiTest {
   }
 
   /**
-   * Tests the logic that is implemented in {@link PmMessageApi#addRequiredMessage(org.pm4j.core.pm.PmAttr)}
+   * Tests the logic that is implemented in {@link PmMessageApi#makeRequiredMessageResData(org.pm4j.core.pm.PmAttr)}
    */
   @Test
   public void testRequiredDefaultMessage() {
@@ -53,7 +53,7 @@ public class PmMessageApiTest {
   }
 
   /**
-   * Tests the logic that is implemented in {@link PmMessageApi#addRequiredMessage(org.pm4j.core.pm.PmAttr)}
+   * Tests the logic that is implemented in {@link PmMessageApi#makeRequiredMessageResData(org.pm4j.core.pm.PmAttr)}
    */
   @Test
   public void testRequiredResourceDefinedSpecialMessage() {

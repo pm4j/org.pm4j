@@ -122,10 +122,10 @@ public class PmMessageUtil {
    *
    * @return The resource data for the required attribute value warning.
    *
-   * @deprecated use {@link PmMessageApi#addRequiredMessage(PmAttr)}
+   * @deprecated use {@link PmMessageApi#makeRequiredMessageResData(PmAttr)}
    */
   public static PmResourceData makeRequiredWarning(PmAttr<?> pm) {
-    return PmMessageApi.addRequiredMessage(pm);
+    return PmMessageApi.makeRequiredMessageResData(pm);
   }
 
   /**

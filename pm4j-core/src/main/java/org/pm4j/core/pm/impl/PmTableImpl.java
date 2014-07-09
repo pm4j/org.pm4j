@@ -500,7 +500,7 @@ public class PmTableImpl
 
   @Override
   protected Validator makePmValidator() {
-    return isDeprValidation()
+    return getOwnMetaDataWithoutPmInitCall().deprValidation
         ? new DeprTableValidator()
         : new TableValidator();
   }
