@@ -263,7 +263,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
            // A disabled parent attribute switches each child attribute to be read-only.
            // Is not implemented in isPmEnabledImpl() to preserve the contract that
            // the domain developer 'owns' that method completely.
-           (md.deprValidation &&
+           (!md.deprValidation &&
             md.embeddedAttr && !getPmParent().isPmEnabled());
   }
 
