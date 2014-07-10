@@ -258,11 +258,13 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
 
   @Override
   protected boolean isPmReadonlyImpl() {
+    MetaData md = getOwnMetaData();
     return super.isPmReadonlyImpl() ||
-           // A disabled parent attribute switches each child attibute to be read-only.
+           // A disabled parent attribute switches each child attribute to be read-only.
            // Is not implemented in isPmEnabledImpl() to preserve the contract that
            // the domain developer 'owns' that method completely.
-           (getOwnMetaData().embeddedAttr && !getPmParent().isPmEnabled());
+           (md.deprValidation &&
+            md.embeddedAttr && !getPmParent().isPmEnabled());
   }
 
   @Override
@@ -1124,7 +1126,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
    *
    * @param <T> The attribute PM type.
    */
-  static class AttrValidator<T extends PmAttrBase<?, ?>> extends ObjectValidator<T> {
+  public static class AttrValidator<T extends PmAttrBase<?, ?>> extends ObjectValidator<T> {
 
     @Override
     protected boolean shouldValidate(T pm) {

@@ -487,15 +487,61 @@ public class PmTableImpl
   /**
    * {@link PmTable} validation logic.
    */
-  static class TableValidator extends ObjectValidator<PmTableImpl<PmBean<?>, ?>> {
+  public static class TableValidator extends ObjectValidator<PmTableImpl<PmBean<?>, ?>> {
+
+    private boolean validateAllRows = false;
+    private long itemNumWarningLimit = 5000;
 
     @SuppressWarnings("unchecked")
     @Override
-    protected Collection<PmObject> getChildrenToValidate(PmTableImpl<PmBean<?>, ?> pm) {
-      Modifications<PmBean<?>> m = pm.getPmPageableCollection().getModifications();
-      List<PmBean<?>> changedItems = ListUtil.collectionsToList(m.getAddedItems(), m.getUpdatedItems());
-      return (Collection<PmObject>) (Object) changedItems;
+    protected Iterable<PmObject> getChildrenToValidate(PmTableImpl<PmBean<?>, ?> pm) {
+      if (validateAllRows) {
+        checkRowNumLimit(pm, pm.getTotalNumOfPmRows());
+        return (Iterable<PmObject>) (Object) pm.getPmPageableCollection();
+      } else {
+        Modifications<PmBean<?>> m = pm.getPmPageableCollection().getModifications();
+        List<PmBean<?>> changedItems = ListUtil.collectionsToList(m.getAddedItems(), m.getUpdatedItems());
+        checkRowNumLimit(pm, changedItems.size());
+        return (Collection<PmObject>) (Object) changedItems;
+      }
     }
+
+    /**
+     * If set to <code>false</code> only the added and modified row PMs will be validated.
+     * This is the default setting.<br>
+     * If set to <code>true</code> all row PMs will be validated.
+     * <p>
+     * WARNING: Validation of all rows may lead to bad performance in case of large tables.
+     *
+     * @param validateAllRows The switch.
+     */
+    public void setValidateAllRows(boolean validateAllRows) {
+      this.validateAllRows = validateAllRows;
+    }
+
+    /**
+     * If more than the configured number of rows has to be validated, the method
+     * {@link #checkRowNumLimit(PmTableImpl, long)} will log a warning.
+     *
+     * @param itemNumWarningLimit The max. rows to validate limit.
+     */
+    public void setItemNumWarningLimit(int itemNumWarningLimit) {
+      this.itemNumWarningLimit = itemNumWarningLimit;
+    }
+
+    /**
+     * Generates a log warning if the limit is exceeded.<br>
+     * Subclasses may override this method to perform their specific action.
+     *
+     * @param pm The table to validate.
+     * @param numOfItemsToValidate The validation item number limit.
+     */
+    protected void checkRowNumLimit(PmTableImpl<PmBean<?>, ?> pm, long numOfItemsToValidate) {
+      if (numOfItemsToValidate > itemNumWarningLimit) {
+        LOG.warn(pm.getPmRelativeName() + ": Performance warning - In memory validation for " + numOfItemsToValidate + " row PMs started.");
+      }
+    }
+
   }
 
   @Override

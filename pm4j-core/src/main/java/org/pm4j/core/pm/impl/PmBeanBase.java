@@ -237,7 +237,7 @@ public class PmBeanBase<T_BEAN>
    * If the validation of all sub-PM's did not provide an error it performs a bean-validation on
    * the bean provided by {@link #getPmBean()}.
    */
-  static class BeanPmValidator<T_BEAN> extends ObjectValidator<PmBeanBase<T_BEAN>> {
+  public static class BeanPmValidator<T_BEAN> extends ObjectValidator<PmBeanBase<T_BEAN>> {
 
     @Override
     protected void validateImpl(PmBeanBase<T_BEAN> pm) throws PmValidationException {

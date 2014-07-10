@@ -586,7 +586,7 @@ public abstract class PmObjectBase implements PmObject {
    *
    * @param <T> The type of PM to validate.
    */
-  static interface Validator {
+  public static interface Validator {
 
     /**
      * Validates the given PM.<br>
@@ -633,7 +633,7 @@ public abstract class PmObjectBase implements PmObject {
    *
    * @param <T> The PM type to validate.
    */
-  static class ObjectValidator<T extends PmObjectBase> implements Validator {
+  public static class ObjectValidator<T extends PmObjectBase> implements Validator {
 
     /**
      * Calls {@link #validateImpl(PmObjectBase)}. Translates catched {@link PmValidationException}s
@@ -665,7 +665,7 @@ public abstract class PmObjectBase implements PmObject {
     }
 
     /** Provides the set of child PMs to validate too. */
-    protected Collection<PmObject> getChildrenToValidate(T pm) {
+    protected Iterable<PmObject> getChildrenToValidate(T pm) {
       return PmUtil.getPmChildren(pm);
     }
 
