@@ -509,9 +509,11 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
         args[resData.msgArgs.length] = getPmTitle();
         setAndPropagateValueConverterMessage(vc, e, resData.msgKey, args);
         if (LOG.isDebugEnabled()) {
+          Throwable cause = e.getParseException() != null ? e.getParseException() : e.getCause();
           LOG.debug("String to value conversion failed in attribute '" + PmUtil.getPmLogString(this) +
               "'. String value: '" + text +
-              "'. Caused by: " + e.getMessage());
+              "'. Caused by: " + e.getMessage(),
+              cause);
         }
         return;
       } catch (RuntimeException e) {

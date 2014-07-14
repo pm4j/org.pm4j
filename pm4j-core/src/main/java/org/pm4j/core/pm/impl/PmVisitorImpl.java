@@ -6,8 +6,11 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.pm4j.common.util.collection.IterableUtil;
+import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.PmObject;
+import org.pm4j.core.pm.PmTable;
 import org.pm4j.core.pm.api.PmVisitorApi.PmVisitCallBack;
 import org.pm4j.core.pm.api.PmVisitorApi.PmVisitHierarchyCallBack;
 import org.pm4j.core.pm.api.PmVisitorApi.PmVisitHint;
@@ -21,8 +24,8 @@ import org.pm4j.core.pm.api.PmVisitorApi.PmVisitResult;
 public class PmVisitorImpl {
 
   private final Set<PmVisitHint> hints;
-  private final PmVisitCallBack callBack;
-  private PmObject stopOnPmObject = null;
+  private PmVisitCallBack callBack;
+  private PmObject visitStoppedOn = null;
 
   /**
    * Creates a visitor.
@@ -40,6 +43,29 @@ public class PmVisitorImpl {
   }
 
   /**
+   * Creates a visitor.
+   *
+   * @param callBack
+   *          the core part of the visitor client.
+   * @param hints
+   *          static selections.
+   */
+  public PmVisitorImpl(PmVisitHint... hints) {
+    assert hints != null;
+    this.hints = new HashSet<PmVisitHint>(Arrays.asList(hints));
+  }
+
+  /**
+   * Sets the {@link PmVisitCallBack} to use.
+   *
+   * @param callBack The callback.
+   */
+  public void setCallBack(PmVisitCallBack callBack) {
+    this.callBack = callBack;
+    this.visitStoppedOn = null;
+  }
+
+  /**
    * Starts the visit of pm and pm's children.
    *
    * @param pm
@@ -48,6 +74,9 @@ public class PmVisitorImpl {
    */
   public PmVisitResult visit(PmObject pm) {
     assert pm != null;
+    if (callBack == null) {
+      throw new PmRuntimeException(pm, "Please define a callback.");
+    }
     PmVisitResult hintResult = considerHints(pm);
     if (hintResult != null) {
       return hintResult;
@@ -58,7 +87,7 @@ public class PmVisitorImpl {
 
     switch (result) {
       case STOP_VISIT:
-        stopOnPmObject = pm;
+        visitStoppedOn = pm;
         return PmVisitResult.STOP_VISIT;
       case SKIP_CHILDREN:
         return PmVisitResult.SKIP_CHILDREN;
@@ -77,8 +106,8 @@ public class PmVisitorImpl {
    */
   public PmVisitResult visitChildren(PmObject pm) {
     assert pm != null;
-    Collection<PmObject> children = getChildren(pm);
-    if (!children.isEmpty()) {
+    Iterable<PmObject> children = getChildren(pm);
+    if (children.iterator().hasNext()) {
       if(callBack instanceof PmVisitHierarchyCallBack) {
         PmVisitHierarchyCallBack vhcb = (PmVisitHierarchyCallBack)callBack;
         PmVisitResult enterResult = vhcb.enterChildren(pm, children);
@@ -98,7 +127,7 @@ public class PmVisitorImpl {
         visitChildrenCollection(children);
       }
     }
-    if (stopOnPmObject != null) {
+    if (visitStoppedOn != null) {
       return PmVisitResult.STOP_VISIT;
     }
 
@@ -106,15 +135,14 @@ public class PmVisitorImpl {
     return PmVisitResult.CONTINUE;
   }
 
-
   /**
    * If {@link PmVisitCallBack} visit returns {@link PmVisitResult#STOP_VISIT} the
-   * responsible pm child will be returned.
+   * responsible PM child will be returned.
    *
-   * @return the visit stopping pm object.
+   * @return the visit stopping PM object.
    */
-  public PmObject getStopOnPmObject() {
-    return stopOnPmObject;
+  public PmObject getVisitStoppedOn() {
+    return visitStoppedOn;
   }
 
   private PmVisitResult considerHints(PmObject pm) {
@@ -150,18 +178,24 @@ public class PmVisitorImpl {
     return null;
   }
 
-  private Collection<PmObject> getChildren(PmObject pm) {
+  @SuppressWarnings("unchecked")
+  protected Iterable<PmObject> getChildren(PmObject pm) {
+    // TODO: Change to iterable to be able to handle larger collections
+    // without memory problems.
     Collection<PmObject> allChildren = new ArrayList<PmObject>();
     allChildren.addAll(((PmObjectBase) pm).getPmChildren());
-    if (!hints.contains(PmVisitHint.SKIP_FACTORY_GENERATED_CHILD_PMS)) {
+    if (pm instanceof PmTable && hints.contains(PmVisitHint.ALL_TABLE_ROWS)) {
+      allChildren.addAll(IterableUtil.asCollection(((PmTable<PmObject>)pm).getPmPageableCollection()));
+    }
+    else if (!hints.contains(PmVisitHint.SKIP_FACTORY_GENERATED_CHILD_PMS)) {
       allChildren.addAll(((PmObjectBase) pm).getFactoryGeneratedChildPms());
     }
     return allChildren;
   }
 
-  private void visitChildrenCollection(Collection<PmObject> children) {
+  private void visitChildrenCollection(Iterable<PmObject> children) {
     for (PmObject child : children) {
-      if (stopOnPmObject != null) {
+      if (visitStoppedOn != null) {
         return;
       }
       visit(child);

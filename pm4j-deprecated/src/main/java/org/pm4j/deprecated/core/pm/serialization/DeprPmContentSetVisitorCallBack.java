@@ -1,7 +1,6 @@
 package org.pm4j.deprecated.core.pm.serialization;
 
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.Deque;
 import java.util.LinkedList;
 
@@ -33,7 +32,7 @@ public class DeprPmContentSetVisitorCallBack implements PmVisitorApi.PmVisitHier
   }
 
   @Override
-  public PmVisitResult enterChildren(PmObject pmParent, Collection<PmObject> pmChildren) {
+  public PmVisitResult enterChildren(PmObject pmParent, Iterable<PmObject> pmChildren) {
     DeprPmContentContainer c = contentContainer.getNamedChildContentMap().get(pmParent.getPmName());
     if (c != null) {
       stack.push(c);
@@ -45,7 +44,7 @@ public class DeprPmContentSetVisitorCallBack implements PmVisitorApi.PmVisitHier
   }
 
   @Override
-  public void leaveChildren(PmObject pmParent, Collection<PmObject> pmChildren) {
+  public void leaveChildren(PmObject pmParent, Iterable<PmObject> pmChildren) {
     stack.pop();
     contentContainer = stack.getFirst();
   }

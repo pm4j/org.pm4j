@@ -14,7 +14,6 @@ public class StringConverterParseException extends Exception {
   private final StringConverterCtxt ctxt;
   private final String stringToParse;
   private final String[] formats;
-  private final Throwable cause;
 
   public StringConverterParseException(String messageString, StringConverterCtxt ctxt, String string, String... formats) {
     this(messageString, ctxt, null, string, formats);
@@ -30,12 +29,12 @@ public class StringConverterParseException extends Exception {
            (cause != null
                ? "\n Caused by: " + cause.getMessage()
                : "") +
-           "\n Context: " + ctxt);
+           "\n Context: " + ctxt,
+           cause);
     this.messageString = messageString;
     this.ctxt = ctxt;
     this.stringToParse = string;
     this.formats = formats;
-    this.cause = cause;
   }
 
   public StringConverterParseException(StringConverterCtxt ctxt, String string, String... formats) {
@@ -68,13 +67,6 @@ public class StringConverterParseException extends Exception {
    */
   public String getMessageString() {
     return messageString;
-  }
-
-  /**
-   * @return the cause
-   */
-  public Throwable getCause() {
-    return cause;
   }
 
 }

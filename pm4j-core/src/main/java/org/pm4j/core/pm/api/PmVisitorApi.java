@@ -1,7 +1,5 @@
 package org.pm4j.core.pm.api;
 
-import java.util.Collection;
-
 import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.impl.PmVisitorImpl;
@@ -38,13 +36,13 @@ public class PmVisitorApi {
      * @param parent the parent.
      * @return controls if the children should really be visited.
      */
-    PmVisitResult enterChildren(PmObject pmParent, Collection<PmObject> pmChildren);
+    PmVisitResult enterChildren(PmObject pmParent, Iterable<PmObject> pmChildren);
 
     /**
      * If parents children will be visited, this method is called after visiting all children.
      * @param parent the parent.
      */
-    void leaveChildren(PmObject pmParent, Collection<PmObject> pmChildren);
+    void leaveChildren(PmObject pmParent, Iterable<PmObject> pmChildren);
   }
 
   /**
@@ -73,8 +71,12 @@ public class PmVisitorApi {
     SKIP_READ_ONLY,
     /** Skip visiting {@link PmConversation} pm's */
     SKIP_CONVERSATION,
-    /** Skip visiting factory generated child pm's */
+    /** Skip visiting factory generated child pm's. Embedded PMs will still be visited. */
     SKIP_FACTORY_GENERATED_CHILD_PMS,
+    /** Visits all rows of table PMs.<br>
+     * WARNING: This has some a performance impact, especially
+     * for service based tables. */
+    ALL_TABLE_ROWS,
     /** Skip of yet initialized child pm's. */
     SKIP_NOT_INITIALIZED
   }

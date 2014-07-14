@@ -81,7 +81,7 @@ public class DeprPmContentGetVisitorCallBack implements PmVisitHierarchyCallBack
   }
 
   @Override
-  public PmVisitResult enterChildren(PmObject parent, Collection<PmObject> pmChildren) {
+  public PmVisitResult enterChildren(PmObject parent, Iterable<PmObject> pmChildren) {
     contentStack.push(new Pair(parentContainer, parent));
     parentContainer = currentContainer;
     currentContainer = null;
@@ -89,7 +89,7 @@ public class DeprPmContentGetVisitorCallBack implements PmVisitHierarchyCallBack
   }
 
   @Override
-  public void leaveChildren(PmObject parent, Collection<PmObject> pmChildren) {
+  public void leaveChildren(PmObject parent, Iterable<PmObject> pmChildren) {
     Pair pair = contentStack.pop();
     currentContainer = pair.container;
     parentContainer = (!contentStack.isEmpty())
