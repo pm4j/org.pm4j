@@ -25,8 +25,30 @@ public interface Expression {
   /**
    * Executes the expression and returns the evaluated result value.
    *
-   * @param ctxt the expression execution context.
-   * @return the evaluation result.
+   * @param bean
+   *          The bean to start the evaluation with.
+   * @return The evaluation result.
+   */
+  Object getValue(Object bean);
+
+  /**
+   * Value assignment operation. Is supported by path expressions referencing
+   * attributes that provide public modification access (setter or public
+   * non-final field declaration).
+   *
+   * @param bean
+   *          The bean to start the expression evaluation with.
+   * @param value
+   *          The value to set to the field, addressed by the path.
+   */
+  void setValue(Object bean, Object value);
+
+
+  /**
+   * Executes the expression and returns the evaluated result value.
+   *
+   * @param ctxt The expression execution context.
+   * @return The evaluation result.
    */
   Object exec(ExprExecCtxt ctxt);
 

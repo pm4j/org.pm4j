@@ -103,6 +103,16 @@ public class PathExpressionChain extends ExprBase<ExprExecCtxt> {
   }
 
   /**
+   * @param exprString
+   *         The expression string to parse.
+   * @return The parsed expression or <code>null</code> if there was an empty
+   *         string to parse.
+   */
+  public static Expression parse(String exprString) {
+    return parse(new ParseCtxt(exprString));
+  }
+
+  /**
    * @param ctxt
    *          The current parse context (text and parse position).
    * @return The parsed expression or <code>null</code> if there was an empty

@@ -9,7 +9,7 @@ import org.pm4j.common.util.reflection.ReflectionException;
 /**
  * A path that uses a public field or getter/setter to resolve the path string.
  *
- * @author olaf boede
+ * @author Olaf Boede
  */
 public class AttributeExpr extends OptionalExpressionBase<ExprExecCtxt> {
 
@@ -64,8 +64,8 @@ public class AttributeExpr extends OptionalExpressionBase<ExprExecCtxt> {
       try {
         accessor = new BeanAttrAccessorImpl(ctxt.getCurrentValue().getClass(), nameWithModifier.getName());
       } catch (ReflectionException e) {
-    	// Property does not exist. Check if that's ok.
-    	// Consider the old meaning of 'o' which also worked like an 'x'.
+      // Property does not exist. Check if that's ok.
+      // Consider the old meaning of 'o' which also worked like an 'x'.
         if(getSyntaxVersion() == SyntaxVersion.VERSION_1) {
           if (!(hasNameModifier(Modifier.OPTIONAL) || hasNameModifier(Modifier.EXISTS_OPTIONALLY))) {
               throw new ExprExecExeption(ctxt, "Unable to resolve expression part '" + nameWithModifier + "'.", e);
@@ -79,6 +79,10 @@ public class AttributeExpr extends OptionalExpressionBase<ExprExecCtxt> {
       }
     }
     return accessor;
+  }
+
+  public static AttributeExpr parse(String exprString) {
+    return parse(new ParseCtxt(exprString));
   }
 
   public static AttributeExpr parse(ParseCtxt ctxt) {

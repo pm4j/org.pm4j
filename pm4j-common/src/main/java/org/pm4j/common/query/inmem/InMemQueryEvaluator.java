@@ -8,15 +8,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.pm4j.common.expr.ExprExecCtxt;
 import org.pm4j.common.expr.Expression;
 import org.pm4j.common.expr.PathExpressionChain;
-import org.pm4j.common.expr.parser.ParseCtxt;
-import org.pm4j.common.query.QueryExprCompare;
-import org.pm4j.common.query.QueryExpr;
 import org.pm4j.common.query.QueryAttr;
 import org.pm4j.common.query.QueryAttrMulti;
 import org.pm4j.common.query.QueryEvaluatorSet;
+import org.pm4j.common.query.QueryExpr;
+import org.pm4j.common.query.QueryExprCompare;
 import org.pm4j.common.query.SortOrder;
 import org.pm4j.common.util.collection.ListUtil;
 import org.pm4j.common.util.collection.MultiObjectValue;
@@ -166,10 +164,10 @@ public class InMemQueryEvaluator<T_ITEM> {
     else  {
       Expression expr = queryAttrToPathExpressionCache.get(attr);
       if (expr == null) {
-        expr = PathExpressionChain.parse(new ParseCtxt(attr.getPath()));
+        expr = PathExpressionChain.parse(attr.getPath());
         queryAttrToPathExpressionCache.put(attr, expr);
       }
-      Object value = expr.exec(new ExprExecCtxt(item));
+      Object value = expr.getValue(item);
       return value;
     }
   }

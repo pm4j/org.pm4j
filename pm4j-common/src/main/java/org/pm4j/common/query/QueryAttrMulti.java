@@ -102,8 +102,8 @@ public class QueryAttrMulti extends QueryAttr {
     Object[] values = new Object[parts.size()];
     for (int i=0; i< parts.size(); ++i) {
       QueryAttr d = parts.get(i);
-      Expression ex = PathExpressionChain.parse(new ParseCtxt(d.getPath()));
-      values[i] = ex.exec(new ExprExecCtxt(item));
+      Expression ex = PathExpressionChain.parse(d.getPath());
+      values[i] = ex.getValue(item);
     }
     return new MultiObjectValue(values);
   }

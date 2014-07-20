@@ -2,8 +2,6 @@ package org.pm4j.common.expr;
 
 import junit.framework.TestCase;
 
-import org.pm4j.common.expr.parser.ParseCtxt;
-
 public class AttributeExprTest extends TestCase {
 
   public final class MyBean {
@@ -15,36 +13,22 @@ public class AttributeExprTest extends TestCase {
   }
 
   public void testReadPublicField() {
-    Expression expr = AttributeExpr.parse(new ParseCtxt("pubField"));
-    ExprExecCtxt execCtxt = new ExprExecCtxt(new MyBean());
-
-    expr.exec(execCtxt);
-    assertEquals("hello", execCtxt.getCurrentValue());
+    assertEquals("hello", AttributeExpr.parse("pubField").getValue(new MyBean()));
   }
 
   public void testWritePublicField() {
-    Expression expr = AttributeExpr.parse(new ParseCtxt("pubField"));
     MyBean bean = new MyBean();
-    ExprExecCtxt execCtxt = new ExprExecCtxt(bean);
-
-    expr.execAssign(execCtxt, "123");
+    AttributeExpr.parse("pubField").setValue(bean, "123");
     assertEquals("123", bean.pubField);
   }
 
   public void testReadFromPublicGetter() {
-    Expression expr = AttributeExpr.parse(new ParseCtxt("s"));
-    ExprExecCtxt execCtxt = new ExprExecCtxt(new MyBean());
-
-    expr.exec(execCtxt);
-    assertEquals("world", execCtxt.getCurrentValue());
+    assertEquals("world", AttributeExpr.parse("s").getValue(new MyBean()));
   }
 
   public void testUsePublicSetter() {
-    Expression expr = AttributeExpr.parse(new ParseCtxt("s"));
     MyBean bean = new MyBean();
-    ExprExecCtxt execCtxt = new ExprExecCtxt(bean);
-
-    expr.execAssign(execCtxt, ":-)");
+    AttributeExpr.parse("s").setValue(bean, ":-)");
     assertEquals(":-)", bean.getS());
   }
 }

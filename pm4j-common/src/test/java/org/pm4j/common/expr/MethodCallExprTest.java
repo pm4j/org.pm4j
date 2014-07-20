@@ -15,11 +15,11 @@ public class MethodCallExprTest {
         return "inline text";
       }
     };
-    Assert.assertEquals("inline text", expr.exec(new ExprExecCtxt(aInline)));
-    Assert.assertEquals("something from B", expr.exec(new ExprExecCtxt(new B())));
-    Assert.assertEquals("something from C", expr.exec(new ExprExecCtxt(new C())));
-    Assert.assertEquals("something from B", expr.exec(new ExprExecCtxt(new B())));
-    Assert.assertEquals("something from C", expr.exec(new ExprExecCtxt(new D())));
+    Assert.assertEquals("inline text", expr.getValue(aInline));
+    Assert.assertEquals("something from B", expr.getValue(new B()));
+    Assert.assertEquals("something from C", expr.getValue(new C()));
+    Assert.assertEquals("something from B", expr.getValue(new B()));
+    Assert.assertEquals("something from C", expr.getValue(new D()));
   }
 
   abstract class A {

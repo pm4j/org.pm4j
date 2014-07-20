@@ -5,7 +5,7 @@ import org.pm4j.common.expr.parser.ParseCtxt;
 /**
  * Basic implementation of some common expression evaluation functionality.
  *
- * @author olaf boede
+ * @author Olaf Boede
  *
  * @param <CTXT> Used type of expression execution context information.
  */
@@ -21,8 +21,15 @@ public abstract class ExprBase<CTXT extends ExprExecCtxt> implements Expression 
     this.syntaxVersion = syntaxVersion;
   }
 
-  protected String getPathName() {
-    return toString();
+  @Override
+  public Object getValue(Object ctxt) {
+    return exec(new ExprExecCtxt(ctxt));
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public void setValue(Object bean, Object value) {
+    execAssignImpl((CTXT)new ExprExecCtxt(bean), value);
   }
 
   @Override @SuppressWarnings("unchecked")
@@ -39,11 +46,6 @@ public abstract class ExprBase<CTXT extends ExprExecCtxt> implements Expression 
     throw new ExprExecExeption(ctxt, "Value assignement is not supported by this expression.");
   }
 
-  /**
-   * Default implementation just throws an exception.
-   * <p>
-   * Subclasses that allow value assignment should override this method.
-   */
   @Override @SuppressWarnings("unchecked")
   public final void execAssign(ExprExecCtxt ctxt, Object value) {
     execAssignImpl((CTXT)ctxt, value);

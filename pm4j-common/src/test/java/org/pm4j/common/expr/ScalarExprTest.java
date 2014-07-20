@@ -42,22 +42,22 @@ public class ScalarExprTest extends TestCase {
 
   public void testFunctionCallWithIntArg() {
     assertEquals(new Integer("-22"),
-                 PathExpressionChain.parse(new ParseCtxt("fnAddOne(-23)")).exec(new ExprExecCtxt(this)));
+                 PathExpressionChain.parse("fnAddOne(-23)").getValue(this));
   }
 
   public void testFunctionCallWithStringArg() {
     assertEquals("Hello world!",
-                 PathExpressionChain.parse(new ParseCtxt("sayHello('world')")).exec(new ExprExecCtxt(this)));
+                 PathExpressionChain.parse("sayHello('world')").getValue(this));
   }
 
   public void testFunctionCallWithNullArg() {
     assertEquals("Hello null!",
-                 PathExpressionChain.parse(new ParseCtxt("sayHello(null)")).exec(new ExprExecCtxt(this)));
+                 PathExpressionChain.parse("sayHello(null)").getValue(this));
   }
 
 
   private Object parseAndGet(String s) {
-    return ScalarExpr.parse(new ParseCtxt(s)).exec(new ExprExecCtxt(null));
+    return ScalarExpr.parse(new ParseCtxt(s)).getValue(null);
   }
 
   public Integer fnAddOne(int i) {
