@@ -36,9 +36,11 @@ import org.pm4j.navi.NaviLink;
 import org.pm4j.navi.NaviRuleLink;
 import org.pm4j.navi.impl.NaviLinkImpl;
 
+import com.sun.xml.internal.ws.developer.MemberSubmissionAddressing.Validation;
+
 /**
  * Implementation for {@link PmCommand}.
- *
+ * 
  * @author olaf boede
  */
 public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable {
@@ -49,8 +51,8 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
   protected static final String PERFORMED_REDIRECT = "- redirect -";
 
   /**
-   * A navigation parameter that contains the PM for a dialog to start
-   * after command execution.
+   * A navigation parameter that contains the PM for a dialog to start after
+   * command execution.
    */
   public static final String NAVI_PARAM_NEXT_DLG_PM = "next_dialog_pm";
 
@@ -68,7 +70,7 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
   private PmCommand undoCommand;
 
   /** The command logic commandDecorators to execute. */
-  /* package */ PmCommandDecoratorSetImpl commandDecorators = new PmCommandDecoratorSetImpl();
+  /* package */PmCommandDecoratorSetImpl commandDecorators = new PmCommandDecoratorSetImpl();
 
   /**
    * The command decorator that returned <code>false</code> for its call of
@@ -91,7 +93,7 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
   /**
    * Constructor for fix commands that have an associated field in the parent
    * PM.
-   *
+   * 
    * @param pmParent
    *          The presentation model that command acts on.
    */
@@ -103,7 +105,7 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
   /**
    * Constructor for fix commands that have an associated field in the parent
    * PM.
-   *
+   * 
    * @param pmParent
    *          The presentation model that command acts on.
    */
@@ -112,16 +114,18 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
   }
 
   /**
-   * Base functionality (includes initialization etc.) is finalized here.<p>
+   * Base functionality (includes initialization etc.) is finalized here.
+   * <p>
    * Subclasses may place their logic in {@link #isPmEnabledImpl()}.
    */
   @Override
   public final boolean isPmEnabled() {
-  return super.isPmEnabled();
+    return super.isPmEnabled();
   }
 
   /**
-   * @param commandDecorator The decorator to add to the command execution logic.
+   * @param commandDecorator
+   *          The decorator to add to the command execution logic.
    */
   @Override
   public void addCommandDecorator(PmCommandDecorator commandDecorator) {
@@ -132,8 +136,9 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
    * The default implementation returns just the suggested framework navigation.
    * <p>
    * Subclasses may override this to provide alternate navigation rules.
-   *
-   * @param suggestedNaviLink The default navigation suggested by the framework.
+   * 
+   * @param suggestedNaviLink
+   *          The default navigation suggested by the framework.
    * @return The intended navigation.
    */
   protected NaviLink actionReturnOnFailure(NaviLink suggestedNaviLink) {
@@ -142,31 +147,28 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
 
   @Override
   protected boolean isPmVisibleImpl() {
-    if ((! isPmEnabled()) &&
-        getOwnMetaData().hideWhenNotEnabled) {
+    if ((!isPmEnabled()) && getOwnMetaData().hideWhenNotEnabled) {
       return false;
-    }
-    else {
+    } else {
       return super.isPmVisibleImpl();
     }
   }
 
   /**
-   * The default implementation checks the own enabled flag and the enablement of
-   * its parent context element.
+   * The default implementation checks the own enabled flag and the enablement
+   * of its parent context element.
    * <p>
    * If the command is child of a command (group), the enablement of the first
    * non-command parent will be checked.
    */
   @Override
   protected boolean isPmEnabledImpl() {
-    return super.isPmEnabledImpl() &&
-           getNonCmdGroupCtxt().isPmEnabled();
+    return super.isPmEnabledImpl() && getNonCmdGroupCtxt().isPmEnabled();
   }
 
   /**
    * A helper that is useful to get the semantic context of the command.
-   *
+   * 
    * @return The first non-command parent context of the command.
    */
   private PmObject getNonCmdGroupCtxt() {
@@ -181,18 +183,17 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
    * Commands usually don't have popups. This default implementation always
    * provides an empty list for this command set kind.
    */
-  @Override @SuppressWarnings("unchecked")
+  @Override
+  @SuppressWarnings("unchecked")
   public List<PmCommand> getVisiblePmCommands(CommandSet commandSet) {
-    return (commandSet == CommandSet.POPUP)
-              ? Collections.EMPTY_LIST
-              : super.getVisiblePmCommands(commandSet);
+    return (commandSet == CommandSet.POPUP) ? Collections.EMPTY_LIST : super.getVisiblePmCommands(commandSet);
   }
 
   public final PmCommand doIt() {
     return doIt(true);
   }
 
-  /**
+/**
    * See {@link #doIt().
    *
    * @param changeCommandHistory
@@ -207,8 +208,7 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
         cmd.doItImpl();
         link = cmd.afterDo(changeCommandHistory);
         cmd.commandState = CommandState.EXECUTED;
-      }
-      catch (Exception e) {
+      } catch (Exception e) {
         cmd.commandState = CommandState.FAILED;
 
         // The standard exception handling can be prevented by a decorator that
@@ -219,7 +219,8 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
         try {
           useStandardExceptionHandling = commandDecorators.onException(this, e);
         } catch (RuntimeException e2) {
-          LOG.info(PmUtil.getPmLogString(cmd) + ": Exception thrown by a command decorator while handling a catched exception '" + this + "'", e);
+          LOG.info(PmUtil.getPmLogString(cmd)
+              + ": Exception thrown by a command decorator while handling a catched exception '" + this + "'", e);
           exceptionToHandle = e2;
         }
 
@@ -232,8 +233,7 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
         }
       }
       execNavigateTo(link);
-    }
-    else {
+    } else {
       cmd.commandState = CommandState.BEFORE_DO_RETURNED_FALSE;
     }
 
@@ -248,14 +248,12 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
     if (!cmd.beforeDo()) {
       cmd.commandState = CommandState.BEFORE_DO_RETURNED_FALSE;
       link = cmd.actionReturnOnFailure(null);
-    }
-    else {
+    } else {
       try {
         cmd.doItImpl();
         link = cmd.afterDo(true);
         cmd.commandState = CommandState.EXECUTED;
-      }
-      catch (Exception e) {
+      } catch (Exception e) {
         cmd.commandState = CommandState.FAILED;
 
         // The standard exception handling can be prevented by a decorator that
@@ -266,7 +264,8 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
         try {
           useStandardExceptionHandling = commandDecorators.onException(this, e);
         } catch (RuntimeException e2) {
-          LOG.info(PmUtil.getPmLogString(cmd) + ": Exception thrown by a command decorator while handling a catched exception '" + this + "'", e);
+          LOG.info(PmUtil.getPmLogString(cmd)
+              + ": Exception thrown by a command decorator while handling a catched exception '" + this + "'", e);
           exceptionToHandle = e2;
         }
 
@@ -275,7 +274,6 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
         }
 
         link = cmd.actionReturnOnFailure(link);
-
 
         if (LOG.isDebugEnabled()) {
           LOG.debug("Command '" + PmUtil.getPmLogString(cmd) + "' failed with exception: '" + e.getMessage() + "'.");
@@ -297,7 +295,7 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
 
   /**
    * Defines the command that may undo this one.
-   *
+   * 
    * @param undoCommand
    */
   public void setUndoCommand(PmCommand undoCommand) {
@@ -306,7 +304,7 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
 
   /**
    * Subclasses may implement here their concrete logic.
-   *
+   * 
    * @throws PmUserMessageException
    *           In case of handled failures that should be reported with a
    *           localized error message in the UI.
@@ -319,11 +317,12 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
   /**
    * Defines a target for navigation after command execution.
    * <p>
-   * Does the same as {@link #setNaviLink(NaviLink)}. Provides just a more intuitive
-   * 'wording' that may be used in {@link #doItImpl()}. It may express, that the
-   * navigation will be performed very soon.
-   *
-   * @param naviLink The target to navigate to after command execution.
+   * Does the same as {@link #setNaviLink(NaviLink)}. Provides just a more
+   * intuitive 'wording' that may be used in {@link #doItImpl()}. It may
+   * express, that the navigation will be performed very soon.
+   * 
+   * @param naviLink
+   *          The target to navigate to after command execution.
    */
   protected final void navigateTo(NaviLink naviLink) {
     this.naviLink = naviLink;
@@ -333,7 +332,7 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
    * Navigates to the page, the user came from.
    * <p>
    * ATTENTION: Works only in case of an enabled navigation history!
-   *
+   * 
    * @param linksToSkip
    *          An optional set of pages that should be skipped.<br>
    *          Example: A cancel button of a wizzard page seqence should skip the
@@ -348,7 +347,7 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
    * The default implementation calls {@link NaviHistory#getPrevOrStartLink()}
    * <p>
    * Subclasses may override this method to provide alternative implementations.
-   *
+   * 
    * @return The back-link to navigate to.<br>
    *         <code>null</code> if no navigation history is available.
    */
@@ -361,12 +360,10 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
 
     NaviLink prevLink = h.getPrevOrStartLink(linksToSkip);
     // FIXME: in case of some links to skip, the backPos has to be read from the
-    //        history item before the link to go back to.
+    // history item before the link to go back to.
     String backPos = getPmConversationImpl().getPmToViewTechnologyConnector().readRequestValue(NaviLink.BACK_POS_PARAM);
 
-    return backPos != null
-          ? new NaviLinkImpl((NaviLinkImpl)prevLink, backPos)
-          : prevLink;
+    return backPos != null ? new NaviLinkImpl((NaviLinkImpl) prevLink, backPos) : prevLink;
   }
 
   /**
@@ -375,7 +372,7 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
    * Does the same as {@link #navigateTo(NaviLink)}. Is only more intuitive
    * 'wording' that may be used in {@link #onPmInit()}. It makes clear, that the
    * navigation will not be executed on calling this method.
-   *
+   * 
    * @param naviLink
    *          The target to navigate to after command execution.
    */
@@ -386,21 +383,22 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
   /**
    * Is called on each successful command execution.
    * <p>
-   * The default implementation provides a success message when
-   * a string resource with the postfix "_successInfo"
-   * is defined.
+   * The default implementation provides a success message when a string
+   * resource with the postfix "_successInfo" is defined.
    * <p>
-   * The message will only be added if the message was not already added
-   * (e.g. by the doItImpl() method).
+   * The message will only be added if the message was not already added (e.g.
+   * by the doItImpl() method).
    */
   protected void makeOptionalSuccessMsg() {
     // First try to find a success message for the resource key base.
-    // This key is usually very specific for the individual command. E.g. 'myElement.myCmd'.
+    // This key is usually very specific for the individual command. E.g.
+    // 'myElement.myCmd'.
     String key = getPmResKeyBase() + PmConstants.SUCCESS_MSG_KEY_POSTFIX;
     String msgTemplate = PmLocalizeApi.findLocalization(this, key);
     if (msgTemplate == null) {
       // If the specific resource base did not provide a message,
-      // an assigned resource (E.g. 'common.cmdSave') key might provide a success message:
+      // an assigned resource (E.g. 'common.cmdSave') key might provide a
+      // success message:
       key = getPmResKey() + PmConstants.SUCCESS_MSG_KEY_POSTFIX;
       msgTemplate = PmLocalizeApi.findLocalization(this, key);
     }
@@ -421,12 +419,10 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
     // This prevents a lot of unnecessary warnings.
     if (msgTemplate.indexOf("{0}") != -1) {
       PmMessageApi.addMessage(this, Severity.INFO, key, getPmParent().getPmTitle());
-    }
-    else {
+    } else {
       PmMessageApi.addMessage(this, Severity.INFO, key);
     }
   }
-
 
   @Override
   public CmdKind getCmdKind() {
@@ -440,7 +436,7 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
       PmObject p = getPmParent();
 
       while (p instanceof PmCommand) {
-        PmCommand pmCommand = (PmCommand)p;
+        PmCommand pmCommand = (PmCommand) p;
         parentCommands.add(pmCommand);
         p = pmCommand.getPmParent();
       }
@@ -448,12 +444,11 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
       int size = parentCommands.size();
       if (size == 0) {
         parentCommands = Collections.emptyList();
-      }
-      else {
+      } else {
         // external sort order: root first, direct parent as last.
-        int halfSize = size/2;
-        for (int i=0; i<halfSize; ++i) {
-          Collections.swap(parentCommands, i, size-i-1);
+        int halfSize = size / 2;
+        for (int i = 0; i < halfSize; ++i) {
+          Collections.swap(parentCommands, i, size - i - 1);
         }
       }
     }
@@ -479,14 +474,13 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
 
   // -- internal helper --
 
-
   /**
    * @return <code>true</code> when at least a single child command is enabled.
    */
   protected boolean isASubCommandEnabled() {
     List<PmCommand> subCmdList = PmUtil.getVisiblePmCommands(this);
     int subCmdNum = subCmdList.size();
-    for (int i=0; i<subCmdNum; ++i) {
+    for (int i = 0; i < subCmdNum; ++i) {
       if (subCmdList.get(i).isPmEnabled()) {
         return true;
       }
@@ -500,7 +494,7 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
   protected boolean isASubCommandVisible() {
     List<PmCommand> subCmdList = PmUtil.getVisiblePmCommands(this);
     int subCmdNum = subCmdList.size();
-    for (int i=0; i<subCmdNum; ++i) {
+    for (int i = 0; i < subCmdNum; ++i) {
       if (subCmdList.get(i).isPmVisible()) {
         return true;
       }
@@ -511,11 +505,10 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
   @Override
   protected PmCommandImpl clone() {
     try {
-      PmCommandImpl clone = (PmCommandImpl)super.clone();
+      PmCommandImpl clone = (PmCommandImpl) super.clone();
       clone.templateCommand = this;
       return clone;
-    }
-    catch (CloneNotSupportedException e) {
+    } catch (CloneNotSupportedException e) {
       throw new PmRuntimeException(this, "This command is not cloneable.");
     }
   }
@@ -536,9 +529,9 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
    * <p>
    * The default implementation checks {@link #isRequiresValidValues()} and
    * triggers the validation of the parent element.
-   *
-   * @return <code>true</code> if the validation was successful. That means: There are no errors related to
-   * {@link #getValidationErrorRootPm()}.
+   * 
+   * @return <code>true</code> if the validation was successful. That means:
+   *         There are no errors related to {@link #getValidationErrorRootPm()}.
    */
   protected boolean validate() {
     return PmValidationApi.validateSubTree(getValidationExecRootPm(), getValidationErrorRootPm());
@@ -552,27 +545,29 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
   }
 
   /**
-   * Provides the object that defines the area (PM sub tree) that should not contain
-   * an error before the command gets executed.
+   * Provides the object that defines the area (PM sub tree) that should not
+   * contain an error before the command gets executed.
    * <p>
    * It will only be considered if the command validates before execution.
    * <p>
    * The default implementation provides the related {@link PmConversation}.
-   *
-   * @return The root object of the PM subtree that should be valid for this command.
+   * 
+   * @return The root object of the PM subtree that should be valid for this
+   *         command.
    */
   protected PmObject getValidationErrorRootPm() {
     return getPmConversation();
   }
 
   /**
-   * Provides the object that defines the area (PM sub tree) the validation should be
-   * called for before command execution.
+   * Provides the object that defines the area (PM sub tree) the validation
+   * should be called for before command execution.
    * <p>
    * It will only be considered if the command validates before execution.
    * <p>
-   * The default implementation provides the next parent of type {@link PmDataInput}.
-   *
+   * The default implementation provides the next parent of type
+   * {@link PmDataInput}.
+   * 
    * @return the PM tree root object to validate before execution.
    */
   protected PmDataInput getValidationExecRootPm() {
@@ -580,46 +575,58 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
   }
 
   /**
+   * @return <code>true</code> to reset the value change state of the pm that is
+   *         used as {@link Validation} root after a validation was performed;
+   *         <code>false</code> other wise.
+   */
+  protected boolean resetValueChangeStateOfValidationExecRootPmAfterValidation() {
+    return true;
+  }
+
+  /**
    * Is executed before {@link #doItImpl()} gets called.
    * <p>
-   * {@link #validate()} gets called in case of commands the require valid values.<br>
+   * {@link #validate()} gets called in case of commands the require valid
+   * values.<br>
    * This method returns <code>false</code> if the validation fails.
    * Consequently the {@link #doItImpl()} method will not be called.
    * <p>
-   * If the command does not required valid values, the current PM messages (error messages)
-   * get cleared and the command gets executed.<br>
+   * If the command does not required valid values, the current PM messages
+   * (error messages) get cleared and the command gets executed.<br>
    * This matches the usual cancel-button logic.
-   *
-   * @return <code>true</code> if the {@link #doItImpl()} logic should be executed.
+   * 
+   * @return <code>true</code> if the {@link #doItImpl()} logic should be
+   *         executed.
    */
   protected boolean beforeDo() {
     if (!isPmEnabled()) {
-      LOG.warn("The command '" + PmUtil.getPmLogString(this)+ "' is not enabled.");
+      LOG.warn("The command '" + PmUtil.getPmLogString(this) + "' is not enabled.");
       return false;
     }
 
     PmConversationImpl conversation = getPmConversationImpl();
 
-    // Clear any message related to this command. A message for a failed previous execution attempt
+    // Clear any message related to this command. A message for a failed
+    // previous execution attempt
     // should not prevent an attempt to try it again...
     conversation.clearPmMessages(this, null);
 
     switch (getBeforeDoStrategy()) {
-      case VALIDATE:
-        if (! validate()) {
-          if (LOG.isDebugEnabled()) {
-            LOG.debug("Command '" + PmUtil.getPmLogString(this) + "' was not executed because of validation errors.");
-          }
-          return false;
+    case VALIDATE:
+      if (!validate()) {
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("Command '" + PmUtil.getPmLogString(this) + "' was not executed because of validation errors.");
         }
-        break;
-      case CLEAR:
-        PmMessageApi.clearPmTreeMessages(getValidationErrorRootPm());
-        break;
-      case DO_NOTHING:
-        break;
-      default:
-        throw new PmRuntimeException(this, "Can't handle 'beforeDo' definition: " + getOwnMetaData().beforeDo);
+        return false;
+      }
+      break;
+    case CLEAR:
+      PmMessageApi.clearPmTreeMessages(getValidationErrorRootPm());
+      break;
+    case DO_NOTHING:
+      break;
+    default:
+      throw new PmRuntimeException(this, "Can't handle 'beforeDo' definition: " + getOwnMetaData().beforeDo);
     }
 
     vetoCommandDecorator = commandDecorators.beforeDoReturnVetoDecorator(this);
@@ -632,8 +639,7 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
       LOG.debug("Command '" + PmUtil.getPmLogString(this) + "' successfully executed.");
     }
 
-    // TODO olaf: that's not really always true. Subclasses should be able to control that.
-    if (getBeforeDoStrategy() == BEFORE_DO.VALIDATE) {
+    if (getBeforeDoStrategy() == BEFORE_DO.VALIDATE && resetValueChangeStateOfValidationExecRootPmAfterValidation()) {
       PmDataInput validationParentPm = getValidationExecRootPm();
       validationParentPm.setPmValueChanged(false);
     }
@@ -645,11 +651,10 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
       do {
         PmCacheApi.clearPmCache(pmToClear, md.clearCachesSet);
         pmToClear = pmToClear.getPmParent();
-      } while (! (pmToClear instanceof PmElement));
+      } while (!(pmToClear instanceof PmElement));
       // Don't forget the enclosing element:
       PmCacheApi.clearPmCache(pmToClear, md.clearCachesSet);
     }
-
 
     PmConversationImpl pmConversation = getPmConversationImpl();
 
@@ -665,15 +670,13 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
     return naviLink;
   }
 
-
-
   /**
-   * Provides the command decorator that returned <code>false</code> for its call of
-   * {@link PmCommandDecorator#beforeDo(PmCommand)}.
+   * Provides the command decorator that returned <code>false</code> for its
+   * call of {@link PmCommandDecorator#beforeDo(PmCommand)}.
    * <p>
    * In other words: The decorator that prevented the execution of the
    * {@link #doItImpl()} logic of this command.
-   *
+   * 
    * @return activeCommandDecorator
    */
   public PmCommandDecorator getVetoCommandDecorator() {
@@ -695,34 +698,33 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
         if (LOG.isDebugEnabled()) {
           LOG.debug("Command '" + PmUtil.getPmLogString(this) + "' navigates with rule string '" + naviString + "'.");
         }
-      }
-      else {
-        if (! (link instanceof NaviLinkImpl)) {
+      } else {
+        if (!(link instanceof NaviLinkImpl)) {
           throw new PmRuntimeException(this,
-              "The command implementation currently only supports the following navigation link classes: " +
-              NaviRuleLink.class.getName() + " and " + NaviLinkImpl.class.getName());
+              "The command implementation currently only supports the following navigation link classes: "
+                  + NaviRuleLink.class.getName() + " and " + NaviLinkImpl.class.getName());
         }
 
         if (LOG.isDebugEnabled()) {
           LOG.debug("Command '" + PmUtil.getPmLogString(this) + "' redirects to '" + link + "'.");
         }
 
-        getPmConversationImpl().getPmToViewTechnologyConnector().redirect((NaviLinkImpl)link);
+        getPmConversationImpl().getPmToViewTechnologyConnector().redirect((NaviLinkImpl) link);
       }
-    }
-    else {
+    } else {
       // TODO olaf: Check if that's still required this way.
-      //            In case of a JSF history based navigation management the
-      //            problem should be solved.
-      //            What about the other cases?
+      // In case of a JSF history based navigation management the
+      // problem should be solved.
+      // What about the other cases?
 
       // Re-render current page using the original request parameter set
       // to preserve the request parameter set.
       // A simple null-string navigation would loose all parameters.
-//      PmViewTechnologyConnector nh = getPmConversationImpl().getPmNavigationHandler();
-//      if (nh.hasRequestParams()) {
-//        nh.redirectWithRequestParams(null);
-//      }
+      // PmViewTechnologyConnector nh =
+      // getPmConversationImpl().getPmNavigationHandler();
+      // if (nh.hasRequestParams()) {
+      // nh.redirectWithRequestParams(null);
+      // }
     }
 
     return naviString;
@@ -732,7 +734,7 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
    * A processed command (after starting {@link #doIt()}) gets cloned from the
    * original command instance (the template).<br>
    * In this state this member identifies the clone source.
-   *
+   * 
    * @return the template instance or <code>null</code> if it's the original
    *         command instance.
    */
@@ -778,27 +780,31 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
   }
 
   /**
-   * Shared meta data for all commands of the same kind.
-   * E.g. for all 'myapp.User.cmdSave' attributes.
+   * Shared meta data for all commands of the same kind. E.g. for all
+   * 'myapp.User.cmdSave' attributes.
    */
   protected static class MetaData extends PmObjectBase.MetaData {
     private PmCommandCfg.BEFORE_DO beforeDo = BEFORE_DO.DEFAULT;
     private CmdKind cmdKind = CmdKind.COMMAND;
     private Set<PmCacheApi.CacheKind> clearCachesSet = Collections.emptySet();
     /**
-     * Should the command be hidden when not applicable. Defaults to <code>false</code>.
+     * Should the command be hidden when not applicable. Defaults to
+     * <code>false</code>.
      */
     private boolean hideWhenNotEnabled = false;
 
     public boolean isHideWhenNotEnabled() {
       return hideWhenNotEnabled;
     }
+
     public void setHideWhenNotEnabled(boolean hideWhenNotEnabled) {
       this.hideWhenNotEnabled = hideWhenNotEnabled;
     }
+
     public CmdKind getCmdKind() {
       return cmdKind;
     }
+
     public void setCmdKind(CmdKind cmdKind) {
       this.cmdKind = cmdKind;
     }
