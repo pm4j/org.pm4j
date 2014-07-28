@@ -1,12 +1,15 @@
 package org.pm4j.core.pm;
 
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.pm4j.common.exception.CheckedExceptionWrapper;
 import org.pm4j.common.expr.Expression.SyntaxVersion;
 import org.pm4j.common.query.filter.FilterDefinitionFactory;
 import org.pm4j.common.query.filter.FilterDefinitionFactoryImpl;
 import org.pm4j.core.pm.annotation.PmCommandCfg;
+import org.pm4j.core.pm.annotation.PmCommandCfg.AFTER_DO;
 import org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO;
 import org.pm4j.core.pm.annotation.PmInject;
 import org.pm4j.core.pm.impl.PmObjectBase.NameBuilder;
@@ -80,8 +83,8 @@ public class PmDefaults implements Cloneable {
    * Defines the default {@link PmCommandCfg#beforeDo()} setting for commands
    * that do not define this attribute explicitly.
    */
-  private PmCommandCfg.BEFORE_DO beforeDoCommandDefault = BEFORE_DO.VALIDATE;
-
+  private PmCommandCfg.BEFORE_DO[] beforeDoCommandDefault = new BEFORE_DO[] {BEFORE_DO.VALIDATE};
+  
   /**
    * Defines, if validation error messages should be added to the tool tip text of
    * the affected attributes.
@@ -214,11 +217,11 @@ public class PmDefaults implements Cloneable {
     this.logStringBuilder = logStringBuilder;
   }
 
-  public PmCommandCfg.BEFORE_DO getBeforeDoCommandDefault() {
-    return beforeDoCommandDefault;
+  public Set<PmCommandCfg.BEFORE_DO> getBeforeDoCommandDefault() {
+    return new HashSet<PmCommandCfg.BEFORE_DO>(Arrays.asList(beforeDoCommandDefault));
   }
 
-  public void setBeforeDoCommandDefault(PmCommandCfg.BEFORE_DO beforeDoCommandDefault) {
+  public void setBeforeDoCommandDefault(PmCommandCfg.BEFORE_DO... beforeDoCommandDefault) {
     this.beforeDoCommandDefault = beforeDoCommandDefault;
   }
 

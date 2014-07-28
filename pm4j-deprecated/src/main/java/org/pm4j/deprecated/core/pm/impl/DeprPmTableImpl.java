@@ -1,12 +1,15 @@
 package org.pm4j.deprecated.core.pm.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.pm4j.common.util.reflection.ClassUtil;
@@ -169,8 +172,8 @@ public class DeprPmTableImpl
         getPageableCollection().setItemFilter(rowFilter);
       }
       @Override
-      protected BEFORE_DO getBeforeDoStrategy() {
-        return BEFORE_DO.DO_NOTHING;
+      protected Set<BEFORE_DO> getBeforeDoActions() {
+        return new HashSet<BEFORE_DO>(Arrays.asList(new BEFORE_DO[] {BEFORE_DO.DO_NOTHING}));
       }
     };
 

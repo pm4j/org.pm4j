@@ -14,7 +14,7 @@ import org.pm4j.core.pm.impl.PmCommandImpl;
 
 /**
  * Static configuration data for commands.
- *
+ * 
  * @author olaf boede
  */
 @Retention(RetentionPolicy.RUNTIME)
@@ -52,16 +52,52 @@ public @interface PmCommandCfg {
     DO_NOTHING,
 
     /**
-     * The definition, defined in the project specific {@link PmDefaults} will be
+     * The definition, defined in the project specific {@link PmDefaults} will
+     * be used.
      */
     DEFAULT
+  }
+  
+  public enum AFTER_DO {
+
+    /**
+	 * Resets the value change state of the pm that is used as validation root.
+	 */
+    RESET_VALUE_CHANGED_STATE,
+	    
+    /**
+     * Clears the caches of all pm's along the path to the root pm. 
+     */
+    CLEAR_CACHES,
+	    
+    /**
+     * Does not executes any special operation in the after do method of the command.
+     * Has the same effect as if {@link PmCommandCfg#afterDo()} returns an empty array.
+     */
+    DO_NOTHING,
+
+    /**
+     * Default is 
+     * <ul>
+     * <li>{@link #CLEAR_CACHES} and</li>
+     * <li>{@link #RESET_VALUE_CHANGED_STATE} if and only if {@link BEFORE_DO#VALIDATE} is set
+     * for {@link PmCommandCfg#beforeDo()}.</li>
+     * </ul>
+     */
+     DEFAULT
   }
 
   /**
    * @return Defines what should be done before executing the command logic.
    * @see BEFORE_DO
    */
-  BEFORE_DO beforeDo() default BEFORE_DO.DEFAULT;
+  BEFORE_DO[] beforeDo() default BEFORE_DO.DEFAULT;
+
+  /**
+   * @return Defines what should be done after executing the command logic.
+   * @see AFTER_DO
+   */
+  AFTER_DO[] afterDo() default AFTER_DO.DEFAULT;
 
   /**
    * @return The {@link CmdKind} of this command class.
@@ -76,7 +112,7 @@ public @interface PmCommandCfg {
 
   /**
    * Defines the caches to clear within the element context of this command.
-   *
+   * 
    * @return The cache kinds to clear.
    */
   PmCacheApi.CacheKind[] clearCaches() default {};

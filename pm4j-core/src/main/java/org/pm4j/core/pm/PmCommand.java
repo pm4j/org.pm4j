@@ -120,7 +120,7 @@ public interface PmCommand extends PmObject {
   /**
    * @return <code>true</code> when the command should fail when there are invalid
    *         values within the current session.
-   * @deprecated Use {@link PmCommandImpl#getBeforeDoStrategy()}.
+   * @deprecated Use {@link PmCommandImpl#getBeforeDoActions()}.
    */
   @Deprecated
   boolean isRequiresValidValues();
