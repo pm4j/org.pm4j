@@ -184,6 +184,7 @@ public class PmTableImpl
         : Collections.EMPTY_LIST;
   }
 
+  /** @deprecated Please use {@link #getRowPms()} */
   @Deprecated
   @Override
   public final List<T_ROW_PM> getRows() {
@@ -247,6 +248,7 @@ public class PmTableImpl
     }
   }
 
+  /** @deprecated Please use <code>getPmPageableBeanCollection().getSelectionHandler()</code> or <code>getPmPageableCollection().getSelectionHandler()</code>. */
   @Override
   @Deprecated
   public SelectionHandler<T_ROW_PM> getPmSelectionHandler() {
