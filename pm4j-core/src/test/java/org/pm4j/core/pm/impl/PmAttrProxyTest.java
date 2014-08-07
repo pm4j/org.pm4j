@@ -12,11 +12,22 @@ public class PmAttrProxyTest {
 
   private PmAttrProxy<String> stringAttrProxy;
   private PmAttrString stringAttr;
+  private boolean delegateEnabled = true;
+  private boolean delegateVisible = true;
 
   @Before
   public void setUp() {
     PmConversation c = new PmConversationImpl();
-    stringAttr = new PmAttrStringImpl(c);
+    stringAttr = new PmAttrStringImpl(c) {
+        @Override
+        protected boolean isPmEnabledImpl() {
+          return delegateEnabled;
+        }
+        @Override
+        protected boolean isPmVisibleImpl() {
+          return delegateVisible;
+        }
+    };
     stringAttrProxy = new PmAttrProxyImpl<String>(c);
   }
 
@@ -32,16 +43,16 @@ public class PmAttrProxyTest {
 
     assertEquals("The proxy should provide the visbibility information of the delegate.",
         true, stringAttrProxy.isPmVisible());
-    stringAttr.setPmVisible(false);
+    delegateVisible = false;
     assertEquals("The proxy should provide the visbibility information of the delegate.",
         false, stringAttrProxy.isPmVisible());
-    stringAttr.setPmVisible(true);
+    delegateVisible = true;
 
     assertEquals("The proxy should provide the enablement information of the delegate.",
         true, stringAttrProxy.isPmEnabled());
-    stringAttr.setPmEnabled(false);
+    delegateEnabled = false;
     assertEquals("The proxy should provide the enablement information of the delegate.",
         false, stringAttrProxy.isPmEnabled());
-    stringAttr.setPmEnabled(true);  }
+  }
 
 }
