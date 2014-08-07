@@ -83,6 +83,34 @@ public class PmTableAssert {
   }
 
   /**
+   * Checks the set of localized column cell string values shown for the selected table rows.
+   *
+   * @param msg
+   *          A message to show in case of a mismatch.
+   * @param expected
+   *          A comma separated string containing the column strings of selected all
+   *          table rows.
+   * @param col
+   *          The column to show the values for.
+   */
+  public static void assertColStringsOfSelection(String msg, String expected, PmTableCol col) {
+    assertEquals(msg, expected, getColStringsOfSelection(col));
+  }
+
+  /**
+   * Checks the set of localized column cell string values shown for the selected table rows.
+   *
+   * @param expected
+   *          A comma separated string containing the column strings of selected all
+   *          table rows.
+   * @param col
+   *          The column to show the values for.
+   */
+  public static void assertColStringsOfSelection(String expected, PmTableCol col) {
+    assertEquals(expected, getColStringsOfSelection(col));
+  }
+
+  /**
    *
    * @param col
    * @return
@@ -115,6 +143,23 @@ public class PmTableAssert {
     }
     return StringUtils.join(strings, ", ");
   }
+
+  /**
+  *
+  * @param col
+  * @return
+  */
+ public static String getColStringsOfSelection(PmTableCol col) {
+   @SuppressWarnings({ "unchecked" })
+   PmTable<? extends PmBean<?>> table = (PmTable<? extends PmBean<?>>) col.getPmParent();
+   String columnName = col.getPmName();
+   List<String> strings = new ArrayList<String>();
+
+   for (PmBean<?> r : table.getPmPageableCollection().getSelection()) {
+     strings.add(getCellAttr(r, columnName).getValueLocalized());
+   }
+   return StringUtils.join(strings, ", ");
+ }
 
   private static PmAttr<?> getCellAttr(PmBean<?> rowPm, String columnName) {
     PmObject cell = PmUtil.findChildPm(rowPm, columnName);
