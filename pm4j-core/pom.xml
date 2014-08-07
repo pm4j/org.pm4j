@@ -3,12 +3,12 @@
 
   <groupId>org.pm4j</groupId>
   <artifactId>pm4j-core</artifactId>
-  <version>0.7.22</version>
+  <version>0.7.23-SNAPSHOT</version>
 
   <parent>
     <groupId>org.pm4j</groupId>
     <artifactId>main</artifactId>
-    <version>0.7.22</version>
+    <version>0.7.23-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
