@@ -74,7 +74,6 @@ public class PmConversationImpl extends PmElementBase implements PmConversation 
 
   private List<PmMessage> pmMessages = Collections.synchronizedList(new ArrayList<PmMessage>());
 
-
   /**
    * Weak references to failed attributes to allow an efficient error state
    * cleanup implementation.
@@ -194,6 +193,16 @@ public class PmConversationImpl extends PmElementBase implements PmConversation 
   @Override
   public PmCommandHistory getPmCommandHistory() {
     return pmCommandHistory;
+  }
+
+  /**
+   * By default a conversation does not inherit the read only state its embedding context.
+   * <p>
+   * If you need a different logic, please override this method.
+   */
+  @Override
+  protected boolean isPmReadonlyImpl() {
+    return getPmMetaData().isReadOnly();
   }
 
   /**

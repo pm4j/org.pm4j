@@ -25,4 +25,25 @@ public class PmConversationImplTest {
     assertEquals(new Integer(13), childConv.getPmToViewConnector());
   }
 
+  @Test
+  public void testConversationReadonlyStateIsIsolatedFromParentReadonlyState() {
+    class RootConv extends PmConversationImpl {
+      boolean rootReadonly = false;
+      @Override
+      protected boolean isPmReadonlyImpl() {
+        return rootReadonly;
+      }
+    }
+
+    RootConv rootConv = new RootConv();
+    PmConversationImpl childConv = new PmConversationImpl(rootConv);
+
+    assertEquals(false, rootConv.isPmReadonly());
+    assertEquals(false, childConv.isPmReadonly());
+
+    rootConv.rootReadonly = true;
+    assertEquals(true, rootConv.isPmReadonly());
+    assertEquals(false, childConv.isPmReadonly());
+  }
+
 }
