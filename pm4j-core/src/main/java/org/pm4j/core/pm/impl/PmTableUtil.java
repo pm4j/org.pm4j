@@ -23,10 +23,18 @@ public final class PmTableUtil {
   private static Logger LOG = Logger.getLogger(PmTableUtil.class);
 
   /**
+   * <b><i>IMPORTANT: If you use this method, the value binding mechanism of the related table will be switched off!<br>
+   * That means that table features like change management, value binding to a backing collection or service no longer
+   * work.<br>
+   * Because of that this method is just a nice feature for table tests, but rarely useful for production code.</i></b>
+   * <p>
    * Creates a {@link PageableCollection} that uses the given collection and assigns it to the given {@link PmTable}.
    * <p>
    * In difference to overriding {@link PmTableImpl#getPmBeansImpl()}, this is a fix assignment. It will only change
    * the collection reference this method gets called again.
+   * <p>
+   * ATTENTION: The standard change detection handling does not work, because the such tables can't react on
+   * a load/reload event.<p>
    *
    * @param tablePm The table that should present the given collection.
    * @param beans The collection. May be <code>null</code>.
