@@ -24,7 +24,7 @@ import org.pm4j.core.pm.impl.PmUtil;
 
 /**
  * A set of junit test support methods.
- * 
+ *
  * @author olaf boede
  */
 public class PmAssert {
@@ -36,7 +36,7 @@ public class PmAssert {
      * Checks if exactly the given message text(s) exist for the given PM (incl. its sub-PMs)
      * and the given minimal message severity.
      * <p>
-     * 
+     *
      * @param rootPm
      *            the root PM of the subtree to check the messages for.
      * @param minSeverity
@@ -48,16 +48,24 @@ public class PmAssert {
     public static void assertMessageText(PmObject rootPm, Severity minSeverity, String... expectedMessages) {
         List<PmMessage> messages = PmMessageApi.getPmTreeMessages(rootPm, minSeverity);
         if (messages.size() != expectedMessages.length) {
-            fail("Expected " + expectedMessages.length +
+            StringBuilder sb = new StringBuilder("Expected " + expectedMessages.length +
                     " messages but found " + messages.size() + " messages." +
                     "\nFound messages: " + messages +
                     "\nExpected messages: " + Arrays.asList(expectedMessages) +
                     "\nPM context: " + PmUtil.getAbsoluteName(rootPm));
+            if (messages.size() > 0) {
+                sb.append("\nFound message details:");
+                for (PmMessage m : messages) {
+                    sb.append("\n\t" + getMessageTitlePrependByPmRelativeName(m));
+                }
+            }
+            fail(sb.toString());
         }
 
         Set<String> expectedSet = new HashSet<String>(Arrays.asList(expectedMessages));
         for (PmMessage m : messages) {
-            if (!expectedSet.contains(m.getTitle())) {
+            if (!expectedSet.contains(m.getTitle()) &&
+                !expectedSet.contains(getMessageTitlePrependByPmRelativeName(m))) {
                 fail("Unexpected message found." +
                         "\nFound messages: " + messages +
                         "\nExpected messages: " + Arrays.asList(expectedMessages) +
@@ -70,7 +78,7 @@ public class PmAssert {
     /**
      * Checks if exactly the given message text(s) exist for the given PM (incl. its sub-PMs).
      * <p>
-     * 
+     *
      * @param rootPm
      *            the root PM of the subtree to check the messages for.
      * @param expectedMessages
@@ -82,7 +90,7 @@ public class PmAssert {
 
     /**
      * Checks that there are no active {@link PmMessage}s for the given PM (incl. its sub-PMs).
-     * 
+     *
      * @param pm
      *            the PM to perform the check for.
      */
@@ -92,7 +100,7 @@ public class PmAssert {
 
     /**
      * Checks that there are no active {@link PmMessage}s for the given PM (incl. its sub-PMs).
-     * 
+     *
      * @param msg
      *            the assert message to display if the check fails.
      * @param pm
@@ -105,7 +113,7 @@ public class PmAssert {
     /**
      * Checks that there are no active {@link PmMessage}s with the given
      * <code>minSeverity</code> for the given PM (incl. its sub-PMs)
-     * 
+     *
      * @param pm
      *            the PM to perform the check for.
      * @param minSeverity
@@ -118,7 +126,7 @@ public class PmAssert {
     /**
      * Checks that there are no active {@link PmMessage}s with the given
      * <code>minSeverity</code> for the given PM (incl. its sub-PMs)
-     * 
+     *
      * @param msg
      *            the assert message to display if the check fails.
      * @param pm
@@ -136,7 +144,7 @@ public class PmAssert {
     /**
      * Checks that there are no active {@link PmMessage}s within the
      * {@link org.pm4j.core.pm.PmConversation} of the given PM.
-     * 
+     *
      * @param pm
      *            the PM to perform the check for.
      */
@@ -147,7 +155,7 @@ public class PmAssert {
     /**
      * Checks that there are no active {@link PmMessage}s within the
      * {@link org.pm4j.core.pm.PmConversation} of the given PM.
-     * 
+     *
      * @param msg
      *            the assert message to display if the check fails.
      * @param pm
@@ -160,7 +168,7 @@ public class PmAssert {
     /**
      * Checks if there is the expected error message active for the given PM (incl. its
      * sub-PMs).
-     * 
+     *
      * @param rootPm
      *            The root PM of the subtree to check the messages for.
      * @param expectedMsgInSubtree
@@ -178,7 +186,7 @@ public class PmAssert {
     /**
      * Checks if a message text - severity combination exists for the given PM (incl. its
      * sub-PMs).
-     * 
+     *
      * @param expectedMsgInSubtree
      *            The expected message text in rootPm or any of its sub-PMs.
      * @param severity
@@ -198,7 +206,7 @@ public class PmAssert {
 
     /**
      * Checks if the given set of PMs is enabled.
-     * 
+     *
      * @param pms
      *            the PMs to check.
      */
@@ -212,7 +220,7 @@ public class PmAssert {
 
     /**
      * Checks if the given set of PMs is not enabled.
-     * 
+     *
      * @param pms
      *            the PMs to check.
      */
@@ -226,7 +234,7 @@ public class PmAssert {
 
     /**
      * Checks if the given set of PMs is visible.
-     * 
+     *
      * @param pms
      *            the PMs to check.
      */
@@ -240,7 +248,7 @@ public class PmAssert {
 
     /**
      * Checks if the given set of PMs is not visible.
-     * 
+     *
      * @param pms
      *            the PMs to check.
      */
@@ -254,7 +262,7 @@ public class PmAssert {
 
     /**
      * Checks if each of the given PM's is marked as changed.
-     * 
+     *
      * @param pms
      *            the PMs to check.
      */
@@ -268,7 +276,7 @@ public class PmAssert {
 
     /**
      * Checks if each of the given PM's is not marked as changed.
-     * 
+     *
      * @param pms
      *            the PMs to check.
      */
@@ -282,7 +290,7 @@ public class PmAssert {
 
     /**
      * Checks if the given set of {@link PmAttr}s is required.
-     * 
+     *
      * @param pms
      *            the PMs to check.
      */
@@ -296,7 +304,7 @@ public class PmAssert {
 
     /**
      * Checks if the given set of {@link PmAttr}s is not required.
-     * 
+     *
      * @param pms
      *            the PMs to check.
      */
@@ -310,7 +318,7 @@ public class PmAssert {
 
     /**
      * Checks if the given attribute has the expected option titles.
-     * 
+     *
      * @param expectedTitles
      *            A comma separated string with all expected titles, e.g. "A, B, C".
      * @param pmAttr
@@ -331,7 +339,7 @@ public class PmAssert {
 
     /**
      * Checks if the given attribute has the expected option titles.
-     * 
+     *
      * @param expectedIds
      *            A comma separated string with all expected IDs, e.g. "A, B, C".
      * @param pmAttr
@@ -359,7 +367,7 @@ public class PmAssert {
      * given PM.
      * <p>
      * Verifies the the getValue() operation provides the expected value.
-     * 
+     *
      * @param attr
      *            the attribute to assign the value to.
      * @param value
@@ -381,7 +389,7 @@ public class PmAssert {
      * given PM.
      * <p>
      * Verifies the the getValue() operation provides the expected value.
-     * 
+     *
      * @param attr
      *            the attribute to assign the value to.
      * @param value
@@ -402,7 +410,7 @@ public class PmAssert {
      * {@link org.pm4j.core.pm.PmCommand.CommandState#EXECUTED}.</li>
      * <li>In case of an unexpected outcome it reports all messages found in the conversation.</li>
      * </ul>
-     * 
+     *
      * @param cmd
      *            the command to execute.
      */
@@ -418,7 +426,7 @@ public class PmAssert {
      * {@link org.pm4j.core.pm.PmCommand.CommandState#EXECUTED}.</li>
      * <li>In case of an unexpected outcome it reports all messages found in the conversation.</li>
      * </ul>
-     * 
+     *
      * @param msg
      *            the assert message to display if the operation fails.
      * @param cmd
@@ -435,7 +443,7 @@ public class PmAssert {
      * <li>Checks if the executed command has the expected execution result state.</li>
      * <li>In case of an unexpected outcome it reports all messages found in the conversation.</li>
      * </ul>
-     * 
+     *
      * @param cmd
      *            the command to execute.
      * @param expectedState
@@ -452,7 +460,7 @@ public class PmAssert {
      * <li>Checks if the executed command has the expected execution result state.</li>
      * <li>In case of an unexpected outcome it reports all messages found in the conversation.</li>
      * </ul>
-     * 
+     *
      * @param msg
      *            the assert message to display if the operation fails.
      * @param cmd
@@ -472,7 +480,7 @@ public class PmAssert {
     /**
      * Validates the PM tree having the given root instance. Fails if the subtree has any
      * messages after the validation call.
-     * 
+     *
      * @param rootPm
      *            The root of the PM tree to validate.
      */
@@ -489,7 +497,7 @@ public class PmAssert {
     /**
      * Validates the PM tree having the given root instance. Fails if the subtree has validated
      * successfully or doesn't contain exactly the expected error messages.
-     * 
+     *
      * @param rootPm
      *            The root of the PM tree to validate.
      * @param expectedErrorMsgsInSubtree
@@ -502,7 +510,7 @@ public class PmAssert {
     /**
      * Validates the PM tree having the given root instance. Fails if the subtree has validated
      * successfully or doesn't contain exactly the expected messages.
-     * 
+     *
      * @param rootPm
      *            The root of the PM tree to validate.
      * @param minSeverity
@@ -518,6 +526,10 @@ public class PmAssert {
     }
 
     // -- internal helper methods --
+
+    private static String getMessageTitlePrependByPmRelativeName(PmMessage m) {
+        return m.getPm().getPmRelativeName() + ": " + m.getTitle();
+    }
 
     private static String subTreeMessagesToString(PmObject pm, Severity minSeverity) {
         return subTreeMessagesToString(null, pm, minSeverity);
