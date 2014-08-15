@@ -1,16 +1,19 @@
 package org.pm4j.core.pm;
 
+import java.util.Locale;
+
 import org.junit.Test;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.annotation.PmTitleCfg;
 import org.pm4j.core.pm.impl.PmAttrIntegerImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
+import org.pm4j.core.pm.impl.PmElementImpl;
 import org.pm4j.core.pm.impl.PmInitApi;
 import org.pm4j.tools.test.PmAssert;
 
 public class PmAttrValidationTest {
 
-  private TestPm pm = PmInitApi.ensurePmInitialization(new TestPm());
+  private TestPm pm = PmInitApi.ensurePmInitialization(new TestPm(new TestConversationPm()));
 
   @Test
   public void testValidateVisibleAttr() {
@@ -24,7 +27,7 @@ public class PmAttrValidationTest {
   }
 
 
-  public static class TestPm extends PmConversationImpl {
+  public static class TestPm extends PmElementImpl {
     boolean requiredIntVisible = true;
 
     @PmAttrCfg(required=true)
@@ -36,12 +39,25 @@ public class PmAttrValidationTest {
       }
     };
 
+    public TestPm(PmObject parentPm) {
+      super(parentPm);
+    }
+
+  }
+
+  /** Test conversation setup. */
+  public static class TestConversationPm extends PmConversationImpl {
     /** Checks the newer validation logic. */
     @Override
     protected boolean isDeprValidation() {
       return false;
     };
 
+    /** Ensure that the message language, because the tested messages are localized. */
+    @Override
+    public Locale getPmLocale() {
+      return Locale.ENGLISH;
+    }
   }
 
 }
