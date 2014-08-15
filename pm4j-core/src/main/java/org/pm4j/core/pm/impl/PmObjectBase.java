@@ -677,7 +677,8 @@ public abstract class PmObjectBase implements PmObject {
      */
     protected boolean shouldValidate(T pm) {
       // XXX oboede: Logic will be extended for the task 'validation on read'
-      return !pm.isPmReadonly();
+      return pm.isPmVisible() &&
+             !pm.isPmReadonly();
     }
 
     /**
