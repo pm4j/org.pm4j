@@ -20,6 +20,8 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import org.apache.commons.lang.ClassUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.Validate;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.pm4j.common.cache.CacheStrategy;
@@ -53,6 +55,7 @@ import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmMessageApi;
 import org.pm4j.core.pm.api.PmValidationApi;
+import org.pm4j.core.pm.impl.PmObjectBase.MetaData.MetaDataId;
 import org.pm4j.core.pm.impl.cache.CacheLog;
 import org.pm4j.core.pm.impl.cache.CacheStrategyBase;
 import org.pm4j.core.pm.impl.cache.CacheStrategyRequest;
@@ -737,12 +740,13 @@ public abstract class PmObjectBase implements PmObject {
    * Ensures that all static definitions of this model are initialized.
    */
   protected void ensurePmMetaDataInitialization() {
-    if (pmMetaData == null) {
+    if (!hasOwnMetaData()) {
       if (pmParent != null) {
         // ensure initialization by calling any external pm-method.
         pmParent.ensurePmMetaDataInitialization();
       }
-      if (pmMetaData == null) {
+      // the parent may have generated may metadata.
+      if (!hasOwnMetaData()) {
         // Prevent concurrent double initialization.
         // Can't be done on class level because of
         // http://bugs.sun.com/bugdatabase/view_bug.do;jsessionid=82a8144e020c83fd1bd1bd741b6e?bug_id=7031759
@@ -784,6 +788,13 @@ public abstract class PmObjectBase implements PmObject {
     this.pmMetaData = sd;
   }
 
+  /** Checks of the PM has a metadata reference and if it's really the matching one. */
+  private final boolean hasOwnMetaData() {
+    return pmMetaData != null &&
+           // In case of pre-assigned child PM meta data the type may not match (if the
+           // embedded PM in place may have different types in different scenarios).
+           pmMetaData.id.pmClass == getClass();
+  }
   /**
    * Initializes the shared presentation model configuration data that is
    * provided for each PM instance with the given name within the given paren
@@ -804,23 +815,26 @@ public abstract class PmObjectBase implements PmObject {
    *          annotations attached to a field or getter.
    */
   /* package */ void zz_initMetaData(PmObjectBase parentPm, String name, boolean isPmField, boolean isSubPm) {
-    if (pmMetaData == null) {
+    if (!hasOwnMetaData()) {
       String lastKeyPart = (name != null)
                             ? name
-                            : getClass().getName();
-      String key = (pmParent != null)
-                            ? PmUtil.getAbsoluteName(pmParent) + PmObjectBase.MetaData.NAME_PATH_DELIMITER + lastKeyPart
-                            : lastKeyPart;
+                            : pmMetaData != null
+                              ? pmMetaData.name // name is known in case of having a more than one type for one child PM.
+                              : getClass().getName(); // a PM that is not a field of a parent PM.
+      MetaDataId key = new MetaDataId(pmParent, lastKeyPart, getClass());
 
       setPmMetaData(pmKeyToMetaDataMap.get(key));
-      if (pmMetaData == null) {
+      if (!hasOwnMetaData()) {
         // Double check with synchronization to ensure maximum get performance and to ensure that
         // meta data for each PM class gets initialized only once.
         // This can't be done on class level because of http://bugs.sun.com/bugdatabase/view_bug.do;jsessionid=82a8144e020c83fd1bd1bd741b6e?bug_id=7031759
         synchronized (pmKeyToMetaDataMap) {
           setPmMetaData(pmKeyToMetaDataMap.get(key));
-          if (pmMetaData == null) {
-            setPmMetaData(makeMetaData());
+          if (!hasOwnMetaData()) {
+            MetaData md = makeMetaData();
+            md.id = key; // XXX: should be parameter of the factory method. But that needs a cross-project refactoring.
+            setPmMetaData(md);
+
             pmMetaData.name = (name != null)
                                 ? name
                                 : StringUtils.uncapitalize(getClass().getSimpleName());
@@ -842,10 +856,11 @@ public abstract class PmObjectBase implements PmObject {
                   "PM class: " + getClass().getCanonicalName());
             }
 
-            pmMetaData.absoluteName = key;
+            pmMetaData.absoluteName = key.getAbsoluteName();
 
             // Perform the subclass specific meta data initialization after having defined names.
             try {
+              pmMetaData.ensureDerivedNames(this);
               initMetaData(pmMetaData);
             }
             catch (RuntimeException e) {
@@ -1000,8 +1015,6 @@ public abstract class PmObjectBase implements PmObject {
       }
     }
 
-    metaData.ensureDerivedNames(this);
-
     if (metaData.resKeyBase == null) {
       metaData.resKeyBase = metaData.isSubPm
             ? pmParent.getPmResKeyBase() + "." + metaData.name
@@ -1112,6 +1125,7 @@ public abstract class PmObjectBase implements PmObject {
       this.addErrorMessagesToTooltip = pmDefaults.addErrorMessagesToTooltip;
     }
 
+    private MetaDataId id;
     private String name;
     private String compositeChildName;
     private String relativeName;
@@ -1210,6 +1224,70 @@ public abstract class PmObjectBase implements PmObject {
 
     }
 
+
+    /**
+     * Internal identifier used as key for the shared {@link PmObjectBase#pmKeyToMetaDataMap}.
+     * <p>
+     * Identifies metadata by {@link #parentId}, {@link #name} and {@link #pmClass}.<br>
+     * The {@link #pmClass} part allows having multiple meta data definitions for a single id path.
+     * This is needed to support polymorph PMs having scenario specific types.
+     */
+    public static class MetaDataId {
+      final MetaDataId parentId;
+      final String name;
+      /** In case of polymorph factory generated PMs a PM field may be used for various types having different meta data. */
+      final Class<?> pmClass;
+      final int hashCode;
+
+      public MetaDataId(PmObjectBase parentPm, String name, Class<?> pmClass) {
+        Validate.notEmpty(name);
+        Validate.notNull(pmClass);
+        if (parentPm != null) {
+          if (parentPm.pmMetaData.id == null) {
+            throw new IllegalStateException("Parent id should be generated before child PM id.");
+          }
+          this.parentId = parentPm.pmMetaData.id;
+        } else {
+          this.parentId = null;
+        }
+
+        this.name = name;
+        this.pmClass = pmClass;
+        this.hashCode = new HashCodeBuilder(68993, 17).append(parentId).append(name).append(pmClass).toHashCode();
+      }
+
+      @Override
+      public boolean equals(Object obj) {
+        if (obj == this) {
+          return true;
+        }
+        if (obj == null) {
+          return false;
+        }
+        MetaDataId other = (MetaDataId) obj;
+        return hashCode == other.hashCode &&
+               ObjectUtils.equals(parentId, other.parentId) &&
+               name.equals(other.name) &&
+               pmClass.equals(other.pmClass);
+      }
+
+      @Override
+      public int hashCode() {
+        return hashCode;
+      }
+
+      /** @return An underline delimited concatenation of the ID hierarchy. */
+      public String getAbsoluteName() {
+          return parentId != null
+                  ? parentId.toString() + '_' + name
+                  : name;
+      }
+
+      @Override
+      public String toString() {
+        return getAbsoluteName();
+      }
+    }
   }
 
   /**

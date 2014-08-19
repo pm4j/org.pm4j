@@ -63,9 +63,7 @@ public class PmInitApi {
    */
   public static <T> PmAttr<T> initDynamicPmAttr(PmAttr<T> pmAttr, String name) {
     PmAttrBase<?, ?> pm = (PmAttrBase<?, ?>)pmAttr;
-    // Make the name based meta data identifier unique based on the attribute class identifier.
-    // TODO: the methods getPmName,getPmReskey etc. provide strange results now :-(
-    pm.zz_initMetaData((PmObjectBase)pm.getPmParent(), name+"_"+pm.getClass().getName(), false, true);
+    pm.zz_initMetaData((PmObjectBase)pm.getPmParent(), name, false, true);
     return pmAttr;
   }
 
