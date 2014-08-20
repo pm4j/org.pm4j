@@ -14,6 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmCommandHistory;
 import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.PmDefaults;
@@ -24,6 +25,7 @@ import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmValidationApi;
 import org.pm4j.core.pm.impl.connector.PmToNoViewTechnologyConnector;
 import org.pm4j.core.pm.impl.connector.PmToViewTechnologyConnector;
+import org.pm4j.core.pm.impl.converter.PmConverterErrorMessage;
 import org.pm4j.core.pm.impl.inject.NamedObjectResolver;
 import org.pm4j.core.pm.impl.inject.NamedObjectResolverChain;
 import org.pm4j.navi.NaviHistory;
@@ -38,7 +40,30 @@ import org.pm4j.navi.NaviHistory;
  */
 public class PmConversationImpl extends PmElementBase implements PmConversation {
 
-  private static final Log LOG = LogFactory.getLog(PmConversationImpl.class);
+  /**
+   * Add message Callback interface
+   */
+  public interface AddMessageCallback {
+    /**
+     * Gets called in method {@link PmConversationImpl#addPmMessage(PmMessage)},
+     * allows to customize PmMessage handling.
+     * 
+     * @param message
+     *          message before adding.
+     * @return modified message to be added.
+     */
+    PmMessage beforeAddMessage(PmMessage message);
+  }
+
+  private static final Log LOG = LogFactory.getLog(PmConversationImpl.class);  
+
+  /** Default implementation changes nothing. */
+  private static final AddMessageCallback DEFAULT_ADD_MESSAGE_CALLBACK = new AddMessageCallback() {
+    @Override
+    public PmMessage beforeAddMessage(PmMessage message) {
+      return message;
+    }
+  };
 
   // initialized with self-reference which indicates that the reference is not yet resolved.
   private PmConversationImpl pmParentConversation = this;
@@ -46,6 +71,11 @@ public class PmConversationImpl extends PmElementBase implements PmConversation 
   private TimeZone pmTimeZone = TimeZone.getDefault();
   private PmExceptionHandler pmExceptionHandler;
   private PmToViewTechnologyConnector pmToViewTechnologyConnector;
+
+  /** Callback to modify an {@link PmMessage} before it is added to the message list */
+  private AddMessageCallback addMessageCallback = DEFAULT_ADD_MESSAGE_CALLBACK;
+
+
   /**
    * A chain of {@link NamedObjectResolver}s that is used to resolve
    * objects referenced by PM expressions.
@@ -322,8 +352,24 @@ public class PmConversationImpl extends PmElementBase implements PmConversation 
     return pmElementFactory;
   }
 
+  /**
+   * @param addMessageCallback
+   *            the callback when adding a PmMessage
+   */
+  public void setAddMessageCallback(AddMessageCallback addMessageCallback) {
+      if (this.addMessageCallback != DEFAULT_ADD_MESSAGE_CALLBACK) {
+        LOG.warn("Trying to define addMessageCallback twice!");
+      } 
+      this.addMessageCallback = addMessageCallback;
+  }
+
+  
   @Override
   public void addPmMessage(PmMessage pmMessage) {
+    // TODO: Move if-block to own AddMessageCallbackBase class and write a test
+    if (!(pmMessage instanceof PmConverterErrorMessage)) {
+        pmMessage = addMessageCallback.beforeAddMessage(pmMessage);
+    }    
     pmMessages.add(pmMessage);
     if (pmMessage instanceof PmValidationMessage) {
       registerInvalidValue((PmValidationMessage)pmMessage);

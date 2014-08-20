@@ -51,7 +51,7 @@ public class PmMessage {
     }
   };
 
-  private final Severity severity;
+  private Severity severity;
   private final PmResourceData resourceData;
   private Throwable cause;
 
@@ -321,5 +321,13 @@ public class PmMessage {
       return sb.toString();
     }
 
+  }
+  
+  /**
+   * Set the severity.
+   * @param severity the new severity
+   */
+  public void setSeverity(Severity severity) {
+    this.severity = severity;
   }
 }
