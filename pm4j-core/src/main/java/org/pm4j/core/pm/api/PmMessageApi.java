@@ -1,7 +1,6 @@
 package org.pm4j.core.pm.api;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.TreeSet;
 
@@ -17,15 +16,15 @@ import org.pm4j.core.pm.impl.PmUtil;
 
 /**
  * API to deal with messages.
- *
+ * 
  * @author sdolke
- *
+ * 
  */
 public class PmMessageApi {
 
   /**
    * Generates a message and propagates it to the PM conversation.
-   *
+   * 
    * @param severity
    *          Message severity.
    * @param key
@@ -51,7 +50,7 @@ public class PmMessageApi {
    * When a custom resource key with the postfix
    * {@link #RESKEY_POSTFIX_REQUIRED_MSG} is provided, that key will be used for
    * message generation.
-   *
+   * 
    * @return The resource data for the required attribute value warning.
    */
   public static PmResourceData makeRequiredMessageResData(PmAttr<?> pm) {
@@ -60,7 +59,8 @@ public class PmMessageApi {
     String customMsg = PmLocalizeApi.findLocalization(pmImpl, msgKey);
 
     if (customMsg == null) {
-      msgKey = (pmImpl.getOptionSet().getOptions().size() == 0) ? PmConstants.MSGKEY_VALIDATION_MISSING_REQUIRED_VALUE
+      msgKey = (pmImpl.getOptionSet().getOptions().size() == 0)
+          ? PmConstants.MSGKEY_VALIDATION_MISSING_REQUIRED_VALUE
           : PmConstants.MSGKEY_VALIDATION_MISSING_REQUIRED_SELECTION;
     }
 
@@ -70,7 +70,7 @@ public class PmMessageApi {
   /** @deprecated Please use {@link #makeRequiredMessageResData(PmAttr)}. */
   @Deprecated
   public static PmResourceData addRequiredMessage(PmAttr<?> pm) {
-      return makeRequiredMessageResData(pm);
+    return makeRequiredMessageResData(pm);
   }
 
   /**
@@ -97,7 +97,7 @@ public class PmMessageApi {
    * <p>
    * Any invalid attribute values within the PM scope are also cleaned by
    * cleaning the corresponding error messages.
-   *
+   * 
    * @return All messages that are related to this presentation model.<br>
    *         In case of no messages an empty collection.
    */
@@ -114,7 +114,7 @@ public class PmMessageApi {
 
   /**
    * Provides the messages of a PM sub tree.
-   *
+   * 
    * @param pm
    *          Root of the PM sub tree to check.
    * @param minSeverity
@@ -134,25 +134,24 @@ public class PmMessageApi {
   }
 
   /**
-   * Finds the most severity message starting from root pm with at least minSeverity.
+   * Finds the most severity message starting from root pm with at least
+   * minSeverity. If there are several messages of most severe level, the one
+   * whose message text is alphabetically first will be returned.
    * 
    * @param pm
-   *            The Root PM sub tree to get the most severe message for.
+   *          The Root PM sub tree to get the most severe message for.
    * @param minSeverity
-   *            The minimal message severity to consider.
+   *          The minimal message severity to consider.
    * 
-   * @return The most severe message for the given PM or <code>null</code> if there is no
-   *         message for the given PM.
+   * @return The most severe message for the given PM or <code>null</code> if
+   *         there is no message for the given PM.
    */
   public static PmMessage findMostSevereMessage(PmObject pm, Severity minSeverity) {
-      TreeSet<PmMessage> messages = new TreeSet<PmMessage>(new Comparator<PmMessage>() {
-          @Override
-          public int compare(PmMessage o1, PmMessage o2) {
-              return -o1.getSeverity().compareTo(o2.getSeverity());
-          }
-      });
-      messages.addAll(PmMessageApi.getPmTreeMessages(pm, minSeverity));
+    TreeSet<PmMessage> messages = new TreeSet<PmMessage>(new PmMessageComparator());
+    messages.addAll(PmMessageApi.getPmTreeMessages(pm, minSeverity));
 
-      return messages.isEmpty() ? null : messages.iterator().next();
+    return messages.isEmpty()
+        ? null
+        : messages.iterator().next();
   }
 }
