@@ -1,6 +1,7 @@
 package org.pm4j.core.pm;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -50,6 +51,26 @@ public class PmMessage {
       }
     }
   };
+
+  /**
+   * Used to order PmMessage. Sorts first for severity descending and second for
+   * message text alphabetically.
+   * 
+   * @author okossak
+   */
+  public static class MessageComparator implements Comparator<PmMessage> {
+
+    @Override
+    public int compare(PmMessage o1, PmMessage o2) {
+
+      int severityDiff = -o1.getSeverity().compareTo(o2.getSeverity());
+      // @formatter:off
+      return (severityDiff == 0)
+          ? o1.getTitle().compareTo(o2.getTitle())
+          : severityDiff;
+      // @formatter:on
+    }
+  }
 
   private Severity severity;
   private final PmResourceData resourceData;

@@ -1,6 +1,5 @@
 package org.pm4j.core.pm.api;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.TreeSet;
 
@@ -169,25 +168,41 @@ public class PmMessageUtil {
   }
 
   /**
+   * Finds the most severity message starting from root pm with at least
+   * minSeverity. If there are several messages of most severe level, the one
+   * whose message text is alphabetically first will be returned.
+   * 
    * @param pm
-   *          The PM to get the most severe message for.
+   *          The Root PM sub tree to get the most severe message for.
+   * @param minSeverity
+   *          The minimal message severity to consider.
+   * 
+   * @return The most severe message for the given PM or <code>null</code> if
+   *         there is no message for the given PM.
+   */
+  public static PmMessage findMostSevereMessage(PmObject pm, Severity minSeverity) {
+    TreeSet<PmMessage> messages = new TreeSet<PmMessage>(new PmMessage.MessageComparator());
+    messages.addAll(PmMessageApi.getPmTreeMessages(pm, minSeverity));
+
+    return messages.isEmpty()
+        ? null
+        : messages.iterator().next();
+  }
+
+  /**
+   * Finds the most severity message starting from root pm. If there are several
+   * messages of most severe level, the one whose message text is alphabetically
+   * first will be returned.
+   * 
+   * @param pm
+   *          The Root PM sub tree to get the most severe message for.
+   * 
    * @return The most severe message for the given PM or <code>null</code> if
    *         there is no message for the given PM.
    */
   public static PmMessage findMostSevereMessage(PmObject pm) {
-    TreeSet<PmMessage> messages = new TreeSet<PmMessage>(new Comparator<PmMessage>() {
-      @Override
-      public int compare(PmMessage o1, PmMessage o2) {
-        return - o1.getSeverity().compareTo(o2.getSeverity());
-      }
-    });
-    messages.addAll(PmMessageApi.getMessages(pm));
-
-    return messages.isEmpty()
-            ? null
-            : messages.iterator().next();
+    return findMostSevereMessage(pm, Severity.INFO);
   }
-
 
   /**
    * Clears the messages within the scope and returns all messages for this PM

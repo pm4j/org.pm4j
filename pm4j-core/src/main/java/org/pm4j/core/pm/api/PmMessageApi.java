@@ -2,7 +2,6 @@ package org.pm4j.core.pm.api;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TreeSet;
 
 import org.pm4j.core.exception.PmResourceData;
 import org.pm4j.core.pm.PmAttr;
@@ -131,27 +130,5 @@ public class PmMessageApi {
     }
 
     return messages;
-  }
-
-  /**
-   * Finds the most severity message starting from root pm with at least
-   * minSeverity. If there are several messages of most severe level, the one
-   * whose message text is alphabetically first will be returned.
-   * 
-   * @param pm
-   *          The Root PM sub tree to get the most severe message for.
-   * @param minSeverity
-   *          The minimal message severity to consider.
-   * 
-   * @return The most severe message for the given PM or <code>null</code> if
-   *         there is no message for the given PM.
-   */
-  public static PmMessage findMostSevereMessage(PmObject pm, Severity minSeverity) {
-    TreeSet<PmMessage> messages = new TreeSet<PmMessage>(new PmMessageComparator());
-    messages.addAll(PmMessageApi.getPmTreeMessages(pm, minSeverity));
-
-    return messages.isEmpty()
-        ? null
-        : messages.iterator().next();
   }
 }
