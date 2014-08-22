@@ -2,6 +2,7 @@ package org.pm4j.common.util.collection;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -105,6 +106,26 @@ public class IterableUtil {
   }
 
   /**
+   * Joins some {@link Iterable}s to a single one.
+   *
+   * @param iterables
+   *          A set of {@link Iterable}s to join to a single {@link Iterable}.<br>
+   *          May contain <code>null</code>s.
+   * @return A single {@link Iterable}. Never <code>null.</code>
+   */
+  @SuppressWarnings("unchecked")
+  public static <T> Iterable<T> join(Iterable<? extends T>... iterables) {
+    if (iterables.length == 0) {
+      return Collections.emptyList();
+    }
+    if (iterables.length == 1) {
+      return (Iterable<T>)iterables[0];
+    }
+    return new IterableChain<T>(iterables);
+  }
+
+
+  /**
    * @param i
    *          An {@link Iterable} to check.
    * @return <code>true</code> if the parameter is <code>null</code> or it has
@@ -117,5 +138,67 @@ public class IterableUtil {
 
   private IterableUtil() {
     super();
+  }
+
+  private static class IterableChain<T> implements Iterable<T> {
+
+    private final Iterable<T>[] iterables;
+
+    @SuppressWarnings("unchecked")
+    public IterableChain(Iterable<? extends T>... iterables) {
+      this.iterables = (Iterable<T>[]) iterables;
+    }
+
+    @Override
+    public Iterator<T> iterator() {
+      return new Iterator<T>() {
+        int iterableIdx = -1;
+        Iterator<T> currentIterator;
+        /** The iterator internally already knows the next item. */
+        T next;
+
+        {
+          // initially we try to fill the next member to be able to answer hasNext().
+          findNext();
+        }
+
+        @Override
+        public boolean hasNext() {
+          return next != null;
+        }
+
+        @Override
+        public T next() {
+          T result = next;
+          findNext();
+          return result;
+        }
+
+        @Override
+        public void remove() {
+          throw new UnsupportedOperationException();
+        }
+
+        private boolean findNext() {
+          if (currentIterator != null && currentIterator.hasNext()) {
+            next = currentIterator.next();
+            return true;
+          } else {
+            while (iterableIdx < iterables.length-1) {
+              ++iterableIdx;
+              if (iterables[iterableIdx] != null) {
+                currentIterator = iterables[iterableIdx].iterator();
+                // recursive call that uses the just found currentIterator.
+                return findNext();
+              }
+            }
+            // all iterables are done.
+            next = null;
+            return false;
+          }
+        }
+      };
+    }
+
   }
 }

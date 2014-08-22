@@ -3,10 +3,13 @@ package org.pm4j.core.pm.impl;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyVetoException;
 import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -17,7 +20,6 @@ import org.apache.commons.logging.LogFactory;
 import org.pm4j.common.cache.CacheStrategy;
 import org.pm4j.common.cache.CacheStrategyNoCache;
 import org.pm4j.common.modifications.ModificationHandler;
-import org.pm4j.common.modifications.Modifications;
 import org.pm4j.common.pageable.PageableCollection;
 import org.pm4j.common.pageable.inmem.InMemCollectionBase;
 import org.pm4j.common.pageable.querybased.QueryService;
@@ -37,7 +39,7 @@ import org.pm4j.common.selection.Selection;
 import org.pm4j.common.selection.SelectionHandler;
 import org.pm4j.common.selection.SelectionHandlerUtil;
 import org.pm4j.common.util.beanproperty.PropertyAndVetoableChangeListener;
-import org.pm4j.common.util.collection.ListUtil;
+import org.pm4j.common.util.collection.IterableUtil;
 import org.pm4j.common.util.collection.MapUtil;
 import org.pm4j.common.util.reflection.ClassUtil;
 import org.pm4j.common.util.reflection.GenericTypeUtil;
@@ -61,6 +63,7 @@ import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmExpressionApi;
+import org.pm4j.core.pm.impl.PmTableImpl.TableValidator.RowsToValidate;
 import org.pm4j.core.pm.impl.cache.CacheStrategyBase;
 import org.pm4j.core.pm.impl.cache.CacheStrategyRequest;
 import org.pm4j.core.pm.impl.pageable.PmBeanCollection;
@@ -491,21 +494,52 @@ public class PmTableImpl
    */
   public static class TableValidator extends ObjectValidator<PmTableImpl<PmBean<?>, ?>> {
 
-    private boolean validateAllRows = false;
+    /** The supported row validation sets. */
+    public enum RowsToValidate {
+      ALL, UPDATED, ADDED, CURRENT_PAGE
+    }
+
+    private Set<RowsToValidate> rowsToValidate = new HashSet<RowsToValidate>();
     private long itemNumWarningLimit = 5000;
+
+    /**
+     * @param rowValidationDefinitions Specifies the row set(s) to validate.
+     */
+    public TableValidator(RowsToValidate... rowValidationDefinitions) {
+      rowsToValidate.addAll(Arrays.asList(rowValidationDefinitions));
+    }
 
     @SuppressWarnings("unchecked")
     @Override
     protected Iterable<PmObject> getChildrenToValidate(PmTableImpl<PmBean<?>, ?> pm) {
-      if (validateAllRows) {
+      Iterable<PmObject> otherChildrenToValidate = super.getChildrenToValidate(pm);
+
+      if (rowsToValidate.contains(RowsToValidate.ALL)) {
         checkRowNumLimit(pm, pm.getTotalNumOfPmRows());
-        return (Iterable<PmObject>) (Object) pm.getPmPageableCollection();
-      } else {
-        Modifications<PmBean<?>> m = pm.getPmPageableCollection().getModifications();
-        List<PmBean<?>> changedItems = ListUtil.collectionsToList(m.getAddedItems(), m.getUpdatedItems());
-        checkRowNumLimit(pm, changedItems.size());
-        return (Collection<PmObject>) (Object) changedItems;
+        return IterableUtil.join(otherChildrenToValidate, pm.getPmPageableCollection());
       }
+
+      // A linked set is used to get a validation error message order that somehow
+      // corresponds to the row sort order.
+      // The developer may define a different position for added records, but
+      // we don't have the exact record positions here (would be to expensive to calculate).
+      Set<PmObject> rows = new LinkedHashSet<PmObject>();
+      rows.addAll(IterableUtil.asCollection(super.getChildrenToValidate(pm)));
+
+      // messages for visible area first
+      if (rowsToValidate.contains(RowsToValidate.CURRENT_PAGE)) {
+        rows.addAll(pm.getRowPms());
+      }
+      if (rowsToValidate.contains(RowsToValidate.UPDATED)) {
+        rows.addAll(pm.getPmPageableCollection().getModifications().getUpdatedItems());
+      }
+      // added items are in most cases displayed at the end of a table
+      if (rowsToValidate.contains(RowsToValidate.ADDED)) {
+        rows.addAll(pm.getPmPageableCollection().getModifications().getAddedItems());
+      }
+
+      checkRowNumLimit(pm, rows.size());
+      return IterableUtil.join(otherChildrenToValidate, rows);
     }
 
     /**
@@ -516,9 +550,16 @@ public class PmTableImpl
      * WARNING: Validation of all rows may lead to bad performance in case of large tables.
      *
      * @param validateAllRows The switch.
+     *
+     * @deprecated Please use constructor parameter configuration.
      */
+    @Deprecated
     public void setValidateAllRows(boolean validateAllRows) {
-      this.validateAllRows = validateAllRows;
+      if (validateAllRows) {
+        this.rowsToValidate.add(RowsToValidate.ALL);
+      } else {
+        this.rowsToValidate.remove(RowsToValidate.ALL);
+      }
     }
 
     /**
@@ -543,14 +584,13 @@ public class PmTableImpl
         LOG.warn(pm.getPmRelativeName() + ": Performance warning - In memory validation for " + numOfItemsToValidate + " row PMs started.");
       }
     }
-
   }
 
   @Override
   protected Validator makePmValidator() {
     return getOwnMetaDataWithoutPmInitCall().deprValidation
         ? new DeprTableValidator()
-        : new TableValidator();
+        : new TableValidator(RowsToValidate.UPDATED, RowsToValidate.ADDED);
   }
 
 
