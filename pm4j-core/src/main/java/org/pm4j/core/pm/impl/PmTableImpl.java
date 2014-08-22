@@ -59,11 +59,11 @@ import org.pm4j.core.pm.PmTableCol;
 import org.pm4j.core.pm.annotation.PmCacheCfg;
 import org.pm4j.core.pm.annotation.PmCacheCfg.CacheMode;
 import org.pm4j.core.pm.annotation.PmTableCfg;
+import org.pm4j.core.pm.annotation.PmTableCfg.RowsToValidate;
 import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmExpressionApi;
-import org.pm4j.core.pm.impl.PmTableImpl.TableValidator.RowsToValidate;
 import org.pm4j.core.pm.impl.cache.CacheStrategyBase;
 import org.pm4j.core.pm.impl.cache.CacheStrategyRequest;
 import org.pm4j.core.pm.impl.pageable.PmBeanCollection;
@@ -493,11 +493,6 @@ public class PmTableImpl
    * {@link PmTable} validation logic.
    */
   public static class TableValidator extends ObjectValidator<PmTableImpl<PmBean<?>, ?>> {
-
-    /** The supported row validation sets. */
-    public enum RowsToValidate {
-      ALL, UPDATED, ADDED, CURRENT_PAGE
-    }
 
     private Set<RowsToValidate> rowsToValidate = new HashSet<RowsToValidate>();
     private long itemNumWarningLimit = 5000;

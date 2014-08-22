@@ -102,4 +102,11 @@ public @interface PmTableCfg {
    */
   int numOfPageRows() default 0;
 
+  // TODO oboede: will be configurable in a future release.
+  /** The supported row validation sets. */
+  public enum RowsToValidate {
+    ALL, UPDATED, ADDED, CURRENT_PAGE
+  }
+
 }
+
