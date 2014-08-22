@@ -10,12 +10,12 @@ import java.util.List;
 import org.junit.Test;
 import org.pm4j.core.pm.annotation.PmBeanCfg;
 import org.pm4j.core.pm.annotation.PmFactoryCfg;
+import org.pm4j.core.pm.annotation.PmTableCfg.RowsToValidate;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
 import org.pm4j.core.pm.impl.PmBeanImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
 import org.pm4j.core.pm.impl.PmTableColImpl;
 import org.pm4j.core.pm.impl.PmTableImpl;
-import org.pm4j.core.pm.impl.PmTableImpl.TableValidator.RowsToValidate;
 import org.pm4j.tools.test.PmAssert;
 
 /**
