@@ -20,3 +20,8 @@ pm4j-facelets-demo/*
 RemoteSystemsTempFiles/*
 web/httpdocs/pm4j-core/docs/current
 /target
+
+*.eml
+*.iml
+.idea/
+out/
