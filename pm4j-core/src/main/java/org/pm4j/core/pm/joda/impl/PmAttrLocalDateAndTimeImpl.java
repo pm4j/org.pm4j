@@ -71,12 +71,7 @@ public class PmAttrLocalDateAndTimeImpl extends PmAttrLocalDateTimeImpl {
         return new PmAttrLocalTimePart(this);
     }
 
-    /**
-     * Inner class for date part.
-     *
-     * @author okossak
-     * @since GLOBE 2.0
-     */
+    /** Inner class for date part. */
     @PmAttrCfg(required=true)
     public class PmAttrLocalDatePart extends PmAttrLocalDateImpl {
 
@@ -110,32 +105,14 @@ public class PmAttrLocalDateAndTimeImpl extends PmAttrLocalDateTimeImpl {
         @Override
         protected void validate(LocalDate value) throws PmValidationException {
           super.validate(value);
-          if (value == null && timePart.getValue() != null) {
+          if (value == null) {
             throw new PmValidationException(PmMessageApi.makeRequiredMessageResData(this));
           }
         }
 
-        // XXX oboede: double check if that is really necessary
-        @Override
-        public void clearPmInvalidValues() {
-            // In method LocalDateTimeAttrPm.pmValidate() the date part and time part get
-            // validated first, and LocalDateTimeAttrPm will be validated just in case the
-            // validation of both parts succeeded. If a user enters a value for date part or
-            // time part, the AJAX call will invoke validation for this part, but if an error
-            // message for LocalDateTimeAttrPm still exists, this message must be cleared
-            // explicitly by this intercepting override of clearPmInvalidValues(). It is invoked
-            // in method PmAttrBase.setValueAsString() .
-            super.clearPmInvalidValues();
-            this.getPmConversationImpl().clearPmMessages(PmAttrLocalDateAndTimeImpl.this, null);
-        }
     }
 
-    /**
-     * Inner class for time part.
-     *
-     * @author okossak
-     * @since GLOBE 2.0
-     */
+    /** Inner class for time part. */
     @PmAttrCfg(required=true)
     public class PmAttrLocalTimePart extends PmAttrLocalTimeImpl {
 
@@ -160,7 +137,7 @@ public class PmAttrLocalDateAndTimeImpl extends PmAttrLocalDateTimeImpl {
         @Override
         protected void validate(LocalTime value) throws PmValidationException {
           super.validate(value);
-          if (value == null && datePart.getValue() != null) {
+          if (value == null) {
             throw new PmValidationException(PmMessageApi.makeRequiredMessageResData(this));
           }
         }
@@ -174,19 +151,6 @@ public class PmAttrLocalDateAndTimeImpl extends PmAttrLocalDateTimeImpl {
             return PmAttrLocalDateAndTimeImpl.this.getPmTitle() + " / " + PmLocalizeApi.localize(this, "pmAttrDateTime_timePart");
         }
 
-        // XXX oboede: double check if that is really necessary
-        @Override
-        public void clearPmInvalidValues() {
-            // In method LocalDateTimeAttrPm.pmValidate() the date part and time part get
-            // validated first, and LocalDateTimeAttrPm will be validated just in case the
-            // validation of both parts succeeded. If a user enters a value for date part or
-            // time part, the AJAX call will invoke validation for this part, but if an error
-            // message for LocalDateTimeAttrPm still exists, this message must be cleared
-            // explicitly by this intercepting override of clearPmInvalidValues(). It is invoked
-            // in method PmAttrBase.setValueAsString() .
-            super.clearPmInvalidValues();
-            this.getPmConversationImpl().clearPmMessages(PmAttrLocalDateAndTimeImpl.this, null);
-        }
     }
 
     /**
