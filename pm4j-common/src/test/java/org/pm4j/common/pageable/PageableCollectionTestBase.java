@@ -21,6 +21,7 @@ import org.pm4j.common.query.QueryUtil;
 import org.pm4j.common.query.SortOrder;
 import org.pm4j.common.query.filter.FilterDefinition;
 import org.pm4j.common.selection.SelectMode;
+import org.pm4j.common.selection.Selection;
 import org.pm4j.common.util.beanproperty.PropertyAndVetoableChangeListener;
 import org.pm4j.common.util.collection.IterableUtil;
 
@@ -28,7 +29,7 @@ import org.pm4j.common.util.collection.IterableUtil;
  * An abstract test that checks the algorithms that should work for all kinds of
  * {@link PageableCollection}.
  *
- * @author olaf boede
+ * @author Olaf Boede
  */
 public abstract class PageableCollectionTestBase<T> {
 
@@ -450,6 +451,12 @@ public abstract class PageableCollectionTestBase<T> {
     assertEquals("Set page size event count", 0, pclPageSize.getPropChangeEventCount());
   }
 
+  @Test
+  public void testIterateAllSelection() {
+    Selection<T> allItemsSelection = collection.getSelectionHandler().getAllItemsSelection();
+    assertEquals("All items iteration result", "[a, b, c, d, e, f]", IterableUtil.shallowCopy(allItemsSelection).toString());
+  }
+
   protected static List<Bean> makeBeans(String... strings) {
     List<Bean> list = new ArrayList<Bean>();
     if (strings != null) {
@@ -463,14 +470,18 @@ public abstract class PageableCollectionTestBase<T> {
 
 
   public static class Bean {
-    public final Integer id;
+    public Integer id;
     public final String name;
     public static final QueryAttr ATTR_ID = new QueryAttr("id", String.class);
     public static final QueryAttr ATTR_NAME = new QueryAttr("name", String.class);
 
-    public Bean(int id, String name) {
-      this.id = id;
+    public Bean(String name) {
       this.name = name;
+    }
+
+    public Bean(int id, String name) {
+      this(name);
+      this.id = id;
     }
 
     @Override
@@ -480,6 +491,10 @@ public abstract class PageableCollectionTestBase<T> {
 
     public Integer getId() {
       return id;
+    }
+
+    public void setId(Integer id) {
+      this.id = id;
     }
 
     @Override

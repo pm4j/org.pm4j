@@ -1,12 +1,7 @@
 package org.pm4j.common.pageable.querybased.pagequery;
 
-import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
-
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 import org.pm4j.common.pageable.PageableCollection;
@@ -17,17 +12,118 @@ import org.pm4j.common.query.QueryExprCompare;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.query.filter.FilterDefinition;
-import org.pm4j.common.query.inmem.InMemQueryEvaluator;
 import org.pm4j.common.util.collection.IterableUtil;
 
+/**
+ * Executes the set of standard operations to test for each
+ * {@link PageableCollection} for the sub class {@link PageQueryCollection}.
+ *
+ * @author Olaf Boede
+ */
 public class PageQueryCollectionTest extends PageableCollectionTestBase<PageableCollectionTestBase.Bean> {
 
+  @Override
+  public void setUp() {
+    super.setUp();
+    assertEquals("Call count stability check.", "{getItemCount=5, getItemForId=2, getItems=5}", service.callCounter.toString());
+    service.callCounter.reset();
+  }
+
+  @Override
+  public void testItemNavigator() {
+    super.testItemNavigator();
+    assertEquals("Call count stability check.", "{getItemCount=2, getItemForId=3, getItems=3}", service.callCounter.toString());
+  }
+
+  @Override
+  public void testSwitchQueryExecOffAndOn() {
+    super.testSwitchQueryExecOffAndOn();
+    assertEquals("Call count stability check.", "{getItemCount=8, getItems=6}", service.callCounter.toString());
+  }
+
+  @Test @Override
+  public void testItemsOnPage() {
+    super.testItemsOnPage();
+    assertEquals("Call count stability check.", "{getItemCount=1, getItems=6}", service.callCounter.toString());
+  }
+
+  @Override
+  public void testSortItems() {
+    super.testSortItems();
+    assertEquals("Call count stability check.", "{getItemCount=16, getItems=12}", service.callCounter.toString());
+  }
+
+  @Override
+  public void testDefaultSortOrder() {
+    super.testDefaultSortOrder();
+    assertEquals("Call count stability check.", "{getItemCount=20, getItems=20}", service.callCounter.toString());
+  }
+
+  @Override
+  public void testFilterItems() {
+    super.testFilterItems();
+    assertEquals("Call count stability check.", "{getItemCount=6, getItems=4}", service.callCounter.toString());
+  }
+
+  @Override
+  public void testSelectItems() {
+    super.testSelectItems();
+    assertEquals("Call count stability check.", "{getItemCount=3, getItems=1}", service.callCounter.toString());
+  }
+
+  @Override
+  public void testSelectInvertAndDeselect() {
+    super.testSelectInvertAndDeselect();
+    assertEquals("Call count stability check.", "{getItemCount=3, getItems=1}", service.callCounter.toString());
+  }
+
+  @Override
+  public void testAddItem() {
+    super.testAddItem();
+    assertEquals("Call count stability check.", "{getItemCount=6, getItems=7}", service.callCounter.toString());
+  }
+
+  @Override
+  public void testAddItemToEmptyCollection() {
+    super.testAddItemToEmptyCollection();
+    assertEquals("Call count stability check.", "{getItemCount=2}", service.callCounter.toString());
+  }
+
+  @Override
+  public void testAddItemInMultiSelectMode() {
+    super.testAddItemInMultiSelectMode();
+    assertEquals("Call count stability check.", "{getItemCount=6, getItems=7}", service.callCounter.toString());
+  }
+
+  @Override
+  public void testRemoveItems() {
+    super.testRemoveItems();
+    assertEquals("Call count stability check.", "{getItemCount=4, getItems=3}", service.callCounter.toString());
+  }
+
+  @Override
+  public void testRemoveOfAddedAndUpdatedItems() {
+    super.testRemoveOfAddedAndUpdatedItems();
+    assertEquals("Call count stability check.", "{getItemCount=3, getItems=3}", service.callCounter.toString());
+  }
+
+  @Override
+  public void testIterateAllSelection() {
+    super.testIterateAllSelection();
+    assertEquals("Call count stability check.", "{getItems=2}", service.callCounter.toString());
+  }
+
+
+  // TODO: either find a better name of move to a PageQueryAllItemsSelectionTest class.
   @Test
   public void testAllItemsSelection() {
     PageQueryAllItemsSelection<Bean, Integer> selection = new PageQueryAllItemsSelection<Bean, Integer>(service);
 
     assertEquals(7L, selection.getSize());
     assertEquals("[ , a, b, c, d, e, f]", IterableUtil.asCollection(selection).toString());
+
+    // TODO oboede: getItems should have been called only once.
+    assertEquals("Call count stability check.", "{getItemCount=1, getItems=2}", service.callCounter.toString());
 
     QueryParams queryParams = new QueryParams();
     queryParams.setFilterExpression(new QueryExprCompare(Bean.ATTR_NAME, CompOpNotEquals.class, " "));
@@ -42,15 +138,14 @@ public class PageQueryCollectionTest extends PageableCollectionTestBase<Pageable
 
   // -- Test infrastructure
 
-  TestService service = new TestService();
+  private BeanPageQueryServiceFake service = new BeanPageQueryServiceFake();
 
   @Override
   protected PageableCollection<Bean> makePageableCollection(String... strings) {
-    int counter = 1;
-    service.removeAllBeans();
+    service.deleteAll();
     if (strings != null) {
       for (String s : strings) {
-        service.addBean(new Bean(++counter, s));
+        service.save(new Bean(s));
       }
     }
 
@@ -66,58 +161,4 @@ public class PageQueryCollectionTest extends PageableCollectionTestBase<Pageable
     return new Bean(id, name);
   }
 
-  // --- A fake service implementation that does the job just in memory. ---
-
-  static class TestService implements PageQueryService<Bean, Integer> {
-
-    private Map<Integer, Bean> idToBeanMap = new LinkedHashMap<Integer, Bean>();
-
-    @Override
-    public Integer getIdForItem(Bean item) {
-      return item.getId();
-    }
-
-    @Override
-    public Bean getItemForId(Integer id) {
-      return idToBeanMap.get(id);
-    }
-
-    @Override
-    public List<Bean> getItems(QueryParams query, long startIdx, int pageSize) {
-      if (startIdx >= idToBeanMap.size()) {
-        return Collections.emptyList();
-      }
-
-      List<Bean> allQueryResultItems = getQueryResult(query);
-      int endIdx = Math.min((int)startIdx + pageSize, allQueryResultItems.size());
-
-      List<Bean> beanList = allQueryResultItems.subList((int)startIdx, endIdx);
-      return beanList;
-    }
-
-    @Override
-    public long getItemCount(QueryParams query) {
-      return getQueryResult(query).size();
-    }
-
-    public void addBean(Bean b) {
-      idToBeanMap.put(b.getId(), b);
-    }
-
-    public void removeAllBeans() {
-      idToBeanMap.clear();
-    }
-
-    // some in memory fakes ...
-    private List<Bean> getQueryResult(QueryParams query) {
-      InMemQueryEvaluator<Bean> evalCtxt = new InMemQueryEvaluator<Bean>();
-      List<Bean> beans = evalCtxt.sort(idToBeanMap.values(), query.getEffectiveSortOrder());
-
-      if (query.getFilterExpression() != null) {
-        beans = evalCtxt.evaluateSubSet(beans, query.getFilterExpression());
-      }
-
-      return beans;
-    }
-  }
 }

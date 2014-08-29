@@ -10,16 +10,17 @@ import org.pm4j.common.query.QueryParams;
 /**
  * A pageable ID service fake that works in memory.
  *
- * @param <T_ITEM>
- * @param <T_ID>
+ * @param <T_ITEM> Query result item type.
+ * @param <T_ID> Query result item ID type.
  *
- * @author olaf boede
+ * @author Olaf Boede
  */
-public abstract class IdQueryServiceFakeBase<T_ITEM, T_ID> extends QueryServiceFakeBase<T_ITEM, T_ID> implements IdQueryService<T_ITEM, T_ID> {
+public class IdQueryServiceFake<T_ITEM, T_ID>
+    extends QueryServiceFakeBase<T_ITEM, T_ID>
+    implements IdQueryService<T_ITEM, T_ID> {
 
   public static final String METHOD_FIND_IDS = "findIds";
   public static final String METHOD_GET_ITEMS = "getItems";
-  public static final String METHOD_GET_ITEM_COUNT = "getItemCount";
 
 
   @Override
@@ -50,10 +51,24 @@ public abstract class IdQueryServiceFakeBase<T_ITEM, T_ID> extends QueryServiceF
     return beans;
   }
 
-  @Override
-  public long getItemCount(QueryParams query) {
-    callCounter.incCallCount(METHOD_GET_ITEM_COUNT);
-    return getQueryResult(query).size();
+
+  /** {@link IdQueryService} fake for result items having an {@link Integer} identifier. */
+  public static class WithIntegerId<T_ITEM> extends IdQueryServiceFake<T_ITEM, Integer> {
+    private int nextId = 1;
+
+    @Override
+    protected Integer makeIdForItem(T_ITEM i) {
+      return nextId++;
+    }
   }
 
+  /** {@link IdQueryService} fake for result items having a {@link Long} identifier. */
+  public static class WithLongId<T_ITEM> extends IdQueryServiceFake<T_ITEM, Long> {
+    private long nextId = 1;
+
+    @Override
+    protected Long makeIdForItem(T_ITEM i) {
+      return nextId++;
+    }
+  }
 }

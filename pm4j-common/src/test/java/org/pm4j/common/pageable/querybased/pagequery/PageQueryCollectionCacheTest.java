@@ -5,19 +5,18 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 import org.pm4j.common.pageable.PageableCollectionTestBase.Bean;
-import org.pm4j.common.pageable.querybased.pagequery.PageQueryCollectionTest.TestService;
 import org.pm4j.common.query.QueryParams;
 
 public class PageQueryCollectionCacheTest {
 
   private static int NUM_OF_ITEMS = 19;
-  private TestService service = new PageQueryCollectionTest.TestService();
+  private BeanPageQueryServiceFake service = new BeanPageQueryServiceFake();
 
 
   @Before
   public void setUp() {
     for (int counter = 0; counter < NUM_OF_ITEMS; ++counter) {
-      service.addBean(new Bean(counter, Integer.toString(counter)));
+      service.save(new Bean(counter, Integer.toString(counter)));
     }
   }
 

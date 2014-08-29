@@ -12,11 +12,10 @@ public class IdQueryCollectionImplTest extends PageableCollectionTestBase<Pageab
 
   @Override
   protected PageableCollection<Bean> makePageableCollection(String... strings) {
-    int counter = 1;
-    service.removeAllFakeItems();
+    service.deleteAll();
     if (strings != null) {
       for (String s : strings) {
-        service.addFakeItem(new Bean(++counter, s));
+        service.save(new Bean(s));
       }
     }
     return new IdQueryCollectionImpl<Bean, Integer>(service, getQueryOptions());
@@ -127,11 +126,14 @@ public class IdQueryCollectionImplTest extends PageableCollectionTestBase<Pageab
     assertEquals("Call count stability check.", "{findIds=2, getItemForId=12, getItems=1}", service.callCounter.toString());
   }
 
+  @Override
+  @Test
+  public void testIterateAllSelection() {
+    super.testIterateAllSelection();
+    assertEquals("Call count stability check.", "{findIds=1, getItemForId=6}", service.callCounter.toString());
+  }
+
   // --- A fake service implementation that does the job just in memory. ---
 
-  static class TestService extends IdQueryServiceFakeBase<Bean, Integer> implements IdQueryService<Bean, Integer> {
-    @Override public Integer getIdForItem(Bean item) {
-      return item.getId();
-    }
-  }
+  static class TestService extends IdQueryServiceFake.WithIntegerId<Bean>{}
 }
