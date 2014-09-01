@@ -38,4 +38,6 @@ public interface IdQueryService<T_BEAN, T_ID> extends QueryService<T_BEAN, T_ID>
    */
   List<T_BEAN> getItems(List<T_ID> ids);
 
+  @Override
+  public long getItemCount(QueryParams query);
 }

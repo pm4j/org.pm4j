@@ -29,7 +29,7 @@ public class IdQueryCollectionImplTest extends PageableCollectionTestBase<Pageab
   @Override
   public void setUp() {
     super.setUp();
-    assertEquals("Call count stability check.", "{findIds=1, getItemForId=11, getItems=1}", service.callCounter.toString());
+    assertEquals("Call count stability check.", "{findIds=1, getItemForId=8, getItems=4}", service.callCounter.toString());
     service.callCounter.reset();
   }
 
@@ -51,7 +51,7 @@ public class IdQueryCollectionImplTest extends PageableCollectionTestBase<Pageab
   @Test @Override
   public void testItemNavigator() {
     super.testItemNavigator();
-    assertEquals("Call count stability check.", "{findIds=1, getItemForId=9, getItems=1}", service.callCounter.toString());
+    assertEquals("Call count stability check.", "{findIds=1, getItems=4}", service.callCounter.toString());
   }
 
   @Test @Override
@@ -99,7 +99,7 @@ public class IdQueryCollectionImplTest extends PageableCollectionTestBase<Pageab
   @Override
   public void testAddItem() {
     super.testAddItem();
-    assertEquals("Call count stability check.", "{findIds=2, getItemForId=8, getItems=4}", service.callCounter.toString());
+    assertEquals("Call count stability check.", "{findIds=2, getItemForId=6, getItems=6}", service.callCounter.toString());
   }
 
   @Override
@@ -111,26 +111,49 @@ public class IdQueryCollectionImplTest extends PageableCollectionTestBase<Pageab
   @Override
   public void testAddItemInMultiSelectMode() {
     super.testAddItemInMultiSelectMode();
-    assertEquals("Call count stability check.", "{findIds=2, getItemForId=8, getItems=4}", service.callCounter.toString());
+    assertEquals("Call count stability check.", "{findIds=2, getItemForId=6, getItems=6}", service.callCounter.toString());
   }
 
   @Override
   public void testRemoveItems() {
     super.testRemoveItems();
-    assertEquals("Call count stability check.", "{findIds=2, getItemForId=8, getItems=1}", service.callCounter.toString());
+    assertEquals("Call count stability check.", "{findIds=2, getItemForId=4, getItems=3}", service.callCounter.toString());
   }
 
   @Override
   public void testRemoveOfAddedAndUpdatedItems() {
     super.testRemoveOfAddedAndUpdatedItems();
-    assertEquals("Call count stability check.", "{findIds=2, getItemForId=12, getItems=1}", service.callCounter.toString());
+    assertEquals("Call count stability check.", "{findIds=2, getItems=3}", service.callCounter.toString());
   }
 
   @Override
   @Test
-  public void testIterateAllSelection() {
-    super.testIterateAllSelection();
-    assertEquals("Call count stability check.", "{findIds=1, getItemForId=6}", service.callCounter.toString());
+  public void testIterateAllSelectionWithBlockSize3() {
+    super.testIterateAllSelectionWithBlockSize3();
+    assertEquals("Call count stability check.", "{findIds=1, getItems=2}", service.callCounter.toString());
+  }
+
+  @Override @Test
+  public void testIterateAllSelectionWithBlockSize6() {
+    super.testIterateAllSelectionWithBlockSize6();
+    assertEquals("Call count stability check.", "{findIds=1, getItems=1}", service.callCounter.toString());
+  }
+
+  @Override @Test
+  public void testIteratePositiveSelectionOf3ItemsWithBlockSize2() {
+    super.testIteratePositiveSelectionOf3ItemsWithBlockSize2();
+    assertEquals("Call count stability check.", "{getItems=2}", service.callCounter.toString());
+  }
+
+  @Override @Test
+  public void testIterateAllSelectionMinusOneWithBlockSize2() {
+    super.testIterateAllSelectionMinusOneWithBlockSize2();
+    assertEquals("Call count stability check.", "{getItems=3}", service.callCounter.toString());
+  }
+
+  @Override
+  protected void resetCallCounter() {
+    service.callCounter.reset();
   }
 
   // --- A fake service implementation that does the job just in memory. ---

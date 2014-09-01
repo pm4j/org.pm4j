@@ -32,7 +32,7 @@ public class PageQueryCollectionTest extends PageableCollectionTestBase<Pageable
   @Override
   public void testItemNavigator() {
     super.testItemNavigator();
-    assertEquals("Call count stability check.", "{getItemCount=2, getItemForId=3, getItems=3}", service.callCounter.toString());
+    assertEquals("Call count stability check.", "{getItemCount=2, getItemForId=3, getItems=2}", service.callCounter.toString());
   }
 
   @Override
@@ -104,13 +104,33 @@ public class PageQueryCollectionTest extends PageableCollectionTestBase<Pageable
   @Override
   public void testRemoveOfAddedAndUpdatedItems() {
     super.testRemoveOfAddedAndUpdatedItems();
-    assertEquals("Call count stability check.", "{getItemCount=3, getItems=3}", service.callCounter.toString());
+    assertEquals("Call count stability check.", "{getItemCount=3, getItems=2}", service.callCounter.toString());
   }
 
   @Override
-  public void testIterateAllSelection() {
-    super.testIterateAllSelection();
+  public void testIterateAllSelectionWithBlockSize3() {
+    super.testIterateAllSelectionWithBlockSize3();
+    assertEquals("Call count stability check.", "{getItems=3}", service.callCounter.toString());
+  }
+
+  @Override @Test
+  public void testIterateAllSelectionWithBlockSize6() {
+    super.testIterateAllSelectionWithBlockSize6();
+    // TODO oboede: should be one less.
     assertEquals("Call count stability check.", "{getItems=2}", service.callCounter.toString());
+  }
+
+  @Override @Test
+  public void testIteratePositiveSelectionOf3ItemsWithBlockSize2() {
+    super.testIteratePositiveSelectionOf3ItemsWithBlockSize2();
+    assertEquals("Call count stability check.", "{getItemForId=3}", service.callCounter.toString());
+  }
+
+  @Override @Test
+  public void testIterateAllSelectionMinusOneWithBlockSize2() {
+    super.testIterateAllSelectionMinusOneWithBlockSize2();
+    // TODO oboede: should be one less
+    assertEquals("Call count stability check.", "{getItems=4}", service.callCounter.toString());
   }
 
 
@@ -122,8 +142,7 @@ public class PageQueryCollectionTest extends PageableCollectionTestBase<Pageable
     assertEquals(7L, selection.getSize());
     assertEquals("[ , a, b, c, d, e, f]", IterableUtil.asCollection(selection).toString());
 
-    // TODO oboede: getItems should have been called only once.
-    assertEquals("Call count stability check.", "{getItemCount=1, getItems=2}", service.callCounter.toString());
+    assertEquals("Call count stability check.", "{getItemCount=1, getItems=1}", service.callCounter.toString());
 
     QueryParams queryParams = new QueryParams();
     queryParams.setFilterExpression(new QueryExprCompare(Bean.ATTR_NAME, CompOpNotEquals.class, " "));
@@ -137,6 +156,11 @@ public class PageQueryCollectionTest extends PageableCollectionTestBase<Pageable
   }
 
   // -- Test infrastructure
+
+  @Override
+  protected void resetCallCounter() {
+    service.callCounter.reset();
+  }
 
   private BeanPageQueryServiceFake service = new BeanPageQueryServiceFake();
 

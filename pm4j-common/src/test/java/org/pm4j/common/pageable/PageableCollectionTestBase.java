@@ -452,9 +452,50 @@ public abstract class PageableCollectionTestBase<T> {
   }
 
   @Test
-  public void testIterateAllSelection() {
+  public void testIterateAllSelectionWithBlockSize3() {
     Selection<T> allItemsSelection = collection.getSelectionHandler().getAllItemsSelection();
+    allItemsSelection.setIteratorBlockSizeHint(3);
     assertEquals("All items iteration result", "[a, b, c, d, e, f]", IterableUtil.shallowCopy(allItemsSelection).toString());
+  }
+
+  @Test
+  public void testIterateAllSelectionWithBlockSize6() {
+    Selection<T> allItemsSelection = collection.getSelectionHandler().getAllItemsSelection();
+    allItemsSelection.setIteratorBlockSizeHint(6);
+    assertEquals("All items iteration result", "[a, b, c, d, e, f]", IterableUtil.shallowCopy(allItemsSelection).toString());
+  }
+
+  @Test
+  public void testIteratePositiveSelectionOf3ItemsWithBlockSize2() {
+    collection.getSelectionHandler().setSelectMode(SelectMode.MULTI);
+    // first item
+    collection.getSelectionHandler().select(true, collection.getItemsOnPage().get(0));
+    collection.setPageIdx(1L);
+    // third and fourth item
+    collection.getSelectionHandler().select(true, collection.getItemsOnPage().get(0));
+    collection.getSelectionHandler().select(true, collection.getItemsOnPage().get(1));
+
+    Selection<T> selection = collection.getSelection();
+    selection.setIteratorBlockSizeHint(2);
+    resetCallCounter();
+    assertEquals("Three selected items iteration result", "[a, c, d]", IterableUtil.shallowCopy(selection).toString());
+  }
+
+  @Test
+  public void testIterateAllSelectionMinusOneWithBlockSize2() {
+    collection.getSelectionHandler().setSelectMode(SelectMode.MULTI);
+    collection.getSelectionHandler().selectAll(true);
+    collection.getSelectionHandler().select(false, collection.getItemsOnPage().get(1));
+    Selection<T> selection = collection.getSelection();
+    selection.setIteratorBlockSizeHint(2);
+    resetCallCounter();
+    assertEquals("All items minus one selection iteration result", "[a, c, d, e, f]", IterableUtil.shallowCopy(selection).toString());
+  }
+
+  // -- Test infrastructure --
+
+  /** Specific test classes reset their call counters when this gets called. */
+  protected void resetCallCounter() {
   }
 
   protected static List<Bean> makeBeans(String... strings) {

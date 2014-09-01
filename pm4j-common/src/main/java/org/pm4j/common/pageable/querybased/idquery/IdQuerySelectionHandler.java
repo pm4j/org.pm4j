@@ -8,12 +8,20 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.pm4j.common.pageable.querybased.QueryService;
 import org.pm4j.common.selection.SelectMode;
 import org.pm4j.common.selection.Selection;
+import org.pm4j.common.selection.SelectionHandler;
 import org.pm4j.common.selection.SelectionHandlerBase;
 
 
+/**
+ * {@link SelectionHandler} for {@link IdQueryCollectionImpl}s.
+ *
+ * @param <T_ITEM> type of items to handle.
+ * @param <T_ID> type of item id's.
+ *
+ * @author Olaf Boede
+ */
 public abstract class IdQuerySelectionHandler<T_ITEM, T_ID> extends SelectionHandlerBase<T_ITEM> {
 
   private static final Log LOG = LogFactory.getLog(IdQuerySelectionHandler.class);
@@ -22,17 +30,17 @@ public abstract class IdQuerySelectionHandler<T_ITEM, T_ID> extends SelectionHan
   private final IdQuerySelectionBase<T_ITEM, T_ID> emptySelection;
 
   /** The converter used to get items for the internally handled id's. */
-  private final QueryService<T_ITEM, T_ID> itemIdConverter;
+  private final IdQueryService<T_ITEM, T_ID> idQueryService;
 
   /** The current selection. */
   private IdQuerySelectionBase<T_ITEM, T_ID> selection;
 
   @SuppressWarnings("unchecked")
-  public IdQuerySelectionHandler(QueryService<T_ITEM, T_ID> itemIdConverter) {
-    assert itemIdConverter != null;
+  public IdQuerySelectionHandler(IdQueryService<T_ITEM, T_ID> idQueryService) {
+    assert idQueryService != null;
 
-    this.itemIdConverter = itemIdConverter;
-    this.emptySelection = new IdQuerySelectionBase<T_ITEM, T_ID>(itemIdConverter, Collections.EMPTY_SET);
+    this.idQueryService = idQueryService;
+    this.emptySelection = new IdQuerySelectionBase<T_ITEM, T_ID>(idQueryService, Collections.EMPTY_SET);
     this.selection = emptySelection;
   }
 
@@ -47,7 +55,7 @@ public abstract class IdQuerySelectionHandler<T_ITEM, T_ID> extends SelectionHan
    @Override
   public boolean select(boolean select, T_ITEM item) {
     Set<T_ID> set = getModifiableIdSet();
-    T_ID id = itemIdConverter.getIdForItem(item);
+    T_ID id = idQueryService.getIdForItem(item);
     if (select) {
       beforeAddSingleItemSelection(set);
       set.add(id);
@@ -68,10 +76,10 @@ public abstract class IdQuerySelectionHandler<T_ITEM, T_ID> extends SelectionHan
 
     for (T_ITEM i : items) {
       if (select) {
-        ids.add(itemIdConverter.getIdForItem(i));
+        ids.add(idQueryService.getIdForItem(i));
       }
       else {
-        ids.remove(itemIdConverter.getIdForItem(i));
+        ids.remove(idQueryService.getIdForItem(i));
       }
     }
 
@@ -137,13 +145,13 @@ public abstract class IdQuerySelectionHandler<T_ITEM, T_ID> extends SelectionHan
 
   @Override
   public Selection<T_ITEM> getAllItemsSelection() {
-    return new IdQuerySelectionBase<T_ITEM, T_ID>(itemIdConverter, new HashSet<T_ID>(getAllIds()));
+    return new IdQuerySelectionBase<T_ITEM, T_ID>(idQueryService, new HashSet<T_ID>(getAllIds()));
   }
 
   private boolean setSelection(Set<T_ID> selectedIds) {
     return setSelection(selectedIds.isEmpty()
         ? emptySelection
-        : new IdQuerySelectionBase<T_ITEM, T_ID>(itemIdConverter, selectedIds));
+        : new IdQuerySelectionBase<T_ITEM, T_ID>(idQueryService, selectedIds));
   }
 
   private Set<T_ID> getModifiableIdSet() {

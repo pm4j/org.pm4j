@@ -72,11 +72,19 @@ public abstract class PageQueryItemIteratorBase<T_ITEM> implements Iterator<T_IT
                         (pagePos == pageItems.size()-1);
 
       if (doQuery) {
+        // if previous read block was not completely filled, the query call sequence already did provide
+        // all available results.
+        if ((pageItems != null) && (pageItems.size() < iteratorBlockSize)) {
+          item = null;
+          pageItems = null;
+          return;
+        }
+
         pagePos = 0;
         pageItems = getItems(idx, iteratorBlockSize);
         if (pageItems == null || pageItems.isEmpty()) {
           item = null;
-          idx = -1;
+          pageItems = null;
           return;
         }
       }
