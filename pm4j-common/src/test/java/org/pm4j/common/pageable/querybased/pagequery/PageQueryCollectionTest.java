@@ -116,7 +116,8 @@ public class PageQueryCollectionTest extends PageableCollectionTestBase<Pageable
   @Override @Test
   public void testIterateAllSelectionWithBlockSize6() {
     super.testIterateAllSelectionWithBlockSize6();
-    // TODO oboede: should be one less.
+    // Two calls, because the first block was completely filled.
+    // The second call is in that case needed to find out that there are no more items.
     assertEquals("Call count stability check.", "{getItems=2}", service.callCounter.toString());
   }
 
@@ -129,12 +130,17 @@ public class PageQueryCollectionTest extends PageableCollectionTestBase<Pageable
   @Override @Test
   public void testIterateAllSelectionMinusOneWithBlockSize2() {
     super.testIterateAllSelectionMinusOneWithBlockSize2();
-    // TODO oboede: should be one less
     assertEquals("Call count stability check.", "{getItems=4}", service.callCounter.toString());
   }
 
+  @Override @Test
+  public void testIterateEmptySelection() {
+    super.testIterateEmptySelection();
+    assertEquals("Call count stability check.", "{}", service.callCounter.toString());
+  }
 
-  // TODO: either find a better name of move to a PageQueryAllItemsSelectionTest class.
+
+  // XXX: either find a better name of move to a PageQueryAllItemsSelectionTest class.
   @Test
   public void testAllItemsSelection() {
     PageQueryAllItemsSelection<Bean, Integer> selection = new PageQueryAllItemsSelection<Bean, Integer>(service);

@@ -492,6 +492,15 @@ public abstract class PageableCollectionTestBase<T> {
     assertEquals("All items minus one selection iteration result", "[a, c, d, e, f]", IterableUtil.shallowCopy(selection).toString());
   }
 
+  @Test
+  public void testIterateEmptySelection() {
+    resetCallCounter();
+    Selection<T> selection = collection.getSelection();
+    assertEquals("Empty selection returns no items.", "[]", IterableUtil.shallowCopy(selection).toString());
+  }
+
+
+
   // -- Test infrastructure --
 
   /** Specific test classes reset their call counters when this gets called. */
