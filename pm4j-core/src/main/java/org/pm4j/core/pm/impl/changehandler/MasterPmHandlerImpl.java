@@ -241,17 +241,18 @@ public abstract class MasterPmHandlerImpl<T_MASTER_BEAN> implements MasterPmHand
    * This way the user gets all relevant validation messages for the user
    * operation.
    *
+   * @param oldMasterBean the currently selected master bean
+   * @param newMasterBean the new selected master bean
    * @return <code>true</code> if the switch can be performed.
    */
-  private boolean beforeSwitch() {
-    T_MASTER_BEAN b = getSelectedMasterBean();
-    if (b == null) {
+  private boolean beforeSwitch(Object oldMasterBean, Object newMasterBean) {
+    if (oldMasterBean == null) {
       return true;
     }
-
+    
     boolean allDetailsAgree = true;
     for (DetailsPmHandler dh : detailsHandlers) {
-      if (!dh.beforeMasterRecordChange(b)) {
+      if (!dh.beforeMasterRecordChange(oldMasterBean, newMasterBean)) {
         allDetailsAgree = false;
       }
     }
@@ -275,7 +276,9 @@ public abstract class MasterPmHandlerImpl<T_MASTER_BEAN> implements MasterPmHand
 
       @Override
       public void vetoableChange(PropertyChangeEvent evt) throws PropertyVetoException {
-        if (!beforeSwitch()) {
+        Object oldValue = getBeanFromEventValue(evt.getOldValue());
+        Object newValue = getBeanFromEventValue(evt.getNewValue());
+        if (!beforeSwitch(oldValue, newValue)) {
           throw new PropertyVetoException("MasterPmSelectionHandler prevents switch", evt);
         }
 
@@ -302,6 +305,21 @@ public abstract class MasterPmHandlerImpl<T_MASTER_BEAN> implements MasterPmHand
       afterMasterSelectionChange();
 
       changedMasterBean = null;
+    }
+    
+    private Object getBeanFromEventValue(Object eventValue) {
+      if (eventValue == null) {
+        return null;
+      }
+      
+      if (Selection.class.isAssignableFrom(eventValue.getClass())) {
+        Selection<?> selection = (Selection<?>) eventValue;
+        return (selection != null && selection.getSize() == 1)
+               ? selection.iterator().next()
+               : null;
+      }
+    
+      return eventValue;
     }
   }
 

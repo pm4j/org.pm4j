@@ -251,7 +251,9 @@ public class DeprMasterPmTableHandlerImpl<T_MASTER_BEAN> implements MasterPmHand
     }
 
     for (DetailsPmHandler dh : detailsHandlers) {
-      if (!dh.beforeMasterRecordChange(rowPm.getPmBean())) {
+      // If you need the second parameter in the DetailsPmHandler
+      // please use MasterPmTableHandlerImpl.
+      if (!dh.beforeMasterRecordChange(rowPm.getPmBean(), null)) {
         return false;
       }
     }

@@ -72,8 +72,8 @@ public abstract class DetailsPmTableHandlerBase<T_MASTER_BEAN, T_DETAILS_BEAN> e
   }
 
   @Override
-  protected boolean beforeMasterRecordChangeImpl(T_MASTER_BEAN oldMasterBean) {
-    boolean canDo =  super.beforeMasterRecordChangeImpl(oldMasterBean);
+  protected boolean beforeMasterRecordChangeImpl(T_MASTER_BEAN oldMasterBean, T_MASTER_BEAN newMasterBean) {
+    boolean canDo =  super.beforeMasterRecordChangeImpl(oldMasterBean, newMasterBean);
     if (canDo) {
       this.beforeSwitchModifications = (Modifications<T_DETAILS_BEAN>) getDetailsTable().getPmPageableBeanCollection().getModifications();
       this.beforeSwitchMasterBean = oldMasterBean;

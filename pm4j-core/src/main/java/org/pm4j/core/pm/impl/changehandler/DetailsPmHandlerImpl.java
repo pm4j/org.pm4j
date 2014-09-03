@@ -46,13 +46,13 @@ public class DetailsPmHandlerImpl<T_DETAILS_PM extends PmDataInput, T_MASTER_REC
 
   /** Calls <code>beforeDo</code> for all decorators and {@link #beforeMasterRecordChangeImpl(Object)}. */
   @SuppressWarnings("unchecked")
-  public final boolean beforeMasterRecordChange(Object oldMasterRecord) {
+  public final boolean beforeMasterRecordChange(Object oldMasterRecord, Object newMasterRecord) {
     for (PmCommandDecorator d : decorators) {
       if (!d.beforeDo(null)) {
         return false;
       }
     }
-    return beforeMasterRecordChangeImpl((T_MASTER_RECORD) oldMasterRecord);
+    return beforeMasterRecordChangeImpl((T_MASTER_RECORD) oldMasterRecord, (T_MASTER_RECORD) newMasterRecord);
   }
 
   /**
@@ -64,9 +64,10 @@ public class DetailsPmHandlerImpl<T_DETAILS_PM extends PmDataInput, T_MASTER_REC
    * area is not valid.
    *
    * @param oldMasterBean The master bean to deselect.
+   * @param newMasterBean The master bean to select.
    * @return <code>true</code> if this handler agrees to the switch. <code>false</code> prevents the switch.
    */
-  protected boolean beforeMasterRecordChangeImpl(T_MASTER_RECORD oldMasterBean) {
+  protected boolean beforeMasterRecordChangeImpl(T_MASTER_RECORD oldMasterBean, T_MASTER_RECORD newMasterRecord) {
     if (!canSwitchMasterRecord()) {
       return false;
     }

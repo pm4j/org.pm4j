@@ -29,9 +29,10 @@ public interface DetailsPmHandler {
    * from the given master record to another one.
    *
    * @param oldMasterBean The master record to deselect.
+   * @param newMasterBean The master record to select.
    * @return <code>true</code> if this handler agrees to the switch. <code>false</code> prevents the switch.
    */
-  boolean beforeMasterRecordChange(Object oldMasterBean);
+  boolean beforeMasterRecordChange(Object oldMasterBean, Object newMasterBean);
 
   /**
    * Gets called after a master record selection change.
