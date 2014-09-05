@@ -73,7 +73,7 @@ public abstract class CompOpBase<T_VALUE> implements CompOp {
   protected abstract boolean isEffectiveFilterValueImpl(T_VALUE filterValue);
 
   /**
-   * This class has currently no parallel {@link #hashCode()} implentation because it is not immutable.
+   * This class has currently no parallel {@link #hashCode()} implementation because it is not immutable.
    */
   @Override
   public boolean equals(Object obj) {

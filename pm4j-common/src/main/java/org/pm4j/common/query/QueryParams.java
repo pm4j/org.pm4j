@@ -39,16 +39,32 @@ public class QueryParams extends PropertyChangeSupportedBase implements Cloneabl
   private boolean execQuery = true;
 
   /**
-   * Creates a new instance.
+   * Creates a new empty instance.
    */
   public QueryParams() {
-    this(null);
+    this(null, null);
   }
 
   /**
    * @param defaultSortOrder the default sort order.
    */
   public QueryParams(SortOrder defaultSortOrder) {
+    this(null, defaultSortOrder);
+  }
+
+  /**
+   * @param filterExpression Defines a filter expression to be used.
+   */
+  public QueryParams(QueryExpr filterExpression) {
+    this(filterExpression, null);
+  }
+
+  /**
+   * @param filterExpression Defines a filter expression to be used.
+   * @param defaultSortOrder The default sort order.
+   */
+  public QueryParams(QueryExpr filterExpression, SortOrder defaultSortOrder) {
+    this.filterExpression = filterExpression;
     this.defaultSortOrder = defaultSortOrder;
   }
 
