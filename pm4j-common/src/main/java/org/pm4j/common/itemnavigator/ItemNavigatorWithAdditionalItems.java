@@ -3,17 +3,15 @@ package org.pm4j.common.itemnavigator;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.pm4j.common.pageable.inmem.InMemCollectionItemNavigator;
-
 /**
  * A navigator over a set of persistent and transient items.
  * <p>
  * The persistent items are handled by a separate {@link ItemNavigator}.</br>
  * The transient items are handled within a simple list.
  *
- * @param <T>
+ * @param <T> Item type.
  *
- * @author olaf boede
+ * @author Olaf Boede
  */
 public class ItemNavigatorWithAdditionalItems<T> implements ItemNavigator<T> {
 
@@ -34,21 +32,6 @@ public class ItemNavigatorWithAdditionalItems<T> implements ItemNavigator<T> {
     for (T t : transientItems) {
       this.additionalItems.add(t);
     }
-  }
-
-  /**
-   * @param baseNavigator
-   *          a navigator that usually provides the persistent items to navigate
-   *          over.
-   *          <p>
-   *          May be <code>null</code>. This creates a navigator having only
-   *          additional items.
-   */
-  public ItemNavigatorWithAdditionalItems(ItemNavigator<T> baseNavigator) {
-    assert baseNavigator != null;
-    this.baseNavigator = baseNavigator != null
-        ? baseNavigator
-        : new InMemCollectionItemNavigator<T>(null);
   }
 
   @Override

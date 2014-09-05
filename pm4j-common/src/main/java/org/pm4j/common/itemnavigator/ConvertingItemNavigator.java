@@ -5,7 +5,7 @@ package org.pm4j.common.itemnavigator;
  * An {@link ItemNavigator} that iterates over a collection of items having a
  * different type.
  *
- * @author olaf boede
+ * @author Olaf Boede
  */
 public class ConvertingItemNavigator<T_EXTERNAL, T_INTERNAL> implements ItemNavigator<T_EXTERNAL> {
 
@@ -34,18 +34,15 @@ public class ConvertingItemNavigator<T_EXTERNAL, T_INTERNAL> implements ItemNavi
     this.converter = converter;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public T_EXTERNAL navigateTo(int itemPos) {
-    currentItem = converter.toNavigatorItemType(queryNavigator.navigateTo(itemPos));
+    // prevent unnecessary calls if this gets called multiple times for the same position.
+    if (queryNavigator.getCurrentItemIdx() != itemPos || currentItem == null) {
+      currentItem = converter.toNavigatorItemType(queryNavigator.navigateTo(itemPos));
+    }
     return currentItem;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public T_EXTERNAL getCurrentItem() {
     if (currentItem == null) {
@@ -57,25 +54,16 @@ public class ConvertingItemNavigator<T_EXTERNAL, T_INTERNAL> implements ItemNavi
     return currentItem;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public int getNumOfItems() {
     return queryNavigator.getNumOfItems();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public int getCurrentItemIdx() {
     return queryNavigator.getCurrentItemIdx();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void clearCaches() {
     queryNavigator.clearCaches();

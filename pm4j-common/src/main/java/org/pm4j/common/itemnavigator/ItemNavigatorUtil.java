@@ -5,7 +5,7 @@ package org.pm4j.common.itemnavigator;
 /**
  * Some useful {@link ItemNavigator} methods.
  *
- * @author olaf boede
+ * @author Olaf Boede
  */
 public class ItemNavigatorUtil {
 
