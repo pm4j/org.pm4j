@@ -105,7 +105,8 @@ public class PmAttrLocalDateAndTimeImpl extends PmAttrLocalDateTimeImpl {
         @Override
         protected void validate(LocalDate value) throws PmValidationException {
           super.validate(value);
-          if (value == null) {
+          // This part gets required if the other part has entered data.
+          if (value == null && timePart.getValue() != null) {
             throw new PmValidationException(PmMessageApi.makeRequiredMessageResData(this));
           }
         }
@@ -137,7 +138,8 @@ public class PmAttrLocalDateAndTimeImpl extends PmAttrLocalDateTimeImpl {
         @Override
         protected void validate(LocalTime value) throws PmValidationException {
           super.validate(value);
-          if (value == null) {
+          // This part gets required if the other part has entered data.
+          if (value == null && datePart.getValue() != null) {
             throw new PmValidationException(PmMessageApi.makeRequiredMessageResData(this));
           }
         }
