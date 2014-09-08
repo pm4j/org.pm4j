@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -26,6 +27,7 @@ public class AddPmMessageCallbackBaseTest {
 
   @Before
   public void setUp() {
+    conv.setPmLocale(Locale.ENGLISH);
     conv.setAddPmMessageCallback(addMessageCallback);
   }
 
