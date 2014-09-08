@@ -37,17 +37,25 @@ public final class PmConstants {
    */
   public static final String SUCCESS_MSG_KEY_POSTFIX = "_successInfo";
 
+  /** Default message: Unable to convert value in field "{0}". */
   public static final String MSGKEY_VALIDATION_CONVERSION_FROM_STRING_FAILED = "pmAttr_validationConversionFromStringFailed";
+  /** Default message: Unable to convert the entered string to a numeric value in field "{0}". */
   public static final String MSGKEY_VALIDATION_NUMBER_CONVERSION_FROM_STRING_FAILED = "pmAttr_validationNumberConversionFromStringFailed";
+  /** Default message: The value of the field "{0}" cannot be interpreted. Please use the format "{1}". */
   public static final String MSGKEY_VALIDATION_FORMAT_FAILURE                = "pmAttr_validationFormatFailure";
+  /** Default message: Please enter a value into "{0}". */
   public static final String MSGKEY_VALIDATION_MISSING_REQUIRED_VALUE        = "pmAttr_validationMissingRequiredValue";
+  /** Default message: Please select a value for "{0}". */
   public static final String MSGKEY_VALIDATION_MISSING_REQUIRED_SELECTION    = "pmAttr_validationMissingRequiredSelection";
   /** Default message: Please enter at least {0} characters in field "{1}". */
   public static final String MSGKEY_VALIDATION_VALUE_TOO_SHORT               = "pmAttr_validationValueTooShort";
   /** Default message: Please enter maximal {0} characters in field "{1}". */
   public static final String MSGKEY_VALIDATION_VALUE_TOO_LONG                = "pmAttr_validationValueTooLong";
+  /** Default message: Please enter a number not less than {0} in field "{1}". */
   public static final String MSGKEY_VALIDATION_VALUE_TOO_LOW                 = "pmAttr_validationValueTooLow";
+  /** Default message: Please enter a number not more than {0} in field "{1}". */
   public static final String MSGKEY_VALIDATION_VALUE_TOO_HIGH                = "pmAttr_validationValueTooHigh";
+  /** Default message: The field "{0}" cannot be altered. */
   public static final String MSGKEY_VALIDATION_READONLY                      = "pmAttr_validationReadonly";
   /** A message like: Unable to set value in field "{field-title}": {exception-message} */
   public static final String MSGKEY_SET_VALUE_EXCEPTION                      = "pmAttr_setValueException";
