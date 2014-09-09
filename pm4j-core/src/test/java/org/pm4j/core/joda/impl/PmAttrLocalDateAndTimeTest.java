@@ -1,5 +1,6 @@
 package org.pm4j.core.joda.impl;
 
+import static junit.framework.Assert.assertFalse;
 import static org.junit.Assert.assertEquals;
 import static org.pm4j.tools.test.PmAssert.assertNotRequired;
 import static org.pm4j.tools.test.PmAssert.assertRequired;
@@ -104,6 +105,8 @@ public class PmAttrLocalDateAndTimeTest {
   @Test
   public void enterTimePartOnlyLeadsToMissingDateValidationError() {
     setValueAsString(dt.timePart, "11:00");
+    assertFalse("The date part will not be marked dynamically as 'required'. Only the validation will complain.",
+                dt.datePart.isRequired());
     validateNotSuccessful(dt, "Please enter a value into \"DateTime / pmAttrDateTime_datePart\".");
   }
 
@@ -116,6 +119,8 @@ public class PmAttrLocalDateAndTimeTest {
   @Test
   public void enterDatePartOnlyLeadsToMissingTimeValidationError() {
     setValueAsString(dt.datePart, "01/01/2014");
+    assertFalse("The time part will not be marked dynamically as 'required'. Only the validation will complain.",
+                dt.timePart.isRequired());
     validateNotSuccessful(dt, "Please enter a value into \"DateTime / pmAttrDateTime_timePart\".");
   }
 
