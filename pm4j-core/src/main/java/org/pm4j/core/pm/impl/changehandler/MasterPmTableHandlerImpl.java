@@ -25,7 +25,7 @@ public class MasterPmTableHandlerImpl<T_MASTER_BEAN> extends MasterPmHandlerImpl
    * @param detailsHandlers
    *          the dependent detail area handlers.
    */
-  public MasterPmTableHandlerImpl(PmTableImpl<?, T_MASTER_BEAN> masterPm, DetailsPmHandler[] detailsHandlers) {
+  public MasterPmTableHandlerImpl(PmTableImpl<?, T_MASTER_BEAN> masterPm, DetailsPmHandler... detailsHandlers) {
     super(masterPm, masterPm.getPmPageableBeanCollection().getSelectionHandler(), detailsHandlers);
   }
 

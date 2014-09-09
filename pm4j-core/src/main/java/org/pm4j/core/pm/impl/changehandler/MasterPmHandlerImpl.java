@@ -249,7 +249,7 @@ public abstract class MasterPmHandlerImpl<T_MASTER_BEAN> implements MasterPmHand
     if (oldMasterBean == null) {
       return true;
     }
-    
+
     boolean allDetailsAgree = true;
     for (DetailsPmHandler dh : detailsHandlers) {
       if (!dh.beforeMasterRecordChange(oldMasterBean, newMasterBean)) {
@@ -306,21 +306,33 @@ public abstract class MasterPmHandlerImpl<T_MASTER_BEAN> implements MasterPmHand
 
       changedMasterBean = null;
     }
-    
+
     private Object getBeanFromEventValue(Object eventValue) {
       if (eventValue == null) {
         return null;
       }
-      
+
       if (Selection.class.isAssignableFrom(eventValue.getClass())) {
         Selection<?> selection = (Selection<?>) eventValue;
         return (selection != null && selection.getSize() == 1)
                ? selection.iterator().next()
                : null;
       }
-    
-      return eventValue;
+
+      return eventValue; // selection in case of multiselect
     }
+
+    private Object getBeanFromEventValue2(Object eventValue) {
+      if (! (eventValue instanceof Selection)) {
+        return false;
+      }
+
+      Selection<?> selection = (Selection<?>) eventValue;
+      return (selection.getSize() == 1)
+             ? selection.iterator().next()
+             : null;
+    }
+
   }
 
   /**
