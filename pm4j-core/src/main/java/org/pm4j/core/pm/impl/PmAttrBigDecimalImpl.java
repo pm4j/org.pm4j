@@ -82,24 +82,23 @@ public class PmAttrBigDecimalImpl extends PmAttrNumBase<BigDecimal> implements P
   @Override
   protected void initMetaData(PmObjectBase.MetaData metaData) {
     super.initMetaData(metaData);
-    MetaData myMetaData = (MetaData) metaData;
-
-    PmAttrBigDecimalCfg annotation = AnnotationUtil.findAnnotation(this, PmAttrBigDecimalCfg.class);
-    if (annotation != null) {
-      BigDecimal maxValue = myMetaData.maxValue = getMaxValue(annotation);
-      BigDecimal minValue = myMetaData.minValue = getMinValue(annotation);
-
-      if (minValue != null && maxValue != null && minValue.compareTo(maxValue) >= 1) {
-        throw new PmRuntimeException(this, "minValue(" + minValue + ") > maxValue(" + maxValue + ")");
-      }
-      myMetaData.setRoundingMode(getRoundingMode(annotation));
-    }
+    ((MetaData) metaData).readBigDecimalAnnotation(this);
   }
 
   protected static class MetaData extends PmAttrNumBase.MetaData {
 
     private BigDecimal maxValue = null;
     private BigDecimal minValue = null;
+
+    /**
+     * The default implementation reads the {@link PmAttrBigDecimalCfg} from
+     * the field instance or one of the attribute base classes.
+     *
+     * @return the found annotation or <code>null</code>.
+     */
+    protected PmAttrBigDecimalCfg findBigDecimalAnnotation(PmAttrBigDecimalImpl pm) {
+      return AnnotationUtil.findAnnotation(pm, PmAttrBigDecimalCfg.class);
+    };
 
     @Override
     protected int getMaxLenDefault() {
@@ -112,9 +111,24 @@ public class PmAttrBigDecimalImpl extends PmAttrNumBase<BigDecimal> implements P
 
     public BigDecimal getMaxValue() {  return maxValue;  }
     public BigDecimal getMinValue() { return minValue; }
+    public void setMaxValue(BigDecimal maxValue) { this.maxValue = maxValue; }
+    public void setMinValue(BigDecimal minValue) { this.minValue = minValue; }
 
     @Override
     protected double getMaxValueAsDouble() { throw new RuntimeException("Not applicable for BigDecimal."); }
+
+    private void readBigDecimalAnnotation(PmAttrBigDecimalImpl pm) {
+      PmAttrBigDecimalCfg annotation = findBigDecimalAnnotation(pm);
+      if (annotation != null) {
+        BigDecimal maxValue = pm.getMaxValue(annotation);
+        BigDecimal minValue = pm.getMinValue(annotation);
+
+        if (minValue != null && maxValue != null && minValue.compareTo(maxValue) >= 1) {
+          throw new PmRuntimeException(pm, "minValue(" + minValue + ") > maxValue(" + maxValue + ")");
+        }
+        setRoundingMode(pm.getRoundingMode(annotation));
+      }
+    }
   }
 
   private final MetaData getOwnMetaDataWithoutPmInitCall() {
