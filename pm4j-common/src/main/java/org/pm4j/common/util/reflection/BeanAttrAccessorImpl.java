@@ -1,5 +1,7 @@
 package org.pm4j.common.util.reflection;
 
+import static org.pm4j.common.util.reflection.ClassUtil.findPublicMethod;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -340,19 +342,6 @@ public class BeanAttrAccessorImpl implements BeanAttrAccessor {
     }
 
     return setter;
-  }
-
-  /** Encapsulates the best-match algorithm used here. */
-  private Method findPublicMethod(Class<?> beanClass, String methodName, Class<?>... argClasses) {
-    try {
-      return beanClass.getMethod(methodName, argClasses);
-    }
-    catch (NoSuchMethodException e) {
-      return null;
-    }
-    catch (SecurityException e) {
-      throw new ReflectionException(makeErrMsg("Security manager problem: " + e.getMessage()), e);
-    }
   }
 
 }

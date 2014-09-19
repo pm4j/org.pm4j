@@ -351,6 +351,26 @@ public class ClassUtil {
   }
 
   /**
+   * Searches for a method signature.
+   * <p>
+   * In difference to {@link Class#getMethod(String, Class...)} it does not
+   * throw an exception if the method does not exists. It returns only <code>null</code> in that case.
+   *
+   * @param beanClass The class to find the method in.
+   * @param methodName Name of the method to find.
+   * @param argClasses The method arguments.
+   * @return the found method or <code>null</code> if there is no match.
+   */
+  public static Method findPublicMethod(Class<?> beanClass, String methodName, Class<?>... argClasses) {
+    try {
+      return beanClass.getMethod(methodName, argClasses);
+    }
+    catch (NoSuchMethodException e) {
+      return null;
+    }
+  }
+
+  /**
    * Provides all fields (incl. private ones) within the given class and its
    * super-classes.
    * <p>
