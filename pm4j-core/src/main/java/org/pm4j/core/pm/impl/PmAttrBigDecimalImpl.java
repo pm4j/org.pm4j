@@ -74,14 +74,13 @@ public class PmAttrBigDecimalImpl extends PmAttrNumBase<BigDecimal> implements P
 
   @Override
   protected PmObjectBase.MetaData makeMetaData() {
-    MetaData md = new MetaData();
-    md.setStringConverter(StringConverterBigDecimal.INSTANCE);
-    return md;
+    return new MetaData();
   }
 
   @Override
   protected void initMetaData(PmObjectBase.MetaData metaData) {
     super.initMetaData(metaData);
+    ((MetaData) metaData).setStringConverter(StringConverterBigDecimal.INSTANCE);
     ((MetaData) metaData).readBigDecimalAnnotation(this);
   }
 
@@ -127,6 +126,8 @@ public class PmAttrBigDecimalImpl extends PmAttrNumBase<BigDecimal> implements P
           throw new PmRuntimeException(pm, "minValue(" + minValue + ") > maxValue(" + maxValue + ")");
         }
         setRoundingMode(pm.getRoundingMode(annotation));
+        setMinValue(minValue);
+        setMaxValue(maxValue);
       }
     }
   }
