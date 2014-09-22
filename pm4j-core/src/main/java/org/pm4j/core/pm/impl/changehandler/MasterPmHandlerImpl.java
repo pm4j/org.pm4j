@@ -228,7 +228,24 @@ public abstract class MasterPmHandlerImpl<T_MASTER_BEAN> implements MasterPmHand
    * @return The decorator.
    */
   protected PropertyAndVetoableChangeListener makeTableSelectionChangeListener() {
-    return new MasterSelectionChangeListener();
+    return new MasterSelectionChangeListener() {
+      @Override
+      protected T_MASTER_BEAN getBeanFromEventValue(Object eventValue) {
+        if (eventValue == null) {
+          return null;
+        }
+
+        if (!Selection.class.isAssignableFrom(eventValue.getClass())) {
+          throw new RuntimeException("Expected an event containing a '"+Selection.class+"' but found '"+eventValue.getClass()+"'");
+        }
+        
+        @SuppressWarnings("unchecked")
+        Selection<T_MASTER_BEAN> selection = (Selection<T_MASTER_BEAN>) eventValue;
+        return selection.getSize() == 1
+               ? selection.iterator().next()
+               : null;
+      }
+    };
   }
 
   /**
@@ -245,7 +262,7 @@ public abstract class MasterPmHandlerImpl<T_MASTER_BEAN> implements MasterPmHand
    * @param newMasterBean the new selected master bean
    * @return <code>true</code> if the switch can be performed.
    */
-  private boolean beforeSwitch(Object oldMasterBean, Object newMasterBean) {
+  private boolean beforeSwitch(T_MASTER_BEAN oldMasterBean, T_MASTER_BEAN newMasterBean) {
     if (oldMasterBean == null) {
       return true;
     }
@@ -271,13 +288,13 @@ public abstract class MasterPmHandlerImpl<T_MASTER_BEAN> implements MasterPmHand
    * and sets the new details area if the change was executed.<br>
    * It also registers the master records that where changed within the details area.
    */
-  public class MasterSelectionChangeListener implements PropertyAndVetoableChangeListener {
+  public abstract class MasterSelectionChangeListener implements PropertyAndVetoableChangeListener {
       private T_MASTER_BEAN changedMasterBean;
 
       @Override
       public void vetoableChange(PropertyChangeEvent evt) throws PropertyVetoException {
-        Object oldValue = getBeanFromEventValue(evt.getOldValue());
-        Object newValue = getBeanFromEventValue(evt.getNewValue());
+        T_MASTER_BEAN oldValue = getBeanFromEventValue(evt.getOldValue());
+        T_MASTER_BEAN newValue = getBeanFromEventValue(evt.getNewValue());
         if (!beforeSwitch(oldValue, newValue)) {
           throw new PropertyVetoException("MasterPmSelectionHandler prevents switch", evt);
         }
@@ -307,31 +324,17 @@ public abstract class MasterPmHandlerImpl<T_MASTER_BEAN> implements MasterPmHand
       changedMasterBean = null;
     }
 
-    private Object getBeanFromEventValue(Object eventValue) {
-      if (eventValue == null) {
-        return null;
-      }
-
-      if (Selection.class.isAssignableFrom(eventValue.getClass())) {
-        Selection<?> selection = (Selection<?>) eventValue;
-        return (selection != null && selection.getSize() == 1)
-               ? selection.iterator().next()
-               : null;
-      }
-
-      return eventValue; // selection in case of multiselect
-    }
-
-    private Object getBeanFromEventValue2(Object eventValue) {
-      if (! (eventValue instanceof Selection)) {
-        return false;
-      }
-
-      Selection<?> selection = (Selection<?>) eventValue;
-      return (selection.getSize() == 1)
-             ? selection.iterator().next()
-             : null;
-    }
+    
+    /**
+     * Extracts the master bean from the event object. The event object type
+     * depends on the observed property. So who ever adds this listener to a
+     * property must provide an implementation to get the bean from the
+     * observed property type.
+     * 
+     * @param eventValue the event
+     * @return the bean encapsulated by the event
+     */
+    protected abstract T_MASTER_BEAN getBeanFromEventValue(Object eventValue);
 
   }
 
