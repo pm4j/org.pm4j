@@ -80,11 +80,14 @@ public class PmAttrBigDecimalImpl extends PmAttrNumBase<BigDecimal> implements P
   @Override
   protected void initMetaData(PmObjectBase.MetaData metaData) {
     super.initMetaData(metaData);
-    ((MetaData) metaData).setStringConverter(StringConverterBigDecimal.INSTANCE);
     ((MetaData) metaData).readBigDecimalAnnotation(this);
   }
 
   protected static class MetaData extends PmAttrNumBase.MetaData {
+    
+    public MetaData() {
+      setStringConverter(StringConverterBigDecimal.INSTANCE);
+    }
 
     private BigDecimal maxValue = null;
     private BigDecimal minValue = null;
