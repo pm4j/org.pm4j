@@ -101,7 +101,7 @@ public class PmDefaults implements Cloneable {
    * used also.<br>
    * This hierarchy feature will be removed in one of the next releases.
    */
-  public boolean supportFactoryHierarchy = true;
+  public boolean supportFactoryHierarchy = false;
 
   /**
    * The set of dependency injection resolvers used for the application.
