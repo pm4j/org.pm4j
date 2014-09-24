@@ -31,7 +31,7 @@ import org.pm4j.common.query.QueryExprOr;
  */
 public class InMemQueryEvaluatorSet extends QueryEvaluatorSet {
 
-  public static QueryEvaluatorSet INSTANCE = new InMemQueryEvaluatorSet().lock();
+  public static final QueryEvaluatorSet INSTANCE = new InMemQueryEvaluatorSet().lock();
 
   public InMemQueryEvaluatorSet() {
     addExprEvaluator(QueryExprAnd.class, new AndEvaluator());

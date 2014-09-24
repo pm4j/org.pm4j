@@ -21,7 +21,9 @@ import org.pm4j.common.cache.CacheStrategy;
 import org.pm4j.common.cache.CacheStrategyNoCache;
 import org.pm4j.common.modifications.ModificationHandler;
 import org.pm4j.common.pageable.PageableCollection;
+import org.pm4j.common.pageable.inmem.InMemCollection;
 import org.pm4j.common.pageable.inmem.InMemCollectionBase;
+import org.pm4j.common.pageable.inmem.InMemCollectionImpl;
 import org.pm4j.common.pageable.querybased.QueryService;
 import org.pm4j.common.pageable.querybased.idquery.IdQueryCollectionImpl;
 import org.pm4j.common.pageable.querybased.idquery.IdQueryService;
@@ -82,7 +84,7 @@ import org.pm4j.core.pm.impl.pathresolver.PmExpressionPathResolver;
  * <li>filtering (see TODO: ...)</li>
  * </ul>.
  * <p>
- *
+ * 
  * @author olaf boede
  */
 public class PmTableImpl
@@ -137,7 +139,7 @@ public class PmTableImpl
 
   /**
    * Creates a table PM.
-   *
+   * 
    * @param pmParent The presentation model context for this table.
    */
   public PmTableImpl(PmObject pmParent) {
@@ -156,7 +158,7 @@ public class PmTableImpl
    * bean of one of the table PM parents. If that bean gets exchanged, a value
    * change event will be propagated to the related PM sub-tree. See:
    * {@link PmBean#setPmBean(Object)}.
-   *
+   * 
    * @param event The event.
    */
   @Override
@@ -216,7 +218,7 @@ public class PmTableImpl
    * Should be called very early within the life cycle of the table.<br>
    * The implementation does currently not fire any change events
    * when this method gets called.
-   *
+   * 
    * @param rowSelectMode The {@link SelectMode} to be used by this table.
    */
   public void setPmRowSelectMode(SelectMode rowSelectMode) {
@@ -272,7 +274,7 @@ public class PmTableImpl
    * <p>
    * The default implementation provides the selected item in case of single
    * selection mode. For other modes it provides <code>null</code>.
-   *
+   * 
    * @return the master row. <code>null</code> if there is no master row.
    */
   protected T_ROW_PM getMasterRowPmImpl() {
@@ -288,7 +290,7 @@ public class PmTableImpl
   /**
    * Provides the bean behind the master row PM.<br>
    * See {@link #getMasterRowPm()}.
-   *
+   * 
    * @return the bean behind the currently active master row PM or <code>null</code>.
    */
   public T_ROW_BEAN getMasterRowPmBean() {
@@ -297,7 +299,6 @@ public class PmTableImpl
         ? rowPm.getPmBean()
         : null;
   }
-
 
   /**
    * INTERNAL method that manually clears the cached master row PM.
@@ -314,7 +315,7 @@ public class PmTableImpl
 
   /**
    * Short cut method to get the {@link QueryParams} of the pageable collection.
-   *
+   * 
    * @return the query behind this table.
    */
   public final QueryParams getPmQueryParams() {
@@ -329,7 +330,7 @@ public class PmTableImpl
    * It may be adjusted by defining one in
    * {@link PmDefaults#getFilterCompareDefinitionFactory()} or by overriding
    * this method.
-   *
+   * 
    * @return the factory.
    */
   public FilterDefinitionFactory getPmFilterCompareDefinitionFactory() {
@@ -381,42 +382,42 @@ public class PmTableImpl
    * <p>
    * Should not be called directly. Please use {@link #updatePmTable(org.pm4j.core.pm.PmTable.ClearAspect...)}
    * to trigger an update.
-   *
+   * 
    * @param clearAspect the PM aspect to clear.
    */
   protected void clearPmAspectImpl(UpdateAspect clearAspect) {
     switch (clearAspect) {
-      case CLEAR_SELECTION:
+    case CLEAR_SELECTION:
         // the 'current' row corrensponds in most case to the selection. It needs to be re-calculated.
-        clearMasterRowPm();
-        // In case of a clear call we do not handle vetos.
+      clearMasterRowPm();
+      // In case of a clear call we do not handle vetos.
         // TODO olaf: Write unit tests to verify that that's not problem in all master details cases.
-        SelectionHandlerUtil.forceSelectAll(getPmPageableCollection().getSelectionHandler(), false);
+      SelectionHandlerUtil.forceSelectAll(getPmPageableCollection().getSelectionHandler(), false);
 
         // Ensure that the minimal standard selection gets re-created on next get-selection request.
         // TODO: can be part of selectAll(false). Every selection that leads to a no-Selection.
-        getPmPageableCollection().getSelectionHandler().ensureSelectionStateRequired();
-        break;
-      case CLEAR_SORT_ORDER:
-        getPmQueryParams().setSortOrder(getPmPageableBeanCollection().getQueryOptions().getDefaultSortOrder());
-        break;
-      case CLEAR_CHANGES:
-        PmCacheApi.clearPmCache(this);
-        ModificationHandler<T_ROW_PM> mh = getPmPageableCollection().getModificationHandler();
-        // a null check for very specific read-only collections
-        if (mh != null && mh.getModifications().isModified()) {
-            mh.clear();
-        }
+      getPmPageableCollection().getSelectionHandler().ensureSelectionStateRequired();
+      break;
+    case CLEAR_SORT_ORDER:
+      getPmQueryParams().setSortOrder(getPmPageableBeanCollection().getQueryOptions().getDefaultSortOrder());
+      break;
+    case CLEAR_CHANGES:
+      PmCacheApi.clearPmCache(this);
+      ModificationHandler<T_ROW_PM> mh = getPmPageableCollection().getModificationHandler();
+      // a null check for very specific read-only collections
+      if (mh != null && mh.getModifications().isModified()) {
+        mh.clear();
+      }
         // Ensure that the row PM's will be re-created. Otherwise it can happen that
-        // a row with a stale object reference stays alive.
-        BeanPmCacheUtil.clearBeanPmCachesOfSubtree(PmTableImpl.this);
+      // a row with a stale object reference stays alive.
+      BeanPmCacheUtil.clearBeanPmCachesOfSubtree(PmTableImpl.this);
 
-        break;
-      case CLEAR_USER_FILTER:
-        clearMasterRowPm();
+      break;
+    case CLEAR_USER_FILTER:
+      clearMasterRowPm();
         // User filters can't be cleared on this level. More detailed implementations
-        // may implement user defined filters that may be cleared.
-        break;
+      // may implement user defined filters that may be cleared.
+      break;
       default: throw new PmRuntimeException(this, "Unknown clear aspect: " + clearAspect);
     }
   }
@@ -447,7 +448,7 @@ public class PmTableImpl
   /** @deprecated please use {@link #getTotalNumOfPmRows()} */
   @Override
   public final int getTotalNumOfRows() {
-    return (int)getTotalNumOfPmRows();
+    return (int) getTotalNumOfPmRows();
   }
 
   /** @deprecated Please use {@link #getPmRowSelectMode()} */
@@ -543,9 +544,9 @@ public class PmTableImpl
      * If set to <code>true</code> all row PMs will be validated.
      * <p>
      * WARNING: Validation of all rows may lead to bad performance in case of large tables.
-     *
+     * 
      * @param validateAllRows The switch.
-     *
+     * 
      * @deprecated Please use constructor parameter configuration.
      */
     @Deprecated
@@ -560,7 +561,7 @@ public class PmTableImpl
     /**
      * If more than the configured number of rows has to be validated, the method
      * {@link #checkRowNumLimit(PmTableImpl, long)} will log a warning.
-     *
+     * 
      * @param itemNumWarningLimit The max. rows to validate limit.
      */
     public void setItemNumWarningLimit(int itemNumWarningLimit) {
@@ -570,7 +571,7 @@ public class PmTableImpl
     /**
      * Generates a log warning if the limit is exceeded.<br>
      * Subclasses may override this method to perform their specific action.
-     *
+     * 
      * @param pm The table to validate.
      * @param numOfItemsToValidate The validation item number limit.
      */
@@ -587,7 +588,6 @@ public class PmTableImpl
         ? new DeprTableValidator()
         : new TableValidator(RowsToValidate.UPDATED, RowsToValidate.ADDED);
   }
-
 
   /**
    * @return The {@link PageableCollection} that handles the table row PM's to display.
@@ -609,14 +609,14 @@ public class PmTableImpl
    */
   @SuppressWarnings("unchecked")
   public final PageableCollection<T_ROW_BEAN> getPmPageableBeanCollection() {
-    return ((PmBeanCollection<T_ROW_PM, T_ROW_BEAN>)getPmPageableCollection()).getBeanCollection();
+    return ((PmBeanCollection<T_ROW_PM, T_ROW_BEAN>) getPmPageableCollection()).getBeanCollection();
   }
 
   /**
    * Provides for service based tables the backing service reference.
    * <p>
    * The base implementation provides a reference to the service configured in {@link PmTableCfg#queryServiceClass()}.
-   *
+   * 
    * @return The used service in case of service based tables. <code>null</code> in case of in-memory tables.
    */
   @SuppressWarnings("unchecked")
@@ -639,7 +639,7 @@ public class PmTableImpl
   /**
    * Gets called whenever the internal {@link #pmPageableCollection} is <code>null</code> and
    * {@link #getPmPageableCollection()} gets called.
-   *
+   * 
    * @return The collection to use. Never <code>null</code>.
    */
   protected PmBeanCollection<T_ROW_PM, T_ROW_BEAN> getPmPageableCollectionImpl() {
@@ -657,12 +657,12 @@ public class PmTableImpl
    * Factory method that may be overridden to create a more specific collection.<br>
    * It will only be called if the table handles in-memory data (if
    * {@link #getPmQueryServiceImpl()} returns <code>null</code>).
-   *
+   * 
    * @return The in-memory collection to be used for this table.
    */
   protected PageableCollection<T_ROW_BEAN> makePmPageableBeanCollection(QueryService<T_ROW_BEAN, Object> service, QueryOptions qo) {
     if (service == null) {
-      return new InMemTableBeanCollection(qo);
+      return makePmPageableInMemBeanCollection(null, qo);
     }
     if (service instanceof PageQueryService) {
       return new PageQueryCollection<T_ROW_BEAN, Object>((PageQueryService<T_ROW_BEAN, Object>) service, qo);
@@ -675,6 +675,21 @@ public class PmTableImpl
         "The service type is not a 'PageableQueryService' and not a 'PageableIdQueryService'. Possibly @PmTableCfg#serviceClass is not well configured.\n" +
         "\tFound serivce: " + service +
         "\tAlternatively you may override makePmPageableBeanCollection() to support create a your specific collection.");
+  }
+
+  /**
+   * Factory method that may be overridden to create a more specific in memory
+   * collection.<br>
+   * It will only be called if the table handles in-memory data.
+   * 
+   * @return The in-memory collection to be used for this table.
+   */
+  protected InMemCollection<T_ROW_BEAN> makePmPageableInMemBeanCollection(Collection<T_ROW_BEAN> beans, QueryOptions qo) {
+    if (beans == null) {
+      return new InMemTableBeanCollection(qo);
+    } else {
+      return new InMemCollectionImpl<T_ROW_BEAN>(beans, qo);
+    }
   }
 
   /**
@@ -695,7 +710,7 @@ public class PmTableImpl
    * will be returned.
    * <p>
    * If the there is no backing service an {@link InMemQueryOptionProvider} will be returned.
-   *
+   * 
    * @return The option provider or <code>null</code>.
    */
   protected QueryOptionProvider getPmQueryOptionProvider() {
@@ -718,7 +733,7 @@ public class PmTableImpl
    * If that is not configured the expression <code>"(o)pmBean.<pmName of my table>"</code>
    * will be used. This default expression is often useful for tables in {@link PmBean}s that represent a
    * bean collection having the same name.
-   *
+   * 
    * @return the set of beans to display. May be <code>null</code>.
    */
   @SuppressWarnings("unchecked")
@@ -739,7 +754,7 @@ public class PmTableImpl
 
     try {
       return (Class<T_ROW_PM>) t;
-    } catch(ClassCastException e) {
+    } catch (ClassCastException e) {
       throw new PmRuntimeException(this, "Unable to determine table row bean class. Please check your generics parametes or override getPmRowBeanClass().", e);
     }
   }
@@ -747,7 +762,7 @@ public class PmTableImpl
   /**
    * Defines the data set to be presented by the table.<br>
    * HINT: Please check if you can define {@link #getPmPageableCollectionImpl()} instead.
-   *
+   * 
    * @param pageable
    *          the data set to present. If it is <code>null</code> an empty
    *          collection will be created internally by the next {@link #getPmPageableCollection()} call.
@@ -782,21 +797,21 @@ public class PmTableImpl
   }
 
   /**
-   *
+   * 
    * A post processing method that allow to apply some default settings to a new pageable collection.
    * <p>
    * Gets called whenever a new {@link #pmPageableCollection} gets assigned:
    * <ul>
-   *  <li>by calling {@link #getPmPageableCollectionImpl()} or</li>
-   *  <li>by calling {@link #setPmPageableCollection(PmBeanCollection)}</li>
+   * <li>by calling {@link #getPmPageableCollectionImpl()} or</li>
+   * <li>by calling {@link #setPmPageableCollection(PmBeanCollection)}</li>
    * </ul>
    * The default settings applied in this base implementation are:
    * <ul>
-   *  <li>Number of page rows and multi-select setting.</li>
-   *  <li>The reference of the (optional) pager to the collection.</li>
+   * <li>Number of page rows and multi-select setting.</li>
+   * <li>The reference of the (optional) pager to the collection.</li>
    * </ul>
    * Sub classes may override this method to extend this logic.
-   *
+   * 
    * @param pageableCollection the collection to initialize.
    */
   protected void assignPmPageableCollection(PmBeanCollection<T_ROW_PM, T_ROW_BEAN> pc) {
@@ -869,7 +884,7 @@ public class PmTableImpl
       QueryOptions options = new QueryOptions();
 
       // * Read the table definitions
-      PmTableImpl<?, ?> pmTable= PmTableImpl.this;
+      PmTableImpl<?, ?> pmTable = PmTableImpl.this;
       MetaData md = PmTableImpl.this.getOwnMetaDataWithoutPmInitCall();
 
       // * Read the column definitions
@@ -1029,7 +1044,7 @@ public class PmTableImpl
     public void propertyChange(PropertyChangeEvent evt) {
       masterRowPm = null;
       // FIXME: may fire too often a DB query. What happens in case of a series of QueryParam changes?
-//      PageableCollectionUtil2.ensureCurrentPageInRange(getPmPageableCollection());
+      // PageableCollectionUtil2.ensureCurrentPageInRange(getPmPageableCollection());
 
       for (PmCommandDecorator d : getPmDecorators(TableChange.FILTER)) {
         d.afterDo(null);
@@ -1043,8 +1058,6 @@ public class PmTableImpl
   protected MetaData makeMetaData() {
     return new MetaData();
   }
-
-
 
   @Override
   protected void initMetaData(PmDataInputBase.MetaData metaData) {

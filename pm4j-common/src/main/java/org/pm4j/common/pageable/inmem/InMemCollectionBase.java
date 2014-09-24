@@ -36,9 +36,9 @@ import org.pm4j.common.util.collection.ListUtil;
 /**
  * Implements a {@link PageableCollection} based on an {@link List} of items to
  * handle.
- *
+ * 
  * @author olaf boede
- *
+ * 
  * @param <T_ITEM>
  *          The type of items handled by this set.
  */
@@ -47,20 +47,20 @@ public abstract class InMemCollectionBase<T_ITEM>
   implements InMemCollection<T_ITEM> {
 
   /** The collection type specific selection handler. */
-  private SelectionHandler<T_ITEM>       selectionHandler = new SelectionHandlerWithItemSet<T_ITEM>(this);
+  private SelectionHandler<T_ITEM> selectionHandler = new SelectionHandlerWithItemSet<T_ITEM>(this);
   /** In-memory specific item set modification handler. */
-  private ModificationHandler<T_ITEM>    modificationHandler = new InMemModificationHandler();
+  private ModificationHandler<T_ITEM> modificationHandler = new InMemModificationHandler();
   /** Interpreter for filtering query expressions. */
   private InMemQueryEvaluator<T_ITEM>    inMemQueryEvaluator = new InMemQueryEvaluator<T_ITEM>(InMemQueryEvaluatorSet.INSTANCE);
 
   /** The cache strategy used for backing collection. */
-  private CacheStrategy                  cacheStrategy = CacheStrategyNoCache.INSTANCE;
+  private CacheStrategy cacheStrategy = CacheStrategyNoCache.INSTANCE;
   /** The cache strategy specific context used to hold the cached value. */
-  private Object                         cacheCtxt;
+  private Object cacheCtxt;
   /** The current set of filtered and sorted items. */
-  private List<T_ITEM>                   filteredAndSortedObjects;
+  private List<T_ITEM> filteredAndSortedObjects;
   /** The currently active sort order comparator. */
-  private Comparator<T_ITEM>             sortOrderComparator;
+  private Comparator<T_ITEM> sortOrderComparator;
 
   /** A listener gets called if a query property gets changed that affects the effective filter result. */
   private PropertyChangeListener changeFilterListener = new PropertyChangeListener() {
@@ -107,7 +107,7 @@ public abstract class InMemCollectionBase<T_ITEM>
 
   /**
    * Concrete classes provide here access to the handled backing collection.
-   *
+   * 
    * @return the handled collection. May be <code>null</code>.
    */
   protected abstract Collection<T_ITEM> getBackingCollectionImpl();
@@ -159,6 +159,7 @@ public abstract class InMemCollectionBase<T_ITEM>
   /**
    * @param inMemQueryEvaluator the inMemQueryEvaluator to set
    */
+  @Override
   public void setInMemQueryEvaluator(InMemQueryEvaluator<T_ITEM> inMemQueryEvaluator) {
     assert inMemQueryEvaluator != null;
     this.inMemQueryEvaluator = inMemQueryEvaluator;
@@ -217,7 +218,6 @@ public abstract class InMemCollectionBase<T_ITEM>
     List<T_ITEM> filteredList = inMemQueryEvaluator.evaluateSubSet(unfilteredList, filterExpression);
     return filteredList;
   }
-
 
   protected class InMemModificationHandler implements ModificationHandler<T_ITEM> {
 
@@ -362,4 +362,3 @@ public abstract class InMemCollectionBase<T_ITEM>
   }
 
 }
-

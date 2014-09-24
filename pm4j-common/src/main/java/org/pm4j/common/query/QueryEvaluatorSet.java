@@ -23,7 +23,10 @@ public class QueryEvaluatorSet {
   private final Map<Class<?>, CompOpEvaluator> defaultAttrCompOpEvaluatorMap = new HashMap<Class<?>, CompOpEvaluator>();
 
   /** The {@link QueryAttr} type specific sets of {@link CompOp} classes mapped to corresponding evaluator instances. */
-  private final Map<Class<?>, Map<Class<?>, CompOpEvaluator>> attrTypeToCompOpEvaluatorMap = new HashMap<Class<?>, Map<Class<?>, CompOpEvaluator>>();
+  private final Map<Class<?>, Map<Class<?>, CompOpEvaluator>> attrClassToCompOpEvaluatorMap = new HashMap<Class<?>, Map<Class<?>, CompOpEvaluator>>();
+  
+  /** The {@link QueryAttr} value type specific sets of {@link CompOp} classes mapped to corresponding evaluator instances. */
+  private final Map<Class<?>, Map<Class<?>, CompOpEvaluator>> valueTypeToCompOpEvaluatorMap = new HashMap<Class<?>, Map<Class<?>, CompOpEvaluator>>();
 
   /** {@link QueryAttr} specific {@link CompOp} maps.  */
   private final Map<QueryAttr, Map<Class<?>, CompOpEvaluator>> attrToCompOpEvaluatorMap = new HashMap<QueryAttr, Map<Class<?>, CompOpEvaluator>>();
@@ -56,11 +59,22 @@ public class QueryEvaluatorSet {
     if (filterCompare.getCompOp() == null) {
       throw new RuntimeException("The filter parameter has no CompOp instance. " + filterCompare);
     }
-
-    Class<?> attrClass = filterCompare.getAttr().getClass();
+    
+    QueryAttr attr = filterCompare.getAttr();
     Class<?> compOpClass = filterCompare.getCompOp().getClass();
 
-    for (Map.Entry<Class<?>, Map<Class<?>, CompOpEvaluator>> e : attrTypeToCompOpEvaluatorMap.entrySet()) {
+    // TODO MHE: Does not work for subclasses. But for final types (e.g LocalDateTime) is nothing to do.
+    if (valueTypeToCompOpEvaluatorMap.containsKey(attr.getType())) {
+      Map<Class<?>, CompOpEvaluator> map = valueTypeToCompOpEvaluatorMap.get(attr.getType());
+      
+      if (map.containsKey(compOpClass)) {
+        return map.get(compOpClass);
+      }
+    }
+
+    Class<?> attrClass = filterCompare.getAttr().getClass();
+
+    for (Map.Entry<Class<?>, Map<Class<?>, CompOpEvaluator>> e : attrClassToCompOpEvaluatorMap.entrySet()) {
       if (e.getKey().isAssignableFrom(attrClass)) {
         CompOpEvaluator ev = e.getValue().get(compOpClass);
         if (ev != null) {
@@ -123,11 +137,36 @@ public class QueryEvaluatorSet {
       return;
     }
 
-    Map<Class<?>, CompOpEvaluator> map = attrTypeToCompOpEvaluatorMap.get(forAttrClass);
+    Map<Class<?>, CompOpEvaluator> map = attrClassToCompOpEvaluatorMap.get(forAttrClass);
     if (map == null) {
       map = new HashMap<Class<?>, CompOpEvaluator>();
-      attrTypeToCompOpEvaluatorMap.put(forAttrClass, map);
+      attrClassToCompOpEvaluatorMap.put(forAttrClass, map);
     }
+    map.put(compOpClass, e);
+  }
+  
+  /**
+   * Adds a valueType specific evaluator for a particular compare
+   * operator. If the operator is already registered with an evaluator, it will
+   * be replaced with the new evaluator passed.
+   * 
+   * ATTENTION: Does not yet work for subclasses of the provided type!
+   *
+   * @param forValueType
+   *          the value type provided by {@link QueryAttr#getType()} this evaluator may be applied for.
+   * @param compOpClass
+   *          compare operator
+   * @param evaluator
+   *          compare operator evaluator (interpreter)
+   */
+  public void addCompOpEvaluatorForValueType(Class<?> forValueType, Class<? extends CompOp> compOpClass, CompOpEvaluator e) {
+    assertUnlocked();
+    
+    if (!valueTypeToCompOpEvaluatorMap.containsKey(forValueType)) {
+      valueTypeToCompOpEvaluatorMap.put(forValueType, new HashMap<Class<?>, CompOpEvaluator>());
+    }
+    
+    Map<Class<?>, CompOpEvaluator> map = valueTypeToCompOpEvaluatorMap.get(forValueType);
     map.put(compOpClass, e);
   }
 

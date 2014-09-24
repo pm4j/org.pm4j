@@ -56,10 +56,9 @@ public final class PmTableUtil {
     // That may happen if the table did set some fix conditions on pmInit.
     QueryParams qp = tablePm.getPmQueryParams();
 
-    // TODO: support internally generated pageable collections.
-//    PageableCollection<T_ROW_BEAN> pc = tablePm.makePmPageableBeanCollection(null, qo);
+    PageableCollection<T_ROW_BEAN> pc = tablePm.makePmPageableInMemBeanCollection(beans, qo);
+    tablePm.setPmPageableCollection(new PmBeanCollection<T_ROW_PM, T_ROW_BEAN>(tablePm, beanClass, pc));
 
-    tablePm.setPmPageableCollection(new PmBeanCollection<T_ROW_PM, T_ROW_BEAN>(tablePm, beanClass, beans, qo));
     tablePm.getPmQueryParams().copyParamValues(qp);
   }
 
