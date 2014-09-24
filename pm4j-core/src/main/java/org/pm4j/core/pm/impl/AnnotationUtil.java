@@ -11,10 +11,12 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.pm4j.common.cache.CacheStrategy;
 import org.pm4j.common.exception.CheckedExceptionWrapper;
+import org.pm4j.common.util.collection.ListUtil;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.annotation.PmCacheCfg;
 import org.pm4j.core.pm.annotation.PmCacheCfg.CacheMode;
+import org.pm4j.core.pm.annotation.PmCacheCfg.Clear;
 
 /**
  * Contains algorithms for reading PM annotations.
@@ -157,7 +159,7 @@ public class AnnotationUtil {
    *          at the last position.
    * @return A reference to the found annotations for inline usage.
    */
-  static <T extends Annotation> Collection<T> findAnnotationsInPmHierarchy(PmObjectBase pm, Class<T> annotationClass, Collection<T> foundAnnotations) {
+  static <T extends Annotation> List<T> findAnnotationsInPmHierarchy(PmObjectBase pm, Class<T> annotationClass, List<T> foundAnnotations) {
     T cfg = AnnotationUtil.findAnnotation(pm, annotationClass);
     if (cfg != null) {
       foundAnnotations.add(cfg);
@@ -239,6 +241,19 @@ public class AnnotationUtil {
     return s;
   }
 
+  /**
+   * Returns configuration of behavior, when cache clear method is called.
+   * 
+   * @param pm The PM to evaluate the behavior for.
+   * @param cacheAnnotations The collected annotations of type {@link PmCacheCfg} of the PM.
+   * @return The evaluated {@link Clear}.
+   */
+  public static Clear evaluateCacheClearBehavior(PmObjectBase pm, List<PmCacheCfg> cacheAnnotations) {
+    PmCacheCfg cacheCfg = ListUtil.listToFirstItemOrNull(cacheAnnotations);
+    return cacheCfg != null
+        ? cacheCfg.clear()
+        : Clear.DEFAULT;
+  }
   /**
    * Reads the specified cache aspect from the given {@link PmCacheCfg}.
    * Considers the {@link PmCacheCfg#all()} definition if the specified cache aspect

@@ -35,6 +35,25 @@ public final class ListUtil {
   }
 
   /**
+   * Transforms a list to its first single item or to a <code>null</code> if the list has no item.
+   * <p>
+   *
+   * @param list the list to transform. May be <code>null</code>.
+   * @return the first single list item or <code>null</code>.
+   */
+  public static <T> T listToFirstItemOrNull(List<T> list) {
+    if (list == null) {
+      return null;
+    }
+    else {
+      switch(list.size()) {
+      case 0: return null;
+      default: return list.get(0);
+      }
+    }
+  }
+
+  /**
    * Identifies the index position of the given item within the provided list.
    * <p>
    * Uses the <code>equals</code> implementation to compare the given item with

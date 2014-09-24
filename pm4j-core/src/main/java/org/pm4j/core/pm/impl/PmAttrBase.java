@@ -1573,7 +1573,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     }
 
     // -- Cache configuration --
-    Collection<PmCacheCfg> cacheAnnotations = AnnotationUtil.findAnnotationsInPmHierarchy(this, PmCacheCfg.class, new ArrayList<PmCacheCfg>());
+    List<PmCacheCfg> cacheAnnotations = AnnotationUtil.findAnnotationsInPmHierarchy(this, PmCacheCfg.class, new ArrayList<PmCacheCfg>());
     myMetaData.cacheStrategyForOptions = AnnotationUtil.evaluateCacheStrategy(this, PmCacheCfg.ATTR_OPTIONS, cacheAnnotations, CACHE_STRATEGIES_FOR_OPTIONS);
     myMetaData.cacheStrategyForValue = AnnotationUtil.evaluateCacheStrategy(this, PmCacheCfg.ATTR_VALUE, cacheAnnotations, CACHE_STRATEGIES_FOR_VALUE);
   }

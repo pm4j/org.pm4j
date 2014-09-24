@@ -46,6 +46,7 @@ import org.pm4j.core.pm.PmMessage.Severity;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmCacheCfg;
 import org.pm4j.core.pm.annotation.PmCacheCfg.CacheMode;
+import org.pm4j.core.pm.annotation.PmCacheCfg.Clear;
 import org.pm4j.core.pm.annotation.PmFactoryCfg;
 import org.pm4j.core.pm.annotation.PmInit;
 import org.pm4j.core.pm.annotation.PmTitleCfg;
@@ -1048,10 +1049,11 @@ public abstract class PmObjectBase implements PmObject {
     }
 
     // -- Cache configuration --
-    Collection<PmCacheCfg> cacheAnnotations = AnnotationUtil.findAnnotationsInPmHierarchy(this, PmCacheCfg.class, new ArrayList<PmCacheCfg>());
+    List<PmCacheCfg> cacheAnnotations = AnnotationUtil.findAnnotationsInPmHierarchy(this, PmCacheCfg.class, new ArrayList<PmCacheCfg>());
     metaData.cacheStrategyForTitle = AnnotationUtil.evaluateCacheStrategy(this, PmCacheCfg.ATTR_TITLE, cacheAnnotations, CACHE_STRATEGIES_FOR_TITLE);
     metaData.cacheStrategyForVisibility = AnnotationUtil.evaluateCacheStrategy(this, PmCacheCfg.ATTR_VISIBILITY, cacheAnnotations, CACHE_STRATEGIES_FOR_VISIBILITY);
     metaData.cacheStrategyForEnablement = AnnotationUtil.evaluateCacheStrategy(this, PmCacheCfg.ATTR_ENABLEMENT, cacheAnnotations, CACHE_STRATEGIES_FOR_ENABLEMENT);
+    metaData.cacheClearBehavior = AnnotationUtil.evaluateCacheClearBehavior(this, cacheAnnotations);
 
     // -- Check for registered domain specific annotations
     metaData.permissionAnnotations = AnnotationUtil.findAnnotations(this, PmAnnotationApi.getPermissionAnnotations()).toArray(new Annotation[0]);
@@ -1148,9 +1150,10 @@ public abstract class PmObjectBase implements PmObject {
     private Validator validator;
     private Annotation[] permissionAnnotations = {};
 
-    private CacheStrategy cacheStrategyForTitle = CacheStrategyNoCache.INSTANCE;
+    private CacheStrategy cacheStrategyForTitle      = CacheStrategyNoCache.INSTANCE;
     private CacheStrategy cacheStrategyForEnablement = CacheStrategyNoCache.INSTANCE;
     private CacheStrategy cacheStrategyForVisibility = CacheStrategyNoCache.INSTANCE;
+    /* package */ Clear   cacheClearBehavior         = Clear.DEFAULT;
 //    private boolean cacheTooltip = false;
     /** An optional factory that is responsible for creating PMs for beans. */
     private BeanPmFactory pmElementFactory;

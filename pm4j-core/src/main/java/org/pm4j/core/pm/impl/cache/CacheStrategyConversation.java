@@ -1,9 +1,10 @@
 package org.pm4j.core.pm.impl.cache;
 
 import org.pm4j.core.pm.PmObject;
+import org.pm4j.core.pm.impl.PmObjectBase;
 import org.pm4j.core.pm.impl.PmUtil;
 
-public class CacheStrategyConversation extends CacheStrategyBase<PmObject> {
+public class CacheStrategyConversation extends CacheStrategyBase<PmObjectBase> {
 
   private final String cacheVarKeyPfx;
 
@@ -13,17 +14,17 @@ public class CacheStrategyConversation extends CacheStrategyBase<PmObject> {
   }
 
   @Override
-  protected Object readRawValue(PmObject pm) {
+  protected Object readRawValue(PmObjectBase pm) {
     return pm.getPmConversation().getPmNamedObject(getCacheIdentity(pm));
   }
 
   @Override
-  protected void writeRawValue(PmObject pm, Object value) {
+  protected void writeRawValue(PmObjectBase pm, Object value) {
     pm.getPmConversation().setPmNamedObject(getCacheIdentity(pm), value);
   }
 
   @Override
-  protected void clearImpl(PmObject pm) {
+  protected void clearImpl(PmObjectBase pm) {
     pm.getPmConversation().setPmNamedObject(getCacheIdentity(pm), null);
   }
 

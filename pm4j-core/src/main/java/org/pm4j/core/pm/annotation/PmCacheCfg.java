@@ -31,6 +31,14 @@ public @interface PmCacheCfg {
      */
     REQUEST
   }
+  
+  /** Configuration values for behavior how to clear cache, when clear method is called. */
+  public enum Clear {
+    /** When clear method is called, cache is cleared. */
+    DEFAULT,
+    /** When clear method is called, cache is never cleared. */
+    NEVER;
+  }
 
   /**
    * @return <code>true</code> when all states should be cached.
@@ -80,6 +88,13 @@ public @interface PmCacheCfg {
    * @return <code>true</code> if the cache definition should also be applied on child PMs.
    */
   boolean cascade() default false;
+
+  /** 
+   * Configuration of clear behavior, when clear method is called.
+   * Default behavior is that cache is cleared, but optionally it can be configured,
+   * that cache is never cleared.
+   */
+  Clear clear() default Clear.DEFAULT;
 
   // Name constants for attributes that are found by reflection:
   public static final String ATTR_VISIBILITY = "visibility";
