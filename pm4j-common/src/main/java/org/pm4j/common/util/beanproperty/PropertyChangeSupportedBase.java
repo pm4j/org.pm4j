@@ -5,7 +5,6 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.beans.PropertyVetoException;
 import java.beans.VetoableChangeListener;
-import java.beans.VetoableChangeSupport;
 
 import org.pm4j.common.exception.CheckedExceptionWrapper;
 
@@ -17,7 +16,7 @@ import org.pm4j.common.exception.CheckedExceptionWrapper;
 public class PropertyChangeSupportedBase implements PropertyChangeSupported, Cloneable {
 
   private PropertyChangeSupport pcs;
-  private VetoableChangeSupport vpcs;
+  private VetoableChangeSupportWithoutRevertEvent vpcs;
   /** A switch that may be used the switch firing of veto events off. */
   private boolean fireVetoEvents = true;
   /** A switch that may be used to switch firing of all property events off. */
@@ -123,9 +122,9 @@ public class PropertyChangeSupportedBase implements PropertyChangeSupported, Clo
     return pcs;
   }
 
-  private VetoableChangeSupport getVpcs() {
+  private VetoableChangeSupportWithoutRevertEvent getVpcs() {
     if (vpcs == null) {
-      vpcs = new VetoableChangeSupport(this);
+      vpcs = new VetoableChangeSupportWithoutRevertEvent(this);
     }
     return vpcs;
   }
