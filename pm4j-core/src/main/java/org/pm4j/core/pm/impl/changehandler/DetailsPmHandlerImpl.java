@@ -33,6 +33,14 @@ public class DetailsPmHandlerImpl<T_DETAILS_PM extends PmDataInput, T_MASTER_REC
   private final List<PmCommandDecorator> decorators = new ArrayList<PmCommandDecorator>();
 
   /**
+   * Constructor for a handler that just observes the master record switches without handling a details
+   * PM directly.
+   */
+  public DetailsPmHandlerImpl() {
+    this.detailsPm = null;
+  }
+
+  /**
    * @param detailsPm The details PM to handle.
    */
   public DetailsPmHandlerImpl(T_DETAILS_PM detailsPm) {
@@ -82,7 +90,9 @@ public class DetailsPmHandlerImpl<T_DETAILS_PM extends PmDataInput, T_MASTER_REC
   @Override
   @Deprecated
   public boolean canSwitchMasterRecord() {
-    return PmValidationApi.validateSubTree((PmDataInput)detailsPm);
+    return detailsPm != null
+        ? PmValidationApi.validateSubTree((PmDataInput)detailsPm)
+        : true;
   }
 
   /**
@@ -105,11 +115,13 @@ public class DetailsPmHandlerImpl<T_DETAILS_PM extends PmDataInput, T_MASTER_REC
    * logic.
    */
   protected void afterMasterRecordChangeImpl(T_MASTER_RECORD newMasterBean) {
-    // The details area has now a new content to handle. The old messages of
-    // that area where related to the record that is no longer active.
-    PmMessageApi.clearPmTreeMessages(detailsPm);
-    // All cached information within the details area should be refreshed.
-    PmCacheApi.clearPmCache(detailsPm, CacheKind.ALL);
+    if (detailsPm != null) {
+      // The details area has now a new content to handle. The old messages of
+      // that area where related to the record that is no longer active.
+      PmMessageApi.clearPmTreeMessages(detailsPm);
+      // All cached information within the details area should be refreshed.
+      PmCacheApi.clearPmCache(detailsPm, CacheKind.ALL);
+    }
   }
 
   /**

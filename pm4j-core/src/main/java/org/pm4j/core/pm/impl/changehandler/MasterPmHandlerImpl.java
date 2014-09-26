@@ -136,7 +136,9 @@ public abstract class MasterPmHandlerImpl<T_MASTER_BEAN> implements MasterPmHand
     };
 
     for (DetailsPmHandler dh : detailsHandlers) {
-      PmEventApi.addHierarchyListener(dh.getDetailsPm(), PmEvent.VALUE_CHANGE, el);
+      if (dh.getDetailsPm() != null) {
+        PmEventApi.addHierarchyListener(dh.getDetailsPm(), PmEvent.VALUE_CHANGE, el);
+      }
       dh.startObservers();
     }
 
@@ -238,7 +240,7 @@ public abstract class MasterPmHandlerImpl<T_MASTER_BEAN> implements MasterPmHand
         if (!Selection.class.isAssignableFrom(eventValue.getClass())) {
           throw new RuntimeException("Expected an event containing a '"+Selection.class+"' but found '"+eventValue.getClass()+"'");
         }
-        
+
         @SuppressWarnings("unchecked")
         Selection<T_MASTER_BEAN> selection = (Selection<T_MASTER_BEAN>) eventValue;
         return selection.getSize() == 1
@@ -324,13 +326,13 @@ public abstract class MasterPmHandlerImpl<T_MASTER_BEAN> implements MasterPmHand
       changedMasterBean = null;
     }
 
-    
+
     /**
      * Extracts the master bean from the event object. The event object type
      * depends on the observed property. So who ever adds this listener to a
      * property must provide an implementation to get the bean from the
      * observed property type.
-     * 
+     *
      * @param eventValue the event
      * @return the bean encapsulated by the event
      */
