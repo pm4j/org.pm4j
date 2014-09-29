@@ -48,6 +48,17 @@ public @interface PmAttrCfg {
      */
     NONE
   }
+  
+  public static enum HideWhen {
+    /**
+     * The value is empty.
+     */
+    EMPTY,
+    /**
+     * The value equals the default value.
+     */
+    DEFAULT
+  }
 
   /**
    * @return An optional expression that describes how to access the attribute value.
@@ -59,8 +70,17 @@ public @interface PmAttrCfg {
    * @return <code>true</code> when only field with values that are not empty
    *         should be shown.<br>
    *         Default value is <code>false</code>.
+   *         
+   * @deprecated Use {@link #hideWhen()}
    */
+  @Deprecated
   boolean hideWhenEmpty() default false;
+  
+  /**
+   * @return List of attribute value scenarios where to hide.
+   */
+  HideWhen[] hideWhen() default {};
+
 
   /**
    * Defines which condition makes the attribute value required.

@@ -52,6 +52,7 @@ import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmOption;
 import org.pm4j.core.pm.PmOptionSet;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
+import org.pm4j.core.pm.annotation.PmAttrCfg.HideWhen;
 import org.pm4j.core.pm.annotation.PmAttrCfg.Restriction;
 import org.pm4j.core.pm.annotation.PmAttrCfg.Validate;
 import org.pm4j.core.pm.annotation.PmCacheCfg;
@@ -281,8 +282,14 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   protected boolean isPmVisibleImpl() {
     boolean visible = super.isPmVisibleImpl();
 
-    if (visible && getOwnMetaData().hideWhenEmpty) {
-      visible = !isEmptyValue(getValue());
+    if (visible) {
+      if (getOwnMetaData().hideWhenEmpty) {
+        visible = !isEmptyValue(getValue());
+      }
+      
+      if (getOwnMetaData().hideWhenDefault) {
+        visible = !ObjectUtils.equals(getValue(), getDefaultValue());   
+      }
     }
 
     return visible;
@@ -1478,7 +1485,13 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     PmAttrCfg.AttrAccessKind accessKindCfgValue = PmAttrCfg.AttrAccessKind.DEFAULT;
     boolean useReflection = true;
     if (fieldAnnotation != null) {
-      myMetaData.hideWhenEmpty = fieldAnnotation.hideWhenEmpty();
+      for (HideWhen hideWhen : fieldAnnotation.hideWhen()) {
+        if (HideWhen.DEFAULT == hideWhen) {
+          myMetaData.hideWhenDefault = true;          
+        } else if (HideWhen.EMPTY == hideWhen) {          
+          myMetaData.hideWhenEmpty = true;
+        }
+      }
       myMetaData.setReadOnly((fieldAnnotation.valueRestriction() == Restriction.READ_ONLY) || fieldAnnotation.readOnly());
 
       // The pm can force more constraints. It should not define less constraints as
@@ -1645,7 +1658,8 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     private BeanAttrAccessor                beanAttrAccessor;
     private PmOptionSetDef<PmAttr<?>>       optionSetDef            = OptionSetDefNoOption.INSTANCE;
     private PmOptionCfg.NullOption          nullOption              = NullOption.DEFAULT;
-    private boolean                         hideWhenEmpty;
+    private boolean                         hideWhenDefault         = false;
+    private boolean                         hideWhenEmpty           = false;
     private boolean                         required;
     private Restriction                     valueRestriction        = Restriction.NONE;
     private boolean                         primitiveType;
