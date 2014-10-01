@@ -1491,6 +1491,8 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
           myMetaData.hideIfDefaultValue = true;          
         } else if (HideIf.EMPTY_VALUE == hideIf) {          
           myMetaData.hideIfEmptyValue = true;
+        } else {
+          throw new PmRuntimeException(this, "Unknown value: " + hideIf.name());
         }
       }
       myMetaData.setReadOnly((fieldAnnotation.valueRestriction() == Restriction.READ_ONLY) || fieldAnnotation.readOnly());

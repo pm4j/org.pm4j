@@ -49,6 +49,9 @@ public @interface PmAttrCfg {
     NONE
   }
   
+  /**
+   * Scenarios for hiding an element.
+   */
   public static enum HideIf {
     /**
      * The value is empty.
