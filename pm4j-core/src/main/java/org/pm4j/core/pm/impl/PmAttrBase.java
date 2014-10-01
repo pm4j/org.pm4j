@@ -52,7 +52,7 @@ import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmOption;
 import org.pm4j.core.pm.PmOptionSet;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
-import org.pm4j.core.pm.annotation.PmAttrCfg.HideWhen;
+import org.pm4j.core.pm.annotation.PmAttrCfg.HideIf;
 import org.pm4j.core.pm.annotation.PmAttrCfg.Restriction;
 import org.pm4j.core.pm.annotation.PmAttrCfg.Validate;
 import org.pm4j.core.pm.annotation.PmCacheCfg;
@@ -282,14 +282,12 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   protected boolean isPmVisibleImpl() {
     boolean visible = super.isPmVisibleImpl();
 
-    if (visible) {
-      if (getOwnMetaData().hideWhenEmpty) {
-        visible = !isEmptyValue(getValue());
-      }
+    if (visible && getOwnMetaData().hideIfEmptyValue) {
+      visible = !isEmptyValue(getValue());
+    }
       
-      if (getOwnMetaData().hideWhenDefault) {
-        visible = !ObjectUtils.equals(getValue(), getDefaultValue());   
-      }
+    if (visible && getOwnMetaData().hideIfDefaultValue) {
+      visible = !ObjectUtils.equals(getValue(), getDefaultValue());   
     }
 
     return visible;
@@ -1485,11 +1483,14 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     PmAttrCfg.AttrAccessKind accessKindCfgValue = PmAttrCfg.AttrAccessKind.DEFAULT;
     boolean useReflection = true;
     if (fieldAnnotation != null) {
-      for (HideWhen hideWhen : fieldAnnotation.hideWhen()) {
-        if (HideWhen.DEFAULT == hideWhen) {
-          myMetaData.hideWhenDefault = true;          
-        } else if (HideWhen.EMPTY == hideWhen) {          
-          myMetaData.hideWhenEmpty = true;
+      myMetaData.hideIfEmptyValue = fieldAnnotation.hideWhenEmpty();
+      // The HideIf enum is the leading attribute. So override the value of hideIfEmptyValue 
+      // even it is set by fieldAnnotation.hideWhenEmpty(). 
+      for (HideIf hideIf : fieldAnnotation.hideIf()) {
+        if (HideIf.DEFAULT_VALUE == hideIf) {
+          myMetaData.hideIfDefaultValue = true;          
+        } else if (HideIf.EMPTY_VALUE == hideIf) {          
+          myMetaData.hideIfEmptyValue = true;
         }
       }
       myMetaData.setReadOnly((fieldAnnotation.valueRestriction() == Restriction.READ_ONLY) || fieldAnnotation.readOnly());
@@ -1658,8 +1659,8 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     private BeanAttrAccessor                beanAttrAccessor;
     private PmOptionSetDef<PmAttr<?>>       optionSetDef            = OptionSetDefNoOption.INSTANCE;
     private PmOptionCfg.NullOption          nullOption              = NullOption.DEFAULT;
-    private boolean                         hideWhenDefault         = false;
-    private boolean                         hideWhenEmpty           = false;
+    private boolean                         hideIfDefaultValue      = false;
+    private boolean                         hideIfEmptyValue        = false;
     private boolean                         required;
     private Restriction                     valueRestriction        = Restriction.NONE;
     private boolean                         primitiveType;

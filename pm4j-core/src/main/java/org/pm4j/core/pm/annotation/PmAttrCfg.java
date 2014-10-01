@@ -49,15 +49,15 @@ public @interface PmAttrCfg {
     NONE
   }
   
-  public static enum HideWhen {
+  public static enum HideIf {
     /**
      * The value is empty.
      */
-    EMPTY,
+    EMPTY_VALUE,
     /**
      * The value equals the default value.
      */
-    DEFAULT
+    DEFAULT_VALUE
   }
 
   /**
@@ -71,7 +71,7 @@ public @interface PmAttrCfg {
    *         should be shown.<br>
    *         Default value is <code>false</code>.
    *         
-   * @deprecated Use {@link #hideWhen()}
+   * @deprecated Use {@link #hideIf()}
    */
   @Deprecated
   boolean hideWhenEmpty() default false;
@@ -79,7 +79,7 @@ public @interface PmAttrCfg {
   /**
    * @return List of attribute value scenarios where to hide.
    */
-  HideWhen[] hideWhen() default {};
+  HideIf[] hideIf() default {};
 
 
   /**
