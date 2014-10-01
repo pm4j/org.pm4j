@@ -25,8 +25,19 @@ public class LocalDateTimeTimeZoneConverterTest {
   public void convertBetweenInternalUtcAndExternalSingapore() {
     ValueConverterCtxt ctxt = new ValueConverterCtxtImpl(TimeZone.getTimeZone("Etc/GMT-8"));
 
-    assertEquals(new LocalDateTime(2014, 9, 23, 19, 00), converter.toExternalValue(ctxt, new LocalDateTime(2014, 9, 23, 11, 00)));
-    assertEquals(new LocalDateTime(2014, 9, 23, 11, 00), converter.toInternalValue(ctxt, new LocalDateTime(2014, 9, 23, 19, 00)));
+    assertEquals(new LocalDateTime(2014, 9, 23, 19, 00),
+                 converter.toExternalValue(ctxt, new LocalDateTime(2014, 9, 23, 11, 00)));
+
+    assertEquals(new LocalDateTime(2014, 9, 23, 11, 00),
+                 converter.toInternalValue(ctxt, new LocalDateTime(2014, 9, 23, 19, 00)));
+  }
+
+
+  // TODO: check how that should be handled.
+  @Test(expected=IllegalArgumentException.class)
+  public void convertIllegalDaylightSavingTime() {
+    ValueConverterCtxt ctxt = new ValueConverterCtxtImpl(TimeZone.getTimeZone("Europe/Berlin"));
+    converter.toInternalValue(ctxt, new LocalDateTime(2014, 03, 30, 02, 30));
   }
 
   @Test
