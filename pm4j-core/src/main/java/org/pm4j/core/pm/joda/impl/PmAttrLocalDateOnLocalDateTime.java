@@ -94,7 +94,7 @@ public class PmAttrLocalDateOnLocalDateTime
       if (e == null) {
         return null;
       }
-      DateTime extDt = e.toDateMidnight(getExternalValueDateTimeZone(ctxt)).toDateTime();
+      DateTime extDt = e.toDateTimeAtStartOfDay(getExternalValueDateTimeZone(ctxt)).toDateTime();
       return extDt.toDateTime(getInternalValueDateTimeZone(ctxt)).toLocalDateTime();
     }
   }
