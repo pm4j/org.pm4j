@@ -121,7 +121,7 @@ public class PmAttrListImpl<T> extends PmAttrBase<List<T>, List<T>> implements P
     }
     return super.getValueImpl();
   }
-
+  
   /**
    * The item-{@link StringConverter} can be configured using the annotation
    * {@link PmAttrListCfg#itemStringConverter()} or by overriding this method.
@@ -194,15 +194,20 @@ public class PmAttrListImpl<T> extends PmAttrBase<List<T>, List<T>> implements P
       if (annotation.itemStringConverter() != StringConverter.class) {
         myMetaData.itemStringConverter = ClassUtil.newInstance(annotation.itemStringConverter());
       }
+      myMetaData.toStringItemSeparator = annotation.toStringItemSeparator();
     }
 
     if (myMetaData.itemStringConverter != null) {
-      myMetaData.setStringConverter(new StringConverterList<T>(((StringConverter<T>)myMetaData.itemStringConverter)));
+      StringConverterList<T> stringConverter = new StringConverterList<T>(((StringConverter<T>) myMetaData.itemStringConverter));
+      stringConverter.setStringSeparator(myMetaData.toStringItemSeparator);
+      myMetaData.setStringConverter(stringConverter);
     }
   }
 
   protected static class MetaData extends PmAttrBase.MetaData {
     private StringConverter<?> itemStringConverter;
+    
+    private String toStringItemSeparator;
 
     public MetaData() {
       super(Integer.MAX_VALUE); // maximum valueAsString characters.
