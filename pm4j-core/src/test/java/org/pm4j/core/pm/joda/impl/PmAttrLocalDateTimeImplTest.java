@@ -1,4 +1,4 @@
-package org.pm4j.core.joda.impl;
+package org.pm4j.core.pm.joda.impl;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;

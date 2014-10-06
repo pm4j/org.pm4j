@@ -1,9 +1,9 @@
-package org.pm4j.core.joda.impl;
+package org.pm4j.core.pm.joda.impl;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
-import static org.pm4j.tools.test.PmAssert.assertSingleErrorMessage;
+import static org.pm4j.tools.test.PmAssert.assertMessage;
 import static org.pm4j.tools.test.PmAssert.setValueAsString;
 
 import java.util.Locale;
@@ -13,11 +13,11 @@ import org.joda.time.LocalTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.pm4j.common.converter.value.joda.LocalTimeTimeZoneConverter;
+import org.pm4j.core.pm.PmMessage.Severity;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.annotation.PmTitleCfg;
 import org.pm4j.core.pm.impl.PmConversationImpl;
 import org.pm4j.core.pm.joda.PmAttrLocalTime;
-import org.pm4j.core.pm.joda.impl.PmAttrLocalTimeImpl;
 import org.pm4j.tools.test.PmAssert;
 
 /**
@@ -39,13 +39,13 @@ public class PmAttrLocalTimeTest {
   public void conversionError() {
     testPm.time.setValueAsString("10:00a");
     assertFalse(testPm.time.isPmValid());
-    assertSingleErrorMessage(testPm.time,
-        "The value of the field \"local time\" cannot be interpreted. Please use the format \"HH:mm\".");
+    assertMessage("The value of the field \"local time\" cannot be interpreted. Please use the format \"HH:mm\".",
+                  Severity.ERROR, testPm.time);
   }
 
   @Test
   public void parseSuccess() {
-    PmAssert.setValueAsString(testPm.time, "10:00");
+    setValueAsString(testPm.time, "10:00");
   }
 
   @Test

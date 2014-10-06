@@ -48,7 +48,7 @@ public @interface PmAttrCfg {
      */
     NONE
   }
-  
+
   /**
    * Scenarios for hiding an element.
    */
@@ -73,12 +73,12 @@ public @interface PmAttrCfg {
    * @return <code>true</code> when only field with values that are not empty
    *         should be shown.<br>
    *         Default value is <code>false</code>.
-   *         
+   *
    * @deprecated Use {@link #hideIf()}
    */
   @Deprecated
   boolean hideWhenEmpty() default false;
-  
+
   /**
    * @return List of attribute value scenarios where to hide.
    */
@@ -159,16 +159,9 @@ public @interface PmAttrCfg {
   String formatResKey() default "";
 
   /**
-   * Defines value change detection on string level.<br>
-   * If set to <code>true</code> a difference between the current string representation
-   * and the value provided by the UI will be used to detect a value change.<br>
-   * This will usually only be done on the native value representation.
-   * <p>
-   * The main reason for this option are formatted date fields....
-   *
-   *  is checked if an entered value should be compared against
-   * @return
+   * @deprecated unused
    */
+  @Deprecated
   boolean checkValueChangeOnStringInput() default false;
 
   /**
