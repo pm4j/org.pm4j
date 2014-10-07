@@ -1,6 +1,7 @@
 package org.pm4j.core.pm.impl;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,11 +31,11 @@ import org.pm4j.common.converter.value.ValueConverter;
 import org.pm4j.common.converter.value.ValueConverterDefault;
 import org.pm4j.common.expr.Expression.SyntaxVersion;
 import org.pm4j.common.util.CompareUtil;
-import org.pm4j.common.util.GenericsUtil;
 import org.pm4j.common.util.collection.MapUtil;
 import org.pm4j.common.util.reflection.BeanAttrAccessor;
 import org.pm4j.common.util.reflection.BeanAttrAccessorImpl;
 import org.pm4j.common.util.reflection.ClassUtil;
+import org.pm4j.common.util.reflection.GenericTypeUtil;
 import org.pm4j.common.util.reflection.ReflectionException;
 import org.pm4j.core.exception.PmConverterException;
 import org.pm4j.core.exception.PmResourceData;
@@ -285,9 +286,9 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     if (visible && getOwnMetaData().hideIfEmptyValue) {
       visible = !isEmptyValue(getValue());
     }
-      
+
     if (visible && getOwnMetaData().hideIfDefaultValue) {
-      visible = !ObjectUtils.equals(getValue(), getDefaultValue());   
+      visible = !ObjectUtils.equals(getValue(), getDefaultValue());
     }
 
     return visible;
@@ -1374,7 +1375,10 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
 
   @Override
   public Class<?> getValueType() {
-    Type t = GenericsUtil.findFirstSuperClassParameterType(getClass());
+    Type t = GenericTypeUtil.resolveGenericArgument(PmAttrBase.class, getClass(), 0);
+    if (t instanceof ParameterizedType) {
+      t = ((ParameterizedType)t).getRawType();
+    }
     if (!(t instanceof Class)) {
       throw new PmRuntimeException(this, "Unable to handle an attribute value type that is not a class or interface. Found type: " + t);
     }
@@ -1484,12 +1488,12 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     boolean useReflection = true;
     if (fieldAnnotation != null) {
       myMetaData.hideIfEmptyValue = fieldAnnotation.hideWhenEmpty();
-      // The HideIf enum is the leading attribute. So override the value of hideIfEmptyValue 
-      // even it is set by fieldAnnotation.hideWhenEmpty(). 
+      // The HideIf enum is the leading attribute. So override the value of hideIfEmptyValue
+      // even it is set by fieldAnnotation.hideWhenEmpty().
       for (HideIf hideIf : fieldAnnotation.hideIf()) {
         if (HideIf.DEFAULT_VALUE == hideIf) {
-          myMetaData.hideIfDefaultValue = true;          
-        } else if (HideIf.EMPTY_VALUE == hideIf) {          
+          myMetaData.hideIfDefaultValue = true;
+        } else if (HideIf.EMPTY_VALUE == hideIf) {
           myMetaData.hideIfEmptyValue = true;
         } else {
           throw new PmRuntimeException(this, "Unknown value: " + hideIf.name());
