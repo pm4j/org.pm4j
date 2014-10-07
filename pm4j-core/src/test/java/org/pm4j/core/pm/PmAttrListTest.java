@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Test;
+import org.pm4j.common.converter.string.StringConverterLong;
 import org.pm4j.common.converter.string.StringConverterString;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.annotation.PmAttrListCfg;
@@ -19,14 +20,23 @@ public class PmAttrListTest {
 
   @Test
   public void testGetAndSetValueForAListOfLongs() {
-    testPm.listOfLongs.setValueAsString("1,2,3");
+    testGetAndSetValueForAListOfLongs(testPm.listOfLongsWithLineBreak, ",");
+  }
+  
+  @Test
+  public void testGetAndSetValueForAListOfLongsWithLineBreak() {
+    testGetAndSetValueForAListOfLongs(testPm.listOfLongsWithLineBreak, "\n");
+  }
+  
+  private void testGetAndSetValueForAListOfLongs(PmAttrList<Long> pm, String itemSeparator) {
+    pm.setValueAsString("1"+itemSeparator+"2"+itemSeparator+"3");
 
-    assertEquals("native value list", Arrays.asList(1L,2L,3L), testPm.listOfLongs.getValue());
-    assertEquals("as a single string", "1,2,3", testPm.listOfLongs.getValueAsString());
-    assertEquals("as list of strings", Arrays.asList("1","2","3"), testPm.listOfLongs.getValueAsStringList());
+    assertEquals("native value list", Arrays.asList(1L,2L,3L), pm.getValue());
+    assertEquals("as a single string", "1"+itemSeparator+"2"+itemSeparator+"3", pm.getValueAsString());
+    assertEquals("as list of strings", Arrays.asList("1","2","3"), pm.getValueAsStringList());
 
-    assertEquals("first 2-item subset", Arrays.asList(1L,2L), testPm.listOfLongs.getValueSubset(0, 2));
-    assertEquals("second 2-item subset", Arrays.asList(3L), testPm.listOfLongs.getValueSubset(2, 2));
+    assertEquals("first 2-item subset", Arrays.asList(1L,2L), pm.getValueSubset(0, 2));
+    assertEquals("second 2-item subset", Arrays.asList(3L), pm.getValueSubset(2, 2));
   }
 
   @Test
@@ -54,6 +64,9 @@ public class PmAttrListTest {
   /** Test PM */
   public static class MyTestElement extends PmConversationImpl {
     public final PmAttrList<Long> listOfLongs = new PmAttrListImpl.Longs(this);
+    
+    @PmAttrListCfg(itemStringConverter = StringConverterLong.class, toStringItemSeparator = "\n")
+    public final PmAttrList<Long> listOfLongsWithLineBreak = new PmAttrListImpl.Longs(this);
 
     @PmAttrListCfg(itemStringConverter=StringConverterString.class)
     public final PmAttrList<String> listOfStrings = new PmAttrListImpl<String>(this);
