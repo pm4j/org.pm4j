@@ -20,7 +20,7 @@ public class PmAttrListTest {
 
   @Test
   public void testGetAndSetValueForAListOfLongs() {
-    testGetAndSetValueForAListOfLongs(testPm.listOfLongsWithLineBreak, ",");
+    testGetAndSetValueForAListOfLongs(testPm.listOfLongs, ",");
   }
   
   @Test
@@ -65,7 +65,7 @@ public class PmAttrListTest {
   public static class MyTestElement extends PmConversationImpl {
     public final PmAttrList<Long> listOfLongs = new PmAttrListImpl.Longs(this);
     
-    @PmAttrListCfg(itemStringConverter = StringConverterLong.class, toStringItemSeparator = "\n")
+    @PmAttrListCfg(itemStringConverter = StringConverterLong.class, valueStringSeparator = "\n")
     public final PmAttrList<Long> listOfLongsWithLineBreak = new PmAttrListImpl.Longs(this);
 
     @PmAttrListCfg(itemStringConverter=StringConverterString.class)

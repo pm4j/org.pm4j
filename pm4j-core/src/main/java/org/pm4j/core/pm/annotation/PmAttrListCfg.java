@@ -24,7 +24,8 @@ public @interface PmAttrListCfg {
   Class<? extends StringConverter> itemStringConverter() default StringConverter.class;
   
   /**
-   * @return the String used to separate the list items in the to String conversion
+   * @return The string used by the list-to-string converter to separate the
+   *         list items in the to/from string conversion.
    */
-  String toStringItemSeparator() default ",";
+  String valueStringSeparator() default ",";
 }
