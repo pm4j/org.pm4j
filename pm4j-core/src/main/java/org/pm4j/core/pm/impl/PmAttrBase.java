@@ -678,12 +678,6 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
       // New game. Forget all the old invalid stuff.
       clearPmInvalidValues();
 
-      // Ensure that primitive types will not be set to null.
-      if ((newPmValue == null) && metaData.primitiveType) {
-        setAndPropagateInvalidValue(value, PmConstants.MSGKEY_VALIDATION_MISSING_REQUIRED_VALUE);
-        return false;
-      }
-
       // FIXME olaf: read only control should be done within the calling setValueAsString method!
       //             The set operation should not be performed in this case. Check for side effects...
       if (pmValueChanged && isPmReadonly()) {
@@ -722,10 +716,19 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
           LOG.debug("Changing PM value of '" + PmUtil.getPmLogString(this) + "' from '" + currentValue + "' to '" + newPmValue + "'.");
         }
 
-        T_BEAN_VALUE beanAttrValue = (newPmValue != null || isConvertingNullValueImpl())
+        T_BEAN_VALUE backingValue = (newPmValue != null || isConvertingNullValueImpl())
                         ? convertPmValueToBackingValue(newPmValue)
                         : null;
-        setBackingValue(beanAttrValue);
+        // Ensure that primitive bacing values will not be set to null.
+        if ((backingValue == null) && getOwnMetaData().primitiveType) {
+          // TODO oboede: This misleading error message will be here for one release only to minimize
+          // compatibility risks. It will be replaced by the exception below in release v0.8.
+          setAndPropagateInvalidValue(value, PmConstants.MSGKEY_VALIDATION_MISSING_REQUIRED_VALUE);
+          return false;
+          // throw new PmRuntimeException(this, "Unable to set a primitive value to null.\n" +
+          //     "You may override 'isConvertingNullValueImpl' and implement a null value conversion (override convertPmValueToBackingValue or configure a valueConverter) to get that feature.");
+        }
+        setBackingValue(backingValue);
         metaData.cacheStrategyForValue.setAndReturnCachedValue(this, newPmValue);
 
         // From now on the value should be handled as intentionally modified.

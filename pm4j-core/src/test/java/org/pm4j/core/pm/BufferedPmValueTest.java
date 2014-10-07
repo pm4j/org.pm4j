@@ -88,6 +88,7 @@ public class BufferedPmValueTest {
   public static class MyBeanClassPm extends PmBeanBase<MyBeanClass> {
     @PmAttrCfg(defaultValue="13")
     public final PmAttrInteger i = new PmAttrIntegerImpl(this);
+    @PmAttrCfg(defaultValue="0")
     public final PmAttrInteger j = new PmAttrIntegerImpl(this);
   }
 }
