@@ -22,4 +22,10 @@ public @interface PmAttrListCfg {
    */
   @SuppressWarnings("rawtypes")
   Class<? extends StringConverter> itemStringConverter() default StringConverter.class;
+  
+  /**
+   * @return The string used by the list-to-string converter to separate the
+   *         list items in the to/from string conversion.
+   */
+  String valueStringSeparator() default ",";
 }

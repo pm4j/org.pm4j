@@ -3,12 +3,16 @@ package org.pm4j.common.util;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
+import org.pm4j.common.util.reflection.GenericTypeUtil;
+
 /**
  * A utility to retrieve Java-generics parameter information from a
  * {@link Class} instance.
  *
  * @author mhoennig, oboede
+ * @deprecated Please use {@link GenericTypeUtil}.
  */
+@Deprecated
 public class GenericsUtil {
 
   /**
