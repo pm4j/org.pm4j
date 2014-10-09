@@ -46,12 +46,6 @@ public class QueryExprOr implements QueryExpr, Serializable {
     return joinToOr(Arrays.asList(expressions));
   }
 
-  /** @deprecated That is a copy-paste bug. Please use {@link #joinToOr(QueryExpr...)}. */
-  @Deprecated
-  public static QueryExpr joinToAnd(QueryExpr... expressions) {
-    return joinToOr(expressions);
-  }
-
 
   private static final long serialVersionUID = 1L;
   private List<QueryExpr> expressions;
