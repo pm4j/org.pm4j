@@ -1,6 +1,7 @@
 package org.pm4j.core.pm.impl;
 
 import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -399,7 +400,7 @@ public class PmTableImpl
       getPmPageableCollection().getSelectionHandler().ensureSelectionStateRequired();
       break;
     case CLEAR_SORT_ORDER:
-      getPmQueryParams().setSortOrder(getPmPageableBeanCollection().getQueryOptions().getDefaultSortOrder());
+      getPmQueryParams().setSortOrder(getPmQueryOptions().getDefaultSortOrder());
       break;
     case CLEAR_CHANGES:
       PmCacheApi.clearPmCache(this);
@@ -836,6 +837,13 @@ public class PmTableImpl
       if (getPmPager() != null) {
         getPmPager().setPageableCollection(pmPageableCollection);
       }
+      
+      pmPageableCollection.getQueryParams().addPropertyChangeListener(QueryParams.PROP_EFFECTIVE_SORT_ORDER, new PropertyChangeListener() {
+        @Override
+        public void propertyChange(PropertyChangeEvent evt) {
+          PmEventApi.firePmEvent(PmTableImpl.this, PmEvent.VALUE_CHANGE, ValueChangeKind.SORT_ORDER);
+        }
+      });
     }
   }
 

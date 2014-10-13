@@ -1,11 +1,14 @@
 package org.pm4j.core.pm.impl;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.pm4j.common.query.QueryAttr;
 import org.pm4j.common.query.QueryOptions;
+import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.query.SortOrder;
 import org.pm4j.common.query.filter.FilterDefinition;
 import org.pm4j.common.query.filter.FilterDefinitionFactory;
@@ -301,10 +304,6 @@ public class PmTableColImpl extends PmObjectBase implements PmTableCol {
       SortOrder querySortOrder = getOwnQuerySortOrder();
       PmTable<?> pmTable = getPmTable();
       pmTable.getPmPageableCollection().getQueryParams().setSortOrder(querySortOrder);
-
-      // TODO: move to a listener within the table implementation.
-      // fire a value change event.
-      PmEventApi.firePmEventIfInitialized(pmTable, new PmEvent(PmTableColImpl.this, pmTable, PmEvent.VALUE_CHANGE, ValueChangeKind.SORT_ORDER));
     }
   }
 

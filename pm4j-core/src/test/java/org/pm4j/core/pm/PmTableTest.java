@@ -37,6 +37,7 @@ import org.pm4j.core.pm.impl.PmAttrIntegerImpl;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
 import org.pm4j.core.pm.impl.PmBeanImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
+import org.pm4j.core.pm.impl.PmInitApi;
 import org.pm4j.core.pm.impl.PmTableColImpl;
 import org.pm4j.core.pm.impl.PmTableImpl;
 import org.pm4j.tools.test.RecordingPmEventListener;
@@ -70,6 +71,8 @@ public class PmTableTest {
       }
     };
     PmEventApi.addPmEventListener(myTablePm, PmEvent.VALUE_CHANGE, valueChangeEventListener);
+    
+    PmInitApi.ensurePmSubTreeInitialization(myTablePm);
   }
 
   @Test
@@ -164,6 +167,21 @@ public class PmTableTest {
     assertEquals("[a, b]", myTablePm.getRowPms().toString());
     setValue(myTablePm.name.getSortOrderAttr(), PmSortOrder.DESC);
     assertEquals("[c, b]", myTablePm.getRowPms().toString());
+  }
+
+  @Test
+  @Ignore("Will be fixed with task 135890")
+  public void testInitialSortOrderConfiguredInTableAnnotation() {
+    assertEquals(PmSortOrder.ASC, myTablePm.name.getSortOrderAttr().getValue());
+  }
+
+  @Test
+  public void testResetPmValuesClearsSortOrder() {
+    setValue(myTablePm.name.getSortOrderAttr(), PmSortOrder.DESC);
+    assertEquals("[c, b]", myTablePm.getRowPms().toString());
+    myTablePm.resetPmValues();
+    assertEquals("[a, b]", myTablePm.getRowPms().toString());
+    assertEquals(PmSortOrder.ASC, myTablePm.name.getSortOrderAttr().getValue());
   }
 
   @Test
