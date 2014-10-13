@@ -1,14 +1,11 @@
 package org.pm4j.core.pm.impl;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.pm4j.common.query.QueryAttr;
 import org.pm4j.common.query.QueryOptions;
-import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.query.SortOrder;
 import org.pm4j.common.query.filter.FilterDefinition;
 import org.pm4j.common.query.filter.FilterDefinitionFactory;
@@ -19,7 +16,6 @@ import org.pm4j.core.pm.PmAttrEnum;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmCommandDecorator;
 import org.pm4j.core.pm.PmEvent;
-import org.pm4j.core.pm.PmEvent.ValueChangeKind;
 import org.pm4j.core.pm.PmEventListener;
 import org.pm4j.core.pm.PmMessage;
 import org.pm4j.core.pm.PmMessage.Severity;
@@ -228,9 +224,8 @@ public class PmTableColImpl extends PmObjectBase implements PmTableCol {
       PmEventListener tableSortOrderChangeListener = new PmEventListener() {
         @Override
         public void handleEvent(PmEvent event) {
-          if ((event.getValueChangeKind() == ValueChangeKind.SORT_ORDER) &&
-              // Checks if the event source is not this column to prevent set value ping-pong games.
-              (event.getPm() != PmTableColImpl.this)) {
+          // Checks if the event source is not this column to prevent set value ping-pong games.
+          if (event.getPm() != PmTableColImpl.this) {
             SortOrder tableSortOrder = getPmTable().getPmPageableCollection().getQueryParams().getSortOrder();
             SortOrder columnSortOrderOption = getColSortOrderOption();
             if (tableSortOrder != null &&
@@ -242,7 +237,7 @@ public class PmTableColImpl extends PmObjectBase implements PmTableCol {
           }
         }
       };
-      PmEventApi.addPmEventListener(getPmTable(), PmEvent.VALUE_CHANGE, tableSortOrderChangeListener);
+      PmEventApi.addPmEventListener(getPmTable(), PmEvent.SORT_ORDER_CHANGE, tableSortOrderChangeListener);
     }
 
     @Override

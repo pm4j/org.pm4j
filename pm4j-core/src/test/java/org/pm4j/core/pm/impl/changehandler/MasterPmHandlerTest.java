@@ -28,6 +28,7 @@ public class MasterPmHandlerTest {
     assertEquals("a", dlg.masterTable.getMasterRowPmBean().toString());
     assertEquals("a", dlg.detailsArea.getPmBean().toString());
 
+    assertEquals("b", dlg.masterTableBeans.get(1).toString());
     dlg.masterTable.getPmPageableBeanCollection().getSelectionHandler().select(true, dlg.masterTableBeans.get(1));
     assertEquals("b", dlg.masterTable.getMasterRowPmBean().toString());
     assertEquals("b", dlg.detailsArea.getPmBean().toString());

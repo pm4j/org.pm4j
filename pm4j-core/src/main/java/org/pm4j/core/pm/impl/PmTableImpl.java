@@ -1,8 +1,5 @@
 package org.pm4j.core.pm.impl;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyVetoException;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collection;
@@ -41,14 +38,12 @@ import org.pm4j.common.selection.SelectMode;
 import org.pm4j.common.selection.Selection;
 import org.pm4j.common.selection.SelectionHandler;
 import org.pm4j.common.selection.SelectionHandlerUtil;
-import org.pm4j.common.util.beanproperty.PropertyAndVetoableChangeListener;
 import org.pm4j.common.util.collection.IterableUtil;
 import org.pm4j.common.util.collection.MapUtil;
 import org.pm4j.common.util.reflection.ClassUtil;
 import org.pm4j.common.util.reflection.GenericTypeUtil;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmBean;
-import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmCommandDecorator;
 import org.pm4j.core.pm.PmDefaults;
 import org.pm4j.core.pm.PmElement;
@@ -85,7 +80,7 @@ import org.pm4j.core.pm.impl.pathresolver.PmExpressionPathResolver;
  * <li>filtering (see TODO: ...)</li>
  * </ul>.
  * <p>
- * 
+ *
  * @author olaf boede
  */
 public class PmTableImpl
@@ -115,14 +110,11 @@ public class PmTableImpl
   /** The set of decorators for various table change kinds. */
   private Map<TableChange, PmCommandDecoratorSetImpl> pmChangeDecoratorMap = Collections.emptyMap();
 
-  /** Listens for selection changes and handles the table relates logic. */
-  private TableSelectionChangeListener pmTableSelectionChangeListener = new TableSelectionChangeListener();
-
-  /** Listens for filter changes and handles the table relates logic. */
-  private TableFilterChangeListener pmTableFilterChangeListener = new TableFilterChangeListener();
+  /** An event adapter that forwards collection events to table events. */
+  private InternalPmTableEventAdapterForPageableCollection pageableCollectionEventAdapter;
 
   /** A cached reference to the selected master row. */
-  private T_ROW_PM masterRowPm;
+  /* package */ T_ROW_PM masterRowPm;
 
   /** The set of supported cache strategies. */
   private static final Map<CacheMode, CacheStrategy> CACHE_STRATEGIES_FOR_IN_MEM_COLLECTION =
@@ -140,7 +132,7 @@ public class PmTableImpl
 
   /**
    * Creates a table PM.
-   * 
+   *
    * @param pmParent The presentation model context for this table.
    */
   public PmTableImpl(PmObject pmParent) {
@@ -159,7 +151,7 @@ public class PmTableImpl
    * bean of one of the table PM parents. If that bean gets exchanged, a value
    * change event will be propagated to the related PM sub-tree. See:
    * {@link PmBean#setPmBean(Object)}.
-   * 
+   *
    * @param event The event.
    */
   @Override
@@ -219,7 +211,7 @@ public class PmTableImpl
    * Should be called very early within the life cycle of the table.<br>
    * The implementation does currently not fire any change events
    * when this method gets called.
-   * 
+   *
    * @param rowSelectMode The {@link SelectMode} to be used by this table.
    */
   public void setPmRowSelectMode(SelectMode rowSelectMode) {
@@ -275,7 +267,7 @@ public class PmTableImpl
    * <p>
    * The default implementation provides the selected item in case of single
    * selection mode. For other modes it provides <code>null</code>.
-   * 
+   *
    * @return the master row. <code>null</code> if there is no master row.
    */
   protected T_ROW_PM getMasterRowPmImpl() {
@@ -291,7 +283,7 @@ public class PmTableImpl
   /**
    * Provides the bean behind the master row PM.<br>
    * See {@link #getMasterRowPm()}.
-   * 
+   *
    * @return the bean behind the currently active master row PM or <code>null</code>.
    */
   public T_ROW_BEAN getMasterRowPmBean() {
@@ -316,7 +308,7 @@ public class PmTableImpl
 
   /**
    * Short cut method to get the {@link QueryParams} of the pageable collection.
-   * 
+   *
    * @return the query behind this table.
    */
   public final QueryParams getPmQueryParams() {
@@ -331,7 +323,7 @@ public class PmTableImpl
    * It may be adjusted by defining one in
    * {@link PmDefaults#getFilterCompareDefinitionFactory()} or by overriding
    * this method.
-   * 
+   *
    * @return the factory.
    */
   public FilterDefinitionFactory getPmFilterCompareDefinitionFactory() {
@@ -383,7 +375,7 @@ public class PmTableImpl
    * <p>
    * Should not be called directly. Please use {@link #updatePmTable(org.pm4j.core.pm.PmTable.ClearAspect...)}
    * to trigger an update.
-   * 
+   *
    * @param clearAspect the PM aspect to clear.
    */
   protected void clearPmAspectImpl(UpdateAspect clearAspect) {
@@ -545,9 +537,9 @@ public class PmTableImpl
      * If set to <code>true</code> all row PMs will be validated.
      * <p>
      * WARNING: Validation of all rows may lead to bad performance in case of large tables.
-     * 
+     *
      * @param validateAllRows The switch.
-     * 
+     *
      * @deprecated Please use constructor parameter configuration.
      */
     @Deprecated
@@ -562,7 +554,7 @@ public class PmTableImpl
     /**
      * If more than the configured number of rows has to be validated, the method
      * {@link #checkRowNumLimit(PmTableImpl, long)} will log a warning.
-     * 
+     *
      * @param itemNumWarningLimit The max. rows to validate limit.
      */
     public void setItemNumWarningLimit(int itemNumWarningLimit) {
@@ -572,7 +564,7 @@ public class PmTableImpl
     /**
      * Generates a log warning if the limit is exceeded.<br>
      * Subclasses may override this method to perform their specific action.
-     * 
+     *
      * @param pm The table to validate.
      * @param numOfItemsToValidate The validation item number limit.
      */
@@ -617,7 +609,7 @@ public class PmTableImpl
    * Provides for service based tables the backing service reference.
    * <p>
    * The base implementation provides a reference to the service configured in {@link PmTableCfg#queryServiceClass()}.
-   * 
+   *
    * @return The used service in case of service based tables. <code>null</code> in case of in-memory tables.
    */
   @SuppressWarnings("unchecked")
@@ -640,7 +632,7 @@ public class PmTableImpl
   /**
    * Gets called whenever the internal {@link #pmPageableCollection} is <code>null</code> and
    * {@link #getPmPageableCollection()} gets called.
-   * 
+   *
    * @return The collection to use. Never <code>null</code>.
    */
   protected PmBeanCollection<T_ROW_PM, T_ROW_BEAN> getPmPageableCollectionImpl() {
@@ -658,7 +650,7 @@ public class PmTableImpl
    * Factory method that may be overridden to create a more specific collection.<br>
    * It will only be called if the table handles in-memory data (if
    * {@link #getPmQueryServiceImpl()} returns <code>null</code>).
-   * 
+   *
    * @return The in-memory collection to be used for this table.
    */
   protected PageableCollection<T_ROW_BEAN> makePmPageableBeanCollection(QueryService<T_ROW_BEAN, Object> service, QueryOptions qo) {
@@ -682,7 +674,7 @@ public class PmTableImpl
    * Factory method that may be overridden to create a more specific in memory
    * collection.<br>
    * It will only be called if the table handles in-memory data.
-   * 
+   *
    * @return The in-memory collection to be used for this table.
    */
   protected InMemCollection<T_ROW_BEAN> makePmPageableInMemBeanCollection(Collection<T_ROW_BEAN> beans, QueryOptions qo) {
@@ -711,7 +703,7 @@ public class PmTableImpl
    * will be returned.
    * <p>
    * If the there is no backing service an {@link InMemQueryOptionProvider} will be returned.
-   * 
+   *
    * @return The option provider or <code>null</code>.
    */
   protected QueryOptionProvider getPmQueryOptionProvider() {
@@ -734,7 +726,7 @@ public class PmTableImpl
    * If that is not configured the expression <code>"(o)pmBean.<pmName of my table>"</code>
    * will be used. This default expression is often useful for tables in {@link PmBean}s that represent a
    * bean collection having the same name.
-   * 
+   *
    * @return the set of beans to display. May be <code>null</code>.
    */
   @SuppressWarnings("unchecked")
@@ -763,7 +755,7 @@ public class PmTableImpl
   /**
    * Defines the data set to be presented by the table.<br>
    * HINT: Please check if you can define {@link #getPmPageableCollectionImpl()} instead.
-   * 
+   *
    * @param pageable
    *          the data set to present. If it is <code>null</code> an empty
    *          collection will be created internally by the next {@link #getPmPageableCollection()} call.
@@ -798,7 +790,7 @@ public class PmTableImpl
   }
 
   /**
-   * 
+   *
    * A post processing method that allow to apply some default settings to a new pageable collection.
    * <p>
    * Gets called whenever a new {@link #pmPageableCollection} gets assigned:
@@ -812,38 +804,27 @@ public class PmTableImpl
    * <li>The reference of the (optional) pager to the collection.</li>
    * </ul>
    * Sub classes may override this method to extend this logic.
-   * 
+   *
    * @param pageableCollection the collection to initialize.
    */
-  protected void assignPmPageableCollection(PmBeanCollection<T_ROW_PM, T_ROW_BEAN> pc) {
-    if (this.pmPageableCollection != pc) {
-      SelectionHandler<T_ROW_PM> selectionHandler = pc.getSelectionHandler();
-      selectionHandler.addPropertyAndVetoableListener(SelectionHandler.PROP_SELECTION, pmTableSelectionChangeListener);
-      pc.getQueryParams().addPropertyAndVetoableListener(QueryParams.PROP_EFFECTIVE_FILTER, pmTableFilterChangeListener);
-
-      if (pmPageableCollection != null) {
-        pmPageableCollection.getSelectionHandler().removePropertyAndVetoableListener(SelectionHandler.PROP_SELECTION, pmTableSelectionChangeListener);
-        pmPageableCollection.getQueryParams().removePropertyAndVetoableListener(QueryParams.PROP_EFFECTIVE_FILTER, pmTableFilterChangeListener);
-      }
+  protected void assignPmPageableCollection(final PmBeanCollection<T_ROW_PM, T_ROW_BEAN> pc) {
+    this.pmPageableCollection = pc;
+    if (pageableCollectionEventAdapter != null) {
+      pageableCollectionEventAdapter.unregisterListeners();
+      pageableCollectionEventAdapter = null;
     }
 
-    this.pmPageableCollection = pc;
     if (pmPageableCollection != null) {
-      SelectionHandler<T_ROW_PM> selectionHandler = pmPageableCollection.getSelectionHandler();
-      selectionHandler.setSelectMode(getPmRowSelectMode());
+      pmPageableCollection.getSelectionHandler().setSelectMode(getPmRowSelectMode());
       pmPageableCollection.setPageSize(getNumOfPageRowPms());
 
-      // XXX olaf: Check - is redundant to the change listener within Pager!
-      if (getPmPager() != null) {
-        getPmPager().setPageableCollection(pmPageableCollection);
-      }
-      
-      pmPageableCollection.getQueryParams().addPropertyChangeListener(QueryParams.PROP_EFFECTIVE_SORT_ORDER, new PropertyChangeListener() {
-        @Override
-        public void propertyChange(PropertyChangeEvent evt) {
-          PmEventApi.firePmEvent(PmTableImpl.this, PmEvent.VALUE_CHANGE, ValueChangeKind.SORT_ORDER);
-        }
-      });
+      pageableCollectionEventAdapter = new InternalPmTableEventAdapterForPageableCollection(this, pmPageableCollection);
+      pageableCollectionEventAdapter.registerListeners();
+    }
+    
+    // XXX olaf: Check - is redundant to the change listener within Pager!
+    if (getPmPager() != null) {
+      getPmPager().setPageableCollection(pmPageableCollection);
     }
   }
 
@@ -998,65 +979,6 @@ public class PmTableImpl
           setPageableCollection(PmTableImpl.this.getPmPageableCollection());
         }
       });
-    }
-  }
-
-  /**
-   * A property change listener that forwards event calls to registered {@link TableChange#SELECTION} decorators.
-   * <p>
-   * TODO olaf: should use an intermediate command to allow the standard logic for confirmed changes...
-   */
-  class TableSelectionChangeListener implements PropertyAndVetoableChangeListener {
-
-    @Override
-    public void vetoableChange(PropertyChangeEvent evt) throws PropertyVetoException {
-      // a command used for value change reporting.
-      PmCommand cmd = new PmAspectChangeCommandImpl(PmTableImpl.this, "selection", evt.getOldValue(), evt.getNewValue());
-      for (PmCommandDecorator d : getPmDecorators(TableChange.SELECTION)) {
-        if (!d.beforeDo(cmd)) {
-          String msg = "Decorator prevents selection change: " + d;
-          LOG.debug(msg);
-          throw new PropertyVetoException(msg, evt);
-        }
-      }
-    }
-
-    @Override
-    public void propertyChange(PropertyChangeEvent evt) {
-      masterRowPm = null;
-      for (PmCommandDecorator d : getPmDecorators(TableChange.SELECTION)) {
-        d.afterDo(null);
-      }
-    }
-  }
-
-  /**
-   * A property change listener that forwards event calls to registered {@link TableChange#FILTER} decorators.
-   * <p>
-   * TODO olaf: should use an intermediate command to allow the standard logic for confirmed changes...
-   */
-  class TableFilterChangeListener implements PropertyAndVetoableChangeListener {
-
-    @Override
-    public void vetoableChange(PropertyChangeEvent evt) throws PropertyVetoException {
-      for (PmCommandDecorator d : getPmDecorators(TableChange.FILTER)) {
-        if (!d.beforeDo(null)) {
-          String msg = "Decorator prevents filter change: " + d;
-          LOG.debug(msg);
-          throw new PropertyVetoException(msg, evt);
-        }
-      }
-    }
-
-    @Override
-    public void propertyChange(PropertyChangeEvent evt) {
-      masterRowPm = null;
-      // FIXME: may fire too often a DB query. What happens in case of a series of QueryParam changes?
-      // PageableCollectionUtil2.ensureCurrentPageInRange(getPmPageableCollection());
-
-      for (PmCommandDecorator d : getPmDecorators(TableChange.FILTER)) {
-        d.afterDo(null);
-      }
     }
   }
 
