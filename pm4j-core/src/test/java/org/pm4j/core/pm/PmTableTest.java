@@ -346,14 +346,13 @@ public class PmTableTest {
   }
 
   public static class RowBean {
-    public String name;
-    public String description;
-    public Integer counter;
-
     public static final QueryAttr ATTR_NAME = new QueryAttr("name", String.class);
     public static final QueryAttr ATTR_DESCRIPTION = new QueryAttr("description", String.class);
     public static final QueryAttr ATTR_COUNTER = new QueryAttr("counter", Integer.class);
 
+    public String name;
+    public String description;
+    public Integer counter;
 
     public RowBean(String name, String description, int counter) {
       assert name != null;
