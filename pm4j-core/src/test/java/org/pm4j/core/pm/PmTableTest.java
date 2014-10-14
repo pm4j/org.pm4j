@@ -17,6 +17,9 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.pm4j.common.pageable.PageableCollection;
 import org.pm4j.common.pageable.PageableCollectionUtil;
+import org.pm4j.common.query.CompOpNotEquals;
+import org.pm4j.common.query.QueryAttr;
+import org.pm4j.common.query.QueryExprCompare;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.filter.FilterDefinition;
 import org.pm4j.common.query.inmem.InMemSortOrder;
@@ -199,11 +202,46 @@ public class PmTableTest {
   }
 
   @Test
-  @Ignore("FIXME oboede: path based columns need to be supported.")
   public void testFilterByPathColumn() {
     assertEquals("[a, b]", myTablePm.getRowPms().toString());
     FilterDefinition fd = getFilterDefinition("pathColumn");
     assertEquals(myTablePm.pathColumn.getPmTitle(), fd.getAttrTitle());
+  }
+
+  @Test
+  public void testExecFilter() {
+    myTablePm.setNumOfPageRowPms(10);
+    assertEquals("[a, b, c]", myTablePm.getRowPms().toString());
+    QueryExprCompare notA = new QueryExprCompare(RowBean.ATTR_NAME, CompOpNotEquals.class, "a");
+    myTablePm.getPmPageableBeanCollection().getQueryParams().setFilterExpression(notA);
+    assertEquals("[b, c]", myTablePm.getRowPms().toString());
+  }
+
+  @Test
+  @Ignore("Solved by 136039: Vetoable property change does not work with FilterExpressions")
+  public void testExecVetoFilter() {
+    myTablePm.setNumOfPageRowPms(10);
+    // all 3 rows should be visible
+    assertEquals("[a, b, c]", myTablePm.getRowPms().toString());
+
+    // add a filter change decorator which prevents any filter change
+    myTablePm.addPmDecorator(new PmCommandDecorator() {
+      @Override
+      public boolean beforeDo(PmCommand cmd) {
+        return false;
+      }
+
+      @Override
+      public void afterDo(PmCommand cmd) {
+      }
+    }, PmTable.TableChange.FILTER);
+
+    // Nevertheless try to register a filter that filters any 'a' 
+    QueryExprCompare noA = new QueryExprCompare(RowBean.ATTR_NAME, CompOpNotEquals.class, "a");
+    myTablePm.getPmPageableBeanCollection().getQueryParams().setFilterExpression(noA);
+
+    // The added Filter does not apply because the filter change decorator prevents the application.
+    assertEquals("[a, b, c]", myTablePm.getRowPms().toString());
   }
 
   @Test
@@ -311,6 +349,11 @@ public class PmTableTest {
     public String name;
     public String description;
     public Integer counter;
+
+    public static final QueryAttr ATTR_NAME = new QueryAttr("name", String.class);
+    public static final QueryAttr ATTR_DESCRIPTION = new QueryAttr("description", String.class);
+    public static final QueryAttr ATTR_COUNTER = new QueryAttr("counter", Integer.class);
+
 
     public RowBean(String name, String description, int counter) {
       assert name != null;

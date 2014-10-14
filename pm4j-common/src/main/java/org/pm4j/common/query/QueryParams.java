@@ -1,5 +1,6 @@
 package org.pm4j.common.query;
 
+import java.beans.PropertyVetoException;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -163,6 +164,13 @@ public class QueryParams extends PropertyChangeSupportedBase implements Cloneabl
    */
   public void setFilterExpression(QueryExpr expr) {
     QueryExpr old = this.filterExpression;
+    // TODO: GLOBE00136039 Vetoable property change does not work with FilterExpressions
+    //  try {
+    //      fireVetoableChange(PROP_EFFECTIVE_FILTER, old, expr);
+    //  } catch (PropertyVetoException e) {
+    //      // XXX log here?
+    //      return;
+    //  }
     this.filterExpression = expr;
 
     firePropertyChange(PROP_EFFECTIVE_FILTER, old, expr);
