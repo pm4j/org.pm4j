@@ -164,7 +164,7 @@ public class QueryParams extends PropertyChangeSupportedBase implements Cloneabl
    */
   public void setFilterExpression(QueryExpr expr) {
     QueryExpr old = this.filterExpression;
-    // TODO: GLOBE00136039 Vetoable property change does not work with FilterExpressions
+    // TODO: 136039 Vetoable property change does not work with FilterExpressions
     //  try {
     //      fireVetoableChange(PROP_EFFECTIVE_FILTER, old, expr);
     //  } catch (PropertyVetoException e) {

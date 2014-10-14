@@ -218,7 +218,7 @@ public class PmTableTest {
   }
 
   @Test
-  @Ignore("Solved by 136039: Vetoable property change does not work with FilterExpressions")
+  @Ignore("TODO: DZA 136039: Vetoable property change does not work with FilterExpressions")
   public void testExecVetoFilter() {
     myTablePm.setNumOfPageRowPms(10);
     // all 3 rows should be visible
