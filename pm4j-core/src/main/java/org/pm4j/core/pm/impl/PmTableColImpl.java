@@ -16,7 +16,6 @@ import org.pm4j.core.pm.PmAttrEnum;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmCommandDecorator;
 import org.pm4j.core.pm.PmEvent;
-import org.pm4j.core.pm.PmEvent.ValueChangeKind;
 import org.pm4j.core.pm.PmEventListener;
 import org.pm4j.core.pm.PmMessage;
 import org.pm4j.core.pm.PmMessage.Severity;
@@ -225,9 +224,8 @@ public class PmTableColImpl extends PmObjectBase implements PmTableCol {
       PmEventListener tableSortOrderChangeListener = new PmEventListener() {
         @Override
         public void handleEvent(PmEvent event) {
-          if ((event.getValueChangeKind() == ValueChangeKind.SORT_ORDER) &&
-              // Checks if the event source is not this column to prevent set value ping-pong games.
-              (event.getPm() != PmTableColImpl.this)) {
+          // Checks if the event source is not this column to prevent set value ping-pong games.
+          if (event.getPm() != PmTableColImpl.this) {
             SortOrder tableSortOrder = getPmTable().getPmPageableCollection().getQueryParams().getSortOrder();
             SortOrder columnSortOrderOption = getColSortOrderOption();
             if (tableSortOrder != null &&
@@ -239,7 +237,7 @@ public class PmTableColImpl extends PmObjectBase implements PmTableCol {
           }
         }
       };
-      PmEventApi.addPmEventListener(getPmTable(), PmEvent.VALUE_CHANGE, tableSortOrderChangeListener);
+      PmEventApi.addPmEventListener(getPmTable(), PmEvent.SORT_ORDER_CHANGE, tableSortOrderChangeListener);
     }
 
     @Override
@@ -301,10 +299,6 @@ public class PmTableColImpl extends PmObjectBase implements PmTableCol {
       SortOrder querySortOrder = getOwnQuerySortOrder();
       PmTable<?> pmTable = getPmTable();
       pmTable.getPmPageableCollection().getQueryParams().setSortOrder(querySortOrder);
-
-      // TODO: move to a listener within the table implementation.
-      // fire a value change event.
-      PmEventApi.firePmEventIfInitialized(pmTable, new PmEvent(PmTableColImpl.this, pmTable, PmEvent.VALUE_CHANGE, ValueChangeKind.SORT_ORDER));
     }
   }
 

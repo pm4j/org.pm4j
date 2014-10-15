@@ -17,6 +17,9 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.pm4j.common.pageable.PageableCollection;
 import org.pm4j.common.pageable.PageableCollectionUtil;
+import org.pm4j.common.query.CompOpNotEquals;
+import org.pm4j.common.query.QueryAttr;
+import org.pm4j.common.query.QueryExprCompare;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.filter.FilterDefinition;
 import org.pm4j.common.query.inmem.InMemSortOrder;
@@ -37,6 +40,7 @@ import org.pm4j.core.pm.impl.PmAttrIntegerImpl;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
 import org.pm4j.core.pm.impl.PmBeanImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
+import org.pm4j.core.pm.impl.PmInitApi;
 import org.pm4j.core.pm.impl.PmTableColImpl;
 import org.pm4j.core.pm.impl.PmTableImpl;
 import org.pm4j.tools.test.RecordingPmEventListener;
@@ -70,6 +74,8 @@ public class PmTableTest {
       }
     };
     PmEventApi.addPmEventListener(myTablePm, PmEvent.VALUE_CHANGE, valueChangeEventListener);
+    
+    PmInitApi.ensurePmSubTreeInitialization(myTablePm);
   }
 
   @Test
@@ -167,6 +173,21 @@ public class PmTableTest {
   }
 
   @Test
+  @Ignore("Will be fixed with task 135890")
+  public void testInitialSortOrderConfiguredInTableAnnotation() {
+    assertEquals(PmSortOrder.ASC, myTablePm.name.getSortOrderAttr().getValue());
+  }
+
+  @Test
+  public void testResetPmValuesClearsSortOrder() {
+    setValue(myTablePm.name.getSortOrderAttr(), PmSortOrder.DESC);
+    assertEquals("[c, b]", myTablePm.getRowPms().toString());
+    myTablePm.resetPmValues();
+    assertEquals("[a, b]", myTablePm.getRowPms().toString());
+    assertEquals(PmSortOrder.ASC, myTablePm.name.getSortOrderAttr().getValue());
+  }
+
+  @Test
   public void testSortByDescriptionUsingCustomComparator() {
     assertEquals("[a, b]", myTablePm.getRowPms().toString());
     setValue(myTablePm.description.getSortOrderAttr(), PmSortOrder.ASC);
@@ -181,11 +202,46 @@ public class PmTableTest {
   }
 
   @Test
-  @Ignore("FIXME oboede: path based columns need to be supported.")
   public void testFilterByPathColumn() {
     assertEquals("[a, b]", myTablePm.getRowPms().toString());
     FilterDefinition fd = getFilterDefinition("pathColumn");
     assertEquals(myTablePm.pathColumn.getPmTitle(), fd.getAttrTitle());
+  }
+
+  @Test
+  public void testExecFilter() {
+    myTablePm.setNumOfPageRowPms(10);
+    assertEquals("[a, b, c]", myTablePm.getRowPms().toString());
+    QueryExprCompare notA = new QueryExprCompare(RowBean.ATTR_NAME, CompOpNotEquals.class, "a");
+    myTablePm.getPmPageableBeanCollection().getQueryParams().setFilterExpression(notA);
+    assertEquals("[b, c]", myTablePm.getRowPms().toString());
+  }
+
+  @Test
+  @Ignore("TODO: DZA 136039: Vetoable property change does not work with FilterExpressions")
+  public void testExecVetoFilter() {
+    myTablePm.setNumOfPageRowPms(10);
+    // all 3 rows should be visible
+    assertEquals("[a, b, c]", myTablePm.getRowPms().toString());
+
+    // add a filter change decorator which prevents any filter change
+    myTablePm.addPmDecorator(new PmCommandDecorator() {
+      @Override
+      public boolean beforeDo(PmCommand cmd) {
+        return false;
+      }
+
+      @Override
+      public void afterDo(PmCommand cmd) {
+      }
+    }, PmTable.TableChange.FILTER);
+
+    // Nevertheless try to register a filter that filters any 'a' 
+    QueryExprCompare noA = new QueryExprCompare(RowBean.ATTR_NAME, CompOpNotEquals.class, "a");
+    myTablePm.getPmPageableBeanCollection().getQueryParams().setFilterExpression(noA);
+
+    // The added Filter does not apply because the filter change decorator prevents the application.
+    assertEquals("[a, b, c]", myTablePm.getRowPms().toString());
   }
 
   @Test
@@ -290,6 +346,10 @@ public class PmTableTest {
   }
 
   public static class RowBean {
+    public static final QueryAttr ATTR_NAME = new QueryAttr("name", String.class);
+    public static final QueryAttr ATTR_DESCRIPTION = new QueryAttr("description", String.class);
+    public static final QueryAttr ATTR_COUNTER = new QueryAttr("counter", Integer.class);
+
     public String name;
     public String description;
     public Integer counter;

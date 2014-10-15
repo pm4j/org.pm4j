@@ -448,7 +448,7 @@ public class DeprPmTableImpl
           Comparator<?> comparator = new RowPmComparator<T_ROW_ELEMENT_PM>(sortCol);
           // sort the PM items.
           getPageableCollection().sortItems(comparator);
-          PmEventApi.firePmEventIfInitialized(DeprPmTableImpl.this, PmEvent.VALUE_CHANGE, ValueChangeKind.SORT_ORDER);
+          PmEventApi.firePmEventIfInitialized(DeprPmTableImpl.this, PmEvent.SORT_ORDER_CHANGE);
           return;
         }
       }
@@ -457,7 +457,7 @@ public class DeprPmTableImpl
       // Can be postponed to the next getPageableColleciton call if the collection is not yet created.
       if (pageableCollection != null) {
         getPageableCollection().sortItems(null);
-        PmEventApi.firePmEventIfInitialized(DeprPmTableImpl.this, PmEvent.VALUE_CHANGE, ValueChangeKind.SORT_ORDER);
+        PmEventApi.firePmEventIfInitialized(DeprPmTableImpl.this, PmEvent.SORT_ORDER_CHANGE);
       }
     }
   }

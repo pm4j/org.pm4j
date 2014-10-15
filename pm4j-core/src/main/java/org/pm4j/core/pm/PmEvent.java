@@ -32,7 +32,9 @@ public class PmEvent extends EventObject {
   public static final int VALIDATION_STATE_CHANGE = 1 << 7;
   public static final int STYLECLASS_CHANGE = 1 << 8;
   public static final int SELECTION_CHANGE = 1 << 9;
-  public static final int EXEC_COMMAND = 1 << 10;
+  public static final int SORT_ORDER_CHANGE = 1 << 10;
+  public static final int FILTER_CHANGE = 1 << 11;
+  public static final int EXEC_COMMAND = 1 << 12;
 
   /**
    * Indicator for an event that fired because of re-loaded data.<br>
@@ -54,7 +56,7 @@ public class PmEvent extends EventObject {
     VALUE_CHANGE | TITLE_CHANGE | TOOLTIP_CHANGE |
     VISIBILITY_CHANGE | ENABLEMENT_CHANGE |
     OPTIONSET_CHANGE | VALUE_CHANGED_STATE_CHANGE | VALIDATION_STATE_CHANGE |
-    STYLECLASS_CHANGE | SELECTION_CHANGE;
+    STYLECLASS_CHANGE | SELECTION_CHANGE | SORT_ORDER_CHANGE | FILTER_CHANGE;
 
   public static final int ALL = ALL_CHANGE_EVENTS | EXEC_COMMAND;
 
@@ -71,11 +73,7 @@ public class PmEvent extends EventObject {
     /** One or more items where deleted from a value. */
     DELETE_ITEM,
     /** The value was re-loaded from the backend. */
-    RELOAD,
-    /** Sort order change */
-    SORT_ORDER,
-    /** Item Filter definition change */
-    FILTER;
+    RELOAD;
 
     /**
      * @return <code>true</code> if the value may be replaced by this value change.
