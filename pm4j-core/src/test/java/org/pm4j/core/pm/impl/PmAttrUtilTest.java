@@ -10,6 +10,11 @@ import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.annotation.PmTitleCfg;
 import org.pm4j.tools.test.PmAssert;
 
+/**
+ * Tests for {@link PmAttrUtil}.
+ *
+ * @author Olaf Boede
+ */
 public class PmAttrUtilTest {
 
   private TestPm testPm = new TestPm();
@@ -75,10 +80,14 @@ public class PmAttrUtilTest {
                  null, testPm.i.getValue());
   }
 
+  /** Internally used test PM */
   public static class TestPm extends PmConversationImpl {
+
     public final PmAttrStringImpl s = new PmAttrStringImpl(this);
+
     @PmAttrCfg(defaultValue="DEFAULT")
     public final PmAttrStringImpl sWithDefault = new PmAttrStringImpl(this);
+
     @PmTitleCfg(title="integer attr")
     public final PmAttrIntegerImpl i = new PmAttrIntegerImpl(this);
 }

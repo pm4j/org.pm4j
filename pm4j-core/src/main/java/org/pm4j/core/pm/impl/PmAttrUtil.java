@@ -18,7 +18,7 @@ public class PmAttrUtil {
 
   /**
    * Sets the backing value of the given attribute(s) to its default value.<br>
-   * Please use it with care because this call may fails in case of attributes
+   * Please use it with care because this call may fail in case of attributes
    * that are not intended for modification. E.g. in case of calculated
    * attributes that support only read operations.
    * <p>
@@ -95,13 +95,13 @@ public class PmAttrUtil {
    *          The attribute that provides the converter logic.<br>
    *          If the value conversion is implemented correctly (without
    *          attribute state change) it's value will not be affected.
-   * @param intValue
+   * @param backingValue
    *          The value to convert. May be <code>null</code>.
    * @return The corresponding external value. May be <code>null</code>.
    */
-  public static <T_EXT, T_INT> T_EXT backingValueToValue(PmAttrBase<T_EXT, T_INT> pmAttrCtxt, T_INT intValue) {
-    return intValue != null || pmAttrCtxt.isConvertingNullValueImpl()
-        ? pmAttrCtxt.convertBackingValueToPmValue(intValue)
+  public static <T_VALUE, T_BACKING_VALUE> T_VALUE backingValueToValue(PmAttrBase<T_VALUE, T_BACKING_VALUE> pmAttrCtxt, T_BACKING_VALUE backingValue) {
+    return backingValue != null || pmAttrCtxt.isConvertingNullValueImpl()
+        ? pmAttrCtxt.convertBackingValueToPmValue(backingValue)
         : null;
   }
 
@@ -114,14 +114,14 @@ public class PmAttrUtil {
    *          The attribute that provides the converter logic.<br>
    *          If the value conversion is implemented correctly (without
    *          attribute state change) it's value will not be affected.
-   * @param extValue
+   * @param value
    *          The value to convert. May be <code>null</code>.
    * @return The corresponding internal value. May be <code>null</code>.
    */
-  public static <T_EXT, T_INT> T_INT valueToBackingValue(PmAttrBase<T_EXT, T_INT> pmAttrCtxt, T_EXT extValue) {
-    return extValue != null || pmAttrCtxt.isConvertingNullValueImpl()
-        ? pmAttrCtxt.convertPmValueToBackingValue(extValue)
-          : null;
+  public static <T_VALUE, T_BACKING_VALUE> T_BACKING_VALUE valueToBackingValue(PmAttrBase<T_VALUE, T_BACKING_VALUE> pmAttrCtxt, T_VALUE value) {
+    return value != null || pmAttrCtxt.isConvertingNullValueImpl()
+        ? pmAttrCtxt.convertPmValueToBackingValue(value)
+        : null;
   }
 
   /**
@@ -136,12 +136,12 @@ public class PmAttrUtil {
    *           if the string does not correspond to a value. E.g. in case of a
    *           format issue.
    */
-  public static <T_EXT> T_EXT convertStringToValue(PmAttr<T_EXT> pmAttrCtxt, String s) {
+  public static <T_VALUE> T_VALUE convertStringToValue(PmAttr<T_VALUE> pmAttrCtxt, String s) {
     @SuppressWarnings("unchecked")
-    PmAttrBase<T_EXT, ?> a = (PmAttrBase<T_EXT, ?>) pmAttrCtxt;
+    PmAttrBase<T_VALUE, ?> ab = (PmAttrBase<T_VALUE, ?>) pmAttrCtxt;
     try {
-      return (s != null || a.isConvertingNullValueImpl())
-          ? a.stringToValueImpl(s)
+      return (s != null || ab.isConvertingNullValueImpl())
+          ? ab.stringToValueImpl(s)
           : null;
     } catch (PmConverterException e) {
       throw new PmRuntimeException(pmAttrCtxt, e.getResourceData(), e);
@@ -157,24 +157,24 @@ public class PmAttrUtil {
    * @param value The value to convert to a string. May be <code>null</code>.
    * @return The corresponding string. May be <code>null</code>.
    */
-  public static <T_EXT> String convertValueToString(PmAttr<T_EXT> pmAttrCtxt, T_EXT value) {
+  public static <T_VALUE> String convertValueToString(PmAttr<T_VALUE> pmAttrCtxt, T_VALUE value) {
     @SuppressWarnings("unchecked")
-    PmAttrBase<T_EXT, ?> a = (PmAttrBase<T_EXT, ?>) pmAttrCtxt;
-    return (value != null || a.isConvertingNullValueImpl())
-        ? a.valueToStringImpl(value)
+    PmAttrBase<T_VALUE, ?> ab = (PmAttrBase<T_VALUE, ?>) pmAttrCtxt;
+    return (value != null || ab.isConvertingNullValueImpl())
+        ? ab.valueToStringImpl(value)
         : null;
   }
 
   /** @deprecated Please use {@link #backingValueToValue(PmAttrBase, Object)}. */
   @Deprecated
-  public static <T_EXT, T_INT> T_EXT convertBackingValue(PmAttrBase<T_EXT, T_INT> pmAttrCtxt, T_INT intValue) {
-    return backingValueToValue(pmAttrCtxt, intValue);
+  public static <T_VALUE, T_BACKING_VALUE> T_VALUE convertBackingValue(PmAttrBase<T_VALUE, T_BACKING_VALUE> pmAttrCtxt, T_BACKING_VALUE backingValue) {
+    return backingValueToValue(pmAttrCtxt, backingValue);
   }
 
   /** @deprecated Please use {@link #valueToBackingValue(PmAttrBase, Object)}. */
   @Deprecated
-  public static <T_EXT, T_INT> T_INT convertExternalValue(PmAttrBase<T_EXT, T_INT> pmAttrCtxt, T_EXT extValue) {
-    return valueToBackingValue(pmAttrCtxt, extValue);
+  public static <T_VALUE, T_BACKING_VALUE> T_BACKING_VALUE convertExternalValue(PmAttrBase<T_VALUE, T_BACKING_VALUE> pmAttrCtxt, T_VALUE value) {
+    return valueToBackingValue(pmAttrCtxt, value);
   }
 
   /**
