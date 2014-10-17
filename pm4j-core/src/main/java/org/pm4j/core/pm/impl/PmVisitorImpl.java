@@ -25,6 +25,7 @@ public class PmVisitorImpl {
 
   private final Set<PmVisitHint> hints;
   private PmVisitCallBack callBack;
+  private PmObject visitRoot = null;
   private PmObject visitStoppedOn = null;
 
   /**
@@ -74,6 +75,10 @@ public class PmVisitorImpl {
    */
   public PmVisitResult visit(PmObject pm) {
     assert pm != null;
+    if (visitRoot == null) {
+      visitRoot = pm;
+    }
+
     if (callBack == null) {
       throw new PmRuntimeException(pm, "Please define a callback.");
     }
@@ -155,7 +160,8 @@ public class PmVisitorImpl {
       }
     }
 
-    if (hints.contains(PmVisitHint.SKIP_CONVERSATION)) {
+    // if the conversation is the visitor start object, then a skip-conversation skips only child conversations.
+    if (hints.contains(PmVisitHint.SKIP_CONVERSATION) && (pm != visitRoot)) {
       if (pm instanceof PmConversation) {
         return PmVisitResult.SKIP_CHILDREN;
       }

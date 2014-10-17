@@ -49,7 +49,7 @@ public class PmAttrPmListImpl<T_ITEM_PM extends PmBean<T_BEAN>, T_BEAN> extends 
     Collection<T_BEAN> beanValue = getBackingValue();
     if (beanValue == null) {
       beanValue = makeBeanCollection();
-      setBackingValue(beanValue);
+      setBackingValueInternal(beanValue);
     }
     beanValue.add(pmElement.getPmBean());
     PmEventApi.firePmEventIfInitialized(this, PmEvent.VALUE_CHANGE);
