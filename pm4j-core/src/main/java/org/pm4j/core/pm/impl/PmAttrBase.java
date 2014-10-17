@@ -1,5 +1,7 @@
 package org.pm4j.core.pm.impl;
 
+import static org.pm4j.core.pm.api.PmCacheApi.clearPmCache;
+
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -64,6 +66,7 @@ import org.pm4j.core.pm.annotation.PmOptionCfg;
 import org.pm4j.core.pm.annotation.PmOptionCfg.NullOption;
 import org.pm4j.core.pm.annotation.PmTitleCfg;
 import org.pm4j.core.pm.api.PmCacheApi;
+import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmExpressionApi;
 import org.pm4j.core.pm.api.PmLocalizeApi;
@@ -600,16 +603,13 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     try {
       // the method will try to populate pmValue with different approaches
       // and return it as result
-      T_PM_VALUE pmValue = null;
-
       T_BEAN_VALUE beanAttrValue = getBackingValue();
+      T_PM_VALUE   pmValue       = PmAttrUtil.backingValueToValue(this, beanAttrValue);
 
-      if (beanAttrValue != null || isConvertingNullValueImpl()) {
-        pmValue = convertBackingValueToPmValue(beanAttrValue);
-        // return the converted value if it is not an "empty value".
-        if(!isEmptyValue(pmValue)) {
-          return pmValue;
-        }
+      // return the converted value if it is not an "empty value".
+      // Otherwise continue with default value logic.
+      if(!isEmptyValue(pmValue)) {
+        return pmValue;
       }
 
       // Default values may have only effect if the value was not set by the user:
@@ -620,9 +620,8 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
       // At this point pmValue is still either null or empty.
       // If a default value exists this shall be used to populate it.
 
-      // The default value will be show in read-only scenarios instead of
+      // The default value will be shown in read-only scenarios instead of
       // the real 'null' value.
-      // TODO oboede: this behavior needs to be checked/well documented!
       T_PM_VALUE defaultValue = getDefaultValue();
       if (defaultValue != null) {
         // The backing value gets changed within the 'get' functionality.
@@ -716,10 +715,8 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
           LOG.debug("Changing PM value of '" + PmUtil.getPmLogString(this) + "' from '" + currentValue + "' to '" + newPmValue + "'.");
         }
 
-        T_BEAN_VALUE backingValue = (newPmValue != null || isConvertingNullValueImpl())
-                        ? convertPmValueToBackingValue(newPmValue)
-                        : null;
-        // Ensure that primitive bacing values will not be set to null.
+        T_BEAN_VALUE backingValue = PmAttrUtil.valueToBackingValue(this, newPmValue);
+        // Ensure that primitive backing values will not be set to null.
         if ((backingValue == null) && getOwnMetaData().primitiveType) {
           // TODO oboede: This misleading error message will be here for one release only to minimize
           // compatibility risks. It will be replaced by the exception below in release v0.8.
@@ -728,7 +725,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
           // throw new PmRuntimeException(this, "Unable to set a primitive value to null.\n" +
           //     "You may override 'isConvertingNullValueImpl' and implement a null value conversion (override convertPmValueToBackingValue or configure a valueConverter) to get that feature.");
         }
-        setBackingValue(backingValue);
+        setBackingValueInternal(backingValue);
         metaData.cacheStrategyForValue.setAndReturnCachedValue(this, newPmValue);
 
         // From now on the value should be handled as intentionally modified.
@@ -1238,7 +1235,11 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   /**
    * Converts the backing attribute value to the external attribute value.
    * <p>
-   * The default implementation uses the {@link ValueConverter} provided by {@link #getValueConverter()}.
+   * The default implementation uses the {@link ValueConverter} provided by
+   * {@link #getValueConverter()}.
+   * <p>
+   * ATTENTION: this method will be made protected soon. Please use
+   * {@link PmAttrUtil#backingValueToValue(PmAttrBase, Object)}.
    */
   public T_PM_VALUE convertBackingValueToPmValue(T_BEAN_VALUE backingValue) {
     return getValueConverter().toExternalValue(converterCtxt, backingValue);
@@ -1247,7 +1248,11 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   /**
    * Converts the external attribute value to the backing attribute value.
    * <p>
-   * The default implementation uses the {@link ValueConverter} provided by {@link #getValueConverter()}.
+   * The default implementation uses the {@link ValueConverter} provided by
+   * {@link #getValueConverter()}.
+   * <p>
+   * ATTENTION: this method will be made protected soon. Please use
+   * {@link PmAttrUtil#valueToBackingValue(PmAttrBase, Object)}.
    */
   public T_BEAN_VALUE convertPmValueToBackingValue(T_PM_VALUE externalValue) {
     return getValueConverter().toInternalValue(converterCtxt, externalValue);
@@ -1301,13 +1306,20 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
    * @see {@link #stringToValueImpl(String)}
    * @see {@link #valueToStringImpl(Object)}
    * @see {@link #getValueConverterImpl()}
-   * @see {@link #convertBackingValueToPmValue(Object)}
-   * @see {@link #convertPmValueToBackingValue(Object)}
+   * @see {@link PmAttrUtil#backingValueToValue(PmAttrBase, Object)}
+   * @see {@link PmAttrUtil#convertExternalValue(PmAttrBase, Object)}
    */
   protected boolean isConvertingNullValueImpl() {
     return false;
   }
 
+  /**
+   * Provides the bound backing value of this attribute.
+   * <p>
+   * Does not use the optionally configured value cache.
+   *
+   * @return the bound backing value.
+   */
   @SuppressWarnings("unchecked")
   public final T_BEAN_VALUE getBackingValue() {
     return (bufferedValue != UNKNOWN_VALUE_INDICATOR)
@@ -1315,7 +1327,32 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
          : getBackingValueImpl();
   }
 
+  /**
+   * Sets the backing value of the attribute directly.<br>
+   * It also:
+   * <ul>
+   *   <li>clears value caches to ensure that the new state gets externally visible<br>
+   *   <li>clears existing invalid attribute value messages</li>
+   *   <li>marks the attribute as unchanged (because it's usually not a user change)</li>
+   * </ul>
+   * Please use it with care because this call may fail in case of attributes
+   * that are not intended for modification. E.g. in case of calculated
+   * attributes that support only read operations.
+   * <p>
+   * In difference to {@link #setValue(Object)} this method also does not
+   * consider attribute enablement.
+   *
+   * @param value
+   *          The value to assign directly to the bound backing value storage.
+   */
   public final void setBackingValue(T_BEAN_VALUE value) {
+    setBackingValueInternal(value);
+    clearPmCache(this, CacheKind.VALUE);
+    clearPmInvalidValues();
+    setPmValueChanged(false);
+  }
+
+  final void setBackingValueInternal(T_BEAN_VALUE value) {
     if (isBufferedPmValueMode()) {
       bufferedValue = value;
     }

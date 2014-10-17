@@ -10,6 +10,7 @@ import org.pm4j.core.pm.annotation.PmCacheCfg.CacheMode;
 import org.pm4j.core.pm.annotation.PmCacheCfg.Clear;
 import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
+import org.pm4j.core.pm.impl.PmAttrUtil;
 import org.pm4j.core.pm.impl.PmBeanImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
 import org.pm4j.core.pm.impl.PmElementBase;
@@ -98,6 +99,22 @@ public class PmAttrCacheTest {
     assertEquals(p.s, pPm.sCachedByClassSpec.getValue());
     assertEquals(p.s, pPm.sClassCacheSwitchedOff.getValue());
     assertEquals(p.s, pPm.sCachedButClearNever.getValue());
+  }
+
+  @Test
+  public void setBackingValueClearsCacheOfAttr() {
+    MyPojo p = new MyPojo();
+    MyPojoPm pPm = new MyPojoPm(new PmConversationImpl(), p);
+
+    p.s = "INITIAL";
+    assertEquals("INITIAL", pPm.sCached.getValue());
+    assertEquals("INITIAL", pPm.sCachedByClassSpec.getValue());
+
+    PmAttrUtil.resetBackingValueToDefault(pPm.sCached);
+    assertEquals(null, pPm.sCached.getValue());
+    assertEquals(null, p.s);
+    assertEquals("A set backing value call only resets the cache of the used attribute.",
+                 "INITIAL", pPm.sCachedByClassSpec.getValue());
   }
 
   // -- Domain model --

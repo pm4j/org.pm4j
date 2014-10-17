@@ -1,9 +1,9 @@
 package org.pm4j.deprecated.core.pm.filter.impl;
 
-import org.pm4j.core.exception.PmConverterException;
+import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmObject;
-import org.pm4j.core.pm.impl.PmUtil;
+import org.pm4j.core.pm.impl.PmAttrUtil;
 import org.pm4j.deprecated.core.pm.filter.DeprCompOp;
 
 /**
@@ -36,10 +36,10 @@ public class DeprFilterByPmAttrValue extends DeprFilterByPmAttrBase<Object> {
   protected boolean doesItemMatchImpl(PmAttr<?> pmAttr, DeprCompOp compOp, Object filterValue) {
     try {
       Object filterObj = (filterValue instanceof String)
-            ? PmUtil.convertStringToValue(pmAttr, (String)filterValue)
+            ? PmAttrUtil.convertStringToValue(pmAttr, (String)filterValue)
             : filterValue;
       return compOp.doesValueMatch(pmAttr.getValue(), filterObj);
-    } catch (PmConverterException e) {
+    } catch (PmRuntimeException e) {
       return showItemsInCaseOfFilterValueConverterFailure(compOp, filterValue);
     }
   }

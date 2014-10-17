@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
-import org.pm4j.core.exception.PmConverterException;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmCommand;
@@ -303,15 +302,6 @@ public final class PmUtil {
     return childPm;
   }
 
-
-  public static Object convertStringToValue(PmAttr<?> pmAttr, String s) throws PmConverterException {
-    return ((PmAttrBase<?, ?>)pmAttr).stringToValueImpl(s);
-  }
-
-  @SuppressWarnings("unchecked")
-  public static String convertToString(PmAttr<?> pmAttr, Object v) {
-    return ((PmAttrBase<Object, ?>)pmAttr).valueToStringImpl(v);
-  }
 
   /**
    * Provides the a space separated lists of style classes for the given PM.

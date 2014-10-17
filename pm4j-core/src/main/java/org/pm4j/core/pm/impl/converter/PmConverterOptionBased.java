@@ -9,6 +9,7 @@ import org.pm4j.core.pm.PmOptionSet;
 import org.pm4j.core.pm.impl.AttrConverterCtxt;
 import org.pm4j.core.pm.impl.AttrStringConverterBase;
 import org.pm4j.core.pm.impl.PmAttrBase;
+import org.pm4j.core.pm.impl.PmAttrUtil;
 import org.pm4j.core.pm.impl.options.PmOptionSetUtil;
 import org.pm4j.core.pm.impl.pathresolver.ExpressionPathResolver;
 import org.pm4j.core.pm.impl.pathresolver.PathResolver;
@@ -51,8 +52,8 @@ public class PmConverterOptionBased extends AttrStringConverterBase<Object> {
       if (o != null) {
         if (o.getValue() != null) {
           value = o.getValue();
-        } else if (o.getBackingValue() != null) {
-          value = pmAttr.convertBackingValueToPmValue(o.getBackingValue());
+        } else {
+          value = PmAttrUtil.backingValueToValue(pmAttr, o.getBackingValue());
         }
       }
     }
