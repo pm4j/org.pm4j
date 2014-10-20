@@ -6,7 +6,9 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.pm4j.core.exception.PmRuntimeException;
+import org.pm4j.core.pm.PmAttrString;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
+import org.pm4j.core.pm.annotation.PmAttrCfg.AttrAccessKind;
 import org.pm4j.core.pm.annotation.PmTitleCfg;
 import org.pm4j.tools.test.PmAssert;
 
@@ -37,13 +39,20 @@ public class PmAttrUtilTest {
   }
 
   @Test
-  public void testResetBackingValuesInTreeToDefault() {
-    PmAttrUtil.resetBackingValuesInTreeToDefault(testPm);
+  public void testResetBackingValuesToDefault() {
+    PmAttrUtil.resetBackingValuesToDefault(testPm);
 
     assertEquals(null, testPm.s.getValue());
     assertEquals(null, testPm.s.getBackingValue());
     assertEquals("DEFAULT", testPm.sWithDefault.getBackingValue());
     assertEquals("DEFAULT", testPm.sWithDefault.getValue());
+  }
+
+  @Test
+  public void testIsEmptyValue() {
+    assertEquals(true, PmAttrUtil.isEmptyValue(testPm.s, ""));
+    assertEquals(true, PmAttrUtil.isEmptyValue(testPm.s, null));
+    assertEquals(false, PmAttrUtil.isEmptyValue(testPm.s, "x"));
   }
 
   @Test
@@ -80,6 +89,14 @@ public class PmAttrUtilTest {
                  null, testPm.i.getValue());
   }
 
+  @Test
+  public void testCanWriteBackingValue() {
+    assertEquals(true, PmAttrUtil.isBackingValueWriteable(testPm.i));
+    assertEquals(true, PmAttrUtil.isBackingValueWriteable(testPm.s));
+    assertEquals(true, PmAttrUtil.isBackingValueWriteable(testPm.sWithDefault));
+    assertEquals(false, PmAttrUtil.isBackingValueWriteable((PmAttrBase<?,?>) testPm.calculatedString));
+  }
+
   /** Internally used test PM */
   public static class TestPm extends PmConversationImpl {
 
@@ -90,6 +107,15 @@ public class PmAttrUtilTest {
 
     @PmTitleCfg(title="integer attr")
     public final PmAttrIntegerImpl i = new PmAttrIntegerImpl(this);
+
+    /** setBackingValue() will not work for this attribute. */
+    @PmAttrCfg(accessKind=AttrAccessKind.OVERRIDE)
+    public final PmAttrString calculatedString = new PmAttrStringImpl(this) {
+      @Override
+      protected String getBackingValueImpl() {
+        return "hello";
+      }
+    };
 }
 
 }
