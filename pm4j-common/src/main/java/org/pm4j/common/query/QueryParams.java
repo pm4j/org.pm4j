@@ -1,6 +1,5 @@
 package org.pm4j.common.query;
 
-import java.beans.PropertyVetoException;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;

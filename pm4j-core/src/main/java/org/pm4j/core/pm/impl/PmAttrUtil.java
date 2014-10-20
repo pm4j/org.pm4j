@@ -1,5 +1,6 @@
 package org.pm4j.core.pm.impl;
 
+import org.pm4j.common.util.reflection.ClassUtil;
 import org.pm4j.core.exception.PmConverterException;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmAttr;
@@ -8,6 +9,7 @@ import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.api.PmVisitorApi;
 import org.pm4j.core.pm.api.PmVisitorApi.PmVisitHint;
 import org.pm4j.core.pm.api.PmVisitorApi.PmVisitResult;
+import org.pm4j.core.pm.impl.PmAttrBase.MetaData;
 
 /**
  * Collection of some useful utility methods for {@link PmAttr}.
@@ -31,9 +33,14 @@ public class PmAttrUtil {
   public static void resetBackingValueToDefault(PmAttr<?>... attr) {
     for (PmAttr<?> a : attr) {
       PmAttrBase<Object, Object> ab = (PmAttrBase<Object, Object>) a;
-      Object defaultVal = ab.getDefaultValue();
-      Object defaultBackingVal = valueToBackingValue(ab, defaultVal);
-      ab.setBackingValue(defaultBackingVal);
+      if (isBackingValueWriteable(ab)) {
+        Object defaultVal = ab.getDefaultValue();
+        Object defaultBackingVal = valueToBackingValue(ab, defaultVal);
+        if (defaultBackingVal == null && getMetaData(ab).primitiveType) {
+            throw new PmRuntimeException(ab, "Can't assign a null default value to a primitive value type. Please define a valid default value.");
+          }
+        ab.setBackingValue(defaultBackingVal);
+      }
     }
   }
 
@@ -44,7 +51,7 @@ public class PmAttrUtil {
    *
    * @param rootPm The root of the PM tree containing the attributes to reset.
    */
-  public static void resetBackingValuesInTreeToDefault(PmObject rootPm) {
+  public static void resetBackingValuesToDefault(PmObject rootPm) {
     PmVisitorApi.visit(rootPm, new ResetBackingValueToDefaultVisitorCallback(), PmVisitHint.SKIP_CONVERSATION);
   }
 
@@ -202,4 +209,29 @@ public class PmAttrUtil {
     }
   };
 
+  /**
+   * Checks if it is physically possible to write the backing attribute value.<br>
+   * That may be evaluated for the value access strategies 'override' and 'reflection'.<br>
+   * TODO oboede:
+   * It currently can't be determined for the strategies 'localValue' and 'valuePath'.
+   *
+   * @param pmAttr The attribute to check
+   * @return <code>true</code> if a write operation most likely works.
+   */
+  static boolean isBackingValueWriteable(PmAttrBase<?,?> pmAttr) {
+    MetaData md = getMetaData(pmAttr);
+    if (md.valueAccessStrategy == PmAttrBase.ValueAccessOverride.INSTANCE) {
+      // XXX oboede: may be optimized it it gets a problem.
+      return ClassUtil.findMethods(pmAttr.getClass(), "setBackingValueImpl").size() > 1;
+    }
+    if (md.beanAttrAccessor != null) {
+      return md.beanAttrAccessor.canSet();
+    }
+    // No physical write access restriction for other strategies implemented.
+    return true;
+  }
+
+  private static MetaData getMetaData(PmAttrBase<?,?> pmAttr) {
+    return (MetaData) pmAttr.getPmMetaData();
+  }
 }

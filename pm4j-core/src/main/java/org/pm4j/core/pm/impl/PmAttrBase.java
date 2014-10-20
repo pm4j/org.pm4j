@@ -1702,14 +1702,14 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   protected static class MetaData extends PmObjectBase.MetaData {
     static final Object                     NOT_INITIALIZED         = "NOT_INITIALIZED";
 
-    private BeanAttrAccessor                beanAttrAccessor;
+    /* package */ BeanAttrAccessor          beanAttrAccessor;
     private PmOptionSetDef<PmAttr<?>>       optionSetDef            = OptionSetDefNoOption.INSTANCE;
     private PmOptionCfg.NullOption          nullOption              = NullOption.DEFAULT;
     private boolean                         hideIfDefaultValue      = false;
     private boolean                         hideIfEmptyValue        = false;
     private boolean                         required;
     private Restriction                     valueRestriction        = Restriction.NONE;
-    private boolean                         primitiveType;
+    /* package */ boolean                   primitiveType;
     private boolean                         embeddedAttr;
     private PathResolver                    valuePathResolver;
     private PathResolver                    valueContainingObjPathResolver = PassThroughPathResolver.INSTANCE;
@@ -1719,7 +1719,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     private CacheStrategy                   cacheStrategyForValue   = CacheStrategyNoCache.INSTANCE;
     private StringConverter<?>              stringConverter;
     private ValueConverter<?, ?>            valueConverter;
-    private BackingValueAccessStrategy      valueAccessStrategy     = ValueAccessLocal.INSTANCE;
+    /* package */ BackingValueAccessStrategy valueAccessStrategy     = ValueAccessLocal.INSTANCE;
     /** Name of the field configured for JSR 303-validation.<br>
      * Is <code>null</code> if there is nothing to validate this way. */
     private String                          validationFieldName;
