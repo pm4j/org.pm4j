@@ -54,7 +54,6 @@ import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmMessageApi;
 import org.pm4j.core.pm.api.PmValidationApi;
 import org.pm4j.core.pm.impl.PmObjectBase.MetaData.MetaDataId;
-import org.pm4j.core.pm.impl.cache.CacheLog;
 import org.pm4j.core.pm.impl.inject.DiResolver;
 import org.pm4j.core.pm.impl.inject.DiResolverUtil;
 import org.pm4j.core.pm.impl.title.PmTitleProvider;
@@ -118,9 +117,6 @@ public abstract class PmObjectBase implements PmObject {
    * If there is no view technology connector available, this member will be set to a self-reference.
    */
   private Object pmToViewConnector = PM_TO_VIEW_CONNECTOR_NOT_YET_INITIALIZED;
-
-  /** Logger for cache usage statistics. */
-  protected static final CacheLog pmCacheLog = new CacheLog();
 
   /**
    * Constructor.
