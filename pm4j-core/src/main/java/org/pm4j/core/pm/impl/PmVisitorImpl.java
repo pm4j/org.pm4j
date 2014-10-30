@@ -10,6 +10,8 @@ import org.pm4j.common.util.collection.IterableUtil;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.PmObject;
+import org.pm4j.core.pm.PmTab;
+import org.pm4j.core.pm.PmTabSet;
 import org.pm4j.core.pm.PmTable;
 import org.pm4j.core.pm.api.PmVisitorApi.PmVisitCallBack;
 import org.pm4j.core.pm.api.PmVisitorApi.PmVisitHierarchyCallBack;
@@ -82,13 +84,11 @@ public class PmVisitorImpl {
     if (callBack == null) {
       throw new PmRuntimeException(pm, "Please define a callback.");
     }
-    PmVisitResult hintResult = considerHints(pm);
-    if (hintResult != null) {
-      return hintResult;
-    }
 
     // The moment where the elephant...
-    PmVisitResult result = callBack.visit(pm);
+    PmVisitResult result = hintsAllowVisit(pm)
+          ? callBack.visit(pm)
+          : PmVisitResult.SKIP_CHILDREN;
 
     switch (result) {
       case STOP_VISIT:
@@ -150,11 +150,16 @@ public class PmVisitorImpl {
     return visitStoppedOn;
   }
 
-  private PmVisitResult considerHints(PmObject pm) {
+  /**
+   * @param pm The PM to check.
+   * @return <code>true</code> if the hints agree to visit the given PM.<br>
+   *         <code>false</code> if the PM and its children shouldn't be visited.
+   */
+  private boolean hintsAllowVisit(PmObject pm) {
 
     if (!PmInitApi.isPmInitialized(pm)) {
       if (hints.contains(PmVisitHint.SKIP_NOT_INITIALIZED)) {
-        return PmVisitResult.SKIP_CHILDREN;
+        return false;
       } else {
         PmInitApi.ensurePmInitialization(pm);
       }
@@ -163,26 +168,60 @@ public class PmVisitorImpl {
     // if the conversation is the visitor start object, then a skip-conversation skips only child conversations.
     if (hints.contains(PmVisitHint.SKIP_CONVERSATION) && (pm != visitRoot)) {
       if (pm instanceof PmConversation) {
-        return PmVisitResult.SKIP_CHILDREN;
+        return false;
       }
     }
     if (hints.contains(PmVisitHint.SKIP_READ_ONLY)) {
       if (pm.isPmReadonly()) {
-        return PmVisitResult.SKIP_CHILDREN;
+        return false;
       }
     }
     if (hints.contains(PmVisitHint.SKIP_INVISIBLE)) {
-      if (!pm.isPmVisible()) {
-        return PmVisitResult.SKIP_CHILDREN;
+      if (! isVisible(pm)) {
+        return false;
+      }
+    }
+    if (hints.contains(PmVisitHint.SKIP_HIDDEN_TAB_CONTENT)) {
+      if (PmTabSetUtil.isInactiveTabChild(pm)) {
+        return false;
       }
     }
     if (hints.contains(PmVisitHint.SKIP_DISABLED)) {
       if (!pm.isPmEnabled()) {
-        return PmVisitResult.SKIP_CHILDREN;
+        return false;
       }
     }
-    return null;
+    return true;
   }
+
+  /**
+   * Considers in addition to {@link PmObject#isPmVisible()} that content of a
+   * not opened tab is not visible as well.
+   * <p>
+   * The method {@link PmObject#isPmVisible()} can't evaluate that every time to
+   * keep a good performance.<br>
+   * A visitor loop that considers tab content visibility will usually not get a
+   * performance problem. It may even be faster, because it does not iterate
+   * invisible not opened tab item trees.<br>
+   * In addition it will be semantically correct.
+   *
+   * @param pm
+   *          The PM to check.
+   * @return <code>true</code> if its <code>isPmVisible()</code> returns
+   *         <code>true</code> and it is not a child of an inactive tab.
+   */
+  protected boolean isVisible(PmObject pm) {
+      PmObject parentPm = pm.getPmParent();
+      // Skip invisible tab content. Only the current tab is really visible.
+      if (parentPm != null &&
+          parentPm instanceof PmTab &&
+          parentPm.getPmParent() instanceof PmTabSet &&
+          ((PmTabSet)parentPm.getPmParent()).getCurrentTabPm() != parentPm) {
+        return false;
+      }
+      return pm.isPmVisible();
+    }
+
 
   @SuppressWarnings("unchecked")
   protected Iterable<PmObject> getChildren(PmObject pm) {

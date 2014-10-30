@@ -20,6 +20,7 @@ import org.pm4j.core.pm.PmDefaults;
 import org.pm4j.core.pm.PmMessage;
 import org.pm4j.core.pm.PmMessage.Severity;
 import org.pm4j.core.pm.PmObject;
+import org.pm4j.core.pm.annotation.PmFactoryCfg;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmValidationApi;
 import org.pm4j.core.pm.impl.connector.PmToNoViewTechnologyConnector;
@@ -109,6 +110,8 @@ public class PmConversationImpl extends PmElementBase implements PmConversation 
    * Used for very small sample and test applications.
    *
    * @param pmFactoryClasses The PM classes, used to initialize the internal PM-Bean factory.
+   *
+   * @deprecated Please use {@link PmFactoryCfg}.
    */
   public PmConversationImpl(Class<?>... pmFactoryClasses) {
     this(null, pmFactoryClasses);
@@ -120,6 +123,8 @@ public class PmConversationImpl extends PmElementBase implements PmConversation 
    *
    * @param pmParent The optional parent context PM.
    * @param pmFactoryClasses The PM classes, used to initialize the internal PM-Bean factory.
+   *
+   * @deprecated Please use {@link PmFactoryCfg}.
    */
   public PmConversationImpl(PmObject pmParent, Class<?>... pmFactoryClasses) {
     this(pmParent);
@@ -132,6 +137,16 @@ public class PmConversationImpl extends PmElementBase implements PmConversation 
   public PmConversationImpl(PmObject pmParent) {
     super(pmParent);
   }
+
+  /**
+   * @param locale The {@link Locale} to use.
+   */
+  public PmConversationImpl(Locale locale) {
+    this();
+    setPmLocale(locale);
+  }
+
+
 
   @Override
   public PmConversation getPmConversation() {

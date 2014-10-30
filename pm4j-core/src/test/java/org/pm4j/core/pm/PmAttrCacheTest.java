@@ -8,6 +8,7 @@ import org.pm4j.core.pm.annotation.PmBeanCfg;
 import org.pm4j.core.pm.annotation.PmCacheCfg;
 import org.pm4j.core.pm.annotation.PmCacheCfg.CacheMode;
 import org.pm4j.core.pm.annotation.PmCacheCfg.Clear;
+import org.pm4j.core.pm.annotation.PmCacheCfg.Observe;
 import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
 import org.pm4j.core.pm.impl.PmAttrUtil;
@@ -185,7 +186,7 @@ public class PmAttrCacheTest {
     public final PmAttrString sClassCacheSwitchedOff = new MyCachedAttrClass(this);
 
     /** The attribute is cached but the cache is never cleared. */
-    @PmCacheCfg(clear=Clear.NEVER)
+    @PmCacheCfg(clear=Clear.NEVER, invalidate=@Observe(value="abc.def", observePmTree=true))
     @PmAttrCfg(valuePath="pmBean.s")
     public final PmAttrString sCachedButClearNever = new MyCachedAttrClass(this);
 
