@@ -30,8 +30,8 @@ public class PmSnapshotTestToolTest {
   // FIXME: does not really work reliable with maven.
   // @After
   public void noTempFilesShouldRemainInSrcDir() {
-    File srcXmlDir = new File(snap.getSrcFileAccessor().getSrcPkgDir(), snap.xmlDirName());
-    File currentStateXmlDir = new File(snap.getSrcFileAccessor().getBinPkgDir(), snap.xmlDirName());
+    File srcXmlDir = new File(snap.getSrcFileAccessor().getSrcPkgDir(), snap.xmlSubDirName());
+    File currentStateXmlDir = new File(snap.getSrcFileAccessor().getBinPkgDir(), snap.xmlSubDirName());
 
     assertFalse("No temporary expectation files shold exist after test execution: " + srcXmlDir,
                 srcXmlDir.exists());
@@ -66,7 +66,7 @@ public class PmSnapshotTestToolTest {
     // compare to the snapshot
     snap.snapshot(new MiniTestPm(), "testWriteAndCompareSameSnapshot");
 
-    File currentStateFile = snap.getCurrentStateFile("testWriteAndCompareSameSnapshot");
+    File currentStateFile = snap.getActualStateFile("testWriteAndCompareSameSnapshot");
     assertFalse("The current state file should not stay alive in case of no difference.\n" + currentStateFile,
                 currentStateFile.exists());
 
@@ -86,7 +86,7 @@ public class PmSnapshotTestToolTest {
       snap.snapshot(pm, "testWriteAndCompareDifferentSnapshot");
       Assert.fail("The snapshot compare operation should fail.");
     } catch (ComparisonFailure e) {
-      File currentStateFile = snap.getCurrentStateFile("testWriteAndCompareDifferentSnapshot");
+      File currentStateFile = snap.getActualStateFile("testWriteAndCompareDifferentSnapshot");
       assertTrue("The current state file should stay alive for manual compare operations.\n" + currentStateFile,
                  currentStateFile.exists());
 

@@ -58,24 +58,23 @@ public class PmSnapshotTestTool {
    * <ol>
   *
    * @param rootPm The root of the PM tree to verify.
-   * @param fileNameBase Name of the XML file. Without 'xml' post fix. E.g. 'myTest.afterEnteringData'.
+   * @param fileNameBase Name of the XML file. Without '.xml' post fix. E.g. 'myTest_afterEnteringData'.
    * @return a reference to the used or generated XML file.
    */
   public File snapshot(PmObject rootPm, String fileNameBase) {
-    File srcXmlDir = new File(getSrcFileAccessor().getSrcPkgDir(), xmlDirName());
-    File expectedFile = new File(srcXmlDir, xmlFileName(fileNameBase));
+    File expectedFile = getExpectedStateFile(fileNameBase);
 
     if (expectedFile.exists()) {
-      File currentStateFile = getCurrentStateFile(fileNameBase);
+      File actualStateFile = getActualStateFile(fileNameBase);
       try {
-        FileUtil.createFile(currentStateFile);
-        writeXml(rootPm, currentStateFile);
+        FileUtil.createFile(actualStateFile);
+        writeXml(rootPm, actualStateFile);
         Assert.assertEquals(
-            "Compare " + fileNameBase + "\nExpected: " + expectedFile + "\nCurrent: " + currentStateFile,
+            "Compare " + fileNameBase + "\nExpected: " + expectedFile + "\nCurrent: " + actualStateFile,
             FileUtil.fileToString(expectedFile),
-            FileUtil.fileToString(currentStateFile));
+            FileUtil.fileToString(actualStateFile));
         // remove currentStateFile if everything was fine:
-        FileUtil.deleteFileAndEmptyParentDirs(currentStateFile);
+        FileUtil.deleteFileAndEmptyParentDirs(actualStateFile);
       } catch (Exception e) {
         throw new PmRuntimeException("Unable to perform snapshot test", e);
       }
@@ -92,22 +91,85 @@ public class PmSnapshotTestTool {
     return expectedFile;
   }
 
-  public File getCurrentStateFile(String fileNameBase) {
-    File currentStateDir = new File(getSrcFileAccessor().getBinPkgDir(), xmlDirName());
-    File currentStateFile = new File(currentStateDir, xmlFileName(fileNameBase));
-    return currentStateFile;
+  /**
+   * Provides the directory the actual PM state files will be written to.
+   * <p>
+   * The default implementation provides the sub directory {@link #xmlSubDirName()}
+   * within the folder the '.class' file of the test class (testCtxtClass) if located in.
+   * <p>
+   * This location may be customized by overriding this method.
+   *
+   * @return the directory to write actual state files to.
+   */
+  protected File getActualStateDir() {
+    return new File(getSrcFileAccessor().getBinPkgDir(), xmlSubDirName());
   }
 
-  public SrcFileAccessor getSrcFileAccessor() {
-    return srcFileAccessor;
+  /**
+   * Provides the directory the expected PM state files will be read from.<br>
+   * The initial test run will also use it to write the initial expected files.
+   * <p>
+   * The default implementation provides the sub directory {@link #xmlSubDirName()}
+   * within the folder the '.java' file of the test class (testCtxtClass) if located in.
+   * <p>
+   * This location may be customized by overriding this method.
+   *
+   * @return the directory to handle the expected state files in.
+   */
+  protected File getExpectedStateDir() {
+    return new File(getSrcFileAccessor().getSrcPkgDir(), xmlSubDirName());
   }
 
-  public String xmlDirName() {
+  /**
+   * Provides the {@link File} the actual PM state will be written to.
+   *
+   * @param fileNameBase
+   *          The file name base string, provided as argument of
+   *          {@link #snapshot(PmObject, String)}.
+   * @return the file to write.
+   */
+  protected File getActualStateFile(String fileNameBase) {
+    return new File(getActualStateDir(), xmlFileName(fileNameBase));
+  }
+
+  /**
+   * Provides the {@link File} the expected PM state will be read from/written to.
+   *
+   * @param fileNameBase
+   *          The file name base string, provided as argument of
+   *          {@link #snapshot(PmObject, String)}.
+   * @return the file to use.
+   */
+  protected File getExpectedStateFile(String fileNameBase) {
+    return new File(getExpectedStateDir(), xmlFileName(fileNameBase));
+  }
+
+  /**
+   * @return the name of the XML sub directory to use (in src as well as in temp dir).<br>
+   *         The default implementation provides the uncapitalized test class
+   *         name.
+   */
+  protected String xmlSubDirName() {
     return StringUtils.uncapitalize(testCtxtClass.getSimpleName());
   }
 
-  public String xmlFileName(String fileNameBase) {
+  /**
+   * @param fileNameBase
+   *          The file name base string, provided as argument of
+   *          {@link #snapshot(PmObject, String)}.
+   * @return the xml file name.<br>
+   *         The default implementation just adds an '.xml' post fix to the
+   *         given string.
+   */
+  protected String xmlFileName(String fileNameBase) {
     return fileNameBase + ".xml";
+  }
+
+  /**
+   * @return the {@link SrcFileAccessor} that provides access to source and bin path information.
+   */
+  protected SrcFileAccessor getSrcFileAccessor() {
+    return srcFileAccessor;
   }
 
   private void writeXml(PmObject rootPm, File file) throws JAXBException, FileNotFoundException {

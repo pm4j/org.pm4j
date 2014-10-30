@@ -5,8 +5,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Scanner;
 
-import org.pm4j.common.exception.CheckedExceptionWrapper;
-
 /**
  * Convenience methods for handling {@link File}s.
  *
@@ -24,12 +22,15 @@ public class FileUtil {
     try {
       return new Scanner(file).useDelimiter("\\Z").next();
     } catch (FileNotFoundException e) {
-      throw new CheckedExceptionWrapper(e);
+      throw new RuntimeException("Failed to read file: " + file, e);
     }
   }
 
   /**
    * Creates a file (incl. parent path if needed).
+   * <p>
+   * It's ok if the file already exists.
+   * TODO: check if the file will be cleared in that case.
    *
    * @param file The file to create.
    * @return the result of {@link File#createNewFile()}.
@@ -37,11 +38,15 @@ public class FileUtil {
    * @throws IOException
    */
 
-  public static boolean createFile(File file) throws IOException {
+  public static void createFile(File file) {
     if (!file.getParentFile().exists()) {
       file.getParentFile().mkdirs();
     }
-    return file.createNewFile();
+    try {
+      file.createNewFile();
+    } catch (IOException e) {
+      throw new RuntimeException("Failed to create file: " + file, e);
+    }
   }
 
   /**

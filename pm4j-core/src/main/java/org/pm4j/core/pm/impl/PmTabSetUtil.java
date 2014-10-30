@@ -12,6 +12,21 @@ import org.pm4j.core.pm.PmTabSet;
 public class PmTabSetUtil {
 
   /**
+   * Checks if the given tab PM is the current active tab of its direct parent tab.
+   * <p>
+   * If the given PM is not used in a {@link PmTabSet}, this method returns <code>false</code>.
+   *
+   * @param pm
+   *          The PM to check.
+   * @return <code>true</code> if it is the current tab of its direct {@link PmTabSet} parent.
+   */
+  public static boolean isCurrentTab(PmTab tabPm) {
+    PmObject tabParentPm = tabPm.getPmParent();
+    return (tabParentPm instanceof PmTabSet) &&
+           ((PmTabSet)tabParentPm).getCurrentTabPm() == tabPm;
+  }
+
+  /**
    * Checks if the given PM is part of a tab that is currently not opened.
    * That means, that the given PM is hidden.
    *
@@ -24,18 +39,11 @@ public class PmTabSetUtil {
     if (tabPm == null) {
       return false;
     }
-
-    PmObject tabParentPm = tabPm.getPmParent();
-    if (tabParentPm == null) {
-      return false;
+    if (!isCurrentTab(tabPm)) {
+      return true;
     }
-
-    if (tabParentPm instanceof PmTabSet) {
-      return ((PmTabSet)tabParentPm).getCurrentTabPm() != tabPm ||
-             isInactiveTabChild(tabParentPm);
-    }
-
-    return isInactiveTabChild(tabParentPm);
+    return tabPm.getPmParent() != null &&
+           isInactiveTabChild(tabPm.getPmParent());
   }
 
 }

@@ -182,7 +182,8 @@ public class PmVisitorImpl {
       }
     }
     if (hints.contains(PmVisitHint.SKIP_HIDDEN_TAB_CONTENT)) {
-      if (PmTabSetUtil.isInactiveTabChild(pm)) {
+      if (pm instanceof PmTab &&
+          !PmTabSetUtil.isCurrentTab((PmTab) pm)) {
         return false;
       }
     }
