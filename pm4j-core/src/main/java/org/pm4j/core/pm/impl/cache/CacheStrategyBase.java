@@ -10,9 +10,16 @@ import org.pm4j.core.pm.impl.PmObjectBase;
 public abstract class CacheStrategyBase<PM extends PmObjectBase> implements CacheStrategy {
 
   private String cacheName;
+  
+  private org.pm4j.core.pm.annotation.PmCacheCfg2.Clear cacheClear;
 
   public CacheStrategyBase(String cacheName) {
     this.cacheName = cacheName;
+  }
+  
+  public CacheStrategyBase(String cacheName, org.pm4j.core.pm.annotation.PmCacheCfg2.Clear cacheClear) {
+    this(cacheName);
+    this.cacheClear = cacheClear;
   }
 
   protected abstract Object readRawValue(PM pm);
@@ -25,8 +32,17 @@ public abstract class CacheStrategyBase<PM extends PmObjectBase> implements Cach
   @Override @SuppressWarnings("unchecked")
   public void clear(Object ctxt) {
     PM pm = (PM)ctxt;
-    if (InternalPmImplUtil.getPmCacheClear(pm).equals(Clear.DEFAULT)) {
-      clearImpl(pm);
+    
+    if (cacheClear != null) {
+      // new annotation style using PmCacheCfg2
+      if (cacheClear == org.pm4j.core.pm.annotation.PmCacheCfg2.Clear.DEFAULT) {
+        clearImpl(pm);
+      }
+    } else {
+      // old annotation style using PmCacheCfg
+      if (InternalPmImplUtil.getPmCacheClear(pm).equals(Clear.DEFAULT)) {
+        clearImpl(pm);
+      }
     }
   }
 

@@ -1,6 +1,7 @@
 package org.pm4j.core.pm.impl.cache;
 
 import org.pm4j.core.pm.PmObject;
+import org.pm4j.core.pm.annotation.PmCacheCfg2.Clear;
 import org.pm4j.core.pm.impl.PmConversationImpl;
 import org.pm4j.core.pm.impl.PmObjectBase;
 import org.pm4j.core.pm.impl.PmUtil;
@@ -11,6 +12,11 @@ public class CacheStrategyRequest extends CacheStrategyBase<PmObjectBase> {
 
   public CacheStrategyRequest(String cacheName, String cacheVarKeyPfx) {
     super(cacheName);
+    this.cacheVarKeyPfx = "pm.rc." + cacheVarKeyPfx + "_";
+  }
+  
+  public CacheStrategyRequest(String cacheName, String cacheVarKeyPfx, Clear cacheClear) {
+    super(cacheName, cacheClear);
     this.cacheVarKeyPfx = "pm.rc." + cacheVarKeyPfx + "_";
   }
 

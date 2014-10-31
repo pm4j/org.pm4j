@@ -11,9 +11,11 @@ import java.lang.annotation.Target;
  * TODOC olaf:
  *
  * @author olaf boede
+ * @deprecated use {@link PmCacheCfg2}
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.FIELD})
+@Deprecated
 public @interface PmCacheCfg {
 
   public enum CacheMode {

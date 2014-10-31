@@ -60,6 +60,9 @@ import org.pm4j.core.pm.annotation.PmAttrCfg.Restriction;
 import org.pm4j.core.pm.annotation.PmAttrCfg.Validate;
 import org.pm4j.core.pm.annotation.PmCacheCfg;
 import org.pm4j.core.pm.annotation.PmCacheCfg.CacheMode;
+import org.pm4j.core.pm.annotation.PmCacheCfg2.Aspect;
+import org.pm4j.core.pm.annotation.PmCacheCfg2.Cache;
+import org.pm4j.core.pm.annotation.PmCacheCfg2.Observe;
 import org.pm4j.core.pm.annotation.PmCommandCfg;
 import org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO;
 import org.pm4j.core.pm.annotation.PmOptionCfg;
@@ -122,7 +125,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
    * Contains optional attribute data that in most cases doesn't exist for usual
    * bean attributes.
    */
-  private PmAttrDataContainer<T_PM_VALUE, T_BEAN_VALUE> dataContainer;
+  PmAttrDataContainer<T_PM_VALUE, T_BEAN_VALUE> dataContainer;
 
   /**
    * Keeps a reference to the entered value in case of buffered data entry.
@@ -1456,7 +1459,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
    *
    * @return The container for optional data parts.
    */
-  private final PmAttrDataContainer<T_PM_VALUE, T_BEAN_VALUE> zz_getDataContainer() {
+  final PmAttrDataContainer<T_PM_VALUE, T_BEAN_VALUE> zz_getDataContainer() {
     if (dataContainer == null) {
       dataContainer = new PmAttrDataContainer<T_PM_VALUE, T_BEAN_VALUE>();
     }
@@ -1633,9 +1636,19 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     }
 
     // -- Cache configuration --
-    List<PmCacheCfg> cacheAnnotations = AnnotationUtil.findAnnotationsInPmHierarchy(this, PmCacheCfg.class, new ArrayList<PmCacheCfg>());
-    myMetaData.cacheStrategyForOptions = AnnotationUtil.evaluateCacheStrategy(this, PmCacheCfg.ATTR_OPTIONS, cacheAnnotations, CACHE_STRATEGIES_FOR_OPTIONS);
-    myMetaData.cacheStrategyForValue = AnnotationUtil.evaluateCacheStrategy(this, PmCacheCfg.ATTR_VALUE, cacheAnnotations, CACHE_STRATEGIES_FOR_VALUE);
+    List cacheAnnotations = PmCacheCfgUtil.findCacheCfgsInPmHierarchy(this, new ArrayList());
+    if (!cacheAnnotations.isEmpty() && cacheAnnotations.get(0).getClass() == PmCacheCfg.class) {
+      // handle cache configuration based on the deprecated PmCacheCfg
+      myMetaData.cacheStrategyForOptions = AnnotationUtil.evaluateCacheStrategy(this, PmCacheCfg.ATTR_OPTIONS, cacheAnnotations, CACHE_STRATEGIES_FOR_OPTIONS);
+      myMetaData.cacheStrategyForValue = AnnotationUtil.evaluateCacheStrategy(this, PmCacheCfg.ATTR_VALUE, cacheAnnotations, CACHE_STRATEGIES_FOR_VALUE);
+    } else {
+      // handle cache configuration based on PmCacheCfg2
+      // TODO handle cacheClear configuration
+      Cache optionsCache = PmCacheCfgUtil.findCacheForAspectInPmHierarchy(this, Aspect.OPTIONS, cacheAnnotations); 
+      myMetaData.cacheStrategyForOptions = CacheStrategyFactory.createStrategyForOptions(optionsCache);
+      Cache valueCache = PmCacheCfgUtil.findCacheForAspectInPmHierarchy(this, Aspect.VALUE, cacheAnnotations);
+      myMetaData.cacheStrategyForValue = CacheStrategyFactory.createStrategyForValue(valueCache);
+    }
   }
 
 
@@ -1716,7 +1729,9 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     private String                          formatResKey;
     private String                          defaultValueString;
     private CacheStrategy                   cacheStrategyForOptions = CacheStrategyNoCache.INSTANCE;
+    private Observe[]                       clearOptionsCacheOn;
     private CacheStrategy                   cacheStrategyForValue   = CacheStrategyNoCache.INSTANCE;
+    private Observe[]                       clearValueCacheOn;
     private StringConverter<?>              stringConverter;
     private ValueConverter<?, ?>            valueConverter;
     /* package */ BackingValueAccessStrategy valueAccessStrategy     = ValueAccessLocal.INSTANCE;
@@ -1831,6 +1846,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     }
   };
 
+  @Deprecated
   private static final CacheStrategy CACHE_OPTIONS_LOCAL = new CacheStrategyBase<PmAttrBase<?,?>>("CACHE_OPTIONS_LOCAL") {
     @Override protected Object readRawValue(PmAttrBase<?, ?> pm) {
       return (pm.dataContainer != null)
