@@ -48,7 +48,7 @@ public class PmSnapshotTestToolTest {
     try {
       assertEquals(file.getAbsolutePath(),
           "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
-          "<conversation name=\"miniTestPm\" title=\"Test PM\">\n" +
+          "<conversation xmlns=\"http://org.pm4j/xml/visualState\" name=\"miniTestPm\" title=\"Test PM\">\n" +
           "    <attr name=\"stringAttr\" title=\"String Attr\"/>\n" +
           "</conversation>",
           FileUtil.fileToString(file));

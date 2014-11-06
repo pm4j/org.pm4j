@@ -147,7 +147,7 @@ public class PmVisitorTest {
   @Test
   public void testGeneratedChildren() {
     PmVisitorApi.visit(pm, visitAllCallBack);
-    String expected = "[pmVisitorTest_MyRootPm, myChPm1, myChPm1_disabled, myChPm1_convImpl, myChPm1_readOnly, myChPm1_invisible, myChPm2, myChPm2_disabled, myChPm2_convImpl, myChPm2_readOnly, myChPm2_invisible, myPmList, pmVisitorTest_MyBeanPm, s, pmVisitorTest_MyBeanPm, s]";
+    String expected = "[pmVisitorTest_MyRootPm, myChPm1, myChPm1_disabled, myChPm1_convImpl, myChPm1_readOnly, myChPm1_invisible, myChPm2, myChPm2_disabled, myChPm2_convImpl, myChPm2_readOnly, myChPm2_invisible, myPmList, pmVisitorTest_MyBeanPm, s, pmVisitorTest_MyBeanPm, s, pmVisitorTest_MyBeanPm, s, pmVisitorTest_MyBeanPm, s]";
     assertEquals(expected, calls.toString());
   }
 

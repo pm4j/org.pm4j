@@ -6,13 +6,14 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.pm4j.common.util.collection.IterableUtil;
+import org.pm4j.common.util.collection.ListUtil;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmTab;
 import org.pm4j.core.pm.PmTabSet;
 import org.pm4j.core.pm.PmTable;
+import org.pm4j.core.pm.PmTreeNode;
 import org.pm4j.core.pm.api.PmVisitorApi.PmVisitCallBack;
 import org.pm4j.core.pm.api.PmVisitorApi.PmVisitHierarchyCallBack;
 import org.pm4j.core.pm.api.PmVisitorApi.PmVisitHint;
@@ -226,15 +227,23 @@ public class PmVisitorImpl {
 
   @SuppressWarnings("unchecked")
   protected Iterable<PmObject> getChildren(PmObject pm) {
-    // TODO: Change to iterable to be able to handle larger collections
-    // without memory problems.
     Collection<PmObject> allChildren = new ArrayList<PmObject>();
     allChildren.addAll(((PmObjectBase) pm).getPmChildren());
-    if (pm instanceof PmTable && hints.contains(PmVisitHint.ALL_TABLE_ROWS)) {
-      allChildren.addAll(IterableUtil.asCollection(((PmTable<PmObject>)pm).getPmPageableCollection()));
+    if (pm instanceof PmTable &&
+        hints.contains(PmVisitHint.ALL_TABLE_ROWS)) {
+      ListUtil.addItemsNotYetInCollection(allChildren, ((PmTable<PmObject>)pm).getPmPageableCollection());
     }
     else if (!hints.contains(PmVisitHint.SKIP_FACTORY_GENERATED_CHILD_PMS)) {
-      allChildren.addAll(((PmObjectBase) pm).getFactoryGeneratedChildPms());
+      if (!hints.contains(PmVisitHint.SKIP_NOT_INITIALIZED)) {
+          // Ensure that dynamic sub-pm's exist. Otherwise they will not be iterated.
+          if (pm instanceof PmTable) {
+              ListUtil.addItemsNotYetInCollection(allChildren, ((PmTable<PmObject>)pm).getRowPms());
+          }
+          if (pm instanceof PmTreeNode) {
+              ListUtil.addItemsNotYetInCollection(allChildren, (Collection<PmObject>)(Object)((PmTreeNode)pm).getPmChildNodes());
+          }
+      }
+      ListUtil.addItemsNotYetInCollection(allChildren, ((PmObjectBase) pm).getFactoryGeneratedChildPms());
     }
     return allChildren;
   }

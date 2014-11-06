@@ -5,6 +5,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -20,11 +23,13 @@ import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.api.PmVisitorApi;
 import org.pm4j.core.pm.api.PmVisitorApi.PmVisitHint;
-import org.pm4j.core.xml.ToXmlVisitorCallBack;
-import org.pm4j.core.xml.bean.XmlPmObject;
+import org.pm4j.core.pm.api.PmVisitorApi.PmMatcher;
+import org.pm4j.core.xml.visibleState.VisibleStatePropertyMatcher;
+import org.pm4j.core.xml.visibleState.VisibleStateXmlCallBack;
+import org.pm4j.core.xml.visibleState.beans.XmlPmObject;
 
 /**
- * A test tool that allows to make an XML snapshot file that report the external visible
+ * A test tool that allows to make a XML snapshot file that report the external visible
  * state of a PM tree.<br>
  * On re-execution of {@link #snapshot(PmObject, String)} it compares the documented state
  * against the state of the current PM to test.
@@ -36,7 +41,11 @@ public class PmSnapshotTestTool {
   private static Log LOG = LogFactory.getLog(PmSnapshotTestTool.class);
 
   private final Class<?> testCtxtClass;
-  private final SrcFileAccessor srcFileAccessor;
+  private SrcFileAccessor srcFileAccessor;
+  private boolean overWriteMode = false;
+
+  private Collection<PmMatcher> excludes = new ArrayList<PmMatcher>();
+  private Collection<VisibleStatePropertyMatcher> excludedProperties = new ArrayList<VisibleStatePropertyMatcher>();
 
   /**
    * @param testCtxtClass
@@ -46,7 +55,28 @@ public class PmSnapshotTestTool {
   public PmSnapshotTestTool(Class<?> testCtxtClass) {
     assert testCtxtClass != null;
     this.testCtxtClass = testCtxtClass;
-    this.srcFileAccessor = new SrcFileAccessor(testCtxtClass);
+  }
+
+  /**
+   * Configures PM items to hide.
+   *
+   * @param hideMatchers
+   * @return the tool for inline usage.
+   */
+  public PmSnapshotTestTool hidePms(PmMatcher... hideMatchers) {
+    excludes.addAll(Arrays.asList(hideMatchers));
+    return this;
+  }
+
+  /**
+   * Configures PM properties to hide.
+   *
+   * @param hideMatchers
+   * @return the tool for inline usage.
+   */
+  public PmSnapshotTestTool hideProperties(VisibleStatePropertyMatcher... hideMatchers) {
+    excludedProperties.addAll(Arrays.asList(hideMatchers));
+    return this;
   }
 
   /**
@@ -64,9 +94,10 @@ public class PmSnapshotTestTool {
   public File snapshot(PmObject rootPm, String fileNameBase) {
     File expectedFile = getExpectedStateFile(fileNameBase);
 
-    if (expectedFile.exists()) {
+    if (!isOverWriteMode() && expectedFile.exists()) {
       File actualStateFile = getActualStateFile(fileNameBase);
       try {
+        LOG.debug("Create actual state file " + actualStateFile);
         FileUtil.createFile(actualStateFile);
         writeXml(rootPm, actualStateFile);
         Assert.assertEquals(
@@ -74,6 +105,7 @@ public class PmSnapshotTestTool {
             FileUtil.fileToString(expectedFile),
             FileUtil.fileToString(actualStateFile));
         // remove currentStateFile if everything was fine:
+        LOG.debug("Remove verified actual state file " + actualStateFile);
         FileUtil.deleteFileAndEmptyParentDirs(actualStateFile);
       } catch (Exception e) {
         throw new PmRuntimeException("Unable to perform snapshot test", e);
@@ -169,22 +201,50 @@ public class PmSnapshotTestTool {
    * @return the {@link SrcFileAccessor} that provides access to source and bin path information.
    */
   protected SrcFileAccessor getSrcFileAccessor() {
+    if (srcFileAccessor == null) {
+      srcFileAccessor = makeSrcFileAccessor(testCtxtClass);
+      assert srcFileAccessor != null;
+    }
     return srcFileAccessor;
   }
 
+  /**
+   * Creates a source file structure accessor that matches your specific source/target
+   * directory structure.
+   *
+   * @param testCtxtClass The test class context. Used to get directory information.
+   * @return the {@link SrcFileAccessor} to use.
+   */
+  protected SrcFileAccessor makeSrcFileAccessor(Class<?> testCtxtClass) {
+    return new SrcFileAccessor(testCtxtClass);
+  }
+
   private void writeXml(PmObject rootPm, File file) throws JAXBException, FileNotFoundException {
-    ToXmlVisitorCallBack toXmlVisitorCallBack = new ToXmlVisitorCallBack();
-    PmVisitorApi.visit(rootPm, toXmlVisitorCallBack,
-                       PmVisitHint.SKIP_INVISIBLE, PmVisitHint.SKIP_HIDDEN_TAB_CONTENT);
+    VisibleStateXmlCallBack xmlCallBack = new VisibleStateXmlCallBack(excludes, excludedProperties);
+    PmVisitorApi.visit(rootPm, xmlCallBack, PmVisitHint.SKIP_CONVERSATION, PmVisitHint.SKIP_HIDDEN_TAB_CONTENT, PmVisitHint.SKIP_INVISIBLE);
 
     OutputStream os = new FileOutputStream(file);
     try {
       JAXBContext jc = JAXBContext.newInstance(XmlPmObject.class);
       Marshaller m = jc.createMarshaller();
       m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-      m.marshal(toXmlVisitorCallBack.getXmlRoot(), os);
+      m.marshal(xmlCallBack.getXmlRoot(), os);
     } finally {
       try { os.close(); } catch (IOException e) {}
     }
+  }
+
+  /**
+   * @return the overWriteMode
+   */
+  public boolean isOverWriteMode() {
+    return overWriteMode;
+  }
+
+  /**
+   * @param overWriteMode the overWriteMode to set
+   */
+  public void setOverWriteMode(boolean overWriteMode) {
+    this.overWriteMode = overWriteMode;
   }
 }

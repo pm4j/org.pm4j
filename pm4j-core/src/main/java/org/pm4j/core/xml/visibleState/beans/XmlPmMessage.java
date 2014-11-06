@@ -1,4 +1,4 @@
-package org.pm4j.core.xml.bean;
+package org.pm4j.core.xml.visibleState.beans;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;

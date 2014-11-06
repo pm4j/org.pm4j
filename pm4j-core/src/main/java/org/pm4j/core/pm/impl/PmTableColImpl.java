@@ -25,6 +25,7 @@ import org.pm4j.core.pm.PmTable;
 import org.pm4j.core.pm.PmTableCol;
 import org.pm4j.core.pm.annotation.PmBoolean;
 import org.pm4j.core.pm.annotation.PmCommandCfg;
+import org.pm4j.core.pm.annotation.PmTitleCfg;
 import org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO;
 import org.pm4j.core.pm.annotation.PmTableColCfg;
 import org.pm4j.core.pm.api.PmEventApi;
@@ -161,6 +162,7 @@ public class PmTableColImpl extends PmObjectBase implements PmTableCol {
    * <p>
    * Delegates all calls to {@link PmTableColImpl#sortOrderAttr}.
    */
+  @PmTitleCfg(resKey="pmTableCol.cmdSort")
   @PmCommandCfg(beforeDo=BEFORE_DO.DO_NOTHING)
   protected class CmdSortPm extends PmCommandImpl {
 
@@ -216,6 +218,7 @@ public class PmTableColImpl extends PmObjectBase implements PmTableCol {
    * <p>
    * May be extended or replaced by domain specific implementations.
    */
+  @PmTitleCfg(resKey="pmTableCol.sortOrder")
   public class SortOrderAttr extends PmAttrEnumImpl<PmSortOrder> {
     public SortOrderAttr(PmObject pmParent) {
       super(pmParent, PmSortOrder.class);

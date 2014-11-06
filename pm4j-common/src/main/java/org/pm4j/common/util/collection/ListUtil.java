@@ -76,13 +76,24 @@ public final class ListUtil {
     return -1;
   }
 
+  /**
+   * Provides the last list item or <code>null</code> if there is no item or the given list is <code>null</code>.
+   *
+   * @param list The list.
+   * @return the last list item or <code>null</code>.
+   */
   public static <T> T lastItemOrNull(List<T> list) {
     return (list == null || list.isEmpty())
         ? null
         : list.get(list.size()-1);
   }
 
-
+  /**
+   * Joins the given set of collections to a single list containing all items.
+   *
+   * @param collections The given set of collections.
+   * @return a list containing all items.
+   */
   @SuppressWarnings({ "unchecked", "rawtypes" })
   public static <T> List<T> collectionsToList(Collection... collections) {
     List<T> list = new ArrayList<T>();
@@ -92,6 +103,15 @@ public final class ListUtil {
     return list;
   }
 
+  /**
+   * Provides the given collection as a {@link List}.
+   * <p>
+   * If it is already a list, it will just return the given instance.<br>
+   * Otherwise it provides a new list containing all items of the given container.
+   *
+   * @param iterable The set of items.
+   * @return a list containing all items.
+   */
   public static <T> List<T> toList(Iterable<T> iterable) {
     if (iterable == null) {
       return null;
@@ -107,9 +127,54 @@ public final class ListUtil {
     }
   }
 
+  /**
+   * Provides a shallow copy of the given collection.
+   *
+   * @param src The source collection. May be <code>null</code>.
+   * @return a new list containing all source items. Is never <code>null</code>.
+   */
+  public static <T> List<T> shallowCopy(Collection<T> src) {
+    return (src == null)
+            ? new ArrayList<T>()
+            : new ArrayList<T>(src);
+  }
+
+  /**
+   * Provides a sub list of the given list instance.
+   *
+   * @param baseList
+   * @param fromIndex
+   * @param maxPageSize
+   * @return
+   */
   public static <T> List<T> subListPage(List<T> baseList, int fromIndex, int maxPageSize) {
     int toIndex = Math.min(baseList.size(), fromIndex + maxPageSize);
     return baseList.subList(fromIndex, toIndex);
+  }
+
+  /**
+   * Adds the given item set if it is not already a member of the given
+   * collection.
+   *
+   * @param targetCollection
+   *          The collection to manage.
+   * @param src
+   *          The set of items to add if it is not already part of the target
+   *          collection.<br>
+   *          May be <code>null</code>.
+   * @return the number of added items.
+   */
+  public static <T> int addItemsNotYetInCollection(Collection<T> targetCollection, Iterable<T> src) {
+    int numAddedItems = 0;
+    if (src != null) {
+      for (T item : src) {
+        if (!targetCollection.contains(item)) {
+          targetCollection.add(item);
+          ++numAddedItems;
+        }
+      }
+    }
+    return numAddedItems;
   }
 
   /**
@@ -118,8 +183,12 @@ public final class ListUtil {
    * @param items
    * @return
    */
+  @Deprecated
   public static <T> T[] toArray(T... items) {
     return items;
   }
+
+
+
 
 }
