@@ -1,5 +1,7 @@
 package org.pm4j.core.xml.visibleState;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.HashSet;
@@ -8,7 +10,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
-import org.pm4j.common.util.collection.ListUtil;
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmConversation;
@@ -19,11 +20,11 @@ import org.pm4j.core.pm.PmTabSet;
 import org.pm4j.core.pm.PmTable;
 import org.pm4j.core.pm.PmTableCol;
 import org.pm4j.core.pm.api.PmMessageApi;
-import org.pm4j.core.pm.api.PmVisitorApi.PmMatcher;
 import org.pm4j.core.pm.api.PmVisitorApi.PmVisitHierarchyCallBack;
 import org.pm4j.core.pm.api.PmVisitorApi.PmVisitResult;
 import org.pm4j.core.pm.impl.PmTableUtil;
 import org.pm4j.core.pm.impl.PmUtil;
+import org.pm4j.core.pm.impl.PmVisitorImpl;
 import org.pm4j.core.pm.impl.options.PmOptionSetUtil;
 import org.pm4j.core.xml.visibleState.beans.XmlPmAttr;
 import org.pm4j.core.xml.visibleState.beans.XmlPmCommand;
@@ -50,26 +51,38 @@ public class VisibleStateXmlCallBack implements PmVisitHierarchyCallBack {
 
   private XmlPmObjectBase xmlRoot, newestXml;
   private Deque<XmlPmObjectBase> parents = new LinkedList<XmlPmObjectBase>();
-  // TODO oboede: should be considered by the visitor.
-  private Collection<PmMatcher> excludes;
-  private Collection<VisibleStatePropertyMatcher> excludedProperties;
+  private Collection<VisibleStatePropertyMatcher> excludedProperties = new ArrayList<VisibleStatePropertyMatcher>();
 
-  public VisibleStateXmlCallBack() {
-    this(null, null);
+  /**
+   * Defines filters for properties to exclude from the xml.
+   * <p>
+   * If you need to exclude complete PMs, please use {@link PmVisitorImpl#exclude(Collection)}.
+   *
+   * @param excludedProperties Match rules for the properties to exclude.
+   * @return self reference for fluent programming.
+   */
+  public VisibleStateXmlCallBack exclude(Collection<VisibleStatePropertyMatcher> excludedProperties) {
+    if (excludedProperties != null) {
+      this.excludedProperties.addAll(excludedProperties);
+    }
+    return this;
   }
 
-  public VisibleStateXmlCallBack(Collection<PmMatcher> excludes, Collection<VisibleStatePropertyMatcher> excludedProperties) {
-    this.excludes = ListUtil.shallowCopy(excludes);
-    this.excludedProperties = ListUtil.shallowCopy(excludedProperties);
+  /**
+   * Defines filters for properties to exclude from the xml.
+   * <p>
+   * If you need to exclude complete PMs, please use {@link PmVisitorImpl#exclude(Collection)}.
+   *
+   * @param excludedProperties Match rules for the properties to exclude.
+   * @return self reference for fluent programming.
+   */
+  public VisibleStateXmlCallBack exclude(VisibleStatePropertyMatcher... excludedProperties) {
+    this.excludedProperties.addAll(Arrays.asList(excludedProperties));
+    return this;
   }
 
   @Override
   public PmVisitResult visit(PmObject pm) {
-    for (PmMatcher m : excludes) {
-      if (m.doesMatch(pm)) {
-        return PmVisitResult.SKIP_CHILDREN;
-      }
-    }
     Set<VisibleStateProperty> hiddenProps = getHiddenProps(pm);
 
     if (pm instanceof PmAttr) {

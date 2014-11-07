@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.pm4j.common.util.collection.ListUtil;
@@ -18,6 +19,7 @@ import org.pm4j.core.pm.api.PmVisitorApi.PmVisitCallBack;
 import org.pm4j.core.pm.api.PmVisitorApi.PmVisitHierarchyCallBack;
 import org.pm4j.core.pm.api.PmVisitorApi.PmVisitHint;
 import org.pm4j.core.pm.api.PmVisitorApi.PmVisitResult;
+import org.pm4j.core.pm.api.PmVisitorApi.PmMatcher;
 
 /**
  * Visitor implementations. Descends deep first.
@@ -27,6 +29,7 @@ import org.pm4j.core.pm.api.PmVisitorApi.PmVisitResult;
 public class PmVisitorImpl {
 
   private final Set<PmVisitHint> hints;
+  private List<PmMatcher> excludes = new ArrayList<PmMatcher>();
   private PmVisitCallBack callBack;
   private PmObject visitRoot = null;
   private PmObject visitStoppedOn = null;
@@ -47,16 +50,37 @@ public class PmVisitorImpl {
   }
 
   /**
-   * Creates a visitor.
+   * Defines match conditions for PMs to exclude from the visit.<br>
+   * The excluded PMs and their children will not be visited.
    *
-   * @param callBack
-   *          the core part of the visitor client.
-   * @param hints
-   *          static selections.
+   * @param matchers Predicates for PMs that should be skipped.
+   * @return this visitor again for fluent programming style support.
    */
-  public PmVisitorImpl(PmVisitHint... hints) {
-    assert hints != null;
-    this.hints = new HashSet<PmVisitHint>(Arrays.asList(hints));
+  public PmVisitorImpl exclude(PmMatcher... matchers) {
+    return exclude(Arrays.asList(matchers));
+  }
+
+  /**
+   * Defines match conditions for PMs to exclude from the visit.<br>
+   * The excluded PMs and their children will not be visited.
+   *
+   * @param matchers Predicates for PMs that should be skipped.
+   * @return this visitor again for fluent programming style support.
+   */
+  public PmVisitorImpl exclude(Collection<PmMatcher> matchers) {
+    if (matchers != null) {
+      excludes.addAll(matchers);
+    }
+    return this;
+  }
+
+  /**
+   * @param hints Some hints to consider.
+   * @return this visitor again for fluent programming style support.
+   */
+  public PmVisitorImpl hints(PmVisitHint... hints) {
+    this.hints.addAll(Arrays.asList(hints));
+    return this;
   }
 
   /**
@@ -87,7 +111,7 @@ public class PmVisitorImpl {
     }
 
     // The moment where the elephant...
-    PmVisitResult result = hintsAllowVisit(pm)
+    PmVisitResult result = shouldVisit(pm)
           ? callBack.visit(pm)
           : PmVisitResult.SKIP_CHILDREN;
 
@@ -156,8 +180,7 @@ public class PmVisitorImpl {
    * @return <code>true</code> if the hints agree to visit the given PM.<br>
    *         <code>false</code> if the PM and its children shouldn't be visited.
    */
-  private boolean hintsAllowVisit(PmObject pm) {
-
+  private boolean shouldVisit(PmObject pm) {
     if (!PmInitApi.isPmInitialized(pm)) {
       if (hints.contains(PmVisitHint.SKIP_NOT_INITIALIZED)) {
         return false;
@@ -193,6 +216,13 @@ public class PmVisitorImpl {
         return false;
       }
     }
+
+    for (PmMatcher matcher : excludes) {
+      if (matcher.doesMatch(pm)) {
+        return false;
+      }
+    }
+
     return true;
   }
 

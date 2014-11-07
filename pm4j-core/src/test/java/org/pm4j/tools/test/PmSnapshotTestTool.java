@@ -21,9 +21,9 @@ import org.pm4j.common.util.io.FileUtil;
 import org.pm4j.common.util.io.SrcFileAccessor;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmObject;
-import org.pm4j.core.pm.api.PmVisitorApi;
-import org.pm4j.core.pm.api.PmVisitorApi.PmVisitHint;
 import org.pm4j.core.pm.api.PmVisitorApi.PmMatcher;
+import org.pm4j.core.pm.api.PmVisitorApi.PmVisitHint;
+import org.pm4j.core.pm.impl.PmVisitorImpl;
 import org.pm4j.core.xml.visibleState.VisibleStatePropertyMatcher;
 import org.pm4j.core.xml.visibleState.VisibleStateXmlCallBack;
 import org.pm4j.core.xml.visibleState.beans.XmlPmObject;
@@ -44,7 +44,7 @@ public class PmSnapshotTestTool {
   private SrcFileAccessor srcFileAccessor;
   private boolean overWriteMode = false;
 
-  private Collection<PmMatcher> excludes = new ArrayList<PmMatcher>();
+  private Collection<PmMatcher> excludedPms = new ArrayList<PmMatcher>();
   private Collection<VisibleStatePropertyMatcher> excludedProperties = new ArrayList<VisibleStatePropertyMatcher>();
 
   /**
@@ -63,8 +63,8 @@ public class PmSnapshotTestTool {
    * @param hideMatchers
    * @return the tool for inline usage.
    */
-  public PmSnapshotTestTool hidePms(PmMatcher... hideMatchers) {
-    excludes.addAll(Arrays.asList(hideMatchers));
+  public PmSnapshotTestTool excludePms(PmMatcher... hideMatchers) {
+    excludedPms.addAll(Arrays.asList(hideMatchers));
     return this;
   }
 
@@ -74,7 +74,7 @@ public class PmSnapshotTestTool {
    * @param hideMatchers
    * @return the tool for inline usage.
    */
-  public PmSnapshotTestTool hideProperties(VisibleStatePropertyMatcher... hideMatchers) {
+  public PmSnapshotTestTool excludeProperties(VisibleStatePropertyMatcher... hideMatchers) {
     excludedProperties.addAll(Arrays.asList(hideMatchers));
     return this;
   }
@@ -220,8 +220,14 @@ public class PmSnapshotTestTool {
   }
 
   private void writeXml(PmObject rootPm, File file) throws JAXBException, FileNotFoundException {
-    VisibleStateXmlCallBack xmlCallBack = new VisibleStateXmlCallBack(excludes, excludedProperties);
-    PmVisitorApi.visit(rootPm, xmlCallBack, PmVisitHint.SKIP_CONVERSATION, PmVisitHint.SKIP_HIDDEN_TAB_CONTENT, PmVisitHint.SKIP_INVISIBLE);
+    VisibleStateXmlCallBack xmlCallBack = new VisibleStateXmlCallBack()
+                                  .exclude(excludedProperties);
+    PmVisitorImpl visitor = new PmVisitorImpl(xmlCallBack)
+                                  .hints(PmVisitHint.SKIP_CONVERSATION,
+                                         PmVisitHint.SKIP_HIDDEN_TAB_CONTENT,
+                                         PmVisitHint.SKIP_INVISIBLE)
+                                  .exclude(excludedPms);
+    visitor.visit(rootPm);
 
     OutputStream os = new FileOutputStream(file);
     try {

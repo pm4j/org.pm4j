@@ -33,7 +33,6 @@ import org.pm4j.core.pm.impl.PmCommandImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
 import org.pm4j.core.pm.impl.PmTableColImpl;
 import org.pm4j.core.pm.impl.PmTableImpl;
-import org.pm4j.core.xml.visibleState.VisibleStateXmlCallBack;
 import org.pm4j.core.xml.visibleState.beans.XmlPmAttr;
 import org.pm4j.core.xml.visibleState.beans.XmlPmObjectBase;
 
@@ -44,7 +43,7 @@ import org.pm4j.core.xml.visibleState.beans.XmlPmObjectBase;
  */
 public class VisibleStateXmlCallBackTest {
 
-  private VisibleStateXmlCallBack cb = new VisibleStateXmlCallBack(null, null);
+  private VisibleStateXmlCallBack cb = new VisibleStateXmlCallBack();
 
   @Test
   public void testTraverseInitialPm() {
