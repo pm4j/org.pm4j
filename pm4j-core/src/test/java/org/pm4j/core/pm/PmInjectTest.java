@@ -39,6 +39,10 @@ public class PmInjectTest {
 
     private String setterInjectedProp;
 
+    public String getSetterInjectedProp() {
+      return this.setterInjectedProp;
+    }
+    
     @PmInject("#myProp")
     public void setSetterInjectedProp(String s) {
       this.setterInjectedProp = s;
@@ -68,6 +72,7 @@ public class PmInjectTest {
     assertEquals("abc", myPm.setterInjectedProp);
   }
 
+  @Test
   public void testNullNotAllowedInjectionFailsForNullValue() {
     try {
       new InvalidPm().getPmTitle();

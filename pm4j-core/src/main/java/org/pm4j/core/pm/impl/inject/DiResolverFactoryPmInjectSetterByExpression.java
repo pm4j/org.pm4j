@@ -1,5 +1,6 @@
 package org.pm4j.core.pm.impl.inject;
 
+import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
@@ -56,25 +57,11 @@ public class DiResolverFactoryPmInjectSetterByExpression implements DiResolverFa
     public void resolveDi(PmObject pm) {
       for (Map.Entry<Method, PathResolver> e : methodToPathResolverMap.entrySet()) {
         Method m = e.getKey();
+        DiResolverUtil.validateGetterReturnsNull(pm, m);
         PathResolver r = e.getValue();
-        Object value = null;
-        try {
-          value = r.getValue(pm);
-        } catch (RuntimeException ex) {
-          throw new PmRuntimeException(pm, "Unable to resolve dependency injection reference to '" + r + "' for setter: " + m, ex);
-        }
-
-        if (value == null && ! r.isNullAllowed()) {
-          throw new PmRuntimeException(pm, "Found value for dependency injection of field '" + m +
-              "' was null. But null value is not allowed. " +
-              "You may configure null-value handling using @PmInject(nullAllowed=...).");
-        }
-
-        try {
-          m.invoke(pm, value);
-        } catch (Exception ex) {
-          throw new PmRuntimeException(pm, "Can't invoke method '" + m + "'.", ex);
-        }
+        Object value = DiResolverUtil.resolveValue(pm, m, r);
+        DiResolverUtil.validateValidValue(pm, r.isNullAllowed(), m, value);        
+        DiResolverUtil.setValue(pm, m, value);
       }
     }
   }

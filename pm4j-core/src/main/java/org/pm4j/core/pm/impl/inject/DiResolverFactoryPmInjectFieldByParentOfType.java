@@ -47,23 +47,12 @@ public class DiResolverFactoryPmInjectFieldByParentOfType implements DiResolverF
     public void resolveDi(PmObject pm) {
       for (Map.Entry<Field, Boolean> e : fieldsWithParentByTypeInjectionsToOptinalFlag.entrySet()) {
         Field f = e.getKey();
+        DiResolverUtil.validateFieldIsNull(pm, f);
         Object value = PmUtil.findPmParentOfType(pm, f.getType());
-        if (value == null && !e.getValue()) {
-          throw new PmRuntimeException(pm, "Found value for dependency injection of field '" + f +
-              "' was null. But null value is not allowed. " +
-              "You may configure null-value handling using @PmInject(nullAllowed=...).");
-        }
-
-        try {
-          f.set(pm, value);
-        } catch (Exception ex) {
-          throw new PmRuntimeException(pm, "Can't initialize field '" + f.getName() + "' in class '"
-              + getClass().getName() + "'.", ex);
-        }
-
+        DiResolverUtil.validateValidValue(pm, e.getValue(), f, value);
+        DiResolverUtil.setValue(pm, f, value);        
       }
     }
-
   }
 
 }

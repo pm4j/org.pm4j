@@ -47,25 +47,9 @@ public class DiResolverFactoryPmInjectSetterByParentOfType implements DiResolver
     public void resolveDi(PmObject pm) {
       for (MethodData md : annotatedMethods) {
         Object value = PmUtil.findPmParentOfType(pm, md.type);
-
-        if (value == null) {
-          if (md.annotation.nullAllowed()) {
-            // in this case there is nothing more to do here.
-            return;
-          } else {
-            throw new PmRuntimeException(pm, "Found value for dependency injection of method '" + md.method +
-                "' was null. But null value is not allowed.\n" +
-                "You may configure null-value handling using @PmInject(nullAllowed=...).");
-          }
-        }
-
-        try {
-          md.method.invoke(pm, value);
-        } catch (Exception ex) {
-          throw new PmRuntimeException(pm, "Can't call setter '" + md.method.getName() + "' in class '"
-              + getClass().getName() + "'.", ex);
-        }
-
+        DiResolverUtil.validateGetterReturnsNull(pm, md.method);
+        DiResolverUtil.validateValidValue(pm, md.annotation.nullAllowed(), md.method, value);
+        DiResolverUtil.setValue(pm, md.method, value);
       }
     }
   }

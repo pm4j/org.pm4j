@@ -10,7 +10,7 @@ import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.impl.inject.NamedObjectResolver;
 
 /**
- * Marks a field to be injected by the PM framework.
+ * Marks a field to be injected by the PM framework. The target must not be null before injection.
  * <p>
  * Supports reference resolution by
  * <ul>
@@ -58,7 +58,10 @@ public @interface PmInject {
   String value() default "";
 
   /**
-   * Defines if <code>null</code> is an accepted value for the injected field.
+   * Defines whether <code>null</code> is an accepted value for the injected field.
+   * If <code>true</code> and the value to inject is actually true, 
+   * the null value will actually be injected 
+   * (e.g. setter called with null or field set to null). 
    * <p>
    * Default value: <code>false</code>.
    */
