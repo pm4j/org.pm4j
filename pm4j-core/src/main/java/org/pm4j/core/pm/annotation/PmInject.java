@@ -10,7 +10,7 @@ import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.impl.inject.NamedObjectResolver;
 
 /**
- * Marks a field to be injected by the PM framework. The target must not be null before injection.
+ * Marks a field to be injected by the PM framework. The target must be null before injection.
  * <p>
  * Supports reference resolution by
  * <ul>
