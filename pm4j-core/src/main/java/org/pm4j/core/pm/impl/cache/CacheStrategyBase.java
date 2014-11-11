@@ -3,6 +3,7 @@ package org.pm4j.core.pm.impl.cache;
 import org.pm4j.common.cache.CacheStrategy;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmCacheCfg.Clear;
+import org.pm4j.core.pm.annotation.PmCacheCfg2;
 import org.pm4j.core.pm.impl.InternalPmImplUtil;
 import org.pm4j.core.pm.impl.PmObjectBase;
 
@@ -11,13 +12,13 @@ public abstract class CacheStrategyBase<PM extends PmObjectBase> implements Cach
 
   private String cacheName;
   
-  private org.pm4j.core.pm.annotation.PmCacheCfg2.Clear cacheClear;
-
+  private PmCacheCfg2.Clear cacheClear;
+  
   public CacheStrategyBase(String cacheName) {
     this.cacheName = cacheName;
   }
   
-  public CacheStrategyBase(String cacheName, org.pm4j.core.pm.annotation.PmCacheCfg2.Clear cacheClear) {
+  public CacheStrategyBase(String cacheName, PmCacheCfg2.Clear cacheClear) {
     this(cacheName);
     this.cacheClear = cacheClear;
   }
@@ -35,7 +36,7 @@ public abstract class CacheStrategyBase<PM extends PmObjectBase> implements Cach
     
     if (cacheClear != null) {
       // new annotation style using PmCacheCfg2
-      if (cacheClear == org.pm4j.core.pm.annotation.PmCacheCfg2.Clear.DEFAULT) {
+      if (cacheClear == PmCacheCfg2.Clear.DEFAULT) {
         clearImpl(pm);
       }
     } else {
@@ -72,7 +73,7 @@ public abstract class CacheStrategyBase<PM extends PmObjectBase> implements Cach
   public boolean isCaching() {
     return true;
   }
-
+  
   protected void logPmCacheHit(PmObject pm) {
     CacheLog.INSTANCE.logPmCacheHit(pm, cacheName);
   }

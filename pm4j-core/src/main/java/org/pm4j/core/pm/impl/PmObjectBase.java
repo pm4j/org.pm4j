@@ -47,7 +47,6 @@ import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmCacheCfg;
 import org.pm4j.core.pm.annotation.PmCacheCfg.CacheMode;
 import org.pm4j.core.pm.annotation.PmCacheCfg.Clear;
-import org.pm4j.core.pm.annotation.PmCacheCfg2.Aspect;
 import org.pm4j.core.pm.annotation.PmCacheCfg2;
 import org.pm4j.core.pm.annotation.PmCacheCfg2.Cache;
 import org.pm4j.core.pm.annotation.PmCacheCfg2.Observe;
@@ -57,6 +56,7 @@ import org.pm4j.core.pm.annotation.PmTitleCfg;
 import org.pm4j.core.pm.annotation.customize.CustomizedAnnotationUtil;
 import org.pm4j.core.pm.annotation.customize.PmAnnotationApi;
 import org.pm4j.core.pm.api.PmCacheApi;
+import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmMessageApi;
 import org.pm4j.core.pm.api.PmValidationApi;
@@ -93,16 +93,16 @@ public abstract class PmObjectBase implements PmObject {
 
   /** Dynamic visibility flag. */
   private boolean pmVisible = true;
-  Object pmVisibleCache;
+  /* package */ Object pmVisibleCache;
 
   /** Enabled state flag. */
   private boolean pmEnabled = true;
-  Object pmEnabledCache;
+  /* package */ Object pmEnabledCache;
 
   /**
    * Optional title cache.
    */
-  String pmCachedTitle;
+  /* package */  String pmCachedTitle;
 
   public enum PmInitState {
     NOT_INITIALIZED,
@@ -802,7 +802,7 @@ public abstract class PmObjectBase implements PmObject {
   }
   /**
    * Initializes the shared presentation model configuration data that is
-   * provided for each PM instance with the given name within the given paren
+   * provided for each PM instance with the given name within the given parent
    * scope.
    * <p>
    * Example: All presentation model for each presentation model instance of
@@ -969,6 +969,7 @@ public abstract class PmObjectBase implements PmObject {
               for (Method method : pmMetaData.initMethods) {
                  method.invoke(this, new Object[] {});
               }
+              initCacheClearOn(pmMetaData);
             }
             catch (Exception e) {
               pmInitState = PmInitState.FIELD_BOUND_CHILD_META_DATA_INITIALIZED;
@@ -1053,24 +1054,26 @@ public abstract class PmObjectBase implements PmObject {
     }
 
     // -- Cache configuration --
-    List cacheAnnotations = PmCacheCfgUtil.findCacheCfgsInPmHierarchy(this, new ArrayList());
-    if (!cacheAnnotations.isEmpty() && cacheAnnotations.get(0).getClass() == PmCacheCfg.class) {
+    List cacheAnnotations = InternalPmCacheCfgUtil.findCacheCfgsInPmHierarchy(this, new ArrayList());
+    if (!cacheAnnotations.isEmpty() && PmCacheCfg2.class.isAssignableFrom(cacheAnnotations.get(0).getClass())) {
+      // handle cache configuration based on PmCacheCfg2
+      Cache cacheForTitle = InternalPmCacheCfgUtil.findCacheForPropertyInPmHierarchy(this, CacheKind.TITLE, cacheAnnotations);
+      metaData.cacheStrategyForTitle = InternalCacheStrategyFactory.create(CacheKind.TITLE, cacheForTitle);
+      metaData.cacheClearOnForTitle = cacheForTitle != null ? cacheForTitle.clearOn() : null;
+      
+      Cache cacheForVisibility = InternalPmCacheCfgUtil.findCacheForPropertyInPmHierarchy(this, CacheKind.VISIBILITY, cacheAnnotations);
+      metaData.cacheStrategyForVisibility = InternalCacheStrategyFactory.create(CacheKind.VISIBILITY, cacheForVisibility);
+      metaData.cacheClearOnForVisibility = cacheForVisibility != null ? cacheForVisibility.clearOn() : null;
+      
+      Cache cacheForEnablement = InternalPmCacheCfgUtil.findCacheForPropertyInPmHierarchy(this, CacheKind.ENABLEMENT, cacheAnnotations);
+      metaData.cacheStrategyForEnablement = InternalCacheStrategyFactory.create(CacheKind.ENABLEMENT, cacheForEnablement);
+      metaData.cacheClearOnForEnablement = cacheForEnablement != null ? cacheForEnablement.clearOn() : null;
+    } else {
       // handle cache configuration based on the deprecated PmCacheCfg
       metaData.cacheStrategyForTitle = AnnotationUtil.evaluateCacheStrategy(this, PmCacheCfg.ATTR_TITLE, cacheAnnotations, CACHE_STRATEGIES_FOR_TITLE);
       metaData.cacheStrategyForVisibility = AnnotationUtil.evaluateCacheStrategy(this, PmCacheCfg.ATTR_VISIBILITY, cacheAnnotations, CACHE_STRATEGIES_FOR_VISIBILITY);
       metaData.cacheStrategyForEnablement = AnnotationUtil.evaluateCacheStrategy(this, PmCacheCfg.ATTR_ENABLEMENT, cacheAnnotations, CACHE_STRATEGIES_FOR_ENABLEMENT);
       metaData.cacheClearBehavior = AnnotationUtil.evaluateCacheClearBehavior(this, cacheAnnotations);
-    } else {
-      // handle cache configuration based on PmCacheCfg2
-      Cache titleCache = PmCacheCfgUtil.findCacheForAspectInPmHierarchy(this, Aspect.TITLE, cacheAnnotations); 
-      metaData.cacheStrategyForTitle = CacheStrategyFactory.createStrategyForTitle(titleCache);
-      metaData.clearTitleCacheOn = titleCache != null ? titleCache.clearOn() : null;
-      Cache visibillityCache = PmCacheCfgUtil.findCacheForAspectInPmHierarchy(this, Aspect.VISIBILITY, cacheAnnotations);
-      metaData.cacheStrategyForVisibility = CacheStrategyFactory.createStrategyForVisibillity(visibillityCache);
-      metaData.clearVisibillityCacheOn = visibillityCache != null ? visibillityCache.clearOn() : null;
-      Cache enablementCache = PmCacheCfgUtil.findCacheForAspectInPmHierarchy(this, Aspect.ENABLEMENT, cacheAnnotations);
-      metaData.cacheStrategyForEnablement = CacheStrategyFactory.createStrategyForEnablement(enablementCache);
-      metaData.clearEnablementCacheOn = enablementCache != null ? enablementCache.clearOn() : null;
     }
 
     // -- Check for registered domain specific annotations
@@ -1086,6 +1089,12 @@ public abstract class PmObjectBase implements PmObject {
     metaData.deprValidation = isDeprValidation();
     metaData.validator = makePmValidator();
     assert metaData.validator != null;
+  }
+  
+  protected void initCacheClearOn(MetaData metaData) {
+    InternalPmCacheCfgUtil.registerClearOnListeners(this, CacheKind.TITLE, pmMetaData.cacheClearOnForTitle);
+    InternalPmCacheCfgUtil.registerClearOnListeners(this, CacheKind.ENABLEMENT, pmMetaData.cacheClearOnForEnablement);
+    InternalPmCacheCfgUtil.registerClearOnListeners(this, CacheKind.VISIBILITY, pmMetaData.cacheClearOnForVisibility);
   }
 
   /**
@@ -1168,15 +1177,13 @@ public abstract class PmObjectBase implements PmObject {
     private Validator validator;
     private Annotation[] permissionAnnotations = {};
 
-    // TODO if we make maps out of this we could save a lot of code
     private CacheStrategy cacheStrategyForTitle      = CacheStrategyNoCache.INSTANCE;
-    private Observe[] clearTitleCacheOn;
     private CacheStrategy cacheStrategyForEnablement = CacheStrategyNoCache.INSTANCE;
-    private Observe[] clearEnablementCacheOn;
     private CacheStrategy cacheStrategyForVisibility = CacheStrategyNoCache.INSTANCE;
-    private Observe[] clearVisibillityCacheOn;
-    @Deprecated
-    /* package */ Clear   cacheClearBehavior         = Clear.DEFAULT;
+    private Observe[] cacheClearOnForTitle;
+    private Observe[] cacheClearOnForEnablement;
+    private Observe[] cacheClearOnForVisibility;
+    @Deprecated /* package */ Clear   cacheClearBehavior         = Clear.DEFAULT;
     
 //    private boolean cacheTooltip = false;
     /** An optional factory that is responsible for creating PMs for beans. */

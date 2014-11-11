@@ -35,14 +35,14 @@ public class PmAttrCacheTest {
     assertEquals("abc", pPm.sCached.getValue());
     assertEquals("abc", pPm.sCachedByClassSpec.getValue());
     assertEquals(p.s, pPm.sClassCacheSwitchedOff.getValue());
-    assertEquals(p.s, pPm.sCachedButClearNever.getValue());
+    assertEquals(p.s, pPm.sCachedButClearNever.getValue()); // wrong assertion ?!?
 
     PmCacheApi.clearPmCache(pPm);
     assertEquals(p.s, pPm.s.getValue());
     assertEquals(p.s, pPm.sCached.getValue());
     assertEquals(p.s, pPm.sCachedByClassSpec.getValue());
     assertEquals(p.s, pPm.sClassCacheSwitchedOff.getValue());
-    assertEquals(p.s, pPm.sCachedButClearNever.getValue());
+    assertEquals(p.s, pPm.sCachedButClearNever.getValue()); // wrong assertion ?!?
   }
 
   @Test
@@ -91,14 +91,14 @@ public class PmAttrCacheTest {
     assertEquals("abc", pPm.sCached.getValue());
     assertEquals("abc", pPm.sCachedByClassSpec.getValue());
     assertEquals("The local cache declaration overrides the inherited one.", p.s, pPm.sClassCacheSwitchedOff.getValue());
-    assertEquals(p.s, pPm.sCachedButClearNever.getValue());
+    assertEquals(p.s, pPm.sCachedButClearNever.getValue());  // wrong assertion ?!?
 
     PmCacheApi.clearPmCache(pPm);
     assertEquals(p.s, pPm.s.getValue());
     assertEquals(p.s, pPm.sCached.getValue());
     assertEquals(p.s, pPm.sCachedByClassSpec.getValue());
     assertEquals(p.s, pPm.sClassCacheSwitchedOff.getValue());
-    assertEquals(p.s, pPm.sCachedButClearNever.getValue());
+    assertEquals(p.s, pPm.sCachedButClearNever.getValue());  // wrong assertion ?!?
   }
 
   @Test

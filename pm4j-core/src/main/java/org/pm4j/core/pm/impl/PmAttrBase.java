@@ -55,12 +55,12 @@ import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmOption;
 import org.pm4j.core.pm.PmOptionSet;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
+import org.pm4j.core.pm.annotation.PmCacheCfg2;
 import org.pm4j.core.pm.annotation.PmAttrCfg.HideIf;
 import org.pm4j.core.pm.annotation.PmAttrCfg.Restriction;
 import org.pm4j.core.pm.annotation.PmAttrCfg.Validate;
 import org.pm4j.core.pm.annotation.PmCacheCfg;
 import org.pm4j.core.pm.annotation.PmCacheCfg.CacheMode;
-import org.pm4j.core.pm.annotation.PmCacheCfg2.Aspect;
 import org.pm4j.core.pm.annotation.PmCacheCfg2.Cache;
 import org.pm4j.core.pm.annotation.PmCacheCfg2.Observe;
 import org.pm4j.core.pm.annotation.PmCommandCfg;
@@ -125,7 +125,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
    * Contains optional attribute data that in most cases doesn't exist for usual
    * bean attributes.
    */
-  PmAttrDataContainer<T_PM_VALUE, T_BEAN_VALUE> dataContainer;
+  /* package */ PmAttrDataContainer<T_PM_VALUE, T_BEAN_VALUE> dataContainer;
 
   /**
    * Keeps a reference to the entered value in case of buffered data entry.
@@ -1636,22 +1636,32 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     }
 
     // -- Cache configuration --
-    List cacheAnnotations = PmCacheCfgUtil.findCacheCfgsInPmHierarchy(this, new ArrayList());
-    if (!cacheAnnotations.isEmpty() && cacheAnnotations.get(0).getClass() == PmCacheCfg.class) {
+    List cacheAnnotations = InternalPmCacheCfgUtil.findCacheCfgsInPmHierarchy(this, new ArrayList());
+    if (!cacheAnnotations.isEmpty() && PmCacheCfg2.class.isAssignableFrom(cacheAnnotations.get(0).getClass())) {
+      // handle cache configuration based on PmCacheCfg2
+      Cache cacheForOptions = InternalPmCacheCfgUtil.findCacheForPropertyInPmHierarchy(this, CacheKind.OPTIONS, cacheAnnotations);
+      myMetaData.cacheStrategyForOptions = InternalCacheStrategyFactory.create(CacheKind.OPTIONS, cacheForOptions);
+      myMetaData.cacheClearOnForOptions = cacheForOptions != null ? cacheForOptions.clearOn() : null;
+          
+      Cache cacheForValue = InternalPmCacheCfgUtil.findCacheForPropertyInPmHierarchy(this, CacheKind.VALUE, cacheAnnotations);
+      myMetaData.cacheStrategyForValue = InternalCacheStrategyFactory.create(CacheKind.VALUE, cacheForValue);
+      myMetaData.cacheClearOnForValue = cacheForValue != null ? cacheForValue.clearOn() : null;
+    } else {
       // handle cache configuration based on the deprecated PmCacheCfg
       myMetaData.cacheStrategyForOptions = AnnotationUtil.evaluateCacheStrategy(this, PmCacheCfg.ATTR_OPTIONS, cacheAnnotations, CACHE_STRATEGIES_FOR_OPTIONS);
       myMetaData.cacheStrategyForValue = AnnotationUtil.evaluateCacheStrategy(this, PmCacheCfg.ATTR_VALUE, cacheAnnotations, CACHE_STRATEGIES_FOR_VALUE);
-    } else {
-      // handle cache configuration based on PmCacheCfg2
-      // TODO handle cacheClear configuration
-      Cache optionsCache = PmCacheCfgUtil.findCacheForAspectInPmHierarchy(this, Aspect.OPTIONS, cacheAnnotations); 
-      myMetaData.cacheStrategyForOptions = CacheStrategyFactory.createStrategyForOptions(optionsCache);
-      Cache valueCache = PmCacheCfgUtil.findCacheForAspectInPmHierarchy(this, Aspect.VALUE, cacheAnnotations);
-      myMetaData.cacheStrategyForValue = CacheStrategyFactory.createStrategyForValue(valueCache);
     }
   }
 
-
+  @Override
+  protected void initCacheClearOn(PmObjectBase.MetaData pmObjectBaseMetaData) {
+    super.initCacheClearOn(pmObjectBaseMetaData);
+    MetaData metaData = (MetaData) pmObjectBaseMetaData;
+    InternalPmCacheCfgUtil.registerClearOnListeners(this, CacheKind.OPTIONS, metaData.cacheClearOnForOptions);
+    InternalPmCacheCfgUtil.registerClearOnListeners(this, CacheKind.VALUE, metaData.cacheClearOnForValue);
+  }
+  
+  
   private void zz_readBeanValidationRestrictions(Class<?> beanClass, PmAttrCfg fieldAnnotation, MetaData myMetaData) {
     if (BeanValidationPmUtil.getBeanValidator() == null)
       return;
@@ -1729,9 +1739,9 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     private String                          formatResKey;
     private String                          defaultValueString;
     private CacheStrategy                   cacheStrategyForOptions = CacheStrategyNoCache.INSTANCE;
-    private Observe[]                       clearOptionsCacheOn;
+    private Observe[]                       cacheClearOnForOptions;    
     private CacheStrategy                   cacheStrategyForValue   = CacheStrategyNoCache.INSTANCE;
-    private Observe[]                       clearValueCacheOn;
+    private Observe[]                       cacheClearOnForValue;
     private StringConverter<?>              stringConverter;
     private ValueConverter<?, ?>            valueConverter;
     /* package */ BackingValueAccessStrategy valueAccessStrategy     = ValueAccessLocal.INSTANCE;

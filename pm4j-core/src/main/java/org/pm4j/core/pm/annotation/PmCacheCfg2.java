@@ -5,10 +5,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
+
 /**
- * Cache definition annotation.
- * <p>
- * TODOC olaf:
+ * Annotation to define a cache configuration for cacheable PM properties.
  *
  * @author olaf boede
  */
@@ -17,26 +17,21 @@ import java.lang.annotation.Target;
 public @interface PmCacheCfg2 {
   
   /**
-   * TODO
-   * @return
+   * Defines a set of cache definitions for the cacheable properties of a
+   * PM object.
    */
   Cache[] value() default {};
   
-  /**
-   * @author sdolke
-   *
-   */
+  /** Defines the cache configuration for a particular cacheable property of a PM object */
   public @interface Cache {
     
     /**
-     * TODO
-     * @return
+     * Defines the property this cache definition is for.
      */
-    Aspect[] aspect() default Aspect.ALL; 
+    CacheKind[] property() default CacheKind.ALL; 
     
     /**
-     * TODO
-     * @return
+     * Defines the cache mode.
      */
     CacheMode mode() default CacheMode.ON;
    
@@ -46,57 +41,44 @@ public @interface PmCacheCfg2 {
      * In some cases it's useful to define a cache mode for a whole sub tree of PM's.
      * If you define {@link #cascade()} as <code>true</code> the cache definition
      * will also be applied for all child PM's.<br>
-     * But: Each recursively defined parent cache aspect definition can be overridden
-     * by a cache aspect definition on child level.
+     * But: Each recursively defined parent cache definition can be overridden
+     * by a cache definition on child level.
      *
      * @return <code>true</code> if the cache definition should also be applied on child PMs.
      */
     boolean cascade() default false;
 
     /** 
-     * Configuration of clear behavior, when clear method is called.
-     * Default behavior is that cache is cleared, but optionally it can be configured,
-     * that cache is never cleared.
+     * Configuration of clear behavior, when clear the method is called.
+     * Default behavior is that the cache is cleared, but optionally it can be
+     * configured, to be never cleared.
      */
     Clear clear() default Clear.DEFAULT;
     
     /**
-     * TODO
-     * @return
+     * Defines a set of PMs that will trigger a cache clear if it's value changes.
      */
     Observe[] clearOn() default {};
-    
   }
   
   
+  /** Used to define a set of PMs that will be observed for value changes. */
   public @interface Observe {
     
     /**
-     * TODO
-     * @return
+     * @return an array of path expressions pointing to PMs that will be observed
+     *         for value changes.
      */
     String[] pm() default {};
     
     /**
-     * @return
+     * @return <code>true</code> if child PMs shall be observer too,
+     *         <code>false</code> otherwise
      */
-    boolean cascade() default false;
+    boolean observePmTree() default false;
   }
-  
-  public enum Aspect {
-    ALL,
-    NONE,
-    ENABLEMENT,
-    OPTIONS,
-    TITLE,
-    VALUE,
-    VISIBILITY
-  }
-  
 
   public enum CacheMode {
-    /** Not specified. */
-    NOT_SPECIFIED,
     /** No caching. */
     OFF,
     /** The value will be cached locally within the PM instance. */
@@ -117,13 +99,5 @@ public @interface PmCacheCfg2 {
     /** When clear method is called, cache is never cleared. */
     NEVER;
   }
-
-  
-  // Name constants for attributes that are found by reflection:
-  public static final String ATTR_VISIBILITY = "visibility";
-  public static final String ATTR_ENABLEMENT = "enablement";
-  public static final String ATTR_TITLE = "title";
-  public static final String ATTR_VALUE = "value";
-  public static final String ATTR_OPTIONS = "options";
 
 }
