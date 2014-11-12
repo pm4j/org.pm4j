@@ -1,32 +1,26 @@
 package org.pm4j.tools.test;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Assert;
+import org.junit.ComparisonFailure;
 import org.pm4j.common.util.io.FileUtil;
 import org.pm4j.common.util.io.SrcFileAccessor;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmObject;
+import org.pm4j.core.pm.PmPager;
+import org.pm4j.core.pm.PmTableCol;
 import org.pm4j.core.pm.api.PmVisitorApi.PmMatcher;
-import org.pm4j.core.pm.api.PmVisitorApi.PmVisitHint;
-import org.pm4j.core.pm.impl.PmVisitorImpl;
-import org.pm4j.core.xml.visibleState.VisibleStatePropertyMatcher;
-import org.pm4j.core.xml.visibleState.VisibleStateXmlCallBack;
-import org.pm4j.core.xml.visibleState.beans.XmlPmObject;
+import org.pm4j.core.pm.impl.PmTableImpl;
+import org.pm4j.core.pm.impl.PmVisitorMatcherBuilder;
+import org.pm4j.core.xml.visibleState.VisibleStateAspectMatcher;
+import org.pm4j.core.xml.visibleState.VisibleStateUtil;
 
 /**
  * A test tool that allows to make a XML snapshot file that report the external visible
@@ -45,7 +39,7 @@ public class PmSnapshotTestTool {
   private boolean overWriteMode = false;
 
   private Collection<PmMatcher> excludedPms = new ArrayList<PmMatcher>();
-  private Collection<VisibleStatePropertyMatcher> excludedProperties = new ArrayList<VisibleStatePropertyMatcher>();
+  private Collection<VisibleStateAspectMatcher> excludedAspects = new ArrayList<VisibleStateAspectMatcher>();
 
   /**
    * @param testCtxtClass
@@ -69,13 +63,13 @@ public class PmSnapshotTestTool {
   }
 
   /**
-   * Configures PM properties to hide.
+   * Configures PM aspects to hide.
    *
    * @param hideMatchers
    * @return the tool for inline usage.
    */
-  public PmSnapshotTestTool excludeProperties(VisibleStatePropertyMatcher... hideMatchers) {
-    excludedProperties.addAll(Arrays.asList(hideMatchers));
+  public PmSnapshotTestTool excludeAspects(VisibleStateAspectMatcher... hideMatchers) {
+    excludedAspects.addAll(Arrays.asList(hideMatchers));
     return this;
   }
 
@@ -95,25 +89,26 @@ public class PmSnapshotTestTool {
     File expectedFile = getExpectedStateFile(fileNameBase);
 
     if (!isOverWriteMode() && expectedFile.exists()) {
-      File actualStateFile = getActualStateFile(fileNameBase);
-      try {
-        LOG.debug("Create actual state file " + actualStateFile);
-        FileUtil.createFile(actualStateFile);
-        writeXml(rootPm, actualStateFile);
-        Assert.assertEquals(
-            "Compare " + fileNameBase + "\nExpected: " + expectedFile + "\nCurrent: " + actualStateFile,
-            FileUtil.fileToString(expectedFile),
-            FileUtil.fileToString(actualStateFile));
-        // remove currentStateFile if everything was fine:
-        LOG.debug("Remove verified actual state file " + actualStateFile);
-        FileUtil.deleteFileAndEmptyParentDirs(actualStateFile);
-      } catch (Exception e) {
-        throw new PmRuntimeException("Unable to perform snapshot test", e);
-      }
+        File actualStateFile = getActualStateFile(fileNameBase);
+        String actualStateXmlString = VisibleStateUtil.toXmlString(rootPm, excludedPms, excludedAspects);
+        String expectedStateXmlString = FileUtil.fileToString(expectedFile);
+
+        try {
+          Assert.assertEquals(
+              "Compare " + fileNameBase + "\nExpected: " + expectedFile + "\nCurrent: " + actualStateFile,
+              expectedStateXmlString,
+              actualStateXmlString);
+        } catch (ComparisonFailure e) {
+          LOG.info("Create actual state file " + actualStateFile);
+          FileUtil.createFile(actualStateFile);
+          // TODO oboede: writing the string is more reliable, because a second iteration may behave different (especially in case of bugs).
+          VisibleStateUtil.toXmlFile(rootPm, actualStateFile, excludedPms, excludedAspects);
+          throw e;
+        }
     } else {
       try {
         FileUtil.createFile(expectedFile);
-        writeXml(rootPm, expectedFile);
+        VisibleStateUtil.toXmlFile(rootPm, expectedFile, excludedPms, excludedAspects);
         LOG.info("Created snapshot file: " + expectedFile);
       } catch (Exception e) {
         throw new PmRuntimeException(rootPm, "Unable to write file " + expectedFile, e);
@@ -219,27 +214,6 @@ public class PmSnapshotTestTool {
     return new SrcFileAccessor(testCtxtClass);
   }
 
-  private void writeXml(PmObject rootPm, File file) throws JAXBException, FileNotFoundException {
-    VisibleStateXmlCallBack xmlCallBack = new VisibleStateXmlCallBack()
-                                  .exclude(excludedProperties);
-    PmVisitorImpl visitor = new PmVisitorImpl(xmlCallBack)
-                                  .hints(PmVisitHint.SKIP_CONVERSATION,
-                                         PmVisitHint.SKIP_HIDDEN_TAB_CONTENT,
-                                         PmVisitHint.SKIP_INVISIBLE)
-                                  .exclude(excludedPms);
-    visitor.visit(rootPm);
-
-    OutputStream os = new FileOutputStream(file);
-    try {
-      JAXBContext jc = JAXBContext.newInstance(XmlPmObject.class);
-      Marshaller m = jc.createMarshaller();
-      m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-      m.marshal(xmlCallBack.getXmlRoot(), os);
-    } finally {
-      try { os.close(); } catch (IOException e) {}
-    }
-  }
-
   /**
    * @return the overWriteMode
    */
@@ -248,9 +222,39 @@ public class PmSnapshotTestTool {
   }
 
   /**
-   * @param overWriteMode the overWriteMode to set
+   * Defines whether the tool write or overwrites the expected state files or not.
    */
-  public void setOverWriteMode(boolean overWriteMode) {
-    this.overWriteMode = overWriteMode;
+  public void setOverWriteMode(boolean newMode) {
+    this.overWriteMode = newMode;
   }
+
+
+  /**
+   * Some common matchers that may be used to control the content to write to xml.
+   */
+  public static class Matcher {
+
+      public static final PmMatcher TABLE = builder().pmClass(PmTableImpl.class).build();
+      public static final PmMatcher TABLE_ROW = builder().parent(TABLE).matcher(new PmMatcher() {
+        @Override
+        public boolean doesMatch(PmObject pm) {
+          return ((PmTableImpl<?, ?>)pm.getPmParent()).getRowPms().contains(pm);
+        }
+      }).build();
+      public static final PmMatcher TABLE_COL = builder().pmClass(PmTableCol.class).build();
+      public static final PmMatcher TABLE_COL_SORT_ORDER_ATTR = builder().parent(PmTableCol.class).name("sortOrderAttr").build();
+      public static final PmMatcher TABLE_COL_CMD_SORT = builder().parent(PmTableCol.class).name("cmdSort").build();
+      public static final PmMatcher TABLE_PAGER = builder().parent(PmTableImpl.class).pmClass(PmPager.class).build();
+
+      /**
+       * Short cut helper. Creates a {@link PmVisitorMatcherBuilder}.
+       *
+       * @return a new builder instance.
+       */
+      protected static PmVisitorMatcherBuilder builder() {
+          return new PmVisitorMatcherBuilder();
+      }
+
+  }
+
 }

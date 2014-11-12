@@ -51,7 +51,7 @@ public class VisibleStateXmlCallBack implements PmVisitHierarchyCallBack {
 
   private XmlPmObjectBase xmlRoot, newestXml;
   private Deque<XmlPmObjectBase> parents = new LinkedList<XmlPmObjectBase>();
-  private Collection<VisibleStatePropertyMatcher> excludedProperties = new ArrayList<VisibleStatePropertyMatcher>();
+  private Collection<VisibleStateAspectMatcher> excludedProperties = new ArrayList<VisibleStateAspectMatcher>();
 
   /**
    * Defines filters for properties to exclude from the xml.
@@ -61,7 +61,7 @@ public class VisibleStateXmlCallBack implements PmVisitHierarchyCallBack {
    * @param excludedProperties Match rules for the properties to exclude.
    * @return self reference for fluent programming.
    */
-  public VisibleStateXmlCallBack exclude(Collection<VisibleStatePropertyMatcher> excludedProperties) {
+  public VisibleStateXmlCallBack exclude(Collection<VisibleStateAspectMatcher> excludedProperties) {
     if (excludedProperties != null) {
       this.excludedProperties.addAll(excludedProperties);
     }
@@ -76,14 +76,14 @@ public class VisibleStateXmlCallBack implements PmVisitHierarchyCallBack {
    * @param excludedProperties Match rules for the properties to exclude.
    * @return self reference for fluent programming.
    */
-  public VisibleStateXmlCallBack exclude(VisibleStatePropertyMatcher... excludedProperties) {
+  public VisibleStateXmlCallBack exclude(VisibleStateAspectMatcher... excludedProperties) {
     this.excludedProperties.addAll(Arrays.asList(excludedProperties));
     return this;
   }
 
   @Override
   public PmVisitResult visit(PmObject pm) {
-    Set<VisibleStateProperty> hiddenProps = getHiddenProps(pm);
+    Set<VisibleStateAspect> hiddenProps = getHiddenProps(pm);
 
     if (pm instanceof PmAttr) {
       newestXml = visitAttr((PmAttr<?>) pm, hiddenProps);
@@ -113,15 +113,15 @@ public class VisibleStateXmlCallBack implements PmVisitHierarchyCallBack {
       xmlRoot = newestXml;
     }
 
-    return hiddenProps.contains(VisibleStateProperty.CHILDREN)
+    return hiddenProps.contains(VisibleStateAspect.CHILDREN)
         ? PmVisitResult.SKIP_CHILDREN
         : PmVisitResult.CONTINUE;
   }
 
   // XXX oboede: change to positive logic.
-  private Set<VisibleStateProperty> getHiddenProps(PmObject pm) {
-    Set<VisibleStateProperty> props = new HashSet<VisibleStateProperty>();
-    for (VisibleStatePropertyMatcher m : excludedProperties) {
+  private Set<VisibleStateAspect> getHiddenProps(PmObject pm) {
+    Set<VisibleStateAspect> props = new HashSet<VisibleStateAspect>();
+    for (VisibleStateAspectMatcher m : excludedProperties) {
       if (m.getPmMatcher().doesMatch(pm)) {
         props.addAll(m.getProperties());
       }
@@ -129,48 +129,48 @@ public class VisibleStateXmlCallBack implements PmVisitHierarchyCallBack {
     return props;
   }
 
-  private XmlPmObjectBase visitObject(PmObject pm, XmlPmObjectBase xmlObject, Set<VisibleStateProperty> hiddenProps) {
+  private XmlPmObjectBase visitObject(PmObject pm, XmlPmObjectBase xmlObject, Set<VisibleStateAspect> hiddenProps) {
     boolean pmReadonly = pm.isPmReadonly();
 
     if (getParent() != null) {
       getParent().children.add(xmlObject);
     }
 
-    if (!hiddenProps.contains(VisibleStateProperty.NAME)) {
+    if (!hiddenProps.contains(VisibleStateAspect.NAME)) {
       xmlObject.name = pm.getPmName();
     }
 
     // Enabled is only important if it is different to the read-only tree state.
     // Otherwise it's redundant.
-    if (!hiddenProps.contains(VisibleStateProperty.ENABLED)) {
+    if (!hiddenProps.contains(VisibleStateAspect.ENABLED)) {
       if (pmReadonly == pm.isPmEnabled()) {
         xmlObject.enabled = pm.isPmEnabled();
       }
     }
 
-    if (!hiddenProps.contains(VisibleStateProperty.TITLE)) {
+    if (!hiddenProps.contains(VisibleStateAspect.TITLE)) {
       if (!StringUtils.isBlank(pm.getPmTitle())) {
         xmlObject.title = pm.getPmTitle();
       }
     }
 
-    if (!hiddenProps.contains(VisibleStateProperty.TOOLTIP)) {
+    if (!hiddenProps.contains(VisibleStateAspect.TOOLTIP)) {
       if (!StringUtils.isBlank(pm.getPmTooltip())) {
         xmlObject.tooltip = pm.getPmTooltip();
       }
     }
 
-    if (!hiddenProps.contains(VisibleStateProperty.ICON)) {
+    if (!hiddenProps.contains(VisibleStateAspect.ICON)) {
       xmlObject.icon = pm.getPmIconPath();
     }
 
-    if (!hiddenProps.contains(VisibleStateProperty.STYLECLASS)) {
+    if (!hiddenProps.contains(VisibleStateAspect.STYLECLASS)) {
         if (!pm.getPmStyleClasses().isEmpty()) {
         xmlObject.styleClass = StringUtils.join(pm.getPmStyleClasses(), ", ");
       }
     }
 
-    if (!hiddenProps.contains(VisibleStateProperty.READONLY)) {
+    if (!hiddenProps.contains(VisibleStateAspect.READONLY)) {
       // The iteration assumes at the root element a write-enabled tree.
       // Otherwise it will be reported.
       boolean parentReadOnly = (getParent() != null)
@@ -182,7 +182,7 @@ public class VisibleStateXmlCallBack implements PmVisitHierarchyCallBack {
       }
     }
 
-    if (!hiddenProps.contains(VisibleStateProperty.MESSAGES)) {
+    if (!hiddenProps.contains(VisibleStateAspect.MESSAGES)) {
       for (PmMessage m : PmMessageApi.getMessages(pm)) {
         XmlPmMessage xmlMsg = new XmlPmMessage();
         xmlMsg.severity = m.getSeverity().toString();
@@ -194,18 +194,18 @@ public class VisibleStateXmlCallBack implements PmVisitHierarchyCallBack {
     return xmlObject;
   }
 
-  private XmlPmAttr visitAttr(PmAttr<?> pm, Set<VisibleStateProperty> hideProps) {
+  private XmlPmAttr visitAttr(PmAttr<?> pm, Set<VisibleStateAspect> hideProps) {
     XmlPmAttr xmlPmAttr = new XmlPmAttr();
     visitObject(pm, xmlPmAttr, hideProps);
 
-    if (!hideProps.contains(VisibleStateProperty.OPTIONS)) {
+    if (!hideProps.contains(VisibleStateAspect.OPTIONS)) {
       List<String> oTitles = PmOptionSetUtil.getOptionTitles(pm.getOptionSet());
       if (!oTitles.isEmpty()) {
         xmlPmAttr.options = StringUtils.join(oTitles, "|");
       }
     }
 
-    if (!hideProps.contains(VisibleStateProperty.VALUE)) {
+    if (!hideProps.contains(VisibleStateAspect.VALUE)) {
       xmlPmAttr.value = pm.getValueLocalized();
     }
     return xmlPmAttr;

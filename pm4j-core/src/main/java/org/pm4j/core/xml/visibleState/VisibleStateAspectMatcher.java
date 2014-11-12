@@ -8,14 +8,14 @@ import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.api.PmVisitorApi.PmMatcher;
 
 /**
- * Checks for defined PMs, whether a property is part of a defined property set.
+ * Checks for defined PMs, whether an aspect is part of a defined property set.
  *
  * @author Olaf Boede
  */
-public class VisibleStatePropertyMatcher {
+public class VisibleStateAspectMatcher {
 
   private final PmMatcher pmMatcher;
-  private final Set<VisibleStateProperty> properties;
+  private final Set<VisibleStateAspect> properties;
 
   /**
    * Constructor for a matcher that will be applied for all PMs.
@@ -23,7 +23,7 @@ public class VisibleStatePropertyMatcher {
    * @param properties
    *          The set of properties that match.
    */
-  public VisibleStatePropertyMatcher(VisibleStateProperty... properties) {
+  public VisibleStateAspectMatcher(VisibleStateAspect... properties) {
     this(null, properties);
   }
 
@@ -43,11 +43,11 @@ public class VisibleStatePropertyMatcher {
    * @param properties
    *          The set of properties that match.
    */
-  public VisibleStatePropertyMatcher(PmMatcher pmMatcher, VisibleStateProperty... properties) {
+  public VisibleStateAspectMatcher(PmMatcher pmMatcher, VisibleStateAspect... properties) {
     this.pmMatcher = pmMatcher != null
         ? pmMatcher
         : ALWAYS_TRUE_PM_MATCHER;
-    this.properties = new HashSet<VisibleStateProperty>(Arrays.asList(properties));
+    this.properties = new HashSet<VisibleStateAspect>(Arrays.asList(properties));
   }
 
   /**
@@ -61,7 +61,7 @@ public class VisibleStatePropertyMatcher {
    * @return <code>true</code> if the PM matcher matches and the property is
    *         part of the defined property set.
    */
-  public boolean doesMatch(PmObject pm, VisibleStateProperty property) {
+  public boolean doesMatch(PmObject pm, VisibleStateAspect property) {
     if (pmMatcher != null && !pmMatcher.doesMatch(pm)) {
       return false;
     }
@@ -78,7 +78,7 @@ public class VisibleStatePropertyMatcher {
   /**
    * @return the set of matching properties. Never <code>null</code>.
    */
-  public Set<VisibleStateProperty> getProperties() {
+  public Set<VisibleStateAspect> getProperties() {
     return properties;
   }
 

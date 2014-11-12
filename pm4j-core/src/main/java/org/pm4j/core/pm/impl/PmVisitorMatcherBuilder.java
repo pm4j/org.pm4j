@@ -1,5 +1,9 @@
 package org.pm4j.core.pm.impl;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.api.PmVisitorApi.PmMatcher;
 
@@ -15,6 +19,7 @@ public class PmVisitorMatcherBuilder {
   private PmMatcher parentMatcher;
   private Class<?> pmClass;
   private String namePattern;
+  private List<PmMatcher> subMatcher = new ArrayList<PmMatcher>();
 
   /**
    * Adds a match condition:<br>
@@ -66,13 +71,24 @@ public class PmVisitorMatcherBuilder {
   }
 
   /**
+   * Adds an additional matcher to consider when this matcher gets evaluated.
+   *
+   * @param matcher The matcher
+   * @return The builder reference for fluent programming style support.
+   */
+  public PmVisitorMatcherBuilder matcher(PmMatcher matcher) {
+    subMatcher.add(matcher);
+    return this;
+  }
+
+  /**
    * Builds the matcher and clear this builder instance.
    * The builder is ready for building the next matcher.
    *
    * @return the matcher.
    */
   public PmMatcher build() {
-    PmMatcherImpl m = new PmMatcherImpl(parentMatcher, pmClass, namePattern);
+    PmMatcherImpl m = new PmMatcherImpl(parentMatcher, pmClass, namePattern, subMatcher);
     clear();
     return m;
   }
@@ -97,23 +113,38 @@ public class PmVisitorMatcherBuilder {
     private PmMatcher parentMatcher;
     private Class<?> pmClass;
     private String pmNamePattern;
+    private List<PmMatcher> subMatcher;
 
     /**
      * @param parentClass
      * @param pmNamePattern See {@link java.util.regex.Pattern}
      */
-    public PmMatcherImpl(PmMatcher parentMatcher, Class<?> pmClass, String pmNamePattern) {
+    @SuppressWarnings("unchecked")
+    public PmMatcherImpl(PmMatcher parentMatcher, Class<?> pmClass, String pmNamePattern, List<PmMatcher> subMatcher) {
       this.parentMatcher = parentMatcher;
       this.pmClass = pmClass;
       this.pmNamePattern = pmNamePattern;
+      this.subMatcher = subMatcher != null && !subMatcher.isEmpty()
+                          ? subMatcher
+                          : Collections.EMPTY_LIST;
     }
 
     @Override
     public boolean doesMatch(PmObject pm) {
-      return pm != null &&
-             doesParentMatch(pm) &&
-             doesPmClassMatch(pm) &&
-             doesNameMatch(pm);
+      if (pm == null ||
+          !doesParentMatch(pm) ||
+          !doesPmClassMatch(pm) ||
+          !doesNameMatch(pm)) {
+        return false;
+      }
+
+      for (PmMatcher m : subMatcher) {
+        if (!m.doesMatch(pm)) {
+          return false;
+        }
+      }
+
+      return true;
     }
 
     private boolean doesPmClassMatch(PmObject pm) {

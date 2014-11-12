@@ -5,7 +5,7 @@ package org.pm4j.core.xml.visibleState;
  *
  * @author Olaf Boede
  */
-public enum VisibleStateProperty {
+public enum VisibleStateAspect {
   // common PM properties
   NAME,
   ENABLED,

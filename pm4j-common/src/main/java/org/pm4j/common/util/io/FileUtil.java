@@ -5,12 +5,17 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Scanner;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * Convenience methods for handling {@link File}s.
  *
  * @author Olaf Boede
  */
 public class FileUtil {
+
+  private static final Log LOG = LogFactory.getLog(FileUtil.class);
 
   /**
    * Reads a complete text file.
@@ -58,8 +63,15 @@ public class FileUtil {
    * @return the result of {@link File#delete()}.
    */
   public static boolean delete(File file) {
-    System.gc();
-    return file.delete();
+    if (file.exists()) {
+      // TODO oboede: workaround for Windows. Find a reliable way to delete a file.
+      System.gc();
+      if (! file.delete()) {
+        LOG.warn("Can't delete file: " + file);
+        return false;
+      }
+    }
+    return true;
   }
 
 
