@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.pm4j.common.util.reflection.ClassUtil;
+import org.pm4j.common.util.reflection.PrefixUtil;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmInject;
@@ -47,32 +48,33 @@ public class DiResolverFactoryPmInjectSetterByParentOfType implements DiResolver
     public void resolveDi(PmObject pm) {
       for (MethodData md : annotatedMethods) {
         Object value = PmUtil.findPmParentOfType(pm, md.type);
-        DiResolverUtil.validateGetterReturnsNull(pm, md.method);
-        DiResolverUtil.validateValidValue(pm, md.annotation.nullAllowed(), md.method, value);
-        DiResolverUtil.setValue(pm, md.method, value);
+        DiResolverUtil.validateGetterReturnsNull(pm, md.getter);
+        DiResolverUtil.setValue(pm, md.setter, md.annotation.nullAllowed(), value);
       }
     }
   }
 
-  static class MethodData {
-    final Method method;
+  private static class MethodData {
+    final Method setter;
+    final Method getter;
     final PmInject annotation;
     final Class<?> type;
 
     public MethodData(Method method, PmInject annotation) {
-      this.method = method;
+      this.setter = method;
+      this.getter = PrefixUtil.findGetterForSetter(setter);
       this.annotation = annotation;
       this.type = getSetterParamType(method, annotation);
     }
 
-    private Class<?> getSetterParamType(Method m, PmInject annotation) {
+    private static Class<?> getSetterParamType(Method setter, PmInject annotation) {
       if (annotation.mode() != Mode.PARENT_OF_TYPE) {
         return null;
       }
 
-      Class<?>[] params = m.getParameterTypes();
+      Class<?>[] params = setter.getParameterTypes();
       if (params.length != 1) {
-        throw new PmRuntimeException("Unable to apply @PmInject to a setter method with more than one parameter.\nMethod: " + m);
+        throw new PmRuntimeException("Unable to apply @PmInject to a setter method with more than one parameter.\nMethod: " + setter);
       }
       return params[0];
     }

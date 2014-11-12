@@ -49,8 +49,7 @@ public class DiResolverFactoryPmInjectFieldByParentOfType implements DiResolverF
         Field f = e.getKey();
         DiResolverUtil.validateFieldIsNull(pm, f);
         Object value = PmUtil.findPmParentOfType(pm, f.getType());
-        DiResolverUtil.validateValidValue(pm, e.getValue(), f, value);
-        DiResolverUtil.setValue(pm, f, value);        
+        DiResolverUtil.setValue(pm, f, e.getValue(), value);        
       }
     }
   }

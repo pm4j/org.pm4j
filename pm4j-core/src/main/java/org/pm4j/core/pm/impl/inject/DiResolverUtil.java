@@ -6,6 +6,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.pm4j.common.util.reflection.PrefixUtil;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmDefaults;
 import org.pm4j.core.pm.PmObject;
@@ -69,36 +70,23 @@ public class DiResolverUtil  {
    * @throws PmRuntimeException if the getter can't be access or returns anything other than null
    * 
    * @param pm the instance to validate
-   * @param setter the setter for which a getter is to be found and used for validation
+   * @param getter the getter to be called to determine the value
    */
-  static void validateGetterReturnsNull(PmObject pm, Method setter) {
-    String getterName = setter.getName().replaceFirst("^set", "get");
+  static void validateGetterReturnsNull(PmObject pm, Method getter) {
+    if (getter == null) {
+      // simply don't check if there is already a value in the field
+      return;
+    }
     Object value = null;
     try {
-      Method getter = setter.getDeclaringClass().getMethod(getterName);
       value = getter.invoke(pm);
     } catch (Exception ex) {
-      throw new PmRuntimeException(pm, "Can't invoke getter for '" + setter.getName() + "' in class '"
+      throw new PmRuntimeException(pm, "Can't invoke getter '" + getter.getName() + "' in class '"
           + pm.getClass().getName() + "'.", ex);
     }
     if (value != null) {
-      throw new PmRuntimeException(pm, "Can't initialize setter '" + setter.getName() + "' in class '"
+      throw new PmRuntimeException(pm, "Can't initialize setter '" + PrefixUtil.setterNameForGetter(getter.getName()) + "' in class '"
           + pm.getClass().getName() + "'.  Already has value: " + value );
-    }
-  }
-
-  /**
-   * @throws PmRuntimeException if 'value' is null but null not allowed
-   * @param pm the related Pm instance
-   * @param nullAllowed whether a null value is allowed or not
-   * @param target related field or method
-   * @param value the value to validate
-   */
-  static void validateValidValue(PmObject pm, boolean nullAllowed, AccessibleObject target, Object value) {
-    if (value == null && !nullAllowed) {
-      throw new PmRuntimeException(pm, "Found value for dependency injection of '" + target +
-          "' was null. But null value is not allowed. " +
-          "You may configure null-value handling using @PmInject(nullAllowed=...).");
     }
   }
 
@@ -107,9 +95,11 @@ public class DiResolverUtil  {
    * 
    * @param pm the Pm instance
    * @param field the field to set
+   * @param nullAllowed true if null value is allowed, false if a null value raises an exception
    * @param value the value to set into the field
    */
-  static void setValue(PmObject pm, Field field, Object value) {
+  static void setValue(PmObject pm, Field field, boolean nullAllowed, Object value) {
+    validateValidValue(pm, field, nullAllowed, value);
     try {
       field.set(pm, value);
     } catch (Exception ex) {
@@ -123,9 +113,11 @@ public class DiResolverUtil  {
    * 
    * @param pm the Pm instance
    * @param method the setter method to call
+   * @param nullAllowed true if null value is allowed, false if a null value raises an exception
    * @param value the value to set into the field
    */
-  static void setValue(PmObject pm, Method method, Object value) {
+  static void setValue(PmObject pm, Method method, boolean nullAllowed, Object value) {
+    validateValidValue(pm, method, nullAllowed, value);
     try {
       method.invoke(pm, value);
     } catch (Exception ex) {
@@ -148,4 +140,19 @@ public class DiResolverUtil  {
     }
     return value;
   }
+  
+  /**
+   * @throws PmRuntimeException if 'value' is null but null not allowed
+   * @param pm the related Pm instance
+   * @param target related field or method
+   * @param nullAllowed whether a null value is allowed or not
+   * @param value the value to validate
+   */
+  static private void validateValidValue(PmObject pm, AccessibleObject target, boolean nullAllowed, Object value) {
+    if (value == null && !nullAllowed) {
+      throw new PmRuntimeException(pm, "Found value for dependency injection of '" + target +
+          "' was null. But null value is not allowed. " +
+          "You may configure null-value handling using @PmInject(nullAllowed=...).");
+    }
+  }  
 }

@@ -222,7 +222,7 @@ public class ClassUtil {
     Class<?> cls = object.getClass();
 
     for (Method m : cls.getMethods()) {
-      if ((!forbiddenGetterNames.contains(m.getName())) && PrefixUtil.isGetter(m)) {
+      if ((!forbiddenGetterNames.contains(m.getName())) && PrefixUtil.hasGetterPrefix(m)) {
         try {
           Object getterResult = m.invoke(object, EMPTY_OBJECT_ARRAY);
           if (getterResult == fieldValue) {
@@ -343,7 +343,7 @@ public class ClassUtil {
   public static Set<String> allPublicGetterNames(Class<?> forClass) {
     Set<String> nonAttributeGetterNames = new HashSet<String>();
     for (Method m : forClass.getMethods()) {
-      if (PrefixUtil.isGetter(m)) {
+      if (PrefixUtil.hasGetterPrefix(m)) {
         nonAttributeGetterNames.add(m.getName());
       }
     }

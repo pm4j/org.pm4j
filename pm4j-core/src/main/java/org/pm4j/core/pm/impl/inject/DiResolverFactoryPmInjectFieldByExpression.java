@@ -60,8 +60,7 @@ public class DiResolverFactoryPmInjectFieldByExpression implements DiResolverFac
         DiResolverUtil.validateFieldIsNull(pm, f);
         PathResolver r = e.getValue();
         Object value = DiResolverUtil.resolveValue(pm, f, r);
-        DiResolverUtil.validateValidValue(pm, r.isNullAllowed(), f, value);
-        DiResolverUtil.setValue(pm, f, value);
+        DiResolverUtil.setValue(pm, f, r.isNullAllowed(), value);
       }
     }
   }
