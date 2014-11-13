@@ -224,8 +224,9 @@ public class PmSnapshotTestTool {
   /**
    * Defines whether the tool write or overwrites the expected state files or not.
    */
-  public void setOverWriteMode(boolean newMode) {
+  public PmSnapshotTestTool setOverWriteMode(boolean newMode) {
     this.overWriteMode = newMode;
+    return this;
   }
 
 

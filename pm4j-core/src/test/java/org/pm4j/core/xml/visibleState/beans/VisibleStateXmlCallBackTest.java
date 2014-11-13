@@ -1,4 +1,4 @@
-package org.pm4j.core.xml.visibleState;
+package org.pm4j.core.xml.visibleState.beans;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -33,6 +33,7 @@ import org.pm4j.core.pm.impl.PmCommandImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
 import org.pm4j.core.pm.impl.PmTableColImpl;
 import org.pm4j.core.pm.impl.PmTableImpl;
+import org.pm4j.core.xml.visibleState.beans.VisibleStateXmlCallBack;
 import org.pm4j.core.xml.visibleState.beans.XmlPmAttr;
 import org.pm4j.core.xml.visibleState.beans.XmlPmObjectBase;
 
@@ -84,7 +85,7 @@ public class VisibleStateXmlCallBackTest {
         "    <attr name=\"requiredAttr\" title=\"Required Attr\" styleClass=\"required\"/>\n" +
         "    <attr name=\"readOnlyAttr\" readOnly=\"true\" title=\"Readonly Attr\"/>\n" +
         "    <cmd name=\"cmdDoSomething\" title=\"Do something\"/>\n" +
-        "    <table name=\"table\" title=\"Table\">\n" +
+        "    <table name=\"table\" rows=\"2\" title=\"Table\">\n" +
         "        <column name=\"name\" title=\"Name\">\n" +
         "            <attr name=\"sortOrderAttr\" enabled=\"false\" title=\"Sort Order\">\n" +
         "                <value></value>\n" +

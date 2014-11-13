@@ -1,4 +1,4 @@
-package org.pm4j.core.xml.visibleState;
+package org.pm4j.core.xml.visibleState.beans;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,17 +26,8 @@ import org.pm4j.core.pm.impl.PmTableUtil;
 import org.pm4j.core.pm.impl.PmUtil;
 import org.pm4j.core.pm.impl.PmVisitorImpl;
 import org.pm4j.core.pm.impl.options.PmOptionSetUtil;
-import org.pm4j.core.xml.visibleState.beans.XmlPmAttr;
-import org.pm4j.core.xml.visibleState.beans.XmlPmCommand;
-import org.pm4j.core.xml.visibleState.beans.XmlPmConversation;
-import org.pm4j.core.xml.visibleState.beans.XmlPmMessage;
-import org.pm4j.core.xml.visibleState.beans.XmlPmObject;
-import org.pm4j.core.xml.visibleState.beans.XmlPmObjectBase;
-import org.pm4j.core.xml.visibleState.beans.XmlPmTab;
-import org.pm4j.core.xml.visibleState.beans.XmlPmTabSet;
-import org.pm4j.core.xml.visibleState.beans.XmlPmTable;
-import org.pm4j.core.xml.visibleState.beans.XmlPmTableCol;
-import org.pm4j.core.xml.visibleState.beans.XmlPmTableRow;
+import org.pm4j.core.xml.visibleState.VisibleStateAspect;
+import org.pm4j.core.xml.visibleState.VisibleStateAspectMatcher;
 
 /**
  * A visitor that reports the visible state of a PM sub-tree to
@@ -92,7 +83,7 @@ public class VisibleStateXmlCallBack implements PmVisitHierarchyCallBack {
     } else if (pm instanceof PmConversation) {
       newestXml = visitObject(pm, new XmlPmConversation(), hiddenProps);
     } else if (pm instanceof PmTable) {
-      newestXml = visitObject(pm, new XmlPmTable(), hiddenProps);
+      newestXml = visitTable((PmTable<?>) pm, hiddenProps);
     } else if (pm instanceof PmTableCol) {
       newestXml = visitObject(pm, new XmlPmTableCol(), hiddenProps);
     }
@@ -194,9 +185,8 @@ public class VisibleStateXmlCallBack implements PmVisitHierarchyCallBack {
     return xmlObject;
   }
 
-  private XmlPmAttr visitAttr(PmAttr<?> pm, Set<VisibleStateAspect> hideProps) {
+  private XmlPmObjectBase visitAttr(PmAttr<?> pm, Set<VisibleStateAspect> hideProps) {
     XmlPmAttr xmlPmAttr = new XmlPmAttr();
-    visitObject(pm, xmlPmAttr, hideProps);
 
     if (!hideProps.contains(VisibleStateAspect.OPTIONS)) {
       List<String> oTitles = PmOptionSetUtil.getOptionTitles(pm.getOptionSet());
@@ -208,8 +198,18 @@ public class VisibleStateXmlCallBack implements PmVisitHierarchyCallBack {
     if (!hideProps.contains(VisibleStateAspect.VALUE)) {
       xmlPmAttr.value = pm.getValueLocalized();
     }
-    return xmlPmAttr;
+    return visitObject(pm, xmlPmAttr, hideProps);
   }
+
+  private XmlPmObjectBase visitTable(PmTable<?> pm, Set<VisibleStateAspect> hideProps) {
+    XmlPmTable xmlPmTable = new XmlPmTable();
+
+    if (!hideProps.contains(VisibleStateAspect.NUM_OF_ROWS)) {
+      xmlPmTable.rows = pm.getTotalNumOfPmRows();
+    }
+    return visitObject(pm, xmlPmTable, hideProps);
+  }
+
 
   @Override
   public PmVisitResult enterChildren(PmObject pmParent, Iterable<PmObject> pmChildren) {

@@ -18,5 +18,7 @@ public enum VisibleStateAspect {
   CHILDREN,
   // attribute properties
   OPTIONS,
-  VALUE
+  VALUE,
+  // table properties
+  NUM_OF_ROWS
 }

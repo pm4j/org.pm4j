@@ -15,6 +15,7 @@ import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.api.PmVisitorApi.PmMatcher;
 import org.pm4j.core.pm.api.PmVisitorApi.PmVisitHint;
 import org.pm4j.core.pm.impl.PmVisitorImpl;
+import org.pm4j.core.xml.visibleState.beans.VisibleStateXmlCallBack;
 import org.pm4j.core.xml.visibleState.beans.XmlPmObject;
 import org.pm4j.core.xml.visibleState.beans.XmlPmObjectBase;
 

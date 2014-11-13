@@ -78,25 +78,32 @@ public class PmSnapshotTestToolTest {
 
   @Test
   public void testWriteAndCompareDifferentSnapshot() {
-    MiniTestPm pm = new MiniTestPm();
-    // create the snapshot
-    File file = snap.snapshot(pm, "testWriteAndCompareDifferentSnapshot");
-    assertTrue(file.exists());
+    File expectedStateFile = snap.getExpectedStateFile("testWriteAndCompareDifferentSnapshot");
+    File currentStateFile = snap.getActualStateFile("testWriteAndCompareDifferentSnapshot");
 
-    // modify PM and compare to the changed state
-    PmAssert.setValue(pm.stringAttr, "hi");
     try {
-      snap.snapshot(pm, "testWriteAndCompareDifferentSnapshot");
-      Assert.fail("The snapshot compare operation should fail.");
-    } catch (ComparisonFailure e) {
-      File currentStateFile = snap.getActualStateFile("testWriteAndCompareDifferentSnapshot");
-      assertTrue("The current state file should stay alive for manual compare operations.\n" + currentStateFile,
-                 currentStateFile.exists());
+      assertFalse("File should not exist: " + expectedStateFile.toString(), expectedStateFile.exists());
+      assertFalse("File should not exist: " + currentStateFile.toString(), currentStateFile.exists());
 
+      MiniTestPm pm = new MiniTestPm();
+      // create the snapshot
+      snap.snapshot(pm, "testWriteAndCompareDifferentSnapshot");
+      assertTrue("File should exist: " + expectedStateFile.toString(), expectedStateFile.exists());
+
+      // modify PM and compare to the changed state
+      PmAssert.setValue(pm.stringAttr, "hi");
+      try {
+        snap.snapshot(pm, "testWriteAndCompareDifferentSnapshot");
+        Assert.fail("The snapshot compare operation should fail.");
+      } catch (ComparisonFailure e) {
+        assertTrue("The current state file should stay alive for manual compare operations.\n" + currentStateFile,
+                   currentStateFile.exists());
+      }
+    } finally {
+      FileUtil.deleteFileAndEmptyParentDirs(expectedStateFile);
       FileUtil.deleteFileAndEmptyParentDirs(currentStateFile);
     }
 
-    FileUtil.deleteFileAndEmptyParentDirs(file);
   }
 
 
