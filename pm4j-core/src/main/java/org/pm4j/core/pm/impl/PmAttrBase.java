@@ -1642,7 +1642,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
       Cache cacheForOptions = InternalPmCacheCfgUtil.findCacheForPropertyInPmHierarchy(this, CacheKind.OPTIONS, cacheAnnotations);
       myMetaData.cacheStrategyForOptions = InternalCacheStrategyFactory.create(CacheKind.OPTIONS, cacheForOptions);
       myMetaData.cacheClearOnForOptions = cacheForOptions != null ? cacheForOptions.clearOn() : null;
-          
+
       Cache cacheForValue = InternalPmCacheCfgUtil.findCacheForPropertyInPmHierarchy(this, CacheKind.VALUE, cacheAnnotations);
       myMetaData.cacheStrategyForValue = InternalCacheStrategyFactory.create(CacheKind.VALUE, cacheForValue);
       myMetaData.cacheClearOnForValue = cacheForValue != null ? cacheForValue.clearOn() : null;
@@ -1653,15 +1653,6 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     }
   }
 
-  @Override
-  protected void initCacheClearOn(PmObjectBase.MetaData pmObjectBaseMetaData) {
-    super.initCacheClearOn(pmObjectBaseMetaData);
-    MetaData metaData = (MetaData) pmObjectBaseMetaData;
-    InternalPmCacheCfgUtil.registerClearOnListeners(this, CacheKind.OPTIONS, metaData.cacheClearOnForOptions);
-    InternalPmCacheCfgUtil.registerClearOnListeners(this, CacheKind.VALUE, metaData.cacheClearOnForValue);
-  }
-  
-  
   private void zz_readBeanValidationRestrictions(Class<?> beanClass, PmAttrCfg fieldAnnotation, MetaData myMetaData) {
     if (BeanValidationPmUtil.getBeanValidator() == null)
       return;
@@ -1739,7 +1730,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     private String                          formatResKey;
     private String                          defaultValueString;
     private CacheStrategy                   cacheStrategyForOptions = CacheStrategyNoCache.INSTANCE;
-    private Observe[]                       cacheClearOnForOptions;    
+    private Observe[]                       cacheClearOnForOptions;
     private CacheStrategy                   cacheStrategyForValue   = CacheStrategyNoCache.INSTANCE;
     private Observe[]                       cacheClearOnForValue;
     private StringConverter<?>              stringConverter;
@@ -1763,6 +1754,13 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
      */
     public MetaData(int maxDefaultLen) {
       this.maxLenDefault = maxDefaultLen;
+    }
+
+    @Override
+    protected void onPmInit(PmObjectBase pm) {
+      super.onPmInit(pm);
+      InternalPmCacheCfgUtil.registerClearOnListeners(pm, CacheKind.OPTIONS, cacheClearOnForOptions);
+      InternalPmCacheCfgUtil.registerClearOnListeners(pm, CacheKind.VALUE, cacheClearOnForValue);
     }
 
     /** @return The statically defined option set algorithm. */

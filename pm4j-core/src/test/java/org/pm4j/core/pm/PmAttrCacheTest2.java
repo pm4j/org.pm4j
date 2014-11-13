@@ -21,7 +21,6 @@ import org.pm4j.core.pm.impl.PmConversationImpl;
 import org.pm4j.core.pm.impl.PmElementBase;
 import org.pm4j.core.pm.impl.PmElementImpl;
 import org.pm4j.core.pm.impl.PmInitApi;
-import org.pm4j.tools.test.PmAssert;
 
 public class PmAttrCacheTest2 {
 
@@ -127,7 +126,7 @@ public class PmAttrCacheTest2 {
     assertEquals("A set backing value call only resets the cache of the used attribute.",
                  "INITIAL", pPm.sCachedByClassSpec.getValue());
   }
-  
+
   @Test
   public void testClearedOnValueChangeInHierarcy() {
     MyPojo p = new MyPojo();
@@ -137,52 +136,52 @@ public class PmAttrCacheTest2 {
     p.s = "INITIAL";
     assertEquals("INITIAL", pPm.s.getValue());
     assertEquals("INITIAL", pPm.sCachedAndClearedOnValueChangeInHierarcy.getValue());
-    
+
     p.s = "BEAN_VALUE_CHANGED";
     assertEquals("INITIAL", pPm.sCachedAndClearedOnValueChangeInHierarcy.getValue());
-    
+
     pPm.tab.stringInTab.setValue("changed");
     assertEquals("BEAN_VALUE_CHANGED", pPm.sCachedAndClearedOnValueChangeInHierarcy.getValue());
   }
-  
+
   @Test
   public void testClearedOnValueChange() {
     MyPojo p = new MyPojo();
     MyPojoPm pPm = new MyPojoPm(new PmConversationImpl(), p);
-    
+
     p.s = "INITIAL";
     assertEquals("INITIAL", pPm.s.getValue());
     assertEquals("INITIAL", pPm.sCachedAndClearedOnValueChange.getValue());
-    
+
     // we can't track bean value changes only PM value changes
     p.s = "BEAN_VALUE_CHANGED";
     assertEquals("BEAN_VALUE_CHANGED", pPm.s.getValue());
     assertEquals("INITIAL", pPm.sCachedAndClearedOnValueChange.getValue());
-    
+
     // change s and see if the cache is cleared
     pPm.s.setValue("PM_VALUE_CHANGED");
     assertEquals("PM_VALUE_CHANGED", pPm.s.getValue());
     assertEquals("PM_VALUE_CHANGED", pPm.sCachedAndClearedOnValueChange.getValue());
-    
+
     // change s2 and see if the cache is cleared
     p.s = "BEAN_VALUE_CHANGED_AGAIN";
     pPm.s2.setValue("PM_VALUE_CHANGED");
     assertEquals("BEAN_VALUE_CHANGED_AGAIN", pPm.s.getValue());
     assertEquals("BEAN_VALUE_CHANGED_AGAIN", pPm.sCachedAndClearedOnValueChange.getValue());
   }
-  
+
   @Test
   public void testMixedAnnotations() {
     try {
       PmInitApi.ensurePmSubTreeInitialization(new MyPmWithMixedAnnotations(new PmConversationImpl()));
     } catch (PmRuntimeException e) {
-      assertEquals(IllegalStateException.class, e.getCause().getClass());
+      assertEquals(PmRuntimeException.class, e.getCause().getClass());
     }
-    
+
     try {
       PmInitApi.ensurePmSubTreeInitialization(new MyPmWithMixedAnnotations2(new PmConversationImpl()));
     } catch (PmRuntimeException e) {
-      assertEquals(IllegalStateException.class, e.getCause().getClass());      
+      assertEquals(PmRuntimeException.class, e.getCause().getClass());
     }
   }
 
@@ -190,9 +189,9 @@ public class PmAttrCacheTest2 {
 
   public static class MyPojo {
     public String s;
-    
+
     public String s2;
-    
+
     // Has getters and setters to allow xPath access (used by valuePath annotation in MyPojoPm).
     public String getS() { return s; }
     public void setS(String s) { this.s = s; }
@@ -204,11 +203,11 @@ public class PmAttrCacheTest2 {
 
   @PmBeanCfg(beanClass=MyPojo.class)
   public static class MyPojoPm extends PmBeanImpl<MyPojo> {
-    
+
     public final PmAttrString s = new PmAttrStringImpl(this);
-    
+
     public final PmAttrString s2 = new PmAttrStringImpl(this);
-    
+
     public final MyTab tab = new MyTab(this);
 
     @PmCacheCfg2(@Cache(property=CacheKind.ALL))
@@ -230,18 +229,14 @@ public class PmAttrCacheTest2 {
     @PmCacheCfg2(@Cache(property = CacheKind.ALL, clear=Clear.NEVER))
     @PmAttrCfg(valuePath="pmBean.s")
     public final PmAttrString sCachedButClearNever = new MyCachedAttrClass(this);
-    
+
     @PmCacheCfg2(@Cache(property = CacheKind.ALL, clearOn=@Observe(pm={"pmParent.s", "pmParent.s2"})))
     @PmAttrCfg(valuePath="pmBean.s")
     public final PmAttrString sCachedAndClearedOnValueChange = new PmAttrStringImpl(this);
-    
+
     @PmCacheCfg2(@Cache(property = CacheKind.ALL, clearOn=@Observe(pm={"pmParent.tab"}, observePmTree=true)))
     @PmAttrCfg(valuePath="pmBean.s")
-    public final PmAttrString sCachedAndClearedOnValueChangeInHierarcy = new PmAttrStringImpl(this) {
-      protected void initCacheClearOn(org.pm4j.core.pm.impl.PmObjectBase.MetaData pmObjectBaseMetaData) {
-        super.initCacheClearOn(pmObjectBaseMetaData);
-      };
-    };
+    public final PmAttrString sCachedAndClearedOnValueChangeInHierarcy = new PmAttrStringImpl(this);
 
     public MyPojoPm(PmObject pmParent, MyPojo myPojo) {
       super(pmParent, myPojo);
@@ -268,7 +263,7 @@ public class PmAttrCacheTest2 {
       super(pmParentBean);
     }
   };
-  
+
   @PmCacheCfg2(@Cache(property = CacheKind.ALL))
   public static class MyPmWithMixedAnnotations extends PmBeanImpl<MyPojo> {
 
@@ -279,7 +274,7 @@ public class PmAttrCacheTest2 {
     @PmCacheCfg(title=org.pm4j.core.pm.annotation.PmCacheCfg.CacheMode.OFF)
     public final PmAttrString s = new PmAttrStringImpl(this);
   }
-  
+
   @PmCacheCfg(all=org.pm4j.core.pm.annotation.PmCacheCfg.CacheMode.ON)
   public static class MyPmWithMixedAnnotations2 extends PmBeanImpl<MyPojo> {
 
@@ -290,12 +285,12 @@ public class PmAttrCacheTest2 {
     @PmCacheCfg2(@Cache(property = CacheKind.TITLE, mode = CacheMode.OFF))
     public final PmAttrString s = new PmAttrStringImpl(this);
   }
-  
+
   public static class MyTab extends PmElementImpl implements PmTab {
     public MyTab(PmObject pmParent) {
       super(pmParent);
     }
-    
+
     public final PmAttrString stringInTab = new PmAttrStringImpl(this);
   }
 
