@@ -3,19 +3,13 @@ package org.pm4j.core.xml.visibleState.beans;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-
 import org.junit.Test;
-import org.pm4j.common.exception.CheckedExceptionWrapper;
 import org.pm4j.core.pm.PmAttrBoolean;
 import org.pm4j.core.pm.PmAttrString;
 import org.pm4j.core.pm.PmCommand;
@@ -34,9 +28,6 @@ import org.pm4j.core.pm.impl.PmConversationImpl;
 import org.pm4j.core.pm.impl.PmTableColImpl;
 import org.pm4j.core.pm.impl.PmTableImpl;
 import org.pm4j.core.xml.visibleState.VisibleStateUtil;
-import org.pm4j.core.xml.visibleState.beans.VisibleStateXmlCallBack;
-import org.pm4j.core.xml.visibleState.beans.XmlPmAttr;
-import org.pm4j.core.xml.visibleState.beans.XmlPmObjectBase;
 
 /**
  * Tests for {@link VisibleStateXmlCallBack}.
