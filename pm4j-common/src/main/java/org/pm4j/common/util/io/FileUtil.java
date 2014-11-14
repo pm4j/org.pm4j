@@ -76,7 +76,7 @@ public class FileUtil {
 
 
   /**
-   * Deletes the given file.
+   * Deletes the given file and all empty parent directories.
    * <p>
    * Triggers internally a GC loop. That seems to be required on Windows systems.
    *

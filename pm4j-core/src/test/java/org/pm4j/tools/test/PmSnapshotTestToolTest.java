@@ -63,17 +63,21 @@ public class PmSnapshotTestToolTest {
   @Ignore("TODO: the final delete does not work reliable if started by maven.")
   public void testWriteAndCompareSameSnapshot() {
     // create the snapshot
-    File file = snap.snapshot(new MiniTestPm(), "testWriteAndCompareSameSnapshot");
-    assertTrue(file.exists());
+    File file = null;
 
-    // compare to the snapshot
-    snap.snapshot(new MiniTestPm(), "testWriteAndCompareSameSnapshot");
+    try {
+      file = snap.snapshot(new MiniTestPm(), "testWriteAndCompareSameSnapshot");
+      assertTrue(file.exists());
 
-    File currentStateFile = snap.getActualStateFile("testWriteAndCompareSameSnapshot");
-    assertFalse("A current state file should not exist in case of no difference.\n" + currentStateFile,
-                currentStateFile.exists());
+      // compare to the snapshot
+      snap.snapshot(new MiniTestPm(), "testWriteAndCompareSameSnapshot");
 
-    FileUtil.deleteFileAndEmptyParentDirs(file);
+      File currentStateFile = snap.getActualStateFile("testWriteAndCompareSameSnapshot");
+      assertFalse("A current state file should not exist in case of no difference.\n" + currentStateFile,
+              currentStateFile.exists());
+    } finally {
+      FileUtil.deleteFileAndEmptyParentDirs(file);
+    }
   }
 
   @Test

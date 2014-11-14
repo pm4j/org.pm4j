@@ -63,7 +63,7 @@ public class PmVisitorMatcherBuilder {
    * Adds a match condition:<br>
    * The PM should have a parent that implement or extends the given interface or class.
    *
-   * @param parentMatcher The parent type condition.
+   * @param parentClass The parent type condition.
    * @return The builder reference for fluent programming style support.
    */
   public PmVisitorMatcherBuilder parent(Class<?> parentClass) {
@@ -97,6 +97,7 @@ public class PmVisitorMatcherBuilder {
     parentMatcher = null;
     pmClass = null;
     namePattern = null;
+    subMatcher.clear();
   }
 
 
@@ -115,10 +116,6 @@ public class PmVisitorMatcherBuilder {
     private String pmNamePattern;
     private List<PmMatcher> subMatcher;
 
-    /**
-     * @param parentClass
-     * @param pmNamePattern See {@link java.util.regex.Pattern}
-     */
     @SuppressWarnings("unchecked")
     public PmMatcherImpl(PmMatcher parentMatcher, Class<?> pmClass, String pmNamePattern, List<PmMatcher> subMatcher) {
       this.parentMatcher = parentMatcher;

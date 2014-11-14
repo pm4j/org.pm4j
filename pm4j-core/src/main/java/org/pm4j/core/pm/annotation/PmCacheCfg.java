@@ -15,15 +15,7 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.FIELD})
-@Documented
 public @interface PmCacheCfg {
-
-  public @interface Observe {
-    String value();
-    boolean observePmTree() default false;
-  }
-
-  Observe[] invalidate() default {};
 
   public enum CacheMode {
     /** Not specified. */
@@ -37,9 +29,6 @@ public @interface PmCacheCfg {
      * <p>
      * This option will currently only be considered in web application environment. In
      * other cases (rich client) it has the effect of the option {@link #OFF}.
-     * <p>
-     * Additionally it's not easy to unit test, because there is currently no support for
-     * unit test 'requests'.
      */
     REQUEST
   }

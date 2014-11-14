@@ -33,6 +33,7 @@ import org.pm4j.core.pm.impl.PmCommandImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
 import org.pm4j.core.pm.impl.PmTableColImpl;
 import org.pm4j.core.pm.impl.PmTableImpl;
+import org.pm4j.core.xml.visibleState.VisibleStateUtil;
 import org.pm4j.core.xml.visibleState.beans.VisibleStateXmlCallBack;
 import org.pm4j.core.xml.visibleState.beans.XmlPmAttr;
 import org.pm4j.core.xml.visibleState.beans.XmlPmObjectBase;
@@ -64,19 +65,19 @@ public class VisibleStateXmlCallBackTest {
   public void testWriteTableRowPm() {
     assertEquals(
         "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
-        "<row name=\"testRowPm\" title=\"Row\" xmlns=\"http://org.pm4j/xml/visualState\">\n" +
+        "<row xmlns=\"http://org.pm4j/xml/visualState\" name=\"testRowPm\" title=\"Row\">\n" +
         "    <attr name=\"name\" title=\"Name\">\n" +
-        "        <value>Hello</value>\n" +
+                "        <value>Hello</value>\n" +
         "    </attr>\n" +
         "</row>\n"
-    , toXmlString(new TestPm().table.getRowPms().get(0)));
+    , VisibleStateUtil.toXmlString(new TestPm().table.getRowPms().get(0)));
   }
 
   @Test
   public void testWriteTestPm() {
     assertEquals(
         "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
-        "<conversation name=\"testPm\" title=\"Test PM\" xmlns=\"http://org.pm4j/xml/visualState\">\n" +
+        "<conversation xmlns=\"http://org.pm4j/xml/visualState\" name=\"testPm\" title=\"Test PM\">\n" +
         "    <attr name=\"boolAttr\" title=\"Boolean Attr\">\n" +
         "        <tooltip>A simple boolean attribute.</tooltip>\n" +
         "        <value>No</value>\n" +
@@ -107,27 +108,7 @@ public class VisibleStateXmlCallBackTest {
         "        </row>\n" +
         "    </table>\n" +
         "</conversation>\n"
-    , toXmlString(new TestPm()));
-  }
-
-  private String toXmlString(PmObject pm) {
-    VisibleStateXmlCallBack cb = new VisibleStateXmlCallBack();
-    PmVisitorApi.visit(pm, cb);
-
-    StringWriter sw = new StringWriter();
-    try {
-      getMarshaller().marshal(cb.getXmlRoot(), sw);
-    } catch (JAXBException e) {
-      throw new CheckedExceptionWrapper(e);
-    }
-    return sw.getBuffer().toString();
-  }
-
-  private Marshaller getMarshaller() throws JAXBException {
-    JAXBContext jc = JAXBContext.newInstance(XmlPmObjectBase.class);
-    Marshaller m = jc.createMarshaller();
-    m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-    return m;
+    , VisibleStateUtil.toXmlString(new TestPm()));
   }
 
   @PmTitleCfg(title = "Test PM")

@@ -234,8 +234,8 @@ public class PmConversationImpl extends PmElementBase implements PmConversation 
    *
    * @param pmExceptionHandler
    */
-  public void setPmExceptionHandler(PmExceptionHandler localPmExceptionHandler) {
-    this.pmExceptionHandler = localPmExceptionHandler;
+  public void setPmExceptionHandler(PmExceptionHandler pmExceptionHandler) {
+    this.pmExceptionHandler = pmExceptionHandler;
   }
 
   /**

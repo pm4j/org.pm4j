@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collection;
+import java.util.Collections;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
@@ -58,8 +59,8 @@ public class VisibleStateUtil {
         PmObject rootPm,
         File file,
         Collection<PmMatcher> excludedPms,
-        Collection<VisibleStateAspectMatcher> excludedProperties) {
-    XmlPmObjectBase xmlObject = toXmlObject(rootPm, excludedPms, excludedProperties);
+        Collection<VisibleStateAspectMatcher> excludedAspects) {
+    XmlPmObjectBase xmlObject = toXmlObject(rootPm, excludedPms, excludedAspects);
     OutputStream os = null;
     try {
       os = new FileOutputStream(file);
@@ -83,8 +84,8 @@ public class VisibleStateUtil {
   public static String toXmlString(
         PmObject rootPm,
         Collection<PmMatcher> excludedPms,
-        Collection<VisibleStateAspectMatcher> excludedProperties) {
-    XmlPmObjectBase xmlObject = toXmlObject(rootPm, excludedPms, excludedProperties);
+        Collection<VisibleStateAspectMatcher> excludedAspects) {
+    XmlPmObjectBase xmlObject = toXmlObject(rootPm, excludedPms, excludedAspects);
 
     ByteArrayOutputStream os = new ByteArrayOutputStream();
     try {
@@ -98,5 +99,13 @@ public class VisibleStateUtil {
     }
   }
 
+    /**
+     * @param rootPm The PM to report.
+     * @return the XML string.
+     */
+    public static String toXmlString(
+            PmObject rootPm) {
+        return toXmlString(rootPm, Collections.EMPTY_LIST, Collections.EMPTY_LIST);
+    }
 
 }

@@ -17,6 +17,13 @@ public class VisibleStateAspectMatcher {
   private final PmMatcher pmMatcher;
   private final Set<VisibleStateAspect> properties;
 
+  private static final PmMatcher ALWAYS_TRUE_PM_MATCHER = new PmMatcher() {
+    @Override
+    public boolean doesMatch(PmObject pm) {
+      return true;
+    }
+  };
+
   /**
    * Constructor for a matcher that will be applied for all PMs.
    *
@@ -26,14 +33,6 @@ public class VisibleStateAspectMatcher {
   public VisibleStateAspectMatcher(VisibleStateAspect... properties) {
     this(null, properties);
   }
-
-
-  private static final PmMatcher ALWAYS_TRUE_PM_MATCHER = new PmMatcher() {
-    @Override
-    public boolean doesMatch(PmObject pm) {
-      return true;
-    }
-  };
 
   /**
    * @param pmMatcher

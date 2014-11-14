@@ -23,14 +23,26 @@ public class SrcFileUtil {
     return new File(rootUrl.getFile());
   }
 
-  public static File getDirRelativeToClassloaderRoot(File classLoaderRoot, String relPath) {
+  /**
+   * @param startDir The directory to start from.
+   * @param relPath A relative path that may contain '..' sub strings identifying parent directories. E.g. '../../myDir'.
+   * @return The related target directory.
+   */
+  public static File getDirRelativeToClassloaderRoot(File startDir, String relPath) {
     while (relPath.startsWith("../")) {
       relPath = relPath.substring(3, relPath.length());
-      classLoaderRoot = classLoaderRoot.getParentFile();
+      startDir = startDir.getParentFile();
     }
-    return new File(classLoaderRoot, relPath);
+    return new File(startDir, relPath);
   }
 
+  /**
+   * Provides the package directory for the given class.
+   *
+   * @param rootDir The root directory to start from.
+   * @param forClass The class to read the package information from.
+   * @return The directory that corresponds to the package.
+   */
   public static File getPkgDir(File rootDir, Class<?> forClass) {
     String relPkgName = forClass.getPackage().getName().replace('.', File.separatorChar);
     return new File(rootDir, relPkgName);

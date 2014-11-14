@@ -109,7 +109,7 @@ public class PmSnapshotTestTool {
       try {
         FileUtil.createFile(expectedFile);
         VisibleStateUtil.toXmlFile(rootPm, expectedFile, excludedPms, excludedAspects);
-        LOG.info("Created snapshot file: " + expectedFile);
+        LOG.warn("Created snapshot file: " + expectedFile);
       } catch (Exception e) {
         throw new PmRuntimeException(rootPm, "Unable to write file " + expectedFile, e);
       }

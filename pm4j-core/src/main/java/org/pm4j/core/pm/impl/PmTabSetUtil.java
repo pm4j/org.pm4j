@@ -16,7 +16,7 @@ public class PmTabSetUtil {
    * <p>
    * If the given PM is not used in a {@link PmTabSet}, this method returns <code>false</code>.
    *
-   * @param pm
+   * @param tabPm
    *          The PM to check.
    * @return <code>true</code> if it is the current tab of its direct {@link PmTabSet} parent.
    */

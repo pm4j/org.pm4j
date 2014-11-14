@@ -80,7 +80,7 @@ public class PmVisitorApi {
      * for service based tables. */
     ALL_TABLE_ROWS,
     /** Skip of yet initialized child pm's. */
-    SKIP_NOT_INITIALIZED,
+    SKIP_NOT_INITIALIZED
   }
 
   /**

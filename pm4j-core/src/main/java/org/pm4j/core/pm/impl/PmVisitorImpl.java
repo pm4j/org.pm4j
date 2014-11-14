@@ -242,7 +242,7 @@ public class PmVisitorImpl {
    * @return <code>true</code> if its <code>isPmVisible()</code> returns
    *         <code>true</code> and it is not a child of an inactive tab.
    */
-  protected boolean isVisible(PmObject pm) {
+  private boolean isVisible(PmObject pm) {
       PmObject parentPm = pm.getPmParent();
       // Skip invisible tab content. Only the current tab is really visible.
       if (parentPm != null &&
