@@ -16,19 +16,19 @@ final class InternalCacheStrategyFactory {
   }
   
   /**
-   * Creates a cache strategy for the given cacheable property.
+   * Creates a cache strategy for the given cache aspect.
    *
-   * @param property the cacheable property to create a cache strategy for
+   * @param aspect the cache aspect to create a cache strategy for
    * @param cache the cache definition
    * @return a cache strategy
    */
-  static CacheStrategy create(CacheKind property, Cache cache) {
+  static CacheStrategy create(CacheKind aspect, Cache cache) {
     CacheMode mode = (cache != null) ? cache.mode() : CacheMode.OFF;
     switch (mode) {
     case OFF:
       return CacheStrategyNoCache.INSTANCE;
     case ON:
-      switch (property) {
+      switch (aspect) {
       case ENABLEMENT:
         return new CacheStrategyForEnablement(cache.clear());
       case OPTIONS:
@@ -40,10 +40,10 @@ final class InternalCacheStrategyFactory {
       case VISIBILITY:
         return new CacheStrategyForVisibility(cache.clear());
       default:
-        throw new PmRuntimeException("Unsupported cache property '"+property+"'.");
+        throw new PmRuntimeException("Unsupported cache property '"+aspect+"'.");
       }
     case REQUEST:
-      return new CacheStrategyRequest("CACHE_"+property+"_IN_REQUEST", property.toString().substring(0, 2).toLowerCase());
+      return new CacheStrategyRequest("CACHE_"+aspect+"_IN_REQUEST", aspect.toString().substring(0, 2).toLowerCase());
     default:
       throw new PmRuntimeException("Unable to find cache strategy for CacheMode '" + cache.mode() + "'.");
     }

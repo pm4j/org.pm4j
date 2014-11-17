@@ -1050,7 +1050,7 @@ public abstract class PmObjectBase implements PmObject {
       metaData.titleCache = InternalPmCacheCfgUtil.readCacheMetaData(this, CacheKind.TITLE, cacheAnnotations);
       metaData.enablementCache = InternalPmCacheCfgUtil.readCacheMetaData(this, CacheKind.ENABLEMENT, cacheAnnotations);
       metaData.visibilityCache = InternalPmCacheCfgUtil.readCacheMetaData(this, CacheKind.VISIBILITY, cacheAnnotations);
-      metaData.cacheClearBehavior = AnnotationUtil.evaluateCacheClearBehavior(this, cacheAnnotations);
+      metaData.cacheClearBehavior = InternalPmCacheCfgUtil.evaluateCacheClearBehavior(this, cacheAnnotations);
     }
 
     // -- Check for registered domain specific annotations

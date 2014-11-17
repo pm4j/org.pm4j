@@ -16,6 +16,7 @@ import org.pm4j.core.pm.PmEventListener;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmCacheCfg;
 import org.pm4j.core.pm.annotation.PmCacheCfg.CacheMode;
+import org.pm4j.core.pm.annotation.PmCacheCfg.Clear;
 import org.pm4j.core.pm.annotation.PmCacheCfg2;
 import org.pm4j.core.pm.annotation.PmCacheCfg2.Cache;
 import org.pm4j.core.pm.annotation.PmCacheCfg2.Observe;
@@ -153,7 +154,7 @@ class InternalPmCacheCfgUtil {
     );
   
   @SuppressWarnings("deprecation")
-  private static final Map<CacheKind, String> ATTR_CONSTANT_FOR_CACHE_KIND =
+  private static final Map<CacheKind, String> ATTR_CONSTANT_FOR_ASPECT =
     MapUtil.makeFixHashMap(
       CacheKind.ENABLEMENT, PmCacheCfg.ATTR_ENABLEMENT,
       CacheKind.OPTIONS,    PmCacheCfg.ATTR_OPTIONS,
@@ -161,6 +162,24 @@ class InternalPmCacheCfgUtil {
       CacheKind.VALUE,      PmCacheCfg.ATTR_VALUE,
       CacheKind.VISIBILITY, PmCacheCfg.ATTR_VISIBILITY
     );      
+  
+  /**
+   * Evaluates the cache clear behavior for the deprecated {@link PmCacheCfg}
+   * annotations. 
+   * 
+   * @param pmObject the pm object in question
+   * @param cacheAnnotations the list of determined cache cfg annotations 
+   * @return the cache clear behavior if the PM is annotated with {@link PmCacheCfg},
+   *         <code>null</code> if the pm is annotated with {@link PmCacheCfg2}
+   */
+  @SuppressWarnings({"rawtypes", "unchecked", "deprecation"})
+  static Clear evaluateCacheClearBehavior(PmObjectBase pmObject, List cacheAnnotations) {
+    if (PmCacheCfg.class.isAssignableFrom(cacheAnnotations.get(0).getClass())) {
+      return AnnotationUtil.evaluateCacheClearBehavior(pmObject, cacheAnnotations);
+    }
+    
+    return null;
+  }
   
   /**
    * Finds all {@link PmCacheCfg} and {@link PmCacheCfg2} annotations in the
@@ -194,30 +213,30 @@ class InternalPmCacheCfgUtil {
   }
 
   /**
-   * Finds a PMs cache definition for a particular cacheable property
+   * Finds a PMs cache definition for a particular cache aspect
    * within the PMs hierarchy.
    *
    * @param pm the PM in question
-   * @param property the cacheable property to find a cache definition for
+   * @param aspect the cache aspect to find a cache definition for
    * @param cacheAnnotations all cache annotations of the PM hierarchy,
    *        @see #findCacheCfgsInPmHierarchy(PmObjectBase, List)
-   * @return the cache definition for the cacheable property in question
+   * @return the cache definition for the cache aspect in question
    *         or <code>null</code>
    */
-  static Cache findCacheForPropertyInPmHierarchy(
+  static Cache findCacheForAspectInPmHierarchy(
       PmObjectBase pm,
-      CacheKind property,
+      CacheKind aspect,
       Collection<PmCacheCfg2> cacheAnnotations)
   {
     PmCacheCfg2 localCfg =  AnnotationUtil.findAnnotation(pm, PmCacheCfg2.class);
     if (localCfg != null) {
-      return getCacheByProperty(localCfg, property);
+      return getCacheByAspect(localCfg, aspect);
     }
 
     for (PmCacheCfg2 parentCfg : cacheAnnotations) {
       // consider all parent annotations that are
       // flagged as cascaded
-      Cache parentCache = getCacheByProperty(parentCfg, property);
+      Cache parentCache = getCacheByAspect(parentCfg, aspect);
       if (parentCache != null && parentCache.cascade()) {
         return parentCache;
       }
@@ -227,27 +246,27 @@ class InternalPmCacheCfgUtil {
   }
   
   @SuppressWarnings({"deprecation", "unchecked", "rawtypes"})
-  static CacheMetaData readCacheMetaData(PmObjectBase pmObjectBase, CacheKind property, List cacheAnnotations) {
+  static CacheMetaData readCacheMetaData(PmObjectBase pmObjectBase, CacheKind aspect, List cacheAnnotations) {
     if (PmCacheCfg2.class.isAssignableFrom(cacheAnnotations.get(0).getClass())) {
-      Cache cache = findCacheForPropertyInPmHierarchy(pmObjectBase, property, cacheAnnotations);
+      Cache cache = findCacheForAspectInPmHierarchy(pmObjectBase, aspect, cacheAnnotations);
       return (cache == null)
           ? CacheMetaData.NO_CACHE
-          : new CacheMetaData(InternalCacheStrategyFactory.create(property, cache), cache);
+          : new CacheMetaData(InternalCacheStrategyFactory.create(aspect, cache), cache);
     } else {
-      return new CacheMetaData(AnnotationUtil.evaluateCacheStrategy(pmObjectBase, ATTR_CONSTANT_FOR_CACHE_KIND.get(property), cacheAnnotations, MODE_TO_STRATEGY_MAP_FOR_CACHE_KIND.get(property)));
+      return new CacheMetaData(AnnotationUtil.evaluateCacheStrategy(pmObjectBase, ATTR_CONSTANT_FOR_ASPECT.get(aspect), cacheAnnotations, MODE_TO_STRATEGY_MAP_FOR_CACHE_KIND.get(aspect)));
     }
   }
 
   /**
    * Registers value change listeners on the PMs defined by the given {@link Observe}
-   * annotations. The value change listeners resets the particular cacheable property
+   * annotations. The value change listeners resets the particular cache aspect
    * of the given PM object if the observed target PM values are changed.
    *
    * @param pmObject the PM object to reset the cache for
-   * @param property the cacheable property that shall be reseted
+   * @param aspect the cache  aspect that shall be reseted
    * @param clearOns defines a set of PMs that shall be observed for value changes
    */
-  static void registerClearOnListeners(final PmObject pmObject, final CacheKind property, Observe[] clearOns) {
+  static void registerClearOnListeners(final PmObject pmObject, final CacheKind aspect, Observe[] clearOns) {
     if (clearOns == null || clearOns.length == 0) {
       return;
     }
@@ -255,13 +274,13 @@ class InternalPmCacheCfgUtil {
     PmEventListener e = new PmEventListener() {
       @Override
       public void handleEvent(PmEvent event) {
-        PmCacheApi.clearPmCache(pmObject, property);
+        PmCacheApi.clearPmCache(pmObject, aspect);
       }
     };
     
     // Cause we use week references we store a hard reference in the
     // pm property map to define the lifecycle of the listener
-    setClearOnListenerAsProperty(pmObject, e, property);
+    setClearOnListenerAsProperty(pmObject, e, aspect);
 
     for (Observe clearOn : clearOns) {
       for (String expression : clearOn.pm()) {
@@ -303,8 +322,8 @@ class InternalPmCacheCfgUtil {
     foundAnnotations.add(cfg);
   }
   
-  private static void setClearOnListenerAsProperty(PmObject pmObject, PmEventListener e, CacheKind property) {
-    String propertyName = "_pmCacheClearListener" + property;
+  private static void setClearOnListenerAsProperty(PmObject pmObject, PmEventListener e, CacheKind aspect) {
+    String propertyName = "_pmCacheClearListener" + aspect;
     if (pmObject.getPmProperty(propertyName) != null) {
       throw new PmRuntimeException(pmObject, "There is already a listener stored under property name '"+propertyName+"'");
     }
@@ -312,16 +331,16 @@ class InternalPmCacheCfgUtil {
   }
 
   /**
-   * Gets the cache definition for the given property from the given cache configuration.
+   * Gets the cache definition for the given aspect from the given cache configuration.
    *
    * @param cfg the cache configuration
-   * @param property the property to get the cache definition for
-   * @return the cache definition for the given property or <code>null</code>
+   * @param aspect the aspect to get the cache definition for
+   * @return the cache definition for the given aspect or <code>null</code>
    */
-  private static Cache getCacheByProperty(PmCacheCfg2 cfg, CacheKind property) {
+  private static Cache getCacheByAspect(PmCacheCfg2 cfg, CacheKind aspect) {
     for (Cache cache : cfg.value()) {
-      List<CacheKind> propertyList = Arrays.asList(cache.property());
-      if (propertyList.contains(property) || propertyList.contains(CacheKind.ALL)) {
+      List<CacheKind> aspectList = Arrays.asList(cache.property());
+      if (aspectList.contains(aspect) || aspectList.contains(CacheKind.ALL)) {
         return cache;
       }
     }
