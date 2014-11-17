@@ -3,6 +3,7 @@ package org.pm4j.common.util.io;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Scanner;
 
 import org.apache.commons.logging.Log;
@@ -32,6 +33,24 @@ public class FileUtil {
   }
 
   /**
+   * Writes the given {@link String} to a file.
+   *
+   * @param file The file to write.
+   * @param string
+   */
+  public static void stringToFile(File file, String string) {
+    PrintWriter pw = null;
+    try {
+      pw = new PrintWriter(file);
+      pw.print(string);
+    } catch (Exception e) {
+      throw new RuntimeException("Failed to write to file " + file, e);
+    } finally {
+      if (pw != null) pw.close();
+    }
+  }
+
+  /**
    * Creates a file (incl. parent path if needed).
    * <p>
    * It's ok if the file already exists.
@@ -42,7 +61,6 @@ public class FileUtil {
    *
    * @throws IOException
    */
-
   public static void createFile(File file) {
     if (!file.getParentFile().exists()) {
       file.getParentFile().mkdirs();

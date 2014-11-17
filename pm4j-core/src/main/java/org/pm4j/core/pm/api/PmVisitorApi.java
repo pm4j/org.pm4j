@@ -8,7 +8,7 @@ import org.pm4j.core.pm.impl.PmVisitorImpl;
  * PM tree visitor functionality.
  *
  * @author DZABEL
- * @author olaf boede
+ * @author Olaf Boede
  */
 public class PmVisitorApi {
 
@@ -81,19 +81,6 @@ public class PmVisitorApi {
     ALL_TABLE_ROWS,
     /** Skip of yet initialized child pm's. */
     SKIP_NOT_INITIALIZED
-  }
-
-  /**
-   * A predicate for filtering visited items.
-   * <p>
-   * TODO: will replace most {@link PmVisitHint}s soon.
-   */
-  public interface PmMatcher {
-    /**
-     * @param pm The PM to check.
-     * @return <code>true</code> if the given PM matches the condition.
-     */
-    boolean doesMatch(PmObject pm);
   }
 
   /**

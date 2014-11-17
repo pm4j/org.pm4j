@@ -56,11 +56,11 @@ public class VisibleStateXmlCallBackTest {
   public void testWriteTableRowPm() {
     assertEquals(
         "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
-        "<row xmlns=\"http://org.pm4j/xml/visualState\" name=\"testRowPm\" title=\"Row\">\n" +
+        "<row xmlns=\"http://org.pm4j/xml/visibleState\" name=\"testRowPm\" title=\"Row\">\n" +
         "    <attr name=\"name\" title=\"Name\">\n" +
                 "        <value>Hello</value>\n" +
         "    </attr>\n" +
-        "</row>\n"
+        "</row>"
     , VisibleStateUtil.toXmlString(new TestPm().table.getRowPms().get(0)));
   }
 
@@ -68,7 +68,7 @@ public class VisibleStateXmlCallBackTest {
   public void testWriteTestPm() {
     assertEquals(
         "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
-        "<conversation xmlns=\"http://org.pm4j/xml/visualState\" name=\"testPm\" title=\"Test PM\">\n" +
+        "<conversation xmlns=\"http://org.pm4j/xml/visibleState\" name=\"testPm\" title=\"Test PM\">\n" +
         "    <attr name=\"boolAttr\" title=\"Boolean Attr\">\n" +
         "        <tooltip>A simple boolean attribute.</tooltip>\n" +
         "        <value>No</value>\n" +
@@ -78,15 +78,15 @@ public class VisibleStateXmlCallBackTest {
         "    <attr name=\"readOnlyAttr\" readOnly=\"true\" title=\"Readonly Attr\"/>\n" +
         "    <cmd name=\"cmdDoSomething\" title=\"Do something\"/>\n" +
         "    <table name=\"table\" rows=\"2\" title=\"Table\">\n" +
-        "        <column name=\"name\" title=\"Name\">\n" +
-        "            <attr name=\"sortOrderAttr\" enabled=\"false\" title=\"Sort Order\">\n" +
-        "                <value></value>\n" +
+        "        <column name=\"name\" title=\"Name\"/>\n" +
+//        "            <attr name=\"sortOrderAttr\" enabled=\"false\" title=\"Sort Order\">\n" +
+//        "                <value></value>\n" +
         // FIXME oboede: neutral and no value is redundant.
-        "                <options>||Ascending|Descending</options>\n" +
-        "            </attr>\n" +
+//        "                <options>||Ascending|Descending</options>\n" +
+//        "            </attr>\n" +
         // TODO oboede: provide default icon resources and corresponding resource property entries.
-        "            <cmd name=\"cmdSort\" enabled=\"false\" title=\"Sort\" icon=\"pmSortOrder.NEUTRAL_iconDisabled\"/>\n" +
-        "        </column>\n" +
+//        "            <cmd name=\"cmdSort\" enabled=\"false\" title=\"Sort\" icon=\"pmSortOrder.NEUTRAL_iconDisabled\"/>\n" +
+//        "        </column>\n" +
         "        <row name=\"testRowPm\" title=\"Row\">\n" +
         "            <attr name=\"name\" title=\"Name\">\n" +
         "                <value>Hello</value>\n" +
@@ -98,7 +98,7 @@ public class VisibleStateXmlCallBackTest {
         "            </attr>\n" +
         "        </row>\n" +
         "    </table>\n" +
-        "</conversation>\n"
+        "</conversation>"
     , VisibleStateUtil.toXmlString(new TestPm()));
   }
 

@@ -14,11 +14,11 @@ import org.pm4j.common.util.io.FileUtil;
 import org.pm4j.common.util.io.SrcFileAccessor;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmObject;
+import org.pm4j.core.pm.PmObject.PmMatcher;
 import org.pm4j.core.pm.PmPager;
 import org.pm4j.core.pm.PmTableCol;
-import org.pm4j.core.pm.api.PmVisitorApi.PmMatcher;
 import org.pm4j.core.pm.impl.PmTableImpl;
-import org.pm4j.core.pm.impl.PmVisitorMatcherBuilder;
+import org.pm4j.core.pm.impl.PmMatcherBuilder;
 import org.pm4j.core.xml.visibleState.VisibleStateAspectMatcher;
 import org.pm4j.core.xml.visibleState.VisibleStateUtil;
 
@@ -91,7 +91,8 @@ public class PmSnapshotTestTool {
     if (!isOverWriteMode() && expectedFile.exists()) {
         File actualStateFile = getActualStateFile(fileNameBase);
         String actualStateXmlString = VisibleStateUtil.toXmlString(rootPm, excludedPms, excludedAspects);
-        String expectedStateXmlString = FileUtil.fileToString(expectedFile);
+        // Disturbing Windows carriage return characters need to be removed.
+        String expectedStateXmlString = FileUtil.fileToString(expectedFile).replaceAll("\r\n", "\n");
 
         try {
           Assert.assertEquals(
@@ -99,10 +100,17 @@ public class PmSnapshotTestTool {
               expectedStateXmlString,
               actualStateXmlString);
         } catch (ComparisonFailure e) {
-          LOG.info("Create actual state file " + actualStateFile);
-          FileUtil.createFile(actualStateFile);
-          // TODO oboede: writing the string is more reliable, because a second iteration may behave different (especially in case of bugs).
-          VisibleStateUtil.toXmlFile(rootPm, actualStateFile, excludedPms, excludedAspects);
+          try {
+            LOG.info("Create actual state file " + actualStateFile);
+            FileUtil.createFile(actualStateFile);
+            FileUtil.stringToFile(actualStateFile, actualStateXmlString);
+          } catch (RuntimeException e2) {
+            // If the test gets executed for a compiled .jar it will not be possible
+            // to write the actual state file.
+            // The programmer will usually repeat the test in a development environment.
+            // Then this error will not occur.
+            LOG.error("Unable to write actual state file " + actualStateFile, e2);
+          }
           throw e;
         }
     } else {
@@ -129,7 +137,7 @@ public class PmSnapshotTestTool {
    * @return the directory to write actual state files to.
    */
   protected File getActualStateDir() {
-    return new File(getSrcFileAccessor().getBinPkgDir(), xmlSubDirName());
+    return new File(getSrcFileAccessor().getSrcPkgDir(), xmlSubDirName());
   }
 
   /**
@@ -156,7 +164,7 @@ public class PmSnapshotTestTool {
    * @return the file to write.
    */
   protected File getActualStateFile(String fileNameBase) {
-    return new File(getActualStateDir(), xmlFileName(fileNameBase));
+    return new File(getActualStateDir(), fileNameBase + ".actual.xml");
   }
 
   /**
@@ -168,7 +176,7 @@ public class PmSnapshotTestTool {
    * @return the file to use.
    */
   protected File getExpectedStateFile(String fileNameBase) {
-    return new File(getExpectedStateDir(), xmlFileName(fileNameBase));
+    return new File(getExpectedStateDir(), fileNameBase + ".xml");
   }
 
   /**
@@ -178,18 +186,6 @@ public class PmSnapshotTestTool {
    */
   protected String xmlSubDirName() {
     return StringUtils.uncapitalize(testCtxtClass.getSimpleName());
-  }
-
-  /**
-   * @param fileNameBase
-   *          The file name base string, provided as argument of
-   *          {@link #snapshot(PmObject, String)}.
-   * @return the xml file name.<br>
-   *         The default implementation just adds an '.xml' post fix to the
-   *         given string.
-   */
-  protected String xmlFileName(String fileNameBase) {
-    return fileNameBase + ".xml";
   }
 
   /**
@@ -233,29 +229,31 @@ public class PmSnapshotTestTool {
   /**
    * Some common matchers that may be used to control the content to write to xml.
    */
-  public static class Matcher {
-
-      public static final PmMatcher TABLE = builder().pmClass(PmTableImpl.class).build();
-      public static final PmMatcher TABLE_ROW = builder().parent(TABLE).matcher(new PmMatcher() {
-        @Override
-        public boolean doesMatch(PmObject pm) {
-          return ((PmTableImpl<?, ?>)pm.getPmParent()).getRowPms().contains(pm);
-        }
-      }).build();
-      public static final PmMatcher TABLE_COL = builder().pmClass(PmTableCol.class).build();
-      public static final PmMatcher TABLE_COL_SORT_ORDER_ATTR = builder().parent(PmTableCol.class).name("sortOrderAttr").build();
-      public static final PmMatcher TABLE_COL_CMD_SORT = builder().parent(PmTableCol.class).name("cmdSort").build();
-      public static final PmMatcher TABLE_PAGER = builder().parent(PmTableImpl.class).pmClass(PmPager.class).build();
-
-      /**
-       * Short cut helper. Creates a {@link PmVisitorMatcherBuilder}.
-       *
-       * @return a new builder instance.
-       */
-      protected static PmVisitorMatcherBuilder builder() {
-          return new PmVisitorMatcherBuilder();
-      }
-
-  }
+//  public static class Matcher {
+//
+//      public static final PmMatcher TABLE = builder().pmClass(PmTableImpl.class).build();
+//      public static final PmMatcher TABLE_ROW = builder().parent(TABLE).matcher(new PmMatcher() {
+//        @Override
+//        public boolean doesMatch(PmObject pm) {
+//          return ((PmTableImpl<?, ?>)pm.getPmParent()).getRowPms().contains(pm);
+//        }
+//        @Override
+//        public String toString() { return "PmTableRow"; }
+//      }).build();
+//      public static final PmMatcher TABLE_COL = builder().pmClass(PmTableCol.class).build();
+//      public static final PmMatcher TABLE_COL_SORT_ORDER_ATTR = builder().parent(PmTableCol.class).name("sortOrderAttr").build();
+//      public static final PmMatcher TABLE_COL_CMD_SORT = builder().parent(PmTableCol.class).name("cmdSort").build();
+//      public static final PmMatcher TABLE_PAGER = builder().parent(PmTableImpl.class).pmClass(PmPager.class).build();
+//
+//      /**
+//       * Short cut helper. Creates a {@link PmMatcherBuilder}.
+//       *
+//       * @return a new builder instance.
+//       */
+//      protected static PmMatcherBuilder builder() {
+//          return new PmMatcherBuilder();
+//      }
+//
+//  }
 
 }

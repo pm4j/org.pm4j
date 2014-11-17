@@ -4,22 +4,21 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.pm4j.core.pm.PmObject;
-import org.pm4j.core.pm.api.PmVisitorApi.PmMatcher;
+import org.pm4j.core.pm.PmObject.PmMatcher;
 
 /**
  * A builder for {@link PmMatcher} instances.
  * <p>
- * Is useful to support immutable matcher instances without having too much
- * matcher constructor variants.
+ * Creates {@link PmMatcher} instances without having too much matcher
+ * constructor variants.
  *
  * @author Olaf Boede
  **/
-public class PmVisitorMatcherBuilder {
-  private PmMatcher parentMatcher;
-  private Class<?> pmClass;
-  private String namePattern;
-  private List<PmMatcher> subMatcher = new ArrayList<PmMatcher>();
+public class PmMatcherBuilder {
+
+  private PmMatcherImpl matcher = new PmMatcherImpl();
 
   /**
    * Adds a match condition:<br>
@@ -28,8 +27,8 @@ public class PmVisitorMatcherBuilder {
    * @param pmClass The class or interface condition.
    * @return The builder reference for fluent programming style support.
    */
-  public PmVisitorMatcherBuilder pmClass(Class<?> pmClass) {
-    this.pmClass = pmClass;
+  public PmMatcherBuilder pmClass(Class<?> pmClass) {
+    matcher.pmClass = pmClass;
     return this;
   }
 
@@ -42,10 +41,36 @@ public class PmVisitorMatcherBuilder {
    * @param namePattern The name condition. May be the name string or a pattern like 'cmd.*'.
    * @return The builder reference for fluent programming style support.
    */
-  public PmVisitorMatcherBuilder name(String namePattern) {
-    this.namePattern = namePattern;
+  public PmMatcherBuilder name(String namePattern) {
+    matcher.pmNamePattern = namePattern;
     return this;
   }
+
+  /**
+   * Adds a match condition:<br>
+   * The result of {@link PmObject#isPmEnabled()} should match the given enabled state.
+   *
+   * @param matchingState The enabled state that matches.
+   * @return The builder reference for fluent programming style support.
+   */
+  public PmMatcherBuilder enabled(boolean matchingState) {
+    matcher.enabled = matchingState;
+    return this;
+  }
+
+  /**
+   * Adds a match condition:<br>
+   * The result of {@link PmObject#isPmVisible()} should match the given visible state.
+   *
+   * @param matchingState The visible state that matches.
+   * @return The builder reference for fluent programming style support.
+   */
+  public PmMatcherBuilder visible(boolean matchingState) {
+    matcher.visible = matchingState;
+    return this;
+  }
+
+
 
   /**
    * Adds a match condition:<br>
@@ -54,8 +79,8 @@ public class PmVisitorMatcherBuilder {
    * @param parentMatcher The parent PM condition.
    * @return The builder reference for fluent programming style support.
    */
-  public PmVisitorMatcherBuilder parent(PmMatcher parentMatcher) {
-    this.parentMatcher = parentMatcher;
+  public PmMatcherBuilder parent(PmMatcher parentMatcher) {
+    matcher.parentMatcher = parentMatcher;
     return this;
   }
 
@@ -66,18 +91,21 @@ public class PmVisitorMatcherBuilder {
    * @param parentClass The parent type condition.
    * @return The builder reference for fluent programming style support.
    */
-  public PmVisitorMatcherBuilder parent(Class<?> parentClass) {
+  public PmMatcherBuilder parent(Class<?> parentClass) {
     return parent(new PmClassMatcher(parentClass));
   }
 
   /**
    * Adds an additional matcher to consider when this matcher gets evaluated.
    *
-   * @param matcher The matcher
+   * @param subMatcher The matcher
    * @return The builder reference for fluent programming style support.
    */
-  public PmVisitorMatcherBuilder matcher(PmMatcher matcher) {
-    subMatcher.add(matcher);
+  public PmMatcherBuilder matcher(PmMatcher subMatcher) {
+    if (matcher.subMatcher.isEmpty()) {
+      matcher.subMatcher = new ArrayList<PmObject.PmMatcher>();
+    }
+    matcher.subMatcher.add(subMatcher);
     return this;
   }
 
@@ -88,18 +116,10 @@ public class PmVisitorMatcherBuilder {
    * @return the matcher.
    */
   public PmMatcher build() {
-    PmMatcherImpl m = new PmMatcherImpl(parentMatcher, pmClass, namePattern, subMatcher);
-    clear();
+    PmMatcherImpl m = matcher;
+    matcher = new PmMatcherImpl();
     return m;
   }
-
-  private void clear() {
-    parentMatcher = null;
-    pmClass = null;
-    namePattern = null;
-    subMatcher.clear();
-  }
-
 
   /**
    * A matcher implementation that may match by
@@ -114,24 +134,18 @@ public class PmVisitorMatcherBuilder {
     private PmMatcher parentMatcher;
     private Class<?> pmClass;
     private String pmNamePattern;
-    private List<PmMatcher> subMatcher;
-
-    @SuppressWarnings("unchecked")
-    public PmMatcherImpl(PmMatcher parentMatcher, Class<?> pmClass, String pmNamePattern, List<PmMatcher> subMatcher) {
-      this.parentMatcher = parentMatcher;
-      this.pmClass = pmClass;
-      this.pmNamePattern = pmNamePattern;
-      this.subMatcher = subMatcher != null && !subMatcher.isEmpty()
-                          ? subMatcher
-                          : Collections.EMPTY_LIST;
-    }
+    private Boolean enabled;
+    private Boolean visible;
+    private List<PmMatcher> subMatcher = Collections.emptyList();
 
     @Override
     public boolean doesMatch(PmObject pm) {
       if (pm == null ||
           !doesParentMatch(pm) ||
           !doesPmClassMatch(pm) ||
-          !doesNameMatch(pm)) {
+          !doesNameMatch(pm) ||
+          (visible != null && pm.isPmVisible() != visible) ||
+          (enabled != null && pm.isPmEnabled() != enabled)) {
         return false;
       }
 
@@ -159,6 +173,23 @@ public class PmVisitorMatcherBuilder {
              parentMatcher.doesMatch(pm.getPmParent());
     }
 
+    @Override
+    public String toString() {
+      List<String> parts = new ArrayList<String>();
+      if (parentMatcher != null) {
+        parts.add("parent(" + parentMatcher + ")");
+      }
+      if (pmClass != null) {
+        parts.add(pmClass.getSimpleName());
+      }
+      if (pmNamePattern != null) {
+        parts.add("name=" + pmNamePattern);
+      }
+      if (!subMatcher.isEmpty()) {
+        parts.add(subMatcher.toString());
+      }
+      return StringUtils.join(parts, "&&");
+    }
 
   }
 
@@ -174,6 +205,11 @@ public class PmVisitorMatcherBuilder {
     public boolean doesMatch(PmObject pm) {
       return pm != null &&
              pmClass.isAssignableFrom(pm.getClass());
+    }
+
+    @Override
+    public String toString() {
+      return pmClass.getSimpleName();
     }
   }
 }

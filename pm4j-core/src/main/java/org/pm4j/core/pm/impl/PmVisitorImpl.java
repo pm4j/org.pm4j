@@ -11,6 +11,7 @@ import org.pm4j.common.util.collection.ListUtil;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.PmObject;
+import org.pm4j.core.pm.PmObject.PmMatcher;
 import org.pm4j.core.pm.PmTab;
 import org.pm4j.core.pm.PmTabSet;
 import org.pm4j.core.pm.PmTable;
@@ -19,7 +20,6 @@ import org.pm4j.core.pm.api.PmVisitorApi.PmVisitCallBack;
 import org.pm4j.core.pm.api.PmVisitorApi.PmVisitHierarchyCallBack;
 import org.pm4j.core.pm.api.PmVisitorApi.PmVisitHint;
 import org.pm4j.core.pm.api.PmVisitorApi.PmVisitResult;
-import org.pm4j.core.pm.api.PmVisitorApi.PmMatcher;
 
 /**
  * Visitor implementations. Descends deep first.

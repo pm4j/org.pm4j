@@ -13,7 +13,7 @@ import javax.xml.bind.Marshaller;
 
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmObject;
-import org.pm4j.core.pm.api.PmVisitorApi.PmMatcher;
+import org.pm4j.core.pm.PmObject.PmMatcher;
 import org.pm4j.core.pm.api.PmVisitorApi.PmVisitHint;
 import org.pm4j.core.pm.impl.PmVisitorImpl;
 import org.pm4j.core.xml.visibleState.beans.VisibleStateXmlCallBack;
@@ -103,8 +103,8 @@ public class VisibleStateUtil {
      * @param rootPm The PM to report.
      * @return the XML string.
      */
-    public static String toXmlString(
-            PmObject rootPm) {
+    @SuppressWarnings("unchecked")
+    public static String toXmlString(PmObject rootPm) {
         return toXmlString(rootPm, Collections.EMPTY_LIST, Collections.EMPTY_LIST);
     }
 

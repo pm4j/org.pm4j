@@ -4,8 +4,10 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 import org.pm4j.core.pm.PmObject;
-import org.pm4j.core.pm.api.PmVisitorApi.PmMatcher;
+import org.pm4j.core.pm.PmObject.PmMatcher;
+import org.pm4j.core.pm.impl.PmMatcherBuilder;
 
 /**
  * Checks for defined PMs, whether an aspect is part of a defined property set.
@@ -17,13 +19,6 @@ public class VisibleStateAspectMatcher {
   private final PmMatcher pmMatcher;
   private final Set<VisibleStateAspect> properties;
 
-  private static final PmMatcher ALWAYS_TRUE_PM_MATCHER = new PmMatcher() {
-    @Override
-    public boolean doesMatch(PmObject pm) {
-      return true;
-    }
-  };
-
   /**
    * Constructor for a matcher that will be applied for all PMs.
    *
@@ -31,7 +26,7 @@ public class VisibleStateAspectMatcher {
    *          The set of properties that match.
    */
   public VisibleStateAspectMatcher(VisibleStateAspect... properties) {
-    this(null, properties);
+    this((PmMatcher) null, properties);
   }
 
   /**
@@ -43,10 +38,20 @@ public class VisibleStateAspectMatcher {
    *          The set of properties that match.
    */
   public VisibleStateAspectMatcher(PmMatcher pmMatcher, VisibleStateAspect... properties) {
-    this.pmMatcher = pmMatcher != null
-        ? pmMatcher
-        : ALWAYS_TRUE_PM_MATCHER;
+    this.pmMatcher = pmMatcher;
     this.properties = new HashSet<VisibleStateAspect>(Arrays.asList(properties));
+  }
+
+  /**
+   * Creates an aspect matcher for a PM class.
+   *
+   * @param pmClass
+   *          The PM class to handle.
+   * @param properties
+   *          The set of properties that match.
+   */
+  public VisibleStateAspectMatcher(Class<?> pmClass, VisibleStateAspect... properties) {
+    this(new PmMatcherBuilder().pmClass(pmClass).build(), properties);
   }
 
   /**
@@ -79,6 +84,13 @@ public class VisibleStateAspectMatcher {
    */
   public Set<VisibleStateAspect> getProperties() {
     return properties;
+  }
+
+  @Override
+  public String toString() {
+    String matcher = pmMatcher != null ? pmMatcher.toString() : null;
+    String aspects = StringUtils.join(properties, "|");
+    return StringUtils.join(new Object[] { aspects, matcher }, " where ");
   }
 
 }
