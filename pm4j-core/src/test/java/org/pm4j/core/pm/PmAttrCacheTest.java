@@ -15,6 +15,7 @@ import org.pm4j.core.pm.impl.PmBeanImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
 import org.pm4j.core.pm.impl.PmElementBase;
 
+@Deprecated
 public class PmAttrCacheTest {
 
   @Test
@@ -136,42 +137,6 @@ public class PmAttrCacheTest {
     @PmCacheCfg(value=CacheMode.ON)
     @PmAttrCfg(valuePath="pmBean.s")
     public final PmAttrString sCached = new PmAttrStringImpl(this);
-
-    // Cache -> Cached, ClearOn or ClearedBy
-
-//    @PmCacheCfg2(title=@Cached(clearedBy=@Clear(pm="s", change=ValueChangeKind.VALUE)))
-
-//    /** Caches the result of {@link PmObject#isPmEnabled()} */
-//    @PmCacheCfg2(enabled=@Cached)
-
-//    /** Caches the result of {@link PmAttr#getValue()} */
-//    @PmCacheCfg2()
-
-//    /** Caches the result of {@link PmAttr#getValue()} */
-//    @PmCacheCfg2(value=@Cached)
-
-//    /**
-//     * Caches the result of {@link PmAttr#getOptionSet()}.<br>
-//     * The cache gets cleared if the value of the PM 's' gets changed.
-//     */
-//    @PmCacheCfg2(optionSet=@Cached(
-//                 clearedBy=@Clear(pm="s", change=ValueChangeKind.VALUE)))
-
-//    /**
-//     * Caches the result of {@link PmAttr#getOptionSet()}.<br>
-//     * The cache gets cleared if
-//     * <ul>
-//     *  <li>the value of the PM 's.x.y' gets changed or</li>
-//     *  <li>the filter of the table 'someTable' gets changed.</li>
-//     * </ul>
-//     */
-//    @PmCacheCfg2(
-//        optionSet=@Cached(
-//            clearedBy={
-//                @Clear(pm={"s.x.y", "b"}),
-//                @Clear(pm="someTable", change=ValueChangeKind.FILTER)
-//        })
-//    )
 
     @PmAttrCfg(valuePath="pmBean.s")
     public final PmAttrString sCachedWithInvalidationListener = new PmAttrStringImpl(this);

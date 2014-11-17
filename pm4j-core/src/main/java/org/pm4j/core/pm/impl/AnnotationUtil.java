@@ -183,6 +183,7 @@ public class AnnotationUtil {
    * @param modeToStrategyMap
    * @return
    */
+  @Deprecated
   public static CacheStrategy readCacheStrategy(
       PmObjectBase pm,
       String cacheCfgAttrName,
@@ -216,6 +217,7 @@ public class AnnotationUtil {
    * @param modeToStrategyMap
    * @return
    */
+  @Deprecated
   public static CacheStrategy evaluateCacheStrategy(
       PmObjectBase pm,
       String cacheCfgAttrName,
@@ -249,6 +251,7 @@ public class AnnotationUtil {
    * @param cacheAnnotations The collected annotations of type {@link PmCacheCfg} of the PM.
    * @return The evaluated {@link Clear}.
    */
+  @Deprecated
   public static Clear evaluateCacheClearBehavior(PmObjectBase pm, List<PmCacheCfg> cacheAnnotations) {
     PmCacheCfg cacheCfg = ListUtil.listToFirstItemOrNull(cacheAnnotations);
     return cacheCfg != null
@@ -264,6 +267,7 @@ public class AnnotationUtil {
    * @param cacheAspectName
    * @return The found {@link CacheMode}. Otherwise {@link CacheMode#NOT_SPECIFIED}.
    */
+  @Deprecated
   private static CacheMode readCacheMode(PmCacheCfg cfg, String cacheAspectName) {
     CacheMode cacheMode = CacheMode.NOT_SPECIFIED;
     try {
@@ -291,6 +295,7 @@ public class AnnotationUtil {
    * @param cacheCfgAttrName
    * @return The found {@link CacheMode} or {@link CacheMode#NOT_SPECIFIED}.
    */
+  @Deprecated
   private static CacheMode readCacheModeWithoutParentModes(PmObjectBase pm, String cacheCfgAttrName) {
     PmCacheCfg cfg = findAnnotation(pm, PmCacheCfg.class);
     return (cfg != null)
