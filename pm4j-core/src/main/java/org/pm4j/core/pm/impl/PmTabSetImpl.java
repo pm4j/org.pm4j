@@ -20,10 +20,11 @@ import org.pm4j.navi.NaviLink;
 /**
  * Basic implementation of a {@link PmTabSet}.
  * <p>
- * Each {@link PmTab} child will be considered as a tab of this set.
- * The tabs are sorted as they are declared here.
+ * Each child PM having the marker interface {@link PmTab} will be considered as a tab of this set.
+ * <p>
+ * The tabs are sorted as they are declared.
  *
- * @author olaf boede
+ * @author Olaf Boede
  */
 public class PmTabSetImpl extends PmElementImpl implements PmTabSet {
 
@@ -46,6 +47,8 @@ public class PmTabSetImpl extends PmElementImpl implements PmTabSet {
 
   /**
    * Adds a {@link PmCommandDecorator} to be executed before a tab switch.
+   * <p>
+   * Alternatively you may override {@link #switchToTabPmImpl(PmCommand, PmTab, PmTab)}.
    *
    * @param fromTab The from-tab to define the decorator for. If it is <code>null</code>, the decorator will be active for all from-tabs.
    * @param toTab The to-tab to define the decorator for. If it is <code>null</code>, the decorator will be active for all to-tabs.
@@ -94,14 +97,25 @@ public class PmTabSetImpl extends PmElementImpl implements PmTabSet {
   }
 
   /**
-   * Subclasses may define here their specific UI logic here.
-   * <p>
+   * Gets called before a tab switch operation. Subclasses may control here if
+   * the tab switch should be allowed.<br>
    * The default implementation always allows to switch the tab.
    * <p>
-   * Internally this method gets called by the {@link PmTabChangeCommand}.
+   * For more generic logic you may consider using
+   * {@link #addTabSwitchCommandDecorator(PmTab, PmTab, PmCommandDecorator)}.
+   *
+   * @param tabChangeCmd
+   *          Unused. Will disappear soon.
+   * @param fromTab
+   *          The tab to leave.
+   * @param toTab
+   *          The tab to enter.
+   * @return <code>true</code> if the switch is allowed.<br>
+   *         <code>false</code> prevents the tab switch.
+   *
    */
   // TODO: rename to beforeSwitch and add an afterSwitch; remove the command reference.
-  protected boolean switchToTabPmImpl(PmCommand tabChangeCmd, PmTab fromTab, PmTab toTab) {
+  protected boolean switchToTabPmImpl(@Deprecated PmCommand tabChangeCmd, PmTab fromTab, PmTab toTab) {
     return true;
   }
 

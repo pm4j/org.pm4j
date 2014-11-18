@@ -8,7 +8,7 @@ import org.pm4j.common.pageable.PageableCollection;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.QueryParams;
 import org.pm4j.core.pm.PmBean;
-import org.pm4j.core.pm.PmElement;
+import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmPager.PagerVisibility;
 import org.pm4j.core.pm.PmTable;
 import org.pm4j.core.pm.impl.pageable.PmBeanCollection;
@@ -69,14 +69,17 @@ public final class PmTableUtil {
    * @return The index (first item has the index zero).<br>
    *    <code>-1</code> if the given row is not on the current page.
    */
-  public static int findIndexOfRowOnCurrentPage(PmElement rowPm) {
-    PmTable<?> tablePm = PmUtil.getPmParentOfType(rowPm, PmTable.class);
-    List<?> rows = tablePm.getRowPms();
-    for (int i = 0; i < rows.size(); ++i) {
-      if (rows.get(i) == rowPm) {
-        return i;
+  public static int findIndexOfRowOnCurrentPage(PmObject rowPm) {
+    if (rowPm.getPmParent() instanceof PmTable) {
+      PmTable<?> tablePm = (PmTable<?>) rowPm.getPmParent();
+      List<?> rows = tablePm.getRowPms();
+      for (int i = 0; i < rows.size(); ++i) {
+        if (rows.get(i) == rowPm) {
+          return i;
+        }
       }
     }
+
     // row not on current page
     return -1;
   }

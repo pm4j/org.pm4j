@@ -225,4 +225,15 @@ public interface PmObject extends Comparable<PmObject> {
   // TODO olaf: move public interface to validation API. Change to protected implementation method.
   void pmValidate();
 
+  /**
+   * A predicate interface used for filtering PMs in visitor contexts.
+   */
+  public interface PmMatcher {
+    /**
+     * @param pm The PM to check.
+     * @return <code>true</code> if the given PM matches the condition.
+     */
+    boolean doesMatch(PmObject pm);
+  }
+
 }

@@ -8,7 +8,7 @@ import org.pm4j.core.pm.impl.PmVisitorImpl;
  * PM tree visitor functionality.
  *
  * @author DZABEL
- * @author olaf boede
+ * @author Olaf Boede
  */
 public class PmVisitorApi {
 
@@ -65,6 +65,8 @@ public class PmVisitorApi {
   public enum PmVisitHint {
     /** Skip visiting not visible pm's */
     SKIP_INVISIBLE,
+    /** Skip visiting content of a tab that is not the currently one. */
+    SKIP_HIDDEN_TAB_CONTENT,
     /** Skip visiting not enabled pm's */
     SKIP_DISABLED,
     /** Skip visiting read only pm's */

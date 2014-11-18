@@ -1,5 +1,6 @@
 package org.pm4j.core.pm.annotation;
 
+import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -26,12 +27,12 @@ public @interface PmCacheCfg {
     /**
      * The value will be cached for the life time of a request.
      * <p>
-     * This option will currently only be considered in the JSF environment. In
+     * This option will currently only be considered in web application environment. In
      * other cases (rich client) it has the effect of the option {@link #OFF}.
      */
     REQUEST
   }
-  
+
   /** Configuration values for behavior how to clear cache, when clear method is called. */
   public enum Clear {
     /** When clear method is called, cache is cleared. */
@@ -89,7 +90,7 @@ public @interface PmCacheCfg {
    */
   boolean cascade() default false;
 
-  /** 
+  /**
    * Configuration of clear behavior, when clear method is called.
    * Default behavior is that cache is cleared, but optionally it can be configured,
    * that cache is never cleared.
