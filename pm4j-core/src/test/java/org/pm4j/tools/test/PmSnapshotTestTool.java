@@ -15,10 +15,6 @@ import org.pm4j.common.util.io.SrcFileAccessor;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmObject.PmMatcher;
-import org.pm4j.core.pm.PmPager;
-import org.pm4j.core.pm.PmTableCol;
-import org.pm4j.core.pm.impl.PmTableImpl;
-import org.pm4j.core.pm.impl.PmMatcherBuilder;
 import org.pm4j.core.xml.visibleState.VisibleStateAspectMatcher;
 import org.pm4j.core.xml.visibleState.VisibleStateUtil;
 
@@ -224,36 +220,5 @@ public class PmSnapshotTestTool {
     this.overWriteMode = newMode;
     return this;
   }
-
-
-  /**
-   * Some common matchers that may be used to control the content to write to xml.
-   */
-//  public static class Matcher {
-//
-//      public static final PmMatcher TABLE = builder().pmClass(PmTableImpl.class).build();
-//      public static final PmMatcher TABLE_ROW = builder().parent(TABLE).matcher(new PmMatcher() {
-//        @Override
-//        public boolean doesMatch(PmObject pm) {
-//          return ((PmTableImpl<?, ?>)pm.getPmParent()).getRowPms().contains(pm);
-//        }
-//        @Override
-//        public String toString() { return "PmTableRow"; }
-//      }).build();
-//      public static final PmMatcher TABLE_COL = builder().pmClass(PmTableCol.class).build();
-//      public static final PmMatcher TABLE_COL_SORT_ORDER_ATTR = builder().parent(PmTableCol.class).name("sortOrderAttr").build();
-//      public static final PmMatcher TABLE_COL_CMD_SORT = builder().parent(PmTableCol.class).name("cmdSort").build();
-//      public static final PmMatcher TABLE_PAGER = builder().parent(PmTableImpl.class).pmClass(PmPager.class).build();
-//
-//      /**
-//       * Short cut helper. Creates a {@link PmMatcherBuilder}.
-//       *
-//       * @return a new builder instance.
-//       */
-//      protected static PmMatcherBuilder builder() {
-//          return new PmMatcherBuilder();
-//      }
-//
-//  }
 
 }

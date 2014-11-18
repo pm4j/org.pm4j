@@ -46,7 +46,7 @@ public class VisibleStateXmlCallBackTest {
     assertNotNull(xmlRoot);
     assertEquals("testPm", xmlRoot.name);
     assertEquals("Test PM", xmlRoot.title);
-    // assertEquals(1, xmlRoot.children.size());
+    assertEquals(5, xmlRoot.children.size());
     XmlPmAttr xmlAttr = (XmlPmAttr) xmlRoot.children.get(0);
     assertEquals("boolAttr", xmlAttr.name);
     assertEquals("Boolean Attr", xmlAttr.title);
@@ -79,14 +79,6 @@ public class VisibleStateXmlCallBackTest {
         "    <cmd name=\"cmdDoSomething\" title=\"Do something\"/>\n" +
         "    <table name=\"table\" rows=\"2\" title=\"Table\">\n" +
         "        <column name=\"name\" title=\"Name\"/>\n" +
-//        "            <attr name=\"sortOrderAttr\" enabled=\"false\" title=\"Sort Order\">\n" +
-//        "                <value></value>\n" +
-        // FIXME oboede: neutral and no value is redundant.
-//        "                <options>||Ascending|Descending</options>\n" +
-//        "            </attr>\n" +
-        // TODO oboede: provide default icon resources and corresponding resource property entries.
-//        "            <cmd name=\"cmdSort\" enabled=\"false\" title=\"Sort\" icon=\"pmSortOrder.NEUTRAL_iconDisabled\"/>\n" +
-//        "        </column>\n" +
         "        <row name=\"testRowPm\" title=\"Row\">\n" +
         "            <attr name=\"name\" title=\"Name\">\n" +
         "                <value>Hello</value>\n" +

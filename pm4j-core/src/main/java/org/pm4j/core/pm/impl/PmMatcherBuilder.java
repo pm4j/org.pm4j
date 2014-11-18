@@ -185,6 +185,12 @@ public class PmMatcherBuilder {
       if (pmNamePattern != null) {
         parts.add("name=" + pmNamePattern);
       }
+      if (enabled != null) {
+        parts.add("enabled=" + enabled);
+      }
+      if (visible != null) {
+        parts.add("visible=" + visible);
+      }
       if (!subMatcher.isEmpty()) {
         parts.add(subMatcher.toString());
       }
