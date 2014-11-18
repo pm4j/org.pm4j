@@ -1,17 +1,13 @@
 package org.pm4j.core.pm.impl.inject;
 
-import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.pm4j.common.expr.parser.ParseCtxt;
 import org.pm4j.common.util.reflection.ClassUtil;
 import org.pm4j.common.util.reflection.PrefixUtil;
-import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmInject;
 import org.pm4j.core.pm.annotation.PmInject.Mode;
@@ -29,17 +25,17 @@ public class DiResolverFactoryPmInjectSetterByExpression implements DiResolverFa
     final Method setter;
     final Method getter;
     final PathResolver pathResolver;
-    
+
     public MethodData(Method method, PathResolver pathResolver) {
       this.setter = method;
       this.getter = PrefixUtil.findGetterForSetter(setter);
       this.pathResolver = pathResolver;
     }
   }
-  
+
   @Override
   public DiResolver makeDiResolver(Class<?> classToInspect) {
-    Set<MethodData> methodInjectionMap = new HashSet<MethodData>();
+    List<MethodData> methodDataList = new ArrayList<MethodData>();
 
     for (Method m : ClassUtil.findMethods(classToInspect, "set.*")) {
       PmInject a = m.getAnnotation(PmInject.class);
@@ -51,26 +47,26 @@ public class DiResolverFactoryPmInjectSetterByExpression implements DiResolverFa
         PathResolver r = PmExpressionPathResolver.parse(new ParseCtxt(propName));
         r.setNullAllowed(a.nullAllowed());
 
-        methodInjectionMap.add(new MethodData(m, r));
+        methodDataList.add(new MethodData(m, r));
         DiResolverUtil.ensureAccessibility(m);
       }
     }
 
-    return !methodInjectionMap.isEmpty()
-        ? new Resolver(methodInjectionMap)
+    return !methodDataList.isEmpty()
+        ? new Resolver(methodDataList)
         : null;
   }
 
   public static class Resolver implements DiResolver {
-    private Set<MethodData> methodToPathResolverSet;
+    private List<MethodData> methodDataList;
 
-    public Resolver(Set<MethodData> methodToPathResolverSet) {
-      this.methodToPathResolverSet = methodToPathResolverSet;
+    public Resolver(List<MethodData> methodDataList) {
+      this.methodDataList = methodDataList;
     }
 
     @Override
     public void resolveDi(PmObject pm) {
-      for (MethodData injectionPoint : methodToPathResolverSet) {
+      for (MethodData injectionPoint : methodDataList) {
         DiResolverUtil.validateGetterReturnsNull(pm, injectionPoint.getter);
         Object value = DiResolverUtil.resolveValue(pm, injectionPoint.setter, injectionPoint.pathResolver);
         DiResolverUtil.setValue(pm, injectionPoint.setter, injectionPoint.pathResolver.isNullAllowed(), value);

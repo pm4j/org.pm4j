@@ -46,9 +46,9 @@ public class DiResolverUtil  {
     }
   }
 
-  /** 
+  /**
    * @throws PmRuntimeException if the field can't be access or already has a value.
-   * 
+   *
    * @param pm the instance to validate
    * @param field the field to validate
    */
@@ -66,15 +66,15 @@ public class DiResolverUtil  {
     }
   }
 
-  /** 
+  /**
    * @throws PmRuntimeException if the getter can't be access or returns anything other than null
-   * 
+   *
    * @param pm the instance to validate
    * @param getter the getter to be called to determine the value
    */
   static void validateGetterReturnsNull(PmObject pm, Method getter) {
     if (getter == null) {
-      // simply don't check if there is already a value in the field
+      // don't check if there is no getter.
       return;
     }
     Object value = null;
@@ -85,14 +85,13 @@ public class DiResolverUtil  {
           + pm.getClass().getName() + "'.", ex);
     }
     if (value != null) {
-      throw new PmRuntimeException(pm, "Can't initialize setter '" + PrefixUtil.setterNameForGetter(getter.getName()) + "' in class '"
-          + pm.getClass().getName() + "'.  Already has value: " + value );
+      throw new PmRuntimeException(pm, "Can't perform @PmInject for '" + PrefixUtil.propNameForGetter(getter.getName()) + "'. It already has value: " + value );
     }
   }
 
   /**
    * Sets the given field in the given Pm instance to a new value.
-   * 
+   *
    * @param pm the Pm instance
    * @param field the field to set
    * @param nullAllowed true if null value is allowed, false if a null value raises an exception
@@ -110,7 +109,7 @@ public class DiResolverUtil  {
 
   /**
    * Calls the given setter in the given Pm instance with the given value.
-   * 
+   *
    * @param pm the Pm instance
    * @param method the setter method to call
    * @param nullAllowed true if null value is allowed, false if a null value raises an exception
@@ -126,7 +125,7 @@ public class DiResolverUtil  {
   }
 
   /**
-   * @return the value as resolved by the given resolver on the given Pm 
+   * @return the value as resolved by the given resolver on the given Pm
    * @param pm the Pm instance
    * @param target the target field or setter (just for the error message)
    * @param resolver the resolver to use
@@ -140,7 +139,7 @@ public class DiResolverUtil  {
     }
     return value;
   }
-  
+
   /**
    * @throws PmRuntimeException if 'value' is null but null not allowed
    * @param pm the related Pm instance
@@ -154,5 +153,5 @@ public class DiResolverUtil  {
           "' was null. But null value is not allowed. " +
           "You may configure null-value handling using @PmInject(nullAllowed=...).");
     }
-  }  
+  }
 }

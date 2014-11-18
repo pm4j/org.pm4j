@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.pm4j.common.util.reflection.ClassUtil;
 import org.pm4j.common.util.reflection.PrefixUtil;
-import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmInject;
 import org.pm4j.core.pm.annotation.PmInject.Mode;
@@ -74,7 +73,7 @@ public class DiResolverFactoryPmInjectSetterByParentOfType implements DiResolver
 
       Class<?>[] params = setter.getParameterTypes();
       if (params.length != 1) {
-        throw new PmRuntimeException("Unable to apply @PmInject to a setter method with more than one parameter.\nMethod: " + setter);
+        throw new RuntimeException("Unable to apply @PmInject to a setter method with more than one parameter.\nMethod: " + setter);
       }
       return params[0];
     }
