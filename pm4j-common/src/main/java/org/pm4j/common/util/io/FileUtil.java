@@ -86,6 +86,7 @@ public class FileUtil {
       System.gc();
       if (! file.delete()) {
         LOG.warn("Can't delete file: " + file);
+        file.deleteOnExit();
         return false;
       }
     }

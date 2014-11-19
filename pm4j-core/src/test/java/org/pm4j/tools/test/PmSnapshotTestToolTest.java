@@ -9,7 +9,6 @@ import java.util.Locale;
 
 import org.junit.Assert;
 import org.junit.ComparisonFailure;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.pm4j.common.util.io.FileUtil;
 import org.pm4j.core.pm.PmAttrString;
@@ -41,7 +40,6 @@ public class PmSnapshotTestToolTest {
   }
 
   @Test
-  @Ignore("TODO: the final delete does not work reliable if started by maven.")
   public void testWriteSnapshot() {
     File file = snap.snapshot(new MiniTestPm(), "testWriteSnapshot");
     assertTrue(file.exists());
@@ -60,7 +58,6 @@ public class PmSnapshotTestToolTest {
   }
 
   @Test
-  @Ignore("TODO: the final delete does not work reliable if started by maven.")
   public void testWriteAndCompareSameSnapshot() {
     // create the snapshot
     File file = null;
