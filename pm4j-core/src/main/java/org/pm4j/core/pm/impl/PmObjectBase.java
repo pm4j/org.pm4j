@@ -987,7 +987,7 @@ public abstract class PmObjectBase implements PmObject {
   }
 
 
-  @SuppressWarnings("rawtypes")
+  @SuppressWarnings({ "rawtypes", "deprecation" })
   protected void initMetaData(MetaData metaData) {
     // -- Language resource configuration --
     PmTitleCfg annotation = AnnotationUtil.findAnnotation(this, PmTitleCfg.class);
@@ -1050,7 +1050,7 @@ public abstract class PmObjectBase implements PmObject {
       metaData.titleCache = InternalPmCacheCfgUtil.readCacheMetaData(this, CacheKind.TITLE, cacheAnnotations);
       metaData.enablementCache = InternalPmCacheCfgUtil.readCacheMetaData(this, CacheKind.ENABLEMENT, cacheAnnotations);
       metaData.visibilityCache = InternalPmCacheCfgUtil.readCacheMetaData(this, CacheKind.VISIBILITY, cacheAnnotations);
-      metaData.cacheClearBehavior = InternalPmCacheCfgUtil.evaluateCacheClearBehavior(this, cacheAnnotations);
+      metaData.cacheClearBehavior = DeprInternalPmCacheCfgUtil.evaluateCacheClearBehavior(this, cacheAnnotations);
     }
 
     // -- Check for registered domain specific annotations
@@ -1120,6 +1120,14 @@ public abstract class PmObjectBase implements PmObject {
 
     public MetaData() {}
 
+    /**
+     * Provides PM type specific initialization logic. Intended for defining common PM types.
+     * Gets called before domain specific initialization.
+     * <p>
+     * To provide domain specific PM initialization logic please use {@link PmObjectBase#onPmInit()}.
+     *
+     * @param pm The PM to initialize.
+     */
     protected void onPmInit(PmObjectBase pm) {
       InternalPmCacheCfgUtil.registerClearOnListeners(pm, CacheKind.TITLE, titleCache.cacheClearOn);
       InternalPmCacheCfgUtil.registerClearOnListeners(pm, CacheKind.ENABLEMENT, enablementCache.cacheClearOn);

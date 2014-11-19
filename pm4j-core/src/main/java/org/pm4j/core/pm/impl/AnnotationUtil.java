@@ -17,6 +17,8 @@ import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.annotation.PmCacheCfg;
 import org.pm4j.core.pm.annotation.PmCacheCfg.CacheMode;
 import org.pm4j.core.pm.annotation.PmCacheCfg.Clear;
+import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
+import org.pm4j.core.pm.impl.InternalPmCacheCfgUtil.CacheMetaData;
 
 /**
  * Contains algorithms for reading PM annotations.
@@ -24,11 +26,6 @@ import org.pm4j.core.pm.annotation.PmCacheCfg.Clear;
  * @author olaf boede
  */
 public class AnnotationUtil {
-
-  /** Helper for reflection based method calls. */
-  private static final Object[] EMPTY_OBJ_ARRAY = new Object[0];
-  /** Cached cache aspect getter methods. */
-  private static Map<String, Method> cacheAspectToGetterMap = new ConcurrentHashMap<String, Method>();
 
   /**
    * Searches for an annotation within the inheritance tree of a class.
@@ -173,7 +170,17 @@ public class AnnotationUtil {
 
     return foundAnnotations;
   }
-  
+
+}
+
+@Deprecated
+class DeprAnnotationUtil {
+
+  /** Helper for reflection based method calls. */
+  private static final Object[] EMPTY_OBJ_ARRAY = new Object[0];
+
+  /** Cached cache aspect getter methods. */
+  private static Map<String, Method> cacheAspectToGetterMap = new ConcurrentHashMap<String, Method>();
 
   /**
    * Reads and evaluates the cache strategy to use for the given cache aspect of the given PM.
@@ -190,10 +197,9 @@ public class AnnotationUtil {
       Map<CacheMode, CacheStrategy> modeToStrategyMap)
   {
     List<PmCacheCfg> cacheAnnotations = new ArrayList<PmCacheCfg>();
-    findAnnotationsInPmHierarchy(pm, PmCacheCfg.class, cacheAnnotations);
-    return AnnotationUtil.evaluateCacheStrategy(pm, cacheCfgAttrName, cacheAnnotations, modeToStrategyMap);
+    AnnotationUtil.findAnnotationsInPmHierarchy(pm, PmCacheCfg.class, cacheAnnotations);
+    return DeprAnnotationUtil.evaluateCacheStrategy(pm, cacheCfgAttrName, cacheAnnotations, modeToStrategyMap);
   }
-
 
   /**
    * Searches for the first {@link CacheMode} property with the given
@@ -224,11 +230,11 @@ public class AnnotationUtil {
       Collection<PmCacheCfg> cacheAnnotations,
       Map<CacheMode, CacheStrategy> modeToStrategyMap)
   {
-    CacheMode cacheMode = readCacheModeWithoutParentModes(pm, cacheCfgAttrName);
+    CacheMode cacheMode = DeprAnnotationUtil.readCacheModeWithoutParentModes(pm, cacheCfgAttrName);
     if (cacheMode == CacheMode.NOT_SPECIFIED) {
       cacheMode = CacheMode.OFF;
       for (PmCacheCfg cfg : cacheAnnotations) {
-        CacheMode v = readCacheMode(cfg, cacheCfgAttrName);
+        CacheMode v = DeprAnnotationUtil.readCacheMode(cfg, cacheCfgAttrName);
         // Only annotations defined for the children will be considered.
         if ( (v != CacheMode.NOT_SPECIFIED) && cfg.cascade() ) {
           cacheMode = v;
@@ -245,19 +251,20 @@ public class AnnotationUtil {
   }
 
   /**
-   * Returns configuration of behavior, when cache clear method is called.
-   * 
-   * @param pm The PM to evaluate the behavior for.
-   * @param cacheAnnotations The collected annotations of type {@link PmCacheCfg} of the PM.
-   * @return The evaluated {@link Clear}.
+   * Looks only for the {@link PmCacheCfg} definition assigned to the given PM.
+   *
+   * @param pm
+   * @param cacheCfgAttrName
+   * @return The found {@link CacheMode} or {@link CacheMode#NOT_SPECIFIED}.
    */
   @Deprecated
-  public static Clear evaluateCacheClearBehavior(PmObjectBase pm, List<PmCacheCfg> cacheAnnotations) {
-    PmCacheCfg cacheCfg = ListUtil.listToFirstItemOrNull(cacheAnnotations);
-    return cacheCfg != null
-        ? cacheCfg.clear()
-        : Clear.DEFAULT;
+  private static CacheMode readCacheModeWithoutParentModes(PmObjectBase pm, String cacheCfgAttrName) {
+    PmCacheCfg cfg = AnnotationUtil.findAnnotation(pm, PmCacheCfg.class);
+    return (cfg != null)
+        ? DeprAnnotationUtil.readCacheMode(cfg, cacheCfgAttrName)
+        : CacheMode.NOT_SPECIFIED;
   }
+
   /**
    * Reads the specified cache aspect from the given {@link PmCacheCfg}.
    * Considers the {@link PmCacheCfg#all()} definition if the specified cache aspect
@@ -289,18 +296,18 @@ public class AnnotationUtil {
   }
 
   /**
-   * Looks only for the {@link PmCacheCfg} definition assigned to the given PM.
+   * Returns configuration of behavior, when cache clear method is called.
    *
-   * @param pm
-   * @param cacheCfgAttrName
-   * @return The found {@link CacheMode} or {@link CacheMode#NOT_SPECIFIED}.
+   * @param pm The PM to evaluate the behavior for.
+   * @param cacheAnnotations The collected annotations of type {@link PmCacheCfg} of the PM.
+   * @return The evaluated {@link Clear}.
    */
   @Deprecated
-  private static CacheMode readCacheModeWithoutParentModes(PmObjectBase pm, String cacheCfgAttrName) {
-    PmCacheCfg cfg = findAnnotation(pm, PmCacheCfg.class);
-    return (cfg != null)
-        ? readCacheMode(cfg, cacheCfgAttrName)
-        : CacheMode.NOT_SPECIFIED;
+  public static Clear evaluateCacheClearBehavior(PmObjectBase pm, List<PmCacheCfg> cacheAnnotations) {
+    PmCacheCfg cacheCfg = ListUtil.listToFirstItemOrNull(cacheAnnotations);
+    return cacheCfg != null
+        ? cacheCfg.clear()
+        : Clear.DEFAULT;
   }
 
 }

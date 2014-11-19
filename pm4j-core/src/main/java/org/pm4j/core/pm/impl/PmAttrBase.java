@@ -1759,9 +1759,6 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     public String getFormatResKey() { return formatResKey; }
     public void setFormatResKey(String formatResKey) { this.formatResKey = formatResKey; }
 
-    public CacheStrategy getCacheStrategyForOptions() { return optionsCache.cacheStrategy; }
-    public CacheStrategy getCacheStrategyForValue() { return valueCache.cacheStrategy; }
-
     public StringConverter<?> getStringConverter() { return stringConverter; }
 
     /**

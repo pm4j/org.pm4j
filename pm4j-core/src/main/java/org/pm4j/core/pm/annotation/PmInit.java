@@ -16,9 +16,9 @@ import java.lang.annotation.Target;
  * If an annotated method is overridden in the class hierarchy, it inherits the
  * annotation, but it is also valid to annotate the method in its sub class
  * again.
- * 
+ *
  * @author SDOLKE
- * 
+ *
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.METHOD })

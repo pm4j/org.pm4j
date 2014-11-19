@@ -28,159 +28,13 @@ import org.pm4j.core.pm.impl.cache.CacheStrategyBase;
 import org.pm4j.core.pm.impl.cache.CacheStrategyRequest;
 
 /**
- * Contains helper methods to work with {@link PmCacheCfg} and {@link PmCacheCfg} annotation.
+ * Contains helper methods to work with {@link PmCacheCfg} and {@link PmCacheCfg2} annotation.
  *
  * @author SDOLKE
  *
  */
 class InternalPmCacheCfgUtil {
-  
-  private static final CacheStrategy CACHE_TITLE_LOCAL = new CacheStrategyBase<PmObjectBase>("CACHE_TITLE_LOCAL") {
-    @Override protected Object readRawValue(PmObjectBase pm) {
-      return pm.pmCachedTitle;
-    }
-    @Override protected void writeRawValue(PmObjectBase pm, Object value) {
-      pm.pmCachedTitle = (String)value;
-    }
-    @Override protected void clearImpl(PmObjectBase pm) {
-      pm.pmCachedTitle = null;
-    }
-  };
-  
-  private static final CacheStrategy CACHE_VISIBLE_LOCAL = new CacheStrategyBase<PmObjectBase>("CACHE_VISIBLE_LOCAL") {
-    @Override protected Object readRawValue(PmObjectBase pm) {
-      return pm.pmVisibleCache;
-    }
-    @Override protected void writeRawValue(PmObjectBase pm, Object value) {
-      pm.pmVisibleCache = value;
-    }
-    @Override protected void clearImpl(PmObjectBase pm) {
-      pm.pmVisibleCache = null;
-    }
-  };
-  
-  private static final CacheStrategy CACHE_ENABLED_LOCAL = new CacheStrategyBase<PmObjectBase>("CACHE_ENABLED_LOCAL") {
-    @Override protected Object readRawValue(PmObjectBase pm) {
-      return pm.pmEnabledCache;
-    }
-    @Override protected void writeRawValue(PmObjectBase pm, Object value) {
-      pm.pmEnabledCache = value;
-    }
-    @Override protected void clearImpl(PmObjectBase pm) {
-      pm.pmEnabledCache = null;
-    }
-  };
 
-  private static final CacheStrategy CACHE_VALUE_LOCAL = new CacheStrategyBase<PmAttrBase<?,?>>("CACHE_VALUE_LOCAL") {
-    @Override protected Object readRawValue(PmAttrBase<?, ?> pm) {
-      return (pm.dataContainer != null)
-                ? pm.dataContainer.cachedValue
-                : null;
-    }
-    @Override protected void writeRawValue(PmAttrBase<?, ?> pm, Object value) {
-      pm.zz_getDataContainer().cachedValue = value;
-    }
-    @Override protected void clearImpl(PmAttrBase<?, ?> pm) {
-      if (pm.dataContainer != null) {
-        pm.dataContainer.cachedValue = null;
-      }
-    }
-  };
-  
-  private static final CacheStrategy CACHE_OPTIONS_LOCAL = new CacheStrategyBase<PmAttrBase<?,?>>("CACHE_OPTIONS_LOCAL") {
-    @Override protected Object readRawValue(PmAttrBase<?, ?> pm) {
-      return (pm.dataContainer != null)
-                ? pm.dataContainer.cachedOptionSet
-                : null;
-    }
-    @Override protected void writeRawValue(PmAttrBase<?, ?> pm, Object value) {
-      pm.zz_getDataContainer().cachedOptionSet = value;
-    }
-    @Override protected void clearImpl(PmAttrBase<?, ?> pm) {
-      if (pm.dataContainer != null) {
-        pm.dataContainer.cachedOptionSet = null;
-      }
-    }
-  };
-  
-  @SuppressWarnings("deprecation")
-  private static final Map<CacheMode, CacheStrategy> CACHE_STRATEGIES_FOR_TITLE =
-    MapUtil.makeFixHashMap(
-      CacheMode.OFF,      CacheStrategyNoCache.INSTANCE,
-      CacheMode.ON,       CACHE_TITLE_LOCAL,
-      CacheMode.REQUEST,  new CacheStrategyRequest("CACHE_TITLE_IN_REQUEST", "ti")
-    );
-  
-  @SuppressWarnings("deprecation")
-  private static final Map<CacheMode, CacheStrategy> CACHE_STRATEGIES_FOR_ENABLEMENT =
-    MapUtil.makeFixHashMap(
-      CacheMode.OFF,      CacheStrategyNoCache.INSTANCE,
-      CacheMode.ON,       CACHE_ENABLED_LOCAL,
-      CacheMode.REQUEST,  new CacheStrategyRequest("CACHE_ENABLED_IN_REQUEST", "en")
-    );
-
-  @SuppressWarnings("deprecation")
-  private static final Map<CacheMode, CacheStrategy> CACHE_STRATEGIES_FOR_VISIBILITY =
-    MapUtil.makeFixHashMap(
-      CacheMode.OFF,      CacheStrategyNoCache.INSTANCE,
-      CacheMode.ON,       CACHE_VISIBLE_LOCAL,
-      CacheMode.REQUEST,  new CacheStrategyRequest("CACHE_VISIBLE_IN_REQUEST", "vi")
-    );
-  
-  @SuppressWarnings("deprecation")
-  private static final Map<CacheMode, CacheStrategy> CACHE_STRATEGIES_FOR_VALUE =
-    MapUtil.makeFixHashMap(
-      CacheMode.OFF,      CacheStrategyNoCache.INSTANCE,
-      CacheMode.ON,       CACHE_VALUE_LOCAL,
-      CacheMode.REQUEST,  new CacheStrategyRequest("CACHE_VALUE_IN_REQUEST", "v")
-    );
-
-  @SuppressWarnings("deprecation")
-  private static final Map<CacheMode, CacheStrategy> CACHE_STRATEGIES_FOR_OPTIONS =
-    MapUtil.makeFixHashMap(
-      CacheMode.OFF,      CacheStrategyNoCache.INSTANCE,
-      CacheMode.ON,       CACHE_OPTIONS_LOCAL,
-      CacheMode.REQUEST,  new CacheStrategyRequest("CACHE_OPTIONS_IN_REQUEST", "os")
-    );
-  
-  @SuppressWarnings("deprecation")
-  private static final Map<CacheKind, Map<CacheMode, CacheStrategy>> MODE_TO_STRATEGY_MAP_FOR_CACHE_KIND =
-    MapUtil.makeFixHashMap(
-      CacheKind.ENABLEMENT, CACHE_STRATEGIES_FOR_ENABLEMENT,
-      CacheKind.OPTIONS,    CACHE_STRATEGIES_FOR_OPTIONS,
-      CacheKind.TITLE,      CACHE_STRATEGIES_FOR_TITLE,
-      CacheKind.VALUE,      CACHE_STRATEGIES_FOR_VALUE,
-      CacheKind.VISIBILITY, CACHE_STRATEGIES_FOR_VISIBILITY
-    );
-  
-  @SuppressWarnings("deprecation")
-  private static final Map<CacheKind, String> ATTR_CONSTANT_FOR_ASPECT =
-    MapUtil.makeFixHashMap(
-      CacheKind.ENABLEMENT, PmCacheCfg.ATTR_ENABLEMENT,
-      CacheKind.OPTIONS,    PmCacheCfg.ATTR_OPTIONS,
-      CacheKind.TITLE,      PmCacheCfg.ATTR_TITLE,
-      CacheKind.VALUE,      PmCacheCfg.ATTR_VALUE,
-      CacheKind.VISIBILITY, PmCacheCfg.ATTR_VISIBILITY
-    );      
-  
-  /**
-   * Evaluates the cache clear behavior for the deprecated {@link PmCacheCfg}
-   * annotations. 
-   * 
-   * @param pmObject the pm object in question
-   * @param cacheAnnotations the list of determined cache cfg annotations 
-   * @return the cache clear behavior if the PM is annotated with {@link PmCacheCfg},
-   *         <code>null</code> if the pm is annotated with {@link PmCacheCfg2}
-   */
-  @SuppressWarnings({"rawtypes", "unchecked", "deprecation"})
-  static Clear evaluateCacheClearBehavior(PmObjectBase pmObject, List cacheAnnotations) {
-    if (PmCacheCfg.class.isAssignableFrom(cacheAnnotations.get(0).getClass())) {
-      return AnnotationUtil.evaluateCacheClearBehavior(pmObject, cacheAnnotations);
-    }
-    
-    return null;
-  }
-  
   /**
    * Finds all {@link PmCacheCfg} and {@link PmCacheCfg2} annotations in the
    * hierarchy of the given PM. Asserts that either the first or the latter
@@ -244,8 +98,8 @@ class InternalPmCacheCfgUtil {
 
     return null;
   }
-  
-  @SuppressWarnings({"deprecation", "unchecked", "rawtypes"})
+
+  @SuppressWarnings({"unchecked", "rawtypes"})
   static CacheMetaData readCacheMetaData(PmObjectBase pmObjectBase, CacheKind aspect, List cacheAnnotations) {
     if (PmCacheCfg2.class.isAssignableFrom(cacheAnnotations.get(0).getClass())) {
       Cache cache = findCacheForAspectInPmHierarchy(pmObjectBase, aspect, cacheAnnotations);
@@ -253,7 +107,7 @@ class InternalPmCacheCfgUtil {
           ? CacheMetaData.NO_CACHE
           : new CacheMetaData(InternalCacheStrategyFactory.create(aspect, cache), cache);
     } else {
-      return new CacheMetaData(AnnotationUtil.evaluateCacheStrategy(pmObjectBase, ATTR_CONSTANT_FOR_ASPECT.get(aspect), cacheAnnotations, MODE_TO_STRATEGY_MAP_FOR_CACHE_KIND.get(aspect)));
+      return DeprInternalPmCacheCfgUtil.createCacheMetaData(pmObjectBase, aspect, cacheAnnotations);
     }
   }
 
@@ -277,10 +131,14 @@ class InternalPmCacheCfgUtil {
         PmCacheApi.clearPmCache(pmObject, aspect);
       }
     };
-    
+
     // Cause we use week references we store a hard reference in the
-    // pm property map to define the lifecycle of the listener
-    setClearOnListenerAsProperty(pmObject, e, aspect);
+    // PM property map to define the life cycle of the listener
+    String propertyName = "_pmCacheClearListener" + aspect;
+    if (pmObject.getPmProperty(propertyName) != null) {
+      throw new PmRuntimeException(pmObject, "There is already a listener stored under property name '"+propertyName+"'");
+    }
+    pmObject.setPmProperty(propertyName, e);
 
     for (Observe clearOn : clearOns) {
       for (String expression : clearOn.pm()) {
@@ -321,14 +179,6 @@ class InternalPmCacheCfgUtil {
 
     foundAnnotations.add(cfg);
   }
-  
-  private static void setClearOnListenerAsProperty(PmObject pmObject, PmEventListener e, CacheKind aspect) {
-    String propertyName = "_pmCacheClearListener" + aspect;
-    if (pmObject.getPmProperty(propertyName) != null) {
-      throw new PmRuntimeException(pmObject, "There is already a listener stored under property name '"+propertyName+"'");
-    }
-    pmObject.setPmProperty(propertyName, e);
-  }
 
   /**
    * Gets the cache definition for the given aspect from the given cache configuration.
@@ -347,7 +197,7 @@ class InternalPmCacheCfgUtil {
 
     return null;
   }
-  
+
   static class CacheMetaData {
     static final CacheMetaData NO_CACHE = new CacheMetaData(CacheStrategyNoCache.INSTANCE);
 
@@ -359,13 +209,157 @@ class InternalPmCacheCfgUtil {
     }
 
     public CacheMetaData(CacheStrategy cacheStrategy, Cache cacheCfg) {
-      this(cacheStrategy, cacheCfg != null ? cacheCfg.clearOn() : null);
-    }
-
-    public CacheMetaData(CacheStrategy cacheStrategy, Observe... cacheClearOn) {
       this.cacheStrategy = cacheStrategy;
-      this.cacheClearOn = cacheClearOn;
+      this.cacheClearOn = cacheCfg != null ? cacheCfg.clearOn() : null;
     }
   }
-  
+
+}
+
+@Deprecated
+class DeprInternalPmCacheCfgUtil {
+  private static final CacheStrategy CACHE_TITLE_LOCAL = new CacheStrategyBase<PmObjectBase>("CACHE_TITLE_LOCAL") {
+    @Override protected Object readRawValue(PmObjectBase pm) {
+      return pm.pmCachedTitle;
+    }
+    @Override protected void writeRawValue(PmObjectBase pm, Object value) {
+      pm.pmCachedTitle = (String)value;
+    }
+    @Override protected void clearImpl(PmObjectBase pm) {
+      pm.pmCachedTitle = null;
+    }
+  };
+
+  private static final CacheStrategy CACHE_VISIBLE_LOCAL = new CacheStrategyBase<PmObjectBase>("CACHE_VISIBLE_LOCAL") {
+    @Override protected Object readRawValue(PmObjectBase pm) {
+      return pm.pmVisibleCache;
+    }
+    @Override protected void writeRawValue(PmObjectBase pm, Object value) {
+      pm.pmVisibleCache = value;
+    }
+    @Override protected void clearImpl(PmObjectBase pm) {
+      pm.pmVisibleCache = null;
+    }
+  };
+
+  private static final CacheStrategy CACHE_ENABLED_LOCAL = new CacheStrategyBase<PmObjectBase>("CACHE_ENABLED_LOCAL") {
+    @Override protected Object readRawValue(PmObjectBase pm) {
+      return pm.pmEnabledCache;
+    }
+    @Override protected void writeRawValue(PmObjectBase pm, Object value) {
+      pm.pmEnabledCache = value;
+    }
+    @Override protected void clearImpl(PmObjectBase pm) {
+      pm.pmEnabledCache = null;
+    }
+  };
+
+  private static final CacheStrategy CACHE_ATTR_VALUE_LOCAL = new CacheStrategyBase<PmAttrBase<?,?>>("CACHE_ATTR_VALUE_LOCAL") {
+    @Override protected Object readRawValue(PmAttrBase<?, ?> pm) {
+      return (pm.dataContainer != null)
+                ? pm.dataContainer.cachedValue
+                : null;
+    }
+    @Override protected void writeRawValue(PmAttrBase<?, ?> pm, Object value) {
+      pm.zz_getDataContainer().cachedValue = value;
+    }
+    @Override protected void clearImpl(PmAttrBase<?, ?> pm) {
+      if (pm.dataContainer != null) {
+        pm.dataContainer.cachedValue = null;
+      }
+    }
+  };
+
+  private static final CacheStrategy CACHE_OPTIONS_LOCAL = new CacheStrategyBase<PmAttrBase<?,?>>("CACHE_OPTIONS_LOCAL") {
+    @Override protected Object readRawValue(PmAttrBase<?, ?> pm) {
+      return (pm.dataContainer != null)
+                ? pm.dataContainer.cachedOptionSet
+                : null;
+    }
+    @Override protected void writeRawValue(PmAttrBase<?, ?> pm, Object value) {
+      pm.zz_getDataContainer().cachedOptionSet = value;
+    }
+    @Override protected void clearImpl(PmAttrBase<?, ?> pm) {
+      if (pm.dataContainer != null) {
+        pm.dataContainer.cachedOptionSet = null;
+      }
+    }
+  };
+
+  private static final Map<CacheMode, CacheStrategy> CACHE_STRATEGIES_FOR_TITLE =
+    MapUtil.makeFixHashMap(
+      CacheMode.OFF,      CacheStrategyNoCache.INSTANCE,
+      CacheMode.ON,       CACHE_TITLE_LOCAL,
+      CacheMode.REQUEST,  new CacheStrategyRequest("CACHE_TITLE_IN_REQUEST", "ti")
+    );
+
+  private static final Map<CacheMode, CacheStrategy> CACHE_STRATEGIES_FOR_ENABLEMENT =
+    MapUtil.makeFixHashMap(
+      CacheMode.OFF,      CacheStrategyNoCache.INSTANCE,
+      CacheMode.ON,       CACHE_ENABLED_LOCAL,
+      CacheMode.REQUEST,  new CacheStrategyRequest("CACHE_ENABLED_IN_REQUEST", "en")
+    );
+
+  private static final Map<CacheMode, CacheStrategy> CACHE_STRATEGIES_FOR_VISIBILITY =
+    MapUtil.makeFixHashMap(
+      CacheMode.OFF,      CacheStrategyNoCache.INSTANCE,
+      CacheMode.ON,       CACHE_VISIBLE_LOCAL,
+      CacheMode.REQUEST,  new CacheStrategyRequest("CACHE_VISIBLE_IN_REQUEST", "vi")
+    );
+
+  private static final Map<CacheMode, CacheStrategy> CACHE_STRATEGIES_FOR_ATTR_VALUE =
+    MapUtil.makeFixHashMap(
+      CacheMode.OFF,      CacheStrategyNoCache.INSTANCE,
+      CacheMode.ON,       CACHE_ATTR_VALUE_LOCAL,
+      CacheMode.REQUEST,  new CacheStrategyRequest("CACHE_ATTR_VALUE_IN_REQUEST", "v")
+    );
+
+  private static final Map<CacheMode, CacheStrategy> CACHE_STRATEGIES_FOR_OPTIONS =
+    MapUtil.makeFixHashMap(
+      CacheMode.OFF,      CacheStrategyNoCache.INSTANCE,
+      CacheMode.ON,       CACHE_OPTIONS_LOCAL,
+      CacheMode.REQUEST,  new CacheStrategyRequest("CACHE_OPTIONS_IN_REQUEST", "os")
+    );
+
+  private static final Map<CacheKind, Map<CacheMode, CacheStrategy>> MODE_TO_STRATEGY_MAP_FOR_CACHE_KIND =
+    MapUtil.makeFixHashMap(
+      CacheKind.ENABLEMENT, CACHE_STRATEGIES_FOR_ENABLEMENT,
+      CacheKind.OPTIONS,    CACHE_STRATEGIES_FOR_OPTIONS,
+      CacheKind.TITLE,      CACHE_STRATEGIES_FOR_TITLE,
+      CacheKind.VALUE,      CACHE_STRATEGIES_FOR_ATTR_VALUE,
+      CacheKind.VISIBILITY, CACHE_STRATEGIES_FOR_VISIBILITY
+    );
+
+  private static final Map<CacheKind, String> ATTR_CONSTANT_FOR_ASPECT =
+    MapUtil.makeFixHashMap(
+      CacheKind.ENABLEMENT, PmCacheCfg.ATTR_ENABLEMENT,
+      CacheKind.OPTIONS,    PmCacheCfg.ATTR_OPTIONS,
+      CacheKind.TITLE,      PmCacheCfg.ATTR_TITLE,
+      CacheKind.VALUE,      PmCacheCfg.ATTR_VALUE,
+      CacheKind.VISIBILITY, PmCacheCfg.ATTR_VISIBILITY
+    );
+
+  /**
+   * Evaluates the cache clear behavior for the deprecated {@link PmCacheCfg}
+   * annotations.
+   *
+   * @param pmObject the pm object in question
+   * @param cacheAnnotations the list of determined cache cfg annotations
+   * @return the cache clear behavior if the PM is annotated with {@link PmCacheCfg},
+   *         <code>null</code> if the pm is annotated with {@link PmCacheCfg2}
+   */
+  @SuppressWarnings({"rawtypes", "unchecked"})
+  static Clear evaluateCacheClearBehavior(PmObjectBase pmObject, List cacheAnnotations) {
+    if (PmCacheCfg.class.isAssignableFrom(cacheAnnotations.get(0).getClass())) {
+      return DeprAnnotationUtil.evaluateCacheClearBehavior(pmObject, cacheAnnotations);
+    }
+
+    return null;
+  }
+
+  @SuppressWarnings({"rawtypes", "unchecked"})
+  static InternalPmCacheCfgUtil.CacheMetaData createCacheMetaData(PmObjectBase pmObjectBase, CacheKind aspect, List cacheAnnotations) {
+    return new InternalPmCacheCfgUtil.CacheMetaData(DeprAnnotationUtil.evaluateCacheStrategy(pmObjectBase, DeprInternalPmCacheCfgUtil.ATTR_CONSTANT_FOR_ASPECT.get(aspect), cacheAnnotations, DeprInternalPmCacheCfgUtil.MODE_TO_STRATEGY_MAP_FOR_CACHE_KIND.get(aspect)));
+  }
+
 }

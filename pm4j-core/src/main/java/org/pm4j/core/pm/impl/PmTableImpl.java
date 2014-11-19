@@ -821,7 +821,7 @@ public class PmTableImpl
       pageableCollectionEventAdapter = new InternalPmTableEventAdapterForPageableCollection(this, pmPageableCollection);
       pageableCollectionEventAdapter.registerListeners();
     }
-    
+
     // XXX olaf: Check - is redundant to the change listener within Pager!
     if (getPmPager() != null) {
       getPmPager().setPageableCollection(pmPageableCollection);
@@ -1031,8 +1031,8 @@ public class PmTableImpl
       if (StringUtils.isNotBlank(valuePath)) {
         myMetaData.valuePathResolver = PmExpressionPathResolver.parse(valuePath, PmExpressionApi.getSyntaxVersion(this));
       }
-      //
-      myMetaData.inMemCollectionCacheStragegy = AnnotationUtil.readCacheStrategy(this, PmCacheCfg.ATTR_VALUE, CACHE_STRATEGIES_FOR_IN_MEM_COLLECTION);
+      // TODO oboede: Missing support for new cache annotation.
+      myMetaData.inMemCollectionCacheStragegy = DeprAnnotationUtil.readCacheStrategy(this, PmCacheCfg.ATTR_VALUE, CACHE_STRATEGIES_FOR_IN_MEM_COLLECTION);
     }
   }
 
