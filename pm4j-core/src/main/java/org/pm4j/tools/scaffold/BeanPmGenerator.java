@@ -100,7 +100,7 @@ public class BeanPmGenerator {
     Ctxt ctxt = new Ctxt();
 
     for (Method m : beanCls.getMethods()) {
-      if (PrefixUtil.isGetter(m) && !m.getDeclaringClass().equals(Object.class)) {
+      if (PrefixUtil.hasGetterPrefix(m) && !m.getDeclaringClass().equals(Object.class)) {
         attrs.add(new AttrInfo(PrefixUtil.propNameForGetter(m.getName()), m));
       }
     }

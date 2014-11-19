@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.pm4j.common.util.reflection.ClassUtil;
-import org.pm4j.core.exception.PmRuntimeException;
+import org.pm4j.common.util.reflection.PrefixUtil;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmInject;
 import org.pm4j.core.pm.annotation.PmInject.Mode;
@@ -47,48 +47,33 @@ public class DiResolverFactoryPmInjectSetterByParentOfType implements DiResolver
     public void resolveDi(PmObject pm) {
       for (MethodData md : annotatedMethods) {
         Object value = PmUtil.findPmParentOfType(pm, md.type);
-
-        if (value == null) {
-          if (md.annotation.nullAllowed()) {
-            // in this case there is nothing more to do here.
-            return;
-          } else {
-            throw new PmRuntimeException(pm, "Found value for dependency injection of method '" + md.method +
-                "' was null. But null value is not allowed.\n" +
-                "You may configure null-value handling using @PmInject(nullAllowed=...).");
-          }
-        }
-
-        try {
-          md.method.invoke(pm, value);
-        } catch (Exception ex) {
-          throw new PmRuntimeException(pm, "Can't call setter '" + md.method.getName() + "' in class '"
-              + getClass().getName() + "'.", ex);
-        }
-
+        DiResolverUtil.validateGetterReturnsNull(pm, md.getter);
+        DiResolverUtil.setValue(pm, md.setter, md.annotation.nullAllowed(), value);
       }
     }
   }
 
-  static class MethodData {
-    final Method method;
+  private static class MethodData {
+    final Method setter;
+    final Method getter;
     final PmInject annotation;
     final Class<?> type;
 
     public MethodData(Method method, PmInject annotation) {
-      this.method = method;
+      this.setter = method;
+      this.getter = PrefixUtil.findGetterForSetter(setter);
       this.annotation = annotation;
       this.type = getSetterParamType(method, annotation);
     }
 
-    private Class<?> getSetterParamType(Method m, PmInject annotation) {
+    private static Class<?> getSetterParamType(Method setter, PmInject annotation) {
       if (annotation.mode() != Mode.PARENT_OF_TYPE) {
         return null;
       }
 
-      Class<?>[] params = m.getParameterTypes();
+      Class<?>[] params = setter.getParameterTypes();
       if (params.length != 1) {
-        throw new PmRuntimeException("Unable to apply @PmInject to a setter method with more than one parameter.\nMethod: " + m);
+        throw new RuntimeException("Unable to apply @PmInject to a setter method with more than one parameter.\nMethod: " + setter);
       }
       return params[0];
     }

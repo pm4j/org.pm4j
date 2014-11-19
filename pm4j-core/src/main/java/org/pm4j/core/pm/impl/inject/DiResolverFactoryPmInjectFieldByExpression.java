@@ -57,26 +57,10 @@ public class DiResolverFactoryPmInjectFieldByExpression implements DiResolverFac
     public void resolveDi(PmObject pm) {
       for (Map.Entry<Field, PathResolver> e : fieldToPathResolverMap.entrySet()) {
         Field f = e.getKey();
+        DiResolverUtil.validateFieldIsNull(pm, f);
         PathResolver r = e.getValue();
-        Object value = null;
-        try {
-          value = r.getValue(pm);
-        } catch (RuntimeException ex) {
-          throw new PmRuntimeException(pm, "Unable to resolve dependency injection reference to '" + r + "' for field: " + f, ex);
-        }
-
-        if (value == null && ! r.isNullAllowed()) {
-          throw new PmRuntimeException(pm, "Found value for dependency injection of field '" + f +
-              "' was null. But null value is not allowed. " +
-              "You may configure null-value handling using @PmInject(nullAllowed=...).");
-        }
-
-        try {
-          f.set(pm, value);
-        } catch (Exception ex) {
-          throw new PmRuntimeException(pm, "Can't initialize field '" + f.getName() + "' in class '"
-              + getClass().getName() + "'.", ex);
-        }
+        Object value = DiResolverUtil.resolveValue(pm, f, r);
+        DiResolverUtil.setValue(pm, f, r.isNullAllowed(), value);
       }
     }
   }
