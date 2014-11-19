@@ -211,6 +211,10 @@ line.separator=\r\n
           <!-- Format of the git tags when release is done -->
           <tagNameFormat>v@{project.version}</tagNameFormat>
           <goals>deploy</goals>
+		  <!-- useReleaseProfile=false introduced to prevent duplicate source code uploads 
+		       see: http://maven.40175.n5.nabble.com/Why-is-source-jar-deployed-twice-during-release-td120643.html
+			   -->
+		  <useReleaseProfile>false</useReleaseProfile>
         </configuration>
       </plugin>
     </plugins>
