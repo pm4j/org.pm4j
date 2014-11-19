@@ -48,7 +48,7 @@ import org.pm4j.tools.test.RecordingPropertyChangeListener;
 
 public class PmTableTest {
 
-  private TablePm myTablePm;
+  private MyTablePm myTablePm;
   private RecordingPmEventListener valueChangeEventListener = new RecordingPmEventListener();
 
   private List<RowBean> editedRowBeanList = new ArrayList<RowBean>(Arrays.asList(
@@ -65,7 +65,7 @@ public class PmTableTest {
 
   @Before
   public void setUp() {
-    myTablePm = new TablePm(new PmConversationImpl()) {
+    myTablePm = new MyTablePm(new PmConversationImpl()) {
       /** We use here an in-memory data table.
        * The table represents the items of the collection provided by this method. */
       @Override
@@ -74,14 +74,14 @@ public class PmTableTest {
       }
     };
     PmEventApi.addPmEventListener(myTablePm, PmEvent.VALUE_CHANGE, valueChangeEventListener);
-    
+
     PmInitApi.ensurePmSubTreeInitialization(myTablePm);
   }
 
   @Test
-  public void testTable() {
+  public void testLessVisibleRowsInTable() {
     assertEquals(3, myTablePm.getTotalNumOfPmRows());
-    assertEquals("[a, b]", myTablePm.getRowPms().toString());
+    assertEquals("setNumOfPageRowPms is 2", "[a, b]", myTablePm.getRowPms().toString());
   }
 
   @Test
@@ -119,7 +119,7 @@ public class PmTableTest {
 
     PmCacheApi.clearPmCache(myTablePm);
     assertEquals("After clearing the PM value caches we see the data change.",
-                 4, myTablePm.getTotalNumOfPmRows());
+            4, myTablePm.getTotalNumOfPmRows());
     assertEquals("First page content is not changed.", "[a, b]", myTablePm.getRowPms().toString());
     PageableCollectionUtil.navigateToLastPage(myTablePm.getPmPageableCollection());
     assertEquals("After a page switch the new item is visible.", "[c, d]", myTablePm.getRowPms().toString());
@@ -128,11 +128,11 @@ public class PmTableTest {
     editedRowBeanList.remove(2);
     assertEquals("[b, a, d]", editedRowBeanList.toString());
     assertEquals("Rerender the current page. It's not changed because the current page items are cached.",
-                 "[c, d]", myTablePm.getRowPms().toString());
+            "[c, d]", myTablePm.getRowPms().toString());
 
     PmCacheApi.clearPmCache(myTablePm);
     assertEquals("After an update call the table should display the current content.",
-        "[d]", myTablePm.getRowPms().toString());
+            "[d]", myTablePm.getRowPms().toString());
   }
 
   @Test
@@ -175,7 +175,11 @@ public class PmTableTest {
   @Test
   @Ignore("Will be fixed with task 135890")
   public void testInitialSortOrderConfiguredInTableAnnotation() {
-    assertEquals(PmSortOrder.ASC, myTablePm.name.getSortOrderAttr().getValue());
+    // name and relative name are the same?
+    assertEquals("name", myTablePm.name.getPmName());
+    assertEquals("name", myTablePm.name.getPmRelativeName());
+    // myTablePm.updatePmTable();
+    assertEquals("initialSortCol is name", PmSortOrder.ASC, myTablePm.name.getSortOrderAttr().getValue());
   }
 
   @Test
@@ -236,7 +240,7 @@ public class PmTableTest {
       }
     }, PmTable.TableChange.FILTER);
 
-    // Nevertheless try to register a filter that filters any 'a' 
+    // Nevertheless try to register a filter that filters any 'a'
     QueryExprCompare noA = new QueryExprCompare(RowBean.ATTR_NAME, CompOpNotEquals.class, "a");
     myTablePm.getPmPageableBeanCollection().getQueryParams().setFilterExpression(noA);
 
@@ -288,9 +292,9 @@ public class PmTableTest {
     assertEquals(1, valueChangeEventListener.getCallCount());
   }
 
-  @PmTableCfg(initialSortCol="name")
+  @PmTableCfg(initialSortCol="name", sortable = true)
   @PmFactoryCfg(beanPmClasses=RowPm.class)
-  public static class TablePm extends PmTableImpl<RowPm, RowBean> {
+  public static class MyTablePm extends PmTableImpl<RowPm, RowBean> {
 
     /** A column with an annotation based filter definition. */
     @PmTableColCfg(sortable=PmBoolean.TRUE)
@@ -309,7 +313,7 @@ public class PmTableTest {
     public final PmTableCol pathColumn = new PmTableColImpl(this);
 
     /** Defines a page size of two items. */
-    public TablePm(PmObject pmParent) {
+    public MyTablePm(PmObject pmParent) {
       super(pmParent);
       setNumOfPageRowPms(2);
     }
