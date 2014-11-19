@@ -55,11 +55,14 @@ import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmOption;
 import org.pm4j.core.pm.PmOptionSet;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
+import org.pm4j.core.pm.annotation.PmCacheCfg2;
 import org.pm4j.core.pm.annotation.PmAttrCfg.HideIf;
 import org.pm4j.core.pm.annotation.PmAttrCfg.Restriction;
 import org.pm4j.core.pm.annotation.PmAttrCfg.Validate;
 import org.pm4j.core.pm.annotation.PmCacheCfg;
 import org.pm4j.core.pm.annotation.PmCacheCfg.CacheMode;
+import org.pm4j.core.pm.annotation.PmCacheCfg2.Cache;
+import org.pm4j.core.pm.annotation.PmCacheCfg2.Observe;
 import org.pm4j.core.pm.annotation.PmCommandCfg;
 import org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO;
 import org.pm4j.core.pm.annotation.PmOptionCfg;
@@ -72,6 +75,7 @@ import org.pm4j.core.pm.api.PmExpressionApi;
 import org.pm4j.core.pm.api.PmLocalizeApi;
 import org.pm4j.core.pm.api.PmMessageApi;
 import org.pm4j.core.pm.api.PmMessageUtil;
+import org.pm4j.core.pm.impl.InternalPmCacheCfgUtil.CacheMetaData;
 import org.pm4j.core.pm.impl.cache.CacheStrategyBase;
 import org.pm4j.core.pm.impl.cache.CacheStrategyRequest;
 import org.pm4j.core.pm.impl.converter.PmConverterErrorMessage;
@@ -122,7 +126,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
    * Contains optional attribute data that in most cases doesn't exist for usual
    * bean attributes.
    */
-  private PmAttrDataContainer<T_PM_VALUE, T_BEAN_VALUE> dataContainer;
+  /* package */ PmAttrDataContainer<T_PM_VALUE, T_BEAN_VALUE> dataContainer;
 
   /**
    * Keeps a reference to the entered value in case of buffered data entry.
@@ -154,7 +158,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   @Override
   public final PmOptionSet getOptionSet() {
     MetaData md = getOwnMetaData();
-    Object ov = md.cacheStrategyForOptions.getCachedValue(this);
+    Object ov = md.optionsCache.cacheStrategy.getCachedValue(this);
 
     if (ov != CacheStrategy.NO_CACHE_VALUE) {
       // just return the cache hit (if there was one)
@@ -162,7 +166,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     }
     else {
       try {
-        return md.cacheStrategyForOptions.setAndReturnCachedValue(this, getOptionSetImpl());
+        return md.optionsCache.cacheStrategy.setAndReturnCachedValue(this, getOptionSetImpl());
       }
       catch (RuntimeException e) {
         PmRuntimeException forwardedEx = PmRuntimeException.asPmRuntimeException(this, e);
@@ -363,7 +367,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   @Override
   public final T_PM_VALUE getValue() {
     MetaData md = getOwnMetaData();
-    Object ov = md.cacheStrategyForValue.getCachedValue(this);
+    Object ov = md.valueCache.cacheStrategy.getCachedValue(this);
 
     if (ov != CacheStrategy.NO_CACHE_VALUE) {
       // just return the cache hit (if there was one)
@@ -382,7 +386,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
           v = getValueImpl();
         }
 
-        return (T_PM_VALUE) md.cacheStrategyForValue.setAndReturnCachedValue(this, v);
+        return (T_PM_VALUE) md.valueCache.cacheStrategy.setAndReturnCachedValue(this, v);
       }
       catch (RuntimeException e) {
         PmRuntimeException forwardedEx = PmRuntimeException.asPmRuntimeException(this, e);
@@ -574,13 +578,13 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
 
     super.clearCachedPmValues(cacheSet);
 
-    MetaData sd = getOwnMetaData();
-
-    if (cacheSet.contains(PmCacheApi.CacheKind.VALUE))
-      sd.cacheStrategyForValue.clear(this);
-
-    if (cacheSet.contains(PmCacheApi.CacheKind.OPTIONS))
-      sd.cacheStrategyForOptions.clear(this);
+    MetaData md = getOwnMetaData();
+    if (cacheSet.contains(PmCacheApi.CacheKind.VALUE)) {
+      md.valueCache.cacheStrategy.clear(this);
+    }
+    if (cacheSet.contains(PmCacheApi.CacheKind.OPTIONS)) {
+      md.optionsCache.cacheStrategy.clear(this);
+    }
   }
 
   /**
@@ -726,7 +730,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
           //     "You may override 'isConvertingNullValueImpl' and implement a null value conversion (override convertPmValueToBackingValue or configure a valueConverter) to get that feature.");
         }
         setBackingValueInternal(backingValue);
-        metaData.cacheStrategyForValue.setAndReturnCachedValue(this, newPmValue);
+        metaData.valueCache.cacheStrategy.setAndReturnCachedValue(this, newPmValue);
 
         // From now on the value should be handled as intentionally modified.
         // That means that the default value shouldn't be returned, even if the
@@ -1456,7 +1460,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
    *
    * @return The container for optional data parts.
    */
-  private final PmAttrDataContainer<T_PM_VALUE, T_BEAN_VALUE> zz_getDataContainer() {
+  final PmAttrDataContainer<T_PM_VALUE, T_BEAN_VALUE> zz_getDataContainer() {
     if (dataContainer == null) {
       dataContainer = new PmAttrDataContainer<T_PM_VALUE, T_BEAN_VALUE>();
     }
@@ -1633,11 +1637,12 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     }
 
     // -- Cache configuration --
-    List<PmCacheCfg> cacheAnnotations = AnnotationUtil.findAnnotationsInPmHierarchy(this, PmCacheCfg.class, new ArrayList<PmCacheCfg>());
-    myMetaData.cacheStrategyForOptions = AnnotationUtil.evaluateCacheStrategy(this, PmCacheCfg.ATTR_OPTIONS, cacheAnnotations, CACHE_STRATEGIES_FOR_OPTIONS);
-    myMetaData.cacheStrategyForValue = AnnotationUtil.evaluateCacheStrategy(this, PmCacheCfg.ATTR_VALUE, cacheAnnotations, CACHE_STRATEGIES_FOR_VALUE);
+    List cacheAnnotations = InternalPmCacheCfgUtil.findCacheCfgsInPmHierarchy(this, new ArrayList());
+    if (!cacheAnnotations.isEmpty()) {
+      myMetaData.optionsCache = InternalPmCacheCfgUtil.readCacheMetaData(this, CacheKind.OPTIONS, cacheAnnotations);
+      myMetaData.valueCache = InternalPmCacheCfgUtil.readCacheMetaData(this, CacheKind.VALUE, cacheAnnotations);
+    }
   }
-
 
   private void zz_readBeanValidationRestrictions(Class<?> beanClass, PmAttrCfg fieldAnnotation, MetaData myMetaData) {
     if (BeanValidationPmUtil.getBeanValidator() == null)
@@ -1715,8 +1720,8 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     private PathResolver                    valueContainingObjPathResolver = PassThroughPathResolver.INSTANCE;
     private String                          formatResKey;
     private String                          defaultValueString;
-    private CacheStrategy                   cacheStrategyForOptions = CacheStrategyNoCache.INSTANCE;
-    private CacheStrategy                   cacheStrategyForValue   = CacheStrategyNoCache.INSTANCE;
+    private CacheMetaData                   optionsCache            = CacheMetaData.NO_CACHE;
+    private CacheMetaData                   valueCache              = CacheMetaData.NO_CACHE;
     private StringConverter<?>              stringConverter;
     private ValueConverter<?, ?>            valueConverter;
     /* package */ BackingValueAccessStrategy valueAccessStrategy     = ValueAccessLocal.INSTANCE;
@@ -1740,15 +1745,19 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
       this.maxLenDefault = maxDefaultLen;
     }
 
+    @Override
+    protected void onPmInit(PmObjectBase pm) {
+      super.onPmInit(pm);
+      InternalPmCacheCfgUtil.registerClearOnListeners(pm, CacheKind.OPTIONS, optionsCache.cacheClearOn);
+      InternalPmCacheCfgUtil.registerClearOnListeners(pm, CacheKind.VALUE, valueCache.cacheClearOn);
+    }
+
     /** @return The statically defined option set algorithm. */
     public PmOptionSetDef<PmAttr<?>> getOptionSetDef() { return optionSetDef; }
     public PmOptionCfg.NullOption getNullOption() { return nullOption; }
 
     public String getFormatResKey() { return formatResKey; }
     public void setFormatResKey(String formatResKey) { this.formatResKey = formatResKey; }
-
-    public CacheStrategy getCacheStrategyForOptions() { return cacheStrategyForOptions; }
-    public CacheStrategy getCacheStrategyForValue() { return cacheStrategyForValue; }
 
     public StringConverter<?> getStringConverter() { return stringConverter; }
 
@@ -1812,55 +1821,6 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   private final MetaData getOwnMetaDataWithoutPmInitCall() {
     return (MetaData) getPmMetaDataWithoutPmInitCall();
   }
-
-  // ====== Cache strategies ====== //
-
-  private static final CacheStrategy CACHE_VALUE_LOCAL = new CacheStrategyBase<PmAttrBase<?,?>>("CACHE_VALUE_LOCAL") {
-    @Override protected Object readRawValue(PmAttrBase<?, ?> pm) {
-      return (pm.dataContainer != null)
-                ? pm.dataContainer.cachedValue
-                : null;
-    }
-    @Override protected void writeRawValue(PmAttrBase<?, ?> pm, Object value) {
-      pm.zz_getDataContainer().cachedValue = value;
-    }
-    @Override protected void clearImpl(PmAttrBase<?, ?> pm) {
-      if (pm.dataContainer != null) {
-        pm.dataContainer.cachedValue = null;
-      }
-    }
-  };
-
-  private static final CacheStrategy CACHE_OPTIONS_LOCAL = new CacheStrategyBase<PmAttrBase<?,?>>("CACHE_OPTIONS_LOCAL") {
-    @Override protected Object readRawValue(PmAttrBase<?, ?> pm) {
-      return (pm.dataContainer != null)
-                ? pm.dataContainer.cachedOptionSet
-                : null;
-    }
-    @Override protected void writeRawValue(PmAttrBase<?, ?> pm, Object value) {
-      pm.zz_getDataContainer().cachedOptionSet = value;
-    }
-    @Override protected void clearImpl(PmAttrBase<?, ?> pm) {
-      if (pm.dataContainer != null) {
-        pm.dataContainer.cachedOptionSet = null;
-      }
-    }
-  };
-
-
-  private static final Map<CacheMode, CacheStrategy> CACHE_STRATEGIES_FOR_VALUE =
-    MapUtil.makeFixHashMap(
-      CacheMode.OFF,      CacheStrategyNoCache.INSTANCE,
-      CacheMode.ON,    CACHE_VALUE_LOCAL,
-      CacheMode.REQUEST,  new CacheStrategyRequest("CACHE_VALUE_IN_REQUEST", "v")
-    );
-
-  private static final Map<CacheMode, CacheStrategy> CACHE_STRATEGIES_FOR_OPTIONS =
-    MapUtil.makeFixHashMap(
-        CacheMode.OFF,      CacheStrategyNoCache.INSTANCE,
-        CacheMode.ON,    CACHE_OPTIONS_LOCAL,
-        CacheMode.REQUEST,  new CacheStrategyRequest("CACHE_OPTIONS_IN_REQUEST", "os")
-      );
 
   // ====== Backing value access strategies ====== //
 

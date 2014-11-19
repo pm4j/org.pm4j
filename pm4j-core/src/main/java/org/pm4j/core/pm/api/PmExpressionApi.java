@@ -65,9 +65,9 @@ public class PmExpressionApi {
    * @param pm
    *          the PM context.
    * @param expression
-   *          the expession used to resolve the object.
+   *          the expression used to resolve the object.
    * @param resultType
-   *          the expectes result type.
+   *          the expects result type.
    * @return The found object or <code>null</code>.
    * @throws PmRuntimeException
    *           if the found object is not compatible to the given
