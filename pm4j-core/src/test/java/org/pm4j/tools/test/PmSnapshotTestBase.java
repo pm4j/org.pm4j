@@ -18,7 +18,7 @@ public class PmSnapshotTestBase {
    * @param snapshotName Name of the snapshot file (without .xml post fix).
    */
   public void snapshot(PmObject rootPm, String snapshotName) {
-    snapshotTestTool.snapshot(rootPm, snapshotName);
+    getSnapshotTestTool().snapshot(rootPm, snapshotName);
   }
 
   /**
