@@ -3,6 +3,11 @@ package org.pm4j.core.pm;
 import java.util.Date;
 
 public interface PmAttrDate extends PmAttr<Date> {
+  
+  /**
+   * Defines explicit maximum allowed length of the {@link String} representation.
+   */
+  public static final int MAX_LENGTH = 20;
 
   /**
    * The default format resource key as defined in the Resources_xx.properties

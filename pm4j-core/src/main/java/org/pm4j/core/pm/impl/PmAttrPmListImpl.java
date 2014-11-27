@@ -267,7 +267,8 @@ public class PmAttrPmListImpl<T_ITEM_PM extends PmBean<T_BEAN>, T_BEAN> extends 
   protected void initMetaData(PmObjectBase.MetaData metaData) {
     super.initMetaData(metaData);
     MetaData myMetaData = (MetaData) metaData;
-
+    myMetaData.setValidateLengths(false);
+    
     PmAttrPmListCfg annotation = AnnotationUtil.findAnnotation(this, PmAttrPmListCfg.class);
     if (annotation != null) {
       myMetaData.provideInvisibleItems = annotation.provideInvisibleItems();

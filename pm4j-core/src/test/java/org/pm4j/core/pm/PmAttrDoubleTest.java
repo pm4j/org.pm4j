@@ -14,6 +14,7 @@ import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.annotation.PmAttrDoubleCfg;
 import org.pm4j.core.pm.impl.PmAttrDoubleImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
+import org.pm4j.tools.test.PmAssert;
 
 /**
  * If you modify this test, please consider at least {@link PmAttrDoubleTest}.
@@ -38,11 +39,6 @@ public class PmAttrDoubleTest {
     myPm.maxLen6.setValue(assignedValue);
     assertEquals("The assigned value should be the current one.", assignedValue, myPm.maxLen6.getValue());
     assertEquals("The assigned value should also appear as string.", "123", myPm.maxLen6.getValueAsString());
-  }
-
-  @Test
-  public void testMaxLen() {
-    assertEquals(6, myPm.maxLen6.getMaxLen());
   }
 
   @Test
@@ -81,14 +77,9 @@ public class PmAttrDoubleTest {
   }
 
   @Test
-  public void testGetMinMax() {
+  public void testGetMinMaxValue() {
     assertEquals(new Double("999.99"), myPm.minMaxAttr.getMaxValue());
     assertEquals(new Double("0.1"), myPm.minMaxAttr.getMinValue());
-  }
-
-  @Test
-  public void testGetMaxLen() {
-    assertEquals(6, myPm.maxLen6.getMaxLen());
   }
 
   private void assertValue(PmAttrDouble pm, String number, boolean isValid) {
@@ -98,8 +89,14 @@ public class PmAttrDoubleTest {
     assertEquals(new Double(number), pm.getValue());
   }
 
+  @Test
+  public void testMinMaxValue() {
+    testMinMaxValue(myPm.minMaxAttr);
+    testMinMaxValue(myPm.minSingleValue);
+    testMinMaxValue(myPm.maxSingleValue);
+  }
 
-  private void testMinMax(PmAttrDouble pm) {
+  private void testMinMaxValue(PmAttrDouble pm) {
     assertValue(pm, "0", false);
     assertValue(pm, "0.1", true);
     assertValue(pm, "0.09", false);
@@ -107,12 +104,29 @@ public class PmAttrDoubleTest {
     assertValue(pm, "9.9999", true);
     assertValue(pm, "99999", false);
   }
-
+  
   @Test
-  public void testMinMax() {
-    testMinMax(myPm.minMaxAttr);
-    testMinMax(myPm.minSingleValue);
-    testMinMax(myPm.maxSingleValue);
+  public void testLengthConstraints() {
+    
+    //Check annotations
+    assertEquals(2, myPm.minLen2.getMinLen());
+    assertEquals(6, myPm.maxLen6.getMaxLen());
+
+    //Validate too big
+    myPm.maxLen6.setValue(1234567d);
+    PmAssert.validateNotSuccessful(myPm.maxLen6, "Please enter maximal 6 characters in field \"pmAttrDoubleTest.MyPm.maxLen6\".");
+    
+    //Validate correct
+    myPm.maxLen6.setValue(123456d);
+    PmAssert.validateSuccessful(myPm);
+
+    //Validate to less
+    myPm.minLen2.setValue(1d);
+    PmAssert.validateNotSuccessful(myPm.minLen2, "Please enter at least 2 characters in field \"pmAttrDoubleTest.MyPm.minLen2\".");
+
+    //Validate correct
+    myPm.minLen2.setValue(12d);
+    PmAssert.validateSuccessful(myPm.minLen2);
   }
 
 
@@ -210,6 +224,9 @@ public class PmAttrDoubleTest {
     @PmAttrDoubleCfg(roundingMode = RoundingMode.HALF_UP)
     public final PmAttrDouble roundingHalfUp = new PmAttrDoubleImpl(this);
 
+    @PmAttrCfg(minLen=2)
+    public final PmAttrDouble minLen2 = new PmAttrDoubleImpl(this);
+    
     @PmAttrCfg(maxLen=6)
     public final PmAttrDouble maxLen6 = new PmAttrDoubleImpl(this);
 
