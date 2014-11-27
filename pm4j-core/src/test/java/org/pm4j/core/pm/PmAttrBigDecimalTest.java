@@ -43,8 +43,32 @@ public class PmAttrBigDecimalTest {
   }
 
   @Test
-  public void testMaxLen() {
+  public void testMinLength() {
+    
+    //Check annotations
+    assertEquals(2, myPm.minLen2.getMinLen());
+
+    //Validate too short
+    myPm.minLen2.setValue(new BigDecimal("1"));
+    PmAssert.validateNotSuccessful(myPm.minLen2, "Please enter at least 2 characters in field \"pmAttrBigDecimalTest.MyPm.minLen2\".");
+
+    //Validate correct
+    myPm.minLen2.setValue(new BigDecimal("12"));
+    PmAssert.validateSuccessful(myPm.minLen2);
+  }
+  
+  public void testMaxLength() {
+    
+    //Check annotations
     assertEquals(6, myPm.maxLen6.getMaxLen());
+
+    //Validate too big
+    myPm.maxLen6.setValue(new BigDecimal("1234567"));
+    PmAssert.validateNotSuccessful(myPm.maxLen6, "Please enter maximal 6 characters in field \"pmAttrBigDecimalTest.MyPm.maxLen6\".");
+    
+    //Validate correct
+    myPm.maxLen6.setValue(new BigDecimal("123456"));
+    PmAssert.validateSuccessful(myPm.maxLen6);
   }
 
   
@@ -85,14 +109,9 @@ public class PmAttrBigDecimalTest {
   }
   
   @Test
-  public void testGetMinMax() {
+  public void testGetMinMaxValue() {
     assertEquals(new BigDecimal("999.99"), myPm.minMaxAttr.getMaxValue());
     assertEquals(new BigDecimal("0.1"), myPm.minMaxAttr.getMinValue());
-  }
-  
-  @Test
-  public void testGetMaxLen() {
-    assertEquals(6, myPm.maxLen6.getMaxLen());    
   }
   
   private void assertValue(PmAttrBigDecimal pm, String number, boolean isValid) {
@@ -102,21 +121,20 @@ public class PmAttrBigDecimalTest {
     assertEquals(new BigDecimal(number), pm.getValue());
   }
   
- 
-  private void testMinMax(PmAttrBigDecimal pm) {
+  @Test
+  public void testMinMaxValue() {
+    testMinMaxValue(myPm.minMaxAttr);
+    testMinMaxValue(myPm.minSingleValue);
+    testMinMaxValue(myPm.maxSingleValue);
+  }
+  
+  private void testMinMaxValue(PmAttrBigDecimal pm) {
     assertValue(pm, "0", false);
     assertValue(pm, "0.1", true);
     assertValue(pm, "0.09", false);
     assertValue(pm, "999.9900001", false);
     assertValue(pm, "9.9999", true);
     assertValue(pm, "99999", false);    
-  }
-
-  @Test
-  public void testMinMax() {
-    testMinMax(myPm.minMaxAttr);
-    testMinMax(myPm.minSingleValue);
-    testMinMax(myPm.maxSingleValue);
   }
   
   @Test
@@ -198,6 +216,9 @@ public class PmAttrBigDecimalTest {
 
     @PmAttrCfg(formatResKey="pmAttrNumberTest_twoDecimalPlaces")
     public final PmAttrBigDecimal roundingUnnecessary = new PmAttrBigDecimalImpl(this);
+    
+    @PmAttrCfg(minLen=2)
+    public final PmAttrBigDecimal minLen2 = new PmAttrBigDecimalImpl(this);
     
     @PmAttrCfg(maxLen=6)
     public final PmAttrBigDecimal maxLen6 = new PmAttrBigDecimalImpl(this);

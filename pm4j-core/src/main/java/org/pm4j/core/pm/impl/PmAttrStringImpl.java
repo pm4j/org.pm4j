@@ -2,9 +2,7 @@ package org.pm4j.core.pm.impl;
 
 import org.apache.commons.lang.StringUtils;
 import org.pm4j.common.converter.string.StringConverterString;
-import org.pm4j.core.exception.PmValidationException;
 import org.pm4j.core.pm.PmAttrString;
-import org.pm4j.core.pm.PmConstants;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmAttrStringCfg;
 
@@ -24,20 +22,6 @@ public class PmAttrStringImpl extends PmAttrBase<String, String> implements PmAt
   @Override
   public boolean isMultiLine() {
     return getOwnMetaData().multiLine;
-  }
-
-  @Override
-  protected void validate(String value) throws PmValidationException {
-    super.validate(value);
-
-    if (value != null) {
-      if (value.length() < getMinLen()) {
-        throw new PmValidationException(this, PmConstants.MSGKEY_VALIDATION_VALUE_TOO_SHORT, getMinLen());
-      }
-      if (value.length() > getMaxLen()) {
-        throw new PmValidationException(this, PmConstants.MSGKEY_VALIDATION_VALUE_TOO_LONG, getMaxLen());
-      }
-    }
   }
 
   // ======== Value handling ======== //
