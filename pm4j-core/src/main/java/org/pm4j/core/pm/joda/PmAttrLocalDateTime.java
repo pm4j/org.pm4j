@@ -11,6 +11,11 @@ import org.pm4j.core.pm.PmAttr;
 public interface PmAttrLocalDateTime extends PmAttr<LocalDateTime> {
 
   /**
+   * Defines explicit maximum allowed length of the {@link String} representation.
+   */
+  public static final int MAX_LENGTH = 29;
+  
+  /**
    * The default format resource key that is used if no attribute specific
    * format is defined.
    */

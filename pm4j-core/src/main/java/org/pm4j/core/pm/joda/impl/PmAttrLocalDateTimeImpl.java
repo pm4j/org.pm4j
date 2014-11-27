@@ -50,7 +50,7 @@ public class PmAttrLocalDateTimeImpl
   @Override
   protected PmObjectBase.MetaData makeMetaData() {
     /** Sets the default max length is the length of the date format pattern. */
-    MetaData md = new MetaData(11);
+    MetaData md = new MetaData(MAX_LENGTH);
     // Configure the default converters. Is done before <code>initMetaData</code> to allow
     // annotation based customization.
     md.setStringConverter(new LocalDateTimeStringConverter());
