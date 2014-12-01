@@ -1119,6 +1119,19 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
         isEmptyValue(value)) {
       throw new PmValidationException(PmMessageApi.makeRequiredMessageResData(this));
     }
+    
+    // Check for the length of the number String representation if enabled
+    if (getOwnMetaDataWithoutPmInitCall().isValidateLengths()) {
+      String valueAsString = valueToStringImpl(value);
+      if (valueAsString != null) {
+        if (valueAsString.length() < getMinLen()) {
+          throw new PmValidationException(this, PmConstants.MSGKEY_VALIDATION_VALUE_TOO_SHORT, getMinLen());
+        }
+        if (valueAsString.length() > getMaxLen()) {
+          throw new PmValidationException(this, PmConstants.MSGKEY_VALIDATION_VALUE_TOO_LONG, getMaxLen());
+        }
+      }
+    }
   }
 
   /**
@@ -1729,6 +1742,8 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
      * Is <code>null</code> if there is nothing to validate this way. */
     private String                          validationFieldName;
     private PmAttrCfg.Validate              validate                = PmAttrCfg.Validate.ON_VALIDATE_CALL;
+    /** if to validate length of the value String representation */
+    private boolean                         validateLengths         = true;
     private int                             maxLen                  = -1;
     private int                             minLen                  = 0;
     private int                             maxLenDefault;
@@ -1802,6 +1817,20 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
       return embeddedAttr;
     }
 
+    /**
+     * @return the validateLengths
+     */
+    public boolean isValidateLengths() {
+      return validateLengths;
+    }
+
+    /**
+     * @param validateLengths the validateLengths to set
+     */
+    public void setValidateLengths(boolean validateLengths) {
+      this.validateLengths = validateLengths;
+    }
+    
   }
 
   /**
