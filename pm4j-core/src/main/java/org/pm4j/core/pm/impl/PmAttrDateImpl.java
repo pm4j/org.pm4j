@@ -15,7 +15,7 @@ import org.pm4j.core.pm.api.PmLocalizeApi;
  * @author olaf boede
  */
 public class PmAttrDateImpl extends PmAttrBase<Date, Date> implements PmAttrDate {
-  
+
   public PmAttrDateImpl(PmObject pmParent) {
     super(pmParent);
   }
@@ -59,7 +59,7 @@ public class PmAttrDateImpl extends PmAttrBase<Date, Date> implements PmAttrDate
   @Override
   protected PmObjectBase.MetaData makeMetaData() {
     // The default max length is the length of the date format pattern.
-    return new MetaData(MAX_LENGTH);
+    return new MetaData(20);
   }
 
 }

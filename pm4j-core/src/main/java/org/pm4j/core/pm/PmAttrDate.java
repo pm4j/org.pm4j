@@ -3,12 +3,6 @@ package org.pm4j.core.pm;
 import java.util.Date;
 
 public interface PmAttrDate extends PmAttr<Date> {
-  
-  /**
-   * Defines the default maximum string length.
-   * You may define your specific string length by defining it in @PmAttrCfg(maxLen).
-   */
-  public static final int MAX_LENGTH = 20;
 
   /**
    * The default format resource key as defined in the Resources_xx.properties

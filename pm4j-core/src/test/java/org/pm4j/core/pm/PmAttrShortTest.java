@@ -8,13 +8,10 @@ import java.util.Locale;
 import org.junit.Before;
 import org.junit.Test;
 import org.pm4j.core.pm.PmMessage.Severity;
-import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.api.PmMessageApi;
 import org.pm4j.core.pm.api.PmMessageUtil;
-import org.pm4j.core.pm.impl.PmAttrIntegerImpl;
 import org.pm4j.core.pm.impl.PmAttrShortImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
-import org.pm4j.tools.test.PmAssert;
 
 public class PmAttrShortTest {
 
@@ -52,47 +49,10 @@ public class PmAttrShortTest {
     Class<?> t = myPm.shortAttr.getValueType();
     assertEquals(Short.class, t);
   }
-  
-  @Test
-  public void testMinLength() {
-    
-    //Check annotations
-    assertEquals(2, myPm.minLen2.getMinLen());
-
-    //Validate too short
-    myPm.minLen2.setValue(1);
-    PmAssert.validateNotSuccessful(myPm.minLen2, "Please enter at least 2 characters in field \"pmAttrShortTest.MyPm.minLen2\".");
-
-    //Validate correct
-    myPm.minLen2.setValue(12);
-    PmAssert.validateSuccessful(myPm.minLen2);
-  }
-  
-  @Test
-  public void testMaxLength() {
-    
-    //Check annotations
-    assertEquals(6, myPm.maxLen6.getMaxLen());
-
-    //Validate too big
-    myPm.maxLen6.setValue(1234567);
-    PmAssert.validateNotSuccessful(myPm.maxLen6, "Please enter maximal 6 characters in field \"pmAttrShortTest.MyPm.maxLen6\".");
-    
-    //Validate correct
-    myPm.maxLen6.setValue(123456);
-    PmAssert.validateSuccessful(myPm);
-  }
 
 
   static class MyPm extends PmConversationImpl {
-    
     public final PmAttrShort shortAttr = new PmAttrShortImpl(this);
-    
-    @PmAttrCfg(minLen=2)
-    public final PmAttrIntegerImpl minLen2 = new PmAttrIntegerImpl(this);
-    
-    @PmAttrCfg(maxLen=6)
-    public final PmAttrIntegerImpl maxLen6 = new PmAttrIntegerImpl(this);
   }
 
 }

@@ -5,14 +5,12 @@ import java.util.Set;
 import org.apache.commons.lang.ObjectUtils;
 import org.pm4j.core.exception.PmConverterException;
 import org.pm4j.core.exception.PmRuntimeException;
-import org.pm4j.core.exception.PmValidationException;
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmAttrProxy;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmOptionSet;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.annotation.PmAttrCfg.AttrAccessKind;
-import org.pm4j.core.pm.api.PmValidationApi;
 
 /**
  *
@@ -158,13 +156,6 @@ public class PmAttrProxyImpl<T_VALUE> extends PmAttrImpl<T_VALUE> implements PmA
     }
     else {
       super.getPmStyleClassesImpl(styleClassSet);
-    }
-  }
-  
-  @Override
-  protected void validate(T_VALUE value) throws PmValidationException {
-    if(delegate != null) {
-      PmValidationApi.validateSubTree(delegate);
     }
   }
 

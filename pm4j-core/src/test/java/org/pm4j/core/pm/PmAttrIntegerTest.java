@@ -12,7 +12,6 @@ import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.impl.PmAttrIntegerImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
-import org.pm4j.tools.test.PmAssert;
 
 public class PmAttrIntegerTest {
 
@@ -98,48 +97,10 @@ public class PmAttrIntegerTest {
     assertEquals(0, pm.withNullConverter.getBackingValue().intValue());
     assertEquals(null, pm.withNullConverter.getValue());
   }
-  
-  @Test
-  public void testMinLength() {
-    
-    //Check annotations
-    assertEquals(2, pm.minLen2.getMinLen());
 
-    //Validate too short
-    pm.minLen2.setValue(1);
-    PmAssert.validateNotSuccessful(pm.minLen2, "Please enter at least 2 characters in field \"pmAttrIntegerTest.MyPm.minLen2\".");
-
-    //Validate correct
-    pm.minLen2.setValue(12);
-    PmAssert.validateSuccessful(pm.minLen2);
-  }
-
-  @Test
-  public void testMaxLength() {
-    
-    //Check annotations
-    assertEquals(6, pm.maxLen6.getMaxLen());
-
-    //Validate too big
-    pm.maxLen6.setValue(1234567);
-    PmAssert.validateNotSuccessful(pm.maxLen6, "Please enter maximal 6 characters in field \"pmAttrIntegerTest.MyPm.maxLen6\".");
-    
-    //Validate correct
-    pm.maxLen6.setValue(123456);
-    PmAssert.validateSuccessful(pm);
-
-  }
-  
   public static class MyPm extends PmConversationImpl {
-    
     @PmAttrCfg(formatResKey="pmAttrIntegerTest.multiFormatTestFormat")
-    public final PmAttrInteger i = new PmAttrIntegerImpl(this);
-    
-    @PmAttrCfg(minLen=2)
-    public final PmAttrIntegerImpl minLen2 = new PmAttrIntegerImpl(this);
-    
-    @PmAttrCfg(maxLen=6)
-    public final PmAttrIntegerImpl maxLen6 = new PmAttrIntegerImpl(this);
+    public final PmAttrIntegerImpl i = new PmAttrIntegerImpl(this);
 
     @PmAttrCfg(defaultValue="3")
     public final PmAttrIntegerImpl withDefaultValue = new PmAttrIntegerImpl(this);
