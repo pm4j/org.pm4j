@@ -175,13 +175,13 @@ class InternalPmBeanCacheStrategyFactory extends InternalCacheStrategyFactory {
     }
 
     @Override protected Object readRawValue(PmBeanImpl2<Object> pm) {
-      return pm.pmBean;
+      return pm.pmBeanCache;
     }
     @Override protected void writeRawValue(PmBeanImpl2<Object> pm, Object value) {
-      pm.pmBean = value;
+      pm.pmBeanCache = value;
     }
     @Override protected void clearImpl(PmBeanImpl2<Object> pm) {
-      pm.pmBean = null;
+      pm.pmBeanCache = null;
     }
   };
 }

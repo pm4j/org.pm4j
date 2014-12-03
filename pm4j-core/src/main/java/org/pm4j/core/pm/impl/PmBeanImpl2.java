@@ -39,7 +39,7 @@ public class PmBeanImpl2<T_BEAN>
       implements PmBean<T_BEAN> {
 
   /** A cached data object behind this PM. */
-  /* package */ T_BEAN pmBean;
+  /* package */ T_BEAN pmBeanCache;
 
   /**
    * Default constructor for PmBeans used in factories.
@@ -58,16 +58,16 @@ public class PmBeanImpl2<T_BEAN>
     super(pmParent);
   }
 
-  /**
-   * Initializing constructor. Allows to access the bean behind this PM at
-   * construction time.
-   *
-   * @param pmParent
-   *          The context this PM is created in (e.g. field, session).
-   * @param bean
-   *          The bean this PM is constructed for.
-   */
 // TODO oboede: needs to be checked.
+//  /**
+//   * Initializing constructor. Allows to access the bean behind this PM at
+//   * construction time.
+//   *
+//   * @param pmParent
+//   *          The context this PM is created in (e.g. field, session).
+//   * @param bean
+//   *          The bean this PM is constructed for.
+//   */
 //  public PmBeanImpl2(PmObject pmParent, T_BEAN bean) {
 //    super(pmParent);
 //    this.pmBean = bean;
@@ -88,7 +88,7 @@ public class PmBeanImpl2<T_BEAN>
   @Override
   public final T_BEAN getPmBean() {
     // Postponed value change events need to be executed at least now. The PM now gets used.
-    BroadcastPmEventProcessor.ensureDeferredValueChangeProcessorExecution(this);
+    BroadcastPmEventProcessor.doDeferredPmEventExecution(this);
 
     CacheStrategy cache = getOwnMetaData().valueCache.cacheStrategy;
     T_BEAN bean = (T_BEAN) cache.getCachedValue(this);
@@ -102,7 +102,7 @@ public class PmBeanImpl2<T_BEAN>
   }
 
   /**
-   * Will be called if {@link #pmBean} is <code>null</code>.
+   * Will be called if {@link #pmBeanCache} is <code>null</code>.
    * <p>
    * The default implementation calls {@link #findPmBeanImpl()}. If that returns
    * <code>null</code> and {@link PmBeanCfg#autoCreateBean()} is configured a
@@ -119,7 +119,7 @@ public class PmBeanImpl2<T_BEAN>
       bean = (T_BEAN) md.beanPathResolver.getValue(getPmParent());
     }
 
-    // PmBeanCfg(autocreate) calls the default ctor if there is no bean:
+    // @PmBeanCfg(autocreate=true) calls the default ctor if there is no bean:
     if ((bean == null) &&
         md.autoCreateBean) {
       try {
@@ -146,14 +146,6 @@ public class PmBeanImpl2<T_BEAN>
     }
   }
 
-  protected void setPmBeanImpl(T_BEAN bean) {
-    MetaData md = getOwnMetaData();
-    // A bean may be referenced by valuePath
-    if (md.beanPathResolver != null) {
-      md.beanPathResolver.setValue(getPmParent(), bean);
-    }
-  }
-
   /**
    * Re-associates the PM to a reloaded bean instance and fires all change events
    * for this instance and all children.<br>
@@ -177,22 +169,33 @@ public class PmBeanImpl2<T_BEAN>
       InternalPmBeanUtil.checkBeanClass(this, bean);
     }
 
-    setPmBeanImpl(bean);
     MetaData md = getOwnMetaData();
+    // XXX oboede: A bean may be referenced by valuePath. Verify if that feature is really needed.
+    //    if (md.beanPathResolver != null) {
+    //      md.beanPathResolver.setValue(getPmParent(), bean);
+    //    }
+
     if (!md.valueCache.cacheStrategy.isCaching()) {
-      // TODO: provide hints here. getter based pmBean without cache does not work.
-      throw new PmRuntimeException(this, "Unable to set a bean if the PmBean is not caching.");
+      throw new PmRuntimeException(this, "Unable to set a bean if the PmBean no caching is configured.\n" +
+            "\tPlease check if your task may be solved by providing a getPmBeanImpl() implementation.\n" +
+            "\tIn some cased a permanent cache configuration @PmCacheCfg(@Cache(VALUE, clear=NEVER)) may be considered to support fix bean assignments.");
     }
+
     md.valueCache.cacheStrategy.setAndReturnCachedValue(this, bean);
+
     T_BEAN newCurrentBean = getPmBean();
     if (newCurrentBean != bean) {
-      // TODO: provide hints here. getter based pmBean without cache does not work.
-      throw new PmRuntimeException(this, "Unable to set the bean behind this instance.");
+      throw new PmRuntimeException(this, "The set operation was not successful. A get-call does not provide the assigned instance.\n" +
+          "\tPlease check if your task may be solved by providing a getPmBeanImpl() implementation.\n" +
+          "\tIn some cased a permanent cache configuration @PmCacheCfg(@Cache(VALUE, clear=NEVER)) may be considered to support fix bean assignments." +
+          "\tInstance used as setPmBean parameter: " + bean +
+          "\tInstance provided by get (after set): " + newCurrentBean);
     }
 
     if (bean != null) {
       // Re-register the bean to PM association to keep the PM system
       // intact.
+      // TODO: check scope. The bean cache should be in the parent instance only.
       synchronized (getPmConversation()) {
         // FIXME olaf: what about un-registration in case of bean==null ?
         registerInPmBeanCache(this);
@@ -201,8 +204,6 @@ public class PmBeanImpl2<T_BEAN>
 
     return true;
   }
-
-
 
   @Override
   protected void clearCachedPmValues(Set<CacheKind> cacheSet) {
@@ -223,7 +224,7 @@ public class PmBeanImpl2<T_BEAN>
   }
 
   /**
-   * A PM for a <code>null</code> bean is by default read-only.
+   * A PM that evaluates {@link #hasPmBean()} to <code>false</code> is by default read-only.
    */
   @Override
   protected boolean isPmReadonlyImpl() {
@@ -237,19 +238,29 @@ public class PmBeanImpl2<T_BEAN>
   @Override
   protected boolean isPmValueChangedImpl() {
     // TODO oboede: Does not yet work for request scoped value caches (quite unusual).
-    return pmBean != null &&
+    // Same problem for valuePath.
+    return pmBeanCache != null &&
            super.isPmValueChangedImpl();
   }
 
+  // TODO: deferred event handling is a common PM aspect. Should be placed in a common PM class.
+  // Check annotation support.
   /**
    * @return <code>true</code> if {@link PmEvent} broadcasts may be deferred
    *         till the next {@link #getPmBean()} call.
    */
-  protected boolean hasDeferredValueChangeEventHandling() {
+  protected boolean hasDeferredPmEventHandling() {
     return false;
   }
 
   /**
+   * The default implementation checks if {@link #getPmBean()} returns null.<br>
+   * Is internally used in {@link #isPmReadonlyImpl()}.
+   * <p>
+   * In lazy load scenarios a call to {@link #getPmBean()} may be a problem, because it
+   * performs a slow bean load operation that should be prevented.<br>
+   * Domain specific implemenation may provide here another (cheaper) implementation.
+   *
    * @return <code>true</code> if this PM currently has a backing bean.
    */
   public boolean hasPmBean() {
@@ -262,12 +273,15 @@ public class PmBeanImpl2<T_BEAN>
   }
 
   /**
-   * A special {@link PmBeanImpl2} class that provides access to the bean that is handled by the embedding
-   * {@link PmBeanImpl2} instance.
+   * A special {@link PmBeanImpl2} class that provides access to the bean that
+   * is handled by the embedding {@link PmBeanImpl2} instance.
    * <p>
-   * If this class is not used in such an embedded context, it acts just like its base class {@link PmBeanImpl2}.
+   * If this class is not used in such an embedded context, it acts just like
+   * its base class {@link PmBeanImpl2} without an embedding {@link PmBean}.
+   * This functionality is intended for loose coupled unit test scenarios.
    *
-   * @param <T_BEAN> Type of the backing bean.
+   * @param <T_BEAN>
+   *          Type of the backing bean.
    */
   @PmCacheCfg2(@Cache(property=CacheKind.VALUE, mode=CacheMode.OFF))
   public static class Nested<T_BEAN> extends PmBeanImpl2<T_BEAN> {
@@ -291,6 +305,13 @@ public class PmBeanImpl2<T_BEAN>
       embeddingBeanPm = PmUtil.findPmParentOfType(this, PmBean.class);
     }
 
+    /**
+     * Converts the bean found in the parent {@link PmBean} to the bean type handled here.<br>
+     * The default implementation just passes the parent bean through.
+     *
+     * @param parentBean
+     * @return
+     */
     @SuppressWarnings("unchecked")
     protected T_BEAN parentBeanToOwnBean(Object parentBean) {
       return (T_BEAN) parentBean;
@@ -332,7 +353,6 @@ public class PmBeanImpl2<T_BEAN>
     PmBeanCfg annotation = AnnotationUtil.findAnnotation(this, PmBeanCfg.class);
     myMetaData.beanClass = InternalPmBeanUtil.readBeanClass(this, annotation);
 
-    // create BeanAttrAccessor
     if (annotation != null) {
       myMetaData.autoCreateBean = annotation.autoCreateBean();
       if (StringUtils.isNotBlank(annotation.findBeanExpr())) {
