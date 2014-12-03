@@ -10,6 +10,7 @@ public final class CacheStrategyNoCache implements CacheStrategy {
     return NO_CACHE_VALUE;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public Object setAndReturnCachedValue(Object ctxt, Object value) {
     return value;

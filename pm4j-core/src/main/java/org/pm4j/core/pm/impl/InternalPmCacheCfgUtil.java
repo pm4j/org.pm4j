@@ -1,6 +1,7 @@
 package org.pm4j.core.pm.impl;
 
 import java.lang.annotation.Annotation;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -16,9 +17,9 @@ import org.pm4j.core.pm.PmEventListener;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmCacheCfg;
 import org.pm4j.core.pm.annotation.PmCacheCfg.CacheMode;
-import org.pm4j.core.pm.annotation.PmCacheCfg.Clear;
 import org.pm4j.core.pm.annotation.PmCacheCfg2;
 import org.pm4j.core.pm.annotation.PmCacheCfg2.Cache;
+import org.pm4j.core.pm.annotation.PmCacheCfg2.Clear;
 import org.pm4j.core.pm.annotation.PmCacheCfg2.Observe;
 import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
@@ -99,13 +100,22 @@ class InternalPmCacheCfgUtil {
     return null;
   }
 
+  @SuppressWarnings({"unchecked"})
+  static CacheMetaData readCacheMetaData(PmObjectBase pm, CacheKind aspect, InternalCacheStrategyFactory factory) {
+    List<Object> cacheAnnotations = InternalPmCacheCfgUtil.findCacheCfgsInPmHierarchy(pm, new ArrayList<Object>());
+    return (!cacheAnnotations.isEmpty())
+        ? InternalPmCacheCfgUtil.readCacheMetaData(pm, aspect, cacheAnnotations, InternalPmBeanCacheStrategyFactory.INSTANCE)
+        : CacheMetaData.NO_CACHE;
+
+  }
+
   @SuppressWarnings({"unchecked", "rawtypes"})
-  static CacheMetaData readCacheMetaData(PmObjectBase pmObjectBase, CacheKind aspect, List cacheAnnotations) {
+  static CacheMetaData readCacheMetaData(PmObjectBase pmObjectBase, CacheKind aspect, List cacheAnnotations, InternalCacheStrategyFactory factory) {
     if (PmCacheCfg2.class.isAssignableFrom(cacheAnnotations.get(0).getClass())) {
       Cache cache = findCacheForAspectInPmHierarchy(pmObjectBase, aspect, cacheAnnotations);
       return (cache == null)
           ? CacheMetaData.NO_CACHE
-          : new CacheMetaData(InternalCacheStrategyFactory.create(aspect, cache), cache);
+          : new CacheMetaData(factory.create(aspect, cache), cache);
     } else {
       return DeprInternalPmCacheCfgUtil.createCacheMetaData(pmObjectBase, aspect, cacheAnnotations);
     }
@@ -203,6 +213,7 @@ class InternalPmCacheCfgUtil {
 
     final CacheStrategy cacheStrategy;
     final Observe[] cacheClearOn;
+    final Clear clear;
 
     public CacheMetaData(CacheStrategy cacheStrategy) {
       this(cacheStrategy, (Cache) null);
@@ -211,6 +222,7 @@ class InternalPmCacheCfgUtil {
     public CacheMetaData(CacheStrategy cacheStrategy, Cache cacheCfg) {
       this.cacheStrategy = cacheStrategy;
       this.cacheClearOn = cacheCfg != null ? cacheCfg.clearOn() : null;
+      this.clear = cacheCfg != null ? cacheCfg.clear() : null;
     }
   }
 
@@ -349,7 +361,7 @@ class DeprInternalPmCacheCfgUtil {
    *         <code>null</code> if the pm is annotated with {@link PmCacheCfg2}
    */
   @SuppressWarnings({"rawtypes", "unchecked"})
-  static Clear evaluateCacheClearBehavior(PmObjectBase pmObject, List cacheAnnotations) {
+  static PmCacheCfg.Clear evaluateCacheClearBehavior(PmObjectBase pmObject, List cacheAnnotations) {
     if (PmCacheCfg.class.isAssignableFrom(cacheAnnotations.get(0).getClass())) {
       return DeprAnnotationUtil.evaluateCacheClearBehavior(pmObject, cacheAnnotations);
     }

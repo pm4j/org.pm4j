@@ -9,6 +9,7 @@ import org.pm4j.core.pm.PmDataInput;
 import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmEventListener;
 import org.pm4j.core.pm.PmObject;
+import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmVisitorApi;
 import org.pm4j.core.pm.api.PmVisitorApi.PmVisitCallBack;
@@ -57,6 +58,8 @@ public abstract class PmDataInputBase extends PmObjectBase implements PmDataInpu
     // This kind event gets recursively applied to a PM tree (part). Because of that we don't need to
     // handle the child PMs.
     _setPmValueChangedForThisInstanceOnly(this, false);
+    // XXX needs to be optimized: iterates repeated over the PM tree
+    clearCachedPmValues(CacheKind.ALL_SET);
   }
 
 
