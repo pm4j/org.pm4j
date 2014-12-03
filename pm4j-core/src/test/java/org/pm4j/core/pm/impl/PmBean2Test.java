@@ -31,6 +31,7 @@ public class PmBean2Test {
     assertEquals(2, pm.callCount_getPmBeanImpl);
   }
 
+  // TODO: check exception message using @Rule s
   @Test(expected=PmRuntimeException.class)
   public void assignBeanToUncachedPmBeanThrowsException() {
     TestPmBase pm = new TestPmBase();
@@ -112,6 +113,7 @@ public class PmBean2Test {
     assertEquals("No getter called.", 0, pm.uncached.callCount_getPmBeanImpl);
 
     assertNull(pm.uncached.getPmBean());
+    assertEquals("Main PM listener count stays as it is.", 3, pm.valueChangeListener.getCallCount());
     assertEquals("Deferred event propagated in getPmBean() call.", 3, pm.uncached.valueChangeListener.getCallCount());
     assertEquals("Deferred event propagated in getPmBean() call.", 3, pm.uncached.sValueChangeListener.getCallCount());
     assertEquals("Main PM unchanged if a sub-PM fires deferred events.", 3, pm.valueChangeListener.getCallCount());
@@ -181,11 +183,11 @@ public class PmBean2Test {
     }
 
     @Override
-    protected boolean hasDeferredValueChangeEventHandling() {
+    protected boolean hasDeferredPmEventHandling() {
       return postponeEvents;
     }
 
-     public TestPmBase provideTestBean(Bean b) {
+    public TestPmBase provideTestBean(Bean b) {
       this.b = b;
       return this;
     }
