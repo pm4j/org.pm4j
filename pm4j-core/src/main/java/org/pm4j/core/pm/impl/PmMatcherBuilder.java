@@ -110,6 +110,16 @@ public class PmMatcherBuilder {
   }
 
   /**
+   * Defines that the match criteria should be logically inverted.
+   *
+   * @return The builder reference for fluent programming style support.
+   */
+  public PmMatcherBuilder invert() {
+    matcher.invert = true;
+    return this;
+  }
+
+  /**
    * Builds the matcher and clear this builder instance.
    * The builder is ready for building the next matcher.
    *
@@ -137,9 +147,15 @@ public class PmMatcherBuilder {
     private Boolean enabled;
     private Boolean visible;
     private List<PmMatcher> subMatcher = Collections.emptyList();
+    private boolean invert = false;
+
 
     @Override
     public boolean doesMatch(PmObject pm) {
+      return doesMatchNotInverted(pm) ^ invert;
+    }
+
+    private boolean doesMatchNotInverted(PmObject pm) {
       if (pm == null ||
           !doesParentMatch(pm) ||
           !doesPmClassMatch(pm) ||

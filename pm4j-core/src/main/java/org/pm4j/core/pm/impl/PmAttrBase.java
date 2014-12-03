@@ -1652,8 +1652,8 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     // -- Cache configuration --
     List cacheAnnotations = InternalPmCacheCfgUtil.findCacheCfgsInPmHierarchy(this, new ArrayList());
     if (!cacheAnnotations.isEmpty()) {
-      myMetaData.optionsCache = InternalPmCacheCfgUtil.readCacheMetaData(this, CacheKind.OPTIONS, cacheAnnotations);
-      myMetaData.valueCache = InternalPmCacheCfgUtil.readCacheMetaData(this, CacheKind.VALUE, cacheAnnotations);
+      myMetaData.optionsCache = InternalPmCacheCfgUtil.readCacheMetaData(this, CacheKind.OPTIONS, cacheAnnotations, InternalAttrCacheStrategyFactory.INSTANCE);
+      myMetaData.valueCache = InternalPmCacheCfgUtil.readCacheMetaData(this, CacheKind.VALUE, cacheAnnotations, InternalAttrCacheStrategyFactory.INSTANCE);
     }
   }
 

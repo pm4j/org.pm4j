@@ -1,20 +1,26 @@
 package org.pm4j.core.pm.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.pm4j.common.exception.CheckedExceptionWrapper;
+import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.PmDataInput;
 import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmEvent.ValueChangeKind;
 import org.pm4j.core.pm.PmEventListener;
 import org.pm4j.core.pm.PmObject;
-import org.pm4j.core.pm.api.PmVisitorApi;
+import org.pm4j.core.pm.PmObject.PmMatcher;
+import org.pm4j.core.pm.api.PmCacheApi;
+import org.pm4j.core.pm.api.PmMessageApi;
 import org.pm4j.core.pm.api.PmVisitorApi.PmVisitCallBack;
 import org.pm4j.core.pm.api.PmVisitorApi.PmVisitHint;
 import org.pm4j.core.pm.api.PmVisitorApi.PmVisitResult;
+import org.pm4j.core.pm.impl.PmObjectBase.PmInitState;
 
 /**
  * Generates an event for each item within a PM tree.
@@ -30,29 +36,121 @@ import org.pm4j.core.pm.api.PmVisitorApi.PmVisitResult;
  * A future extension may add some different handling. To preserve behaviour compatibility, a changed behaviour
  * must be configured explicitely.
  *
- * @author olaf boede
+ * @author Olaf Boede
  */
-public class BroadcastPmEventProcessor {
-  protected final PmDataInput rootPm;
+public class BroadcastPmEventProcessor implements Cloneable {
+  // TODO: fix skip visit logic in R2.2:
+  //  a) skip conversations in general.
+  //  b) check if all factory generated should really be skipped. I suspect that the already generated instances
+  //     should be informed.
+  private static final PmMatcher INVISIBLE_CONVERSATIONS = new PmMatcherBuilder()
+                                 .pmClass(PmConversation.class).visible(false).build();
+  private static final String DEFERRED_VALUE_CHANGE_KEY = "_pm_DeferredValueChange_";
+
+
   private final int eventMask;
   private final ValueChangeKind changeKind;
-  private final Map<PmObject, PmEvent> pmToEventMap = new IdentityHashMap<PmObject, PmEvent>();
-  private final List<PmEvent> eventsToPostProcess = new ArrayList<PmEvent>();
+  private final List<PmMatcher> excludes = new ArrayList<PmMatcher>();
+  // runtime members:
+  protected PmObject rootPm;
+  private Map<PmObject, PmEvent> pmToEventMap;
+  private List<PmEvent> eventsToPostProcess;
+  private boolean immediateMode;
 
-  public BroadcastPmEventProcessor(PmDataInput rootPm, final int eventMask) {
+
+  /**
+   * @param rootPm The root of the PM tree that should be used.
+   * @param eventMask The event mask to distribute.
+   */
+  public BroadcastPmEventProcessor(PmObject rootPm, final int eventMask) {
     this(rootPm, eventMask, ValueChangeKind.UNKNOWN);
   }
 
-  public BroadcastPmEventProcessor(PmDataInput rootPm, final int eventMask, final ValueChangeKind changeKind) {
-    this.rootPm = rootPm;
+  /**
+   * @param rootPm The root of the PM tree that should be used.
+   * @param eventMask The event mask to distribute.
+   * @param changeKind A value change kind (will be deprecated soon.)
+   */
+  public BroadcastPmEventProcessor(PmObject rootPm, final int eventMask, final ValueChangeKind changeKind) {
+    setRootPm(rootPm);
     this.eventMask = eventMask;
     this.changeKind = changeKind;
+    excludes.add(INVISIBLE_CONVERSATIONS);
+  }
+
+  // FIXME oboede: this should be part of the regular broadcast.
+  // It should consider the value change flag and do the cleanup operations in that case.
+  /**
+   * Sends an individual {@link PmEvent} to each PM tree item.
+   *
+   * @param pm The root of the PM tree to inform.
+   * @param additionalEventFlags Additional event flags to set.
+   */
+  public static void broadcastAllChangeEvent(PmBeanImpl2<?> pm, int additionalEventFlags) {
+    // Inform all sub PMs.
+    // This is not done within the initialization phase to prevent problems with initialization race conditions.
+    if (pm.pmInitState == PmInitState.INITIALIZED) {
+      // Inform observers of this instance and all sub-PMs.
+      BroadcastPmEventProcessor p = new BroadcastPmEventProcessor(pm, PmEvent.ALL_CHANGE_EVENTS | additionalEventFlags,
+            (additionalEventFlags & PmEvent.RELOAD) != 0 ? ValueChangeKind.RELOAD : ValueChangeKind.VALUE) {
+        @Override
+        protected void fireEvents() {
+          // == Cleanup all PM state, because the bean to show is a new one. ==
+
+          // Forget all changes and dynamic PM's below this instance.
+          BeanPmCacheUtil.clearBeanPmCachesOfSubtree(rootPm);
+
+          // All sub PM messages are no longer relevant.
+          PmMessageApi.clearPmTreeMessages(rootPm);
+
+          // Old cache values are related to the old bean.
+          // This cache cleanup can only be done AFTER visiting the tree because
+          // it cleans the current-row information that is relevant.
+          PmCacheApi.clearPmCache(rootPm);
+
+          // Visit the sub-tree to inform all PM listeners.
+          super.fireEvents();
+
+          // Another (postponed) cleanup:
+          // Mark the whole sub tree as unchanged.
+          // FIXME olaf: Move that to a PmObject related API asap.
+          ((PmDataInput)rootPm).setPmValueChanged(false);
+        }
+      };
+      p.doIt();
+    }
+  }
+
+  /**
+   * Sets a new root
+   */
+  public BroadcastPmEventProcessor setRootPm(PmObject rootPm) {
+    this.rootPm = rootPm;
+    pmToEventMap = new IdentityHashMap<PmObject, PmEvent>();
+    eventsToPostProcess = new ArrayList<PmEvent>();
+    immediateMode = false;
+    return this;
+  }
+
+  /**
+   * Defines rules for PM's to exclude from the visit.
+   *
+   * @param matcher Matchers for the PMs to exclude.
+   * @return this instance for fluent programming usage.
+   */
+  public BroadcastPmEventProcessor exclude(PmMatcher... matcher) {
+    excludes.addAll(Arrays.asList(matcher));
+    return this;
   }
 
   public void doIt() {
-    preProcess();
-    fireEvents();
-    postProcess();
+    if (hasDeferredPmEventHandling(rootPm)) {
+      rootPm.setPmProperty(DEFERRED_VALUE_CHANGE_KEY, BroadcastPmEventProcessor.this.clone().setRootPm(rootPm));
+    } else {
+      preProcess();
+      fireEvents();
+      postProcess();
+    }
   }
 
   protected void preProcess() {
@@ -61,41 +159,40 @@ public class BroadcastPmEventProcessor {
     //
     // The generated PM's can only get informed after they got generated by the main
     // event... - Thus it seems to be not possible to pre-process them at all.
-    PmVisitorApi.visit(rootPm, new PmVisitCallBack() {
+    new PmVisitorImpl(new PmVisitCallBack() {
       @Override
       public PmVisitResult visit(PmObject pm) {
-        // TODO olaf: make a VistHint.SKIP_INVISIBLE_CONVERSATION
-        // Don't iterate over closed sub conversations (e.g. closed popup PMs).
-        // This will only generate overhead an trouble.
-        if ((pm instanceof PmConversation) && !pm.isPmVisible()) {
+        if (hasDeferredPmEventHandling(pm)) {
           return PmVisitResult.SKIP_CHILDREN;
         }
-
         PmEventApiHandler.sendToListeners(pm, getEventForPm(pm), true /* preProcess */);
         return PmVisitResult.CONTINUE;
       }
-    },
-    PmVisitHint.SKIP_FACTORY_GENERATED_CHILD_PMS);
-
+    })
+    .hints(PmVisitHint.SKIP_FACTORY_GENERATED_CHILD_PMS)
+    .exclude(excludes)
+    .visit(rootPm);
   }
 
   protected void fireEvents() {
     // Main visitor loop: Each child gets the information about the 'change all' event.
-    PmVisitCallBack handleEventCallBack = new PmVisitCallBack() {
+    new PmVisitorImpl(new PmVisitCallBack() {
       @Override
       public PmVisitResult visit(PmObject pm) {
-        // Don't iterate over closed sub conversations (e.g. closed popup PMs).
-        // This will only generate overhead an trouble.
-        if ((pm instanceof PmConversation) && !pm.isPmVisible()) {
+        if (hasDeferredPmEventHandling(pm)) {
+          pm.setPmProperty(DEFERRED_VALUE_CHANGE_KEY, BroadcastPmEventProcessor.this.clone().setRootPm(pm));
           return PmVisitResult.SKIP_CHILDREN;
         }
-
         // If there is an existing event instance from the pre-process loop, it will
         // be used again.
         // This way it is possible to accumulate the post processing requests.
         PmEvent e = getEventForPm(pm);
-
         PmEventApiHandler.firePmEvent(pm, e, false /* handle */);
+
+        // TODO: quick hack: ensure that lazy loaded PmBean gets loaded... Check if still needed.
+//        if (e.hasEventMaskBits(PmEvent.VALUE_CHANGE) && !e.hasEventMaskBits(PmEvent.VALUE_CHANGE_TO_NULL) && (pm instanceof PmBean)) {
+//          ((PmBean<?>)pm).getPmBean();
+//        }
 
         // If there is a registered post processor, remember this event for post
         // processing.
@@ -105,10 +202,10 @@ public class BroadcastPmEventProcessor {
         }
         return PmVisitResult.CONTINUE;
       }
-    };
-
-    // Fire the 'everything has changed' information to the whole sub tree.
-    PmVisitorApi.visit(rootPm, handleEventCallBack, PmVisitHint.SKIP_NOT_INITIALIZED);
+    })
+    .hints()
+    .exclude(excludes)
+    .visit(rootPm);
   }
 
   protected void postProcess() {
@@ -139,4 +236,67 @@ public class BroadcastPmEventProcessor {
     }
     return event;
   }
+
+  private boolean hasDeferredPmEventHandling(PmObject pm) {
+    return !immediateMode &&
+           (eventMask & PmEvent.VALUE_CHANGE_TO_NULL) == 0 &&
+           hasDeferredPmEventHandlingImpl(pm);
+  }
+
+  /**
+   * Defines whether received value change event broadcasts immediately be propagated to the
+   * given PM or if if should be deferred until the next get value (getPmBean) request.
+   *
+   * @param pm The PM to to check.
+   * @return <code>true</code> if the given PM supports deferred PM events
+   */
+  protected boolean hasDeferredPmEventHandlingImpl(PmObject pm) {
+    return (pm instanceof PmBeanImpl2) &&
+           ((PmBeanImpl2<?>)pm).hasDeferredValueChangeEventHandling();
+  }
+
+  /**
+   * Looks for a deferred value change event processor attached to the given PM.<br>
+   * If there is one, its reference gets removed from the PM and after that it gets
+   * executed.
+   *
+   * @param pm The PM to find the processor for.
+   */
+  public static final void ensureDeferredValueChangeProcessorExecution(PmObject pm) {
+    BroadcastPmEventProcessor p = (BroadcastPmEventProcessor) pm.getPmProperty(DEFERRED_VALUE_CHANGE_KEY);
+    if (p != null) {
+      pm.setPmProperty(DEFERRED_VALUE_CHANGE_KEY, null);
+      p.immediateMode = true;
+      p.doIt();
+    }
+  }
+
+  // TODO: Move to PmEventApi
+  /**
+   * Ensures that getPmBean was called at least once for each visible {@link PmBean}. In case
+   * of deferred event handling, this ensures that each deferred event got fired.
+   *
+   * @param toTab
+   */
+  public static final void ensureDeferredEventsFiredForVisiblePms(PmObject toTab) {
+      PmVisitorImpl v = new PmVisitorImpl(new PmVisitCallBack() {
+          @Override
+          public PmVisitResult visit(PmObject pm) {
+              ensureDeferredValueChangeProcessorExecution(pm);
+              return PmVisitResult.CONTINUE;
+          }
+      }, PmVisitHint.SKIP_INVISIBLE);
+      v.visit(toTab);
+  }
+
+  @Override
+  protected BroadcastPmEventProcessor clone() {
+    try {
+      BroadcastPmEventProcessor clone = (BroadcastPmEventProcessor) super.clone();
+      return clone;
+    } catch (CloneNotSupportedException e) {
+      throw new CheckedExceptionWrapper(e);
+    }
+  }
+
 }
