@@ -38,7 +38,7 @@ public class PmBeanBase<T_BEAN>
   private final static Log LOG = LogFactory.getLog(PmBeanBase.class);
 
   /** The bean data object behind this PM. */
-  /* package */ T_BEAN pmBean;
+  private T_BEAN pmBean;
 
   /**
    * Default constructor for dependency injected PM's.
@@ -433,6 +433,7 @@ public class PmBeanBase<T_BEAN>
     return (MetaData) getPmMetaDataWithoutPmInitCall();
   }
 
+  // TODO oboede: remove in v0.9x, keep it for now to check whether we break old code.
   public static class ValueChangeEventProcessor extends BroadcastPmEventProcessor {
     public ValueChangeEventProcessor(PmDataInput rootPm, boolean isReloadEvent) {
       super(rootPm,
