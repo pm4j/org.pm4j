@@ -36,11 +36,18 @@ public @interface PmCacheCfg {
   }
 
   /** Configuration values for behavior how to clear cache, when clear method is called. */
+  @Deprecated
   public enum Clear {
     /** When clear method is called, cache is cleared. */
     DEFAULT,
     /** When clear method is called, cache is never cleared. */
     NEVER;
+
+    public PmCacheCfg2.Clear toNonDeprecatedEnum() {
+      return (this == NEVER)
+          ? PmCacheCfg2.Clear.NEVER
+          : PmCacheCfg2.Clear.DEFAULT;
+    }
   }
 
   /**

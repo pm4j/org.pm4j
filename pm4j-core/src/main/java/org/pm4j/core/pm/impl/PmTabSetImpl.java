@@ -93,7 +93,13 @@ public class PmTabSetImpl extends PmElementImpl implements PmTabSet {
 
     // If the UI logic prevents the tab navigation, no exception will be thrown.
     // So we check here if the tab navigation was really successfully performed.
-    return executedCommand.getCommandState() == CommandState.EXECUTED;
+    if (executedCommand.getCommandState() == CommandState.EXECUTED) {
+      // The visible tab needs to be loaded/initialized.
+      BroadcastPmEventProcessor.ensureDeferredEventsFiredForVisiblePms(toTab);
+      return true;
+    } else {
+      return false;
+    }
   }
 
   /**

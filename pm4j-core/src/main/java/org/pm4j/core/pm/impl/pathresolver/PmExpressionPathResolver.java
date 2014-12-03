@@ -15,11 +15,20 @@ import org.pm4j.core.pm.impl.expr.PmExprExecCtxt;
  * Provides a simplified interface for getting an setting values by using
  * expressions.
  *
- * @author olaf boede
+ * @author Olaf Boede
  */
 public class PmExpressionPathResolver extends PathResolverBase {
 
   private Expression expression;
+
+  /**
+   * Parses the given string using the current syntax ({@link SyntaxVersion#VERSION_2}).
+   *
+   * @param exprString The string to parse.
+   */
+  public static PathResolver parse(String exprString) {
+    return parse(exprString, SyntaxVersion.VERSION_2);
+  }
 
   /**
    * @param exprString The string to parse.

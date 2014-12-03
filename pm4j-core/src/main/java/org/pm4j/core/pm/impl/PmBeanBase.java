@@ -38,7 +38,7 @@ public class PmBeanBase<T_BEAN>
   private final static Log LOG = LogFactory.getLog(PmBeanBase.class);
 
   /** The bean data object behind this PM. */
-  private T_BEAN pmBean;
+  /* package */ T_BEAN pmBean;
 
   /**
    * Default constructor for dependency injected PM's.
@@ -465,7 +465,7 @@ public class PmBeanBase<T_BEAN>
 
       // FIXME olaf: this is done AFTER the main visit to keep some old code alive.
       // See: RoleEditorBeanTabPm...
-      rootPm.setPmValueChanged(false);
+      ((PmDataInput)rootPm).setPmValueChanged(false);
     }
 
   };

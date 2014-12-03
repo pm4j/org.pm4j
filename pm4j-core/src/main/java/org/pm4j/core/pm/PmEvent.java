@@ -36,6 +36,9 @@ public class PmEvent extends EventObject {
   public static final int FILTER_CHANGE = 1 << 11;
   public static final int EXEC_COMMAND = 1 << 12;
 
+  /** An additional flag that indicates a to-null value change. */
+  public static final int VALUE_CHANGE_TO_NULL = 1 << 29;
+
   /**
    * Indicator for an event that fired because of re-loaded data.<br>
    * An example: After saving a record, its current state gets reloaded from the DB.
