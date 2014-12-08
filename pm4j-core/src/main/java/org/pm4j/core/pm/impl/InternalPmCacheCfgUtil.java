@@ -366,7 +366,7 @@ class DeprInternalPmCacheCfgUtil {
       return DeprAnnotationUtil.evaluateCacheClearBehavior(pmObject, cacheAnnotations);
     }
 
-    return null;
+    return PmCacheCfg.Clear.DEFAULT;
   }
 
   @SuppressWarnings({"rawtypes", "unchecked"})
