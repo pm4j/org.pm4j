@@ -3,12 +3,12 @@
 
   <groupId>org.pm4j</groupId>
   <artifactId>pm4j-facelets</artifactId>
-  <version>0.9.15</version>
+  <version>0.9.16-SNAPSHOT</version>
 
   <parent>
     <groupId>org.pm4j</groupId>
     <artifactId>main</artifactId>
-    <version>0.9.15</version>
+    <version>0.9.16-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
