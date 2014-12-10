@@ -229,14 +229,7 @@ public class PmTableColImpl extends PmObjectBase implements PmTableCol {
         public void handleEvent(PmEvent event) {
           // Checks if the event source is not this column to prevent set value ping-pong games.
           if (event.getPm() != PmTableColImpl.this) {
-            SortOrder tableSortOrder = getPmTable().getPmPageableCollection().getQueryParams().getSortOrder();
-            SortOrder columnSortOrderOption = getColSortOrderOption();
-            if (tableSortOrder != null &&
-                SortOrder.bothOrdersUseTheSameAttributeSet(tableSortOrder, columnSortOrderOption)) {
-              setBackingValue(tableSortOrder.isAscending() ? PmSortOrder.ASC : PmSortOrder.DESC);
-            } else {
-              setBackingValue(PmSortOrder.NEUTRAL);
-            }
+            setBackingValue(readColSortOrderFromTableQueryParams());
           }
         }
       };
@@ -245,7 +238,24 @@ public class PmTableColImpl extends PmObjectBase implements PmTableCol {
 
     @Override
     protected PmSortOrder getDefaultValueImpl() {
-      return PmSortOrder.NEUTRAL;
+      return readColSortOrderFromTableQueryParams();
+    }
+
+    /**
+     * Reads the current sort order for this column from the table query parameters.
+     *
+     * @return <code>NEUTRAL</code> if the table is currently not sorted by this column.<br>
+     *         <code>ASC</code> or <code>DESC</code> if the table is currently sorted by this column.
+     */
+    private PmSortOrder readColSortOrderFromTableQueryParams() {
+      SortOrder tableSortOrder = getPmTable().getPmPageableCollection().getQueryParams().getEffectiveSortOrder();
+      SortOrder columnSortOrderOption = getColSortOrderOption();
+      if (tableSortOrder != null &&
+          SortOrder.bothOrdersUseTheSameAttributeSet(tableSortOrder, columnSortOrderOption)) {
+        return (tableSortOrder.isAscending() ? PmSortOrder.ASC : PmSortOrder.DESC);
+      } else {
+        return PmSortOrder.NEUTRAL;
+      }
     }
 
     @Override
@@ -285,7 +295,9 @@ public class PmTableColImpl extends PmObjectBase implements PmTableCol {
           super.getValueChangeDecorators());
     }
 
-    private SortOrder getOwnQuerySortOrder() {
+    /** Applies the sort order change on the table query parameters. */
+    @Override
+    protected void afterValueChange(PmSortOrder oldValue, PmSortOrder newValue) {
       PmSortOrder sortDirection = getValue();
       SortOrder querySortOrder = null;
       if (sortDirection != PmSortOrder.NEUTRAL) {
@@ -294,14 +306,7 @@ public class PmTableColImpl extends PmObjectBase implements PmTableCol {
           querySortOrder = querySortOrder.getReverseSortOrder();
         }
       }
-      return querySortOrder;
-    }
-
-    @Override
-    protected void afterValueChange(PmSortOrder oldValue, PmSortOrder newValue) {
-      SortOrder querySortOrder = getOwnQuerySortOrder();
-      PmTable<?> pmTable = getPmTable();
-      pmTable.getPmPageableCollection().getQueryParams().setSortOrder(querySortOrder);
+      getPmTable().getPmPageableCollection().getQueryParams().setSortOrder(querySortOrder);
     }
   }
 
