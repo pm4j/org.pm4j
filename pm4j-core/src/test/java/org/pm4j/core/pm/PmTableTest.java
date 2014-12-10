@@ -173,12 +173,10 @@ public class PmTableTest {
   }
 
   @Test
-  @Ignore("Will be fixed with task 135890")
   public void testInitialSortOrderConfiguredInTableAnnotation() {
     // name and relative name are the same?
     assertEquals("name", myTablePm.name.getPmName());
     assertEquals("name", myTablePm.name.getPmRelativeName());
-    // myTablePm.updatePmTable();
     assertEquals("initialSortCol is name", PmSortOrder.ASC, myTablePm.name.getSortOrderAttr().getValue());
   }
 
