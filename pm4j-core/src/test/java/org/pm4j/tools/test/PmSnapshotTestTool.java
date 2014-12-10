@@ -32,7 +32,7 @@ public class PmSnapshotTestTool {
 
   private final Class<?> testCtxtClass;
   private SrcFileAccessor srcFileAccessor;
-  private boolean writeMode = false;
+  private boolean overWriteMode = false;
 
   private Collection<PmMatcher> excludedPms = new ArrayList<PmMatcher>();
   private Collection<VisibleStateAspectMatcher> excludedAspects = new ArrayList<VisibleStateAspectMatcher>();
@@ -84,7 +84,7 @@ public class PmSnapshotTestTool {
   public File snapshot(PmObject rootPm, String fileNameBase) {
     File expectedFile = getExpectedStateFile(fileNameBase);
 
-    if (!isWriteMode() && expectedFile.exists()) {
+    if (!isOverWriteMode() && expectedFile.exists()) {
         File actualStateFile = getActualStateFile(fileNameBase);
         String actualStateXmlString = VisibleStateUtil.toXmlString(rootPm, excludedPms, excludedAspects);
         // Disturbing Windows carriage return characters need to be removed.
@@ -109,7 +109,7 @@ public class PmSnapshotTestTool {
           }
           throw e;
         }
-    } else if(isWriteMode()) {
+    } else {
       try {
         FileUtil.createFile(expectedFile);
         VisibleStateUtil.toXmlFile(rootPm, expectedFile, excludedPms, excludedAspects);
@@ -117,8 +117,6 @@ public class PmSnapshotTestTool {
       } catch (Exception e) {
         throw new PmRuntimeException(rootPm, "Unable to write file " + expectedFile, e);
       }
-    } else {
-      Assert.fail("No snapshot file exists at " + expectedFile + " and you are not in writeMode.");
     }
 
     return expectedFile;
@@ -209,17 +207,17 @@ public class PmSnapshotTestTool {
   }
 
   /**
-   * @return the writeMode
+   * @return the overWriteMode
    */
-  public boolean isWriteMode() {
-    return writeMode;
+  public boolean isOverWriteMode() {
+    return overWriteMode;
   }
 
   /**
    * Defines whether the tool write or overwrites the expected state files or not.
    */
-  public PmSnapshotTestTool setWriteMode(boolean newMode) {
-    this.writeMode = newMode;
+  public PmSnapshotTestTool setOverWriteMode(boolean newMode) {
+    this.overWriteMode = newMode;
     return this;
   }
 
