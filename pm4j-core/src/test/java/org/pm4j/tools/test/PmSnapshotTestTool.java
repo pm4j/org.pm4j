@@ -32,7 +32,7 @@ public class PmSnapshotTestTool {
 
   private final Class<?> testCtxtClass;
   private SrcFileAccessor srcFileAccessor;
-  private boolean overWriteMode = false;
+  private boolean writeMode = false;
 
   private Collection<PmMatcher> excludedPms = new ArrayList<PmMatcher>();
   private Collection<VisibleStateAspectMatcher> excludedAspects = new ArrayList<VisibleStateAspectMatcher>();
@@ -84,7 +84,7 @@ public class PmSnapshotTestTool {
   public File snapshot(PmObject rootPm, String fileNameBase) {
     File expectedFile = getExpectedStateFile(fileNameBase);
 
-    if (!isOverWriteMode() && expectedFile.exists()) {
+    if (!isWriteMode() && expectedFile.exists()) {
         File actualStateFile = getActualStateFile(fileNameBase);
         String actualStateXmlString = VisibleStateUtil.toXmlString(rootPm, excludedPms, excludedAspects);
         // Disturbing Windows carriage return characters need to be removed.
@@ -109,7 +109,7 @@ public class PmSnapshotTestTool {
           }
           throw e;
         }
-    } else {
+    } else if(isWriteMode()) {
       try {
         FileUtil.createFile(expectedFile);
         VisibleStateUtil.toXmlFile(rootPm, expectedFile, excludedPms, excludedAspects);
@@ -117,6 +117,8 @@ public class PmSnapshotTestTool {
       } catch (Exception e) {
         throw new PmRuntimeException(rootPm, "Unable to write file " + expectedFile, e);
       }
+    } else {
+      Assert.fail("No snapshot file exists at " + expectedFile + " and you are not in writeMode.");
     }
 
     return expectedFile;
@@ -207,17 +209,17 @@ public class PmSnapshotTestTool {
   }
 
   /**
-   * @return the overWriteMode
+   * @return the writeMode
    */
-  public boolean isOverWriteMode() {
-    return overWriteMode;
+  public boolean isWriteMode() {
+    return writeMode;
   }
 
   /**
    * Defines whether the tool write or overwrites the expected state files or not.
    */
-  public PmSnapshotTestTool setOverWriteMode(boolean newMode) {
-    this.overWriteMode = newMode;
+  public PmSnapshotTestTool setWriteMode(boolean newMode) {
+    this.writeMode = newMode;
     return this;
   }
 
