@@ -11,6 +11,12 @@ import org.pm4j.core.pm.PmAttr;
 public interface PmAttrLocalDate extends PmAttr<LocalDate> {
 
   /**
+   * Defines the default maximum string length.
+   * You may define your specific string length by defining it in @PmAttrCfg(maxLen).
+   */
+  public static final int MAX_LENGTH = 20;
+  
+  /**
    * The default format resource key that is used if no attribute specific
    * format is defined.
    */
