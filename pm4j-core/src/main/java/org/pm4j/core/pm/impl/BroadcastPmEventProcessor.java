@@ -79,7 +79,7 @@ public class BroadcastPmEventProcessor implements Cloneable {
    * @param pm The root of the PM tree to inform.
    * @param additionalEventFlags Additional event flags to set.
    */
-  public static void broadcastAllChangeEvent(PmBeanImpl2<?> pm, int additionalEventFlags) {
+  public static void broadcastAllChangeEvent(PmDataInputBase pm, int additionalEventFlags) {
     // Inform all sub PMs.
     // This is not done within the initialization phase to prevent problems with initialization race conditions.
     if (pm.pmInitState == PmInitState.INITIALIZED) {
@@ -178,7 +178,7 @@ public class BroadcastPmEventProcessor implements Cloneable {
         }
         return PmVisitResult.CONTINUE;
       }
-    }, PmVisitHint.SKIP_CONVERSATION)
+    }, PmVisitHint.SKIP_FACTORY_GENERATED_CHILD_PMS, PmVisitHint.SKIP_CONVERSATION)
     .visit(rootPm);
   }
 

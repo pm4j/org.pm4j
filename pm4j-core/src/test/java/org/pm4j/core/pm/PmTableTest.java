@@ -36,6 +36,7 @@ import org.pm4j.core.pm.annotation.PmTitleCfg;
 import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
 import org.pm4j.core.pm.api.PmEventApi;
+import org.pm4j.core.pm.impl.BroadcastPmEventProcessor;
 import org.pm4j.core.pm.impl.PmAttrIntegerImpl;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
 import org.pm4j.core.pm.impl.PmBeanImpl;
@@ -74,7 +75,7 @@ public class PmTableTest {
       }
     };
     PmEventApi.addPmEventListener(myTablePm, PmEvent.VALUE_CHANGE, valueChangeEventListener);
-    
+
     PmInitApi.ensurePmSubTreeInitialization(myTablePm);
   }
 
@@ -236,7 +237,7 @@ public class PmTableTest {
       }
     }, PmTable.TableChange.FILTER);
 
-    // Nevertheless try to register a filter that filters any 'a' 
+    // Nevertheless try to register a filter that filters any 'a'
     QueryExprCompare noA = new QueryExprCompare(RowBean.ATTR_NAME, CompOpNotEquals.class, "a");
     myTablePm.getPmPageableBeanCollection().getQueryParams().setFilterExpression(noA);
 
@@ -286,6 +287,21 @@ public class PmTableTest {
     assertEquals(1, deleteBeanPropertyChangeListener.getNumOfPropertyChangesCalls());
     assertEquals(1, deleteBeanPropertyChangeListener.getNumOfVetoableChangesCalls());
     assertEquals(1, valueChangeEventListener.getCallCount());
+  }
+
+  /**
+   * An all change event makes factory generated PM's like row PMs completely irrelevant.
+   * Their corresponding beans are no longer valid.
+   * <p>
+   * Because of that they are not visited.
+   */
+  @Test
+  public void testRowsAreNotVisitedOnBroadCastAllChangeEvents() {
+    RecordingPmEventListener l = new RecordingPmEventListener();
+    PmEventApi.addPmEventListener(myTablePm.getRowPms().get(0), PmEvent.ALL_CHANGE_EVENTS, l);
+    BroadcastPmEventProcessor.broadcastAllChangeEvent(myTablePm, 0);
+
+    assertEquals(0, l.getCallCount());
   }
 
   @PmTableCfg(initialSortCol="name")
