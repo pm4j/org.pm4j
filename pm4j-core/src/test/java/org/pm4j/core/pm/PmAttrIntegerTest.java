@@ -6,6 +6,7 @@ import static org.pm4j.tools.test.PmAssert.setValueAsString;
 
 import java.util.Locale;
 
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
@@ -16,7 +17,13 @@ import org.pm4j.tools.test.PmAssert;
 
 public class PmAttrIntegerTest {
 
-  private MyPm pm = new MyPm();
+  private MyPm pm;
+  
+  @Before
+  public void setup() {
+    pm = new MyPm();
+    pm.setPmLocale(Locale.ENGLISH);
+  }
 
   @Test
   public void testNullValue() {

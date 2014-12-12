@@ -18,10 +18,11 @@ import org.pm4j.tools.test.PmAssert;
 
 public class PmAttrShortTest {
 
-  private MyPm myPm = new MyPm();
+  private MyPm myPm;
 
   @Before
   public void setUp() {
+    myPm = new MyPm();
     myPm.setPmLocale(Locale.ENGLISH);
   }
 
