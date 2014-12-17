@@ -41,12 +41,32 @@ public class IdQueryCollectionImpl<T_ITEM, T_ID> extends QueryCollectionBase<T_I
 
   private static final Log LOG = LogFactory.getLog(IdQueryCollectionImpl.class);
 
-  private final IdQueryService<T_ITEM, T_ID> service;
+  private final IdQueryService<T_ITEM, T_ID>    service;
   /** The collection type specific selection handler. */
-  private final SelectionHandler<T_ITEM>  selectionHandler;
-  private List<T_ID>                      ids;
-  private List<T_ITEM>                    currentPageItems;
-  private AddItemStrategy                 addItemStrategy = new AddItemStrategyAtTheEnd();
+  private final SelectionHandler<T_ITEM>        selectionHandler;
+  private List<T_ID>                            ids;
+  private List<T_ITEM>                          currentPageItems;
+  private AddItemStrategy                       addItemStrategy = new AddItemStrategyAtTheEnd();
+  /** The maximum number of ids to get. */
+  private int                                   maxResultsLimit = Integer.MAX_VALUE;
+  /** Strategy for getting ids. */
+  private GetIdQueryStrategy                    getIdQueryStrategy = new SingleQueryStrategy();
+  
+  public int getMaxResultsLimit() {
+    return maxResultsLimit;
+  }
+
+  public void setMaxResultsLimit(int maxResultsLimit) {
+    this.maxResultsLimit = maxResultsLimit;
+  }  
+
+  public GetIdQueryStrategy getGetIdQueryStrategy() {
+    return getIdQueryStrategy;
+  }
+
+  public void setGetIdQueryStrategy(GetIdQueryStrategy getIdQueryStrategy) {
+    this.getIdQueryStrategy = getIdQueryStrategy;
+  }
 
   /**
    * Maintains the set of ID's on removing items.
@@ -161,23 +181,17 @@ public class IdQueryCollectionImpl<T_ITEM, T_ID> extends QueryCollectionBase<T_I
    * Provides all matching IDs using a lazy loading mechanism.
    *
    * @return the ID set according to the current query configuration.
+   * @throws MaxResultsViolationException Thrown if the number of found ids is more than {@link IdQueryCollectionImpl#maxResultsLimit}.
    */
-  @SuppressWarnings("unchecked")
-  protected List<T_ID> getIds() {
+  protected List<T_ID> getIds() throws MaxResultsViolationException {
     if (ids != null) {
       return ids;
     }
-
-    // prevent parallel service calls for the same thing.
+    
     synchronized (this) {
-      if (ids == null) {
-        currentPageItems = null;
-        QueryParams queryParams = getQueryParamsWithRemovedItems();
-        ids = queryParams.isExecQuery()
-            ? service.findIds(queryParams, 0, Integer.MAX_VALUE)
-            // In no-exec case: an unmodifyable collection.
-            : Collections.EMPTY_LIST;
-      }
+      currentPageItems = null;
+      ids = getIdQueryStrategy.getIds(getQueryParamsWithRemovedItems());
+      
       return ids;
     }
   }
@@ -321,6 +335,70 @@ public class IdQueryCollectionImpl<T_ITEM, T_ID> extends QueryCollectionBase<T_I
       int subListLast = Math.min((int)last, ids.size());
 
       return ids.subList(subListFirst, subListLast);
+    }
+  }
+  
+  abstract class GetIdQueryStrategy {
+    
+    /**
+     * Finds the ID set according to the current query configuration.
+     * 
+     * @return The ID set according to the current query configuration.
+     * @throws MaxResultsViolationException If the number of found ids is more than {@link IdQueryCollectionImpl#maxResultsLimit}. 
+     */
+    public abstract List<T_ID> getIds(QueryParams queryParams) throws MaxResultsViolationException;
+    
+    @SuppressWarnings("unchecked")
+    List<T_ID> findIds(QueryParams queryParams, int maxListSize) {            
+      return queryParams.isExecQuery() 
+          ? service.findIds(queryParams, 0, maxListSize)
+          // In no-exec case: an unmodifyable collection.
+          : Collections.EMPTY_LIST;
+    }
+  }
+  
+  /**
+   * A strategy to get the ID set according to the current query configuration with a single request. 
+   */
+  public class SingleQueryStrategy extends GetIdQueryStrategy {    
+
+    /** 
+     * Finds the ID set according to the current query configuration with a single request. If the number of found ids is more than {@link IdQueryCollectionImpl#maxResultsLimit} a MaxResultsViolationException is thrown.
+     * 
+     * @return The ID set according to the current query configuration.
+     */ 
+    @Override
+    public List<T_ID> getIds(QueryParams queryParams) throws MaxResultsViolationException {
+      // If possible increase the number of maxResultsLimit with 1, so that it is possible to check that the query returns more than maxResultsLimit entries. 
+      int maxListSize = maxResultsLimit == Integer.MAX_VALUE ? maxResultsLimit : maxResultsLimit+1;
+      List<T_ID> ids = findIds(queryParams, maxListSize);
+              
+      if (ids.size() > maxResultsLimit) {
+        throw new MaxResultsViolationException("The query returns more than " + maxResultsLimit + " entries.");
+      }
+        
+      return ids;
+    }
+  }
+  
+  /**
+   * A strategy to get the ID set according to the current query configuration within a single request. 
+   */
+  public class ExtraCountQueryStrategy extends GetIdQueryStrategy {    
+
+    /** 
+     * Finds all ids with a single request. If the number of found ids is more than {@link IdQueryCollectionImpl#maxResultsLimit} a MaxResultsViolationException is thrown.
+     * 
+     * @return The ID set according to the current query configuration.
+     * @throws MaxResultsViolationException Thrown if the number of found ids is more than maxResultsLimit.
+     */ 
+    @Override
+    public List<T_ID> getIds(QueryParams queryParams) throws MaxResultsViolationException {                
+      if (service.getItemCount(queryParams) > maxResultsLimit) {
+        throw new MaxResultsViolationException("The query returns more than " + maxResultsLimit + " entries.");
+      }
+          
+      return findIds(queryParams, maxResultsLimit);
     }
   }
 }

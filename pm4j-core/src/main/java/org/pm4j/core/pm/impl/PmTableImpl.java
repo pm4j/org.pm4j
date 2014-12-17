@@ -129,6 +129,16 @@ public class PmTableImpl
 
   /** An indicator that protects a getter logic based table against concurrent setter logic access. */
   boolean pmCollectionGetterLogicUsed;
+  
+  /** The maximum number of ids to get from a getIds() call in {@link IdQueryCollectionImpl}. */
+  private int idQueryMaxResultsLimit = Integer.MAX_VALUE;
+  
+  /** The query strategy for getting ids from a getIds() call in {@link IdQueryCollectionImpl}. */
+  private IdQueryStrategy idQueryStrategy = IdQueryStrategy.SINGLE_REQUEST;
+
+  public enum IdQueryStrategy {
+    SINGLE_REQUEST, EXTRA_COUNT_QUERY;
+  }
 
   /**
    * Creates a table PM.
@@ -137,6 +147,22 @@ public class PmTableImpl
    */
   public PmTableImpl(PmObject pmParent) {
     super(pmParent);
+  }
+  
+  public int getIdQueryMaxResultsLimit() {
+    return idQueryMaxResultsLimit;
+  }
+
+  public void setIdQueryMaxResultsLimit(int idQueryMaxResultsLimit) {
+    this.idQueryMaxResultsLimit = idQueryMaxResultsLimit;
+  }
+
+  public IdQueryStrategy getIdQueryStrategy() {
+    return idQueryStrategy;
+  }
+
+  public void setIdQueryStrategy(IdQueryStrategy idQueryStrategy) {
+    this.idQueryStrategy = idQueryStrategy;
   }
 
   /**
@@ -661,7 +687,15 @@ public class PmTableImpl
       return new PageQueryCollection<T_ROW_BEAN, Object>((PageQueryService<T_ROW_BEAN, Object>) service, qo);
     }
     if (service instanceof IdQueryService) {
-      return new IdQueryCollectionImpl<T_ROW_BEAN, Object>((IdQueryService<T_ROW_BEAN, Object>) service, qo);
+      IdQueryCollectionImpl<T_ROW_BEAN, Object> idQueryCollectionImpl = new IdQueryCollectionImpl<T_ROW_BEAN, Object>((IdQueryService<T_ROW_BEAN, Object>) service, qo);
+      
+      idQueryCollectionImpl.setMaxResultsLimit(idQueryMaxResultsLimit); 
+      // The default strategy is IdQueryCollectionImpl.SingleQueryStrategy.
+      if (idQueryStrategy == IdQueryStrategy.EXTRA_COUNT_QUERY) {
+        idQueryCollectionImpl.setGetIdQueryStrategy(idQueryCollectionImpl.new ExtraCountQueryStrategy());
+      }
+      
+      return idQueryCollectionImpl;
     }
     // a different service type:
     throw new PmRuntimeException(this,
