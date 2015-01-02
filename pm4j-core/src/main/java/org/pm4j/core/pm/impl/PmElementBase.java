@@ -58,7 +58,6 @@ public abstract class PmElementBase
       // The tab case should be added to the base class (each PmObject may be a tab).
   }
 
-
   // ======== meta data ======== //
 
   @Override

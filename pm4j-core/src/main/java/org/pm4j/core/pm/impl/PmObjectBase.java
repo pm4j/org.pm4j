@@ -309,7 +309,7 @@ public class PmObjectBase implements PmObject {
   }
 
   /**
-   * Override this method to define business logic driven enablement logic.
+   * You may override this method to provide your domain specific enablement logic.
    *
    * The default implementation considers the annotation {@link PmObjectCfg#enabled()}.
    *
@@ -587,7 +587,7 @@ public class PmObjectBase implements PmObject {
    * Clears cached content (if there was something cached).<br>
    * Causes a reload of the content with the next request.
    *
-   * @param cacheKinds
+   * @param cacheSet
    *          The set of caches to be cleared. If no cacheKind is specified, all
    *          cache kinds will be cleared.
    */
@@ -786,8 +786,6 @@ public class PmObjectBase implements PmObject {
 
   /**
    * PM validator interface.
-   *
-   * @param <T> The type of PM to validate.
    */
   public static interface Validator {
 
