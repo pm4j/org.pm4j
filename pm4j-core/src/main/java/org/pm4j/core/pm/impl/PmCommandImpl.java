@@ -113,15 +113,6 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
   }
 
   /**
-   * Base functionality (includes initialization etc.) is finalized here.<p>
-   * Subclasses may place their logic in {@link #isPmEnabledImpl()}.
-   */
-  @Override
-  public final boolean isPmEnabled() {
-  return super.isPmEnabled();
-  }
-
-  /**
    * @param commandDecorator The decorator to add to the command execution logic.
    */
   @Override
@@ -776,13 +767,13 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
         myMetaData.clearCachesSet = new TreeSet<PmCacheApi.CacheKind>(Arrays.asList(annotation.clearCaches()));
       }
     } else {
-    	myMetaData.beforeDo = new HashSet<BEFORE_DO>(Arrays.asList(new BEFORE_DO[] {BEFORE_DO.DEFAULT}));
-    	myMetaData.afterDo = new HashSet<AFTER_DO>(Arrays.asList(new AFTER_DO[] {AFTER_DO.DEFAULT}));
+      myMetaData.beforeDo = new HashSet<BEFORE_DO>(Arrays.asList(new BEFORE_DO[] {BEFORE_DO.DEFAULT}));
+      myMetaData.afterDo = new HashSet<AFTER_DO>(Arrays.asList(new AFTER_DO[] {AFTER_DO.DEFAULT}));
     }
 
     if (myMetaData.beforeDo.contains(BEFORE_DO.DEFAULT)) {
       if (myMetaData.beforeDo.size() > 1) {
-    	  throw new PmRuntimeException(this, "beforeDo can not contain other values if default is specified.");
+        throw new PmRuntimeException(this, "beforeDo can not contain other values if default is specified.");
       }
       myMetaData.beforeDo = PmDefaults.getInstance().getBeforeDoCommandDefault();
     }
@@ -791,7 +782,7 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
           throw new PmRuntimeException(this, "afterDo can not contain other values if default is specified.");
       }
       if (myMetaData.beforeDo.contains(BEFORE_DO.VALIDATE)) {
-    	  myMetaData.afterDo.add(AFTER_DO.RESET_VALUE_CHANGED_STATE);
+        myMetaData.afterDo.add(AFTER_DO.RESET_VALUE_CHANGED_STATE);
       }
       myMetaData.afterDo.add(AFTER_DO.CLEAR_CACHES);
     }
@@ -806,7 +797,7 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
     private Set<PmCommandCfg.AFTER_DO> afterDo;
     private CmdKind cmdKind = CmdKind.COMMAND;
     private Set<PmCacheApi.CacheKind> clearCachesSet = Collections.emptySet();
-    
+
     /**
      * Should the command be hidden when not applicable. Defaults to <code>false</code>.
      */

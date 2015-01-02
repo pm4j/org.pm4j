@@ -16,14 +16,13 @@ import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmCommand.CommandSet;
 import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmObject;
-import org.pm4j.core.pm.PmTreeNode;
 import org.pm4j.core.pm.impl.PmUtil;
 import org.pm4j.swt.pb.base.PbViewerToPmBase;
 
-public class PbTree extends PbViewerToPmBase<TreeViewer, Tree, PmTreeNode>  {
+public class PbTree extends PbViewerToPmBase<TreeViewer, Tree, PmObject>  {
 
   @Override
-  protected TreeViewer makeViewerImpl(Composite parentCtxt, PmTreeNode pm) {
+  protected TreeViewer makeViewerImpl(Composite parentCtxt, PmObject pm) {
     TreeViewer tv = new TreeViewer(parentCtxt);
 
     tv.setContentProvider(new ContentProvider());
@@ -51,14 +50,14 @@ public class PbTree extends PbViewerToPmBase<TreeViewer, Tree, PmTreeNode>  {
 
 
   @Override
-  protected PbBinding makeBinding(PmTreeNode pm) {
+  protected PbBinding makeBinding(PmObject pm) {
     return new Binding();
   }
 
   /**
    * Handles PM events as well as the SWT modification and focus event.
    */
-  public class Binding extends PbViewerToPmBase<TreeViewer, Tree, PmTreeNode>.Binding {
+  public class Binding extends PbViewerToPmBase<TreeViewer, Tree, PmObject>.Binding {
 
     @Override
     public void bind() {
@@ -101,8 +100,8 @@ public class PbTree extends PbViewerToPmBase<TreeViewer, Tree, PmTreeNode>  {
   public static class ContentProvider implements ITreeContentProvider {
 
     public Object[] getChildren(Object element) {
-      if (element instanceof PmTreeNode) {
-        return ((PmTreeNode) element).getPmChildNodes().toArray();
+      if (element instanceof PmObject) {
+        return ((PmObject) element).getPmChildNodes().toArray();
       }
       else {
         return EMPTY_OBJ_ARR;

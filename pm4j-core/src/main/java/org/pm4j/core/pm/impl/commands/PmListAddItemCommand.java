@@ -4,8 +4,8 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.pm4j.core.pm.PmAttrPmList;
+import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmCommand;
-import org.pm4j.core.pm.PmElement;
 import org.pm4j.core.pm.impl.PmAttrBase;
 import org.pm4j.core.pm.impl.PmCommandImpl;
 
@@ -16,12 +16,12 @@ import org.pm4j.core.pm.impl.PmCommandImpl;
  */
 public class PmListAddItemCommand extends PmCommandImpl implements PmCommand {
 
-  private final Collection<PmElement> addedItems;
+  private final Collection<PmBean<?>> addedItems;
 
   @SuppressWarnings("unchecked")
   public PmListAddItemCommand(PmAttrPmList<?> pmListAttr, Collection<?> addedItems) {
     super(pmListAttr);
-    this.addedItems = (Collection<PmElement>)addedItems;
+    this.addedItems = (Collection<PmBean<?>>)addedItems;
 
 //    setUndoCommand(undoCommand)
   }
@@ -34,18 +34,18 @@ public class PmListAddItemCommand extends PmCommandImpl implements PmCommand {
   @Override
   protected void doItImpl() throws Exception {
     @SuppressWarnings("unchecked")
-    PmAttrPmList<PmElement> pmListAttr = (PmAttrPmList<PmElement>) getPmParent();
+    PmAttrPmList<PmBean<?>> pmListAttr = (PmAttrPmList<PmBean<?>>) getPmParent();
 
     PmCommandImpl undoCommand = new PmCommandImpl((PmAttrBase<?,?>)pmListAttr);
     undoCommand.setUndoCommand(this);
     this.setUndoCommand(undoCommand);
 
-    for (PmElement pm : addedItems) {
+    for (PmBean<?> pm : addedItems) {
       pmListAttr.add(pm);
     }
   }
 
-  public Collection<PmElement> getAddedItems() {
+  public Collection<PmBean<?>> getAddedItems() {
     return addedItems;
   }
 

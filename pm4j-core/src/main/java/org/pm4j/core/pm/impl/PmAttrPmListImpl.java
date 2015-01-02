@@ -155,25 +155,12 @@ public class PmAttrPmListImpl<T_ITEM_PM extends PmBean<T_BEAN>, T_BEAN> extends 
   }
 
 
-  // ======== PmTreeNode implementation ======== //
-
-  private PmObject nodeDetailsPm;
-  @Override
-  public PmObject getNodeDetailsPm() {
-    if (nodeDetailsPm == null) {
-      nodeDetailsPm = getNodeDetailsPmImpl();
-    }
-    return nodeDetailsPm;
-  }
-
-  protected PmObject getNodeDetailsPmImpl() {
-    return null;
-  }
+  // ======== Tree node implementation ======== //
 
   @SuppressWarnings("unchecked")
   @Override
-  public List<PmTreeNode> getPmChildNodes() {
-    return (List<PmTreeNode>)(Object)getValue();
+  protected List<PmObject> getPmChildNodesImpl() {
+    return (List<PmObject>) getValue();
   }
 
   /**

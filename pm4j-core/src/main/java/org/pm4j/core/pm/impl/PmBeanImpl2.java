@@ -1,6 +1,5 @@
 package org.pm4j.core.pm.impl;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -13,7 +12,6 @@ import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmMessage.Severity;
 import org.pm4j.core.pm.PmObject;
-import org.pm4j.core.pm.PmTreeNode;
 import org.pm4j.core.pm.annotation.PmBeanCfg;
 import org.pm4j.core.pm.annotation.PmBoolean;
 import org.pm4j.core.pm.annotation.PmCacheCfg2;
@@ -405,8 +403,8 @@ public class PmBeanImpl2<T_BEAN>
   }
 
   /**
-   * Shared meta data for all attributes of the same kind.
-   * E.g. for all 'myapp.User.name' attributes.
+   * Shared meta data for all PM's of the same kind.
+   * E.g. for all 'myapp.myForm' attributes.
    */
   protected static class MetaData extends PmElementBase.MetaData {
     private Class<?>        beanClass;
@@ -430,23 +428,6 @@ public class PmBeanImpl2<T_BEAN>
   private final MetaData getOwnMetaDataWithoutPmInitCall() {
     return (MetaData) getPmMetaDataWithoutPmInitCall();
   }
-
-  // FIXME: check how to support PM trees / tree tables next. Move to PmObjectBase?
-  @Override
-  public List<PmTreeNode> getPmChildNodes() {
-    return Collections.emptyList();
-  }
-
-  @Override
-  public PmObject getNodeDetailsPm() {
-    return this;
-  }
-
-  @Override
-  public boolean isPmTreeLeaf() {
-    return true;
-  }
-
 
   /**
    * {@link PmBeanImpl2} validator logic.<br>

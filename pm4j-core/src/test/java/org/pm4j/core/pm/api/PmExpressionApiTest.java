@@ -7,14 +7,13 @@ import org.junit.Test;
 import org.pm4j.common.expr.Expression.SyntaxVersion;
 import org.pm4j.core.pm.PmAttrString;
 import org.pm4j.core.pm.PmElement;
-import org.pm4j.core.pm.PmLabel;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmInject;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
 import org.pm4j.core.pm.impl.PmElementImpl;
 import org.pm4j.core.pm.impl.PmInitApi;
-import org.pm4j.core.pm.impl.PmLabelImpl;
+import org.pm4j.core.pm.impl.PmObjectBase;
 import org.pm4j.core.pm.impl.pathresolver.PathResolver;
 import org.pm4j.core.pm.impl.pathresolver.PmExpressionPathResolver;
 
@@ -81,7 +80,7 @@ public class PmExpressionApiTest {
     }
   }
   class Child2Pm extends PmElementImpl {
-    public final PmLabel aLabel = new PmLabelImpl(this);
+    public final PmObject aLabel = new PmObjectBase(this);
     // TODO: allow property syntax by making variable usage explicite.
 //    @PmInject("(*)pmParent.aDialogPm")
     @PmInject("(*)getPmParent().aDialogPm")

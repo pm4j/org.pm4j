@@ -43,6 +43,7 @@ import org.pm4j.core.pm.PmMessage;
 import org.pm4j.core.pm.PmMessage.Severity;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmCacheCfg.Clear;
+import org.pm4j.core.pm.annotation.PmCacheCfg2;
 import org.pm4j.core.pm.annotation.PmFactoryCfg;
 import org.pm4j.core.pm.annotation.PmInit;
 import org.pm4j.core.pm.annotation.PmObjectCfg;
@@ -56,6 +57,7 @@ import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmMessageApi;
 import org.pm4j.core.pm.api.PmValidationApi;
+import org.pm4j.core.pm.impl.InternalPmCacheCfgUtil.CacheMetaData;
 import org.pm4j.core.pm.impl.PmObjectBase.MetaData.MetaDataId;
 import org.pm4j.core.pm.impl.inject.DiResolver;
 import org.pm4j.core.pm.impl.inject.DiResolverUtil;
@@ -68,7 +70,7 @@ import org.pm4j.core.pm.impl.title.TitleProviderAttrValueBased;
  *
  * @author olaf boede
  */
-public abstract class PmObjectBase implements PmObject {
+public class PmObjectBase implements PmObject {
 
   private static final Log LOG = LogFactory.getLog(PmObjectBase.class);
 
@@ -91,6 +93,9 @@ public abstract class PmObjectBase implements PmObject {
   /** Enabled state flag. */
   private boolean pmEnabled = true;
   /* package */ Object pmEnabledCache;
+
+  /** A cached child node set. Is used when the childNode cache is switched on. */
+  /* package */ Object pmChildNodesCache = null;
 
   /**
    * Optional title cache.
@@ -269,20 +274,10 @@ public abstract class PmObjectBase implements PmObject {
     }
   }
 
+  /** Please override {@link #isPmEnabledImpl()} to control that state. */
   @Override
-  public boolean isPmEnabled() {
-    MetaData metaData = getPmMetaData();
-    Object e = metaData.enablementCache.cacheStrategy.getCachedValue(this);
-
-    if (e != CacheStrategy.NO_CACHE_VALUE) {
-      // just return the cache hit (if there was one)
-      return (Boolean) e;
-    }
-    else {
-      boolean enabled = isPmEnabledImpl() &&
-                        CustomizedAnnotationUtil.isEnabled(this, metaData.permissionAnnotations);
-      return (Boolean) metaData.enablementCache.cacheStrategy.setAndReturnCachedValue(this, enabled);
-    }
+  public final boolean isPmEnabled() {
+    return getPmMetaData().isPmEnabled(this);
   }
 
   /**
@@ -1083,6 +1078,7 @@ public abstract class PmObjectBase implements PmObject {
       metaData.titleCache = InternalPmCacheCfgUtil.readCacheMetaData(this, CacheKind.TITLE, cacheAnnotations, InternalCacheStrategyFactory.INSTANCE);
       metaData.enablementCache = InternalPmCacheCfgUtil.readCacheMetaData(this, CacheKind.ENABLEMENT, cacheAnnotations, InternalCacheStrategyFactory.INSTANCE);
       metaData.visibilityCache = InternalPmCacheCfgUtil.readCacheMetaData(this, CacheKind.VISIBILITY, cacheAnnotations, InternalCacheStrategyFactory.INSTANCE);
+      metaData.nodesCache      = InternalPmCacheCfgUtil.readCacheMetaData(this, CacheKind.NODES, InternalPmBeanCacheStrategyFactory.INSTANCE);
       metaData.cacheClearBehavior = DeprInternalPmCacheCfgUtil.evaluateCacheClearBehavior(this, cacheAnnotations);
     }
 
@@ -1165,12 +1161,52 @@ public abstract class PmObjectBase implements PmObject {
       InternalPmCacheCfgUtil.registerClearOnListeners(pm, CacheKind.TITLE, titleCache.cacheClearOn);
       InternalPmCacheCfgUtil.registerClearOnListeners(pm, CacheKind.ENABLEMENT, enablementCache.cacheClearOn);
       InternalPmCacheCfgUtil.registerClearOnListeners(pm, CacheKind.VISIBILITY, visibilityCache.cacheClearOn);
+      InternalPmCacheCfgUtil.registerClearOnListeners(pm, CacheKind.NODES, nodesCache.cacheClearOn);
     }
 
     /** Initializes the some attributes based on PM-default settings. */
     protected void init(PmDefaults pmDefaults) {
       this.addErrorMessagesToTooltip = pmDefaults.addErrorMessagesToTooltip;
     }
+
+    /**
+     * Evaluates the enablement state for the given PM.<br>
+     * Considers the related enablement cache and calls {@link PmObjectBase#isPmEnabledImpl()} if the value is not cached.
+     *
+     * @param pm The PM to evaluate the enablement for.
+     * @return the enablement state.
+     */
+    protected boolean isPmEnabled(PmObjectBase pm) {
+      Object e = enablementCache.cacheStrategy.getCachedValue(pm);
+
+      if (e != CacheStrategy.NO_CACHE_VALUE) {
+        // just return the cache hit (if there was one)
+        return (Boolean) e;
+      }
+      else {
+        boolean enabled = pm.isPmEnabledImpl() &&
+                          CustomizedAnnotationUtil.isEnabled(pm, permissionAnnotations);
+        return (Boolean) enablementCache.cacheStrategy.setAndReturnCachedValue(pm, enabled);
+      }
+    }
+
+    /**
+     * Evaluates the PM children for tree views.<br>
+     * Considers the related cache and calls {@link PmObjectBase#getPmChildNodesImpl()()} if the value is not cached.
+     *
+     * @param pm The PM to get the tree display child nodes for.
+     * @return the child nodes.
+     */
+    @SuppressWarnings("unchecked")
+    protected List<? extends PmObject> getPmChildNodes(PmObjectBase pm) {
+      Object nodes = nodesCache.cacheStrategy.getCachedValue(pm);
+      if (nodes == CacheStrategy.NO_CACHE_VALUE) {
+        nodes = pm.getPmChildNodesImpl();
+        nodesCache.cacheStrategy.setAndReturnCachedValue(pm, nodes);
+      }
+      return (List<? extends PmObject>) nodes;
+    }
+
 
     private MetaDataId id;
     private String name;
@@ -1197,9 +1233,10 @@ public abstract class PmObjectBase implements PmObject {
     private Enable enablementCfg = Enable.DEFAULT;
     private Visible visibilityCfg = Visible.DEFAULT;
 
-    private InternalPmCacheCfgUtil.CacheMetaData titleCache = InternalPmCacheCfgUtil.CacheMetaData.NO_CACHE;
-    private InternalPmCacheCfgUtil.CacheMetaData enablementCache = InternalPmCacheCfgUtil.CacheMetaData.NO_CACHE;
-    private InternalPmCacheCfgUtil.CacheMetaData visibilityCache = InternalPmCacheCfgUtil.CacheMetaData.NO_CACHE;
+    private CacheMetaData titleCache      = CacheMetaData.NO_CACHE;
+    private CacheMetaData enablementCache = CacheMetaData.NO_CACHE;
+    private CacheMetaData visibilityCache = CacheMetaData.NO_CACHE;
+    private CacheMetaData nodesCache      = CacheMetaData.NO_CACHE;
     @Deprecated /* package */ Clear   cacheClearBehavior         = Clear.DEFAULT;
 
 //    private boolean cacheTooltip = false;
@@ -1394,6 +1431,32 @@ public abstract class PmObjectBase implements PmObject {
     for (PmMessage m : PmMessageApi.getMessages(this)) {
       styleClassSet.add(m.getSeverity().getStyleClass());
     }
+  }
+
+  @Override
+  public final List<? extends PmObject> getPmChildNodes() {
+    return getPmMetaData().getPmChildNodes(this);
+  }
+
+  /**
+   * Provides the set of child nodes.
+   * <p>
+   * The default implementation always provides <code>null</code>. That identifies this node as
+   * a leaf node, having no chance to have child nodes at all.
+   * <p>
+   * If your node can have child nodes, please override this method to provide them.
+   * <p>
+   * This set may be cached if you define a {@link PmCacheCfg2} value cache.
+   *
+   * @return The set of child nodes. <code>null</code> in case of leaf nodes.
+   */
+  protected List<? extends PmObject> getPmChildNodesImpl() {
+    return null;
+  }
+
+  @Override
+  public boolean isPmTreeLeaf() {
+    return getPmChildNodes() == null;
   }
 
   @Override

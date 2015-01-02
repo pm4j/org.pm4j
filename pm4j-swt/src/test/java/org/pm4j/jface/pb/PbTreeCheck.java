@@ -6,7 +6,7 @@ import java.util.List;
 import org.pm4j.core.pm.PmAttrPmList;
 import org.pm4j.core.pm.PmAttrString;
 import org.pm4j.core.pm.PmConversation;
-import org.pm4j.core.pm.PmTreeNode;
+import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmBeanCfg;
 import org.pm4j.core.pm.annotation.PmTitleCfg;
 import org.pm4j.core.pm.api.PmFactoryApi;
@@ -45,7 +45,7 @@ public class PbTreeCheck {
      * of this PM node.
      */
     @Override
-    protected List<? extends PmTreeNode> getPmChildNodesImpl() {
+    protected List<? extends PmObject> getPmChildNodesImpl() {
       return list1.getValue();
     }
   }

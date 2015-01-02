@@ -14,8 +14,8 @@ import org.pm4j.core.pm.annotation.PmFactoryCfg;
  *
  * @author olaf boede
  */
-public interface PmAttrPmList<T_ITEM_PM extends PmElement>
-  extends PmAttr<List<T_ITEM_PM>>, PmTreeNode {
+public interface PmAttrPmList<T_ITEM_PM extends PmBean<?>>
+  extends PmAttr<List<T_ITEM_PM>> {
 
   void add(T_ITEM_PM pmElement);
 

@@ -26,6 +26,7 @@ import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmExpressionApi;
 import org.pm4j.core.pm.impl.InternalPmBeanCacheStrategyFactory.CacheStrategyForPmBeanValue;
+import org.pm4j.core.pm.impl.InternalCacheStrategyFactory.CacheStrategyForNodes;
 import org.pm4j.core.pm.impl.cache.CacheStrategyBase;
 import org.pm4j.core.pm.impl.cache.CacheStrategyRequest;
 
@@ -343,6 +344,13 @@ class DeprInternalPmCacheCfgUtil {
       CacheMode.REQUEST,  new CacheStrategyRequest("CACHE_VISIBLE_IN_REQUEST", "vi")
     );
 
+  private static final Map<CacheMode, CacheStrategy> CACHE_STRATEGIES_FOR_NODES =
+      MapUtil.makeFixHashMap(
+        CacheMode.OFF,      CacheStrategyNoCache.INSTANCE,
+        CacheMode.ON,       new CacheStrategyForNodes(PmCacheCfg2.Clear.DEFAULT),
+        CacheMode.REQUEST,  new CacheStrategyRequest("CACHE_NODES_IN_REQUEST", "cn")
+      );
+
   private static final Map<CacheMode, CacheStrategy> CACHE_STRATEGIES_FOR_ATTR_VALUE =
     MapUtil.makeFixHashMap(
       CacheMode.OFF,      CacheStrategyNoCache.INSTANCE,
@@ -363,7 +371,8 @@ class DeprInternalPmCacheCfgUtil {
       CacheKind.OPTIONS,    CACHE_STRATEGIES_FOR_OPTIONS,
       CacheKind.TITLE,      CACHE_STRATEGIES_FOR_TITLE,
       CacheKind.VALUE,      CACHE_STRATEGIES_FOR_ATTR_VALUE,
-      CacheKind.VISIBILITY, CACHE_STRATEGIES_FOR_VISIBILITY
+      CacheKind.VISIBILITY, CACHE_STRATEGIES_FOR_VISIBILITY,
+      CacheKind.NODES,CACHE_STRATEGIES_FOR_NODES
     );
 
   static final Map<CacheKind, String> ATTR_CONSTANT_FOR_ASPECT =
@@ -372,7 +381,8 @@ class DeprInternalPmCacheCfgUtil {
       CacheKind.OPTIONS,    PmCacheCfg.ATTR_OPTIONS,
       CacheKind.TITLE,      PmCacheCfg.ATTR_TITLE,
       CacheKind.VALUE,      PmCacheCfg.ATTR_VALUE,
-      CacheKind.VISIBILITY, PmCacheCfg.ATTR_VISIBILITY
+      CacheKind.VISIBILITY, PmCacheCfg.ATTR_VISIBILITY,
+      CacheKind.NODES,      PmCacheCfg.ATTR_NODES
     );
 
   /**

@@ -20,6 +20,7 @@ import org.pm4j.core.pm.impl.PmBeanBase;
 import org.pm4j.core.pm.impl.PmConversationImpl;
 import org.pm4j.core.pm.impl.PmElementImpl;
 import org.pm4j.core.pm.impl.PmLabelImpl;
+import org.pm4j.core.pm.impl.PmObjectBase;
 
 public class PmVisitorTest {
 
@@ -168,13 +169,13 @@ public class PmVisitorTest {
   }
 
   public static class MyPmChild extends PmElementImpl {
-    public final PmLabel disabled = new PmLabelImpl(this) {
-      public boolean isPmEnabled() {
+    public final PmObject disabled = new PmObjectBase(this) {
+      protected boolean isPmEnabledImpl() {
         return false;
       };
     };
     public final PmConversation convImpl = new PmConversationImpl(this);
-    public final PmLabel readOnly = new PmLabelImpl(this) {
+    public final PmObject readOnly = new PmObjectBase(this) {
       protected boolean isPmReadonlyImpl() {
         return true;
       };

@@ -4,10 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.pm4j.core.pm.PmCommand;
+import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.api.PmLocalizeApi;
 import org.pm4j.core.pm.impl.PmCommandImpl;
 import org.pm4j.core.pm.impl.PmElementImpl;
-import org.pm4j.core.pm.impl.PmLabelImpl;
+import org.pm4j.core.pm.impl.PmObjectBase;
 
 /**
  * A standard confirmation dialog PM.<br>
@@ -55,13 +56,13 @@ public class PmConfirmDialog extends PmElementImpl {
    * Subclasses may override {@link PmConfirmDialog#getMessageString()} to
    * provide a more specific message content.
    */
-  public final PmLabelImpl dialogMessage = new PmLabelImpl(this) {
+  public final PmObject dialogMessage = new PmObjectBase(this) {
     @Override
     protected String getPmTitleImpl() {
       String s = getMessageString();
       return (s != null)
             ? s
-			// TODO: Konstante!
+            // TODO: Konstante!
             : PmLocalizeApi.localize(this, getLocalOrStandardDlgResKey("_dialogMessage"), getNameOfThingToConfirm());
     };
   };
@@ -167,7 +168,7 @@ public class PmConfirmDialog extends PmElementImpl {
 
   // -- Getters for frameworks that can't access public fields. */
 
-  public PmLabelImpl getDialogMessage() {
+  public PmObject getDialogMessage() {
     return dialogMessage;
   }
 

@@ -1,5 +1,6 @@
 package org.pm4j.core.pm;
 
+import java.util.List;
 import java.util.Set;
 
 
@@ -184,6 +185,19 @@ public interface PmObject extends Comparable<PmObject> {
    * @return The set of CSS style classes for this PM.
    */
   Set<String> getPmStyleClasses();
+
+  /**
+   * PM functionality to support tree views.
+   *
+   * @return The set of sub-nodes to display for this item.
+   */
+  List<? extends PmObject> getPmChildNodes();
+
+  /**
+   * @return <code>true</code> if this instance should be presented as a tree
+   *         leaf node.
+   */
+  boolean isPmTreeLeaf();
 
   /**
    * Returns an application specific property that may have been defined using

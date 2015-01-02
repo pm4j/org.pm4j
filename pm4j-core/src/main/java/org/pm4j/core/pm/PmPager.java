@@ -47,7 +47,7 @@ public interface PmPager {
   /**
    * @return A label presenting a text like 'Element 5 - 10 of 54'.
    */
-  PmLabel getItemXtillYofZ();
+  PmObject getItemXtillYofZ();
 
   /**
    * @return The total number of items (on all pages).

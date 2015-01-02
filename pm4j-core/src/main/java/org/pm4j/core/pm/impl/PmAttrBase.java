@@ -269,14 +269,8 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
             md.embeddedAttr && !getPmParent().isPmEnabled());
   }
 
-  @Override
-  public final boolean isPmEnabled() {
-    // link enable status to read only even if the default impl of isPmEnabledImpl is overwritten
-    // The read-only check is done first because some domain implementations of isPmEnabledImpl()
-    // are implemented in a way that fails under some read-only conditions (e.g. in case of a missing backing bean).
-    return !isPmReadonly() && super.isPmEnabled();
-  }
-
+  // TODO olaf: move common logic to isPmVisible. Additional effort: ensure that isPmVisible stays final
+  // for all PM sub classes.
   @Override
   protected boolean isPmVisibleImpl() {
     boolean visible = super.isPmVisibleImpl();
@@ -1766,6 +1760,15 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
       InternalPmCacheCfgUtil.registerClearOnListeners(pm, CacheKind.OPTIONS, optionsCache.cacheClearOn);
       InternalPmCacheCfgUtil.registerClearOnListeners(pm, CacheKind.VALUE, valueCache.cacheClearOn);
     }
+
+    @Override
+    protected boolean isPmEnabled(PmObjectBase pm) {
+      // link enable status to read only even if the default impl of isPmEnabledImpl is overwritten
+      // The read-only check is done first because some domain implementations of isPmEnabledImpl()
+      // are implemented in a way that fails under some read-only conditions (e.g. in case of a missing backing bean).
+      return !pm.isPmReadonly() && super.isPmEnabled(pm);
+    }
+
 
     /** @return The statically defined option set algorithm. */
     public PmOptionSetDef<PmAttr<?>> getOptionSetDef() { return optionSetDef; }

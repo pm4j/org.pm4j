@@ -6,8 +6,11 @@ import org.pm4j.core.pm.PmObject;
 /**
  * A label implementation.
  *
+ * @deprecated Please use {@link PmObjectBase}.
+ *
  * @author olaf boede
  */
+@Deprecated
 public class PmLabelImpl extends PmObjectBase implements PmLabel {
 
   /**
@@ -20,13 +23,4 @@ public class PmLabelImpl extends PmObjectBase implements PmLabel {
     super(pmParent);
   }
 
-  @Override
-  public void clearPmInvalidValues() {
-    // nothing to do.
-  }
-
-  @Override
-  protected MetaData makeMetaData() {
-    return new MetaData();
-  }
 }

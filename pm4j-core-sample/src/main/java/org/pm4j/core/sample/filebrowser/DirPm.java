@@ -12,7 +12,6 @@ import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.PmElement;
 import org.pm4j.core.pm.PmObject;
-import org.pm4j.core.pm.PmTreeNode;
 import org.pm4j.core.pm.annotation.PmFactoryCfg;
 import org.pm4j.core.pm.api.PmFactoryApi;
 import org.pm4j.core.pm.impl.PmAttrPmListImpl;
@@ -35,14 +34,15 @@ public class DirPm extends FilePmBase {
     };
 
     /** Show details as a table of directories. */
-    @Override protected PmObject getNodeDetailsPmImpl() {
-      return new FileTablePm(this) {
-        @SuppressWarnings("unchecked")
-        protected Collection<File> getPmBeansImpl() {
-          return (Collection<File>)(Object) subDirs.getValue();
-        }
-      };
-    }
+    // TODO: needs to be replaced.
+//    @Override protected PmObject getNodeDetailsPmImpl() {
+//      return new FileTablePm(this) {
+//        @SuppressWarnings("unchecked")
+//        protected Collection<File> getPmBeansImpl() {
+//          return (Collection<File>)(Object) subDirs.getValue();
+//        }
+//      };
+//    }
   };
 
   /** The set of files within the directory. */
@@ -54,14 +54,15 @@ public class DirPm extends FilePmBase {
     };
 
     /** Show details as a table of files. */
-    @Override protected PmObject getNodeDetailsPmImpl() {
-      return new FileTablePm(this) {
-        @SuppressWarnings("unchecked")
-        protected Collection<File> getPmBeansImpl() {
-          return (Collection<File>)(Object) files.getValue();
-        }
-      };
-    }
+    // TODO: needs to be replaced.
+//    @Override protected PmObject getNodeDetailsPmImpl() {
+//      return new FileTablePm(this) {
+//        @SuppressWarnings("unchecked")
+//        protected Collection<File> getPmBeansImpl() {
+//          return (Collection<File>)(Object) files.getValue();
+//        }
+//      };
+//    }
   };
 
   public final PmCommand cmdMakeSubDir = new PmConfirmedCommand(this) {
@@ -95,15 +96,16 @@ public class DirPm extends FilePmBase {
 
   /** Provides the tree-view sub-nodes. */
   @Override
-  protected List<? extends PmTreeNode> getPmChildNodesImpl() {
+  protected List<PmObject> getPmChildNodesImpl() {
     return ListUtil.collectionsToList(subDirs.getValue(), files.getValue());
   };
 
   /** Show details as a table of files. */
-  @Override
-  public PmObject getNodeDetailsPm() {
-    return files.getNodeDetailsPm();
-  };
+  // TODO: needs to be replaced.
+//  @Override
+//  public PmObject getNodeDetailsPm() {
+//    return files.getNodeDetailsPm();
+//  };
 
   @Override
   public boolean isPmTreeLeaf() {
