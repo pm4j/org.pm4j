@@ -1,0 +1,12 @@
+
+description = 'pm4j deprecated'
+dependencies {
+  compile project(':org.pm4j:pm4j-core')
+  testCompile project(':org.pm4j:pm4j-core').sourceSets.test.output
+}
+
+task packageTests(type: Jar) {
+  from sourceSets.test.output
+  classifier = 'tests'
+}
+artifacts.archives packageTests

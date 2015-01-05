@@ -1,0 +1,49 @@
+allprojects  {
+  apply plugin: 'maven'
+  apply plugin: 'java'
+
+  group = 'org.pm4j'
+version = '0.9.16-SNAPSHOT'
+
+  task resourceCopy(type: Copy) {
+    println "resourceCopy -- root dir: ${projectDir}/src/main/java build dir ${buildDir}/main"
+    from("${projectDir}/src/main/java") {
+      include '**/*.properties'
+      destinationDir new File("${buildDir}/main")
+    }
+  }
+  task testResourceCopy(type: Copy) {
+    println "testResourceCopy -- root dir: ${projectDir}/src/test/java build dir ${buildDir}/test"
+    from("${projectDir}/src/test/java") {
+      include '**/*.properties'
+      destinationDir new File("${buildDir}/test")
+    }
+  }
+
+  classes.dependsOn('resourceCopy')
+  testClasses.dependsOn('testResourceCopy')
+}
+
+subprojects {
+  apply plugin: 'java'
+  sourceCompatibility = 1.6
+  targetCompatibility = 1.6
+
+  task packageSources(type: Jar) {
+classifier = 'sources'
+from sourceSets.main.allSource
+
+}
+artifacts.archives packageSources
+  repositories {
+    mavenLocal()
+    
+    maven { url "http://repo.maven.apache.org/maven2" }
+  }
+
+  
+  dependencies {
+    testCompile group: 'junit', name: 'junit', version:'4.11'
+}
+
+}

@@ -1,0 +1,14 @@
+rootProject.name = 'main'
+include ':pm4j-common'
+include ':pm4j-core'
+include ':pm4j-core-sample'
+include ':pm4j-facelets'
+include ':pm4j-deprecated'
+include ':pm4j-swing'
+
+project(':pm4j-common').projectDir = "$rootDir/pm4j-common" as File
+project(':pm4j-core').projectDir = "$rootDir/pm4j-core" as File
+project(':pm4j-core-sample').projectDir = "$rootDir/pm4j-core-sample" as File
+project(':pm4j-facelets').projectDir = "$rootDir/pm4j-facelets" as File
+project(':pm4j-deprecated').projectDir = "$rootDir/pm4j-deprecated" as File
+project(':pm4j-swing').projectDir = "$rootDir/pm4j-swing" as File

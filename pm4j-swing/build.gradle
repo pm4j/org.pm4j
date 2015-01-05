@@ -1,0 +1,12 @@
+
+description = 'pm4j swing'
+dependencies {
+  compile project(':org.pm4j:pm4j-core')
+  compile project(':org.pm4j:pm4j-common')
+}
+
+task packageTests(type: Jar) {
+  from sourceSets.test.output
+  classifier = 'tests'
+}
+artifacts.archives packageTests
