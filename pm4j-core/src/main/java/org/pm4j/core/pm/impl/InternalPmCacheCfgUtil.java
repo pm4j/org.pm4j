@@ -41,11 +41,17 @@ class InternalPmCacheCfgUtil {
    * hierarchy of the given PM. Asserts that either the first or the latter
    * annotation type is used but never both.
    *
-   * @param pm the PM in question
-   * @param foundAnnotations a list to collect the found annotations
-   * @return the filled foundAnnotation parameter list
-   * @throws IllegalStateException if the PM hierarchy contains mixed
-   *         annotations e.g. old and new
+   * @param pm
+   *          the PM in question
+   * @param foundAnnotations
+   *          a list to collect the found annotations
+   * @return the filled foundAnnotation parameter list.<br>
+   *         The first annotations are more relevant than the following ones.
+   *         First annotation is 'nearer' defined e.g. directly on the field
+   *         instance. An annotation on a grand-parent PM may appear at the
+   *         end of the list.
+   * @throws IllegalStateException
+   *           if the PM hierarchy contains mixed annotations e.g. old and new
    */
   @SuppressWarnings({"rawtypes", "deprecation"})
   static List findCacheCfgsInPmHierarchy(PmObjectBase pm, List foundAnnotations) {
@@ -109,15 +115,31 @@ class InternalPmCacheCfgUtil {
 
   }
 
-  @SuppressWarnings({"unchecked", "rawtypes"})
-  static CacheMetaData readCacheMetaData(PmObjectBase pmObjectBase, CacheKind aspect, List cacheAnnotations, InternalCacheStrategyFactory factory) {
+  @SuppressWarnings({"unchecked", "rawtypes", "deprecation"})
+  static CacheMetaData readCacheMetaData(PmObjectBase pm, CacheKind aspect, List cacheAnnotations, InternalCacheStrategyFactory factory) {
     if (PmCacheCfg2.class.isAssignableFrom(cacheAnnotations.get(0).getClass())) {
-      Cache cache = findCacheForAspectInPmHierarchy(pmObjectBase, aspect, cacheAnnotations);
+      Cache cache = findCacheForAspectInPmHierarchy(pm, aspect, cacheAnnotations);
       return (cache == null)
           ? CacheMetaData.NO_CACHE
           : new CacheMetaData(factory.create(aspect, cache), cache);
     } else {
-      return DeprInternalPmCacheCfgUtil.createCacheMetaData(pmObjectBase, aspect, cacheAnnotations);
+      Map<CacheMode, CacheStrategy> map = ((aspect == CacheKind.VALUE && pm instanceof PmBeanImpl2)
+            ? InternalPmBeanCacheStrategyFactory.DEPR_CACHE_STRATEGIES_FOR_PM_BEAN_VALUE
+            : DeprInternalPmCacheCfgUtil.MODE_TO_STRATEGY_MAP_FOR_CACHE_KIND.get(aspect));
+
+      CacheStrategy strategy = DeprAnnotationUtil.evaluateCacheStrategy(pm, DeprInternalPmCacheCfgUtil.ATTR_CONSTANT_FOR_ASPECT.get(aspect), cacheAnnotations, map);
+
+      // XXX oboede: quick hack for clear definition of deprecated PmBeanImpl2 cache cfg:
+      if (aspect == CacheKind.VALUE && pm instanceof PmBeanImpl2) {
+        for (PmCacheCfg cfg : (List<PmCacheCfg>)cacheAnnotations) {
+          if (cfg.clear() != PmCacheCfg.Clear.DEFAULT) {
+            ((CacheStrategyBase<?>)strategy).setCacheClear(cfg.clear().toNonDeprecatedEnum());
+            break;
+          }
+        }
+      }
+
+      return new InternalPmCacheCfgUtil.CacheMetaData(strategy);
     }
   }
 
@@ -333,7 +355,7 @@ class DeprInternalPmCacheCfgUtil {
       CacheMode.REQUEST,  new CacheStrategyRequest("CACHE_OPTIONS_IN_REQUEST", "os")
     );
 
-  private static final Map<CacheKind, Map<CacheMode, CacheStrategy>> MODE_TO_STRATEGY_MAP_FOR_CACHE_KIND =
+  static final Map<CacheKind, Map<CacheMode, CacheStrategy>> MODE_TO_STRATEGY_MAP_FOR_CACHE_KIND =
     MapUtil.makeFixHashMap(
       CacheKind.ENABLEMENT, CACHE_STRATEGIES_FOR_ENABLEMENT,
       CacheKind.OPTIONS,    CACHE_STRATEGIES_FOR_OPTIONS,
@@ -342,7 +364,7 @@ class DeprInternalPmCacheCfgUtil {
       CacheKind.VISIBILITY, CACHE_STRATEGIES_FOR_VISIBILITY
     );
 
-  private static final Map<CacheKind, String> ATTR_CONSTANT_FOR_ASPECT =
+  static final Map<CacheKind, String> ATTR_CONSTANT_FOR_ASPECT =
     MapUtil.makeFixHashMap(
       CacheKind.ENABLEMENT, PmCacheCfg.ATTR_ENABLEMENT,
       CacheKind.OPTIONS,    PmCacheCfg.ATTR_OPTIONS,
@@ -367,11 +389,6 @@ class DeprInternalPmCacheCfgUtil {
     }
 
     return PmCacheCfg.Clear.DEFAULT;
-  }
-
-  @SuppressWarnings({"rawtypes", "unchecked"})
-  static InternalPmCacheCfgUtil.CacheMetaData createCacheMetaData(PmObjectBase pmObjectBase, CacheKind aspect, List cacheAnnotations) {
-    return new InternalPmCacheCfgUtil.CacheMetaData(DeprAnnotationUtil.evaluateCacheStrategy(pmObjectBase, DeprInternalPmCacheCfgUtil.ATTR_CONSTANT_FOR_ASPECT.get(aspect), cacheAnnotations, DeprInternalPmCacheCfgUtil.MODE_TO_STRATEGY_MAP_FOR_CACHE_KIND.get(aspect)));
   }
 
 }
