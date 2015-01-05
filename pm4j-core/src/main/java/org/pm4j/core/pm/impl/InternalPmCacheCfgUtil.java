@@ -130,7 +130,7 @@ class InternalPmCacheCfgUtil {
       CacheStrategy strategy = DeprAnnotationUtil.evaluateCacheStrategy(pm, DeprInternalPmCacheCfgUtil.ATTR_CONSTANT_FOR_ASPECT.get(aspect), cacheAnnotations, map);
 
       // XXX oboede: quick hack for clear definition of deprecated PmBeanImpl2 cache cfg:
-      if (aspect == CacheKind.VALUE && pm instanceof PmBeanImpl2) {
+      if (aspect == CacheKind.VALUE && pm instanceof PmBeanImpl2 && strategy instanceof CacheStrategyBase) {
         for (PmCacheCfg cfg : (List<PmCacheCfg>)cacheAnnotations) {
           if (cfg.clear() != PmCacheCfg.Clear.DEFAULT) {
             ((CacheStrategyBase<?>)strategy).setCacheClear(cfg.clear().toNonDeprecatedEnum());
