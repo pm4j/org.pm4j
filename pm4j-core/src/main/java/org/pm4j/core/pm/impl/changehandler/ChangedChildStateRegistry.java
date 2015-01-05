@@ -8,7 +8,7 @@ import java.util.Map;
 
 import org.pm4j.common.modifications.ModificationHandler;
 import org.pm4j.common.modifications.Modifications;
-import org.pm4j.core.pm.PmDataInput;
+import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmEventListener;
 import org.pm4j.core.pm.PmObject;
@@ -91,7 +91,7 @@ public class ChangedChildStateRegistry {
            isDetailsChangeRegistered();
   }
 
-  protected PmDataInput findChildItemToObserve(PmObject changedItem) {
+  protected PmObject findChildItemToObserve(PmObject changedItem) {
     if (changedItem == observedRootPm) {
       return null;
     }
@@ -101,12 +101,7 @@ public class ChangedChildStateRegistry {
       if (p.getPmParent() == observedRootPm) {
         // FIXME olaf: this does not correctly identify the intended children
         // (in case of tables we need to make sure that we only observe rows...)
-        if (p instanceof PmDataInput) {
-          return (PmDataInput)p;
-        }
-        else {
-          return null;
-        }
+        return p;
       }
       p = p.getPmParent();
     }
@@ -130,7 +125,7 @@ public class ChangedChildStateRegistry {
   private class PmChangeListener implements PmEventListener {
     @Override
     public void handleEvent(PmEvent event) {
-      PmDataInput itemPm = findChildItemToObserve(event.pm);
+      PmObject itemPm = findChildItemToObserve(event.pm);
 
       if (itemPm != null) {
         CHANGE registeredRowChange = changedItemPms.get(itemPm);

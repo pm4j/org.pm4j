@@ -8,6 +8,7 @@ import org.pm4j.core.pm.api.PmFactoryApi;
 import org.pm4j.core.pm.api.PmValidationApi;
 import org.pm4j.core.pm.impl.PmCommandImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
+import org.pm4j.core.pm.impl.PmDataInputUtil;
 import org.pm4j.deprecated.core.pm.DeprPmAttrPmRef;
 
 public class DomainEditSession extends PmConversationImpl.ChildSession<AdminSession> {
@@ -50,7 +51,7 @@ public class DomainEditSession extends PmConversationImpl.ChildSession<AdminSess
     @Override protected void doItImpl() {
       DomainPm pm = getEditedDomain();
       if (pm != null && PmValidationApi.hasValidAttributes(pm)) {
-        pm.commitBufferedPmChanges();
+        PmDataInputUtil.commitBufferedPmChanges(pm);
         getParentSessionImpl().getDomainService().saveDomain(pm.getPmBean());
         clearEdited();
       }

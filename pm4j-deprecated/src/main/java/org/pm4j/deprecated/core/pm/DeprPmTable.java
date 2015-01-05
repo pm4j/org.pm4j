@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.pm4j.common.selection.SelectMode;
 import org.pm4j.core.pm.PmCommandDecorator;
-import org.pm4j.core.pm.PmDataInput;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmTable;
 import org.pm4j.deprecated.core.pm.filter.DeprFilterByDefinition;
@@ -24,7 +23,7 @@ import org.pm4j.deprecated.core.pm.filter.DeprFilterable;
  * @deprecated Please use {@link PmTable}.
  */
 @Deprecated
-public interface DeprPmTable<T_ROW_OBJ> extends PmObject, PmDataInput, DeprFilterable, DeprFilterByDefinitionProvider {
+public interface DeprPmTable<T_ROW_OBJ> extends PmObject, DeprFilterable, DeprFilterByDefinitionProvider {
 
   /**
    * The set of supported row selection modes.
@@ -175,7 +174,7 @@ public interface DeprPmTable<T_ROW_OBJ> extends PmObject, PmDataInput, DeprFilte
      */
     @Deprecated
     DeprPmPager getPager();
-    
+
     DeprPmPager getPmPager();
   }
 

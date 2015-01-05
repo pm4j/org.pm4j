@@ -26,7 +26,7 @@ import org.pm4j.navi.NaviLink;
  *
  * @author Olaf Boede
  */
-public class PmTabSetImpl extends PmElementImpl implements PmTabSet {
+public class PmTabSetImpl extends PmObjectBase implements PmTabSet {
 
   private static final Log LOG = LogFactory.getLog(PmTabSetImpl.class);
 

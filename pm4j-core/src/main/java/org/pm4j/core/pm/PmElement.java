@@ -8,6 +8,6 @@ package org.pm4j.core.pm;
  *
  * @author olaf boede
  */
-public interface PmElement extends PmDataInput {
+public interface PmElement extends PmObject {
 
 }

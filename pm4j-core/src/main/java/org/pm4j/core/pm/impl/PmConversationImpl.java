@@ -38,7 +38,7 @@ import org.pm4j.navi.NaviHistory;
  *
  * @author olaf boede
  */
-public class PmConversationImpl extends PmElementBase implements PmConversation {
+public class PmConversationImpl extends PmDataInputBase implements PmConversation {
 
   private static final Log LOG = LogFactory.getLog(PmConversationImpl.class);
 
@@ -51,7 +51,6 @@ public class PmConversationImpl extends PmElementBase implements PmConversation 
 
   /** Callback to modify an {@link PmMessage} before it is added to the message list */
   private AddPmMessageCallback addMessageCallback;
-
 
   /**
    * A chain of {@link NamedObjectResolver}s that is used to resolve

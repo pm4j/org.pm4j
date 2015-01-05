@@ -103,7 +103,7 @@ import org.pm4j.navi.NaviLink;
  * @author olaf boede
  */
 public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
-        extends PmDataInputBase
+        extends PmObjectBase
         implements PmAttr<T_PM_VALUE> {
 
   private static final Log LOG = LogFactory.getLog(PmAttrBase.class);
@@ -1220,7 +1220,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   // ======== Buffered data input support ======== //
 
   public boolean isBufferedPmValueMode() {
-  PmDataInput parentPmCtxt = PmUtil.getPmParentOfType(this, PmDataInput.class);
+    PmDataInput parentPmCtxt = PmUtil.getPmParentOfType(this, PmDataInput.class);
     return parentPmCtxt.isBufferedPmValueMode();
   }
 

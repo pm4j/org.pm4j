@@ -24,7 +24,7 @@ import org.pm4j.core.pm.api.PmValidationApi;
  * @param <T_DETAILS_PM>
  *          Type of the supported details PM.
  */
-public class DetailsPmHandlerImpl<T_DETAILS_PM extends PmDataInput, T_MASTER_RECORD> implements DetailsPmHandler {
+public class DetailsPmHandlerImpl<T_DETAILS_PM extends PmObject, T_MASTER_RECORD> implements DetailsPmHandler {
 
   /** The details area PM. */
   private final T_DETAILS_PM detailsPm;
@@ -91,7 +91,7 @@ public class DetailsPmHandlerImpl<T_DETAILS_PM extends PmDataInput, T_MASTER_REC
   @Deprecated
   public boolean canSwitchMasterRecord() {
     return detailsPm != null
-        ? PmValidationApi.validateSubTree((PmDataInput)detailsPm)
+        ? PmValidationApi.validateSubTree(detailsPm)
         : true;
   }
 

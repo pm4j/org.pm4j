@@ -12,7 +12,6 @@ import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmConversation;
-import org.pm4j.core.pm.PmDataInput;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.impl.PmObjectBase.PmInitState;
@@ -361,36 +360,23 @@ public final class PmUtil {
   // -- internal helper --
 
   private static boolean _findChangedPms(PmObject searchRootPm, List<PmObject> listOfChangedPms) {
-    boolean isChanged = false;
-
-    if (searchRootPm instanceof PmDataInput) {
-      isChanged = ((PmDataInput)searchRootPm).isPmValueChanged();
-      if (!isChanged) {
-        return false;
-      }
-
-      boolean foundChangedChild = false;
-      for (PmObject child : getPmChildren(searchRootPm)) {
-        if (_findChangedPms(child, listOfChangedPms)) {
-          foundChangedChild = true;
-        }
-      }
-
-      if (!foundChangedChild) {
-        listOfChangedPms.add(searchRootPm);
-      }
-
-      return true;
+    boolean isChanged = searchRootPm.isPmValueChanged();
+    if (!isChanged) {
+      return false;
     }
-    else {
-      boolean foundChangedChild = false;
-      for (PmObject child : getPmChildren(searchRootPm)) {
-        if (_findChangedPms(child, listOfChangedPms)) {
-          foundChangedChild = true;
-        }
+
+    boolean foundChangedChild = false;
+    for (PmObject child : getPmChildren(searchRootPm)) {
+      if (_findChangedPms(child, listOfChangedPms)) {
+        foundChangedChild = true;
       }
-      return foundChangedChild;
     }
+
+    if (!foundChangedChild) {
+      listOfChangedPms.add(searchRootPm);
+    }
+
+    return true;
   }
 
 }

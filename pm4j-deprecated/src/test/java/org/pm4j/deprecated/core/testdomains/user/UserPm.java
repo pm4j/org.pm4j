@@ -20,6 +20,7 @@ import org.pm4j.core.pm.impl.PmAttrListImpl;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
 import org.pm4j.core.pm.impl.PmBeanBase;
 import org.pm4j.core.pm.impl.PmCommandImpl;
+import org.pm4j.core.pm.impl.PmDataInputUtil;
 import org.pm4j.deprecated.core.pm.DeprPmAttrPmRef;
 import org.pm4j.deprecated.core.pm.impl.DeprPmAttrPmRefImpl;
 
@@ -70,7 +71,7 @@ public class UserPm extends PmBeanBase<User> implements PmBean<User> {
   //@PmCommandCfg(beforeDo=BEFORE_DO.VALIDATE)
   public final PmCommand cmdCommitChanges = new PmCommandImpl(this) {
     @Override protected void doItImpl() {
-      commitBufferedPmChanges();
+      PmDataInputUtil.commitBufferedPmChanges(getPmParent());
     }
   };
 

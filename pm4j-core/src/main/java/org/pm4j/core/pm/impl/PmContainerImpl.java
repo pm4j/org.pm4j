@@ -25,34 +25,4 @@ public class PmContainerImpl extends PmElementImpl implements PmContainer {
     super(pmParent);
   }
 
-  /**
-   * A convenience base class that provides a default constructor.
-   * <p>
-   * Please make sure that {@link #setPmParent(PmObject)} gets called before the
-   * PM gets used.
-   * <p>
-   * This kind of deferred initialization is useful for some object management
-   * systems that don't support constructor parameters.<br>
-   * An example: JSF managed beans use only setters to resolve dependencies.
-   */
-  public static class WithDeferredParentAssignment extends PmContainerImpl {
-
-    /**
-     * Default contructor.<br>
-     * Please don't forget to call {@link #setPmParent(PmObject)} before this
-     * instance gets used.
-     */
-    public WithDeferredParentAssignment() {
-      super(null);
-    }
-
-    /**
-     * The class also provides a parent defining constructor.
-     *
-     * @param pmParent the PM tree parent.
-     */
-    public WithDeferredParentAssignment(PmObject pmParent) {
-      super(pmParent);
-    }
-  }
 }

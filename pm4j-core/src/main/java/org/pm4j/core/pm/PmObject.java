@@ -3,6 +3,8 @@ package org.pm4j.core.pm;
 import java.util.List;
 import java.util.Set;
 
+import org.pm4j.core.pm.impl.PmAttrUtil;
+
 
 /**
  * Basic interface for common presentation model functionality.
@@ -174,6 +176,41 @@ public interface PmObject extends Comparable<PmObject> {
    *         related this PM.
    */
   boolean isPmValid();
+
+  /**
+   * Indicates a value change. E.g. a value was entered, but not yet saved by
+   * the user.
+   * <p>
+   * The changed state usually gets cleared on execution of a {@link PmCommand}
+   * that required valid values.
+   *
+   * @return <code>true</code> if the value of this PM or one of its composite
+   *         children was changed.
+   */
+  boolean isPmValueChanged();
+
+  /**
+   * Marks the PM manually a changed or unchanged.
+   * <p>
+   * Setting the PM to unchanged will be propagated recursively to all child PMs.
+   *
+   * @param changed the new changed state.
+   */
+  void setPmValueChanged(boolean changed);
+
+  /**
+   * Resets the values of editable attributes to their default value.
+   * <p>
+   * Switches the changed state to <code>false</code>.
+   * <p>
+   * This method has some limitations. In more complex scenarios the value of
+   * one field may control the enabled state of a second field.<br>
+   * In that case it may happen that the value of the second field will be reset.
+   * <p>
+   * Please consider using {@link PmAttrUtil#resetBackingValuesToDefault(PmObject)}.
+   * It does not have that editable state limitation.
+   */
+  void resetPmValues();
 
   /**
    * A PM may provide CSS style classes to provide layout hints.

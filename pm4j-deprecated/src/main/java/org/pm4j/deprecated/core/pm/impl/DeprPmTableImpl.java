@@ -17,7 +17,6 @@ import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmCommand.CommandState;
 import org.pm4j.core.pm.PmCommandDecorator;
-import org.pm4j.core.pm.PmDataInput;
 import org.pm4j.core.pm.PmElement;
 import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmEvent.ValueChangeKind;
@@ -33,7 +32,6 @@ import org.pm4j.core.pm.impl.PmAttrBase;
 import org.pm4j.core.pm.impl.PmAttrEnumImpl;
 import org.pm4j.core.pm.impl.PmCommandDecoratorSetImpl;
 import org.pm4j.core.pm.impl.PmCommandImpl;
-import org.pm4j.core.pm.impl.PmDataInputBase;
 import org.pm4j.core.pm.impl.PmObjectBase;
 import org.pm4j.core.pm.impl.PmTableImpl;
 import org.pm4j.core.pm.impl.PmUtil;
@@ -68,7 +66,7 @@ import org.pm4j.deprecated.core.pm.pageable.DeprPageableListImpl;
 @Deprecated
 public class DeprPmTableImpl
         <T_ROW_ELEMENT_PM extends PmElement>
-        extends PmDataInputBase
+        extends PmObjectBase
         implements DeprPmTable<T_ROW_ELEMENT_PM> {
 
   /** The content this table is based on. */
@@ -541,9 +539,7 @@ public class DeprPmTableImpl
   @Override
   public void pmValidate() {
     for (PmObject itemPm : new ArrayList<PmObject>(changedStateRegistry.getChangedItems())) {
-      if (itemPm instanceof PmDataInput) {
-        ((PmDataInput)itemPm).pmValidate();
-      }
+      itemPm.pmValidate();
     }
   }
 

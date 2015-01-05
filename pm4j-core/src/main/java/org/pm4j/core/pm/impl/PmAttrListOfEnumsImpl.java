@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
+import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmOption;
 import org.pm4j.core.pm.PmOptionSet;
 import org.pm4j.core.pm.annotation.PmAttrListCfg;
@@ -17,7 +18,7 @@ import org.pm4j.core.pm.impl.options.PmOptionSetImpl;
  *
  * @param T_ENUM Type of the handled enum items.
  *
- * @author olaf boede
+ * @author Olaf Boede
  */
 @PmAttrListCfg(itemStringConverter=PmAttrListOfEnumsImpl.Converter.class)
 public class PmAttrListOfEnumsImpl<T_ENUM extends Enum<?>> extends PmAttrListImpl<T_ENUM> {
@@ -28,7 +29,7 @@ public class PmAttrListOfEnumsImpl<T_ENUM extends Enum<?>> extends PmAttrListImp
    * @param pmParent The PM hierarchy parent.
    * @param enumClass The class of the handled enum type.
    */
-  public PmAttrListOfEnumsImpl(PmElementBase pmParent, Class<T_ENUM> enumClass) {
+  public PmAttrListOfEnumsImpl(PmObject pmParent, Class<T_ENUM> enumClass) {
     super(pmParent);
     this.enumClass = enumClass;
   }

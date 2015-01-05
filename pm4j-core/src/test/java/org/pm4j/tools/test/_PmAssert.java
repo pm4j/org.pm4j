@@ -1,6 +1,7 @@
 package org.pm4j.tools.test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,7 +14,6 @@ import org.junit.Assert;
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmCommand.CommandState;
-import org.pm4j.core.pm.PmDataInput;
 import org.pm4j.core.pm.PmMessage;
 import org.pm4j.core.pm.PmMessage.Severity;
 import org.pm4j.core.pm.PmObject;
@@ -268,8 +268,8 @@ public class _PmAssert {
      * @param pms
      *            the PMs to check.
      */
-    public static void assertChanged(PmDataInput... pms) {
-        for (PmDataInput pm : pms) {
+    public static void assertChanged(PmObject... pms) {
+        for (PmObject pm : pms) {
             if (!pm.isPmValueChanged()) {
                 fail(pm.getPmRelativeName() + " should be in a changed state.");
             }
@@ -282,8 +282,8 @@ public class _PmAssert {
      * @param pms
      *            the PMs to check.
      */
-    public static void assertNotChanged(PmDataInput... pms) {
-        for (PmDataInput pm : pms) {
+    public static void assertNotChanged(PmObject... pms) {
+        for (PmObject pm : pms) {
             if (pm.isPmValueChanged()) {
                 fail(pm.getPmRelativeName() + " should not be in a changed state.");
             }
@@ -486,7 +486,7 @@ public class _PmAssert {
      * @param rootPm
      *            The root of the PM tree to validate.
      */
-    public static void validateSuccessful(PmDataInput rootPm) {
+    public static void validateSuccessful(PmObject rootPm) {
         if (!PmValidationApi.validateSubTree(rootPm)) {
             List<String> msgStrings = new ArrayList<String>();
             for (PmMessage m : PmMessageApi.getPmTreeMessages(rootPm, Severity.INFO)) {
@@ -505,7 +505,7 @@ public class _PmAssert {
      * @param expectedErrorMsgsInSubtree
      *            The expected error messages in rootPm or its PM subtree.
      */
-    public static void validateNotSuccessful(PmDataInput rootPm, String... expectedErrorMsgsInSubtree) {
+    public static void validateNotSuccessful(PmObject rootPm, String... expectedErrorMsgsInSubtree) {
         validateNotSuccessful(rootPm, Severity.ERROR, expectedErrorMsgsInSubtree);
     }
 
@@ -520,7 +520,7 @@ public class _PmAssert {
      * @param expectedMessagesInSubtree
      *            The expected messages in rootPm or its PM subtree.
      */
-    public static void validateNotSuccessful(PmDataInput rootPm, Severity minSeverity, String... expectedMessagesInSubtree) {
+    public static void validateNotSuccessful(PmObject rootPm, Severity minSeverity, String... expectedMessagesInSubtree) {
         if (PmValidationApi.validateSubTree(rootPm)) {
             Assert.fail("Unexpected successful validation of " + rootPm.getPmRelativeName());
         }

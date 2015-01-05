@@ -3,19 +3,13 @@ package org.pm4j.core.pm.impl;
 import java.util.List;
 import java.util.Set;
 
-import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.PmElement;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.api.PmCacheApi;
 
 public abstract class PmElementBase
-        extends PmDataInputBase
+        extends PmObjectBase
         implements PmElement {
-
-  /**
-   * Cache shortcut member.
-   */
-  private PmConversation pmConversation;
 
   /** Cached child nodes for tree interface. */
   private List<PmObject> pmChildNodes = null;
@@ -62,17 +56,6 @@ public abstract class PmElementBase
       // All found logic needs to be switched to isPmReadonlyImpl().
       // After that step this method should be deleted.
       // The tab case should be added to the base class (each PmObject may be a tab).
-  }
-
-  /**
-   * Optimization: Cached conversation navigation.
-   */
-  @Override
-  public PmConversation getPmConversation() {
-    if (pmConversation == null) {
-      pmConversation = super.getPmConversation();
-    }
-    return pmConversation;
   }
 
 

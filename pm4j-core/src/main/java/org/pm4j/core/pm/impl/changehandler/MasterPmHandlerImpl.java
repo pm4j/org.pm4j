@@ -14,7 +14,6 @@ import org.pm4j.common.modifications.Modifications;
 import org.pm4j.common.selection.Selection;
 import org.pm4j.common.selection.SelectionHandler;
 import org.pm4j.common.util.beanproperty.PropertyAndVetoableChangeListener;
-import org.pm4j.core.pm.PmDataInput;
 import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmEventListener;
 import org.pm4j.core.pm.PmObject;
@@ -159,8 +158,8 @@ public abstract class MasterPmHandlerImpl<T_MASTER_BEAN> implements MasterPmHand
    */
   protected boolean isCurrentDetailsAreaChanged() {
     for (DetailsPmHandler dh : detailsHandlers) {
-      Object detail = dh.getDetailsPm();
-      if ((detail instanceof PmDataInput) && ((PmDataInput) detail).isPmValueChanged()) {
+      PmObject detail = dh.getDetailsPm();
+      if (detail != null && detail.isPmValueChanged()) {
         return true;
       }
     }

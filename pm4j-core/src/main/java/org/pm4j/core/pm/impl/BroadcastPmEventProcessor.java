@@ -8,7 +8,6 @@ import java.util.Map;
 import org.pm4j.common.exception.CheckedExceptionWrapper;
 import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmConversation;
-import org.pm4j.core.pm.PmDataInput;
 import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmEvent.ValueChangeKind;
 import org.pm4j.core.pm.PmEventListener;
@@ -83,10 +82,10 @@ public class BroadcastPmEventProcessor implements Cloneable {
    * @param pm The root of the PM tree to inform.
    * @param additionalEventFlags Additional event flags to set.
    */
-  public static void broadcastAllChangeEvent(PmDataInputBase pm, int additionalEventFlags) {
+  public static void broadcastAllChangeEvent(PmObject pm, int additionalEventFlags) {
     // Inform all sub PMs.
     // This is not done within the initialization phase to prevent problems with initialization race conditions.
-    if (pm.pmInitState == PmInitState.INITIALIZED) {
+    if (PmInitApi.isPmInitialized(pm)) {
       // Inform observers of this instance and all sub-PMs.
       BroadcastPmEventProcessor p = new BroadcastPmEventProcessor(pm, PmEvent.ALL_CHANGE_EVENTS | additionalEventFlags,
             (additionalEventFlags & PmEvent.RELOAD) != 0 ? ValueChangeKind.RELOAD : ValueChangeKind.VALUE) {
@@ -110,8 +109,7 @@ public class BroadcastPmEventProcessor implements Cloneable {
 
           // Another (postponed) cleanup:
           // Mark the whole sub tree as unchanged.
-          // FIXME olaf: Move that to a PmObject related API asap.
-          ((PmDataInput)rootPm).setPmValueChanged(false);
+          rootPm.setPmValueChanged(false);
         }
       };
       p.doIt();

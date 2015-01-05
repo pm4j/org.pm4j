@@ -35,14 +35,14 @@ public class PmInjectTest {
     private String injectedNullProp;
 
     @PmInject(mode=Mode.PARENT_OF_TYPE)
-    private PmDataInput injectedParentOfType;
+    private PmObject injectedParentOfType;
 
     private String setterInjectedProp;
 
     public String getSetterInjectedProp() {
       return this.setterInjectedProp;
     }
-    
+
     @PmInject("#myProp")
     public void setSetterInjectedProp(String s) {
       this.setterInjectedProp = s;

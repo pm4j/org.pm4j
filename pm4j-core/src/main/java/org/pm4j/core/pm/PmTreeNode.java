@@ -1,6 +1,5 @@
 package org.pm4j.core.pm;
 
-import java.util.List;
 
 /**
  * Interface for presentation models that may be displayed as tree node items.

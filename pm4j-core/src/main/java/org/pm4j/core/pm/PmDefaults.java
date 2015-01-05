@@ -9,7 +9,6 @@ import org.pm4j.common.expr.Expression.SyntaxVersion;
 import org.pm4j.common.query.filter.FilterDefinitionFactory;
 import org.pm4j.common.query.filter.FilterDefinitionFactoryImpl;
 import org.pm4j.core.pm.annotation.PmCommandCfg;
-import org.pm4j.core.pm.annotation.PmCommandCfg.AFTER_DO;
 import org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO;
 import org.pm4j.core.pm.annotation.PmInject;
 import org.pm4j.core.pm.impl.PmObjectBase.NameBuilder;

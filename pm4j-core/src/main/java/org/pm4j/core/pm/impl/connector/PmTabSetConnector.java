@@ -1,6 +1,6 @@
 package org.pm4j.core.pm.impl.connector;
 
-import org.pm4j.core.pm.PmDataInput;
+import org.pm4j.core.pm.PmObject;
 
 /**
  * View technology specific adapter for tabs.
@@ -16,6 +16,6 @@ public interface PmTabSetConnector {
    *
    * @param pmTab the tab to switch to.
    */
-  void switchToTab(PmDataInput pmTab);
+  void switchToTab(PmObject pmTab);
 
 }

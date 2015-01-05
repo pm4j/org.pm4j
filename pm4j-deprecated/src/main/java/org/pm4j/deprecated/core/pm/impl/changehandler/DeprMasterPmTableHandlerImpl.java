@@ -16,7 +16,6 @@ import org.pm4j.common.selection.Selection;
 import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmCommandDecorator;
-import org.pm4j.core.pm.PmDataInput;
 import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmEventListener;
 import org.pm4j.core.pm.PmObject;
@@ -80,10 +79,10 @@ public class DeprMasterPmTableHandlerImpl<T_MASTER_BEAN> implements MasterPmHand
    *          The table to observe.
    * @param detailsPms The details PM's to observe.
    */
-  public DeprMasterPmTableHandlerImpl(DeprPmTable<?> masterTablePm, PmDataInput... detailsPms) {
+  public DeprMasterPmTableHandlerImpl(DeprPmTable<?> masterTablePm, PmObject... detailsPms) {
     this.masterTablePm = masterTablePm;
-    for (PmDataInput pm : detailsPms) {
-      addDetailsHander(new DetailsPmHandlerImpl<PmDataInput, T_MASTER_BEAN>(pm));
+    for (PmObject pm : detailsPms) {
+      addDetailsHander(new DetailsPmHandlerImpl<PmObject, T_MASTER_BEAN>(pm));
     }
   }
 
@@ -155,9 +154,9 @@ public class DeprMasterPmTableHandlerImpl<T_MASTER_BEAN> implements MasterPmHand
    */
   public boolean isCurrentDetailsAreaChanged() {
     for (DetailsPmHandler dh : detailsHandlers) {
-      Object detail = dh.getDetailsPm();
-      if ((detail instanceof PmDataInput) &&
-          ((PmDataInput)detail).isPmValueChanged()) {
+      PmObject detail = dh.getDetailsPm();
+      if (detail != null &&
+          detail.isPmValueChanged()) {
         return true;
       }
     }
@@ -272,9 +271,9 @@ public class DeprMasterPmTableHandlerImpl<T_MASTER_BEAN> implements MasterPmHand
   protected boolean validateDetails() {
     boolean allDetailsValid = true;
     for (DetailsPmHandler dh : detailsHandlers) {
-      Object d = dh.getDetailsPm();
-      if ((d instanceof PmDataInput) &&
-          !PmValidationApi.validateSubTree((PmDataInput)d)) {
+      PmObject d = dh.getDetailsPm();
+      if (d != null &&
+          !PmValidationApi.validateSubTree(d)) {
         allDetailsValid = false;
       }
     }

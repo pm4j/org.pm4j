@@ -160,7 +160,7 @@ public class PmAttrPmListImpl<T_ITEM_PM extends PmBean<T_BEAN>, T_BEAN> extends 
   @SuppressWarnings("unchecked")
   @Override
   protected List<PmObject> getPmChildNodesImpl() {
-    return (List<PmObject>) getValue();
+    return (List<PmObject>)(Object) getValue();
   }
 
   /**
@@ -255,7 +255,7 @@ public class PmAttrPmListImpl<T_ITEM_PM extends PmBean<T_BEAN>, T_BEAN> extends 
     super.initMetaData(metaData);
     MetaData myMetaData = (MetaData) metaData;
     myMetaData.setValidateLengths(false);
-    
+
     PmAttrPmListCfg annotation = AnnotationUtil.findAnnotation(this, PmAttrPmListCfg.class);
     if (annotation != null) {
       myMetaData.provideInvisibleItems = annotation.provideInvisibleItems();

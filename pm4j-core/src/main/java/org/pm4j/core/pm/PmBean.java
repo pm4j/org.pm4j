@@ -8,7 +8,7 @@ import org.pm4j.core.pm.impl.PmBeanBase;
  *
  * @param <T_BEAN> The type of the supported data bean.
  */
-public interface PmBean<T_BEAN> extends PmDataInput {
+public interface PmBean<T_BEAN> extends PmObject {
 
   /**
    * @return The data bean behind this presentation model element.<br>

@@ -10,6 +10,7 @@ import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmDataInput;
+import org.pm4j.core.pm.PmObject;
 
 
 /**
@@ -215,14 +216,14 @@ public @interface PmAttrCfg {
 
   /**
    * Defines attribute validation strategies.<br>
-   * Each attribute gets validated when {@link PmDataInput#pmValidate()} gets called.
+   * Each attribute gets validated when {@link PmObject#pmValidate()} gets called.
    * But the strategies {@link #BEFORE_SET} and {@link #AFTER_SET} allow to define additional
    * validation triggers.
    */
   public enum Validate {
 
     /**
-     * Validates the attribute only if {@link PmDataInput#pmValidate()} gets
+     * Validates the attribute only if {@link PmObject#pmValidate()} gets
      * called. This happens usually when a validating {@link PmCommand} gets
      * executed.
      * <p>

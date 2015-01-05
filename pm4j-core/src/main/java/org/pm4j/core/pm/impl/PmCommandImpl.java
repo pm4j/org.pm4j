@@ -542,7 +542,7 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
   protected Set<BEFORE_DO> getBeforeDoActions() {
     return getOwnMetaData().beforeDo;
   }
-  
+
   /**
    * @return Defines what happens after {@link #doItImpl()} gets called.
    */
@@ -570,12 +570,16 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
    * <p>
    * It will only be considered if the command validates before execution.
    * <p>
-   * The default implementation provides the next parent of type {@link PmDataInput}.
+   * The default implementation provides the next parent that is not of type {@link PmCommand}.
    *
    * @return the PM tree root object to validate before execution.
    */
-  protected PmDataInput getValidationExecRootPm() {
-    return PmUtil.getPmParentOfType(this, PmDataInput.class);
+  protected PmObject getValidationExecRootPm() {
+    PmObject o = getPmParent();
+    while (o instanceof PmCommand) {
+      o = o.getPmParent();
+    }
+    return o;
   }
 
   /**
@@ -627,7 +631,7 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
     }
 
     if (getAfterDoActions().contains(AFTER_DO.RESET_VALUE_CHANGED_STATE)) {
-      PmDataInput validationParentPm = getValidationExecRootPm();
+      PmObject validationParentPm = getValidationExecRootPm();
       validationParentPm.setPmValueChanged(false);
     }
 
@@ -819,6 +823,23 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
 
   private final MetaData getOwnMetaData() {
     return (MetaData) getPmMetaData();
+  }
+
+  // FIXME oboede: methods needed to identify direct usages (which shouldn't exist in the old code)
+  // Make base methods final and remove this implementations after doing that.
+  @Override
+  public boolean isPmValueChanged() {
+    return super.isPmValueChanged();
+  }
+
+  @Override
+  public void setPmValueChanged(boolean changed) {
+    super.setPmValueChanged(changed);
+  }
+
+  @Override
+  public void resetPmValues() {
+    super.resetPmValues();
   }
 
 }

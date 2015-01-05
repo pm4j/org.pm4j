@@ -36,7 +36,7 @@ import org.pm4j.core.pm.impl.pathresolver.PmExpressionPathResolver;
  * @author Olaf Boede
  */
 public class PmBeanImpl2<T_BEAN>
-      extends PmDataInputBase
+      extends PmObjectBase
       implements PmBean<T_BEAN> {
 
   /** A cached data object behind this PM. */

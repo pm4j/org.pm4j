@@ -18,7 +18,7 @@ import org.pm4j.core.pm.impl.PmAttrImpl;
  *
  * @param <T> The attribute value type provided for the view.
  *
- * @author olaf boede
+ * @author Olaf Boede
  */
 public interface PmAttr<T> extends PmObject, PmDataInput {
 
