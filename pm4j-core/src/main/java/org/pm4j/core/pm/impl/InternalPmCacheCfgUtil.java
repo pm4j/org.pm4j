@@ -25,6 +25,7 @@ import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmExpressionApi;
+import org.pm4j.core.pm.impl.InternalPmBeanCacheStrategyFactory.CacheStrategyForPmBeanValue;
 import org.pm4j.core.pm.impl.cache.CacheStrategyBase;
 import org.pm4j.core.pm.impl.cache.CacheStrategyRequest;
 
@@ -130,10 +131,11 @@ class InternalPmCacheCfgUtil {
       CacheStrategy strategy = DeprAnnotationUtil.evaluateCacheStrategy(pm, DeprInternalPmCacheCfgUtil.ATTR_CONSTANT_FOR_ASPECT.get(aspect), cacheAnnotations, map);
 
       // XXX oboede: quick hack for clear definition of deprecated PmBeanImpl2 cache cfg:
-      if (aspect == CacheKind.VALUE && pm instanceof PmBeanImpl2 && strategy instanceof CacheStrategyBase) {
+      if (strategy instanceof CacheStrategyForPmBeanValue) {
         for (PmCacheCfg cfg : (List<PmCacheCfg>)cacheAnnotations) {
           if (cfg.clear() != PmCacheCfg.Clear.DEFAULT) {
-            ((CacheStrategyBase<?>)strategy).setCacheClear(cfg.clear().toNonDeprecatedEnum());
+            // create a new strategy if it's needed to have a different one.
+            strategy = new CacheStrategyForPmBeanValue(cfg.clear().toNonDeprecatedEnum());
             break;
           }
         }

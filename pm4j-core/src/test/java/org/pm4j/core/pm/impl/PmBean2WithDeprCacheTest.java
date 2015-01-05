@@ -57,7 +57,7 @@ public class PmBean2WithDeprCacheTest {
     pm.setPmBean(new Bean("NewBean"));
   }
 
-  @Test
+  @Test @Ignore
   public void readBeanPmCachedNeverCleared() {
     TestPmBase pm = new TestPmCachedNeverCleared().provideTestBean(bean);
     assertSame(bean, pm.getPmBean());

@@ -39,16 +39,6 @@ public abstract class CacheStrategyBase<PM extends PmObjectBase> implements Cach
 
   protected abstract void clearImpl(PM pm);
 
-  /**
-   * @deprecated Only introduced to support a deprecated cache cfg scenario.
-   */
-  @Deprecated
-  public void setCacheClear(PmCacheCfg2.Clear cacheClear) {
-    this.cacheClear = cacheClear;
-  }
-
-
-
   @Override @SuppressWarnings("unchecked")
   public void clear(Object ctxt) {
     PM pm = (PM)ctxt;

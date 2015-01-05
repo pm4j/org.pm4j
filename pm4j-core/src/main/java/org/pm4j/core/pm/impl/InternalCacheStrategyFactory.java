@@ -183,7 +183,7 @@ class InternalPmBeanCacheStrategyFactory extends InternalCacheStrategyFactory {
   }
 
   static class CacheStrategyForPmBeanValue extends CacheStrategyBase<PmBeanImpl2<Object>> {
-    private CacheStrategyForPmBeanValue(Clear cacheClear) {
+    CacheStrategyForPmBeanValue(Clear cacheClear) {
       super("CACHE_VALUE_LOCAL", cacheClear);
     }
 
