@@ -1,21 +1,13 @@
-
-description = 'pm4j core'
 dependencies {
-
-  compile project(':org.pm4j:pm4j-common')
-    compile group: 'javax.validation', name: 'validation-api', version:'1.0.0.GA'
-    compile group: 'joda-time', name: 'joda-time', version:'2.1'
-    compile group: 'commons-lang', name: 'commons-lang', version:'2.4'
-    compile group: 'commons-logging', name: 'commons-logging', version:'1.1.1'
-    compile group: 'log4j', name: 'log4j', version:'1.2.16'
-    compile group: 'org.hibernate', name: 'hibernate-validator', version:'4.1.0.Final'
-    compile group: 'org.slf4j', name: 'slf4j-api', version:'1.6.1'
-    compile group: 'org.slf4j', name: 'slf4j-log4j12', version:'1.6.1'
-  testCompile project(':org.pm4j:pm4j-common').sourceSets.test.output
+    compile project(':pm4j-common')
+    compile group: 'javax.validation', name: 'validation-api', version: '1.0.0.GA'
+    compile group: 'joda-time', name: 'joda-time', version: '2.1'
+    compile group: 'commons-lang', name: 'commons-lang', version: '2.4'
+    compile group: 'commons-logging', name: 'commons-logging', version: '1.1.1'
+    compile group: 'log4j', name: 'log4j', version: '1.2.16'
+    compile group: 'org.hibernate', name: 'hibernate-validator', version: '4.1.0.Final'
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.6.1'
+    compile group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.6.1'
+    // todo: Base classes for tests do not belong in src/test but in a separate project in src/main
+    testCompile project(':pm4j-common').sourceSets.test.output
 }
-
-task packageTests(type: Jar) {
-  from sourceSets.test.output
-  classifier = 'tests'
-}
-artifacts.archives packageTests

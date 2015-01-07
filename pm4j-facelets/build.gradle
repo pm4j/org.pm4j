@@ -1,16 +1,7 @@
-
-description = 'pm4j facelets'
 dependencies {
-  compile project(':org.pm4j:pm4j-core')
-  compile project(':org.pm4j:pm4j-common')
-    compile group: 'javax.servlet', name: 'servlet-api', version:'2.4'
-    compile group: 'org.apache.myfaces.core', name: 'myfaces-api', version:'1.2.10'
-    compile group: 'org.apache.myfaces.core', name: 'myfaces-impl', version:'1.2.10'
-    compile group: 'commons-io', name: 'commons-io', version:'1.4'
+    compile project(':pm4j-core')
+    compile group: 'javax.servlet', name: 'servlet-api', version: '2.4'
+    compile group: 'org.apache.myfaces.core', name: 'myfaces-api', version: '1.2.10'
+    compile group: 'org.apache.myfaces.core', name: 'myfaces-impl', version: '1.2.10'
+    compile group: 'commons-io', name: 'commons-io', version: '1.4'
 }
-
-task packageTests(type: Jar) {
-  from sourceSets.test.output
-  classifier = 'tests'
-}
-artifacts.archives packageTests

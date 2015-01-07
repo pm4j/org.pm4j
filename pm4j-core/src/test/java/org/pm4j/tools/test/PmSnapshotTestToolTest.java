@@ -44,7 +44,7 @@ public class PmSnapshotTestToolTest {
     File file = snap.snapshot(new MiniTestPm(), "testWriteSnapshot");
     assertTrue(file.exists());
     String path = file.getPath().replace('\\', '/');
-    assertTrue(path, path.endsWith("pm4j-core/src/test/java/org/pm4j/tools/test/pmSnapshotTestToolTest/testWriteSnapshot.xml"));
+    assertTrue(path, path.endsWith("src/test/java/org/pm4j/tools/test/pmSnapshotTestToolTest/testWriteSnapshot.xml"));
     try {
       assertEquals(file.getAbsolutePath(),
           "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +

@@ -1,12 +1,5 @@
-
-description = 'pm4j deprecated'
 dependencies {
-  compile project(':org.pm4j:pm4j-core')
-  testCompile project(':org.pm4j:pm4j-core').sourceSets.test.output
+    compile project(':pm4j-core')
+    // todo: Base classes for tests do not belong in src/test but in a separate project in src/main
+    testCompile project(':pm4j-core').sourceSets.test.output
 }
-
-task packageTests(type: Jar) {
-  from sourceSets.test.output
-  classifier = 'tests'
-}
-artifacts.archives packageTests

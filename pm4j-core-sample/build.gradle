@@ -1,14 +1,3 @@
-
-description = 'pm4j core sample'
 dependencies {
-  compile project(':org.pm4j:pm4j-core')
-  compile project(':org.pm4j:pm4j-common')
-  //compile project(':org.pm4j:pm4j-core')
-  testCompile project(':org.pm4j:pm4j-common').sourceSets.test.output
+    compile project(':pm4j-core')
 }
-
-task packageTests(type: Jar) {
-  from sourceSets.test.output
-  classifier = 'tests'
-}
-artifacts.archives packageTests
