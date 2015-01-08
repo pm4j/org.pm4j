@@ -1,3 +1,4 @@
+apply from: '../pm4j.gradle'
 dependencies {
     compile project(':pm4j-core')
 }

@@ -1,3 +1,4 @@
+apply from: '../pm4j.gradle'
 dependencies {
     compile project(':pm4j-common')
     compile group: 'javax.validation', name: 'validation-api', version: '1.0.0.GA'

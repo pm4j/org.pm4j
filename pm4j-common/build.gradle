@@ -1,3 +1,4 @@
+apply from: '../pm4j.gradle'
 dependencies {
     compile group: 'javax.validation', name: 'validation-api', version: '1.0.0.GA'
     compile group: 'joda-time', name: 'joda-time', version: '2.1'
