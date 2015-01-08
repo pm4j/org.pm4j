@@ -44,6 +44,7 @@ import org.pm4j.core.exception.PmResourceData;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.exception.PmValidationException;
 import org.pm4j.core.pm.PmAttr;
+import org.pm4j.core.pm.PmAttrString;
 import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmCommandDecorator;
 import org.pm4j.core.pm.PmConstants;
@@ -1121,7 +1122,9 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     }
 
     // Check for the length of the number String representation if enabled
-    if (getOwnMetaDataWithoutPmInitCall().isValidateLengths()) {
+    // FIXME oboede: disabled for an integration
+    // if (getOwnMetaDataWithoutPmInitCall().isValidateLengths()) {
+    if (this instanceof PmAttrString) {
       String valueAsString =  (value != null || isConvertingNullValueImpl()) ? valueToStringImpl(value) : null;
       if (valueAsString != null) {
         if (valueAsString.length() < getMinLen()) {
