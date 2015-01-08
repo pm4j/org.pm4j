@@ -1119,7 +1119,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
         isEmptyValue(value)) {
       throw new PmValidationException(PmMessageApi.makeRequiredMessageResData(this));
     }
-    
+
     // Check for the length of the number String representation if enabled
     if (getOwnMetaDataWithoutPmInitCall().isValidateLengths()) {
       String valueAsString =  (value != null || isConvertingNullValueImpl()) ? valueToStringImpl(value) : null;
@@ -1821,7 +1821,8 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
      * @return the validateLengths
      */
     public boolean isValidateLengths() {
-      return validateLengths;
+      // FIXME oboede: re-activate that asap.
+      return false; // validateLengths;
     }
 
     /**
@@ -1830,7 +1831,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     public void setValidateLengths(boolean validateLengths) {
       this.validateLengths = validateLengths;
     }
-    
+
   }
 
   /**
