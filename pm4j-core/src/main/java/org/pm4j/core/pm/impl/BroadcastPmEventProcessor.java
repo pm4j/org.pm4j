@@ -1,7 +1,6 @@
 package org.pm4j.core.pm.impl;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
@@ -84,7 +83,7 @@ public class BroadcastPmEventProcessor implements Cloneable {
    * @param pm The root of the PM tree to inform.
    * @param additionalEventFlags Additional event flags to set.
    */
-  public static void broadcastAllChangeEvent(PmBeanImpl2<?> pm, int additionalEventFlags) {
+  public static void broadcastAllChangeEvent(PmDataInputBase pm, int additionalEventFlags) {
     // Inform all sub PMs.
     // This is not done within the initialization phase to prevent problems with initialization race conditions.
     if (pm.pmInitState == PmInitState.INITIALIZED) {
@@ -186,7 +185,8 @@ public class BroadcastPmEventProcessor implements Cloneable {
         return PmVisitResult.CONTINUE;
       }
     })
-    .hints()
+    // TODO: check if iteration of factory generated PMs (e.g. table rows should be configurable.)
+    .hints(PmVisitHint.SKIP_FACTORY_GENERATED_CHILD_PMS)
     .exclude(excludes)
     .visit(rootPm);
   }

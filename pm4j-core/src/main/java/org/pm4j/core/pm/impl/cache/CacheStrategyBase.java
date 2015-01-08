@@ -7,17 +7,27 @@ import org.pm4j.core.pm.annotation.PmCacheCfg2;
 import org.pm4j.core.pm.impl.InternalPmImplUtil;
 import org.pm4j.core.pm.impl.PmObjectBase;
 
+/**
+ * Basic implementation for a {@link CacheStrategy}.
+ *
+ * @author Olaf Boede
+ *
+ * @param <PM> The cache context class that provides the location to read and write the cached values.
+ */
 //TODO oboede: remove the PM dependency.
 public abstract class CacheStrategyBase<PM extends PmObjectBase> implements CacheStrategy {
 
+  /** Marker instance, identifies a <code>null</code> value within the cache. */
+  private static final Object NULL_VALUE_OBJECT = "--null value--";
+
   private String cacheName;
-  
+
   private PmCacheCfg2.Clear cacheClear;
-  
+
   public CacheStrategyBase(String cacheName) {
     this.cacheName = cacheName;
   }
-  
+
   public CacheStrategyBase(String cacheName, PmCacheCfg2.Clear cacheClear) {
     this(cacheName);
     this.cacheClear = cacheClear;
@@ -29,11 +39,10 @@ public abstract class CacheStrategyBase<PM extends PmObjectBase> implements Cach
 
   protected abstract void clearImpl(PM pm);
 
-
   @Override @SuppressWarnings("unchecked")
   public void clear(Object ctxt) {
     PM pm = (PM)ctxt;
-    
+
     if (cacheClear != null) {
       // new annotation style using PmCacheCfg2
       if (cacheClear == PmCacheCfg2.Clear.DEFAULT) {
@@ -73,7 +82,12 @@ public abstract class CacheStrategyBase<PM extends PmObjectBase> implements Cach
   public boolean isCaching() {
     return true;
   }
-  
+
+  @Override
+  public boolean isCacheNeverCleared() {
+    return cacheClear == PmCacheCfg2.Clear.NEVER;
+  }
+
   protected void logPmCacheHit(PmObject pm) {
     CacheLog.INSTANCE.logPmCacheHit(pm, cacheName);
   }

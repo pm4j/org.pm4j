@@ -36,6 +36,7 @@ import org.pm4j.core.pm.annotation.PmTitleCfg;
 import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
 import org.pm4j.core.pm.api.PmEventApi;
+import org.pm4j.core.pm.impl.BroadcastPmEventProcessor;
 import org.pm4j.core.pm.impl.PmAttrIntegerImpl;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
 import org.pm4j.core.pm.impl.PmBeanImpl;
@@ -290,7 +291,22 @@ public class PmTableTest {
     assertEquals(1, valueChangeEventListener.getCallCount());
   }
 
-  @PmTableCfg(initialSortCol="name", sortable = true)
+  /**
+   * An all change event makes factory generated PM's like row PMs completely irrelevant.
+   * Their corresponding beans are no longer valid.
+   * <p>
+   * Because of that they are not visited.
+   */
+  @Test
+  public void testRowsAreNotVisitedOnBroadCastAllChangeEvents() {
+    RecordingPmEventListener l = new RecordingPmEventListener();
+    PmEventApi.addPmEventListener(myTablePm.getRowPms().get(0), PmEvent.ALL_CHANGE_EVENTS, l);
+    BroadcastPmEventProcessor.broadcastAllChangeEvent(myTablePm, 0);
+
+    assertEquals(0, l.getCallCount());
+  }
+
+  @PmTableCfg(initialSortCol="name")
   @PmFactoryCfg(beanPmClasses=RowPm.class)
   public static class MyTablePm extends PmTableImpl<RowPm, RowBean> {
 

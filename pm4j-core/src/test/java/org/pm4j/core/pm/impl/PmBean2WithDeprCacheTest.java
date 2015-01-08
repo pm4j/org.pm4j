@@ -12,20 +12,17 @@ import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmCacheCfg;
 import org.pm4j.core.pm.annotation.PmCacheCfg.CacheMode;
-import org.pm4j.core.pm.annotation.PmCacheCfg2;
-import org.pm4j.core.pm.annotation.PmCacheCfg2.Cache;
-import org.pm4j.core.pm.annotation.PmCacheCfg2.Clear;
 import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.tools.test.RecordingPmEventListener;
 
-public class PmBean2Test {
+public class PmBean2WithDeprCacheTest {
 
   private Bean bean = new Bean("InitialBean");
 
   @Test
-  public void readFromUncachedPm() {
+  public void readBeanPmWithGetterLogic() {
     TestPmBase pm = new TestPmBase().provideTestBean(bean);
     assertSame(bean, pm.getPmBean());
     assertEquals(1, pm.callCount_getPmBeanImpl);
@@ -33,7 +30,7 @@ public class PmBean2Test {
     assertEquals(2, pm.callCount_getPmBeanImpl);
   }
 
-  // XXX: check exception message using @Rule s
+  // TODO: check exception message using @Rule s
   @Test(expected=PmRuntimeException.class)
   public void assignBeanToUncachedPmBeanThrowsException() {
     TestPmBase pm = new TestPmBase();
@@ -41,7 +38,7 @@ public class PmBean2Test {
   }
 
   @Test
-  public void readFromCachedPm() {
+  public void readBeanPmCached() {
     TestPmBase pm = new TestPmCached().provideTestBean(bean);
     assertSame(bean, pm.getPmBean());
     assertEquals(1, pm.callCount_getPmBeanImpl);
@@ -54,17 +51,14 @@ public class PmBean2Test {
   }
 
   // TODO oboede: should we allow that without fixing the cache forever?
-  //@Test(expected=PmRuntimeException.class)
+  @Test(expected=PmRuntimeException.class) @Ignore
   public void assignBeanToCachedPmBean() {
     TestPmBase pm = new TestPmCached();
     pm.setPmBean(new Bean("NewBean"));
-    assertEquals("NewBean", pm.getPmBean().s);
-    PmEventApi.broadcastPmEvent(pm, PmEvent.ALL_CHANGE_EVENTS);
-    assertEquals("NewBean", pm.getPmBean().s);
   }
 
-  @Test
-  public void readFromCachedNeverClearedPm() {
+  @Test @Ignore
+  public void readBeanPmCachedNeverCleared() {
     TestPmBase pm = new TestPmCachedNeverCleared().provideTestBean(bean);
     assertSame(bean, pm.getPmBean());
     assertEquals(1, pm.callCount_getPmBeanImpl);
@@ -202,19 +196,19 @@ public class PmBean2Test {
   public static class TestPm extends TestPmBase {
     public final TestPmBase uncached = new TestPmBase(this);
 
-    @PmCacheCfg2(@Cache(property=CacheKind.VALUE))
+    @PmCacheCfg(value=CacheMode.ON)
     public final TestPmBase cached = new TestPmBase(this);
 
-    @PmCacheCfg2(@Cache(property=CacheKind.VALUE, clear=Clear.NEVER))
+    @PmCacheCfg(value=CacheMode.ON, clear=PmCacheCfg.Clear.NEVER)
     public final TestPmBase cachedClearNever = new TestPmBase(this);
 
   }
 
-  @PmCacheCfg2(@Cache(property=CacheKind.VALUE))
+  @PmCacheCfg(value=CacheMode.ON)
   public static class TestPmCached extends TestPmBase {
   }
 
-  @PmCacheCfg2(@Cache(property=CacheKind.VALUE, clear=Clear.NEVER))
+  @PmCacheCfg(value=CacheMode.ON, clear=PmCacheCfg.Clear.NEVER)
   public static class TestPmCachedNeverCleared extends TestPmBase {
   }
 

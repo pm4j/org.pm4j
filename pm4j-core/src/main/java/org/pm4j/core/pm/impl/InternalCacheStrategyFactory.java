@@ -1,8 +1,12 @@
 package org.pm4j.core.pm.impl;
 
+import java.util.Map;
+
 import org.pm4j.common.cache.CacheStrategy;
 import org.pm4j.common.cache.CacheStrategyNoCache;
+import org.pm4j.common.util.collection.MapUtil;
 import org.pm4j.core.exception.PmRuntimeException;
+import org.pm4j.core.pm.annotation.PmCacheCfg;
 import org.pm4j.core.pm.annotation.PmCacheCfg2.Cache;
 import org.pm4j.core.pm.annotation.PmCacheCfg2.CacheMode;
 import org.pm4j.core.pm.annotation.PmCacheCfg2.Clear;
@@ -159,18 +163,27 @@ class InternalPmBeanCacheStrategyFactory extends InternalCacheStrategyFactory {
 
   public static final InternalPmBeanCacheStrategyFactory INSTANCE = new InternalPmBeanCacheStrategyFactory();
 
+  static final Map<PmCacheCfg.CacheMode, CacheStrategy> DEPR_CACHE_STRATEGIES_FOR_PM_BEAN_VALUE =
+      MapUtil.makeFixHashMap(
+        PmCacheCfg.CacheMode.OFF,      CacheStrategyNoCache.INSTANCE,
+        PmCacheCfg.CacheMode.ON,       new CacheStrategyForPmBeanValue(Clear.DEFAULT),
+        PmCacheCfg.CacheMode.REQUEST,  new CacheStrategyRequest("CACHE_PM_BEAN_VALUE_IN_REQUEST", "v")
+      );
+
+
+
   @Override
   protected CacheStrategy createImpl(CacheKind aspect, Cache cache) {
     switch (aspect) {
       case VALUE:
-        return new CacheStrategyForValue(cache.clear());
+        return new CacheStrategyForPmBeanValue(cache.clear());
       default:
         return super.createImpl(aspect, cache);
     }
   }
 
-  private static class CacheStrategyForValue extends CacheStrategyBase<PmBeanImpl2<Object>> {
-    private CacheStrategyForValue(Clear cacheClear) {
+  static class CacheStrategyForPmBeanValue extends CacheStrategyBase<PmBeanImpl2<Object>> {
+    CacheStrategyForPmBeanValue(Clear cacheClear) {
       super("CACHE_VALUE_LOCAL", cacheClear);
     }
 
