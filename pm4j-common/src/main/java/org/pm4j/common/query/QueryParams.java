@@ -37,7 +37,7 @@ public class QueryParams extends PropertyChangeSupportedBase implements Cloneabl
   private Map<String, Object> baseQueryParams = new HashMap<String, Object>();
   /** A switch to allow/prevent query execution. */
   private boolean execQuery = true;
-  private long maxResults = Long.MAX_VALUE;
+  private Long maxResults;
 
   /**
    * Creates a new empty instance.
@@ -238,18 +238,21 @@ public class QueryParams extends PropertyChangeSupportedBase implements Cloneabl
   public boolean isExecQuery() {
     return execQuery;
   }
-  
+
   /**
-   * @return maximum number of records to get from a query
+   * @return maximum number of records to get from a query.<br>
+   *         May be <code>null</code> if no limit is defined.
    */
-  public long getMaxResults() {
+  public Long getMaxResults() {
     return maxResults;
   }
 
-  /** 
-   * @param maxResults maximum number of records to get from a query
+  /**
+   * @param maxResults
+   *          Maximum number of records to get from a query.<br>
+   *          <code>null</code> defines no limit.
    */
-  public void setMaxResults(long maxResults) {
+  public void setMaxResults(Long maxResults) {
     this.maxResults = maxResults;
   }
 

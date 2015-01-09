@@ -86,17 +86,17 @@ public class PageQueryCollection<T_ITEM, T_ID> extends QueryCollectionBase<T_ITE
 
   @Override
   public long getNumOfItems() {
-    QueryParams queryParams = getQueryParamsWithRemovedItems();    
-    
+    QueryParams queryParams = getQueryParamsWithRemovedItems();
+
     if (getQueryParams().isExecQuery()) {
       long itemCount = cachingService.getItemCount(queryParams);
-      long maxResults = queryParams.getMaxResults();
-      
-      if (itemCount > maxResults) {
-        throw new MaxQueryResultsViolationException("The query returns more than " + maxResults + " entries.", maxResults, itemCount);
-      } 
-      
-      return itemCount + modificationHandler.getModifications().getAddedItems().size();      
+      Long maxResults = queryParams.getMaxResults();
+
+      if (maxResults != null && itemCount > maxResults) {
+        throw new MaxQueryResultsViolationException(maxResults, itemCount);
+      }
+
+      return itemCount + modificationHandler.getModifications().getAddedItems().size();
     } else {
       return 0;
     }

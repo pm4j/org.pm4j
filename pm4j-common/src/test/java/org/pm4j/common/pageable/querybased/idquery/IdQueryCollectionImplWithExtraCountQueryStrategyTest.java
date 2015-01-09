@@ -17,7 +17,7 @@ public class IdQueryCollectionImplWithExtraCountQueryStrategyTest extends Pageab
         service.save(new Bean(s));
       }
     }
-    return new IdQueryCollectionImpl<Bean, Integer>(service, getQueryOptions(), new IdQueryCollectionImpl.ExtraCountQueryStrategy(service));
+    return new IdQueryCollectionImpl<Bean, Integer>(service, getQueryOptions(), IdQueryCollectionImpl.ExtraCountQueryStrategy.INSTANCE);
   }
 
   @Override
@@ -160,10 +160,10 @@ public class IdQueryCollectionImplWithExtraCountQueryStrategyTest extends Pageab
     super.testGetNumOfItems();
     assertEquals("Call count stability check.", "{findIds=1, getItemCount=1}", service.callCounter.toString());
   }
-  
+
   @Test(expected=MaxQueryResultsViolationException.class)
   public void testGetNumOfItemsWithMaxQueryResultsViolationException() {
-    collection.getQueryParams().setMaxResults(1);
+    collection.getQueryParams().setMaxResults(1L);
     super.testGetNumOfItems();
   }
 
@@ -171,7 +171,7 @@ public class IdQueryCollectionImplWithExtraCountQueryStrategyTest extends Pageab
   protected void resetCallCounter() {
     service.callCounter.reset();
   }
-  
+
 
   // --- A fake service implementation that does the job just in memory. ---
 
