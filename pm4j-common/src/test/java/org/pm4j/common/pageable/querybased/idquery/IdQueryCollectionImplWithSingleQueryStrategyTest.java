@@ -1,12 +1,12 @@
 package org.pm4j.common.pageable.querybased.idquery;
 
-import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 import org.pm4j.common.pageable.PageableCollection;
 import org.pm4j.common.pageable.PageableCollectionTestBase;
 
-public class IdQueryCollectionImplTest extends PageableCollectionTestBase<PageableCollectionTestBase.Bean> {
+public class IdQueryCollectionImplWithSingleQueryStrategyTest extends PageableCollectionTestBase<PageableCollectionTestBase.Bean> {
 
   TestService service = new TestService();
 
@@ -156,10 +156,23 @@ public class IdQueryCollectionImplTest extends PageableCollectionTestBase<Pageab
     assertEquals("Call count stability check.", "{}", service.callCounter.toString());
   }
 
+  @Test
+  public void testGetNumOfItems() {
+    super.testGetNumOfItems();
+    assertEquals("Call count stability check.", "{findIds=1}", service.callCounter.toString());
+  }
+  
+  @Test(expected=MaxQueryResultsViolationException.class)
+  public void testGetNumOfItemsWithMaxQueryResultsViolationException() {
+    collection.getQueryParams().setMaxResults(1);
+    super.testGetNumOfItems();
+  }
+
   @Override
   protected void resetCallCounter() {
     service.callCounter.reset();
   }
+  
 
   // --- A fake service implementation that does the job just in memory. ---
 

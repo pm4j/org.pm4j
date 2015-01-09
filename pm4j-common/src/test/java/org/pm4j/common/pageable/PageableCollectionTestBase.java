@@ -499,7 +499,12 @@ public abstract class PageableCollectionTestBase<T> {
     assertEquals("Empty selection returns no items.", "[]", IterableUtil.shallowCopy(selection).toString());
   }
 
-
+  @Test
+  public void testGetNumOfItems() {
+    resetCallCounter();
+    long numOfItems = collection.getNumOfItems();
+    assertEquals("The number of items must be six.", 6, numOfItems);
+  }
 
   // -- Test infrastructure --
 

@@ -10,6 +10,7 @@ import org.pm4j.common.pageable.PageableCollection;
 import org.pm4j.common.pageable.PageableCollectionUtil;
 import org.pm4j.common.pageable.querybased.QueryCollectionBase;
 import org.pm4j.common.pageable.querybased.QueryCollectionModificationHandlerBase;
+import org.pm4j.common.pageable.querybased.idquery.MaxQueryResultsViolationException;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.selection.SelectionHandler;
@@ -85,10 +86,20 @@ public class PageQueryCollection<T_ITEM, T_ID> extends QueryCollectionBase<T_ITE
 
   @Override
   public long getNumOfItems() {
-    return getQueryParams().isExecQuery()
-      ? cachingService.getItemCount(getQueryParamsWithRemovedItems()) +
-        modificationHandler.getModifications().getAddedItems().size()
-      : 0;
+    QueryParams queryParams = getQueryParamsWithRemovedItems();    
+    
+    if (getQueryParams().isExecQuery()) {
+      long itemCount = cachingService.getItemCount(queryParams);
+      long maxResults = queryParams.getMaxResults();
+      
+      if (itemCount > maxResults) {
+        throw new MaxQueryResultsViolationException("The query returns more than " + maxResults + " entries.", maxResults, itemCount);
+      } 
+      
+      return itemCount + modificationHandler.getModifications().getAddedItems().size();      
+    } else {
+      return 0;
+    }
   }
 
   @SuppressWarnings("unchecked")

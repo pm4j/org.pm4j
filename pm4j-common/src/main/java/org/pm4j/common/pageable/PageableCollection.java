@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.pm4j.common.modifications.ModificationHandler;
 import org.pm4j.common.modifications.Modifications;
+import org.pm4j.common.pageable.querybased.idquery.MaxQueryResultsViolationException;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.selection.Selection;
@@ -122,9 +123,9 @@ public interface PageableCollection<T_ITEM> extends Iterable<T_ITEM>, PropertyCh
   void setPageIdx(long pageIdx);
 
   /**
-   * Provides the total number of objects within this set.
-   *         <p>
-   *         A filter definition may influence this number.
+   * Provides the total number of objects within this set. A filter definition may influence this number.<br/>
+   * If a query is called to get the number of items a {@link MaxQueryResultsViolationException} 
+   * could be thrown, if the number of found items is lager than {@link QueryParams#getMaxResults()}. 
    *
    * @return the number of filtered items.
    */
