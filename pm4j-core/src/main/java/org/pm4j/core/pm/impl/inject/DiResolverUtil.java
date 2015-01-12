@@ -55,6 +55,7 @@ public class DiResolverUtil  {
   static void validateFieldIsNull(PmObject pm, Field f) {
     Object value = null;
     try {
+      ensureAccessibility(f);
       value = f.get(pm);
     } catch (Exception ex) {
       throw new PmRuntimeException(pm, "Can't read field '" + f.getName() + "' in class '"
@@ -100,6 +101,7 @@ public class DiResolverUtil  {
   static void setValue(PmObject pm, Field field, boolean nullAllowed, Object value) {
     validateValidValue(pm, field, nullAllowed, value);
     try {
+      ensureAccessibility(field);
       field.set(pm, value);
     } catch (Exception ex) {
       throw new PmRuntimeException(pm, "Can't initialize field '" + field.getName() + "' in class '"

@@ -3,12 +3,12 @@ package org.pm4j.core.pm.impl.inject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.pm4j.common.expr.Expression.SyntaxVersion;
+import org.pm4j.common.util.reflection.ClassUtil;
 import org.pm4j.common.util.reflection.PrefixUtil;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmConversation;
@@ -95,9 +95,9 @@ public class DiResolverUtilTest {
     }
   }
 
-  private static final Field myFieldInitializedNullPropField = ReflectionHelper.getDeclaredField(MyPm.class, "myFieldInitializedNullProp");
-  private static final Field myFieldInitializedPropField = ReflectionHelper.getDeclaredField(MyPm.class, "myFieldInitializedProp");
-  private static final Field myAlienFakePropField = ReflectionHelper.getDeclaredField(AnotherPm.class, "myAlienFakeProp");
+  private static final Field myFieldInitializedNullPropField = ClassUtil.findField(MyPm.class, "myFieldInitializedNullProp");
+  private static final Field myFieldInitializedPropField = ClassUtil.findField(MyPm.class, "myFieldInitializedProp");
+  private static final Field myAlienFakePropField = ClassUtil.findField(AnotherPm.class, "myAlienFakeProp");
 
   private static final Method mySetterInitializedNullPropSetter = getSetter(MyPm.class, "mySetterInitializedNullProp", String.class);
   private static final Method mySetterInitializedPropSetter = getSetter(MyPm.class, "mySetterInitializedProp", String.class);
@@ -130,14 +130,14 @@ public class DiResolverUtilTest {
     expectedException.expect(PmRuntimeException.class);
     expectedException.expectMessage("Can't initialize field 'myFieldInitializedNullProp' in class 'org.pm4j.core.pm.impl.inject.DiResolverUtilTest$MyPm'.  Already has value: [faking some preexisting initialization]");
     myPm.myFieldInitializedNullProp = "[faking some preexisting initialization]";
-    DiResolverUtil.validateFieldIsNull(myPm, ReflectionHelper.getDeclaredField(MyPm.class, "myFieldInitializedNullProp"));
+    DiResolverUtil.validateFieldIsNull(myPm, ClassUtil.findField(MyPm.class, "myFieldInitializedNullProp"));
   }
 
   @Test
   public void validateFieldIsNullThrowsExceptionWhenFieldIsNotReadable() {
     expectedException.expect(PmRuntimeException.class);
     expectedException.expectMessage("Can't read field 'myAlienFakeProp' in class 'org.pm4j.core.pm.impl.inject.DiResolverUtilTest$MyPm'.");
-    DiResolverUtil.validateFieldIsNull(myPm, ReflectionHelper.getDeclaredField(AnotherPm.class, "myAlienFakeProp"));
+    DiResolverUtil.validateFieldIsNull(myPm, ClassUtil.findField(AnotherPm.class, "myAlienFakeProp"));
   }
 
   @Test
