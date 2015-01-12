@@ -41,12 +41,13 @@ public class IdQueryCollectionImpl<T_ITEM, T_ID> extends QueryCollectionBase<T_I
 
   private static final Log LOG = LogFactory.getLog(IdQueryCollectionImpl.class);
 
-  private final IdQueryService<T_ITEM, T_ID> service;
+  private final IdQueryService<T_ITEM, T_ID>    service;
   /** The collection type specific selection handler. */
-  private final SelectionHandler<T_ITEM>  selectionHandler;
-  private List<T_ID>                      ids;
-  private List<T_ITEM>                    currentPageItems;
-  private AddItemStrategy                 addItemStrategy = new AddItemStrategyAtTheEnd();
+  private final SelectionHandler<T_ITEM>        selectionHandler;
+  private List<T_ID>                            ids;
+  private List<T_ITEM>                          currentPageItems;
+  private AddItemStrategy                       addItemStrategy = new AddItemStrategyAtTheEnd();
+  private final IdQueryStrategy                 idQueryStrategy;
 
   /**
    * Maintains the set of ID's on removing items.
@@ -70,9 +71,32 @@ public class IdQueryCollectionImpl<T_ITEM, T_ID> extends QueryCollectionBase<T_I
     }
   }
 
+  /**
+   * Creates an instance that uses {@link SingleQueryStrategy}.
+   *
+   * @param service
+   *          Provides the required query functionality.
+   * @param queryOptions
+   *          The set of sort order and filter restrictions that may be adjusted
+   *          by the user (or application).
+   */
   public IdQueryCollectionImpl(IdQueryService<T_ITEM, T_ID> service, QueryOptions queryOptions) {
+    this(service, queryOptions, SingleQueryStrategy.INSTANCE);
+  }
+
+  /**
+   * @param service
+   *          Provides the required query functionality.
+   * @param queryOptions
+   *          The set of sort order and filter restrictions that may be adjusted
+   *          by the user (or application).
+   * @param idQueryStrategy
+   *          The used query strategy.
+   */
+  public IdQueryCollectionImpl(IdQueryService<T_ITEM, T_ID> service, QueryOptions queryOptions, IdQueryStrategy idQueryStrategy) {
     super(queryOptions);
     assert service != null;
+    assert idQueryStrategy != null;
 
     this.service = service;
 
@@ -102,6 +126,8 @@ public class IdQueryCollectionImpl<T_ITEM, T_ID> extends QueryCollectionBase<T_I
         addItemStrategy.onAddItem((T_ITEM)evt.getNewValue());
       }
     });
+
+    this.idQueryStrategy = idQueryStrategy;
   }
 
   protected IdQueryService<T_ITEM, T_ID> getService() {
@@ -131,6 +157,7 @@ public class IdQueryCollectionImpl<T_ITEM, T_ID> extends QueryCollectionBase<T_I
 
   @Override
   public long getNumOfItems() {
+    // getIds() throws a MaxResultsViolationException, if the number of found items in the database is larger than maxResultsLimit.
     return getIds().size() + modificationHandler.getModifications().getAddedItems().size();
   }
 
@@ -161,6 +188,7 @@ public class IdQueryCollectionImpl<T_ITEM, T_ID> extends QueryCollectionBase<T_I
    * Provides all matching IDs using a lazy loading mechanism.
    *
    * @return the ID set according to the current query configuration.
+   * @throws MaxQueryResultsViolationException Thrown if the number of requested database records is larger than {@link QueryParams#getMaxQueryRecords()}.
    */
   @SuppressWarnings("unchecked")
   protected List<T_ID> getIds() {
@@ -168,18 +196,35 @@ public class IdQueryCollectionImpl<T_ITEM, T_ID> extends QueryCollectionBase<T_I
       return ids;
     }
 
-    // prevent parallel service calls for the same thing.
     synchronized (this) {
       if (ids == null) {
         currentPageItems = null;
         QueryParams queryParams = getQueryParamsWithRemovedItems();
+
         ids = queryParams.isExecQuery()
-            ? service.findIds(queryParams, 0, Integer.MAX_VALUE)
+            ? idQueryStrategy.getIds(service, queryParams)
             // In no-exec case: an unmodifyable collection.
             : Collections.EMPTY_LIST;
       }
+
       return ids;
     }
+  }
+
+  @SuppressWarnings("unchecked")
+  private static <T_ITEM, T_ID> List<T_ID> findIds(IdQueryService<T_ITEM, T_ID> service, QueryParams queryParams, int maxListSize) {
+    return queryParams.isExecQuery()
+        ? service.findIds(queryParams, 0, maxListSize)
+        // In no-exec case: an unmodifyable collection.
+        : Collections.EMPTY_LIST;
+  }
+
+  private static int getMaxResultsAsInt(QueryParams queryParams) {
+    long maxResults = queryParams.getMaxResults() != null ? queryParams.getMaxResults().longValue() : Integer.MAX_VALUE;
+    if (maxResults > Integer.MAX_VALUE) {
+      throw new IllegalArgumentException("An IdQuery can't be configured to provide more than " + Integer.MAX_VALUE + " results.");
+    }
+    return (int)maxResults;
   }
 
   /**
@@ -248,7 +293,7 @@ public class IdQueryCollectionImpl<T_ITEM, T_ID> extends QueryCollectionBase<T_I
     public void readNext(ItemIterator iter) {
       int maxIdListIdx = iter.ids.size()-1;
       do {
-    	++iter.nextIdx;
+      ++iter.nextIdx;
         if (iter.nextIdx > maxIdListIdx) {
           List<T_ITEM> addedItems = modificationHandler.getModifications().getAddedItems();
           int addedItemIdx = iter.nextIdx - maxIdListIdx - 1;
@@ -321,6 +366,86 @@ public class IdQueryCollectionImpl<T_ITEM, T_ID> extends QueryCollectionBase<T_I
       int subListLast = Math.min((int)last, ids.size());
 
       return ids.subList(subListFirst, subListLast);
+    }
+  }
+
+  /**
+   * Interface for implementing a strategy to get the ID set according to performance considerations.
+   */
+  public interface IdQueryStrategy {
+
+    /**
+     * Finds all ID's set according to the given <code>queryParams</code>.
+     *
+     * @param service Provides the used query functionality.
+     * @param queryParams Provides the restrictions and sort order to consider.
+     * @return the ID set according to the current query configuration.
+     * @throws MaxQueryResultsViolationException Thrown if the number of records provided by the service is larger than {@link QueryParams#getMaxQueryRecords()}.
+     */
+    List<?> getIds(IdQueryService<?, ?> service, QueryParams queryParams);
+  }
+
+  /**
+   * A strategy that provides the ID set using a single
+   * {@link IdQueryService#findIds(QueryParams, long, int)} request.
+   * <p>
+   * That strategy is fine for most scenarios.
+   * <p>
+   * The following performance risk should be considered:<br>
+   * If the search restrictions cause an unexpected large result set, a DB query
+   * may waste a time for sorting an unlimited result that is finally not used
+   * by the following control flow because of a result size limit violation.<br>
+   * If you get such problems you may consider using
+   * {@link ExtraCountQueryStrategy}.
+   */
+  public static class SingleQueryStrategy implements IdQueryStrategy {
+
+    /** An instance that may be used as a kind of singleton. */
+    public static final SingleQueryStrategy INSTANCE = new SingleQueryStrategy();
+
+    @Override
+    public List<?> getIds(IdQueryService<?, ?> service, QueryParams queryParams) {
+      // If possible increase the number of maxResultsLimit with 1, so that it is possible to check that the query returns more than maxResultsLimit entries.
+      int maxResults = getMaxResultsAsInt(queryParams);
+      int maxListSize = maxResults == Integer.MAX_VALUE ? Integer.MAX_VALUE : maxResults+1;
+
+      List<?> ids = findIds(service, queryParams, maxListSize);
+      if (ids.size() > maxResults) {
+        // The actual number of items is not known. Thus we pass a 'null' here.
+        throw new MaxQueryResultsViolationException(maxResults, null);
+      }
+
+      return ids;
+    }
+  }
+
+  /**
+   * A strategy that provides the ID set using the following service calls:
+   * <ul>
+   * <li>{@link IdQueryService#getItemCount(QueryParams)} and (if the count is
+   * within the limits) a call to</li>
+   * <li>{@link IdQueryService#findIds(QueryParams, long, int)}</li>
+   * </ul>
+   * That strategy is useful for some scenarios where performance
+   * problems are expected in case of unlimited large result sets.<br>
+   * An order-by clause might make the
+   * {@link IdQueryService#findIds(QueryParams, long, int)} much more expensive
+   * than the {@link IdQueryService#getItemCount(QueryParams)}.
+   */
+  public static class ExtraCountQueryStrategy implements IdQueryStrategy {
+
+    /** An instance that may be used as a kind of singleton. */
+    public static final ExtraCountQueryStrategy INSTANCE = new ExtraCountQueryStrategy();
+
+    @Override
+    public List<?> getIds(IdQueryService<?, ?> service, QueryParams queryParams) {
+      int maxResults = getMaxResultsAsInt(queryParams);
+      long itemCount = service.getItemCount(queryParams);
+      if (itemCount > maxResults) {
+        throw new MaxQueryResultsViolationException(maxResults, itemCount);
+      }
+
+      return findIds(service, queryParams, maxResults);
     }
   }
 }
