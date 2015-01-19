@@ -3,7 +3,7 @@
 
   <groupId>org.pm4j</groupId>
   <artifactId>main</artifactId>
-  <version>0.9.22-SNAPSHOT</version>
+  <version>0.7.43</version>
   <packaging>pom</packaging>
 
   <name>pm4j parent pom</name>
@@ -32,7 +32,7 @@
 
   <scm>
     <developerConnection>scm:git:https://github.com/pm4j/org.pm4j.git</developerConnection>
-    <tag>HEAD</tag>
+    <tag>v0.7.43</tag>
   </scm>
 
   <distributionManagement>
@@ -51,7 +51,6 @@
   <modules>
     <module>pm4j-common</module>
     <module>pm4j-core</module>
-    <module>pm4j-testtools</module>
     <module>pm4j-core-sample</module>
     <module>pm4j-facelets</module>
     <module>pm4j-deprecated</module>
@@ -203,7 +202,7 @@ line.separator=\r\n
 
       <plugin>
         <artifactId>maven-release-plugin</artifactId>
-        <version>2.5.1</version>
+        <version>2.4.1</version>
         <configuration>
           <!-- Auto-Version all modules the same as the parent module -->
           <autoVersionSubmodules>true</autoVersionSubmodules>
@@ -212,10 +211,6 @@ line.separator=\r\n
           <!-- Format of the git tags when release is done -->
           <tagNameFormat>v@{project.version}</tagNameFormat>
           <goals>deploy</goals>
-		  <!-- useReleaseProfile=false introduced to prevent duplicate source code uploads 
-		       see: http://maven.40175.n5.nabble.com/Why-is-source-jar-deployed-twice-during-release-td120643.html
-			   -->
-		  <useReleaseProfile>false</useReleaseProfile>
         </configuration>
       </plugin>
     </plugins>
@@ -225,7 +220,7 @@ line.separator=\r\n
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.11</version>
+      <version>4.8.1</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
