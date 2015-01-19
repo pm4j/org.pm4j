@@ -1515,9 +1515,13 @@ class PmEventTable {
   private final Map<PmEventListener, Integer> pmEventListeners;
 
   public PmEventTable(boolean isWeak) {
+    // Initial map size reduced to 2 to optimize memory consumption.
+    // XXX oboede: further memory reduction may be achieved by performing standard observer operations
+    // in methods instead of using observer instances. See PmDataInputBase ctor.
+    // A table example test pointed out that this would reduce the sample screen PM footprint by 15%.
     pmEventListeners = isWeak
-          ? new WeakHashMap<PmEventListener, Integer>()
-          : new ConcurrentHashMap<PmEventListener, Integer>();
+          ? new WeakHashMap<PmEventListener, Integer>(2)
+          : new HashMap<PmEventListener, Integer>(2);
   }
 
   public synchronized void addListener(int eventMask, PmEventListener listener) {
@@ -1560,7 +1564,6 @@ class PmEventTable {
    * @param preProcess if set to <code>true</code>, only the pre process part will be done for each listener.<br>
    *                   if set to <code>false</code>, only the handle part will be done for each listener.<br>
    */
-  @SuppressWarnings("unchecked")
   /* package */ void fireEvent(final PmEvent event, boolean preProcess) {
     boolean hasListeners = !pmEventListeners.isEmpty();
 
@@ -1572,7 +1575,7 @@ class PmEventTable {
       boolean isPropagationEvent = event.isPropagationEvent();
       // copy the listener list to prevent problems with listener
       // set changes within the notification processing loop.
-      for (Map.Entry<PmEventListener, Integer> e : pmEventListeners.entrySet().toArray(new Map.Entry[pmEventListeners.size()])) {
+      for (Map.Entry<PmEventListener, Integer> e : eventListenersCopy()) {
         // could be null because of WeakReferences.
         if(e == null || e.getValue() == null) {
           continue;
@@ -1601,6 +1604,12 @@ class PmEventTable {
     return pmEventListeners.isEmpty();
   }
 
+  /** Provides a shallow copy of all event listener entries. Used to prevent concurrent
+   * modification problems with listeners changing the event listener set. */
+  @SuppressWarnings("unchecked")
+  private synchronized Map.Entry<PmEventListener, Integer>[] eventListenersCopy() {
+    return pmEventListeners.entrySet().toArray(new Map.Entry[pmEventListeners.size()]);
+  }
 } // end of PmEventTable
 
 /**
