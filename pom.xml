@@ -3,7 +3,7 @@
 
   <groupId>org.pm4j</groupId>
   <artifactId>main</artifactId>
-  <version>0.7.43</version>
+  <version>0.8.8</version>
   <packaging>pom</packaging>
 
   <name>pm4j parent pom</name>
@@ -32,7 +32,7 @@
 
   <scm>
     <developerConnection>scm:git:https://github.com/pm4j/org.pm4j.git</developerConnection>
-    <tag>v0.7.43</tag>
+    <tag>v0.8.8</tag>
   </scm>
 
   <distributionManagement>
@@ -211,6 +211,10 @@ line.separator=\r\n
           <!-- Format of the git tags when release is done -->
           <tagNameFormat>v@{project.version}</tagNameFormat>
           <goals>deploy</goals>
+		  <!-- useReleaseProfile=false introduced to prevent duplicate source code uploads 
+		       see: http://maven.40175.n5.nabble.com/Why-is-source-jar-deployed-twice-during-release-td120643.html
+			   -->
+		  <useReleaseProfile>false</useReleaseProfile>
         </configuration>
       </plugin>
     </plugins>
