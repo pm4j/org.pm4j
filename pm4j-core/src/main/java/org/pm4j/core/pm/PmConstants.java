@@ -61,8 +61,13 @@ public final class PmConstants {
   /** The title that gets displayed when no option is selected. */
   public static final String MSGKEY_NULL_OPTION                              = "pmAttr_nullOption";
 
+  /** Prints just the first message parameter: "{0}". */
+  public static final String MSGKEY_FIRST_MSG_PARAM                          = "firstMsgParam";
+
   /**
    * A resource key for cached exceptions. The first Parameter of the resource is used to transfer the exception message.
+   * @deprecated Please use {@link #MSGKEY_FIRST_MSG_PARAM}.
    */
+  @Deprecated
   public static final String MSGKEY_EXCEPTION                                = "pmException";
 }

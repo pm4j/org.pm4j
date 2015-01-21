@@ -34,7 +34,7 @@ public class PmConverterException extends PmValidationException {
    * @param ex The string converter issue to report.
    */
   public PmConverterException(PmObject pm, StringConverterParseException ex) {
-    super(pm, PmConstants.MSGKEY_EXCEPTION, getParseExceptionMessage(pm, ex));
+    super(pm, PmConstants.MSGKEY_FIRST_MSG_PARAM, getParseExceptionMessage(pm, ex));
     this.parseException = ex;
   }
 

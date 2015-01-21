@@ -86,7 +86,7 @@ public class BeanValidationPmUtil {
         // TODO olaf: add handling for translated strings.
         //             what is the result of:
         //System.out.println("v.getMessageTemplate: '" + v.getMessageTemplate() + "'  message: " + v.getMessage());
-        PmValidationMessage msg = new PmValidationMessage(pm, PmConstants.MSGKEY_EXCEPTION, v.getMessage(), v);
+        PmValidationMessage msg = new PmValidationMessage(pm, PmConstants.MSGKEY_FIRST_MSG_PARAM, v.getMessage(), v);
         pm.getPmConversation().addPmMessage(msg);
       }
     }
