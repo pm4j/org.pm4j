@@ -665,8 +665,8 @@ public class PmTableImpl
     }
     // a different service type:
     throw new PmRuntimeException(this,
-        "The service type is not a 'PageableQueryService' and not a 'PageableIdQueryService'. Possibly @PmTableCfg#serviceClass is not well configured.\n" +
-        "\tFound serivce: " + service +
+        "The service type is not a 'PageQueryService' and not a 'IdQueryService'. Possibly @PmTableCfg#serviceClass is not well configured.\n" +
+        "\tFound service: " + service +
         "\tAlternatively you may override makePmPageableBeanCollection() to support create a your specific collection.");
   }
 
