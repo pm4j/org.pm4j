@@ -1,0 +1,108 @@
+package org.pm4j.core.pm.annotation;
+
+import org.pm4j.core.pm.PmAttr;
+import org.pm4j.core.pm.PmObject;
+import org.pm4j.core.pm.PmTable;
+import org.pm4j.core.pm.impl.PmObjectBase;
+
+/**
+ * Allows defining fix settings for some common PM aspects.
+ *
+ * @author Olaf Boede
+ */
+public @interface PmObjectCfg {
+
+  /**
+   * Configurable rules for PM enablement. May be used for a fix annotation
+   * based definition.
+   *
+   * @author Olaf Boede
+   */
+  public enum Enable {
+    /**
+     * By default PMs are enabled.
+     * <p>
+     * A specific rules applies for {@link PmAttr}: It is not enabled if it's PM
+     * tree is read-only.
+     */
+    DEFAULT,
+    /**
+     * Enables this PM always.<br>
+     * Regardless of some {@link PmAttr} rule mentioned in the java doc for
+     * {@link #DEFAULT}.
+     */
+    YES,
+    /**
+     * Disables this PM always.
+     */
+    NO,
+    /**
+     * Enables this PM only if this PM is in an editable context.<br>
+     * Technically expressed: Its method {@link PmObject#isPmReadonly()} returns
+     * <code>false</code>. <br>
+     * {@link PmAttr}s do that by default.
+     */
+    IN_EDITABLE_CTXT
+  }
+
+  /**
+   * Configurable rules for PM visibility. May be used for a fix annotation
+   * based definition.
+   * <p>
+   * If you need a more complex visibility definition, consider overriding
+   * {@link PmObjectBase#isPmVisibleImpl()}.
+   *
+   * @author Olaf Boede
+   */
+  public enum Visible {
+    /**
+     * By default PMs are visible.
+     */
+    DEFAULT,
+    /**
+     * Makes this PM always invisible.
+     */
+    NO,
+    /**
+     * Is visible only if this PM is in an editable context.<br>
+     * Technically expressed: Its method {@link PmObject#isPmReadonly()} returns
+     * <code>false</code>.
+     */
+    IN_EDITABLE_CTXT,
+    /**
+     * Is only visible if it is enables.<br>
+     * Technically expressed: Its method {@link PmObject#isPmEnabled()} returns
+     * <code>true</code>.
+     */
+    IF_ENABLED,
+    /**
+     * Is only visible if there is a value to show.
+     * <p>
+     * Applies only for PMs having values, such as {@link PmAttr} and {@link PmTable}.
+     */
+    IF_NOT_EMPTY
+  }
+
+  /**
+   * Enablement rule for this PM.
+   * <p>
+   * If you need a more complex enablement definition, consider overriding
+   * {@link PmObjectBase#isPmEnabledImpl()} or
+   * {@link PmObjectBase#isPmReadonlyImpl()} (to control PM trees).
+   *
+   * @return the configured enablement definition.<br>
+   *         By default {@link Enable#DEFAULT}.
+   */
+  Enable enabled() default Enable.DEFAULT;
+
+  /**
+   * Visibility rule for this PM.
+   * <p>
+   * If you need a more complex enablement definition, consider overriding
+   * {@link PmObjectBase#isPmVisibleImpl()}.
+   *
+   * @return the configured visibility definition.<br>
+   *         By default {@link Visible#DEFAULT}.
+   */
+  Visible visible() default Visible.DEFAULT;
+}
