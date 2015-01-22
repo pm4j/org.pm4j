@@ -15,8 +15,7 @@ import org.pm4j.core.pm.PmAttrString;
 import org.pm4j.core.pm.annotation.PmTitleCfg;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
-
-import sun.misc.IOUtils;
+import org.pm4j.tools.test.PmSnapshotTestTool.TestMode;
 
 /**
  * Tests for {@link PmSnapshotTestTool}.
@@ -43,6 +42,7 @@ public class PmSnapshotTestToolTest {
 
   @Test
   public void testWriteSnapshot() {
+    snap.setTestMode(TestMode.AUTO_CREATE);
     File file = null;
     try {
       file = snap.snapshot(new MiniTestPm(), "testWriteSnapshot");
@@ -65,6 +65,7 @@ public class PmSnapshotTestToolTest {
   @Test
   public void testWriteAndCompareSameSnapshot() {
     // create the snapshot
+    snap.setTestMode(TestMode.AUTO_CREATE);
     File file = null;
 
     try {
@@ -81,17 +82,62 @@ public class PmSnapshotTestToolTest {
       FileUtil.deleteFileAndEmptyParentDirs(file);
     }
   }
+  
+  @Test(expected= AssertionError.class)
+  public void testWriteSnapshotInStrictMode() {
+    snap.setTestMode(TestMode.STRICT);
+    snap.snapshot(new MiniTestPm(), "testWriteAndCompareSameSnapshot");
+  }
+  
+  @Test
+  public void testOverrideExistingSnapshot() {
+
+    // create the snapshot
+    final String fileBaseName = "overrideMe";
+    MiniTestPm pm = new MiniTestPm();
+    snap.setTestMode(TestMode.AUTO_CREATE);
+    File expectedStateFileSrc = null;
+    File expectedStateFile = getExpectedFile(fileBaseName);
+
+    try {
+      expectedStateFileSrc = snap.snapshot(pm, fileBaseName);
+      assertTrue(expectedStateFileSrc.exists());
+
+      // modify PM and compare to the changed state
+      PmAssert.setValue(pm.stringAttr, "hi");
+      
+      // Copy the generated expected state file to the binary directory (usually done by the build process).
+      // After that we can simulate a regular compare operation.
+      FileUtil.copyFile(expectedStateFileSrc, expectedStateFile);
+
+      // override snapshot
+      snap.setTestMode(TestMode.OVERRIDE);
+      snap.snapshot(pm, fileBaseName);
+
+      // Copy the overridden expected state
+      FileUtil.copyFile(expectedStateFileSrc, expectedStateFile);
+      
+      // now test in STRICT MODE
+      snap.setTestMode(TestMode.STRICT);
+      snap.snapshot(pm, "overrideMe");
+
+    } finally {
+      FileUtil.deleteFileAndEmptyParentDirs(expectedStateFile);
+      FileUtil.deleteFileAndEmptyParentDirs(expectedStateFileSrc);
+    }
+  }
 
   @Test
   public void testWriteAndCompareDifferentSnapshot() {
+    snap.setTestMode(TestMode.AUTO_CREATE);
     final String fileBaseName = "testWriteAndCompareDifferentSnapshot";
     File expectedStateFileSrc = snap.getExpectedStateSrcFile(fileBaseName);
-    File expectedStateFile = snap.getExpectedStateFile(fileBaseName);
     File currentStateFile = snap.getActualStateFile(fileBaseName);
+    File expectedStateFile = getExpectedFile(fileBaseName );
 
     try {
       assertFalse("File should not exist: " + expectedStateFile, expectedStateFile.exists());
-      assertFalse("File should not exist: " + currentStateFile, currentStateFile.exists());
+      assertFalse("File should not exist: " + currentStateFile,  currentStateFile.exists());
 
       MiniTestPm pm = new MiniTestPm();
       // create the snapshot
@@ -119,6 +165,16 @@ public class PmSnapshotTestToolTest {
       FileUtil.deleteFileAndEmptyParentDirs(currentStateFile);
     }
 
+  }
+  
+  /**
+   * This method is to determine possible target expected file destination as {@link PmSnapshotTestTool#getExpectedStateDir()} returns {@code null} when path was not created.
+   * 
+   * @param fileBaseName file base name
+   * @return expected file descriptor
+   */
+  private File getExpectedFile(String fileBaseName) {
+    return new File(new File(snap.getSrcFileAccessor().getBinPkgDir(), snap.xmlSubDirName()), fileBaseName + ".xml");
   }
 
 
