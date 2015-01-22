@@ -16,6 +16,8 @@ import org.pm4j.core.pm.annotation.PmTitleCfg;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
 
+import sun.misc.IOUtils;
+
 /**
  * Tests for {@link PmSnapshotTestTool}.
  *
@@ -41,11 +43,12 @@ public class PmSnapshotTestToolTest {
 
   @Test
   public void testWriteSnapshot() {
-    File file = snap.snapshot(new MiniTestPm(), "testWriteSnapshot");
-    assertTrue(file.exists());
-    String path = file.getPath().replace('\\', '/');
-    assertTrue(path, path.endsWith("src/test/java/org/pm4j/tools/test/pmSnapshotTestToolTest/testWriteSnapshot.xml"));
+    File file = null;
     try {
+      file = snap.snapshot(new MiniTestPm(), "testWriteSnapshot");
+      assertTrue(file.exists());
+      String path = file.getPath().replace('\\', '/');
+      assertTrue(path, path.endsWith("src/test/java/org/pm4j/tools/test/pmSnapshotTestToolTest/testWriteSnapshot.xml"));
       assertEquals(file.getAbsolutePath(),
           "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
           "<conversation xmlns=\"http://org.pm4j/xml/visibleState\" name=\"miniTestPm\" title=\"Test PM\">\n" +
@@ -53,7 +56,9 @@ public class PmSnapshotTestToolTest {
           "</conversation>",
           FileUtil.fileToString(file));
     } finally {
-      FileUtil.deleteFileAndEmptyParentDirs(file);
+      if (file != null) {
+        FileUtil.deleteFileAndEmptyParentDirs(file);
+      }
     }
   }
 
@@ -79,28 +84,37 @@ public class PmSnapshotTestToolTest {
 
   @Test
   public void testWriteAndCompareDifferentSnapshot() {
-    File expectedStateFile = snap.getExpectedStateFile("testWriteAndCompareDifferentSnapshot");
-    File currentStateFile = snap.getActualStateFile("testWriteAndCompareDifferentSnapshot");
+    final String fileBaseName = "testWriteAndCompareDifferentSnapshot";
+    File expectedStateFileSrc = snap.getExpectedStateSrcFile(fileBaseName);
+    File expectedStateFile = snap.getExpectedStateFile(fileBaseName);
+    File currentStateFile = snap.getActualStateFile(fileBaseName);
 
     try {
-      assertFalse("File should not exist: " + expectedStateFile.toString(), expectedStateFile.exists());
-      assertFalse("File should not exist: " + currentStateFile.toString(), currentStateFile.exists());
+      assertFalse("File should not exist: " + expectedStateFile, expectedStateFile.exists());
+      assertFalse("File should not exist: " + currentStateFile, currentStateFile.exists());
 
       MiniTestPm pm = new MiniTestPm();
       // create the snapshot
-      snap.snapshot(pm, "testWriteAndCompareDifferentSnapshot");
-      assertTrue("File should exist: " + expectedStateFile.toString(), expectedStateFile.exists());
+      File createdSrcFile = snap.snapshot(pm, fileBaseName);
+      assertTrue("File should exist: " + createdSrcFile, createdSrcFile.exists());
+      assertEquals(expectedStateFileSrc.getPath(), createdSrcFile.getPath());
+
+
+      // Copy the generated expected state file to the binary directory (usually done by the build process).
+      // After that we can simulate a regular compare operation.
+      FileUtil.copyFile(expectedStateFileSrc, expectedStateFile);
 
       // modify PM and compare to the changed state
       PmAssert.setValue(pm.stringAttr, "hi");
       try {
-        snap.snapshot(pm, "testWriteAndCompareDifferentSnapshot");
+        snap.snapshot(pm, fileBaseName);
         Assert.fail("The snapshot compare operation should fail.");
       } catch (ComparisonFailure e) {
         assertTrue("The current state file should stay alive for manual compare operations.\n" + currentStateFile,
                    currentStateFile.exists());
       }
     } finally {
+      FileUtil.deleteFileAndEmptyParentDirs(expectedStateFileSrc);
       FileUtil.deleteFileAndEmptyParentDirs(expectedStateFile);
       FileUtil.deleteFileAndEmptyParentDirs(currentStateFile);
     }

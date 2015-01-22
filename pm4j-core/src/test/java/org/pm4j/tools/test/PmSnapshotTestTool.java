@@ -182,17 +182,19 @@ public class PmSnapshotTestTool {
         }
         throw e;
       }
+      return expectedFile;
     } else {
+      File expectedStateFileSrc = getExpectedStateSrcFile(fileNameBase);
       try {
-        FileUtil.createFile(expectedFile);
-        VisibleStateUtil.toXmlFile(rootPm, expectedFile, excludedPms, excludedAspects);
-        LOG.warn("Created snapshot file: " + expectedFile);
+        FileUtil.createFile(expectedStateFileSrc);
+        VisibleStateUtil.toXmlFile(rootPm, expectedStateFileSrc, excludedPms, excludedAspects);
+        LOG.info("Created snapshot file: " + expectedStateFileSrc);
+        return expectedStateFileSrc;
       } catch (Exception e) {
-        throw new PmRuntimeException(rootPm, "Unable to write file " + expectedFile, e);
+        throw new PmRuntimeException(rootPm, "Unable to write file " + expectedStateFileSrc, e);
       }
     }
 
-    return expectedFile;
   }
 
   /**
@@ -262,7 +264,7 @@ public class PmSnapshotTestTool {
    * @return the file to use.
    */
   protected File getExpectedStateSrcFile(String fileNameBase) {
-    return new File(getExpectedStateDir(), fileNameBase + ".xml");
+    return new File(getExpectedStateSrcDir(), fileNameBase + ".xml");
   }
 
   /**

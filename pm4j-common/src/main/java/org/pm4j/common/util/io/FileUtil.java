@@ -1,13 +1,18 @@
 package org.pm4j.common.util.io;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Scanner;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.pm4j.common.exception.CheckedExceptionWrapper;
 
 /**
  * Convenience methods for handling {@link File}s.
@@ -72,6 +77,34 @@ public class FileUtil {
     }
   }
 
+  public static void copyFile(File srcFile, File targetFile) {
+    if (srcFile == null || !srcFile.exists()) {
+      throw new RuntimeException("Copy source file does not exist " + srcFile);
+    }
+    createFile(targetFile);
+
+    BufferedInputStream reader = null;
+    BufferedOutputStream writer = null;
+    try {
+      reader = new BufferedInputStream(new FileInputStream(srcFile));
+      writer = new BufferedOutputStream(new FileOutputStream(targetFile, false));
+      byte[] buff = new byte[8192];
+      int numChars;
+      while ((numChars = reader.read(buff, 0, buff.length)) != -1) {
+        writer.write(buff, 0, numChars);
+      }
+    } catch (IOException e) {
+      throw new CheckedExceptionWrapper(e);
+    } finally {
+      try {
+        if (reader != null) reader.close();
+        if (writer != null) writer.close();
+      } catch (IOException ex) {
+        LOG.warn("Error closing files when transferring " + srcFile.getPath() + " to " + targetFile.getPath());
+      }
+    }
+  }
+
   /**
    * Deletes the given file.
    * <p>
@@ -103,6 +136,9 @@ public class FileUtil {
    * @return the result of {@link File#delete()}.
    */
   public static boolean deleteFileAndEmptyParentDirs(File file) {
+    if (file == null) {
+      return false;
+    }
     boolean deleted = delete(file);
     deleteEmptyDirAndEmptyParentDirs(file.getParentFile());
     return deleted;
