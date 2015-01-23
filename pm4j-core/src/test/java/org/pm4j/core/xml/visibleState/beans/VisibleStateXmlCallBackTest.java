@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNotNull;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -14,6 +15,8 @@ import org.pm4j.core.pm.PmAttrBoolean;
 import org.pm4j.core.pm.PmAttrString;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmObject;
+import org.pm4j.core.pm.PmTab;
+import org.pm4j.core.pm.PmTabSet;
 import org.pm4j.core.pm.PmTableCol;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.annotation.PmBeanCfg;
@@ -25,8 +28,12 @@ import org.pm4j.core.pm.impl.PmAttrStringImpl;
 import org.pm4j.core.pm.impl.PmBeanBase;
 import org.pm4j.core.pm.impl.PmCommandImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
+import org.pm4j.core.pm.impl.PmElementBase;
+import org.pm4j.core.pm.impl.PmTabSetImpl;
 import org.pm4j.core.pm.impl.PmTableColImpl;
 import org.pm4j.core.pm.impl.PmTableImpl;
+import org.pm4j.core.xml.visibleState.VisibleStateAspect;
+import org.pm4j.core.xml.visibleState.VisibleStateAspectMatcher;
 import org.pm4j.core.xml.visibleState.VisibleStateUtil;
 
 /**
@@ -92,6 +99,36 @@ public class VisibleStateXmlCallBackTest {
         "    </table>\n" +
         "</conversation>"
     , VisibleStateUtil.toXmlString(new TestPm()));
+  }
+
+  @SuppressWarnings({"unchecked", "unused"})
+  @Test
+  public void testWriteTabSet() {
+    class Tab extends PmElementBase implements PmTab {
+      public final PmAttrString stringAttr = new PmAttrStringImpl(this);
+      public Tab(PmObject pmParent) {
+        super(pmParent);
+      }
+    }
+
+    PmTabSet ts = new PmTabSetImpl(new PmConversationImpl()) {
+      public final Tab tab1 = new Tab(this);
+      public final Tab tab2 = new Tab(this);
+    };
+
+    // Notice: Child elements are only rendered for the current tab.
+    assertEquals(
+        "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
+        "<tabset xmlns=\"http://org.pm4j/xml/visibleState\" name=\"\">\n" +
+        "    <tab name=\"tab1\">\n" +
+        "        <attr name=\"stringAttr\"/>\n" +
+        "    </tab>\n" +
+        "    <tab name=\"tab2\"/>\n" +
+        "</tabset>",
+        // print current state ignoring the not implemented titles:
+        VisibleStateUtil.toXmlString(ts,
+            Collections.EMPTY_LIST,
+            Arrays.asList(new VisibleStateAspectMatcher(VisibleStateAspect.TITLE))));
   }
 
   @PmTitleCfg(title = "Test PM")

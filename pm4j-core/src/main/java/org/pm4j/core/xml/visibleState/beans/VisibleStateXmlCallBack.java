@@ -22,6 +22,7 @@ import org.pm4j.core.pm.PmTableCol;
 import org.pm4j.core.pm.api.PmMessageApi;
 import org.pm4j.core.pm.api.PmVisitorApi.PmVisitHierarchyCallBack;
 import org.pm4j.core.pm.api.PmVisitorApi.PmVisitResult;
+import org.pm4j.core.pm.impl.PmTabSetUtil;
 import org.pm4j.core.pm.impl.PmTableUtil;
 import org.pm4j.core.pm.impl.PmUtil;
 import org.pm4j.core.pm.impl.PmVisitorImpl;
@@ -94,8 +95,11 @@ public class VisibleStateXmlCallBack implements PmVisitHierarchyCallBack {
       newestXml = visitObject(pm, new XmlPmTabSet(), hiddenProps);
     }
     // XML readability: Tabs (really used within a tab set) are reported as 'tab'
+    // FIXME oboede: a PM may be a table and a tab. Such semantic clashes need to be handled
+    // Suggestion: handle the tab semantic here and delegate type specific handling to a
+    // separate method that may be called by visitTab() as well as by the usual visit().
     else if (pm instanceof PmTab && pm.getPmParent() instanceof PmTabSet) {
-      newestXml = visitObject(pm, new XmlPmTab(), hiddenProps);
+      newestXml = visitTab((PmTab)pm, hiddenProps);
     } else {
       newestXml = visitObject(pm, new XmlPmObject(), hiddenProps);
     }
@@ -210,6 +214,17 @@ public class VisibleStateXmlCallBack implements PmVisitHierarchyCallBack {
     return visitObject(pm, xmlPmTable, hideProps);
   }
 
+  /** Renders child elements only for the currently opened tab. */
+  private XmlPmObjectBase visitTab(PmTab pm, Set<VisibleStateAspect> hideProps) {
+    XmlPmTab xmlPmTab = new XmlPmTab();
+    if (PmTabSetUtil.isCurrentTab((PmTab) pm)) {
+      return visitObject(pm, xmlPmTab, hideProps);
+    } else {
+      Set<VisibleStateAspect> hideChildrenSet = new HashSet<VisibleStateAspect>(hideProps);
+      hideChildrenSet.add(VisibleStateAspect.CHILDREN);
+      return visitObject(pm, xmlPmTab, hideChildrenSet);
+    }
+  }
 
   @Override
   public PmVisitResult enterChildren(PmObject pmParent, Iterable<PmObject> pmChildren) {

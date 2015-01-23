@@ -41,7 +41,6 @@ public class VisibleStateUtil {
                             .exclude(excludedAspects);
     PmVisitorImpl visitor = new PmVisitorImpl(xmlCallBack)
                             .hints(PmVisitHint.SKIP_CONVERSATION,
-                                   PmVisitHint.SKIP_HIDDEN_TAB_CONTENT,
                                    PmVisitHint.SKIP_INVISIBLE)
                             .exclude(excludedPms);
     visitor.visit(rootPm);
