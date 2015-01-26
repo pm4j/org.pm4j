@@ -1,5 +1,6 @@
 package org.pm4j.common.expr.parser;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.pm4j.common.expr.Expression.SyntaxVersion;
 
@@ -58,7 +59,7 @@ public class ParseCtxt {
    * @return <code>true</code> if it is a space character, tab, newline ect.
    */
   public static boolean isSpace(char ch) {
-    return Character.isSpaceChar(ch) || (ch == '\n');
+    return Character.isSpaceChar(ch) || (ch == '\t') || (ch == '\n');
   }
 
 	/**
@@ -114,18 +115,40 @@ public class ParseCtxt {
     }
   }
 
-	/**
-	 * Liest das aktuelle Zeichen und inkrementiert die Position.
-	 *
-	 * @return Das gelesene Zeichen.
-	 * @throws ArrayOfBoundsException
-	 *             wenn {@link #isDone()}.
-	 */
-	public final char readCharAndAdvance() {
-		return text.charAt(pos++);
-	}
+  /**
+   * Liest das aktuelle Zeichen und inkrementiert die Position.
+   *
+   * @return Das gelesene Zeichen.
+   * @throws ArrayOfBoundsException
+   *             wenn {@link #isDone()}.
+   */
+  public final char readCharAndAdvance() {
+    return text.charAt(pos++);
+  }
 
-  public final String skipBlanksAndReadNameString() {
+  /**
+   * Reads all characters until one of the stop characters is read and advances to right before the actual stop character.
+   *
+   * @return The characters read without whitespace.
+   * @throws ArrayOfBoundsException
+   *             if {@link #isDone()}.
+   */
+  public String readCharsAndAdvanceUntil(char... charsToStopBefore) {
+    String chars = "";
+    while ( !ArrayUtils.contains(charsToStopBefore, text.charAt(pos)) ) {
+      chars += readCharAndAdvance();
+    }
+    return chars.replaceAll("\\s+","");
+  }
+
+  /**
+   * Skips blanks, then reads a typical name, starting with a letter, containing letters, numbers and
+   * underlines in the following characters.
+   *
+   * @return The found name string or <code>null</code> if there was none at the
+   *         current position.
+   */
+    public final String skipBlanksAndReadNameString() {
     int startPos = pos;
     String name = skipBlanks().readNameString();
 
@@ -136,7 +159,7 @@ public class ParseCtxt {
     return name;
   }
 
-	/**
+  /**
    * Reads a typical name, starting with a letter, containing letters, numbers and
    * underlines in the following characters.
    *
@@ -278,5 +301,4 @@ public class ParseCtxt {
 	public SyntaxVersion getSyntaxVersion()	{
 	  return syntaxVersion;
 	}
-
 }
