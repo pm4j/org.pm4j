@@ -77,7 +77,7 @@ public class PmVariableOrAttributeExpr extends OptionalExpressionBase<ExprExecCt
       return null;
     }
 
-    // Decides if its a variable or Attribut Expression.
+    // Decides whether its a variable or attribute expression.
     if(n.isVariable()) {
       return new PmVariableExpr(ctxt, n);
     }

@@ -25,9 +25,10 @@ import org.pm4j.common.expr.parser.ParseException;
  */
 public class NameWithModifier implements Cloneable {
 
-  public static final char[] PART_DELIMITER = new char[]{',', ')'};
-  
-  
+  /** Delimiter between between multiple modifiers and the closing brace */
+  private static final char[] PART_DELIMITER = new char[]{',', ')'};
+
+
   private Set<Modifier> modifiers = new HashSet<Modifier>();
   private boolean variable;
   private String name;
@@ -54,6 +55,8 @@ public class NameWithModifier implements Cloneable {
   public static enum Modifier {
     OPTIONAL("o"),
     EXISTS_OPTIONALLY("x"),
+    // TODO oboede:
+    /** @deprecated check for usages and remove the undocumented '*' modifier. */
     REPEATED("*"),
     ALIAS("as:") {
       @Override
@@ -64,13 +67,13 @@ public class NameWithModifier implements Cloneable {
             throw new ParseException(ctxt, "invalid 'as:', alias already set");
           }
           n.modifiers.add(this);
-          
+
           // as there is always a ':', the 2nd part must exists, it just could be empty
-          String alias = nextPart.split(":", 2)[1];
-          if ( alias.isEmpty() ) {
+          String[] aliasParts = nextPart.split(":", 2);
+          if ( aliasParts.length < 2 || aliasParts[1].isEmpty() ) {
             throw new ParseException(ctxt, "invalid 'as:', alias must not be empty");
           }
-          n.setAlias(nextPart.split(":", 2)[1]);
+          n.setAlias(aliasParts[1]);
         }
         return matches;
       }
@@ -81,14 +84,14 @@ public class NameWithModifier implements Cloneable {
     private Modifier(String id) {
       this.id = id;
     }
-    
+
     public String getId() {
       return id;
     }
 
     static Modifier parse(ParseCtxt ctxt, NameWithModifier n) {
-      String token = ctxt.skipBlanks().readCharsAndAdvanceUntil(PART_DELIMITER); 
-      return Modifier.byToken(ctxt, token, n);      
+      String token = ctxt.skipBlanks().readCharsAndAdvanceUntil(PART_DELIMITER);
+      return Modifier.byToken(ctxt, token, n);
    }
 
     private static Modifier byToken(ParseCtxt ctxt, String token, NameWithModifier n) {
@@ -157,7 +160,7 @@ public class NameWithModifier implements Cloneable {
 
       boolean done = false;
       do {
-        Modifier m = Modifier.parse(ctxt, n);
+        Modifier.parse(ctxt, n);
 
         ctxt.skipBlanks();
         switch (ctxt.currentChar()) {
