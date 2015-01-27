@@ -82,7 +82,7 @@ public class VisibleStateXmlCallBackTest {
         "        <options>|Yes|No</options>\n" +
         "    </attr>\n" +
         "    <attr name=\"requiredAttr\" title=\"Required Attr\" styleClass=\"required\"/>\n" +
-        "    <attr name=\"readOnlyAttr\" readOnly=\"true\" title=\"Readonly Attr\"/>\n" +
+        "    <attr name=\"readOnlyAttr\" enabled=\"false\" title=\"Readonly Attr\"/>\n" +
         "    <cmd name=\"cmdDoSomething\" title=\"Do something\"/>\n" +
         "    <table name=\"table\" rows=\"2\" title=\"Table\">\n" +
         "        <column name=\"name\" title=\"Name\"/>\n" +
@@ -187,7 +187,7 @@ public class VisibleStateXmlCallBackTest {
     public TestBean(String name) {
         this.name = name;
     }
-}
+  }
 
 
 }

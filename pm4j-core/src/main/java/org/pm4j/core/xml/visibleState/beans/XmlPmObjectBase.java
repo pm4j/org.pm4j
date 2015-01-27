@@ -19,7 +19,6 @@ import javax.xml.bind.annotation.XmlSeeAlso;
     XmlPmConversation.class,
     XmlPmMessage.class,
     XmlPmObject.class,
-    XmlPmTab.class,
     XmlPmTable.class,
     XmlPmTableCol.class,
     XmlPmTableRow.class,
@@ -30,8 +29,9 @@ public class XmlPmObjectBase {
   protected String title;
   /** Represented as element. May contain complex content (newlines etc.). */
   protected String tooltip;
-  protected Boolean readOnly;
   protected Boolean enabled;
+  /** Is true if the object is used as a tab within a tab set. */
+  protected Boolean isTab;
   protected String icon;
   protected String styleClass;
   protected List<XmlPmMessage> messages = new ArrayList<XmlPmMessage>();
