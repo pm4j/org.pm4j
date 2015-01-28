@@ -89,7 +89,7 @@ public class PmObjectCfgWithPmCommandsTest {
    * @PmObjectCfg(enabled = Enable.IN_EDITABLE_CTXT)
    */
   @Test
-  public void testEnabledInEditableCtxtWhenCacheIsOff() {  
+  public void testEnabledInEditableCtxtWhenCacheIsOff() {
     pm.isReadOnly = false;
     
     _PmAssert.assertEnabled(pm.cmdWithDisabledCache);
@@ -104,7 +104,7 @@ public class PmObjectCfgWithPmCommandsTest {
    * @PmObjectCfg(enabled = Enable.IN_EDITABLE_CTXT)
    */
   @Test
-  public void testEnabledInEditableCtxtWhenCacheIsOn() {   
+  public void testEnabledInEditableCtxtWhenCacheIsOn() {
     pm.isReadOnly = false;
     
     _PmAssert.assertEnabled(pm.cmdWithEnabledCache);
@@ -116,7 +116,6 @@ public class PmObjectCfgWithPmCommandsTest {
     PmCacheApi.clearPmCache(pm.cmdWithEnabledCache, CacheKind.ENABLEMENT);
     
     _PmAssert.assertNotEnabled(pm.cmdWithDisabledCache);
-    
   }
   
   /*
@@ -179,7 +178,7 @@ public class PmObjectCfgWithPmCommandsTest {
   }
 
   private static class HelperParentPm extends PmConversationImpl {
-    
+
     private boolean isReadOnly = false;
     
     @Override

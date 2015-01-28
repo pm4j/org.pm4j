@@ -270,6 +270,9 @@ public class PmObjectBase implements PmObject {
 
   /**
    * Override this method to define business logic driven visibility logic.
+   * 
+   * Overriding this method may result in losing {@link @PmObjectCfg} annotation 
+   * configuration, that might have been set. 
    *
    * The default implementation considers the annotation {@link PmObjectCfg#visible()}.
    *
@@ -284,7 +287,7 @@ public class PmObjectBase implements PmObject {
     case NO:
       return false;
     default:
-      // support for the deprecated setter logic. An attotation overrules it.
+      // support for the deprecated setter logic. An annotation overrules it.
       return pmVisible;
     }
   }
@@ -1193,7 +1196,6 @@ public class PmObjectBase implements PmObject {
 
   @SuppressWarnings({ "rawtypes", "deprecation" })
   protected void initMetaData(MetaData metaData) {
-
     // -- Enablement & visibility configuration --
     PmObjectCfg objectCfg = AnnotationUtil.findAnnotation(this, PmObjectCfg.class);
     if (objectCfg != null) {

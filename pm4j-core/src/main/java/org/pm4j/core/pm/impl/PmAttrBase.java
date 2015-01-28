@@ -1489,6 +1489,10 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     Class<?> beanClass = (getPmParent() instanceof PmBean)
           ? ((PmBean)getPmParent()).getPmBeanClass()
           : null;
+          
+    if (metaData.getEnablementCfg() == Enable.IN_EDITABLE_CTXT) {
+    	throw new PmRuntimeException(this, "An attribute is alway only enabled in an editable context. The configured value is redundant for PmAttr.");
+    }
 
     if (metaData.getEnablementCfg() == Enable.IN_EDITABLE_CTXT) {
       throw new PmRuntimeException(this, "An attribute is alway only enabled in an editable context. The configured value is redundant for PmAttr.");
