@@ -3,7 +3,7 @@
 
   <groupId>org.pm4j</groupId>
   <artifactId>main</artifactId>
-  <version>0.8.8</version>
+  <version>0.9.18</version>
   <packaging>pom</packaging>
 
   <name>pm4j parent pom</name>
@@ -32,7 +32,7 @@
 
   <scm>
     <developerConnection>scm:git:https://github.com/pm4j/org.pm4j.git</developerConnection>
-    <tag>v0.8.8</tag>
+    <tag>v0.9.18</tag>
   </scm>
 
   <distributionManagement>
@@ -202,7 +202,7 @@ line.separator=\r\n
 
       <plugin>
         <artifactId>maven-release-plugin</artifactId>
-        <version>2.4.1</version>
+        <version>2.5.1</version>
         <configuration>
           <!-- Auto-Version all modules the same as the parent module -->
           <autoVersionSubmodules>true</autoVersionSubmodules>
@@ -224,7 +224,7 @@ line.separator=\r\n
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.8.1</version>
+      <version>4.11</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
