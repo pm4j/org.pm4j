@@ -18,21 +18,30 @@ import org.pm4j.common.expr.parser.ParseException;
  *   expression for a field or getter that may exist: (x)myVar
  *   expression for a field or getter that may exist or may be null: (x,o)myVar.x
  *   expression for an optional variable: (o)#myVar
+ *   expression with an alias name: (as:myAlias)myVar
  * </pre>
  *
  * @author olaf boede
  */
 public class NameWithModifier implements Cloneable {
 
+  /** Delimiter between between multiple modifiers and the closing brace */
+  private static final char[] PART_DELIMITER = new char[]{',', ')'};
+
+
   private Set<Modifier> modifiers = new HashSet<Modifier>();
   private boolean variable;
   private String name;
+  private String alias;
 
   public Set<Modifier> getModifiers() { return modifiers; }
   public boolean isOptional() { return modifiers.contains(Modifier.OPTIONAL); }
   public boolean isVariable() { return variable; }
   public void setVariable(boolean variable) { this.variable = variable; }
   public String getName() { return name; }
+  public String getAlias() { return alias; }
+  private void setAlias(String alias) { this.alias = alias; }
+
 
   @Override
   public NameWithModifier clone() {
@@ -44,45 +53,64 @@ public class NameWithModifier implements Cloneable {
   }
 
   public static enum Modifier {
-    OPTIONAL("o") {
-      @Override public void applyModifier(NameWithModifier n) {
-        n.modifiers.add(OPTIONAL);
-      }
-    },
-    EXISTS_OPTIONALLY("x") {
-      @Override public void applyModifier(NameWithModifier n) {
-        n.modifiers.add(EXISTS_OPTIONALLY);
-      }
-    },
-    REPEATED("*") {
-      @Override public void applyModifier(NameWithModifier n) {
-        n.modifiers.add(REPEATED);
+    OPTIONAL("o"),
+    EXISTS_OPTIONALLY("x"),
+    // TODO oboede:
+    /** @deprecated check for usages and remove the undocumented '*' modifier. */
+    REPEATED("*"),
+    ALIAS("as:") {
+      @Override
+      protected boolean applyModifierIfMatching(ParseCtxt ctxt, String nextPart, NameWithModifier n) {
+        boolean matches = nextPart.startsWith(getId());
+        if ( matches ) {
+          if ( n.getAlias() != null ) {
+            throw new ParseException(ctxt, "invalid 'as:', alias already set");
+          }
+          n.modifiers.add(this);
+
+          // as there is always a ':', the 2nd part must exists, it just could be empty
+          String[] aliasParts = nextPart.split(":", 2);
+          if ( aliasParts.length < 2 || aliasParts[1].isEmpty() ) {
+            throw new ParseException(ctxt, "invalid 'as:', alias must not be empty");
+          }
+          n.setAlias(aliasParts[1]);
+        }
+        return matches;
       }
     };
 
     private final String id;
 
     private Modifier(String id) {
-      if (id.length() != 1) {
-        throw new IllegalArgumentException("The parse algorithm needs to be extended to support more than one character.");
-      }
       this.id = id;
     }
 
-    public abstract void applyModifier(NameWithModifier n);
+    public String getId() {
+      return id;
+    }
 
-    static Modifier parse(ParseCtxt ctxt) {
-      char ch = ctxt.skipBlanks().readCharAndAdvance();
+    static Modifier parse(ParseCtxt ctxt, NameWithModifier n) {
+      String token = ctxt.skipBlanks().readCharsAndAdvanceUntil(PART_DELIMITER);
+      return Modifier.byToken(ctxt, token, n);
+   }
 
+    private static Modifier byToken(ParseCtxt ctxt, String token, NameWithModifier n) {
       for (Modifier m : values()) {
-        if (m.id.charAt(0) == ch) {
+        if (m.applyModifierIfMatching(ctxt, token, n)) {
           return m;
         }
       }
 
-      throw new ParseException(ctxt, "Unknown modifier '" + ch + "' found.");
+      throw new ParseException(ctxt, "Unknown modifier '" + token + "' found.");
     }
 
+    protected boolean applyModifierIfMatching(ParseCtxt ctxt, String token, NameWithModifier n) {
+      if ( id.equals(token) ) {
+        n.modifiers.add(this);
+        return true;
+      }
+      return false;
+    }
   }
 
   @Override
@@ -132,8 +160,7 @@ public class NameWithModifier implements Cloneable {
 
       boolean done = false;
       do {
-        Modifier m = Modifier.parse(ctxt);
-        m.applyModifier(n);
+        Modifier.parse(ctxt, n);
 
         ctxt.skipBlanks();
         switch (ctxt.currentChar()) {
