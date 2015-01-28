@@ -1,5 +1,10 @@
 package org.pm4j.core.pm.annotation;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmTable;
@@ -10,6 +15,8 @@ import org.pm4j.core.pm.impl.PmObjectBase;
  *
  * @author Olaf Boede
  */
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.TYPE, ElementType.FIELD})
 public @interface PmObjectCfg {
 
   /**
@@ -27,12 +34,6 @@ public @interface PmObjectCfg {
      */
     DEFAULT,
     /**
-     * Enables this PM always.<br>
-     * Regardless of some {@link PmAttr} rule mentioned in the java doc for
-     * {@link #DEFAULT}.
-     */
-    YES,
-    /**
      * Disables this PM always.
      */
     NO,
@@ -40,7 +41,9 @@ public @interface PmObjectCfg {
      * Enables this PM only if this PM is in an editable context.<br>
      * Technically expressed: Its method {@link PmObject#isPmReadonly()} returns
      * <code>false</code>. <br>
-     * {@link PmAttr}s do that by default.
+     * {@link PmAttr}s do that by default. That's why attempts to apply this option 
+     * to {@link PmAttr}s are redundant, thus unnecessary and will result in 
+     * {@link PmRuntimeException}
      */
     IN_EDITABLE_CTXT
   }

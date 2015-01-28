@@ -11,7 +11,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 
@@ -26,14 +25,12 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.pm4j.common.cache.CacheStrategy;
-import org.pm4j.common.cache.CacheStrategyNoCache;
 import org.pm4j.common.converter.string.StringConverter;
 import org.pm4j.common.converter.string.StringConverterParseException;
 import org.pm4j.common.converter.value.ValueConverter;
 import org.pm4j.common.converter.value.ValueConverterDefault;
 import org.pm4j.common.expr.Expression.SyntaxVersion;
 import org.pm4j.common.util.CompareUtil;
-import org.pm4j.common.util.collection.MapUtil;
 import org.pm4j.common.util.reflection.BeanAttrAccessor;
 import org.pm4j.common.util.reflection.BeanAttrAccessorImpl;
 import org.pm4j.common.util.reflection.ClassUtil;
@@ -56,16 +53,13 @@ import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmOption;
 import org.pm4j.core.pm.PmOptionSet;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
-import org.pm4j.core.pm.annotation.PmCacheCfg2;
 import org.pm4j.core.pm.annotation.PmAttrCfg.HideIf;
 import org.pm4j.core.pm.annotation.PmAttrCfg.Restriction;
 import org.pm4j.core.pm.annotation.PmAttrCfg.Validate;
-import org.pm4j.core.pm.annotation.PmCacheCfg;
-import org.pm4j.core.pm.annotation.PmCacheCfg.CacheMode;
-import org.pm4j.core.pm.annotation.PmCacheCfg2.Cache;
-import org.pm4j.core.pm.annotation.PmCacheCfg2.Observe;
 import org.pm4j.core.pm.annotation.PmCommandCfg;
 import org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO;
+import org.pm4j.core.pm.annotation.PmObjectCfg.Enable;
+import org.pm4j.core.pm.annotation.PmObjectCfg.Visible;
 import org.pm4j.core.pm.annotation.PmOptionCfg;
 import org.pm4j.core.pm.annotation.PmOptionCfg.NullOption;
 import org.pm4j.core.pm.annotation.PmTitleCfg;
@@ -77,8 +71,6 @@ import org.pm4j.core.pm.api.PmLocalizeApi;
 import org.pm4j.core.pm.api.PmMessageApi;
 import org.pm4j.core.pm.api.PmMessageUtil;
 import org.pm4j.core.pm.impl.InternalPmCacheCfgUtil.CacheMetaData;
-import org.pm4j.core.pm.impl.cache.CacheStrategyBase;
-import org.pm4j.core.pm.impl.cache.CacheStrategyRequest;
 import org.pm4j.core.pm.impl.converter.PmConverterErrorMessage;
 import org.pm4j.core.pm.impl.converter.PmConverterOptionBased;
 import org.pm4j.core.pm.impl.options.GenericOptionSetDef;
@@ -290,12 +282,15 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   @Override
   protected boolean isPmVisibleImpl() {
     boolean visible = super.isPmVisibleImpl();
-
-    if (visible && getOwnMetaData().hideIfEmptyValue) {
+    MetaData metaData = getOwnMetaData();
+    
+    if (visible && 
+       (metaData.getVisibilityCfg() == Visible.IF_NOT_EMPTY || 
+        metaData.hideIfEmptyValue) ) {
       visible = !isEmptyValue(getValue());
     }
 
-    if (visible && getOwnMetaData().hideIfDefaultValue) {
+    if (visible && metaData.hideIfDefaultValue) {
       visible = !ObjectUtils.equals(getValue(), getDefaultValue());
     }
 
@@ -1502,6 +1497,10 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     Class<?> beanClass = (getPmParent() instanceof PmBean)
           ? ((PmBean)getPmParent()).getPmBeanClass()
           : null;
+          
+    if (metaData.getEnablementCfg() == Enable.IN_EDITABLE_CTXT) {
+    	throw new PmRuntimeException(this, "An attribute is alway only enabled in an editable context. The configured value is redundant for PmAttr.");
+    }
 
     myMetaData.embeddedAttr = getPmParent() instanceof PmAttr;
 

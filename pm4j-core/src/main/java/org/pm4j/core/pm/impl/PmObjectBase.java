@@ -45,6 +45,9 @@ import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmCacheCfg.Clear;
 import org.pm4j.core.pm.annotation.PmFactoryCfg;
 import org.pm4j.core.pm.annotation.PmInit;
+import org.pm4j.core.pm.annotation.PmObjectCfg;
+import org.pm4j.core.pm.annotation.PmObjectCfg.Enable;
+import org.pm4j.core.pm.annotation.PmObjectCfg.Visible;
 import org.pm4j.core.pm.annotation.PmTitleCfg;
 import org.pm4j.core.pm.annotation.customize.CustomizedAnnotationUtil;
 import org.pm4j.core.pm.annotation.customize.PmAnnotationApi;
@@ -236,11 +239,23 @@ public abstract class PmObjectBase implements PmObject {
 
   /**
    * Override this method to define business logic driven visibility logic.
+   * 
+   * Overriding this method may result in losing {@link @PmObjectCfg} annotation 
+   * configuration, that might have been set. 
    *
    * @return <code>true</code> if the PM should be visible.
    */
-  protected boolean isPmVisibleImpl() {
-    return pmVisible;
+  protected boolean isPmVisibleImpl() {  
+    switch(getPmMetaData().visibilityCfg) {
+    case IF_ENABLED:
+      return isPmEnabled();
+    case IN_EDITABLE_CTXT:
+      return !isPmReadonly();
+    case NO:
+      return false;
+    default:
+      return pmVisible;    
+    }
   }
 
   @Override @Deprecated
@@ -270,8 +285,23 @@ public abstract class PmObjectBase implements PmObject {
     }
   }
 
+  /**
+   * Override this method to define business logic driven enablement logic.
+   * 
+   * Be aware, that overriding this method may result in losing {@link PmObjectCfg} 
+   * configuration, that might have been set. 
+   *
+   * @return <code>true</code> if the PM should be visible.
+   */
   protected boolean isPmEnabledImpl() {
-    return pmEnabled;
+    switch(getPmMetaData().enablementCfg) {
+    case NO: 
+      return false;
+    case IN_EDITABLE_CTXT:
+      return !isPmReadonly();
+    default:
+      return pmEnabled;
+    }
   }
 
   @Override @Deprecated
@@ -985,6 +1015,14 @@ public abstract class PmObjectBase implements PmObject {
 
   @SuppressWarnings({ "rawtypes", "deprecation" })
   protected void initMetaData(MetaData metaData) {
+    
+    // -- Enablement & visibility configuration --
+    PmObjectCfg objectCfg = AnnotationUtil.findAnnotation(this, PmObjectCfg.class);
+    if (objectCfg != null) {
+      metaData.enablementCfg = objectCfg.enabled();
+      metaData.visibilityCfg = objectCfg.visible();
+    }
+    
     // -- Language resource configuration --
     PmTitleCfg annotation = AnnotationUtil.findAnnotation(this, PmTitleCfg.class);
     if (annotation != null) {
@@ -1157,6 +1195,8 @@ public abstract class PmObjectBase implements PmObject {
     boolean deprValidation;
     private Validator validator;
     private Annotation[] permissionAnnotations = {};
+    Enable enablementCfg = Enable.DEFAULT;
+    Visible visibilityCfg = Visible.DEFAULT;
 
     private InternalPmCacheCfgUtil.CacheMetaData titleCache = InternalPmCacheCfgUtil.CacheMetaData.NO_CACHE;
     private InternalPmCacheCfgUtil.CacheMetaData enablementCache = InternalPmCacheCfgUtil.CacheMetaData.NO_CACHE;
@@ -1210,6 +1250,22 @@ public abstract class PmObjectBase implements PmObject {
       this.pmElementFactory = pmElementFactory;
     }
 
+    public Enable getEnablementCfg() {
+      return this.enablementCfg;
+    }
+    
+    public Visible getVisibilityCfg() {
+      return this.visibilityCfg;
+    }
+    
+    /* package */ void setDefaultEnablementCfg(Enable defaultEnablementCfg) {
+      this.enablementCfg = defaultEnablementCfg;
+    }
+    
+    /* package */ void setDefaultVisibilityCfg(Visible defaultVisibilityCfg) {
+      this.visibilityCfg = defaultVisibilityCfg;
+    }
+    
     public boolean isReadOnly() { return readOnly; }
     public void setReadOnly(boolean readOnly) { this.readOnly = readOnly; }
 
