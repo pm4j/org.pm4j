@@ -120,10 +120,10 @@ public class VisibleStateXmlCallBackTest {
     assertEquals(
         "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
         "<tabset xmlns=\"http://org.pm4j/xml/visibleState\" name=\"\">\n" +
-        "    <tab name=\"tab1\">\n" +
+        "    <pm name=\"tab1\" isTab=\"true\">\n" +
         "        <attr name=\"stringAttr\"/>\n" +
-        "    </tab>\n" +
-        "    <tab name=\"tab2\"/>\n" +
+        "    </pm>\n" +
+        "    <pm name=\"tab2\" isTab=\"true\"/>\n" +
         "</tabset>",
         // print current state ignoring the not implemented titles:
         VisibleStateUtil.toXmlString(ts,
