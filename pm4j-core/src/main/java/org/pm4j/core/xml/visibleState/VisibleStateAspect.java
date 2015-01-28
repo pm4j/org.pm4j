@@ -13,7 +13,7 @@ public enum VisibleStateAspect {
   TOOLTIP,
   ICON,
   STYLECLASS,
-  READONLY,
+  IS_TAB,
   MESSAGES,
   CHILDREN,
   // attribute properties

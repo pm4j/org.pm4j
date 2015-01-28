@@ -16,7 +16,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlRootElement(name="table")
 @XmlType(propOrder = {
     // attributes (in reverese order for Java 1.6. In java 1.7 in opposite direction :-( ):
-    "styleClass", "icon", "title", "enabled", "readOnly", "rows", "name",
+    "styleClass", "icon", "title", "enabled", "rows", "isTab", "name",
     // elements:
     "tooltip", "messages", "children" })
 public class XmlPmTable extends XmlPmObjectBase {
@@ -24,10 +24,11 @@ public class XmlPmTable extends XmlPmObjectBase {
 
   // @XmlType.propOrder seems not to support inherited properties.
   // Because of that everything is defined locally here.
+  // TODO: remove enabled from all places that are no longer relevant.
   @XmlAttribute public Boolean getEnabled() { return enabled; }
   @XmlAttribute public String getIcon() { return icon; }
   @XmlAttribute public String getName() { return name; }
-  @XmlAttribute public Boolean getReadOnly() { return readOnly; }
+  @XmlAttribute public Boolean getIsTab() { return isTab; }
   @XmlAttribute public String getStyleClass() { return styleClass; }
   @XmlAttribute public String getTitle() { return title; }
 

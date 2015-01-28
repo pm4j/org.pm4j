@@ -17,7 +17,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlRootElement(name="attr")
 @XmlType(propOrder = {
     // attributes (in reverese order for Java 1.6. In java 1.7 in opposite direction :-( ):
-    "styleClass", "icon", "title", "enabled", "readOnly", "name",
+    "styleClass", "icon", "title", "enabled", "isTab", "name",
     // elements:
     "tooltip", "value", "options", "messages", "children" })
 public class XmlPmAttr extends XmlPmObjectBase {
@@ -29,7 +29,7 @@ public class XmlPmAttr extends XmlPmObjectBase {
   @XmlAttribute public Boolean getEnabled() { return enabled; }
   @XmlAttribute public String getIcon() { return icon; }
   @XmlAttribute public String getName() { return name; }
-  @XmlAttribute public Boolean getReadOnly() { return readOnly; }
+  @XmlAttribute public Boolean getIsTab() { return isTab; }
   @XmlAttribute public String getStyleClass() { return styleClass; }
   @XmlAttribute public String getTitle() { return title; }
 

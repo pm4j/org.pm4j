@@ -196,12 +196,14 @@ public class PmAssert {
      */
     public static void assertMessage(String expectedMsgInSubtree, Severity severity, PmObject rootPm) {
         List<PmMessage> messages = PmMessageApi.getPmTreeMessages(rootPm, severity);
+        List<String> messageStrings = new ArrayList<String>();
         for (PmMessage message : messages) {
             if (StringUtils.equals(expectedMsgInSubtree, message.getTitle()) && message.getSeverity() == severity) {
                 return;
             }
+            messageStrings.add(message.getSeverity().name() + ": " + message.getTitle());
         }
-        fail("Expected message/severity combination not found for '" + rootPm.getPmRelativeName() + ". Found messages: " + messages);
+        assertEquals(severity.name() + ": " + expectedMsgInSubtree, StringUtils.join(messageStrings, "\n"));
     }
 
     /**

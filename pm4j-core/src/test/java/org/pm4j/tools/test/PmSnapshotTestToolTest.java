@@ -15,6 +15,7 @@ import org.pm4j.core.pm.PmAttrString;
 import org.pm4j.core.pm.annotation.PmTitleCfg;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
+import org.pm4j.tools.test.PmSnapshotTestTool.TestMode;
 
 /**
  * Tests for {@link PmSnapshotTestTool}.
@@ -41,11 +42,13 @@ public class PmSnapshotTestToolTest {
 
   @Test
   public void testWriteSnapshot() {
-    File file = snap.snapshot(new MiniTestPm(), "testWriteSnapshot");
-    assertTrue(file.exists());
-    String path = file.getPath().replace('\\', '/');
-    assertTrue(path, path.endsWith("src/test/java/org/pm4j/tools/test/pmSnapshotTestToolTest/testWriteSnapshot.xml"));
+    snap.setTestMode(TestMode.AUTO_CREATE);
+    File file = null;
     try {
+      file = snap.snapshot(new MiniTestPm(), "testWriteSnapshot");
+      assertTrue(file.exists());
+      String path = file.getPath().replace('\\', '/');
+      assertTrue(path, path.endsWith("src/test/java/org/pm4j/tools/test/pmSnapshotTestToolTest/testWriteSnapshot.xml"));
       assertEquals(file.getAbsolutePath(),
           "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
           "<conversation xmlns=\"http://org.pm4j/xml/visibleState\" name=\"miniTestPm\" title=\"Test PM\">\n" +
@@ -53,13 +56,16 @@ public class PmSnapshotTestToolTest {
           "</conversation>",
           FileUtil.fileToString(file));
     } finally {
-      FileUtil.deleteFileAndEmptyParentDirs(file);
+      if (file != null) {
+        FileUtil.deleteFileAndEmptyParentDirs(file);
+      }
     }
   }
 
   @Test
   public void testWriteAndCompareSameSnapshot() {
     // create the snapshot
+    snap.setTestMode(TestMode.AUTO_CREATE);
     File file = null;
 
     try {
@@ -76,35 +82,99 @@ public class PmSnapshotTestToolTest {
       FileUtil.deleteFileAndEmptyParentDirs(file);
     }
   }
+  
+  @Test(expected= AssertionError.class)
+  public void testWriteSnapshotInStrictMode() {
+    snap.setTestMode(TestMode.STRICT);
+    snap.snapshot(new MiniTestPm(), "testWriteAndCompareSameSnapshot");
+  }
+  
+  @Test
+  public void testWriteExistingSnapshot() {
+
+    // create the snapshot
+    final String fileBaseName = "overrideMe";
+    MiniTestPm pm = new MiniTestPm();
+    snap.setTestMode(TestMode.AUTO_CREATE);
+    File expectedStateFileSrc = null;
+    File expectedStateFile = getExpectedFile(fileBaseName);
+
+    try {
+      expectedStateFileSrc = snap.snapshot(pm, fileBaseName);
+      assertTrue(expectedStateFileSrc.exists());
+
+      // modify PM and compare to the changed state
+      PmAssert.setValue(pm.stringAttr, "hi");
+      
+      // Copy the generated expected state file to the binary directory (usually done by the build process).
+      // After that we can simulate a regular compare operation.
+      FileUtil.copyFile(expectedStateFileSrc, expectedStateFile);
+
+      // override snapshot
+      snap.setTestMode(TestMode.WRITE);
+      snap.snapshot(pm, fileBaseName);
+
+      // Copy the overridden expected state
+      FileUtil.copyFile(expectedStateFileSrc, expectedStateFile);
+      
+      // now test in STRICT MODE
+      snap.setTestMode(TestMode.STRICT);
+      snap.snapshot(pm, "overrideMe");
+
+    } finally {
+      FileUtil.deleteFileAndEmptyParentDirs(expectedStateFile);
+      FileUtil.deleteFileAndEmptyParentDirs(expectedStateFileSrc);
+    }
+  }
 
   @Test
   public void testWriteAndCompareDifferentSnapshot() {
-    File expectedStateFile = snap.getExpectedStateFile("testWriteAndCompareDifferentSnapshot");
-    File currentStateFile = snap.getActualStateFile("testWriteAndCompareDifferentSnapshot");
+    snap.setTestMode(TestMode.AUTO_CREATE);
+    final String fileBaseName = "testWriteAndCompareDifferentSnapshot";
+    File expectedStateFileSrc = snap.getExpectedStateSrcFile(fileBaseName);
+    File currentStateFile = snap.getActualStateFile(fileBaseName);
+    File expectedStateFile = getExpectedFile(fileBaseName );
 
     try {
-      assertFalse("File should not exist: " + expectedStateFile.toString(), expectedStateFile.exists());
-      assertFalse("File should not exist: " + currentStateFile.toString(), currentStateFile.exists());
+      assertFalse("File should not exist: " + expectedStateFile, expectedStateFile.exists());
+      assertFalse("File should not exist: " + currentStateFile,  currentStateFile.exists());
 
       MiniTestPm pm = new MiniTestPm();
       // create the snapshot
-      snap.snapshot(pm, "testWriteAndCompareDifferentSnapshot");
-      assertTrue("File should exist: " + expectedStateFile.toString(), expectedStateFile.exists());
+      File createdSrcFile = snap.snapshot(pm, fileBaseName);
+      assertTrue("File should exist: " + createdSrcFile, createdSrcFile.exists());
+      assertEquals(expectedStateFileSrc.getPath(), createdSrcFile.getPath());
+
+
+      // Copy the generated expected state file to the binary directory (usually done by the build process).
+      // After that we can simulate a regular compare operation.
+      FileUtil.copyFile(expectedStateFileSrc, expectedStateFile);
 
       // modify PM and compare to the changed state
       PmAssert.setValue(pm.stringAttr, "hi");
       try {
-        snap.snapshot(pm, "testWriteAndCompareDifferentSnapshot");
+        snap.snapshot(pm, fileBaseName);
         Assert.fail("The snapshot compare operation should fail.");
       } catch (ComparisonFailure e) {
         assertTrue("The current state file should stay alive for manual compare operations.\n" + currentStateFile,
                    currentStateFile.exists());
       }
     } finally {
+      FileUtil.deleteFileAndEmptyParentDirs(expectedStateFileSrc);
       FileUtil.deleteFileAndEmptyParentDirs(expectedStateFile);
       FileUtil.deleteFileAndEmptyParentDirs(currentStateFile);
     }
 
+  }
+  
+  /**
+   * This method is to determine possible target expected file destination as {@link PmSnapshotTestTool#getExpectedStateDir()} returns {@code null} when path was not created.
+   * 
+   * @param fileBaseName file base name
+   * @return expected file descriptor
+   */
+  private File getExpectedFile(String fileBaseName) {
+    return new File(new File(snap.getSrcFileAccessor().getBinPkgDir(), snap.xmlSubDirName()), fileBaseName + ".xml");
   }
 
 

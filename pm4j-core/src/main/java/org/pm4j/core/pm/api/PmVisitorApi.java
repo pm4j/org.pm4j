@@ -2,6 +2,7 @@ package org.pm4j.core.pm.api;
 
 import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.PmObject;
+import org.pm4j.core.pm.impl.PmMatcherBuilder;
 import org.pm4j.core.pm.impl.PmVisitorImpl;
 
 /**
@@ -65,7 +66,9 @@ public class PmVisitorApi {
   public enum PmVisitHint {
     /** Skip visiting not visible pm's */
     SKIP_INVISIBLE,
-    /** Skip visiting content of a tab that is not the currently one. */
+    /** Skip visiting content of a tab that is not the currently one.
+     * @deprecated Please use {@link PmMatcherBuilder} to configure that filter. */
+    @Deprecated
     SKIP_HIDDEN_TAB_CONTENT,
     /** Skip visiting not enabled pm's */
     SKIP_DISABLED,
