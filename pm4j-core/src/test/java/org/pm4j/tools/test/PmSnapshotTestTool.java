@@ -58,10 +58,10 @@ public class PmSnapshotTestTool {
         AUTO_CREATE,
 
         /**
-         * Recommended only for intended override of existing snapshot files. No compare tests
+         * Recommended only for intended WRITE of existing snapshot files. No compare tests
          * are executed in this mode.
          */
-        OVERRIDE
+        WRITE
     }
 
     private static final char CLASSLOADER_RESOURCE_SEPARATOR = '/';
@@ -200,7 +200,7 @@ public class PmSnapshotTestTool {
         switch (testMode) {
         case STRICT:
             return compare(rootPm, fileNameBase, expectedFile);
-        case OVERRIDE:
+        case WRITE:
             return writeSnapshot(rootPm, fileNameBase);
         case AUTO_CREATE:
             if (expectedFile != null && expectedFile.exists()) {
@@ -231,7 +231,7 @@ public class PmSnapshotTestTool {
      */
     protected File compare(PmObject rootPm, String fileNameBase, File expectedFile) {
 
-        Assert.assertTrue("No expected file has been generated for this test. Please change mode of PmSnapshotTestTool to AUTO_CREATE or OVERRIDE by using -DpmSnapshotTestMode=AUTO_CREATE or by setTestMode()", expectedFile != null && expectedFile.exists());
+        Assert.assertTrue("No expected file has been generated for this test. Please change mode of PmSnapshotTestTool to AUTO_CREATE or WRITE by using -DpmSnapshotTestMode=AUTO_CREATE or by setTestMode()", expectedFile != null && expectedFile.exists());
       
         File actualStateFile = getActualStateFile(fileNameBase);
         String actualStateXmlString = VisibleStateUtil.toXmlString(rootPm, excludedPms, excludedAspects);

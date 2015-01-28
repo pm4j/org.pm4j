@@ -90,7 +90,7 @@ public class PmSnapshotTestToolTest {
   }
   
   @Test
-  public void testOverrideExistingSnapshot() {
+  public void testWriteExistingSnapshot() {
 
     // create the snapshot
     final String fileBaseName = "overrideMe";
@@ -111,7 +111,7 @@ public class PmSnapshotTestToolTest {
       FileUtil.copyFile(expectedStateFileSrc, expectedStateFile);
 
       // override snapshot
-      snap.setTestMode(TestMode.OVERRIDE);
+      snap.setTestMode(TestMode.WRITE);
       snap.snapshot(pm, fileBaseName);
 
       // Copy the overridden expected state
