@@ -86,7 +86,7 @@ public class PmSnapshotTestToolTest {
   @Test(expected= AssertionError.class)
   public void testWriteSnapshotInStrictMode() {
     snap.setTestMode(TestMode.STRICT);
-    snap.snapshot(new MiniTestPm(), "testWriteAndCompareSameSnapshot");
+    snap.snapshot(new MiniTestPm(), "testWriteSnapshotInStrictMode");
   }
   
   @Test
