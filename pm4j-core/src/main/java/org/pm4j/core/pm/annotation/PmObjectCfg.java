@@ -43,15 +43,9 @@ public @interface PmObjectCfg {
      * Technically expressed: Its method {@link PmObject#isPmEnabled()} returns
      * <code>true</code> if its method {@link PmObject#isPmReadonly()} returns
      * <code>false</code>. <br>
-<<<<<<< HEAD
      * {@link PmAttr}s do that by default. That's why attempts to apply this
-     * option to {@link PmAttr}s are redundant, thus unnecessary and will result
-     * in {@link PmRuntimeException}.
-=======
-     * {@link PmAttr}s do that by default. That's why attempts to apply this option 
-     * to {@link PmAttr}s are redundant, thus unnecessary and will result in 
-     * {@link PmRuntimeException}
->>>>>>> [G123791] PmObjectCfg
+     * option to {@link PmAttr}s are redundant and will result in a
+     * {@link PmRuntimeException}.
      */
     IN_EDITABLE_CTXT
   }

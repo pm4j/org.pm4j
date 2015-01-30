@@ -270,9 +270,8 @@ public class PmObjectBase implements PmObject {
 
   /**
    * Override this method to define business logic driven visibility logic.
-   * 
-   * Overriding this method may result in losing {@link @PmObjectCfg} annotation 
-   * configuration, that might have been set. 
+   *
+   * The default implementation considers the annotation {@link PmObjectCfg#visible()}.
    *
    * The default implementation considers the annotation {@link PmObjectCfg#visible()}.
    *

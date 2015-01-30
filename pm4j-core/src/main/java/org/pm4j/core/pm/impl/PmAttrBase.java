@@ -269,7 +269,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
             md.embeddedAttr && !getPmParent().isPmEnabled());
   }
 
-  // TODO olaf: move common logic to isPmVisible. Additional effort: ensure that isPmVisible stays final
+  // TODO olaf: move common logic to meda data isPmVisible. Additional effort: ensure that isPmVisible stays final
   // for all PM sub classes.
   @Override
   protected boolean isPmVisibleImpl() {
@@ -1489,9 +1489,9 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     Class<?> beanClass = (getPmParent() instanceof PmBean)
           ? ((PmBean)getPmParent()).getPmBeanClass()
           : null;
-          
+
     if (metaData.getEnablementCfg() == Enable.IN_EDITABLE_CTXT) {
-    	throw new PmRuntimeException(this, "An attribute is alway only enabled in an editable context. The configured value is redundant for PmAttr.");
+      throw new PmRuntimeException(this, "An attribute is alway only enabled in an editable context. The configured value is redundant for PmAttr.");
     }
 
     if (metaData.getEnablementCfg() == Enable.IN_EDITABLE_CTXT) {
