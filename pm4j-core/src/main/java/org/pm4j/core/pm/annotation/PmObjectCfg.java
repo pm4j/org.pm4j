@@ -6,6 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.pm4j.core.pm.PmAttr;
+import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmTable;
 import org.pm4j.core.pm.impl.PmObjectBase;
@@ -39,11 +40,12 @@ public @interface PmObjectCfg {
     NO,
     /**
      * Enables this PM only if this PM is in an editable context.<br>
-     * Technically expressed: Its method {@link PmObject#isPmReadonly()} returns
+     * Technically expressed: Its method {@link PmObject#isPmEnabled()} returns
+     * <code>true</code> if its method {@link PmObject#isPmReadonly()} returns
      * <code>false</code>. <br>
-     * {@link PmAttr}s do that by default. That's why attempts to apply this option 
-     * to {@link PmAttr}s are redundant, thus unnecessary and will result in 
-     * {@link PmRuntimeException}
+     * {@link PmAttr}s do that by default. That's why attempts to apply this
+     * option to {@link PmAttr}s are redundant, thus unnecessary and will result
+     * in {@link PmRuntimeException}.
      */
     IN_EDITABLE_CTXT
   }
@@ -54,8 +56,6 @@ public @interface PmObjectCfg {
    * <p>
    * If you need a more complex visibility definition, consider overriding
    * {@link PmObjectBase#isPmVisibleImpl()}.
-   *
-   * @author Olaf Boede
    */
   public enum Visible {
     /**
@@ -73,15 +73,16 @@ public @interface PmObjectCfg {
      */
     IN_EDITABLE_CTXT,
     /**
-     * Is only visible if it is enables.<br>
-     * Technically expressed: Its method {@link PmObject#isPmEnabled()} returns
+     * Is only visible if it is enabled.<br>
+     * Technically expressed: Its method {@link PmObject#isPmVisble()} returns
+     * <code>true</code> if {@link PmObject#isPmEnabled()} returns
      * <code>true</code>.
      */
     IF_ENABLED,
     /**
      * Is only visible if there is a value to show.
      * <p>
-     * Applies only for PMs having values, such as {@link PmAttr} and {@link PmTable}.
+     * Applies only for PMs having values, such as {@link PmAttr}, {@link PmTable} and {@link PmBean}.
      */
     IF_NOT_EMPTY
   }
@@ -93,19 +94,17 @@ public @interface PmObjectCfg {
    * {@link PmObjectBase#isPmEnabledImpl()} or
    * {@link PmObjectBase#isPmReadonlyImpl()} (to control PM trees).
    *
-   * @return the configured enablement definition.<br>
-   *         By default {@link Enable#DEFAULT}.
+   * @return the configured enablement definition.
    */
   Enable enabled() default Enable.DEFAULT;
 
   /**
    * Visibility rule for this PM.
    * <p>
-   * If you need a more complex enablement definition, consider overriding
+   * If you need a more complex visibility definition, consider overriding
    * {@link PmObjectBase#isPmVisibleImpl()}.
    *
-   * @return the configured visibility definition.<br>
-   *         By default {@link Visible#DEFAULT}.
+   * @return the configured visibility definition.
    */
   Visible visible() default Visible.DEFAULT;
 }
