@@ -55,8 +55,7 @@ public class PmObjectCfgWithPmBeansTest {
 
     @PmBeanCfg(beanClass = Bean.class)
     @PmObjectCfg(visible = Visible.IF_NOT_EMPTY)
-    // FIXME oboede: it should be possible to assign a value if no clear=NEVER is configured.
-    @PmCacheCfg2(@Cache(property = CacheKind.VALUE, clear=Clear.NEVER))
+    @PmCacheCfg2(@Cache(property = CacheKind.VALUE))
     public final PmBeanImpl2<Bean> beanPm = new PmBeanImpl2<Bean>(this);
 
     // TODO: move to a separate test class.

@@ -44,6 +44,9 @@ public class PmBeanImpl2<T_BEAN>
   /** A cached data object behind this PM. */
   /* package */ T_BEAN pmBeanCache;
 
+  /** Used to prevent clearing the cached within a setValue operation immediately. */
+  private transient boolean pmBeanInSetValueOperation = false;
+  
   /**
    * Default constructor for PmBeans used in factories.
    */
@@ -143,10 +146,16 @@ public class PmBeanImpl2<T_BEAN>
    */
   @Override
   public void setPmBean(T_BEAN bean) {
-    if (doSetPmBean(bean)) {
-      int changeFlags = (bean != null) ? 0 : PmEvent.VALUE_CHANGE_TO_NULL;
-      BroadcastPmEventProcessor.broadcastAllChangeEvent(this, changeFlags);
+    try {
+      pmBeanInSetValueOperation = true;
+      if (doSetPmBean(bean)) {
+        int changeFlags = (bean != null) ? 0 : PmEvent.VALUE_CHANGE_TO_NULL;
+        BroadcastPmEventProcessor.broadcastAllChangeEvent(this, changeFlags);
+      }
+    } finally {
+      pmBeanInSetValueOperation = false;
     }
+
   }
 
   /**
@@ -158,8 +167,13 @@ public class PmBeanImpl2<T_BEAN>
    */
   @Override
   public void reloadPmBean(T_BEAN reloadedBean) {
-    doSetPmBean(reloadedBean);
-    BroadcastPmEventProcessor.broadcastAllChangeEvent(this, PmEvent.RELOAD);
+    try {
+      pmBeanInSetValueOperation = true;
+      doSetPmBean(reloadedBean);
+      BroadcastPmEventProcessor.broadcastAllChangeEvent(this, PmEvent.RELOAD);
+    } finally {
+      pmBeanInSetValueOperation = false;
+    }
   }
 
   boolean doSetPmBean(T_BEAN bean) {
@@ -214,7 +228,8 @@ public class PmBeanImpl2<T_BEAN>
     if (pmInitState != PmInitState.INITIALIZED)
       return;
     super.clearCachedPmValues(cacheSet);
-    if (cacheSet.contains(PmCacheApi.CacheKind.VALUE)) {
+    if (cacheSet.contains(PmCacheApi.CacheKind.VALUE) &&
+        !pmBeanInSetValueOperation) {
       getOwnMetaData().valueCache.cacheStrategy.clear(this);
     }
   }

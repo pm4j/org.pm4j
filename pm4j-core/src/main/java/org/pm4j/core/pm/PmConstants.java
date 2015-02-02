@@ -62,7 +62,7 @@ public final class PmConstants {
   public static final String MSGKEY_NULL_OPTION                              = "pmAttr_nullOption";
 
   /** Prints just the first message parameter: "{0}". */
-  public static final String MSGKEY_FIRST_MSG_PARAM                          = "firstMsgParam";
+  public static final String MSGKEY_FIRST_MSG_PARAM                          = "firstParamOnlyResource";
 
   /**
    * A resource key for cached exceptions. The first Parameter of the resource is used to transfer the exception message.
