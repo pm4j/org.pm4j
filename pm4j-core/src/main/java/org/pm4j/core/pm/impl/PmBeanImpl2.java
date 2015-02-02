@@ -46,9 +46,9 @@ public class PmBeanImpl2<T_BEAN>
 
   /** Used to prevent clearing the cached within a setValue operation immediately. */
   private transient boolean pmBeanInSetValueOperation = false;
-  
+
   /**
-   * Default constructor for PmBeans used in factories.
+   * Default constructor for PmBeans used in factories. E.g. table row PMs.
    */
   public PmBeanImpl2() {
     this(null);
@@ -195,7 +195,7 @@ public class PmBeanImpl2<T_BEAN>
     if (!md.valueCache.cacheStrategy.isCaching()) {
       throw new PmRuntimeException(this, "Unable to set a bean if the PmBean no caching is configured.\n" +
             "\tPlease check if your task may be solved by providing a getPmBeanImpl() implementation.\n" +
-            "\tIn some cases a permanent cache configuration @PmCacheCfg(@Cache(VALUE, clear=NEVER)) may be considered to support" +
+            "\tIn some cases a value cache configuration @PmCacheCfg(@Cache(VALUE)) may be considered to support" +
             " setter based bean assignments.");
     }
 
@@ -205,7 +205,7 @@ public class PmBeanImpl2<T_BEAN>
     if (newCurrentBean != bean) {
       throw new PmRuntimeException(this, "The set operation was not successful. A get-call does not provide the assigned instance.\n" +
           "\tPlease check if your task may be solved by providing a getPmBeanImpl() implementation.\n" +
-          "\tIn some cased a permanent cache configuration @PmCacheCfg(@Cache(VALUE, clear=NEVER)) may be considered to support fix bean assignments." +
+          "\tIn some cased a value cache configuration @PmCacheCfg(@Cache(VALUE)) may be considered to support bean assignments." +
           "\tInstance used as setPmBean parameter: " + bean +
           "\tInstance provided by get (after set): " + newCurrentBean);
     }
