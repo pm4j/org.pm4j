@@ -193,8 +193,8 @@ public class PmBeanImpl2<T_BEAN>
     if (!md.valueCache.cacheStrategy.isCaching()) {
       throw new PmRuntimeException(this, "Unable to set a bean if the PmBean no caching is configured.\n" +
             "\tPlease check if your task may be solved by providing a getPmBeanImpl() implementation.\n" +
-            "\tIn some cases a value cache configuration @PmCacheCfg(@Cache(VALUE)) may be considered to support" +
-            " setter based bean assignments.");
+            "\tIn some cases a value cache configuration @PmCacheCfg(@Cache(VALUE)) (optionally using clear=NEVER)" +
+            "\t may be considered to support setter based bean assignments.");
     }
 
     md.valueCache.cacheStrategy.setAndReturnCachedValue(this, bean);
