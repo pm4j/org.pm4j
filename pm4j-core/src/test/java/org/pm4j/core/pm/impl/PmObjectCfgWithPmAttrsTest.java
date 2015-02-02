@@ -1,6 +1,5 @@
 package org.pm4j.core.pm.impl;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmAttrString;
@@ -16,72 +15,70 @@ import org.pm4j.tools.test.PmAssert;
  * 
  */
 public class PmObjectCfgWithPmAttrsTest {
+  HelperParentPm parentPm = new HelperParentPm();
   
   @Test
   public void testVisibleIfNotEmpty() {
-    TestPm testPm = new TestPm();
     
-    PmAssert.setValue(testPm.visibleIfNotEmpty, "SOME VALUE");
-    PmAssert.assertVisible(testPm.visibleIfNotEmpty);
+    PmAssert.setValue(parentPm.visibleIfNotEmpty, "SOME VALUE");
+    PmAssert.assertVisible(parentPm.visibleIfNotEmpty);
   }
   
   @Test
   public void testReadOnlyParentPmBehavior() {
     // assign
-    TestPm underTest = new TestPm();
-    underTest.isReadOnly = true;
+    parentPm.isReadOnly = true;
 
     PmAssert.assertNotEnabled(
-        underTest.attrDefaultEnabledAndVisibleBehavior,
-        underTest.alwaysDisabled,
-        underTest.neverVisible,
-        underTest.visibleIfEnabled,
-        underTest.visibleIfEnabledNo,
-        underTest.visibleIfNotEmpty,
-        underTest.visibleInEditableContext
+        parentPm.attrDefaultEnabledAndVisibleBehavior,
+        parentPm.alwaysDisabled,
+        parentPm.neverVisible,
+        parentPm.visibleIfEnabled,
+        parentPm.visibleIfEnabledNo,
+        parentPm.visibleIfNotEmpty,
+        parentPm.visibleInEditableContext
     );
     
     PmAssert.assertVisible(
-        underTest.attrDefaultEnabledAndVisibleBehavior,
-        underTest.alwaysDisabled
+        parentPm.attrDefaultEnabledAndVisibleBehavior,
+        parentPm.alwaysDisabled
     );
     
     PmAssert.assertNotVisible(
-        underTest.neverVisible,
-        underTest.visibleIfEnabled,
-        underTest.visibleIfNotEmpty,
-        underTest.visibleInEditableContext
+        parentPm.neverVisible,
+        parentPm.visibleIfEnabled,
+        parentPm.visibleIfNotEmpty,
+        parentPm.visibleInEditableContext
     );
   }
 
   @Test
   public void testEditableParentPmBehavior() {
-    TestPm underTest = new TestPm();
-    underTest.isReadOnly = false;
+    parentPm.isReadOnly = false;
     
     PmAssert.assertEnabled(
-        underTest.attrDefaultEnabledAndVisibleBehavior,
-        underTest.neverVisible,
-        underTest.visibleIfEnabled,
-        underTest.visibleIfNotEmpty,
-        underTest.visibleInEditableContext
+        parentPm.attrDefaultEnabledAndVisibleBehavior,
+        parentPm.neverVisible,
+        parentPm.visibleIfEnabled,
+        parentPm.visibleIfNotEmpty,
+        parentPm.visibleInEditableContext
     );
     
     PmAssert.assertNotEnabled(
-        underTest.visibleIfEnabledNo,
-        underTest.alwaysDisabled
+        parentPm.visibleIfEnabledNo,
+        parentPm.alwaysDisabled
     );
     
     PmAssert.assertVisible(
-        underTest.attrDefaultEnabledAndVisibleBehavior,
-        underTest.visibleIfEnabled,
-        underTest.alwaysDisabled,
-        underTest.visibleInEditableContext
+        parentPm.attrDefaultEnabledAndVisibleBehavior,
+        parentPm.visibleIfEnabled,
+        parentPm.alwaysDisabled,
+        parentPm.visibleInEditableContext
     );
     
     PmAssert.assertNotVisible(
-        underTest.neverVisible,
-        underTest.visibleIfNotEmpty
+        parentPm.neverVisible,
+        parentPm.visibleIfNotEmpty
     );
     
   }
@@ -94,7 +91,7 @@ public class PmObjectCfgWithPmAttrsTest {
   }
 
   
-  private static class TestPm extends PmConversationImpl {
+  private static class HelperParentPm extends PmConversationImpl {
     private boolean isReadOnly = false;
     
     @Override

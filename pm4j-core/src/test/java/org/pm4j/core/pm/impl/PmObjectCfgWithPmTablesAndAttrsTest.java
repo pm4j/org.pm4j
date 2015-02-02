@@ -17,80 +17,75 @@ import org.pm4j.tools.test.PmAssert;
  */
 public class PmObjectCfgWithPmTablesAndAttrsTest {
 
+  HelperParentPm helperParentPm = new HelperParentPm();
+  
   @Test
   public void testAnnotatedEmptyTableVisibility() {
     // assign:
-    Test2Pm underTest = new Test2Pm();
-    underTest.tableNotVisibleIfEmpty.numberOfPmRows = 0L;
+    helperParentPm.tableNotVisibleIfEmpty.numberOfPmRows = 0L;
     
     // act & assert:
-    PmAssert.assertNotVisible(underTest.tableNotVisibleIfEmpty);
+    PmAssert.assertNotVisible(helperParentPm.tableNotVisibleIfEmpty);
   }
   
   @Test
   public void testAnnotatedNotEmptyTableVisibility() {
     // assign:
-    Test2Pm underTest = new Test2Pm();
-    underTest.tableNotVisibleIfEmpty.numberOfPmRows = 1L;
+    helperParentPm.tableNotVisibleIfEmpty.numberOfPmRows = 1L;
     
     // act & assert: 
-    PmAssert.assertVisible(underTest.tableNotVisibleIfEmpty);
+    PmAssert.assertVisible(helperParentPm.tableNotVisibleIfEmpty);
   }
   
   @Test
   public void testDefaultEmptyTableVisibility() {
     // assign:
-    Test2Pm underTest = new Test2Pm();
-    underTest.tableWithDefaultVisibility.numberOfPmRows = 0;
+    helperParentPm.tableWithDefaultVisibility.numberOfPmRows = 0;
     
     // act & assert:
-    PmAssert.assertVisible(underTest.tableWithDefaultVisibility);
+    PmAssert.assertVisible(helperParentPm.tableWithDefaultVisibility);
   }
   
   @Test
   public void testDefaultNotEmptyTableVisibility() {
     // assign:
-    Test2Pm underTest = new Test2Pm();
-    underTest.tableWithDefaultVisibility.numberOfPmRows = 0;
+    helperParentPm.tableWithDefaultVisibility.numberOfPmRows = 0;
     
     // act & assert:
-    PmAssert.assertVisible(underTest.tableWithDefaultVisibility);
+    PmAssert.assertVisible(helperParentPm.tableWithDefaultVisibility);
   }
   
   @Test
   public void testAnnotatedAndNotEmptyButSuperInvisible() {
     // assign:
-    Test2Pm underTest = new Test2Pm();
-    underTest.tableNotVisibleIfEmpty.numberOfPmRows = 1000;
-    underTest.tableNotVisibleIfEmpty.setPmVisible(false);
+    helperParentPm.tableNotVisibleIfEmpty.numberOfPmRows = 1000;
+    helperParentPm.tableNotVisibleIfEmpty.setPmVisible(false);
     
     // act & assert:
-    PmAssert.assertNotVisible(underTest.tableNotVisibleIfEmpty);
+    PmAssert.assertNotVisible(helperParentPm.tableNotVisibleIfEmpty);
   }
   
   @Test
   public void testPmShouldBeInvisibleAndDisabled() {
     // assign:
-    Test2Pm underTest = new Test2Pm();
-    underTest.isReadOnly = true;
+    helperParentPm.isReadOnly = true;
    
     // act & assert:
-    PmAssert.assertNotVisible(underTest.tableWithEditableAndVisibleInEditableCtx);
-    PmAssert.assertNotEnabled(underTest.tableWithEditableAndVisibleInEditableCtx);
+    PmAssert.assertNotVisible(helperParentPm.tableWithEditableAndVisibleInEditableCtx);
+    PmAssert.assertNotEnabled(helperParentPm.tableWithEditableAndVisibleInEditableCtx);
   }
   
   @Test
   public void testPmShouldBeEnabledAndVisible() {
     // assign:
-    Test2Pm underTest = new Test2Pm();
-    underTest.isReadOnly = false;
+    helperParentPm.isReadOnly = false;
    
     // act & assert:
-    PmAssert.assertVisible(underTest.tableWithEditableAndVisibleInEditableCtx);
-    PmAssert.assertEnabled(underTest.tableWithEditableAndVisibleInEditableCtx);
+    PmAssert.assertVisible(helperParentPm.tableWithEditableAndVisibleInEditableCtx);
+    PmAssert.assertEnabled(helperParentPm.tableWithEditableAndVisibleInEditableCtx);
   }
   
-  private static class Test2Pm extends PmConversationImpl {
+  private static class HelperParentPm extends PmConversationImpl {
     private boolean isReadOnly = false;
     
     @Override
