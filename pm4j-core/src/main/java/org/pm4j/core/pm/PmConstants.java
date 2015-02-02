@@ -69,5 +69,5 @@ public final class PmConstants {
    * @deprecated Please use {@link #MSGKEY_FIRST_MSG_PARAM}.
    */
   @Deprecated
-  public static final String MSGKEY_EXCEPTION                                = "pmException";
+  public static final String MSGKEY_EXCEPTION                                = MSGKEY_FIRST_MSG_PARAM;
 }

@@ -56,8 +56,8 @@ public class PmBean2Test {
     pm.setPmBean(new Bean("NewBean"));
     assertEquals("NewBean", pm.getPmBean().s);
 
-    PmCacheApi.clearPmCache(pm);
-    assertNull("The cached bean value disappears on observing an all-change event.", pm.getPmBean());
+    PmCacheApi.clearPmCache(pm, CacheKind.VALUE);
+    assertNull("The cached bean value disappears on clearing the value cache.", pm.getPmBean());
   }
 
   @Test
