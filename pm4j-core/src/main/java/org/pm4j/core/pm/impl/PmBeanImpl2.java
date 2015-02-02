@@ -31,6 +31,8 @@ import org.pm4j.core.pm.impl.pathresolver.PmExpressionPathResolver;
 /**
  * A PM that handles a bean.
  *
+ * It supports UI logic for the bean provided by {@link #getPmBean()}/{@link #getPmBeanImpl()}.
+ *
  * @param <T_BEAN> The backing bean type.
  *
  * @author Olaf Boede
@@ -179,7 +181,8 @@ public class PmBeanImpl2<T_BEAN>
     if (!md.valueCache.cacheStrategy.isCaching()) {
       throw new PmRuntimeException(this, "Unable to set a bean if the PmBean no caching is configured.\n" +
             "\tPlease check if your task may be solved by providing a getPmBeanImpl() implementation.\n" +
-            "\tIn some cased a permanent cache configuration @PmCacheCfg(@Cache(VALUE, clear=NEVER)) may be considered to support fix bean assignments.");
+            "\tIn some cases a permanent cache configuration @PmCacheCfg(@Cache(VALUE, clear=NEVER)) may be considered to support" +
+            " setter based bean assignments.");
     }
 
     md.valueCache.cacheStrategy.setAndReturnCachedValue(this, bean);

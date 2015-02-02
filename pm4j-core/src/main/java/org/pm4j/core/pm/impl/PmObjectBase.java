@@ -288,8 +288,7 @@ public abstract class PmObjectBase implements PmObject {
   /**
    * Override this method to define business logic driven enablement logic.
    *
-   * Be aware, that overriding this method may result in losing {@link PmObjectCfg}
-   * configuration, that might have been set.
+   * The default implementation considers the annotation {@link PmObjectCfg#enabled()}.
    *
    * @return <code>true</code> if the PM should be visible.
    */
