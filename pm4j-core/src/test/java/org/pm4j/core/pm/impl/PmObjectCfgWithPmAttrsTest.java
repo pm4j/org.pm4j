@@ -15,70 +15,70 @@ import org.pm4j.tools.test.PmAssert;
  * 
  */
 public class PmObjectCfgWithPmAttrsTest {
-  HelperParentPm parentPm = new HelperParentPm();
+  HelperParentPm pm = new HelperParentPm();
   
   @Test
   public void testVisibleIfNotEmpty() {
     
-    PmAssert.setValue(parentPm.visibleIfNotEmpty, "SOME VALUE");
-    PmAssert.assertVisible(parentPm.visibleIfNotEmpty);
+    PmAssert.setValue(pm.visibleIfNotEmpty, "SOME VALUE");
+    PmAssert.assertVisible(pm.visibleIfNotEmpty);
   }
   
   @Test
   public void testReadOnlyParentPmBehavior() {
     // assign
-    parentPm.isReadOnly = true;
+    pm.isReadOnly = true;
 
     PmAssert.assertNotEnabled(
-        parentPm.attrDefaultEnabledAndVisibleBehavior,
-        parentPm.alwaysDisabled,
-        parentPm.neverVisible,
-        parentPm.visibleIfEnabled,
-        parentPm.visibleIfEnabledNo,
-        parentPm.visibleIfNotEmpty,
-        parentPm.visibleInEditableContext
+        pm.attrDefaultEnabledAndVisibleBehavior,
+        pm.alwaysDisabled,
+        pm.neverVisible,
+        pm.visibleIfEnabled,
+        pm.visibleIfEnabledNo,
+        pm.visibleIfNotEmpty,
+        pm.visibleInEditableContext
     );
     
     PmAssert.assertVisible(
-        parentPm.attrDefaultEnabledAndVisibleBehavior,
-        parentPm.alwaysDisabled
+        pm.attrDefaultEnabledAndVisibleBehavior,
+        pm.alwaysDisabled
     );
     
     PmAssert.assertNotVisible(
-        parentPm.neverVisible,
-        parentPm.visibleIfEnabled,
-        parentPm.visibleIfNotEmpty,
-        parentPm.visibleInEditableContext
+        pm.neverVisible,
+        pm.visibleIfEnabled,
+        pm.visibleIfNotEmpty,
+        pm.visibleInEditableContext
     );
   }
 
   @Test
   public void testEditableParentPmBehavior() {
-    parentPm.isReadOnly = false;
+    pm.isReadOnly = false;
     
     PmAssert.assertEnabled(
-        parentPm.attrDefaultEnabledAndVisibleBehavior,
-        parentPm.neverVisible,
-        parentPm.visibleIfEnabled,
-        parentPm.visibleIfNotEmpty,
-        parentPm.visibleInEditableContext
+        pm.attrDefaultEnabledAndVisibleBehavior,
+        pm.neverVisible,
+        pm.visibleIfEnabled,
+        pm.visibleIfNotEmpty,
+        pm.visibleInEditableContext
     );
     
     PmAssert.assertNotEnabled(
-        parentPm.visibleIfEnabledNo,
-        parentPm.alwaysDisabled
+        pm.visibleIfEnabledNo,
+        pm.alwaysDisabled
     );
     
     PmAssert.assertVisible(
-        parentPm.attrDefaultEnabledAndVisibleBehavior,
-        parentPm.visibleIfEnabled,
-        parentPm.alwaysDisabled,
-        parentPm.visibleInEditableContext
+        pm.attrDefaultEnabledAndVisibleBehavior,
+        pm.visibleIfEnabled,
+        pm.alwaysDisabled,
+        pm.visibleInEditableContext
     );
     
     PmAssert.assertNotVisible(
-        parentPm.neverVisible,
-        parentPm.visibleIfNotEmpty
+        pm.neverVisible,
+        pm.visibleIfNotEmpty
     );
     
   }

@@ -16,21 +16,21 @@ import org.pm4j.tools.test.PmAssert;
  */
 public class PmObjectCfgWithPmBeanImplsTest {
 
-  private TestPm testPm = new TestPm();
+  private HelperParentPm pm = new HelperParentPm();
 
   @Test
   public void testBeanPmImplWithValue() {
-    PmAssert.assertNotVisible(testPm.pmBeanImpl);
+    PmAssert.assertNotVisible(pm.pmBeanImpl);
   }
 
   @Test
   public void testBeanPmImplWithoutValue() {
-    testPm.pmBeanImpl.setPmBean(new Bean());
+    pm.pmBeanImpl.setPmBean(new Bean());
 
-    PmAssert.assertVisible(testPm.pmBeanImpl);
+    PmAssert.assertVisible(pm.pmBeanImpl);
   }
 
-  private static class TestPm extends PmConversationImpl {
+  private static class HelperParentPm extends PmConversationImpl {
     
     @PmBeanCfg(beanClass = Bean.class)
     @PmObjectCfg(visible = Visible.IF_NOT_EMPTY)

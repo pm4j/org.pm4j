@@ -17,72 +17,72 @@ import org.pm4j.tools.test.PmAssert;
  */
 public class PmObjectCfgWithPmTablesAndAttrsTest {
 
-  HelperParentPm helperParentPm = new HelperParentPm();
+  HelperParentPm pm = new HelperParentPm();
   
   @Test
   public void testAnnotatedEmptyTableVisibility() {
     // assign:
-    helperParentPm.tableNotVisibleIfEmpty.numberOfPmRows = 0L;
+    pm.tableNotVisibleIfEmpty.numberOfPmRows = 0L;
     
     // act & assert:
-    PmAssert.assertNotVisible(helperParentPm.tableNotVisibleIfEmpty);
+    PmAssert.assertNotVisible(pm.tableNotVisibleIfEmpty);
   }
   
   @Test
   public void testAnnotatedNotEmptyTableVisibility() {
     // assign:
-    helperParentPm.tableNotVisibleIfEmpty.numberOfPmRows = 1L;
+    pm.tableNotVisibleIfEmpty.numberOfPmRows = 1L;
     
     // act & assert: 
-    PmAssert.assertVisible(helperParentPm.tableNotVisibleIfEmpty);
+    PmAssert.assertVisible(pm.tableNotVisibleIfEmpty);
   }
   
   @Test
   public void testDefaultEmptyTableVisibility() {
     // assign:
-    helperParentPm.tableWithDefaultVisibility.numberOfPmRows = 0;
+    pm.tableWithDefaultVisibility.numberOfPmRows = 0;
     
     // act & assert:
-    PmAssert.assertVisible(helperParentPm.tableWithDefaultVisibility);
+    PmAssert.assertVisible(pm.tableWithDefaultVisibility);
   }
   
   @Test
   public void testDefaultNotEmptyTableVisibility() {
     // assign:
-    helperParentPm.tableWithDefaultVisibility.numberOfPmRows = 0;
+    pm.tableWithDefaultVisibility.numberOfPmRows = 0;
     
     // act & assert:
-    PmAssert.assertVisible(helperParentPm.tableWithDefaultVisibility);
+    PmAssert.assertVisible(pm.tableWithDefaultVisibility);
   }
   
   @Test
   public void testAnnotatedAndNotEmptyButSuperInvisible() {
     // assign:
-    helperParentPm.tableNotVisibleIfEmpty.numberOfPmRows = 1000;
-    helperParentPm.tableNotVisibleIfEmpty.setPmVisible(false);
+    pm.tableNotVisibleIfEmpty.numberOfPmRows = 1000;
+    pm.tableNotVisibleIfEmpty.setPmVisible(false);
     
     // act & assert:
-    PmAssert.assertNotVisible(helperParentPm.tableNotVisibleIfEmpty);
+    PmAssert.assertNotVisible(pm.tableNotVisibleIfEmpty);
   }
   
   @Test
   public void testPmShouldBeInvisibleAndDisabled() {
     // assign:
-    helperParentPm.isReadOnly = true;
+    pm.isReadOnly = true;
    
     // act & assert:
-    PmAssert.assertNotVisible(helperParentPm.tableWithEditableAndVisibleInEditableCtx);
-    PmAssert.assertNotEnabled(helperParentPm.tableWithEditableAndVisibleInEditableCtx);
+    PmAssert.assertNotVisible(pm.tableWithEditableAndVisibleInEditableCtx);
+    PmAssert.assertNotEnabled(pm.tableWithEditableAndVisibleInEditableCtx);
   }
   
   @Test
   public void testPmShouldBeEnabledAndVisible() {
     // assign:
-    helperParentPm.isReadOnly = false;
+    pm.isReadOnly = false;
    
     // act & assert:
-    PmAssert.assertVisible(helperParentPm.tableWithEditableAndVisibleInEditableCtx);
-    PmAssert.assertEnabled(helperParentPm.tableWithEditableAndVisibleInEditableCtx);
+    PmAssert.assertVisible(pm.tableWithEditableAndVisibleInEditableCtx);
+    PmAssert.assertEnabled(pm.tableWithEditableAndVisibleInEditableCtx);
   }
   
   private static class HelperParentPm extends PmConversationImpl {
