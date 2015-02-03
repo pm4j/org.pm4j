@@ -15,15 +15,19 @@ import org.pm4j.core.pm.impl.PmUtil;
 
 /**
  * API to deal with messages.
- * 
+ *
  * @author sdolke
- * 
+ *
  */
 public class PmMessageApi {
 
   /**
-   * Generates a message and propagates it to the PM conversation.
-   * 
+   * Generates a message for the given PM.
+   * <p>
+   * Existing messages for a PM or a PM tree may be retrieved using {@link #getMessages(PmObject)} or {@link #getPmTreeMessages(PmObject, Severity)}.
+   *
+   * @param pm
+   *          The PM to generate the message for.
    * @param severity
    *          Message severity.
    * @param key
@@ -39,6 +43,23 @@ public class PmMessageApi {
   }
 
   /**
+   * Generates  a message using a simple message string.
+   * <p>
+   * Existing messages for a PM or a PM tree may be retrieved using {@link #getMessages(PmObject)} or {@link #getPmTreeMessages(PmObject, Severity)}.
+   *
+   * @param pm
+   *          The PM to generate the message for.
+   * @param severity
+   *          Message severity.
+   * @param msgString
+   *          The message string to display.
+   * @return The generated message.
+   */
+  public static PmMessage addStringMessage(PmObject pm, Severity severity, String msgString) {
+    return addMessage(pm, severity, PmConstants.MSGKEY_FIRST_MSG_PARAM, msgString);
+  }
+
+  /**
    * Generates a warning that indicates that a required value is not provided.
    * <p>
    * For attributes with options the resource
@@ -49,7 +70,7 @@ public class PmMessageApi {
    * When a custom resource key with the postfix
    * {@link #RESKEY_POSTFIX_REQUIRED_MSG} is provided, that key will be used for
    * message generation.
-   * 
+   *
    * @return The resource data for the required attribute value warning.
    */
   public static PmResourceData makeRequiredMessageResData(PmAttr<?> pm) {
@@ -96,7 +117,7 @@ public class PmMessageApi {
    * <p>
    * Any invalid attribute values within the PM scope are also cleaned by
    * cleaning the corresponding error messages.
-   * 
+   *
    * @return All messages that are related to this presentation model.<br>
    *         In case of no messages an empty collection.
    */
@@ -113,7 +134,7 @@ public class PmMessageApi {
 
   /**
    * Provides the messages of a PM sub tree.
-   * 
+   *
    * @param pm
    *          Root of the PM sub tree to check.
    * @param minSeverity

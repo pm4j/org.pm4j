@@ -51,6 +51,7 @@ public @interface PmAttrCfg {
 
   /**
    * Scenarios for hiding an element.
+   * @deprecated Please use {@link PmObjectCfg#visible()}.
    */
   public static enum HideIf {
     /**
@@ -81,7 +82,9 @@ public @interface PmAttrCfg {
 
   /**
    * @return List of attribute value scenarios where to hide.
+   * @deprecated Please use {@link PmObjectCfg#visible()}
    */
+  @Deprecated
   HideIf[] hideIf() default {};
 
 

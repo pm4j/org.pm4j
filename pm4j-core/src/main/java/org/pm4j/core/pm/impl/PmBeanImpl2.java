@@ -19,6 +19,7 @@ import org.pm4j.core.pm.annotation.PmBoolean;
 import org.pm4j.core.pm.annotation.PmCacheCfg2;
 import org.pm4j.core.pm.annotation.PmCacheCfg2.Cache;
 import org.pm4j.core.pm.annotation.PmCacheCfg2.CacheMode;
+import org.pm4j.core.pm.annotation.PmObjectCfg.Visible;
 import org.pm4j.core.pm.annotation.PmValidationCfg;
 import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
@@ -29,6 +30,8 @@ import org.pm4j.core.pm.impl.pathresolver.PmExpressionPathResolver;
 
 /**
  * A PM that handles a bean.
+ *
+ * It supports UI logic for the bean provided by {@link #getPmBean()}/{@link #getPmBeanImpl()}.
  *
  * @param <T_BEAN> The backing bean type.
  *
@@ -41,8 +44,11 @@ public class PmBeanImpl2<T_BEAN>
   /** A cached data object behind this PM. */
   /* package */ T_BEAN pmBeanCache;
 
+  /** Used to prevent clearing the cached within a setValue operation immediately. */
+  private transient boolean pmBeanInSetValueOperation = false;
+
   /**
-   * Default constructor for PmBeans used in factories.
+   * Default constructor for PmBeans used in factories. E.g. table row PMs.
    */
   public PmBeanImpl2() {
     this(null);
@@ -140,10 +146,16 @@ public class PmBeanImpl2<T_BEAN>
    */
   @Override
   public void setPmBean(T_BEAN bean) {
-    if (doSetPmBean(bean)) {
-      int changeFlags = (bean != null) ? 0 : PmEvent.VALUE_CHANGE_TO_NULL;
-      BroadcastPmEventProcessor.broadcastAllChangeEvent(this, changeFlags);
+    try {
+      pmBeanInSetValueOperation = true;
+      if (doSetPmBean(bean)) {
+        int changeFlags = (bean != null) ? 0 : PmEvent.VALUE_CHANGE_TO_NULL;
+        BroadcastPmEventProcessor.broadcastAllChangeEvent(this, changeFlags);
+      }
+    } finally {
+      pmBeanInSetValueOperation = false;
     }
+
   }
 
   /**
@@ -155,8 +167,13 @@ public class PmBeanImpl2<T_BEAN>
    */
   @Override
   public void reloadPmBean(T_BEAN reloadedBean) {
-    doSetPmBean(reloadedBean);
-    BroadcastPmEventProcessor.broadcastAllChangeEvent(this, PmEvent.RELOAD);
+    try {
+      pmBeanInSetValueOperation = true;
+      doSetPmBean(reloadedBean);
+      BroadcastPmEventProcessor.broadcastAllChangeEvent(this, PmEvent.RELOAD);
+    } finally {
+      pmBeanInSetValueOperation = false;
+    }
   }
 
   boolean doSetPmBean(T_BEAN bean) {
@@ -178,7 +195,8 @@ public class PmBeanImpl2<T_BEAN>
     if (!md.valueCache.cacheStrategy.isCaching()) {
       throw new PmRuntimeException(this, "Unable to set a bean if the PmBean no caching is configured.\n" +
             "\tPlease check if your task may be solved by providing a getPmBeanImpl() implementation.\n" +
-            "\tIn some cased a permanent cache configuration @PmCacheCfg(@Cache(VALUE, clear=NEVER)) may be considered to support fix bean assignments.");
+            "\tIn some cases a value cache configuration @PmCacheCfg(@Cache(VALUE)) may be considered to support" +
+            " setter based bean assignments.");
     }
 
     md.valueCache.cacheStrategy.setAndReturnCachedValue(this, bean);
@@ -187,7 +205,7 @@ public class PmBeanImpl2<T_BEAN>
     if (newCurrentBean != bean) {
       throw new PmRuntimeException(this, "The set operation was not successful. A get-call does not provide the assigned instance.\n" +
           "\tPlease check if your task may be solved by providing a getPmBeanImpl() implementation.\n" +
-          "\tIn some cased a permanent cache configuration @PmCacheCfg(@Cache(VALUE, clear=NEVER)) may be considered to support fix bean assignments." +
+          "\tIn some cased a value cache configuration @PmCacheCfg(@Cache(VALUE)) may be considered to support bean assignments." +
           "\tInstance used as setPmBean parameter: " + bean +
           "\tInstance provided by get (after set): " + newCurrentBean);
     }
@@ -210,7 +228,8 @@ public class PmBeanImpl2<T_BEAN>
     if (pmInitState != PmInitState.INITIALIZED)
       return;
     super.clearCachedPmValues(cacheSet);
-    if (cacheSet.contains(PmCacheApi.CacheKind.VALUE)) {
+    if (cacheSet.contains(PmCacheApi.CacheKind.VALUE) &&
+        !pmBeanInSetValueOperation) {
       getOwnMetaData().valueCache.cacheStrategy.clear(this);
     }
   }
@@ -230,6 +249,15 @@ public class PmBeanImpl2<T_BEAN>
   protected boolean isPmReadonlyImpl() {
     return !hasPmBean() ||
            super.isPmReadonlyImpl();
+  }
+
+  @Override
+  protected boolean isPmVisibleImpl() {
+    boolean visible = super.isPmVisibleImpl();
+    if (visible && (getOwnMetaData().getVisibilityCfg() == Visible.IF_NOT_EMPTY)) {
+      visible = getPmBean() != null;
+    }
+    return visible;
   }
 
   /**

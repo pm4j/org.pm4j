@@ -16,6 +16,7 @@ import org.pm4j.core.pm.PmMessage.Severity;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmBeanCfg;
 import org.pm4j.core.pm.annotation.PmBoolean;
+import org.pm4j.core.pm.annotation.PmObjectCfg.Visible;
 import org.pm4j.core.pm.annotation.PmValidationCfg;
 import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.api.PmExpressionApi;
@@ -220,6 +221,15 @@ public class PmBeanBase<T_BEAN>
   protected boolean isPmReadonlyImpl() {
     return (getPmBean() == null) ||
            super.isPmReadonlyImpl();
+  }
+
+  @Override
+  protected boolean isPmVisibleImpl() {
+    boolean visible = super.isPmVisibleImpl();
+    if (visible && (getOwnMetaData().getVisibilityCfg() == Visible.IF_NOT_EMPTY)) {
+      visible = getPmBean() != null;
+    }
+    return visible;
   }
 
   /**

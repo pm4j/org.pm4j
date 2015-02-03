@@ -1,17 +1,14 @@
 package org.pm4j.core.pm.impl;
 
-import static junit.framework.Assert.assertNull;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmAttrString;
 import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmObject;
-import org.pm4j.core.pm.annotation.PmCacheCfg;
-import org.pm4j.core.pm.annotation.PmCacheCfg.CacheMode;
 import org.pm4j.core.pm.annotation.PmCacheCfg2;
 import org.pm4j.core.pm.annotation.PmCacheCfg2.Cache;
 import org.pm4j.core.pm.annotation.PmCacheCfg2.Clear;
@@ -53,14 +50,14 @@ public class PmBean2Test {
     assertEquals(2, pm.callCount_getPmBeanImpl);
   }
 
-  // TODO oboede: should we allow that without fixing the cache forever?
-  //@Test(expected=PmRuntimeException.class)
+  @Test
   public void assignBeanToCachedPmBean() {
     TestPmBase pm = new TestPmCached();
     pm.setPmBean(new Bean("NewBean"));
     assertEquals("NewBean", pm.getPmBean().s);
-    PmEventApi.broadcastPmEvent(pm, PmEvent.ALL_CHANGE_EVENTS);
-    assertEquals("NewBean", pm.getPmBean().s);
+
+    PmCacheApi.clearPmCache(pm, CacheKind.VALUE);
+    assertNull("The cached bean value disappears on clearing the value cache.", pm.getPmBean());
   }
 
   @Test

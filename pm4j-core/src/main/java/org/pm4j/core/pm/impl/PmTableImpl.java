@@ -56,6 +56,7 @@ import org.pm4j.core.pm.PmTable;
 import org.pm4j.core.pm.PmTableCol;
 import org.pm4j.core.pm.annotation.PmCacheCfg;
 import org.pm4j.core.pm.annotation.PmCacheCfg.CacheMode;
+import org.pm4j.core.pm.annotation.PmObjectCfg.Visible;
 import org.pm4j.core.pm.annotation.PmTableCfg;
 import org.pm4j.core.pm.annotation.PmTableCfg.RowsToValidate;
 import org.pm4j.core.pm.api.PmCacheApi;
@@ -167,6 +168,19 @@ public class PmTableImpl
       // are no longer valid.
       updatePmTable();
     }
+  }
+  
+  @Override
+  protected boolean isPmVisibleImpl() {
+    if(!super.isPmVisibleImpl()) {
+      return false;
+    }
+    
+    if(getOwnMetaData().getVisibilityCfg() == Visible.IF_NOT_EMPTY) {
+      return getTotalNumOfPmRows() > 0;
+    }
+    
+    return true;
   }
 
   @Override

@@ -60,7 +60,8 @@ public interface PmTable<T_ROW_PM> extends PmObject, PmDataInput {
   int getNumOfPageRows();
 
   /**
-   * @return The total size of the un-filtered row set behind this table PM.
+   * @return The total number of row set behind this table PM.<br>
+   *         In case of active filters it provides the number of rows after applying the filter.
    */
   long getTotalNumOfPmRows();
 
