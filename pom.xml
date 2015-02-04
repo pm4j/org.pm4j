@@ -51,6 +51,7 @@
   <modules>
     <module>pm4j-common</module>
     <module>pm4j-core</module>
+    <module>pm4j-testtools</module>
     <module>pm4j-core-sample</module>
     <module>pm4j-facelets</module>
     <module>pm4j-deprecated</module>
