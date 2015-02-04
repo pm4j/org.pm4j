@@ -5,11 +5,26 @@
 :lang: en
 :encoding: iso-8859-1
 
-== What is the feature used for ==
+== Purpose of the component ==
 
-PmCommand is an interface to execute actions for e.g. buttons, links or menu entries.
+PmCommand models support UI logic for view components triggering actions. E.g. buttons, links or menu entries.
 
 == Usage of PmCommand objects ==
+
+=== Relevant classes and interfaces ===
+
+==== Core interfaces and classes ====
+
+* _PmCommand_ - external interface for views
+* _PmCommandImpl_ - a basic command logic implementation
+
+==== Specialized command classes ====
+
+* _PmCommandDecorator_ - interface for command execution interceptors
+* _PmCommandProxy_ - fix commands that may delegate requests to a registered executing command. +
+  Example use case: A fix toolbars that delegating calls to actual context specific real commands.
+
+== PmCommand usage ==
 
 In this chapter we will describe how a framework user can add a new command element. An example for that will be the usage of a button command element.  
 
@@ -17,47 +32,27 @@ In this chapter we will describe how a framework user can add a new command elem
 
 To use a new command element you have to add the ui element (e.g. commandButton) into the xhtml file and corresponding PmCommand object into the related java implementation.
 
-1. XHTML file:
+1. Java code:
 [source]
-<ui:define name="content">
-	...
-		<base:commandButton pm="#{pm.button}" />
-	...
-</ui:define>
+public final PmCommand cmdSave = new PmCommandImpl(this);
 
-1. Java class:
+1. View (e.g. JSF)
 [source]
-public final PmCommand button = new PmCommandImpl(this) {
-};
+<pmtags:commandButton pm="#{pm.cmdSave}" />
 
-=== Performing an action ===
+=== Defining an action ===
 
-To implement the necessary actions to execute you just have to override the doItImpl method.
+To implement the necessary actions to execute you just have to override the _doItImpl()_ method.
 
 [source]
 @Override
-protected void doItImpl() throws Exception {
-};
+protected void doItImpl() {
+  // ... some UI logic code
+}
 
-Example for a simple action:
 
-[source]
-------------------------------------------------------------------------
-@PmTitleCfg(title = "Save")
-public final PmCommand add = new PmCommandImpl(this) {
-
-    @Override
-    protected void doItImpl() throws Exception { // Perform an action
-        Person person = new Person();
-
-        person.setFirstname(firstname.getValue());
-        person.setLastname(lastname.getValue());
-
-        persons.add(person);
-    }
-};
-------------------------------------------------------------------------
-
+// OBO: Den Validierungsblock würde ich weglassen. Die Doku sollte sich auf beforeDo und afterDo beschränken.
+// die validate() Methode ist m.E. durchaus ein Löschkandidat.
 === Validation of a PM area ===
 
 The validation of a command element is automatically called before executing the command. The default implementation of PMCommand 
@@ -100,9 +95,9 @@ This means that you will loose all inherited validation actions like checking co
 With the PmCommandCfg you have the possibility to change the default behaviour of the PmCommand object. This means that you can configure for example 
 the behaviour before or after executing the command.
 
-==== BeforeDo ====
+==== beforeDo ====
 
-The beforeDo paramter defines what should be done before executing the command logic, whereat the following actions are possible:
+The _beforeDo_ paramter defines what should be done before executing the command logic, whereat the following actions are possible:
 
 * VALIDATE: This call validates the entered data of the containing PmDataInput objects (see Validation of a PM area [HIER LINK SETZEN!]). The doItImpl method of the command 
 will only be executed if the validation was successful.
@@ -111,16 +106,18 @@ will also be cleared. The doItImpl method of the command will be executed regard
 * DO_NOTHING: Does not care about existing (error-) messages and does not clear any of these messages before it gets executed.
 * DEFAULT: The definition, defined in the project specific PmDefaults will be used. The default implementation is VALIDATE.
 
-==== AfterDo ====
+==== afterDo ====
 
-The afterDo parameter defines what should be done after executing the command logic, whereat the following actions are possible:
+The _afterDo_ parameter defines what should be done after executing the command logic, whereat the following actions are possible:
 
 * RESET_VALUE_CHANGED_STATE: Resets the value change state of the pm that is used as validation root.
 * CLEAR_CACHES: Clears the caches of all pm's along the path to the root pm. 
 * DO_NOTHING: Does not executes any special operation in the after do method of the command.
 * DEFAULT: The default logic is to execute CLEAR_CACHES and if VALIDATE is set for the beforeDo action also RESET_VALUE_CHANGED_STATE.
 
-==== CmdKind ====
+==== cmdKind ====
+
+The various roles of a commands in toolbars and command menus are supported by a CmdKind enum indicator.  
 
 The default value is COMMAND.
 
@@ -129,36 +126,55 @@ This way an executeable command may also act as command group.
 * GROUP: A pure organizational structure of commands.
 * SEPARATOR: A separator between command sections of a command list.
 
-==== HideWhenNotEnabled ====
+// OBO: will be deprecated.
+==== hideWhenNotEnabled ====
 
 * If true, the command should be hidden when not applicable. The default value is false.
 
-==== ClearCaches ====
+==== clearCaches ====
 
 *  Defines the caches to clear within the element context of this command. The default value is an empty array, which means that there is nothing to clear.
 
 === Navigate to another view ===
+
+//OBO: HotLinkCommandPm is not available in pm4j. - I just detected it, and it's a candidate for removal. - A view adapter should do what's defined there.
 
 To navigate to another view you can use the HotLinkCommandPm. Here you have to override the getNaviLinkImpl to return a NaviLink object, 
 that contains the information about the target to navigate to. Optional it is also possible to add some parameters.
 
 [source]
 ------------------------------------------------------------------------
-@PmTitleCfg(title = "Show All")
-public final PmCommand cmdShowAll = new HotLinkCommandPm(this) {
+public final PmCommand cmdNavigateToFixTarget = new PmCommandImpl(this, new NaviLinkImpl("/page/someDialog.iface"));
+
+public final PmCommand cmdNavigateToCalculatedTarget = new PmCommandImpl(this);
 
     @Override
     protected NaviLink getNaviLinkImpl() {
+		String page = someCondition() ? "targetPage1" : "targetPage2";
+		
         // Path to the requested component
-        NaviLinkImpl naviLink = new NaviLinkImpl( "/page/someDialog.iface" );
+        NaviLinkImpl naviLink = new NaviLinkImpl(page);
         
         naviLink.addParam("name", "value");
         // ... more parameter ...
-
         return naviLink;
     }
 };
+
+public final PmCommand cmdThatOnlySometimesNavigates = new PmCommandImpl(this);
+
+    @Override
+    protected void doItImpl() {
+        // .. some logic
+		if (verySpecialCondition()) {
+		   setNaviLink(new NaviLinkImpl("specialConditionHandlingPage");
+		}
+    }
+};
+
 ------------------------------------------------------------------------
+
+// OBO: should be moved to the Globe specific hotlink docu.
 
 You can read these parameter in the target object like this:
 
@@ -212,36 +228,19 @@ you are also able to check the content of the validation messages, so that you c
 
 [source]
 ------------------------------------------------------------------------
-public class MyViewPmTest {
+public class MyFormPmTest {
 
-    private MyViewPm view = new MyViewPm();
+	// OBO: Views and PMs are different concepts.
+    private MyFormPm form = new MyFormPm();
 
-    @Before
-    public void setUp() {
-        AppDlgAssert.initTestPm(view);                                     (1)
+	public void testSaveValidValues() {
+		PmAssert.setValue(form.requiredAttr, "My Value");
+		PmAssert.doIt(form.cmdSave);
     }
 	
-	public void testMyCommand() {
-        cmd.myAttribute.setValue("My Value");                              (4)
-	
-        PmCommand cmd = (PmCommandImpl) view.myCommand.doIt();             (2)
-		
-		CommandState commandState = cmd.getCommandState();
-        assertEquals(CommandState.EXECUTED, commandState);                 (3)
-		
-		...
-    }
-	
-	public void testShouldFail() {
-	    PmCommand cmd = (PmCommandImpl) view.myCommand.doIt();
-		
-        CommandState commandState = cmd.getCommandState();
-        assertEquals(CommandState.BEFORE_DO_RETURNED_FALSE, commandState); (5)
-
-        // Validation messages
-        List<PmMessage> validationScopeErrors = 
-            PmMessageApi.getPmTreeMessages(dialog, Severity.ERROR);        (6)
-        ...
+	public void testSaveWithoutRequiredValueShouldFail() {
+		PmAssert.doIt(form.cmdSave, CommandState.FAILED);
+		PmAssert.assertMessage(form, Severity.ERROR, "Please enter a valid value in 'required attr'");
     }
 }
 ------------------------------------------------------------------------
