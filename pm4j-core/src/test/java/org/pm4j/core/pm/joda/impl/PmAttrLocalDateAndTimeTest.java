@@ -2,12 +2,12 @@ package org.pm4j.core.pm.joda.impl;
 
 import static junit.framework.Assert.assertFalse;
 import static org.junit.Assert.assertEquals;
-import static org.pm4j.tools.test.PmAssert.assertNotRequired;
-import static org.pm4j.tools.test.PmAssert.assertRequired;
-import static org.pm4j.tools.test.PmAssert.setValue;
-import static org.pm4j.tools.test.PmAssert.setValueAsString;
-import static org.pm4j.tools.test.PmAssert.validateNotSuccessful;
-import static org.pm4j.tools.test.PmAssert.validateSuccessful;
+import static org.pm4j.tools.test._PmAssert.assertNotRequired;
+import static org.pm4j.tools.test._PmAssert.assertRequired;
+import static org.pm4j.tools.test._PmAssert.setValue;
+import static org.pm4j.tools.test._PmAssert.setValueAsString;
+import static org.pm4j.tools.test._PmAssert.validateNotSuccessful;
+import static org.pm4j.tools.test._PmAssert.validateSuccessful;
 
 import java.util.Locale;
 

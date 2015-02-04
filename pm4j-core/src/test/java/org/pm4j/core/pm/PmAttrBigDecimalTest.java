@@ -15,7 +15,7 @@ import org.pm4j.core.pm.annotation.PmAttrBigDecimalCfg;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.impl.PmAttrBigDecimalImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
-import org.pm4j.tools.test.PmAssert;
+import org.pm4j.tools.test._PmAssert;
 
 /**
  * If you modify this test, please consider at least {@link PmAttrDoubleTest}.
@@ -51,11 +51,11 @@ public class PmAttrBigDecimalTest {
 
     //Validate too short
     myPm.minLen2.setValue(new BigDecimal("1"));
-    PmAssert.validateNotSuccessful(myPm.minLen2, "Please enter at least 2 characters in field \"pmAttrBigDecimalTest.MyPm.minLen2\".");
+    _PmAssert.validateNotSuccessful(myPm.minLen2, "Please enter at least 2 characters in field \"pmAttrBigDecimalTest.MyPm.minLen2\".");
 
     //Validate correct
     myPm.minLen2.setValue(new BigDecimal("12"));
-    PmAssert.validateSuccessful(myPm.minLen2);
+    _PmAssert.validateSuccessful(myPm.minLen2);
   }
 
   public void testMaxLength() {
@@ -65,11 +65,11 @@ public class PmAttrBigDecimalTest {
 
     //Validate too big
     myPm.maxLen6.setValue(new BigDecimal("1234567"));
-    PmAssert.validateNotSuccessful(myPm.maxLen6, "Please enter maximal 6 characters in field \"pmAttrBigDecimalTest.MyPm.maxLen6\".");
+    _PmAssert.validateNotSuccessful(myPm.maxLen6, "Please enter maximal 6 characters in field \"pmAttrBigDecimalTest.MyPm.maxLen6\".");
 
     //Validate correct
     myPm.maxLen6.setValue(new BigDecimal("123456"));
-    PmAssert.validateSuccessful(myPm.maxLen6);
+    _PmAssert.validateSuccessful(myPm.maxLen6);
   }
 
 
@@ -166,7 +166,7 @@ public class PmAttrBigDecimalTest {
     // the 0.005 will be rounded because of the format and rounding mode
     assertEquals("Should not have been changed", "1.005", myPm.roundingUnnecessary.getValueAsString());
     assertEquals("Should be null", null, myPm.roundingUnnecessary.getValue());
-    PmAssert.assertSingleErrorMessage(myPm.roundingUnnecessary, "Unable to convert the entered string to a numeric value in field \"1.005\".");
+    _PmAssert.assertSingleErrorMessage(myPm.roundingUnnecessary, "Unable to convert the entered string to a numeric value in field \"1.005\".");
   }
 
   @Test

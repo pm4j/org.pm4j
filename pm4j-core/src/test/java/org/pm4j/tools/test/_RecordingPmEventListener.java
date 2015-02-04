@@ -13,7 +13,7 @@ import org.pm4j.core.pm.PmEventListener;
  *
  * @author Olaf Boede
  */
-public class RecordingPmEventListener implements PmEventListener {
+public class _RecordingPmEventListener implements PmEventListener {
   private List<PmEvent> receivedEvents = new ArrayList<PmEvent>();
 
   @Override

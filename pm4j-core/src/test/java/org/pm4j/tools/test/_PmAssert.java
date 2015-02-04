@@ -27,9 +27,9 @@ import org.pm4j.core.pm.impl.PmUtil;
  *
  * @author olaf boede
  */
-public class PmAssert {
+public class _PmAssert {
 
-    private PmAssert() {
+    private _PmAssert() {
     }
 
     /**
@@ -173,7 +173,7 @@ public class PmAssert {
      *            The root PM of the subtree to check the messages for.
      * @param expectedMsgInSubtree
      *            The expected message text in rootPm or any of its sub-PMs.
-     * @deprecated Please use {@link PmAssert.assertMessageText(PmObject rootPm, Severity
+     * @deprecated Please use {@link _PmAssert.assertMessageText(PmObject rootPm, Severity
      *             minSeverity, String... expectedMessages)} instead.
      */
     @Deprecated

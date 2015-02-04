@@ -3,8 +3,8 @@ package org.pm4j.core.pm.joda.impl;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
-import static org.pm4j.tools.test.PmAssert.assertSingleErrorMessage;
-import static org.pm4j.tools.test.PmAssert.setValueAsString;
+import static org.pm4j.tools.test._PmAssert.assertSingleErrorMessage;
+import static org.pm4j.tools.test._PmAssert.setValueAsString;
 
 import java.util.Locale;
 import java.util.TimeZone;
@@ -16,7 +16,7 @@ import org.pm4j.common.converter.value.joda.LocalDateTimeTimeZoneConverter;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.annotation.PmTitleCfg;
 import org.pm4j.core.pm.impl.PmConversationImpl;
-import org.pm4j.tools.test.PmAssert;
+import org.pm4j.tools.test._PmAssert;
 
 /**
  * Test for {@link PmAttrLocalDateTimeImpl}.
@@ -43,13 +43,13 @@ public class PmAttrLocalDateTimeImplTest {
 
   @Test
   public void parseSuccess() {
-    PmAssert.setValueAsString(testPm.dateTime, "29/05/2012 10:00");
+    _PmAssert.setValueAsString(testPm.dateTime, "29/05/2012 10:00");
   }
 
   @Test
   public void testBeanValueConversion() {
     LocalDateTime localDate = new LocalDateTime(2012, 6, 6, 10, 0);
-    PmAssert.setValue(testPm.dateTime, localDate);
+    _PmAssert.setValue(testPm.dateTime, localDate);
     assertTrue(testPm.dateTime.isPmValid());
     assertEquals("06/06/2012 10:00", testPm.dateTime.getValueAsString());
     assertEquals(localDate, testPm.dateTime.getBackingValue());

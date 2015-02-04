@@ -3,8 +3,8 @@ package org.pm4j.core.pm.joda.impl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.pm4j.tools.test.PmAssert.assertMessage;
-import static org.pm4j.tools.test.PmAssert.setValueAsString;
+import static org.pm4j.tools.test._PmAssert.assertMessage;
+import static org.pm4j.tools.test._PmAssert.setValueAsString;
 
 import java.util.Locale;
 import java.util.TimeZone;
@@ -18,7 +18,7 @@ import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.annotation.PmTitleCfg;
 import org.pm4j.core.pm.impl.PmConversationImpl;
 import org.pm4j.core.pm.joda.PmAttrLocalTime;
-import org.pm4j.tools.test.PmAssert;
+import org.pm4j.tools.test._PmAssert;
 
 /**
  * Test for {@link PmAttrLocalTime}.
@@ -51,7 +51,7 @@ public class PmAttrLocalTimeTest {
   @Test
   public void testBeanValueConversion() {
     LocalTime localDate = new LocalTime(10, 0);
-    PmAssert.setValue(testPm.time, localDate);
+    _PmAssert.setValue(testPm.time, localDate);
     assertTrue(testPm.time.isPmValid());
     assertEquals("10:00", testPm.time.getValueAsString());
     assertEquals(localDate, testPm.time.getBackingValue());

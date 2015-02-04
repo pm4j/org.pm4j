@@ -1,7 +1,7 @@
 package org.pm4j.core.pm;
 
 import static org.junit.Assert.assertEquals;
-import static org.pm4j.tools.test.PmAssert.setValue;
+import static org.pm4j.tools.test._PmAssert.setValue;
 
 import java.util.ArrayList;
 import java.util.Arrays;

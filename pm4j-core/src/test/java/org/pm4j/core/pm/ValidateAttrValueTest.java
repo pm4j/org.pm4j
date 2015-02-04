@@ -4,8 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO.VALIDATE;
-import static org.pm4j.tools.test.PmAssert.assertNoMessagesInSubTree;
-import static org.pm4j.tools.test.PmAssert.assertSingleErrorMessage;
+import static org.pm4j.tools.test._PmAssert.assertNoMessagesInSubTree;
+import static org.pm4j.tools.test._PmAssert.assertSingleErrorMessage;
 
 import java.util.Locale;
 

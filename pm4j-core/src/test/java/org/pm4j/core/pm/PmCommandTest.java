@@ -1,6 +1,6 @@
 package org.pm4j.core.pm;
 
-import static org.pm4j.tools.test.PmAssert.doIt;
+import static org.pm4j.tools.test._PmAssert.doIt;
 
 import org.junit.Test;
 import org.pm4j.core.pm.PmCommand.CommandState;

@@ -9,7 +9,7 @@ import org.pm4j.core.pm.impl.PmAttrIntegerImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
 import org.pm4j.core.pm.impl.PmElementImpl;
 import org.pm4j.core.pm.impl.PmInitApi;
-import org.pm4j.tools.test.PmAssert;
+import org.pm4j.tools.test._PmAssert;
 
 public class PmAttrValidationTest {
 
@@ -17,13 +17,13 @@ public class PmAttrValidationTest {
 
   @Test
   public void testValidateVisibleAttr() {
-    PmAssert.validateNotSuccessful(pm, "Please enter a value into \"Required Integer\".");
+    _PmAssert.validateNotSuccessful(pm, "Please enter a value into \"Required Integer\".");
   }
 
   @Test
   public void testDontValidateInvisibleAttr() {
     pm.requiredIntVisible = false;
-    PmAssert.validateSuccessful(pm);
+    _PmAssert.validateSuccessful(pm);
   }
 
 

@@ -15,7 +15,7 @@ import org.pm4j.core.pm.annotation.PmCacheCfg2.Clear;
 import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
 import org.pm4j.core.pm.api.PmEventApi;
-import org.pm4j.tools.test.RecordingPmEventListener;
+import org.pm4j.tools.test._RecordingPmEventListener;
 
 public class PmBean2Test {
 
@@ -164,8 +164,8 @@ public class PmBean2Test {
     int callCount_getPmBeanImpl = 0;
     Bean b;
     boolean postponeEvents;
-    RecordingPmEventListener valueChangeListener = new RecordingPmEventListener();
-    RecordingPmEventListener sValueChangeListener = new RecordingPmEventListener();
+    _RecordingPmEventListener valueChangeListener = new _RecordingPmEventListener();
+    _RecordingPmEventListener sValueChangeListener = new _RecordingPmEventListener();
 
 
     public TestPmBase() {

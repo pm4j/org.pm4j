@@ -14,7 +14,7 @@ import org.pm4j.common.util.beanproperty.PropertyAndVetoableChangeListener;
  *
  * @author Olaf Boede
  */
-public class RecordingPropertyChangeListener implements PropertyAndVetoableChangeListener {
+public class _RecordingPropertyChangeListener implements PropertyAndVetoableChangeListener {
 
   private List<PropertyChangeEvent> propertyChangeCalls = new ArrayList<PropertyChangeEvent>();
   private List<PropertyChangeEvent> vetoableChangeCalls = new ArrayList<PropertyChangeEvent>();

@@ -6,7 +6,7 @@ import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.annotation.PmAttrCfg.HideIf;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
-import org.pm4j.tools.test.PmAssert;
+import org.pm4j.tools.test._PmAssert;
 
 public class PmAttrVisibilityTest {
 
@@ -14,46 +14,46 @@ public class PmAttrVisibilityTest {
 
   @Test
   public void hideIfEmpty() {
-    PmAssert.assertNotVisible(testPm.hideIfEmptyValue);
+    _PmAssert.assertNotVisible(testPm.hideIfEmptyValue);
   }
 
   @Test
   public void showIfNotEmpty() {
-    PmAssert.setValue(testPm.hideIfEmptyValue, "hello");
-    PmAssert.assertVisible(testPm.hideIfEmptyValue);
+    _PmAssert.setValue(testPm.hideIfEmptyValue, "hello");
+    _PmAssert.assertVisible(testPm.hideIfEmptyValue);
   }
 
   @Test
   public void hideIfDefault() {
     Assert.assertEquals("abc", testPm.hideIfDefaultValue.getValue());
-    PmAssert.assertNotVisible(testPm.hideIfDefaultValue);
+    _PmAssert.assertNotVisible(testPm.hideIfDefaultValue);
   }
 
   @Test
   public void showIfNotDefault() {
     // Does not set the default value automatically, because the user sets the value explicitly.
-    PmAssert.setValue(testPm.hideIfDefaultValue, null);
-    PmAssert.assertVisible(testPm.hideIfDefaultValue);
+    _PmAssert.setValue(testPm.hideIfDefaultValue, null);
+    _PmAssert.assertVisible(testPm.hideIfDefaultValue);
   }
   
   @Test
   public void hideIfDefaultOrEmpty1() {
     Assert.assertEquals("abc", testPm.hideIfDefaultOrEmptyValue.getValue());
-    PmAssert.assertNotVisible(testPm.hideIfDefaultOrEmptyValue);
+    _PmAssert.assertNotVisible(testPm.hideIfDefaultOrEmptyValue);
   }
   
   @Test
   public void hideIfDefaultOrEmpty2() {
     Assert.assertEquals("abc", testPm.hideIfDefaultOrEmptyValue.getValue());
-    PmAssert.setValue(testPm.hideIfDefaultOrEmptyValue, null);
+    _PmAssert.setValue(testPm.hideIfDefaultOrEmptyValue, null);
     Assert.assertEquals(null, testPm.hideIfDefaultOrEmptyValue.getValue());
-    PmAssert.assertNotVisible(testPm.hideIfDefaultOrEmptyValue);
+    _PmAssert.assertNotVisible(testPm.hideIfDefaultOrEmptyValue);
   }
   
   @Test
   public void showIfNotDefaultAndNotEmpty() {
-    PmAssert.setValue(testPm.hideIfDefaultOrEmptyValue, "hello");
-    PmAssert.assertVisible(testPm.hideIfDefaultOrEmptyValue);
+    _PmAssert.setValue(testPm.hideIfDefaultOrEmptyValue, "hello");
+    _PmAssert.assertVisible(testPm.hideIfDefaultOrEmptyValue);
   }
 
   static class TestPm extends PmConversationImpl {

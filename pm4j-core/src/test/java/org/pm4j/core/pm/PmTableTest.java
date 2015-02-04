@@ -2,7 +2,7 @@ package org.pm4j.core.pm;
 
 import static org.junit.Assert.assertEquals;
 import static org.pm4j.common.pageable.PageableCollection.EVENT_REMOVE_SELECTION;
-import static org.pm4j.tools.test.PmAssert.setValue;
+import static org.pm4j.tools.test._PmAssert.setValue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,13 +44,13 @@ import org.pm4j.core.pm.impl.PmConversationImpl;
 import org.pm4j.core.pm.impl.PmInitApi;
 import org.pm4j.core.pm.impl.PmTableColImpl;
 import org.pm4j.core.pm.impl.PmTableImpl;
-import org.pm4j.tools.test.RecordingPmEventListener;
-import org.pm4j.tools.test.RecordingPropertyChangeListener;
+import org.pm4j.tools.test._RecordingPmEventListener;
+import org.pm4j.tools.test._RecordingPropertyChangeListener;
 
 public class PmTableTest {
 
   private MyTablePm myTablePm;
-  private RecordingPmEventListener valueChangeEventListener = new RecordingPmEventListener();
+  private _RecordingPmEventListener valueChangeEventListener = new _RecordingPmEventListener();
 
   private List<RowBean> editedRowBeanList = new ArrayList<RowBean>(Arrays.asList(
       new RowBean("b", "a 'b'", 2),
@@ -252,8 +252,8 @@ public class PmTableTest {
     PageableCollection<RowPm> pc = myTablePm.getPmPageableCollection();
     pc.getSelectionHandler().setSelectMode(SelectMode.SINGLE);
     assertEquals("[a, b]", myTablePm.getRowPms().toString());
-    RecordingPropertyChangeListener deletePropertyChangeListener = new RecordingPropertyChangeListener();
-    RecordingPropertyChangeListener deleteBeanPropertyChangeListener = new RecordingPropertyChangeListener();
+    _RecordingPropertyChangeListener deletePropertyChangeListener = new _RecordingPropertyChangeListener();
+    _RecordingPropertyChangeListener deleteBeanPropertyChangeListener = new _RecordingPropertyChangeListener();
     pc.addPropertyAndVetoableListener(EVENT_REMOVE_SELECTION, deletePropertyChangeListener);
     myTablePm.getPmPageableBeanCollection().addPropertyAndVetoableListener(EVENT_REMOVE_SELECTION, deleteBeanPropertyChangeListener);
 
@@ -274,8 +274,8 @@ public class PmTableTest {
     PageableCollection<RowBean> pc = myTablePm.getPmPageableBeanCollection();
     pc.getSelectionHandler().setSelectMode(SelectMode.SINGLE);
     assertEquals("[a, b]", myTablePm.getRowPms().toString());
-    RecordingPropertyChangeListener deletePropertyChangeListener = new RecordingPropertyChangeListener();
-    RecordingPropertyChangeListener deleteBeanPropertyChangeListener = new RecordingPropertyChangeListener();
+    _RecordingPropertyChangeListener deletePropertyChangeListener = new _RecordingPropertyChangeListener();
+    _RecordingPropertyChangeListener deleteBeanPropertyChangeListener = new _RecordingPropertyChangeListener();
     pc.addPropertyAndVetoableListener(EVENT_REMOVE_SELECTION, deletePropertyChangeListener);
     myTablePm.getPmPageableBeanCollection().addPropertyAndVetoableListener(EVENT_REMOVE_SELECTION, deleteBeanPropertyChangeListener);
 
@@ -299,7 +299,7 @@ public class PmTableTest {
    */
   @Test
   public void testRowsAreNotVisitedOnBroadCastAllChangeEvents() {
-    RecordingPmEventListener l = new RecordingPmEventListener();
+    _RecordingPmEventListener l = new _RecordingPmEventListener();
     PmEventApi.addPmEventListener(myTablePm.getRowPms().get(0), PmEvent.ALL_CHANGE_EVENTS, l);
     BroadcastPmEventProcessor.broadcastAllChangeEvent(myTablePm, 0);
 

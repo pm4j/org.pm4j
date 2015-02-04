@@ -14,7 +14,7 @@ import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.annotation.PmAttrDoubleCfg;
 import org.pm4j.core.pm.impl.PmAttrDoubleImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
-import org.pm4j.tools.test.PmAssert;
+import org.pm4j.tools.test._PmAssert;
 
 /**
  * If you modify this test, please consider at least {@link PmAttrDoubleTest}.
@@ -114,11 +114,11 @@ public class PmAttrDoubleTest {
 
     //Validate too short
     myPm.minLen2.setValue(1d);
-    PmAssert.validateNotSuccessful(myPm.minLen2, "Please enter at least 2 characters in field \"pmAttrDoubleTest.MyPm.minLen2\".");
+    _PmAssert.validateNotSuccessful(myPm.minLen2, "Please enter at least 2 characters in field \"pmAttrDoubleTest.MyPm.minLen2\".");
 
     //Validate correct
     myPm.minLen2.setValue(12d);
-    PmAssert.validateSuccessful(myPm.minLen2);
+    _PmAssert.validateSuccessful(myPm.minLen2);
   }
 
   @Test
@@ -130,11 +130,11 @@ public class PmAttrDoubleTest {
 
     //Validate too big
     myPm.maxLen6.setValue(1234567d);
-    PmAssert.validateNotSuccessful(myPm.maxLen6, "Please enter maximal 6 characters in field \"pmAttrDoubleTest.MyPm.maxLen6\".");
+    _PmAssert.validateNotSuccessful(myPm.maxLen6, "Please enter maximal 6 characters in field \"pmAttrDoubleTest.MyPm.maxLen6\".");
 
     //Validate correct
     myPm.maxLen6.setValue(123456d);
-    PmAssert.validateSuccessful(myPm);
+    _PmAssert.validateSuccessful(myPm);
   }
 
 
