@@ -1,4 +1,8 @@
+if (!hasProperty('artifactory_globe')) ext.artifactory_globe = 'globe-virt'
 repositories {
+    maven {
+        url "${artifactory_url}/${artifactory_globe}"
+	}
     mavenLocal()
     mavenCentral()
 }
