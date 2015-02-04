@@ -11,7 +11,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.impl.PmConversationImpl;
-import org.pm4j.core.pm.joda.impl.PmAttrLocalDateImpl;
 import org.pm4j.tools.test.PmAssert;
 
 public class PmAttrLocalDateImplTest {

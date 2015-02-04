@@ -17,7 +17,6 @@ import org.junit.Test;
 import org.pm4j.core.exception.PmValidationException;
 import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.impl.PmConversationImpl;
-import org.pm4j.core.pm.joda.impl.PmAttrLocalDateAndTimeImpl;
 
 /**
  * Tests for {@link PmAttrLocalDateAndTimeImpl}.

@@ -90,7 +90,7 @@ public class PmSnapshotTestTool {
         try {
             this.testMode = TestMode.valueOf(System.getProperty(SYS_PROP_TEST_MODE, TestMode.STRICT.toString()));
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Invalid pmSnapshotTestMode value. Please check allowed values for org.pm4j.tools.test.PmSnapshotTestTool.TestMode.", e);
+            throw new IllegalArgumentException("Invalid pmSnapshotTestMode value. Please check allowed values for PmSnapshotTestTool.TestMode.", e);
         }
     }
 
