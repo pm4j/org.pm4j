@@ -23,6 +23,8 @@ PmCommand models support UI logic for view components triggering actions. E.g. b
 * _PmCommandDecorator_ - interface for command execution interceptors
 * _PmCommandProxy_ - fix commands that may delegate requests to a registered executing command. +
   Example use case: A fix toolbars that delegating calls to actual context specific real commands.
+  
+image:resources/PmCommand_Overview.png[]
 
 == PmCommand usage ==
 
@@ -49,46 +51,6 @@ To implement the necessary actions to execute you just have to override the _doI
 protected void doItImpl() {
   // ... some UI logic code
 }
-
-
-// OBO: Den Validierungsblock würde ich weglassen. Die Doku sollte sich auf beforeDo und afterDo beschränken.
-// die validate() Methode ist m.E. durchaus ein Löschkandidat.
-=== Validation of a PM area ===
-
-The validation of a command element is automatically called before executing the command. The default implementation of PMCommand 
-triggers the validation of the parent element, whereat the parent is the first parent that implements the PmDataInput interface.
-This means that the validation process validates the sub tree of this parent element, so that the attribute configuration 
-(e.g. @PmAttrCfg(required = true)) and the implemented validation method of every element of the sub tree are executed. 
-After validating the parent element the validation process checks if there are any error messages. 
-
-If the developer wants to have a different kind of validation he just has to override the validate method of PmCommand.
-
-[source] 
-@Override
-protected boolean validate() {
-    // some specific validation
-    ...
-}
-
-To implement some specific validation rules for an element of the subtree the developer just has override the validation method of that element (e.g. PmAttrString).
-
-[source]
-------------------------------------------------------------------------
-@PmAttrCfg(required = true)
-public final PmAttrString myAttribute = new PmAttrStringImpl(this) {
-
-    @Override
-    protected void validate(String value) throws PmValidationException {
-        super.validate(value);
-
-        // more validation actions
-        ...
-    }
-};
-------------------------------------------------------------------------
-
-NOTE: Be careful: Do not forget to call the super implementation of validate. Otherwise you will get a completely independent validation implementation. 
-This means that you will loose all inherited validation actions like checking configured annotations (e.g. @PmAttrCfg). 
 
 === Configuration of PmCommandCfg annotation ===
 
@@ -135,17 +97,20 @@ This way an executeable command may also act as command group.
 
 *  Defines the caches to clear within the element context of this command. The default value is an empty array, which means that there is nothing to clear.
 
-=== Navigate to another view ===
+=== Navigate to another page ===
 
-//OBO: HotLinkCommandPm is not available in pm4j. - I just detected it, and it's a candidate for removal. - A view adapter should do what's defined there.
+It is possible to navigate to another page via NaviLink in a static or in a dynamic way.
 
-To navigate to another view you can use the HotLinkCommandPm. Here you have to override the getNaviLinkImpl to return a NaviLink object, 
-that contains the information about the target to navigate to. Optional it is also possible to add some parameters.
-
+==== Static navigation ====
+* You can navigate to a page directly.
 [source]
 ------------------------------------------------------------------------
-public final PmCommand cmdNavigateToFixTarget = new PmCommandImpl(this, new NaviLinkImpl("/page/someDialog.iface"));
-
+public final PmCommand cmdNavigateToFixTarget = new PmCommandImpl(this, 
+	new NaviLinkImpl("/page/someDialog.iface"));
+------------------------------------------------------------------------
+* You also can override the getNaviLinkImpl method of a PmCommand.
+[source]
+------------------------------------------------------------------------
 public final PmCommand cmdNavigateToCalculatedTarget = new PmCommandImpl(this);
 
     @Override
@@ -160,7 +125,13 @@ public final PmCommand cmdNavigateToCalculatedTarget = new PmCommandImpl(this);
         return naviLink;
     }
 };
+------------------------------------------------------------------------
 
+==== Dynamic navigation ====
+
+* You can navigate to another page by implementing the navigation logic in the doItImpl method.
+[source]
+------------------------------------------------------------------------
 public final PmCommand cmdThatOnlySometimesNavigates = new PmCommandImpl(this);
 
     @Override
@@ -171,20 +142,7 @@ public final PmCommand cmdThatOnlySometimesNavigates = new PmCommandImpl(this);
 		}
     }
 };
-
 ------------------------------------------------------------------------
-
-// OBO: should be moved to the Globe specific hotlink docu.
-
-You can read these parameter in the target object like this:
-
-[source]
-@Override
-    protected void afterDialogInitialization() {
-        String value = Jsf2Util.readRequestParameter("name");
-		... more parameter ...
-    }
-}
 
 === Success message ===
 
@@ -217,21 +175,15 @@ Example:
 
 === Testing commands ===
 
-It quite easy to test the implemented functionality of a PmCommand object. To do so you have to create a test conversation for the view that contains your command, first (1).
-Then you can test the implementation of the PMCommand by calling the doIt method (2). To check, if the execution of doIt was successful or not you can validate the CommandState 
-of the PmCommand cmd, now. In our first test the execution should be successful, so the CommandState should be EXECUTED (3).
-
-When calling the doIt method, it first validates the command like it is descriped in "Validation of a PM area" [HIER LINK SETZEN!]. So it is sometimes required to initialize all 
-the attributes of the parent of your command to prevent a validation error, first (4). But if you want to check that the validation also works fine, you only have to call the doIt method 
-without initializing the view attributes. Then you will not receive an EXECUTED command state, but a BEFORE_DO_RETURNED_FALSE command state (5). When getting such a validation error,
-you are also able to check the content of the validation messages, so that you can verify that the validation works correct (6).
+It is quite easy to test the implemented functionality of a PmCommand object. To do so you only have to call the doIt method of the PmCommand 
+by using the PmAssert class. If you have to do some other special actions (like setting values or checking the returned message) you can also 
+do this via using PmAssert.
 
 [source]
 ------------------------------------------------------------------------
 public class MyFormPmTest {
 
-	// OBO: Views and PMs are different concepts.
-    private MyFormPm form = new MyFormPm();
+	private MyFormPm form = new MyFormPm();
 
 	public void testSaveValidValues() {
 		PmAssert.setValue(form.requiredAttr, "My Value");
@@ -240,13 +192,10 @@ public class MyFormPmTest {
 	
 	public void testSaveWithoutRequiredValueShouldFail() {
 		PmAssert.doIt(form.cmdSave, CommandState.FAILED);
-		PmAssert.assertMessage(form, Severity.ERROR, "Please enter a valid value in 'required attr'");
+		PmAssert.assertMessage(
+			form, Severity.ERROR, "Please enter a valid value in 'required attr'");
     }
 }
 ------------------------------------------------------------------------
 
-== Implementation of PmCommand in pm4j ==
 
-=== Class model ===
-
-image:resources/PmCommand_Overview.png[]
