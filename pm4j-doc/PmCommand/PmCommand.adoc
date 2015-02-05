@@ -52,21 +52,37 @@ protected void doItImpl() {
   // ... some UI logic code
 }
 
-=== Configuration of PmCommandCfg annotation ===
+=== BeforeDo and afterDo logic ===
 
-With the PmCommandCfg you have the possibility to change the default behaviour of the PmCommand object. This means that you can configure for example 
-the behaviour before or after executing the command.
+It's often useful to define precondition checks or follow-up operations for commands.
+
+The following options exist for defining before/after operations:
+
+- For standard cases you may configure _@PmCommandCfg(beforeDo=..., afterDo=...)_.
+- You may override _beforeDo()_ and _afterDo()_ for more domain specific logic.
+- For reusable or attachable before/after logic a _PmCommandDecorator_ may be used.
+
+=== _@PmCommandCfg_ ===
+
+...allows defining some standard command behaviour.
 
 ==== beforeDo ====
 
-The _beforeDo_ paramter defines what should be done before executing the command logic, whereat the following actions are possible:
+The _beforeDo_ parameter defines what should be done before executing the command logic, whereat the following actions are possible:
 
-* VALIDATE: This call validates the entered data of the containing PmDataInput objects (see Validation of a PM area [HIER LINK SETZEN!]). The doItImpl method of the command 
-will only be executed if the validation was successful.
-* CLEAR: Clears all messages within the current PmConversation. Additionally entered string values that have failed to convert to the corresponding attribute value type 
+* _VALIDATE_:
+
+Performs a validation of the next parent PM not being of type _PmCommand_.
+
+The method _doItImpl()_ will only be executed if the _PmConversation_ has no error messages after that validation.
+(see Validation of a PM area [HIER LINK SETZEN!]). 
+
+* _CLEAR_: Clears all messages within the current _PmConversation_. Additionally entered string values that have failed to convert to the corresponding attribute value type 
 will also be cleared. The doItImpl method of the command will be executed regardless if there are errors within the related PmConversation or not.
-* DO_NOTHING: Does not care about existing (error-) messages and does not clear any of these messages before it gets executed.
-* DEFAULT: The definition, defined in the project specific PmDefaults will be used. The default implementation is VALIDATE.
+
+* _DO_NOTHING_: Does not care about existing (error-) messages and does not clear any of these messages before it gets executed.
+
+* _DEFAULT_: The definition, defined in the project specific PmDefaults will be used. The default implementation is VALIDATE.
 
 ==== afterDo ====
 
@@ -87,11 +103,6 @@ The default value is COMMAND.
 This way an executeable command may also act as command group.
 * GROUP: A pure organizational structure of commands.
 * SEPARATOR: A separator between command sections of a command list.
-
-// OBO: will be deprecated.
-==== hideWhenNotEnabled ====
-
-* If true, the command should be hidden when not applicable. The default value is false.
 
 ==== clearCaches ====
 
