@@ -767,8 +767,11 @@ public class PmTableImpl
   }
 
   /**
-   * Defines the data set to be presented by the table.<br>
-   * HINT: Please check if you can define {@link #getPmPageableCollectionImpl()} instead.
+   * Defines the data set to be presented by the table.
+   * 
+   * <p>ATTENTION: Some unit test setups might be easier using this method, but it 's strongly 
+   * discouraged to use it in production code; some features might not work properly, e.g. filtering.
+   * For production code, overriding {@link #getPmBeansImpl()} is recommended.</p>
    *
    * @param pageable
    *          the data set to present. If it is <code>null</code> an empty
