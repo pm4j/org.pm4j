@@ -25,8 +25,8 @@ public @interface PmCommandCfg {
     /**
      * {@link PmCommandImpl#validate()} will be executed before the
      * <code>doItImpl()</code> method gets executed.<br>
-     * This call validates the entered data of the containing
-     * {@link PmDataInput} object (usually the next parent element).
+     * This call validates the entered data of the first parent not
+     * being a {@link org.pm4j.core.pm.PmCommand}.
      * <p>
      * The <code>doItImpl()</code> method of the command will only be executed
      * if the validation was successful.
