@@ -88,8 +88,8 @@ public class PageQueryCollectionWithMultiFieldIdTest extends PageableCollectionW
       InMemQueryEvaluator<Bean> evalCtxt = new InMemQueryEvaluator<Bean>();
       List<Bean> beans = evalCtxt.sort(idToBeanMap.values(), query.getEffectiveSortOrder());
 
-      if (query.getFilterExpression() != null) {
-        beans = evalCtxt.evaluateSubSet(beans, query.getFilterExpression());
+      if (query.getQueryExpression() != null) {
+        beans = evalCtxt.evaluateSubSet(beans, query.getQueryExpression());
       }
 
       return beans;

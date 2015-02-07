@@ -101,8 +101,8 @@ public abstract class QueryServiceFakeBase<T_ITEM, T_ID>
   protected List<T_ITEM> getQueryResult(QueryParams query) {
     List<T_ITEM> beans = getQueryEvaluator().sort(idToBeanMap.values(), query.getEffectiveSortOrder());
 
-    if (query.getFilterExpression() != null) {
-      beans = getQueryEvaluator().evaluateSubSet(beans, query.getFilterExpression());
+    if (query.getQueryExpression() != null) {
+      beans = getQueryEvaluator().evaluateSubSet(beans, query.getQueryExpression());
     }
 
     return beans;

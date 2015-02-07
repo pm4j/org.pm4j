@@ -131,7 +131,7 @@ public class PmAttrCacheTest2 {
   public void testClearedOnValueChangeInHierarcy() {
     MyPojo p = new MyPojo();
     MyPojoPm pPm = new MyPojoPm(new PmConversationImpl(), p);
-    PmInitApi.ensurePmSubTreeInitialization(pPm);
+    PmInitApi.initPmTree(pPm);
 
     p.s = "INITIAL";
     assertEquals("INITIAL", pPm.s.getValue());
@@ -173,13 +173,13 @@ public class PmAttrCacheTest2 {
   @Test
   public void testMixedAnnotations() {
     try {
-      PmInitApi.ensurePmSubTreeInitialization(new MyPmWithMixedAnnotations(new PmConversationImpl()));
+      PmInitApi.initPmTree(new MyPmWithMixedAnnotations(new PmConversationImpl()));
     } catch (PmRuntimeException e) {
       assertEquals(PmRuntimeException.class, e.getCause().getClass());
     }
 
     try {
-      PmInitApi.ensurePmSubTreeInitialization(new MyPmWithMixedAnnotations2(new PmConversationImpl()));
+      PmInitApi.initPmTree(new MyPmWithMixedAnnotations2(new PmConversationImpl()));
     } catch (PmRuntimeException e) {
       assertEquals(PmRuntimeException.class, e.getCause().getClass());
     }

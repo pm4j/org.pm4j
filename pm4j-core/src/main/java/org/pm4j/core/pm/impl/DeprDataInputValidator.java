@@ -4,6 +4,7 @@ import org.pm4j.core.exception.PmValidationException;
 import org.pm4j.core.pm.PmMessage.Severity;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.api.PmMessageApi;
+import org.pm4j.core.pm.api.PmValidationApi;
 
 /**
  * Implements the validation logic that was formerly in {@link PmDataInputBase#pmValidate()}.
@@ -26,7 +27,7 @@ class DeprDataInputValidator<T extends PmObjectBase> implements PmObjectBase.Val
   protected void validateImpl(T pm)  throws PmValidationException {
     for (PmObject d : PmUtil.getPmChildren(pm)) {
       if (d.isPmVisible() && !d.isPmReadonly()) {
-        d.pmValidate();
+        PmValidationApi.validate(d);
       }
     }
   }

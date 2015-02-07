@@ -69,7 +69,7 @@ public class PmTabSetImpl extends PmObjectBase implements PmTabSet {
 
     // ensure that the to-tab is initialized (was an issue in domain specific
     // unit tests):
-    PmInitApi.ensurePmInitialization(toTab);
+    PmInitApi.initPmTree(toTab);
 
     // Delegate to an undoable command.
     PmTabChangeCommand tabChangeCommand = new PmTabChangeCommand(this, _fromTab, toTab);
@@ -102,6 +102,11 @@ public class PmTabSetImpl extends PmObjectBase implements PmTabSet {
     }
   }
 
+  // TODO: rename to beforeSwitch and add an afterSwitch; remove the command reference.
+  protected boolean switchToTabPmImpl(@Deprecated PmCommand tabChangeCmd, PmTab fromTab, PmTab toTab) {
+    return true;
+  }
+
   /**
    * Gets called before a tab switch operation. Subclasses may control here if
    * the tab switch should be allowed.<br>
@@ -110,8 +115,6 @@ public class PmTabSetImpl extends PmObjectBase implements PmTabSet {
    * For more generic logic you may consider using
    * {@link #addTabSwitchCommandDecorator(PmTab, PmTab, PmCommandDecorator)}.
    *
-   * @param tabChangeCmd
-   *          Unused. Will disappear soon.
    * @param fromTab
    *          The tab to leave.
    * @param toTab
@@ -120,9 +123,8 @@ public class PmTabSetImpl extends PmObjectBase implements PmTabSet {
    *         <code>false</code> prevents the tab switch.
    *
    */
-  // TODO: rename to beforeSwitch and add an afterSwitch; remove the command reference.
-  protected boolean switchToTabPmImpl(@Deprecated PmCommand tabChangeCmd, PmTab fromTab, PmTab toTab) {
-    return true;
+  protected boolean beforeSwitch(PmTab fromTab, PmTab toTab) {
+    return switchToTabPmImpl(null, fromTab, toTab);
   }
 
   /**
@@ -130,7 +132,7 @@ public class PmTabSetImpl extends PmObjectBase implements PmTabSet {
    */
   @Override
   public PmTab getCurrentTabPm() {
-    PmInitApi.ensurePmInitialization(this);
+    PmInitApi.initThisPmOnly(this);
     return (currentTabPm != null)
             ? currentTabPm
             : getFirstTabPm();

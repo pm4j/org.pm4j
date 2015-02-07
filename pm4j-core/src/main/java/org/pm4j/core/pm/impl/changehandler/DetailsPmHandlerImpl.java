@@ -29,7 +29,7 @@ public class DetailsPmHandlerImpl<T_DETAILS_PM extends PmObject, T_MASTER_RECORD
   /** The details area PM. */
   private final T_DETAILS_PM detailsPm;
 
-  /** Additional decorators to apply on {@link #canSwitchMasterRecord()} and {@link #afterMasterRecordChange(Object)}. */
+  /** Additional decorators to apply on {@link #beforeMasterRecordChange(Object, Object)} ()} and {@link #afterMasterRecordChange(Object)}. */
   private final List<PmCommandDecorator> decorators = new ArrayList<PmCommandDecorator>();
 
   /**
@@ -75,7 +75,7 @@ public class DetailsPmHandlerImpl<T_DETAILS_PM extends PmObject, T_MASTER_RECORD
    * @param newMasterBean The master bean to select.
    * @return <code>true</code> if this handler agrees to the switch. <code>false</code> prevents the switch.
    */
-  protected boolean beforeMasterRecordChangeImpl(T_MASTER_RECORD oldMasterBean, T_MASTER_RECORD newMasterRecord) {
+  protected boolean beforeMasterRecordChangeImpl(T_MASTER_RECORD oldMasterBean, T_MASTER_RECORD newMasterBean) {
     if (!canSwitchMasterRecord()) {
       return false;
     }

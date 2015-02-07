@@ -20,9 +20,9 @@ import org.pm4j.common.util.collection.IterableUtil;
  *
  * @author olaf boede
  */
-public class SelectionHandlerWithItemSet<T_ITEM> extends SelectionHandlerBase<T_ITEM>{
+public class ItemSetSelectionHandler<T_ITEM> extends SelectionHandlerBase<T_ITEM>{
 
-  private static final Log LOG = LogFactory.getLog(SelectionHandlerWithItemSet.class);
+  private static final Log LOG = LogFactory.getLog(ItemSetSelectionHandler.class);
 
   @SuppressWarnings("unchecked")
   private static final ItemSetSelection<?> EMPTY_SELECTION = new ItemSetSelection<Object>(Collections.EMPTY_SET);
@@ -38,7 +38,7 @@ public class SelectionHandlerWithItemSet<T_ITEM> extends SelectionHandlerBase<T_
   /**
    * @param collection the collection to handle selected items for.
    */
-  public SelectionHandlerWithItemSet(Iterable<T_ITEM> collection) {
+  public ItemSetSelectionHandler(Iterable<T_ITEM> collection) {
     assert collection != null;
 
     this.collection = collection;

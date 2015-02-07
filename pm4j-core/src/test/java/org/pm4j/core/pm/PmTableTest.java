@@ -76,7 +76,7 @@ public class PmTableTest {
     };
     PmEventApi.addPmEventListener(myTablePm, PmEvent.VALUE_CHANGE, valueChangeEventListener);
 
-    PmInitApi.ensurePmSubTreeInitialization(myTablePm);
+    PmInitApi.initPmTree(myTablePm);
   }
 
   @Test
@@ -216,7 +216,7 @@ public class PmTableTest {
     myTablePm.setNumOfPageRowPms(10);
     assertEquals("[a, b, c]", myTablePm.getRowPms().toString());
     QueryExprCompare notA = new QueryExprCompare(RowBean.ATTR_NAME, CompOpNotEquals.class, "a");
-    myTablePm.getPmPageableBeanCollection().getQueryParams().setFilterExpression(notA);
+    myTablePm.getPmPageableBeanCollection().getQueryParams().setQueryExpression(notA);
     assertEquals("[b, c]", myTablePm.getRowPms().toString());
   }
 
@@ -241,7 +241,7 @@ public class PmTableTest {
 
     // Nevertheless try to register a filter that filters any 'a'
     QueryExprCompare noA = new QueryExprCompare(RowBean.ATTR_NAME, CompOpNotEquals.class, "a");
-    myTablePm.getPmPageableBeanCollection().getQueryParams().setFilterExpression(noA);
+    myTablePm.getPmPageableBeanCollection().getQueryParams().setQueryExpression(noA);
 
     // The added Filter does not apply because the filter change decorator prevents the application.
     assertEquals("[a, b, c]", myTablePm.getRowPms().toString());

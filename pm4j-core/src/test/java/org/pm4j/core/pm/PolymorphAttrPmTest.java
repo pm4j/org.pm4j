@@ -22,8 +22,8 @@ import org.pm4j.core.pm.impl.PmInitApi;
 public class PolymorphAttrPmTest {
 
   PmConversation convPm = new PmConversationImpl();
-  TestItemPm pmWithStringAttr = PmInitApi.ensurePmInitialization(new TestItemPm(convPm, new TestBean(false)));
-  TestItemPm pmWithIntAttr = PmInitApi.ensurePmInitialization(new TestItemPm(convPm, new TestBean(true)));
+  TestItemPm pmWithStringAttr = PmInitApi.initPmTree(new TestItemPm(convPm, new TestBean(false)));
+  TestItemPm pmWithIntAttr = PmInitApi.initPmTree(new TestItemPm(convPm, new TestBean(true)));
 
   @Test
   public void testStringAttr() {

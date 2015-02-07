@@ -242,6 +242,6 @@ public class DiResolverUtilTest {
 
   // this is not in @Before to be able to test different scenarios
   private void initMyPm() {
-    myPm = PmInitApi.ensurePmSubTreeInitialization(new MyPm(pmConversation));
+    myPm = PmInitApi.initPmTree(new MyPm(pmConversation));
   }
 }

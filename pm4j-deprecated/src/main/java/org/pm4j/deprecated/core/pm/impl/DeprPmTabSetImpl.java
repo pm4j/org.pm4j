@@ -116,7 +116,7 @@ public class DeprPmTabSetImpl extends PmElementImpl implements DeprPmTabSet {
    */
   @Override
   public PmElement getCurrentTabPm() {
-    PmInitApi.ensurePmInitialization(this);
+    PmInitApi.initThisPmOnly(this);
     return (currentTabPm != null)
             ? currentTabPm
             : getFirstTabPm();

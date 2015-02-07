@@ -13,6 +13,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.pm4j.core.pm.annotation.PmAttrBigDecimalCfg;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
+import org.pm4j.core.pm.api.PmValidationApi;
 import org.pm4j.core.pm.impl.PmAttrBigDecimalImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
 import org.pm4j.tools.test._PmAssert;
@@ -117,7 +118,7 @@ public class PmAttrBigDecimalTest {
 
   private void assertValue(PmAttrBigDecimal pm, String number, boolean isValid) {
     pm.setValueAsString(number);
-    pm.pmValidate();
+    PmValidationApi.validate(pm);
     assertEquals(number, pm.getValueAsString());
     assertEquals(new BigDecimal(number), pm.getValue());
   }

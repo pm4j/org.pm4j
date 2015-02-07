@@ -52,7 +52,7 @@ public class PmExpressionApiTest {
   @Test
   public void testPmInjectUsingRepeatedExpression() {
     // Please consider: @PmInject provides values only after PM initialization!
-    PmInitApi.ensurePmInitialization(testPm.child1.child2);
+    PmInitApi.initPmTree(testPm.child1.child2);
 
     assertEquals("@PmInject provides references to parent context information.", testPm.aDialogPm, testPm.child1.child2.refToADialogPm);
   }

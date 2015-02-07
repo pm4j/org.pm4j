@@ -29,7 +29,7 @@ import org.pm4j.common.selection.ItemSetSelection;
 import org.pm4j.common.selection.Selection;
 import org.pm4j.common.selection.SelectionHandler;
 import org.pm4j.common.selection.SelectionHandlerUtil;
-import org.pm4j.common.selection.SelectionHandlerWithItemSet;
+import org.pm4j.common.selection.ItemSetSelectionHandler;
 import org.pm4j.common.util.collection.IterableUtil;
 import org.pm4j.common.util.collection.ListUtil;
 
@@ -47,7 +47,7 @@ public abstract class InMemCollectionBase<T_ITEM>
   implements InMemCollection<T_ITEM> {
 
   /** The collection type specific selection handler. */
-  private SelectionHandler<T_ITEM> selectionHandler = new SelectionHandlerWithItemSet<T_ITEM>(this);
+  private SelectionHandler<T_ITEM> selectionHandler = new ItemSetSelectionHandler<T_ITEM>(this);
   /** In-memory specific item set modification handler. */
   private ModificationHandler<T_ITEM> modificationHandler = new InMemModificationHandler();
   /** Interpreter for filtering query expressions. */
@@ -210,7 +210,7 @@ public abstract class InMemCollectionBase<T_ITEM>
 
   /** Generates a list of filtered items based on the given list. */
   private List<T_ITEM> _filter(List<T_ITEM> unfilteredList) {
-    QueryExpr filterExpression = getQueryParams().getFilterExpression();
+    QueryExpr filterExpression = getQueryParams().getQueryExpression();
     if (filterExpression == null) {
       return unfilteredList;
     }

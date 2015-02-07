@@ -48,9 +48,9 @@ public class MasterPmHandlerTestDlg extends PmConversationImpl {
     }
 
     @Override
-    protected boolean beforeMasterRecordChangeImpl(Bean oldMasterBean, Bean newMasterRecord) {
-      beforeCalls.add(Arrays.asList(oldMasterBean, newMasterRecord));
-      return super.beforeMasterRecordChangeImpl(oldMasterBean, newMasterRecord);
+    protected boolean beforeMasterRecordChangeImpl(Bean oldMasterBean, Bean newMasterBean) {
+      beforeCalls.add(Arrays.asList(oldMasterBean, newMasterBean));
+      return super.beforeMasterRecordChangeImpl(oldMasterBean, newMasterBean);
     }
   }
 

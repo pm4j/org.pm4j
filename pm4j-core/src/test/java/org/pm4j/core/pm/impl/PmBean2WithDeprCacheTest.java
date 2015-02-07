@@ -90,7 +90,7 @@ public class PmBean2WithDeprCacheTest {
     assertEquals("No value change broadcast for unused, not initialized PMs.", 0, pm.uncached.sValueChangeListener.getCallCount());
     assertEquals("No getter called.", 0, pm.uncached.callCount_getPmBeanImpl);
 
-    PmInitApi.ensurePmInitialization(pm);
+    PmInitApi.initPmTree(pm);
     BroadcastPmEventProcessor.broadcastAllChangeEvent(pm, 0);
     assertEquals("Each sub-PM gets informed.", 1, pm.valueChangeListener.getCallCount());
     assertEquals("Each sub-PM gets informed.", 1, pm.uncached.valueChangeListener.getCallCount());
@@ -126,7 +126,7 @@ public class PmBean2WithDeprCacheTest {
     BroadcastPmEventProcessor.broadcastAllChangeEvent(pm, 0);
     assertEquals("No value change broadcast for unused, not initialized PMs.", 0, pm.valueChangeListener.getCallCount());
 
-    PmInitApi.ensurePmInitialization(pm);
+    PmInitApi.initPmTree(pm);
     BroadcastPmEventProcessor.broadcastAllChangeEvent(pm, 0);
     assertEquals("Initialized PMs get informed.", 1, pm.valueChangeListener.getCallCount());
 

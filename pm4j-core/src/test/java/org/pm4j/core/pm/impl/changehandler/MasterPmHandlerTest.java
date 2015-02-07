@@ -8,7 +8,7 @@ import org.pm4j.core.pm.impl.PmInitApi;
 
 public class MasterPmHandlerTest {
 
-  private MasterPmHandlerTestDlg dlg = PmInitApi.ensurePmInitialization(new MasterPmHandlerTestDlg());
+  private MasterPmHandlerTestDlg dlg = PmInitApi.initPmTree(new MasterPmHandlerTestDlg());
 
   @Before
   public void setUp() {

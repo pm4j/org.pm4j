@@ -25,6 +25,9 @@ import org.pm4j.core.pm.impl.PmCommandImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
 import org.pm4j.core.pm.impl.PmElementBase;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Tests JSR-303 bean validation support.
  *
@@ -91,10 +94,10 @@ public class PmBeanValidationTest {
     myBeanPm.setPmBean(new MyBean(null, null, null));
     Assert.assertEquals("The @Size.max constraint is read from the bean restriction.", 4, myBeanPm.s.getMaxLen());
 
-    myBeanPm.pmValidate();
-    Assert.assertTrue(myBeanPm.s.isPmValid());
-    Assert.assertFalse(myBeanPm.i.isPmValid());
-    Assert.assertFalse(myBeanPm.j.isPmValid());
+    PmValidationApi.validate(myBeanPm);
+    assertTrue(myBeanPm.s.isPmValid());
+    assertFalse(myBeanPm.i.isPmValid());
+    assertFalse(myBeanPm.j.isPmValid());
   }
 
   @Test
@@ -103,18 +106,15 @@ public class PmBeanValidationTest {
     Assert.assertEquals("The @Size.max constraint is read from the bean restriction.", 4, myBeanPm.s.getMaxLen());
 
     myBeanPm.cmdTriggeringValidation.doIt();
-    Assert.assertTrue(myBeanPm.s.isPmValid());
-    Assert.assertFalse(myBeanPm.i.isPmValid());
-    Assert.assertFalse(myBeanPm.j.isPmValid());
+    assertTrue(myBeanPm.s.isPmValid());
+    assertFalse(myBeanPm.i.isPmValid());
+    assertFalse(myBeanPm.j.isPmValid());
   }
 
   @Test
   public void testValidationOfBeanTriggeredByPmBean() {
     myBeanPm.setPmBean(new MyBean("hi", 2, 1));
-
-    myBeanPm.pmValidate();
-    Assert.assertFalse(myBeanPm.isPmValid());
-
+    assertFalse(PmValidationApi.validate(myBeanPm));
   }
 
 

@@ -5,6 +5,7 @@ import org.pm4j.common.converter.value.ValueConverterCtxt;
 import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.api.PmFactoryApi;
+import org.pm4j.core.pm.api.PmValidationApi;
 import org.pm4j.core.pm.impl.PmAttrBase;
 import org.pm4j.core.pm.impl.PmObjectBase;
 import org.pm4j.core.pm.impl.PmUtil;
@@ -63,7 +64,7 @@ public class DeprPmAttrPmRefImpl<T_REFED_PM extends PmBean<?>, T_BEAN>
 
     T_REFED_PM value = getValue();
     if (value != null) {
-      value.pmValidate();
+      PmValidationApi.validate(value);
     }
   }
 

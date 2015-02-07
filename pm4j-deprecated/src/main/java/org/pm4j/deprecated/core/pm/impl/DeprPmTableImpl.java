@@ -26,6 +26,7 @@ import org.pm4j.core.pm.PmSortOrder;
 import org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmMessageApi;
+import org.pm4j.core.pm.api.PmValidationApi;
 import org.pm4j.core.pm.impl.AnnotationUtil;
 import org.pm4j.core.pm.impl.BeanPmCacheUtil;
 import org.pm4j.core.pm.impl.PmAttrBase;
@@ -539,7 +540,7 @@ public class DeprPmTableImpl
   @Override
   public void pmValidate() {
     for (PmObject itemPm : new ArrayList<PmObject>(changedStateRegistry.getChangedItems())) {
-      itemPm.pmValidate();
+      PmValidationApi.validate(itemPm);
     }
   }
 

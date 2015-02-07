@@ -151,7 +151,7 @@ public class PageQueryCollectionTest extends PageableCollectionTestBase<Pageable
     assertEquals("Call count stability check.", "{getItemCount=1, getItems=1}", service.callCounter.toString());
 
     QueryParams queryParams = new QueryParams();
-    queryParams.setFilterExpression(new QueryExprCompare(Bean.ATTR_NAME, CompOpNotEquals.class, " "));
+    queryParams.setQueryExpression(new QueryExprCompare(Bean.ATTR_NAME, CompOpNotEquals.class, " "));
     selection = new PageQueryAllItemsSelection<Bean, Integer>(service, queryParams);
     assertEquals(6L, selection.getSize());
     assertEquals("[a, b, c, d, e, f]", IterableUtil.asCollection(selection).toString());

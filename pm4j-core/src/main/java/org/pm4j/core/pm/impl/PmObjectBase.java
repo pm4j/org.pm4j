@@ -158,7 +158,7 @@ public class PmObjectBase implements PmObject {
     PmEventApi.addPmEventListener(this, PmEvent.VALUE_CHANGE, new PmEventListener() {
       @Override
       public void handleEvent(PmEvent event) {
-        if (event.isInitializationEvent() || event.isReloadEvent()) {
+        if (event.isAllChangedEvent() || event.isReloadEvent()) {
           onPmDataExchangeEvent(event);
         }
       }
@@ -897,7 +897,7 @@ public class PmObjectBase implements PmObject {
      */
     protected void validateImpl(T pm) throws PmValidationException {
       for (PmObject d : getChildrenToValidate(pm)) {
-        d.pmValidate();
+        PmValidationApi.validate(d);
       }
     }
   }

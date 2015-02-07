@@ -183,10 +183,15 @@ public class PmEvent extends EventObject {
   }
 
   /**
-   * @return <code>true</code> if the event is caused by an initialization. This
-   *         event kind is also generated if <code>setPmBean</code> was called
+   * @return <code>true</code> if the event reports that the data content of the PM subtree is completely changed.
+   *         This event kind is also generated if <code>setPmBean</code> was called
    *         and all values of the related PM sub-tree are exchanged.
    */
+  public boolean isAllChangedEvent() {
+    return (changeMask & ALL_CHANGE_EVENTS) == ALL_CHANGE_EVENTS;
+  }
+
+  /** @deprecated please use #isAllChangedEvent(). */
   public boolean isInitializationEvent() {
     return (changeMask & ALL_CHANGE_EVENTS) == ALL_CHANGE_EVENTS;
   }

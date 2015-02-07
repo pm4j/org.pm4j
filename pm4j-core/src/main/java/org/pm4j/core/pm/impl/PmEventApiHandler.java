@@ -147,7 +147,7 @@ public class PmEventApiHandler {
 
       // Non-init events will be propagated to the parent hierarchy.
       // This allows to maintain the changed state of a sub-tree.
-      if (! event.isInitializationEvent()) {
+      if (! event.isAllChangedEvent()) {
         propagateEventToParents(pmImpl, event);
       }
     }

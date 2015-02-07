@@ -106,7 +106,7 @@ public abstract class MasterPmHandlerImpl<T_MASTER_BEAN> implements MasterPmHand
       PostProcessor<Object> postProcessor = new PostProcessor<Object>() {
         @Override
         public void postProcess(PmEvent event, Object postProcessPayload) {
-          if (event.isInitializationEvent() || event.isReloadEvent()) {
+          if (event.isAllChangedEvent() || event.isReloadEvent()) {
             afterMasterSelectionChange();
           }
         }

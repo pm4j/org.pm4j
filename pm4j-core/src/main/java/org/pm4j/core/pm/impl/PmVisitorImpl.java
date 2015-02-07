@@ -184,7 +184,7 @@ public class PmVisitorImpl {
       if (hints.contains(PmVisitHint.SKIP_NOT_INITIALIZED)) {
         return false;
       } else {
-        PmInitApi.ensurePmInitialization(pm);
+        PmInitApi.initThisPmOnly(pm);
       }
     }
 

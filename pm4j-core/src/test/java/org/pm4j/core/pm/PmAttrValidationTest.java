@@ -13,7 +13,7 @@ import org.pm4j.tools.test._PmAssert;
 
 public class PmAttrValidationTest {
 
-  private TestPm pm = PmInitApi.ensurePmInitialization(new TestPm(new TestConversationPm()));
+  private TestPm pm = PmInitApi.initPmTree(new TestPm(new TestConversationPm()));
 
   @Test
   public void testValidateVisibleAttr() {

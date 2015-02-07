@@ -88,7 +88,7 @@ class BeanPmFactory {
         pm = (T) pmCtor.newInstance();
         ((PmBeanBase<Object>)pm).initPmBean(pmParent, bean);
       }
-      PmInitApi.ensurePmInitialization(pm);
+      PmInitApi.initThisPmOnly(pm);
 
       return pm;
     } catch (Exception e) {

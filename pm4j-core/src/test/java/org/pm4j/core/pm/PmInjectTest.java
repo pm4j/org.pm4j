@@ -58,7 +58,7 @@ public class PmInjectTest {
     pmConversation = new PmConversationImpl();
     pmConversation.setPmNamedObject("myProp", "abc");
     pmConversation.setPmNamedObject("myInjectedProp2", "prop2");
-    myPm = PmInitApi.ensurePmSubTreeInitialization(new MyPm(pmConversation));
+    myPm = PmInitApi.initPmTree(new MyPm(pmConversation));
   }
 
   @Test

@@ -1,12 +1,9 @@
 package org.pm4j.core.pm.api;
 
-import java.util.List;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmConversation;
-import org.pm4j.core.pm.PmDataInput;
 import org.pm4j.core.pm.PmMessage;
 import org.pm4j.core.pm.PmMessage.Severity;
 import org.pm4j.core.pm.PmObject;
@@ -15,6 +12,8 @@ import org.pm4j.core.pm.api.PmVisitorApi.PmVisitResult;
 import org.pm4j.core.pm.impl.PmConversationImpl;
 import org.pm4j.core.pm.impl.PmObjectBase;
 import org.pm4j.core.pm.impl.PmUtil;
+
+import java.util.List;
 
 /**
  * API for PM validation related operations.
@@ -70,7 +69,7 @@ public final class PmValidationApi {
       }
 
       List<PmMessage> conversationErrorsBeforeValidate = PmMessageApi.getPmTreeMessages(pmConversation, Severity.ERROR);
-      validationExecTreeRootPm.pmValidate();
+      validate(validationExecTreeRootPm);
       List<PmMessage> conversationErrorsAfterValidate = PmMessageApi.getPmTreeMessages(pmConversation, Severity.ERROR);
 
       if (conversationErrorsAfterValidate.isEmpty()) {
@@ -103,6 +102,20 @@ public final class PmValidationApi {
       }
   }
 
+  /**
+   * Validates the given PM without clearing existing messages.
+   * <p>
+   * If you need to prevent messages duplicates from former validation calls, you may consider using
+   * #validateSubTree.
+   *
+   * @param pm The PM to validate.
+   * @return <code>true</code> if there are finally no error messages in the tree of the given PM.
+   */
+  public static boolean validate(PmObject pm) {
+    pm.pmValidate();
+    return pm.isPmValid();
+  }
+
   // TODO olaf:
   static boolean validate(PmObject startPm, final boolean skipReadOnly) {
     PmVisitCallBack cb = new PmVisitCallBack() {
@@ -112,7 +125,7 @@ public final class PmValidationApi {
             (skipReadOnly && pm.isPmReadonly())) {
           return PmVisitResult.SKIP_CHILDREN;
         } else {
-          pm.pmValidate();
+          validate(pm);
           return PmVisitResult.CONTINUE;
         }
       }

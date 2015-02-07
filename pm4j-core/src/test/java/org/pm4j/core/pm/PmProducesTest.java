@@ -27,7 +27,7 @@ public class PmProducesTest {
     private PmAttrString injectedRefToProducedStringAttr;
   }
 
-  private MyPm myPm = PmInitApi.ensurePmSubTreeInitialization(new MyPm());
+  private MyPm myPm = PmInitApi.initPmTree(new MyPm());
 
   @Test
   public void testProducedInjection() {

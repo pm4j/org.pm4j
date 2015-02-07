@@ -23,22 +23,30 @@ public class PmInitApi {
    * @param pm The PM to initialize.
    * @return the PM reference again for inline usage.
    */
-  public static <T extends PmObject> T ensurePmInitialization(T pm) {
+  public static <T extends PmObject> T initThisPmOnly(T pm) {
     ((PmObjectBase)pm).zz_ensurePmInitialization();
     return pm;
   }
+  @Deprecated
+  public static <T extends PmObject> T ensurePmInitialization(T pm) {
+    return initThisPmOnly(pm);
+  }
 
+  @Deprecated
+  public static <T extends PmObject> T ensurePmSubTreeInitialization(T rootPm) {
+    return initPmTree(rootPm);
+  }
   /**
    * Ensures that the passed PM and all of it's PM children are initialized.
    *
    * @param rootPm The root PM of the PM tree part to initialize.
    * @return the PM reference again for inline usage.
    */
-  public static <T extends PmObject> T ensurePmSubTreeInitialization(T rootPm) {
+  public static <T extends PmObject> T initPmTree(T rootPm) {
     PmVisitorImpl visitor = new PmVisitorImpl(new PmVisitCallBack() {
         @Override
         public PmVisitResult visit(PmObject pm) {
-          ensurePmInitialization(pm);
+          initThisPmOnly(pm);
           return PmVisitResult.CONTINUE;
         }
       }
