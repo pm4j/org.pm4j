@@ -119,12 +119,15 @@ public class PmTabSetImpl extends PmObjectBase implements PmTabSet {
    *          The tab to leave.
    * @param toTab
    *          The tab to enter.
+   * @param tabChangeCmd
+   *          The internally used tab change command. May be used for command confirmation scenarios.
+   *
    * @return <code>true</code> if the switch is allowed.<br>
    *         <code>false</code> prevents the tab switch.
    *
    */
-  protected boolean beforeSwitch(PmTab fromTab, PmTab toTab) {
-    return switchToTabPmImpl(null, fromTab, toTab);
+  protected boolean beforeSwitch(PmTab fromTab, PmTab toTab, PmCommand tabChangeCmd) {
+    return switchToTabPmImpl(tabChangeCmd, fromTab, toTab);
   }
 
   /**
@@ -251,10 +254,7 @@ public class PmTabSetImpl extends PmObjectBase implements PmTabSet {
     protected boolean beforeDo() {
       boolean canDo = super.beforeDo();
       if (canDo) {
-        // XXX olaf: a strange solution. This should happen in doItImpl()...
-        // A split off to canSwitch and switch could make it clearer. But that makes
-        // it harder to express some business constraints. Check!
-        canDo = tabSet.switchToTabPmImpl(this, fromTab, toTab);
+        canDo = tabSet.beforeSwitch(fromTab, toTab, this);
       }
       return canDo;
     }
