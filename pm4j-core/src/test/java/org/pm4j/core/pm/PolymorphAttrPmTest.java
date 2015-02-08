@@ -27,22 +27,22 @@ public class PolymorphAttrPmTest {
 
   @Test
   public void testStringAttr() {
-    assertEquals(String.class, pmWithStringAttr.polymorphAttr.getValueType());
+    assertEquals(String.class, pmWithStringAttr.polymorphAttr.getValueClass());
     setValueAsString(pmWithStringAttr.polymorphAttr, "1");
     assertEquals("1", pmWithStringAttr.polymorphAttr.getValue());
   }
 
   @Test
   public void testIntegerAttr() {
-    assertEquals(Integer.class, pmWithIntAttr.polymorphAttr.getValueType());
+    assertEquals(Integer.class, pmWithIntAttr.polymorphAttr.getValueClass());
     setValueAsString(pmWithIntAttr.polymorphAttr, "1");
     assertEquals(new Integer(1), pmWithIntAttr.polymorphAttr.getValue());
   }
 
   @Test
   public void testBothAttrTypes() {
-    assertEquals(Integer.class, pmWithIntAttr.polymorphAttr.getValueType());
-    assertEquals(String.class, pmWithStringAttr.polymorphAttr.getValueType());
+    assertEquals(Integer.class, pmWithIntAttr.polymorphAttr.getValueClass());
+    assertEquals(String.class, pmWithStringAttr.polymorphAttr.getValueClass());
 
     setValueAsString(pmWithIntAttr.polymorphAttr, "1");
     setValueAsString(pmWithStringAttr.polymorphAttr, "1");

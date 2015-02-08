@@ -1421,7 +1421,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   }
 
   @Override
-  public Class<?> getValueType() {
+  public Class<?> getValueClass() {
     Type t = GenericTypeUtil.resolveGenericArgument(PmAttrBase.class, getClass(), 0);
     if (t instanceof ParameterizedType) {
       t = ((ParameterizedType)t).getRawType();

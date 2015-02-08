@@ -51,7 +51,7 @@ public class PmAttrShortTest {
 
   @Test
   public void testValueType() {
-    Class<?> t = myPm.shortAttr.getValueType();
+    Class<?> t = myPm.shortAttr.getValueClass();
     assertEquals(Short.class, t);
   }
 

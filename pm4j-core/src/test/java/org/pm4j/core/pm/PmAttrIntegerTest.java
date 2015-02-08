@@ -37,7 +37,7 @@ public class PmAttrIntegerTest {
 
   @Test
   public void testValueType() {
-    assertEquals(Integer.class, new MyPm().i.getValueType());
+    assertEquals(Integer.class, new MyPm().i.getValueClass());
   }
 
   @Test

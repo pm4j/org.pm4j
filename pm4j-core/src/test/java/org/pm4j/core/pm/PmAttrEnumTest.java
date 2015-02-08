@@ -35,7 +35,7 @@ public class PmAttrEnumTest {
 
   @Test
   public void testValueType() {
-    Class<?> t = new MyPm().myEnum.getValueType();
+    Class<?> t = new MyPm().myEnum.getValueClass();
     assertEquals(MyEnum.class, t);
     assertTrue(Enum.class.isAssignableFrom(t));
   }

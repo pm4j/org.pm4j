@@ -244,7 +244,7 @@ public class PmAttrDoubleTest {
 
   @Test
   public void testValueType() {
-    assertEquals(Double.class, myPm.bare.getValueType());
+    assertEquals(Double.class, myPm.bare.getValueClass());
   }
 
 }

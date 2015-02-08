@@ -41,8 +41,8 @@ public class PmAttrListTest {
 
   @Test
   public void testValueType() {
-    assertEquals(List.class, testPm.listOfStrings.getValueType());
-    assertEquals(List.class, testPm.listOfLongs.getValueType());
+    assertEquals(List.class, testPm.listOfStrings.getValueClass());
+    assertEquals(List.class, testPm.listOfLongs.getValueClass());
   }
 
   @Test
