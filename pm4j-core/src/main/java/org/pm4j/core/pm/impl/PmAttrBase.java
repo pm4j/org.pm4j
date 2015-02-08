@@ -650,7 +650,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
    * @return <code>true</code> when the attribute value was really changed.
    */
   // TODO oboede: make it final or package private? Which functionality is not covered by setBackingValueImpl()?
-  protected boolean setValueImpl(SetValueContainer<T_PM_VALUE> value) {
+  boolean setValueImpl(SetValueContainer<T_PM_VALUE> value) {
     PmEventApi.ensureThreadEventSource(this);
     MetaData metaData = getOwnMetaData();
 

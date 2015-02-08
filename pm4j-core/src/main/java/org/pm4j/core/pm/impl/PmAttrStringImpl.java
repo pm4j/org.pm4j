@@ -31,7 +31,7 @@ public class PmAttrStringImpl extends PmAttrBase<String, String> implements PmAt
    * Adds trim functionality to the generic value interface.
    */
   @Override
-  protected boolean setValueImpl(SetValueContainer<String> value) {
+  boolean setValueImpl(SetValueContainer<String> value) {
     // XXX olaf: move to converter method? - might be the better place...
     if (getOwnMetaData().trim) {
       if (value.isStringValueSet()) {
