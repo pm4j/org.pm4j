@@ -1,6 +1,5 @@
 package org.pm4j.standards;
 
-import org.pm4j.core.pm.PmElement;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.impl.PmCommandImpl;
 import org.pm4j.navi.NaviHistory;
@@ -36,7 +35,7 @@ public class PmConfirmedCommand extends PmCommandImpl {
   // TODO olaf: Consider registration of the confirm dialog as a composite child.
   //            This would solve the naming issue, but adds some some child
   //            registration/de-registration code.
-  protected PmElement makeConfirmDialogPm() {
+  protected PmObject makeConfirmDialogPm() {
     return new PmConfirmDialog(this);
   }
 
@@ -72,7 +71,7 @@ public class PmConfirmedCommand extends PmCommandImpl {
         !confirmDisplayed &&
         shouldAskForConfirmation()) {
 
-      PmElement confirmDialogPm = makeConfirmDialogPm();
+      PmObject confirmDialogPm = makeConfirmDialogPm();
 
       // XXX olaf: The rich client currently asks the current navilink for the dialog PM...
       //           Check if there is a chance to get a cleaner communication path...

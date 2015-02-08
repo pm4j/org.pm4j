@@ -25,7 +25,7 @@ public class PmConfirmedDeleteCommand extends PmConfirmedCommand {
   }
 
   @Override
-  protected PmElement makeConfirmDialogPm() {
+  protected PmObject makeConfirmDialogPm() {
     return new PmConfirmDialog(this) {
       @Override
       protected String getNameOfThingToConfirm() {

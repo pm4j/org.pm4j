@@ -1,16 +1,9 @@
 package org.pm4j.core.sample.filebrowser;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-
 import org.pm4j.common.util.collection.ListUtil;
 import org.pm4j.core.pm.PmAttrPmList;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmConversation;
-import org.pm4j.core.pm.PmElement;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmFactoryCfg;
 import org.pm4j.core.pm.api.PmFactoryApi;
@@ -19,6 +12,12 @@ import org.pm4j.core.pm.impl.PmConversationImpl;
 import org.pm4j.core.sample.filebrowser.FileUtil.ListKind;
 import org.pm4j.standards.PmConfirmedCommand;
 import org.pm4j.standards.PmInputDialog;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * PM for a directories.
@@ -72,7 +71,7 @@ public class DirPm extends FilePmBase {
     };
 
     @Override
-    protected PmElement makeConfirmDialogPm() {
+    protected PmObject makeConfirmDialogPm() {
       return new PmInputDialog(this) {
         @Override
         protected void onOk() {
