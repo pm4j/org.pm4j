@@ -1,16 +1,16 @@
 package org.pm4j.core.pm;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.annotation.PmInject;
 import org.pm4j.core.pm.annotation.PmInject.Mode;
 import org.pm4j.core.pm.impl.PmConversationImpl;
-import org.pm4j.core.pm.impl.PmElementImpl;
 import org.pm4j.core.pm.impl.PmInitApi;
+import org.pm4j.core.pm.impl.PmObjectBase;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * Tests some PmInject variants.
@@ -19,7 +19,7 @@ import org.pm4j.core.pm.impl.PmInitApi;
  */
 public class PmInjectTest {
 
-  public final class MyPm extends PmElementImpl {
+  public final class MyPm extends PmObjectBase {
 
     public MyPm(PmObject pmParent) {
       super(pmParent);

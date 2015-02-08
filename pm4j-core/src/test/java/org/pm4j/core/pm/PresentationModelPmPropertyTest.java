@@ -1,11 +1,10 @@
 package org.pm4j.core.pm;
 
 import junit.framework.TestCase;
-
 import org.pm4j.core.pm.annotation.PmInject;
 import org.pm4j.core.pm.api.PmExpressionApi;
 import org.pm4j.core.pm.impl.PmConversationImpl;
-import org.pm4j.core.pm.impl.PmElementImpl;
+import org.pm4j.core.pm.impl.PmObjectBase;
 import org.pm4j.navi.NaviHistory;
 
 public class PresentationModelPmPropertyTest extends TestCase {
@@ -49,7 +48,7 @@ public class PresentationModelPmPropertyTest extends TestCase {
     }
   }
 
-  public final class MyPm extends PmElementImpl {
+  public final class MyPm extends PmObjectBase {
 
     public MyPm(PmObject pmParent) {
       super(pmParent);

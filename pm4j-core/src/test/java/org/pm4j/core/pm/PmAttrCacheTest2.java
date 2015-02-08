@@ -14,13 +14,7 @@ import org.pm4j.core.pm.annotation.PmCacheCfg2.Clear;
 import org.pm4j.core.pm.annotation.PmCacheCfg2.Observe;
 import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
-import org.pm4j.core.pm.impl.PmAttrStringImpl;
-import org.pm4j.core.pm.impl.PmAttrUtil;
-import org.pm4j.core.pm.impl.PmBeanImpl;
-import org.pm4j.core.pm.impl.PmConversationImpl;
-import org.pm4j.core.pm.impl.PmElementBase;
-import org.pm4j.core.pm.impl.PmElementImpl;
-import org.pm4j.core.pm.impl.PmInitApi;
+import org.pm4j.core.pm.impl.*;
 
 public class PmAttrCacheTest2 {
 
@@ -286,7 +280,7 @@ public class PmAttrCacheTest2 {
     public final PmAttrString s = new PmAttrStringImpl(this);
   }
 
-  public static class MyTab extends PmElementImpl implements PmTab {
+  public static class MyTab extends PmObjectBase implements PmTab {
     public MyTab(PmObject pmParent) {
       super(pmParent);
     }

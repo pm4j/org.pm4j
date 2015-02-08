@@ -70,7 +70,7 @@ import org.pm4j.core.pm.impl.pathresolver.PathResolver;
 import org.pm4j.core.pm.impl.pathresolver.PmExpressionPathResolver;
 
 /**
- * A table that presents the content of a set of {@link PmElement}s.
+ * Implementation for @{link PmTable}.
  * <p>
  * The table data related logic is provided by a {@link PageableCollection}.
  * This collection supports the logic for

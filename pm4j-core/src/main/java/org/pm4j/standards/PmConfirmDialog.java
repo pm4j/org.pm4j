@@ -1,14 +1,13 @@
 package org.pm4j.standards;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.api.PmLocalizeApi;
 import org.pm4j.core.pm.impl.PmCommandImpl;
-import org.pm4j.core.pm.impl.PmElementImpl;
 import org.pm4j.core.pm.impl.PmObjectBase;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A standard confirmation dialog PM.<br>
@@ -35,7 +34,7 @@ import org.pm4j.core.pm.impl.PmObjectBase;
  *
  * @author olaf boede
  */
-public class PmConfirmDialog extends PmElementImpl {
+public class PmConfirmDialog extends PmObjectBase {
 
   private PmConfirmedCommand cmdToConfim;
 

@@ -1,12 +1,6 @@
 package org.pm4j.core.sample.album;
 
-import static org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO.CLEAR;
-
-import org.pm4j.core.pm.PmAttr;
-import org.pm4j.core.pm.PmCommand;
-import org.pm4j.core.pm.PmEvent;
-import org.pm4j.core.pm.PmEventListener;
-import org.pm4j.core.pm.PmObject;
+import org.pm4j.core.pm.*;
 import org.pm4j.core.pm.annotation.PmCommandCfg;
 import org.pm4j.core.pm.annotation.PmInject;
 import org.pm4j.core.pm.annotation.PmOptionCfg;
@@ -15,12 +9,14 @@ import org.pm4j.core.pm.annotation.PmTitleCfg;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.impl.PmAttrImpl;
 import org.pm4j.core.pm.impl.PmCommandImpl;
-import org.pm4j.core.pm.impl.PmElementImpl;
+import org.pm4j.core.pm.impl.PmObjectBase;
 import org.pm4j.core.sample.album.domain.Album;
 import org.pm4j.core.sample.album.domain.AlbumService;
 import org.pm4j.standards.PmConfirmedCommand;
 
-public class AlbumFormPm extends PmElementImpl {
+import static org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO.CLEAR;
+
+public class AlbumFormPm extends PmObjectBase {
 
   public AlbumFormPm(PmObject pmParent) {
     super(pmParent);

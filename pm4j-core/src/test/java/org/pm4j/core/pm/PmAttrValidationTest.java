@@ -1,15 +1,15 @@
 package org.pm4j.core.pm;
 
-import java.util.Locale;
-
 import org.junit.Test;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.annotation.PmTitleCfg;
 import org.pm4j.core.pm.impl.PmAttrIntegerImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
-import org.pm4j.core.pm.impl.PmElementImpl;
 import org.pm4j.core.pm.impl.PmInitApi;
+import org.pm4j.core.pm.impl.PmObjectBase;
 import org.pm4j.tools.test._PmAssert;
+
+import java.util.Locale;
 
 public class PmAttrValidationTest {
 
@@ -27,7 +27,7 @@ public class PmAttrValidationTest {
   }
 
 
-  public static class TestPm extends PmElementImpl {
+  public static class TestPm extends PmObjectBase {
     boolean requiredIntVisible = true;
 
     @PmAttrCfg(required=true)

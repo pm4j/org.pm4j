@@ -1,26 +1,16 @@
 package org.pm4j.deprecated.core.pm.remote;
 
-import static org.junit.Assert.assertEquals;
-
 import org.junit.Ignore;
 import org.junit.Test;
-import org.pm4j.core.pm.PmAttrInteger;
-import org.pm4j.core.pm.PmAttrString;
-import org.pm4j.core.pm.PmCommand;
-import org.pm4j.core.pm.PmConversation;
-import org.pm4j.core.pm.PmElement;
+import org.pm4j.core.pm.*;
 import org.pm4j.core.pm.PmMessage.Severity;
-import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmAttrIntegerCfg;
 import org.pm4j.core.pm.annotation.PmCommandCfg;
 import org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO;
 import org.pm4j.core.pm.api.PmMessageApi;
-import org.pm4j.core.pm.impl.PmAttrIntegerImpl;
-import org.pm4j.core.pm.impl.PmAttrStringImpl;
-import org.pm4j.core.pm.impl.PmCommandImpl;
-import org.pm4j.core.pm.impl.PmConversationImpl;
-import org.pm4j.core.pm.impl.PmElementImpl;
-import org.pm4j.core.pm.impl.PmUtil;
+import org.pm4j.core.pm.impl.*;
+
+import static org.junit.Assert.assertEquals;
 
 public class PmRemoteChannelInVmTest {
 
@@ -51,7 +41,7 @@ public class PmRemoteChannelInVmTest {
   }
 
 
-  public static class ClientPm extends PmElementImpl {
+  public static class ClientPm extends PmObjectBase {
     public ClientPm(PmObject pmParent) { super(pmParent); }
 
     public final PmAttrString s1 = new PmAttrStringImpl(this);
@@ -68,7 +58,7 @@ public class PmRemoteChannelInVmTest {
   }
 
 
-  public static class ServerPm extends PmElementImpl {
+  public static class ServerPm extends PmObjectBase {
     public ServerPm(PmObject pmParent) {
       super(pmParent);
     }

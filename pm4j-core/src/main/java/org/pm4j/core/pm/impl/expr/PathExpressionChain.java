@@ -1,23 +1,13 @@
 package org.pm4j.core.pm.impl.expr;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import org.apache.commons.lang.StringUtils;
-import org.pm4j.common.expr.AttributeExpr;
-import org.pm4j.common.expr.ConcatExpr;
-import org.pm4j.common.expr.ExprBase;
-import org.pm4j.common.expr.ExprExecCtxt;
-import org.pm4j.common.expr.ExprExecExeption;
-import org.pm4j.common.expr.Expression;
-import org.pm4j.common.expr.MethodCallExpr;
+import org.pm4j.common.expr.*;
 import org.pm4j.common.expr.NameWithModifier.Modifier;
-import org.pm4j.common.expr.OptionalExpression;
-import org.pm4j.common.expr.ScalarExpr;
-import org.pm4j.common.expr.ThisExpr;
 import org.pm4j.common.expr.parser.ParseCtxt;
 import org.pm4j.common.expr.parser.ParseException;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class PathExpressionChain extends ExprBase<ExprExecCtxt> {
 
@@ -47,15 +37,6 @@ public class PathExpressionChain extends ExprBase<ExprExecCtxt> {
         break;
       }
 
-      if (r.hasNameModifier(Modifier.REPEATED)) {
-        if (i == chain.length-1) {
-          // Double check. Is also done within the parse operation
-          throw new ExprExecExeption(ctxt, "A repeated expression can't be used as last part of an expression.");
-        }
-
-        ctxt = evalRepeated(ctxt, r, Arrays.copyOfRange(chain, i+1, chain.length));
-        return ctxt.getCurrentValue();
-      }
     }
     return ctxt.getCurrentValue();
   }
@@ -78,10 +59,6 @@ public class PathExpressionChain extends ExprBase<ExprExecCtxt> {
         }
       }
 
-      if (r.hasNameModifier(Modifier.REPEATED)) {
-        ctxt = evalRepeated(ctxt, r, Arrays.copyOfRange(chain, i+1, chain.length-1));
-        break;
-      }
     }
     chain[lastPos].execAssign(ctxt, value);
   }
@@ -208,10 +185,6 @@ public class PathExpressionChain extends ExprBase<ExprExecCtxt> {
         else {
           throw new ParseException(ctxt, "Path expression expected after the dot character.");
         }
-      }
-
-      if (exprList.get(exprList.size()-1).hasNameModifier(Modifier.REPEATED)) {
-        throw new ParseException(ctxt, "A repeated expression can't be used as last part of an expression.");
       }
 
       if (exprList.size() == 1) {

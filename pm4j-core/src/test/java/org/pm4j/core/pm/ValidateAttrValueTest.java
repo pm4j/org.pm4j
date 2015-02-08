@@ -1,14 +1,5 @@
 package org.pm4j.core.pm;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO.VALIDATE;
-import static org.pm4j.tools.test._PmAssert.assertMessageText;
-import static org.pm4j.tools.test._PmAssert.assertNoMessagesInSubTree;
-
-import java.util.Locale;
-
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -23,7 +14,14 @@ import org.pm4j.core.pm.api.PmValidationApi;
 import org.pm4j.core.pm.impl.PmAttrIntegerImpl;
 import org.pm4j.core.pm.impl.PmCommandImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
-import org.pm4j.core.pm.impl.PmElementImpl;
+import org.pm4j.core.pm.impl.PmObjectBase;
+
+import java.util.Locale;
+
+import static org.junit.Assert.*;
+import static org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO.VALIDATE;
+import static org.pm4j.tools.test._PmAssert.assertMessageText;
+import static org.pm4j.tools.test._PmAssert.assertNoMessagesInSubTree;
 
 public class ValidateAttrValueTest {
 
@@ -154,7 +152,7 @@ public class ValidateAttrValueTest {
    * The testee.
    */
   public static class MyPmClass extends PmConversationImpl {
-    public static class NestedPm extends PmElementImpl {
+    public static class NestedPm extends PmObjectBase {
       public NestedPm(PmObject pmParent) { super(pmParent); }
 
       @PmAttrIntegerCfg(maxValue=10)

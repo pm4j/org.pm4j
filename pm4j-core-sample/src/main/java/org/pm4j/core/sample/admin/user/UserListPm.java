@@ -2,22 +2,18 @@ package org.pm4j.core.sample.admin.user;
 
 import org.pm4j.core.pm.PmAttrPmList;
 import org.pm4j.core.pm.PmCommand;
-import org.pm4j.core.pm.annotation.PmAttrCfg;
-import org.pm4j.core.pm.annotation.PmBeanCfg;
-import org.pm4j.core.pm.annotation.PmFactoryCfg;
-import org.pm4j.core.pm.annotation.PmInject;
-import org.pm4j.core.pm.annotation.PmTitleCfg;
+import org.pm4j.core.pm.annotation.*;
 import org.pm4j.core.pm.impl.PmAttrPmListImpl;
 import org.pm4j.core.pm.impl.PmBeanBase;
 import org.pm4j.core.pm.impl.PmCommandImpl;
-import org.pm4j.core.pm.impl.PmElementImpl;
+import org.pm4j.core.pm.impl.PmObjectBase;
 import org.pm4j.core.pm.impl.commands.PmCommandNaviBack;
 import org.pm4j.core.sample.admin.AdminPages;
 import org.pm4j.core.sample.admin.user.service.User;
 import org.pm4j.core.sample.admin.user.service.UserService;
 
 /** PM for the page that shows the list of existing users. */
-public class UserListPm extends PmElementImpl {
+public class UserListPm extends PmObjectBase {
 
   /**
    * The list of user items to show.<br>

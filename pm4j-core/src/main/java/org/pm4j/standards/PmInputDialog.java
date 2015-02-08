@@ -1,7 +1,5 @@
 package org.pm4j.standards;
 
-import static org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO.CLEAR;
-
 import org.pm4j.core.pm.PmAttrString;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmObject;
@@ -9,7 +7,9 @@ import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.annotation.PmCommandCfg;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
 import org.pm4j.core.pm.impl.PmCommandImpl;
-import org.pm4j.core.pm.impl.PmElementImpl;
+import org.pm4j.core.pm.impl.PmObjectBase;
+
+import static org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO.CLEAR;
 
 /**
  * Supports the common scenario, where a string should be entered within a dialog.
@@ -18,7 +18,7 @@ import org.pm4j.core.pm.impl.PmElementImpl;
  *
  * @author olaf boede
  */
-public class PmInputDialog extends PmElementImpl {
+public class PmInputDialog extends PmObjectBase {
 
   /**
    * Constructor for dependency injection scenarios.<br>

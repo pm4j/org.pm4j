@@ -10,13 +10,13 @@ import org.pm4j.core.pm.annotation.PmOptionCfg;
 import org.pm4j.core.pm.impl.PmAttrImpl;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
 import org.pm4j.core.pm.impl.PmCommandImpl;
-import org.pm4j.core.pm.impl.PmElementImpl;
+import org.pm4j.core.pm.impl.PmObjectBase;
 import org.pm4j.deprecated.core.sample.admin.remote_sample.server.service.Department;
 import org.pm4j.deprecated.core.sample.admin.remote_sample.server.service.LoginService;
 import org.pm4j.deprecated.core.sample.admin.remote_sample.shared.LoginState;
 
 
-public class LoginSrvPm extends PmElementImpl {
+public class LoginSrvPm extends PmObjectBase {
 //  @PmServerCfg(providedAspects={PmAspect.VALUE, PmAspect.OPTIONS})
   @PmOptionCfg(values="#adminService.departments", id="id", title="name")
   public final PmAttr<Department> department = new PmAttrImpl<Department>(this);

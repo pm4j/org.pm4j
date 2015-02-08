@@ -1,12 +1,5 @@
 package org.pm4j.core.pm.annotation.customize;
 
-import static org.junit.Assert.assertEquals;
-
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,12 +7,19 @@ import org.pm4j.core.pm.PmAttrString;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
-import org.pm4j.core.pm.impl.PmElementImpl;
+import org.pm4j.core.pm.impl.PmObjectBase;
 import org.pm4j.core.pm.impl.PmUtil;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+import static org.junit.Assert.assertEquals;
 
 public class PermissionAnnotationHandlerTest {
 
-  public static class MyPermissionAnnotatedPm extends PmElementImpl {
+  public static class MyPermissionAnnotatedPm extends PmObjectBase {
 
     /** Visible for all, but only editable for authors. */
     @MyPermissionCfg(editableFor=UserRole.AUTHOR)

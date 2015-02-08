@@ -1,33 +1,16 @@
 package org.pm4j.demo.basic;
 
-import static org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO.CLEAR;
+import org.pm4j.core.pm.*;
+import org.pm4j.core.pm.annotation.PmAttrCfg;
+import org.pm4j.core.pm.annotation.PmCommandCfg;
+import org.pm4j.core.pm.impl.*;
+import org.pm4j.core.pm.impl.commands.PmCommandNaviBack;
 
 import java.util.Locale;
 
-import org.pm4j.core.pm.PmAttrBoolean;
-import org.pm4j.core.pm.PmAttrDate;
-import org.pm4j.core.pm.PmAttrDouble;
-import org.pm4j.core.pm.PmAttrEnum;
-import org.pm4j.core.pm.PmAttrInteger;
-import org.pm4j.core.pm.PmAttrLong;
-import org.pm4j.core.pm.PmAttrString;
-import org.pm4j.core.pm.PmCommand;
-import org.pm4j.core.pm.PmConversation;
-import org.pm4j.core.pm.PmObject;
-import org.pm4j.core.pm.annotation.PmAttrCfg;
-import org.pm4j.core.pm.annotation.PmCommandCfg;
-import org.pm4j.core.pm.impl.PmAttrBooleanImpl;
-import org.pm4j.core.pm.impl.PmAttrDateImpl;
-import org.pm4j.core.pm.impl.PmAttrDoubleImpl;
-import org.pm4j.core.pm.impl.PmAttrEnumImpl;
-import org.pm4j.core.pm.impl.PmAttrIntegerImpl;
-import org.pm4j.core.pm.impl.PmAttrLongImpl;
-import org.pm4j.core.pm.impl.PmAttrStringImpl;
-import org.pm4j.core.pm.impl.PmCommandImpl;
-import org.pm4j.core.pm.impl.PmElementImpl;
-import org.pm4j.core.pm.impl.commands.PmCommandNaviBack;
+import static org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO.CLEAR;
 
-public class BasicDemoElementPm extends PmElementImpl {
+public class BasicDemoElementPm extends PmObjectBase {
 
   @PmAttrCfg(required=true, maxLen=10)
   public final PmAttrString      textFieldShort = new PmAttrStringImpl(this);

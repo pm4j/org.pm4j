@@ -5,16 +5,12 @@ import org.pm4j.core.pm.PmAttrLong;
 import org.pm4j.core.pm.PmAttrString;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
-import org.pm4j.core.pm.impl.PmAttrEnumImpl;
-import org.pm4j.core.pm.impl.PmAttrLongImpl;
-import org.pm4j.core.pm.impl.PmAttrStringImpl;
-import org.pm4j.core.pm.impl.PmCommandImpl;
-import org.pm4j.core.pm.impl.PmElementImpl;
+import org.pm4j.core.pm.impl.*;
 import org.pm4j.deprecated.core.sample.admin.remote_sample.annotations.PmClientCfg;
 import org.pm4j.deprecated.core.sample.admin.remote_sample.shared.Gender;
 
 @PmClientCfg()
-public class SampleUserPm extends PmElementImpl {
+public class SampleUserPm extends PmObjectBase {
 
   // TODO: add a remote configuration to API.
   protected String getPmServerCfg() {

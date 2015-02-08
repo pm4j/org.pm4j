@@ -1,22 +1,18 @@
 package org.pm4j.core.pm.api;
 
-import static junit.framework.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-
-import java.util.List;
-
 import org.junit.Before;
 import org.junit.Test;
-import org.pm4j.core.pm.PmAttrInteger;
-import org.pm4j.core.pm.PmConstants;
-import org.pm4j.core.pm.PmConversation;
-import org.pm4j.core.pm.PmMessage;
-import org.pm4j.core.pm.PmObject;
+import org.pm4j.core.pm.*;
 import org.pm4j.core.pm.PmMessage.Severity;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.impl.PmAttrIntegerImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
-import org.pm4j.core.pm.impl.PmElementImpl;
+import org.pm4j.core.pm.impl.PmObjectBase;
+
+import java.util.List;
+
+import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 public class PmValidationApiTest {
 
@@ -43,7 +39,7 @@ public class PmValidationApiTest {
     assertEquals(PmConstants.MSGKEY_VALIDATION_MISSING_REQUIRED_VALUE, messages.get(0).getMsgKey());
   }
 
-  public static class TestPm extends PmElementImpl {
+  public static class TestPm extends PmObjectBase {
 
     @PmAttrCfg(required=true)
     public final PmAttrInteger i = new PmAttrIntegerImpl(this);

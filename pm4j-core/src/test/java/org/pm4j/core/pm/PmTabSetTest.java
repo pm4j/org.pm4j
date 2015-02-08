@@ -1,12 +1,12 @@
 package org.pm4j.core.pm;
 
-import static org.junit.Assert.assertEquals;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.pm4j.core.pm.impl.PmConversationImpl;
-import org.pm4j.core.pm.impl.PmElementImpl;
+import org.pm4j.core.pm.impl.PmObjectBase;
 import org.pm4j.core.pm.impl.PmTabSetImpl;
+
+import static org.junit.Assert.assertEquals;
 
 public class PmTabSetTest {
 
@@ -94,7 +94,7 @@ public class PmTabSetTest {
 
   /** Each instance that wants to be handled as a tab needs to implement
    * the interface {@link PmTab}. */
-  public static class MyTab extends PmElementImpl implements PmTab {
+  public static class MyTab extends PmObjectBase implements PmTab {
     public MyTab(PmObject pmParent) {
       super(pmParent);
     }

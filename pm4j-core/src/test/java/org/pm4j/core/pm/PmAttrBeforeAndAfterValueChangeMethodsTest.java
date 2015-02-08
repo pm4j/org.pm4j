@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
 import org.pm4j.core.pm.impl.PmElementImpl;
+import org.pm4j.core.pm.impl.PmObjectBase;
 
 
 public class PmAttrBeforeAndAfterValueChangeMethodsTest {
@@ -16,7 +17,7 @@ public class PmAttrBeforeAndAfterValueChangeMethodsTest {
   private boolean allowValueChange = true;
 
 
-  public class MyPm extends PmElementImpl {
+  public class MyPm extends PmObjectBase {
 
     public final PmAttrString myAttr = new PmAttrStringImpl(this) {
 
