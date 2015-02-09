@@ -193,7 +193,7 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
   public PmCommand doIt(boolean changeCommandHistory) {
     PmCommandImpl cmd = zz_doCloneAndRegisterEventSource();
 
-    if (cmd.beforeDo()) {
+    if (cmd._beforeDo()) {
       NaviLink link = null;
       try {
         cmd.doItImpl();
@@ -237,7 +237,7 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
     PmCommandImpl cmd = zz_doCloneAndRegisterEventSource();
     NaviLink link = null;
 
-    if (!cmd.beforeDo()) {
+    if (!cmd._beforeDo()) {
       cmd.commandState = CommandState.BEFORE_DO_RETURNED_FALSE;
       link = cmd.actionReturnOnFailure(null);
     }
@@ -620,9 +620,7 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
       PmMessageApi.clearPmTreeMessages(getValidationErrorRootPm());
     }
 
-    vetoCommandDecorator = commandDecorators.beforeDoReturnVetoDecorator(this);
-    // before-do was successful if all decorators agree.
-    return vetoCommandDecorator == null;
+    return true;
   }
 
   protected NaviLink afterDo(boolean changeCommandHistory) {
@@ -664,7 +662,16 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
     return naviLink;
   }
 
-
+  /** Calls domain specific {@link #beforeDo()} and after that the before-do logic of configured decorators. */
+  boolean _beforeDo() {
+    if (!beforeDo()) {
+      return false;
+    } else {
+      vetoCommandDecorator = commandDecorators.beforeDoReturnVetoDecorator(this);
+      // before-do was successful if all decorators agree.
+      return vetoCommandDecorator == null;
+    }
+  }
 
   /**
    * Provides the command decorator that returned <code>false</code> for its call of
