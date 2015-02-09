@@ -588,9 +588,11 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   /**
    *
    * @return
+   * @deprecated please call getValue and override only getBackingValueImpl.
    */
   // TODO oboede: is there a use case that is not covered by overriding getBackingValueImpl()?
   // Can we make this method final and private?
+  @Deprecated
   protected T_PM_VALUE getValueImpl() {
     try {
       // the method will try to populate pmValue with different approaches

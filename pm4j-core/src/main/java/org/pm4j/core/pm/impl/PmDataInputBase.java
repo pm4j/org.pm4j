@@ -3,6 +3,9 @@ package org.pm4j.core.pm.impl;
 import org.pm4j.core.pm.PmDataInput;
 import org.pm4j.core.pm.PmObject;
 
+/**
+ * For internal use only!
+ */
 public abstract class PmDataInputBase extends PmObjectBase implements PmDataInput {
 
   public PmDataInputBase(PmObject parentPm) {

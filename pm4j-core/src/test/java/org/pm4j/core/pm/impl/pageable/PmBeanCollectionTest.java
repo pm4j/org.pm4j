@@ -1,12 +1,5 @@
 package org.pm4j.core.pm.impl.pageable;
 
-import static junit.framework.Assert.assertTrue;
-import static org.junit.Assert.assertEquals;
-import static org.pm4j.common.pageable.PageableCollection.EVENT_ITEM_UPDATE;
-import static org.pm4j.tools.test._PmAssert.setValue;
-
-import java.util.List;
-
 import org.junit.Test;
 import org.pm4j.common.pageable.PageableCollection;
 import org.pm4j.common.pageable.PageableCollectionTestBase;
@@ -22,12 +15,15 @@ import org.pm4j.core.pm.PmTableCol;
 import org.pm4j.core.pm.annotation.PmBeanCfg;
 import org.pm4j.core.pm.annotation.PmFactoryCfg;
 import org.pm4j.core.pm.api.PmFactoryApi;
-import org.pm4j.core.pm.impl.PmAttrStringImpl;
-import org.pm4j.core.pm.impl.PmBeanImpl;
-import org.pm4j.core.pm.impl.PmConversationImpl;
-import org.pm4j.core.pm.impl.PmTableColImpl;
-import org.pm4j.core.pm.impl.PmTableImpl;
+import org.pm4j.core.pm.impl.*;
 import org.pm4j.tools.test._RecordingPropertyChangeListener;
+
+import java.util.List;
+
+import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.pm4j.common.pageable.PageableCollection.EVENT_ITEM_UPDATE;
+import static org.pm4j.tools.test._PmAssert.setValue;
 
 public class PmBeanCollectionTest extends PageableCollectionTestBase<PmBeanCollectionTest.BeanRowPm> {
 
@@ -95,7 +91,7 @@ public class PmBeanCollectionTest extends PageableCollectionTestBase<PmBeanColle
 
 
   @PmBeanCfg(beanClass=Bean.class)
-  public static class BeanRowPm extends PmBeanImpl<PageableCollectionTestBase.Bean> {
+  public static class BeanRowPm extends PmBeanBase<PageableCollectionTestBase.Bean> {
     public final PmAttrString name = new PmAttrStringImpl(this);
 
     @Override

@@ -14,7 +14,7 @@ import org.pm4j.core.pm.PmObject;
 public class PmLabelImpl extends PmObjectBase implements PmLabel {
 
   /**
-   * @param pmParentElement
+   * @param pmParent
    *          The parent element or session context to get some data like
    *          the current language.<br>
    *          It also provides the resource loading context.

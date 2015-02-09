@@ -34,6 +34,6 @@ public class PmObjectCfgWithPmBeanImplsTest {
     
     @PmBeanCfg(beanClass = Bean.class)
     @PmObjectCfg(visible = Visible.IF_NOT_EMPTY)
-    public final PmBean<Bean> pmBeanImpl = new PmBeanImpl<Bean>(this);
+    public final PmBean<Bean> pmBeanImpl = new PmBeanBase<Bean>(this);
   }
 }

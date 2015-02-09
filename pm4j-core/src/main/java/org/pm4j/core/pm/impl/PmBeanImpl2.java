@@ -383,6 +383,8 @@ public class PmBeanImpl2<T_BEAN>
       myMetaData.autoCreateBean = annotation.autoCreateBean();
       if (StringUtils.isNotBlank(annotation.findBeanExpr())) {
         myMetaData.beanPathResolver = PmExpressionPathResolver.parse(annotation.findBeanExpr());
+      } else if (StringUtils.isNotBlank(annotation.valuePath())) {
+        myMetaData.beanPathResolver = PmExpressionPathResolver.parse(annotation.valuePath());
       }
       myMetaData.setReadOnly(annotation.readOnly());
     }

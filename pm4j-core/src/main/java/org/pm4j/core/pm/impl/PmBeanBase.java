@@ -406,6 +406,9 @@ public class PmBeanBase<T_BEAN>
     if (annotation != null) {
       myMetaData.autoCreateBean = annotation.autoCreateBean();
       myMetaData.beanPropertyKey = StringUtils.trimToEmpty(annotation.findBeanExpr());
+      if (StringUtils.isEmpty(myMetaData.beanPropertyKey)) {
+        myMetaData.beanPropertyKey = StringUtils.trimToEmpty(annotation.valuePath());
+      }
       myMetaData.setReadOnly(annotation.readOnly());
     }
 

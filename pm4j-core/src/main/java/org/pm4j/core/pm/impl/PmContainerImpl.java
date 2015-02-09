@@ -9,7 +9,9 @@ import org.pm4j.core.pm.PmObject;
  * TODO oboede: Will be the replacement for the weak named {@link PmElementImpl}.
  *
  * @author olaf boede
+ * @deprecated Please use {@link org.pm4j.core.pm.impl.PmObjectBase}.
  */
+@Deprecated
 public class PmContainerImpl extends PmElementImpl implements PmContainer {
 
   /**

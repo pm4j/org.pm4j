@@ -152,7 +152,7 @@ public class PmTableValidationTest {
   }
 
   @PmBeanCfg(beanClass=RowBean.class)
-  public static class RowPm extends PmBeanImpl<RowBean> {
+  public static class RowPm extends PmBeanBase<RowBean> {
     public final PmAttrString name = new PmAttrStringImpl(this);
 
     @Override

@@ -62,7 +62,7 @@ public class PmObjectCfgWithPmBeansTest {
     // TODO: move to a separate test class.
     @PmBeanCfg(beanClass = Bean.class)
     @PmObjectCfg(visible = Visible.IF_NOT_EMPTY)
-    public final PmBean<Bean> pmBeanImpl = new PmBeanImpl<Bean>(this);
+    public final PmBean<Bean> pmBeanImpl = new PmBeanBase<Bean>(this);
   }
 
   public static class Bean {

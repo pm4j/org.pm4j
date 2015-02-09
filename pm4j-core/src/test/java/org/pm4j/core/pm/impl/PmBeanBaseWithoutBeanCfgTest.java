@@ -34,7 +34,7 @@ public class PmBeanBaseWithoutBeanCfgTest {
   static class DomainObjectImpl {
   }
 
-  static class DomainObjectPm extends PmBeanImpl<DomainObjectImpl> {
+  static class DomainObjectPm extends PmBeanBase<DomainObjectImpl> {
     /** Constructor */
     DomainObjectPm(PmObject parent) {
       super(parent);

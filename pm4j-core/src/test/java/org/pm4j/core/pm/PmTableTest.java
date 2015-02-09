@@ -1,15 +1,5 @@
 package org.pm4j.core.pm;
 
-import static org.junit.Assert.assertEquals;
-import static org.pm4j.common.pageable.PageableCollection.EVENT_REMOVE_SELECTION;
-import static org.pm4j.tools.test._PmAssert.setValue;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-
 import org.apache.commons.lang.StringUtils;
 import org.junit.Assert;
 import org.junit.Before;
@@ -26,26 +16,19 @@ import org.pm4j.common.query.inmem.InMemSortOrder;
 import org.pm4j.common.selection.SelectMode;
 import org.pm4j.common.util.CompareUtil;
 import org.pm4j.core.pm.PmTable.UpdateAspect;
-import org.pm4j.core.pm.annotation.PmAttrCfg;
-import org.pm4j.core.pm.annotation.PmBeanCfg;
-import org.pm4j.core.pm.annotation.PmBoolean;
-import org.pm4j.core.pm.annotation.PmFactoryCfg;
-import org.pm4j.core.pm.annotation.PmTableCfg;
-import org.pm4j.core.pm.annotation.PmTableColCfg;
-import org.pm4j.core.pm.annotation.PmTitleCfg;
+import org.pm4j.core.pm.annotation.*;
 import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
 import org.pm4j.core.pm.api.PmEventApi;
-import org.pm4j.core.pm.impl.BroadcastPmEventProcessor;
-import org.pm4j.core.pm.impl.PmAttrIntegerImpl;
-import org.pm4j.core.pm.impl.PmAttrStringImpl;
-import org.pm4j.core.pm.impl.PmBeanImpl;
-import org.pm4j.core.pm.impl.PmConversationImpl;
-import org.pm4j.core.pm.impl.PmInitApi;
-import org.pm4j.core.pm.impl.PmTableColImpl;
-import org.pm4j.core.pm.impl.PmTableImpl;
+import org.pm4j.core.pm.impl.*;
 import org.pm4j.tools.test._RecordingPmEventListener;
 import org.pm4j.tools.test._RecordingPropertyChangeListener;
+
+import java.util.*;
+
+import static org.junit.Assert.assertEquals;
+import static org.pm4j.common.pageable.PageableCollection.EVENT_REMOVE_SELECTION;
+import static org.pm4j.tools.test._PmAssert.setValue;
 
 public class PmTableTest {
 
@@ -349,7 +332,7 @@ public class PmTableTest {
   }
 
   @PmBeanCfg(beanClass=RowBean.class)
-  public static class RowPm extends PmBeanImpl<RowBean> {
+  public static class RowPm extends PmBeanBase<RowBean> {
     public final PmAttrString name = new PmAttrStringImpl(this);
     public final PmAttrString description = new PmAttrStringImpl(this);
     public final PmAttrInteger counter = new PmAttrIntegerImpl(this);

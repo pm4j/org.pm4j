@@ -2,6 +2,8 @@ package org.pm4j.core.pm;
 
 
 /**
+ * For internal use only!
+ * <p>
  * Interface for data input related presentation models.
  *
  * @author olaf boede

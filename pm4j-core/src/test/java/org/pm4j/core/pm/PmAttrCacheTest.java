@@ -1,7 +1,5 @@
 package org.pm4j.core.pm;
 
-import static org.junit.Assert.assertEquals;
-
 import org.junit.Test;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.annotation.PmBeanCfg;
@@ -9,11 +7,9 @@ import org.pm4j.core.pm.annotation.PmCacheCfg;
 import org.pm4j.core.pm.annotation.PmCacheCfg.CacheMode;
 import org.pm4j.core.pm.annotation.PmCacheCfg.Clear;
 import org.pm4j.core.pm.api.PmCacheApi;
-import org.pm4j.core.pm.impl.PmAttrStringImpl;
-import org.pm4j.core.pm.impl.PmAttrUtil;
-import org.pm4j.core.pm.impl.PmBeanImpl;
-import org.pm4j.core.pm.impl.PmConversationImpl;
-import org.pm4j.core.pm.impl.PmElementBase;
+import org.pm4j.core.pm.impl.*;
+
+import static org.junit.Assert.assertEquals;
 
 @Deprecated
 public class PmAttrCacheTest {
@@ -131,7 +127,7 @@ public class PmAttrCacheTest {
   // -- Presentation models --
 
   @PmBeanCfg(beanClass=MyPojo.class)
-  public static class MyPojoPm extends PmBeanImpl<MyPojo> {
+  public static class MyPojoPm extends PmBeanBase<MyPojo> {
     public final PmAttrString s = new PmAttrStringImpl(this);
 
     @PmCacheCfg(value=CacheMode.ON)

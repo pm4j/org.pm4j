@@ -21,7 +21,7 @@ public class PmTableImplTest {
   static class RowBean {
   }
 
-  static class RowBeanPm extends PmBeanImpl<RowBean> {
+  static class RowBeanPm extends PmBeanBase<RowBean> {
 
   }
 

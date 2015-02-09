@@ -1,9 +1,5 @@
 package org.pm4j.core.pm.impl.changehandler;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import org.pm4j.common.selection.SelectMode;
 import org.pm4j.core.pm.PmAttrString;
 import org.pm4j.core.pm.PmBean;
@@ -12,18 +8,18 @@ import org.pm4j.core.pm.PmTableCol;
 import org.pm4j.core.pm.annotation.PmBeanCfg;
 import org.pm4j.core.pm.annotation.PmFactoryCfg;
 import org.pm4j.core.pm.annotation.PmTableCfg;
-import org.pm4j.core.pm.impl.PmAttrStringImpl;
-import org.pm4j.core.pm.impl.PmBeanImpl;
-import org.pm4j.core.pm.impl.PmConversationImpl;
-import org.pm4j.core.pm.impl.PmTableColImpl;
-import org.pm4j.core.pm.impl.PmTableImpl;
+import org.pm4j.core.pm.impl.*;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class MasterPmHandlerTestDlg extends PmConversationImpl {
 
   @PmTableCfg(rowSelectMode = SelectMode.SINGLE, valuePath="masterTableBeans")
   public final MasterTablePm masterTable = new MasterTablePm(this);
   @PmBeanCfg(beanClass=Bean.class)
-  public final PmBean<Bean> detailsArea = new PmBeanImpl<Bean>(this);
+  public final PmBean<Bean> detailsArea = new PmBeanBase<Bean>(this);
 
   public List<Bean> masterTableBeans = Arrays.asList(new Bean("a"), new Bean("b"));
 
@@ -65,7 +61,7 @@ public class MasterPmHandlerTestDlg extends PmConversationImpl {
 
 
   @PmBeanCfg(beanClass=Bean.class)
-  public static class MasterRowPm extends PmBeanImpl<Bean> {
+  public static class MasterRowPm extends PmBeanBase<Bean> {
     public final PmAttrString f1 = new PmAttrStringImpl(this);
   }
 

@@ -38,7 +38,7 @@ public class PmBeanBaseAssignableBeanClassesTest {
 
   @PmBeanCfg(beanClass = DomainObjectImpl.class)
   static class DomainObjectPm
-      extends PmBeanImpl<DomainObject> {
+      extends PmBeanBase<DomainObject> {
 
     /** Constructor */
     DomainObjectPm(PmObject parent) {

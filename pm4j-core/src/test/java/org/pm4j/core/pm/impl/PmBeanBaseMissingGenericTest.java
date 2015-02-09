@@ -27,7 +27,7 @@ public class PmBeanBaseMissingGenericTest {
   // The bean without @PmBeanCfg and without generic parameter
   @SuppressWarnings("rawtypes")
   static class DomainObjectPm
-      extends PmBeanImpl {
+      extends PmBeanBase {
 
     /** Constructor */
     DomainObjectPm(PmObject parent) {

@@ -33,7 +33,7 @@ public class PmBeanBaseUsingPmBeanCfgTest {
 
   @PmBeanCfg(beanClass = DomainObjectImpl.class)
   static class DomainObjectPm
-      extends PmBeanImpl<DomainObjectImpl> {
+      extends PmBeanBase<DomainObjectImpl> {
 
     /** Constructor */
     DomainObjectPm(PmObject parent) {

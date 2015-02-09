@@ -49,7 +49,10 @@ public @interface PmBeanCfg {
    * @return An expression that addresses the object to use.<br>
    *         Default value is an empty string.
    */
+  String valuePath() default "";
+  @Deprecated
   String findBeanExpr() default "";
+
 
   /**
    * @return <code>true</code> for PMs with attribute values that shouldn't be changed.

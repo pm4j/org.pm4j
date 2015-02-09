@@ -1,7 +1,5 @@
 package org.pm4j.core.pm;
 
-import static org.junit.Assert.assertEquals;
-
 import org.junit.Test;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
@@ -15,6 +13,8 @@ import org.pm4j.core.pm.annotation.PmCacheCfg2.Observe;
 import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
 import org.pm4j.core.pm.impl.*;
+
+import static org.junit.Assert.assertEquals;
 
 public class PmAttrCacheTest2 {
 
@@ -196,7 +196,7 @@ public class PmAttrCacheTest2 {
   // -- Presentation models --
 
   @PmBeanCfg(beanClass=MyPojo.class)
-  public static class MyPojoPm extends PmBeanImpl<MyPojo> {
+  public static class MyPojoPm extends PmBeanBase<MyPojo> {
 
     public final PmAttrString s = new PmAttrStringImpl(this);
 
@@ -259,7 +259,7 @@ public class PmAttrCacheTest2 {
   };
 
   @PmCacheCfg2(@Cache(property = CacheKind.ALL))
-  public static class MyPmWithMixedAnnotations extends PmBeanImpl<MyPojo> {
+  public static class MyPmWithMixedAnnotations extends PmBeanBase<MyPojo> {
 
     public MyPmWithMixedAnnotations(PmObject pmParent) {
       super(pmParent);
@@ -270,7 +270,7 @@ public class PmAttrCacheTest2 {
   }
 
   @PmCacheCfg(all=org.pm4j.core.pm.annotation.PmCacheCfg.CacheMode.ON)
-  public static class MyPmWithMixedAnnotations2 extends PmBeanImpl<MyPojo> {
+  public static class MyPmWithMixedAnnotations2 extends PmBeanBase<MyPojo> {
 
     public MyPmWithMixedAnnotations2(PmObject pmParent) {
       super(pmParent);

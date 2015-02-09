@@ -12,7 +12,9 @@ package org.pm4j.core.pm;
  * next release.
  *
  * @author olaf boede
+ * @deprecated Please use {@link org.pm4j.core.pm.PmObject}.
  */
+@Deprecated
 public interface PmContainer extends PmElement {
 
 }

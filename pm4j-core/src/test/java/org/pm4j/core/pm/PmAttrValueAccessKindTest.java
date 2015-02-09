@@ -1,13 +1,13 @@
 package org.pm4j.core.pm;
 
-import static org.junit.Assert.assertEquals;
-
 import org.junit.Test;
 import org.pm4j.core.pm.annotation.PmBeanCfg;
 import org.pm4j.core.pm.impl.PmAttrIntegerImpl;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
-import org.pm4j.core.pm.impl.PmBeanImpl;
+import org.pm4j.core.pm.impl.PmBeanBase;
 import org.pm4j.core.pm.impl.PmConversationImpl;
+
+import static org.junit.Assert.assertEquals;
 
 public class PmAttrValueAccessKindTest {
 
@@ -38,7 +38,7 @@ public class PmAttrValueAccessKindTest {
 
 
   @PmBeanCfg(beanClass=MyBean.class)
-  public static class MyPm extends PmBeanImpl<MyBean> {
+  public static class MyPm extends PmBeanBase<MyBean> {
     /** In a subclass of PmBean this field gets bound to the corresponding field or getter/setter pair. */
     public final PmAttrString stringField = new PmAttrStringImpl(this);
     /** In a subclass of PmBean this field gets bound to the corresponding field or getter/setter pair. */

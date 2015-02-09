@@ -1,8 +1,5 @@
 package org.pm4j.core.sample.filebrowser;
 
-import java.io.File;
-import java.util.Date;
-
 import org.pm4j.core.pm.PmAttrDate;
 import org.pm4j.core.pm.PmAttrString;
 import org.pm4j.core.pm.PmCommand;
@@ -11,13 +8,16 @@ import org.pm4j.core.pm.annotation.PmBeanCfg;
 import org.pm4j.core.pm.annotation.PmTitleCfg;
 import org.pm4j.core.pm.impl.PmAttrDateImpl;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
-import org.pm4j.core.pm.impl.PmBeanImpl;
+import org.pm4j.core.pm.impl.PmBeanBase;
 import org.pm4j.core.pm.impl.commands.PmCommandSeparator;
 import org.pm4j.standards.PmConfirmedCommand;
 
+import java.io.File;
+import java.util.Date;
+
 @PmBeanCfg(beanClass=File.class)
 @PmTitleCfg(attrValue="name")
-public class FilePmBase extends PmBeanImpl<File> {
+public class FilePmBase extends PmBeanBase<File> {
 
   /** References by reflection the 'name' property of the File object. */
   public final PmAttrString name = new PmAttrStringImpl(this);

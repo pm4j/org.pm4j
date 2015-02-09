@@ -1,16 +1,12 @@
 package org.pm4j.core.pm;
 
-import static org.junit.Assert.assertEquals;
-import static org.pm4j.tools.test._PmAssert.setValueAsString;
-
 import org.junit.Test;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.annotation.PmAttrCfg.AttrAccessKind;
-import org.pm4j.core.pm.impl.PmAttrIntegerImpl;
-import org.pm4j.core.pm.impl.PmAttrStringImpl;
-import org.pm4j.core.pm.impl.PmBeanImpl;
-import org.pm4j.core.pm.impl.PmConversationImpl;
-import org.pm4j.core.pm.impl.PmInitApi;
+import org.pm4j.core.pm.impl.*;
+
+import static org.junit.Assert.assertEquals;
+import static org.pm4j.tools.test._PmAssert.setValueAsString;
 
 /**
  * Tests the an attribute is generated dynamically to support different value types, depending on some business condition.
@@ -58,7 +54,7 @@ public class PolymorphAttrPmTest {
     }
   }
 
-  public static class TestItemPm extends PmBeanImpl<TestBean> {
+  public static class TestItemPm extends PmBeanBase<TestBean> {
     @PmAttrCfg(accessKind=AttrAccessKind.LOCALVALUE)
     public final PmAttr<?> polymorphAttr = getPmBean().makeIntAttr
         ? new PmAttrIntegerImpl(this)

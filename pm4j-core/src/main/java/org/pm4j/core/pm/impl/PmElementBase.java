@@ -7,6 +7,10 @@ import org.pm4j.core.pm.PmElement;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.api.PmCacheApi;
 
+/**
+ * @deprecated Please use {@link org.pm4j.core.pm.impl.PmObjectBase}.
+ */
+@Deprecated
 public abstract class PmElementBase
         extends PmObjectBase
         implements PmElement {
