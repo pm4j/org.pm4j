@@ -32,7 +32,7 @@ public class PmListAddItemCommand extends PmCommandImpl implements PmCommand {
   }
 
   @Override
-  protected void doItImpl() throws Exception {
+  protected void doItImpl() {
     @SuppressWarnings("unchecked")
     PmAttrPmList<PmBean<?>> pmListAttr = (PmAttrPmList<PmBean<?>>) getPmParent();
 

@@ -33,7 +33,7 @@ public class LoginSrvPm extends PmObjectBase {
 
     @PmInject private LoginService loginService;
 
-    protected void doItImpl() throws Exception {
+    protected void doItImpl()  {
       if (loginService.login(userName.getValue(), pwd.getValue())) {
         loginState.setValue(new LoginState("logged in"));
       }

@@ -148,7 +148,7 @@ public class DeprPmFilterSetBase extends PmBeanBase<DeprFilterSet> implements De
     }
 
     @Override
-    protected void doItImpl() throws Exception {
+    protected void doItImpl()  {
       setPmBean(getDefaultFilterSet());
     }
   }

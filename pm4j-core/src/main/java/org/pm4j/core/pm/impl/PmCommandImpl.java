@@ -291,10 +291,8 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
    * @throws PmUserMessageException
    *           In case of handled failures that should be reported with a
    *           localized error message in the UI.
-   * @throws Exception
-   *           In case of an unexpected failure.
    */
-  protected void doItImpl() throws Exception {
+  protected void doItImpl() {
   }
 
   /**

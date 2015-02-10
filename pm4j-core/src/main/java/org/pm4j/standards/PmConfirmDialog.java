@@ -69,7 +69,7 @@ public class PmConfirmDialog extends PmObjectBase {
   /** Executes the confirmed command. */
   public final PmCommand cmdYes = new PmCommandImpl(this) {
     @Override
-    protected void doItImpl() throws Exception {
+    protected void doItImpl() {
       cmdToConfim.doIt();
     }
 

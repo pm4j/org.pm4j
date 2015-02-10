@@ -19,7 +19,7 @@ public class PmAspectChangeCommandImpl extends PmCommandImpl {
   }
 
   @Override
-  protected void doItImpl() throws Exception {
+  protected void doItImpl() {
     throw new PmRuntimeException(this, "No do-implementation for aspect: " + pmAspectName);
   }
 

@@ -1,7 +1,5 @@
 package org.pm4j.core.pm.impl;
 
-import java.util.Map;
-
 import org.pm4j.common.cache.CacheStrategy;
 import org.pm4j.common.cache.CacheStrategyNoCache;
 import org.pm4j.common.util.collection.MapUtil;
@@ -14,6 +12,8 @@ import org.pm4j.core.pm.annotation.PmCacheCfg2.Clear;
 import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
 import org.pm4j.core.pm.impl.cache.CacheStrategyBase;
 import org.pm4j.core.pm.impl.cache.CacheStrategyRequest;
+
+import java.util.Map;
 
 // TODO oboede: distribute as protected embedded classes of related PM classes.
 class InternalCacheStrategyFactory {

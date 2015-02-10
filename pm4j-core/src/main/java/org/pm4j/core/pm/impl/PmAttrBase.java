@@ -1961,7 +1961,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     }
 
     @Override @SuppressWarnings("unchecked")
-    protected void doItImpl() throws Exception {
+    protected void doItImpl()  {
       ((PmAttrBase<Object, ?>)getPmParent()).setValue(newValue);
     }
 

@@ -29,7 +29,7 @@ public class BasicDemoElementPm extends PmObjectBase {
   // .. persist the values somehow.
   public final PmCommand         cmdSave = new PmCommandImpl(this) {
     @Override
-    protected void doItImpl() throws Exception {
+    protected void doItImpl()  {
       // ... persist the changed values.
       navigateBack();
     }

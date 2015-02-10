@@ -66,7 +66,7 @@ public class DirPm extends FilePmBase {
 
   public final PmCommand cmdMakeSubDir = new PmConfirmedCommand(this) {
     @Override
-    protected void doItImpl() throws Exception {
+    protected void doItImpl()  {
       System.out.println("Stelle Unterverzeichnis her in : " + getPmBean());
     };
 

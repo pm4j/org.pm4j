@@ -30,7 +30,7 @@ public class PmListRemoveItemCommand extends PmCommandImpl implements PmCommand 
   }
 
   @Override
-  protected void doItImpl() throws Exception {
+  protected void doItImpl() {
     @SuppressWarnings("unchecked")
     PmAttrPmList<PmBean<?>> pmAttrList = (PmAttrPmList<PmBean<?>>) getPmParent();
     for (PmBean<?> pm : removedItems) {

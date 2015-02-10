@@ -37,7 +37,7 @@ public class FilePmBase extends PmBeanBase<File> {
       return getPmBean().canWrite();
     }
 
-    @Override protected void doItImpl() throws Exception {
+    @Override protected void doItImpl()  {
       getPmBean().delete();
     }
 

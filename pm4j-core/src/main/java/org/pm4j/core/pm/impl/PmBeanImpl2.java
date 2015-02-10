@@ -1,8 +1,5 @@
 package org.pm4j.core.pm.impl;
 
-import java.util.List;
-import java.util.Set;
-
 import org.apache.commons.lang.StringUtils;
 import org.pm4j.common.cache.CacheStrategy;
 import org.pm4j.common.util.reflection.GenericTypeUtil;
@@ -25,6 +22,9 @@ import org.pm4j.core.pm.api.PmMessageApi;
 import org.pm4j.core.pm.impl.InternalPmCacheCfgUtil.CacheMetaData;
 import org.pm4j.core.pm.impl.pathresolver.PathResolver;
 import org.pm4j.core.pm.impl.pathresolver.PmExpressionPathResolver;
+
+import java.util.List;
+import java.util.Set;
 
 /**
  * A PM that handles a bean.

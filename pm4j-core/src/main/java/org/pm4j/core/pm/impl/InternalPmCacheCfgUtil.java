@@ -1,12 +1,5 @@
 package org.pm4j.core.pm.impl;
 
-import java.lang.annotation.Annotation;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-
 import org.pm4j.common.cache.CacheStrategy;
 import org.pm4j.common.cache.CacheStrategyNoCache;
 import org.pm4j.common.util.collection.MapUtil;
@@ -25,10 +18,13 @@ import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmExpressionApi;
-import org.pm4j.core.pm.impl.InternalPmBeanCacheStrategyFactory.CacheStrategyForPmBeanValue;
 import org.pm4j.core.pm.impl.InternalCacheStrategyFactory.CacheStrategyForNodes;
+import org.pm4j.core.pm.impl.InternalPmBeanCacheStrategyFactory.CacheStrategyForPmBeanValue;
 import org.pm4j.core.pm.impl.cache.CacheStrategyBase;
 import org.pm4j.core.pm.impl.cache.CacheStrategyRequest;
+
+import java.lang.annotation.Annotation;
+import java.util.*;
 
 /**
  * Contains helper methods to work with {@link PmCacheCfg} and {@link PmCacheCfg2} annotation.

@@ -1,9 +1,5 @@
 package org.pm4j.core.pm.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-
 import org.junit.Test;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmAttrString;
@@ -16,6 +12,8 @@ import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.tools.test._RecordingPmEventListener;
+
+import static org.junit.Assert.*;
 
 public class PmBean2Test {
 

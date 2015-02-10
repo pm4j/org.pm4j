@@ -2,8 +2,10 @@ package org.pm4j.core.sample.admin.user;
 
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmAttrString;
-import org.pm4j.core.pm.annotation.*;
-import org.pm4j.core.pm.annotation.PmCacheCfg.CacheMode;
+import org.pm4j.core.pm.annotation.PmAttrCfg;
+import org.pm4j.core.pm.annotation.PmBeanCfg;
+import org.pm4j.core.pm.annotation.PmCacheCfg2;
+import org.pm4j.core.pm.annotation.PmOptionCfg;
 import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.impl.PmAttrImpl;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;

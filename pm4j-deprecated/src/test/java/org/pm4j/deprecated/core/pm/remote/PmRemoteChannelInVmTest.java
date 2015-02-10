@@ -48,7 +48,7 @@ public class PmRemoteChannelInVmTest {
     public final PmAttrInteger i1 = new PmAttrIntegerImpl(this);
 
     public final PmCommand cmdSave = new PmCommandImpl(this) {
-      protected void doItImpl() throws Exception {
+      protected void doItImpl()  {
         PmElement pmParent = PmUtil.getPmParentOfType(this, PmElement.class);
         channel.sendValuesAndCallServerCommand("getMyTestPm('hallo')", pmParent, "cmdSave");
       }
@@ -68,7 +68,7 @@ public class PmRemoteChannelInVmTest {
 
     @PmCommandCfg(beforeDo=BEFORE_DO.VALIDATE) //
     public final PmCommand cmdSave = new PmCommandImpl(this) {
-      protected void doItImpl() throws Exception {
+      protected void doItImpl()  {
         System.out.println("cmdSave was called on server pm.\n"+
             "s1="+s1.getValue() + " i1=" + i1.getValueAsString());
         s1.setValue("Server says hello!");

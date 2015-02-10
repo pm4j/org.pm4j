@@ -43,7 +43,7 @@ public class PmInputDialog extends PmObjectBase {
 
   public final PmCommand cmdOk = new PmCommandImpl(this) {
     @Override
-    protected void doItImpl() throws Exception {
+    protected void doItImpl() {
       onOk();
     }
   };
@@ -51,7 +51,7 @@ public class PmInputDialog extends PmObjectBase {
   @PmCommandCfg(beforeDo=CLEAR)
   public final PmCommand cmdCancel = new PmCommandImpl(this) {
     @Override
-    protected void doItImpl() throws Exception {
+    protected void doItImpl() {
       onCancel();
     }
   };

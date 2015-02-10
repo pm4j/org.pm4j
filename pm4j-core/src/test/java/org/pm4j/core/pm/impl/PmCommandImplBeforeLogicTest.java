@@ -136,7 +136,7 @@ public class PmCommandImplBeforeLogicTest {
     @PmCommandCfg(beforeDo=DO_NOTHING)
     public final PmCommand cmdThatDoesNothingBeforeDoButFails = new ExecReportingCmdPm() {
       @Override
-      protected void doItImpl() throws Exception {
+      protected void doItImpl()  {
         throw new RuntimeException("This command intentially fails.");
       }
     };
@@ -156,7 +156,7 @@ public class PmCommandImplBeforeLogicTest {
       }
 
       @Override
-      protected void doItImpl() throws Exception {
+      protected void doItImpl()  {
         doItImplHasBeenExecuted = true;
       }
     }

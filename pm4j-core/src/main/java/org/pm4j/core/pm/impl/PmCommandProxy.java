@@ -88,7 +88,7 @@ public class PmCommandProxy extends PmCommandImpl {
     }
 
     @Override
-    protected void doItImpl() throws Exception {
+    protected void doItImpl()  {
       executedDelegateCmdClone = delegateCmd.doIt();
     }
 

@@ -105,7 +105,7 @@ public class PmCommandImplAfterLogicTest {
       }
 
       @Override
-      protected void doItImpl() throws Exception {
+      protected void doItImpl()  {
         doItImplHasBeenExecuted = true;
       }
     }

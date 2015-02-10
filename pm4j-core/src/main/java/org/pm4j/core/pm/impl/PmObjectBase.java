@@ -1,22 +1,5 @@
 package org.pm4j.core.pm.impl;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.WeakHashMap;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArraySet;
-
 import org.apache.commons.lang.ClassUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
@@ -32,32 +15,16 @@ import org.pm4j.common.util.reflection.BeanAttrArrayList;
 import org.pm4j.common.util.reflection.ClassUtil;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.exception.PmValidationException;
-import org.pm4j.core.pm.PmBean;
-import org.pm4j.core.pm.PmCommand;
-import org.pm4j.core.pm.PmConversation;
-import org.pm4j.core.pm.PmDefaults;
-import org.pm4j.core.pm.PmElement;
-import org.pm4j.core.pm.PmEvent;
-import org.pm4j.core.pm.PmEventListener;
-import org.pm4j.core.pm.PmMessage;
+import org.pm4j.core.pm.*;
 import org.pm4j.core.pm.PmMessage.Severity;
-import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmCacheCfg.Clear;
-import org.pm4j.core.pm.annotation.PmCacheCfg2;
-import org.pm4j.core.pm.annotation.PmFactoryCfg;
-import org.pm4j.core.pm.annotation.PmInit;
-import org.pm4j.core.pm.annotation.PmObjectCfg;
+import org.pm4j.core.pm.annotation.*;
 import org.pm4j.core.pm.annotation.PmObjectCfg.Enable;
 import org.pm4j.core.pm.annotation.PmObjectCfg.Visible;
-import org.pm4j.core.pm.annotation.PmTitleCfg;
 import org.pm4j.core.pm.annotation.customize.CustomizedAnnotationUtil;
 import org.pm4j.core.pm.annotation.customize.PmAnnotationApi;
-import org.pm4j.core.pm.api.PmCacheApi;
+import org.pm4j.core.pm.api.*;
 import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
-import org.pm4j.core.pm.api.PmEventApi;
-import org.pm4j.core.pm.api.PmMessageApi;
-import org.pm4j.core.pm.api.PmValidationApi;
-import org.pm4j.core.pm.api.PmVisitorApi;
 import org.pm4j.core.pm.api.PmVisitorApi.PmVisitCallBack;
 import org.pm4j.core.pm.api.PmVisitorApi.PmVisitHint;
 import org.pm4j.core.pm.api.PmVisitorApi.PmVisitResult;
@@ -68,6 +35,14 @@ import org.pm4j.core.pm.impl.inject.DiResolverUtil;
 import org.pm4j.core.pm.impl.title.PmTitleProvider;
 import org.pm4j.core.pm.impl.title.PmTitleProviderValuebased;
 import org.pm4j.core.pm.impl.title.TitleProviderAttrValueBased;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * Provides common presentation model base functionality.
