@@ -4,11 +4,8 @@ import org.junit.Test;
 import org.pm4j.common.query.QueryAttr;
 import org.pm4j.common.query.SortOrder;
 import org.pm4j.core.pm.PmTable.UpdateAspect;
-import org.pm4j.core.pm.annotation.PmAttrCfg;
-import org.pm4j.core.pm.annotation.PmBeanCfg;
-import org.pm4j.core.pm.annotation.PmCacheCfg;
+import org.pm4j.core.pm.annotation.*;
 import org.pm4j.core.pm.annotation.PmCacheCfg.CacheMode;
-import org.pm4j.core.pm.annotation.PmFactoryCfg;
 import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.impl.*;
 
@@ -111,7 +108,7 @@ public class PmTableCacheTest {
   public static class MyRowPm extends PmBeanBase<MyRowBean> {
     public final PmAttrString s = new PmAttrStringImpl(this);
 
-    @PmCacheCfg(value=CacheMode.ON)
+    @PmCacheCfg2(@PmCacheCfg2.Cache(property = PmCacheApi.CacheKind.VALUE))
     @PmAttrCfg(valuePath="pmBean.s")
     public final PmAttrString sCached = new PmAttrStringImpl(this);
 
@@ -130,7 +127,7 @@ public class PmTableCacheTest {
     }
   }
 
-  @PmCacheCfg(value=CacheMode.ON)
+  @PmCacheCfg2(@PmCacheCfg2.Cache(property = PmCacheApi.CacheKind.VALUE))
   public static class MyTablePmWithCachedCollectionRef extends MyTablePm {
     public MyTablePmWithCachedCollectionRef(PmObject pmParent) {
       super(pmParent);
