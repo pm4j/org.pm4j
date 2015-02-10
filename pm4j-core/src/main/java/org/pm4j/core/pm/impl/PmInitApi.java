@@ -27,15 +27,7 @@ public class PmInitApi {
     ((PmObjectBase)pm).zz_ensurePmInitialization();
     return pm;
   }
-  @Deprecated
-  public static <T extends PmObject> T ensurePmInitialization(T pm) {
-    return initThisPmOnly(pm);
-  }
 
-  @Deprecated
-  public static <T extends PmObject> T ensurePmSubTreeInitialization(T rootPm) {
-    return initPmTree(rootPm);
-  }
   /**
    * Ensures that the passed PM and all of it's PM children are initialized.
    *

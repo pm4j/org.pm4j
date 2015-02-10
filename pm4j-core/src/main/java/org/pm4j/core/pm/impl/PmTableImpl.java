@@ -68,7 +68,7 @@ import java.util.*;
  */
 public class PmTableImpl
         <T_ROW_PM extends PmBean<T_ROW_BEAN>, T_ROW_BEAN>
-        extends PmDataInputBase
+        extends PmObjectBase
         implements PmTable<T_ROW_PM> {
 
   /**
@@ -682,7 +682,7 @@ public class PmTableImpl
   }
 
   /**
-   * Reads the {@link QueryOptions} to using the information provided by the given {@link TablePm2}
+   * Reads the {@link QueryOptions} to using the information provided by the given {@link org.pm4j.core.pm.PmTable}
    * and {@link QueryService}.
    *
    * @return The evaluated {@link QueryOptions} instance. Never <code>null</code>.
@@ -801,7 +801,7 @@ public class PmTableImpl
    * </ul>
    * Sub classes may override this method to extend this logic.
    *
-   * @param pageableCollection the collection to initialize.
+   * @param pc the collection to initialize.
    */
   protected void assignPmPageableCollection(final PmBeanCollection<T_ROW_PM, T_ROW_BEAN> pc) {
     this.pmPageableCollection = pc;
@@ -986,7 +986,7 @@ public class PmTableImpl
   }
 
   @Override
-  protected void initMetaData(PmDataInputBase.MetaData metaData) {
+  protected void initMetaData(PmObjectBase.MetaData metaData) {
     super.initMetaData(metaData);
     @SuppressWarnings("unchecked")
     MetaData myMetaData = (MetaData) metaData;
@@ -1032,7 +1032,7 @@ public class PmTableImpl
     }
   }
 
-  protected class MetaData extends PmDataInputBase.MetaData {
+  protected class MetaData extends PmObjectBase.MetaData {
     private SelectMode rowSelectMode = SelectMode.DEFAULT;
     private int numOfPageRowPms = DEFAULT_NUM_OF_PAGE_ROW_PMS;
     private PathResolver valuePathResolver;

@@ -175,10 +175,6 @@ public class QueryParams extends PropertyChangeSupportedBase implements Cloneabl
 
     firePropertyChange(PROP_EFFECTIVE_FILTER, old, expr);
   }
-  @Deprecated
-  public void setFilterExpression(QueryExpr expr) {
-    setQueryExpression(expr);
-  }
 
   /**
    * Provides the current filter expression.
@@ -188,10 +184,6 @@ public class QueryParams extends PropertyChangeSupportedBase implements Cloneabl
   public QueryExpr getQueryExpression() {
     return queryExpression;
   }
-  @Deprecated
-  public QueryExpr getFilterExpression() {
-    return queryExpression;
-  }
 
   /**
    * Provides the (optional) parameter object for a query the filter is based on.
@@ -199,10 +191,6 @@ public class QueryParams extends PropertyChangeSupportedBase implements Cloneabl
    * @return the value set by {@link #setBaseQueryParam(Object)}.
    */
   public Object getQueryProperty(String name) {
-    return propertyMap.get(name);
-  }
-  @Deprecated
-  public Object getBaseQueryParam(String name) {
     return propertyMap.get(name);
   }
 
@@ -225,10 +213,6 @@ public class QueryParams extends PropertyChangeSupportedBase implements Cloneabl
     Object oldBaseQueryParam = this.propertyMap.get(name);
     this.propertyMap.put(name, baseQueryParam);
     firePropertyChange(PROP_EFFECTIVE_FILTER, oldBaseQueryParam, baseQueryParam);
-  }
-  @Deprecated
-  public void setBaseQueryParam(String name, Object baseQueryParam) {
-    setQueryProperty(name, baseQueryParam);
   }
 
   /**

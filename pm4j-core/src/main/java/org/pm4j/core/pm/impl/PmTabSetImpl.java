@@ -102,11 +102,6 @@ public class PmTabSetImpl extends PmObjectBase implements PmTabSet {
     }
   }
 
-  // TODO: rename to beforeSwitch and add an afterSwitch; remove the command reference.
-  protected boolean switchToTabPmImpl(@Deprecated PmCommand tabChangeCmd, PmTab fromTab, PmTab toTab) {
-    return true;
-  }
-
   /**
    * Gets called before a tab switch operation. Subclasses may control here if
    * the tab switch should be allowed.<br>
@@ -127,7 +122,7 @@ public class PmTabSetImpl extends PmObjectBase implements PmTabSet {
    *
    */
   protected boolean beforeSwitch(PmTab fromTab, PmTab toTab, PmCommand tabChangeCmd) {
-    return switchToTabPmImpl(tabChangeCmd, fromTab, toTab);
+    return true;
   }
 
   /**

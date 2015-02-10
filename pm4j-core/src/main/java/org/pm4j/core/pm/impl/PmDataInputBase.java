@@ -6,6 +6,7 @@ import org.pm4j.core.pm.PmObject;
 /**
  * For internal use only!
  */
+@Deprecated
 public abstract class PmDataInputBase extends PmObjectBase implements PmDataInput {
 
   public PmDataInputBase(PmObject parentPm) {

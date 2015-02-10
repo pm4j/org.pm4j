@@ -191,11 +191,6 @@ public class PmEvent extends EventObject {
     return (changeMask & ALL_CHANGE_EVENTS) == ALL_CHANGE_EVENTS;
   }
 
-  /** @deprecated please use #isAllChangedEvent(). */
-  public boolean isInitializationEvent() {
-    return (changeMask & ALL_CHANGE_EVENTS) == ALL_CHANGE_EVENTS;
-  }
-
   /**
    * @return <code>true</code> if the event is caused by re-loading a bean behind the PM.<br>
    *         This event kind is generated for all components of a PM tree if
