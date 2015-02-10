@@ -132,17 +132,6 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
     return suggestedNaviLink;
   }
 
-  @Override
-  protected boolean isPmVisibleImpl() {
-    if ((! isPmEnabled()) &&
-        getOwnMetaData().hideWhenNotEnabled) {
-      return false;
-    }
-    else {
-      return super.isPmVisibleImpl();
-    }
-  }
-
   /**
    * The default implementation checks the own enabled flag and the enablement of
    * its parent context element.
@@ -773,7 +762,6 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
       myMetaData.beforeDo = new HashSet<BEFORE_DO>(Arrays.asList(annotation.beforeDo()));
       myMetaData.afterDo = new HashSet<AFTER_DO>(Arrays.asList(annotation.afterDo()));
       myMetaData.cmdKind = annotation.cmdKind();
-      myMetaData.hideWhenNotEnabled = annotation.hideWhenNotEnabled();
       if (annotation.clearCaches().length > 0) {
         myMetaData.clearCachesSet = new TreeSet<PmCacheApi.CacheKind>(Arrays.asList(annotation.clearCaches()));
       }
@@ -808,18 +796,6 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
     private Set<PmCommandCfg.AFTER_DO> afterDo;
     private CmdKind cmdKind = CmdKind.COMMAND;
     private Set<PmCacheApi.CacheKind> clearCachesSet = Collections.emptySet();
-
-    /**
-     * Should the command be hidden when not applicable. Defaults to <code>false</code>.
-     */
-    private boolean hideWhenNotEnabled = false;
-
-    public boolean isHideWhenNotEnabled() {
-      return hideWhenNotEnabled;
-    }
-    public void setHideWhenNotEnabled(boolean hideWhenNotEnabled) {
-      this.hideWhenNotEnabled = hideWhenNotEnabled;
-    }
     public CmdKind getCmdKind() {
       return cmdKind;
     }

@@ -76,7 +76,10 @@ public class DetailsPmHandlerImpl<T_DETAILS_PM extends PmObject, T_MASTER_RECORD
    * @return <code>true</code> if this handler agrees to the switch. <code>false</code> prevents the switch.
    */
   protected boolean beforeMasterRecordChangeImpl(T_MASTER_RECORD oldMasterBean, T_MASTER_RECORD newMasterBean) {
-    if (!canSwitchMasterRecord()) {
+    boolean valid = detailsPm != null
+            ? PmValidationApi.validateSubTree(detailsPm)
+            : true;
+    if (!valid) {
       return false;
     }
     for (PmCommandDecorator d : decorators) {
@@ -85,14 +88,6 @@ public class DetailsPmHandlerImpl<T_DETAILS_PM extends PmObject, T_MASTER_RECORD
       }
     }
     return true;
-  }
-
-  @Override
-  @Deprecated
-  public boolean canSwitchMasterRecord() {
-    return detailsPm != null
-        ? PmValidationApi.validateSubTree(detailsPm)
-        : true;
   }
 
   /**

@@ -1,19 +1,18 @@
 package org.pm4j.deprecated.core.pm.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmElement;
 import org.pm4j.core.pm.PmObject;
-import org.pm4j.core.pm.impl.PmLabelImpl;
 import org.pm4j.core.pm.impl.PmObjectBase;
 import org.pm4j.core.pm.impl.PmUtil;
 import org.pm4j.deprecated.core.pm.DeprPmTable;
 import org.pm4j.deprecated.core.pm.DeprPmTableCol;
 import org.pm4j.deprecated.core.pm.DeprPmTableGenericRow;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A table row implementation that is specific for {@link DeprecatedPmTableOfPmElementsImpl}.

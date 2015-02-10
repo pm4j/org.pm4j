@@ -19,7 +19,7 @@ import org.pm4j.common.util.beanproperty.PropertyChangeSupportedBase;
  * <p>
  * See {@link InMemQueryEvaluator} and {@link PageQueryService} for usage examples.
  *
- * @author Olaf Boede
+ * @author Olaf Boedese
  */
 public class QueryParams extends PropertyChangeSupportedBase implements Cloneable, Serializable {
 

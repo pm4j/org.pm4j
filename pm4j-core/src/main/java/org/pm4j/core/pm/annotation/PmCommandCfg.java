@@ -105,12 +105,6 @@ public @interface PmCommandCfg {
   CmdKind cmdKind() default CmdKind.COMMAND;
 
   /**
-   * @return <code>true</code> when the command should be hidden when not
-   *         applicable.
-   */
-  boolean hideWhenNotEnabled() default false;
-
-  /**
    * Defines the caches to clear within the element context of this command.
    * 
    * @return The cache kinds to clear.

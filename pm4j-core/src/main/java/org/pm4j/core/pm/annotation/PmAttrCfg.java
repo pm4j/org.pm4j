@@ -1,16 +1,15 @@
 package org.pm4j.core.pm.annotation;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 import org.pm4j.common.converter.value.ValueConverter;
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmCommand;
-import org.pm4j.core.pm.PmDataInput;
 import org.pm4j.core.pm.PmObject;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 
 /**
@@ -51,43 +50,10 @@ public @interface PmAttrCfg {
   }
 
   /**
-   * Scenarios for hiding an element.
-   * @deprecated Please use {@link PmObjectCfg#visible()}.
-   */
-  public static enum HideIf {
-    /**
-     * The value is empty.
-     */
-    EMPTY_VALUE,
-    /**
-     * The value equals the default value.
-     */
-    DEFAULT_VALUE
-  }
-
-  /**
    * @return An optional expression that describes how to access the attribute value.
    * @see {@link https://github.com/pm4j/org.pm4j/wiki/Resolving-path-expressions}
    */
   String valuePath() default "";
-
-  /**
-   * @return <code>true</code> when only field with values that are not empty
-   *         should be shown.<br>
-   *         Default value is <code>false</code>.
-   *
-   * @deprecated Use {@link #hideIf()}
-   */
-  @Deprecated
-  boolean hideWhenEmpty() default false;
-
-  /**
-   * @return List of attribute value scenarios where to hide.
-   * @deprecated Please use {@link PmObjectCfg#visible()}
-   */
-  @Deprecated
-  HideIf[] hideIf() default {};
-
 
   /**
    * Defines which condition makes the attribute value required.
