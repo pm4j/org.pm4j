@@ -18,18 +18,16 @@ public class NameWithModifierTest {
     assertEquals(false, n.getModifiers().contains(Modifier.OPTIONAL));
     assertEquals(false, n.getModifiers().contains(Modifier.EXISTS_OPTIONALLY));
     assertEquals(true, n.getModifiers().contains(Modifier.ALIAS));
-    assertEquals(false, n.getModifiers().contains(Modifier.REPEATED));
     assertEquals("myAlias", n.getAlias());
   }
 
   @Test
   public void asTokenInbetweenOtherTagsIsRecocognized() {
-    NameWithModifier n = NameWithModifier.parseNameAndModifier(new ParseCtxt("(x,o,as:myAlias,*)hallo"));
+    NameWithModifier n = NameWithModifier.parseNameAndModifier(new ParseCtxt("(x,o,as:myAlias)hallo"));
     assertEquals("hallo", n.getName());
     assertEquals(true, n.getModifiers().contains(Modifier.OPTIONAL));
     assertEquals(true, n.getModifiers().contains(Modifier.EXISTS_OPTIONALLY));
     assertEquals(true, n.getModifiers().contains(Modifier.ALIAS));
-    assertEquals(true, n.getModifiers().contains(Modifier.REPEATED));
     assertEquals("myAlias", n.getAlias());
   }
 
@@ -48,12 +46,11 @@ public class NameWithModifierTest {
 
   @Test
   public void blanksAreSkipped() {
-    NameWithModifier n = NameWithModifier.parseNameAndModifier(new ParseCtxt("( \t x  ,  o  ,  as  \t:  myAlias  ,  *  )hallo"));
+    NameWithModifier n = NameWithModifier.parseNameAndModifier(new ParseCtxt("( \t x  ,  o  ,  as  \t:  myAlias  )hallo"));
     assertEquals("hallo", n.getName());
     assertEquals(true, n.getModifiers().contains(Modifier.OPTIONAL));
     assertEquals(true, n.getModifiers().contains(Modifier.EXISTS_OPTIONALLY));
     assertEquals(true, n.getModifiers().contains(Modifier.ALIAS));
-    assertEquals(true, n.getModifiers().contains(Modifier.REPEATED));
     assertEquals("myAlias", n.getAlias());
   }
 
@@ -64,7 +61,6 @@ public class NameWithModifierTest {
     assertEquals(false, n.getModifiers().contains(Modifier.OPTIONAL));
     assertEquals(false, n.getModifiers().contains(Modifier.EXISTS_OPTIONALLY));
     assertEquals(false, n.getModifiers().contains(Modifier.ALIAS));
-    assertEquals(false, n.getModifiers().contains(Modifier.REPEATED));
   }
 
   @Test
@@ -74,7 +70,6 @@ public class NameWithModifierTest {
     assertEquals(true, n.getModifiers().contains(Modifier.OPTIONAL));
     assertEquals(false, n.getModifiers().contains(Modifier.EXISTS_OPTIONALLY));
     assertEquals(false, n.getModifiers().contains(Modifier.ALIAS));
-    assertEquals(false, n.getModifiers().contains(Modifier.REPEATED));
   }
 
   @Test
@@ -84,7 +79,6 @@ public class NameWithModifierTest {
     assertEquals(false, n.getModifiers().contains(Modifier.OPTIONAL));
     assertEquals(true, n.getModifiers().contains(Modifier.EXISTS_OPTIONALLY));
     assertEquals(false, n.getModifiers().contains(Modifier.ALIAS));
-    assertEquals(false, n.getModifiers().contains(Modifier.REPEATED));
   }
 
   @Test
@@ -95,17 +89,15 @@ public class NameWithModifierTest {
     assertEquals(true, n.getModifiers().contains(Modifier.OPTIONAL));
     assertEquals(true, n.getModifiers().contains(Modifier.EXISTS_OPTIONALLY));
     assertEquals(false, n.getModifiers().contains(Modifier.ALIAS));
-    assertEquals(false, n.getModifiers().contains(Modifier.REPEATED));
   }
 
   @Test
-  public void xoAndAsterixTokenArRecocognized() {
-    NameWithModifier n = NameWithModifier.parseNameAndModifier(new ParseCtxt("(x,o,*)hallo"));
+  public void xoTokenArRecocognized() {
+    NameWithModifier n = NameWithModifier.parseNameAndModifier(new ParseCtxt("(x,o)hallo"));
     assertEquals("hallo", n.getName());
     assertEquals(true, n.getModifiers().contains(Modifier.OPTIONAL));
     assertEquals(true, n.getModifiers().contains(Modifier.EXISTS_OPTIONALLY));
     assertEquals(false, n.getModifiers().contains(Modifier.ALIAS));
-    assertEquals(true, n.getModifiers().contains(Modifier.REPEATED));
   }
 
 }

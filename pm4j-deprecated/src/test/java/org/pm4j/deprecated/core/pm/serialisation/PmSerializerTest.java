@@ -9,10 +9,7 @@ import org.pm4j.core.pm.PmAttrInteger;
 import org.pm4j.core.pm.PmAttrString;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.api.PmExpressionApi;
-import org.pm4j.core.pm.impl.PmAttrIntegerImpl;
-import org.pm4j.core.pm.impl.PmAttrStringImpl;
-import org.pm4j.core.pm.impl.PmConversationImpl;
-import org.pm4j.core.pm.impl.PmElementImpl;
+import org.pm4j.core.pm.impl.*;
 import org.pm4j.deprecated.core.pm.serialization.DeprPmContentSerializer;
 
 public class PmSerializerTest {
@@ -79,7 +76,7 @@ public class PmSerializerTest {
     }
   }
 
-  public static class MyTestPm extends PmElementImpl {
+  public static class MyTestPm extends PmObjectBase {
     public MyTestPm(PmObject pmParent) {
       super(pmParent);
     }

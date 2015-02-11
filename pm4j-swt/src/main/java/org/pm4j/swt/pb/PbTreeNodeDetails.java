@@ -15,7 +15,7 @@ import org.pm4j.swt.util.SwtUtil;
 
 /**
  * Provides a details view for the PM provided by {@link PmTreeNode#getNodeDetailsPm()}.
- * 
+ *
  * @author olaf boede
  */
 public class PbTreeNodeDetails extends PbCompositeChildToPmBase<Composite, PmTreeNode> {
@@ -24,7 +24,7 @@ public class PbTreeNodeDetails extends PbCompositeChildToPmBase<Composite, PmTre
    * The view factory matcher for the details PMs to display.<br>
    * Defines which view will be displayed for the details PM of the selected
    * node. The method {@link PmTreeNode#getNodeDetailsPm()} provides the PM to
-   * match. 
+   * match.
    */
   private PbMatcherMapped pbMatcher = new PbMatcherMapped();
 
@@ -32,7 +32,7 @@ public class PbTreeNodeDetails extends PbCompositeChildToPmBase<Composite, PmTre
    * The background of the details area. Default: {@link SWT#COLOR_LIST_BACKGROUND}.
    */
   private Color backgroundColor = SWTResourceManager.getColor(SWT.COLOR_LIST_BACKGROUND);
-  
+
   /**
    * The SWT background color mode. Default: {@link SWT#INHERIT_DEFAULT}.
    */
@@ -54,16 +54,16 @@ public class PbTreeNodeDetails extends PbCompositeChildToPmBase<Composite, PmTre
     detailComposite.setLayout(new FillLayout());
     detailComposite.setBackground(backgroundColor);
     detailComposite.setBackgroundMode(backgroundMode);
-    
+
     return detailComposite;
   }
-  
-  
+
+
   @Override
   protected PbBinding makeBinding(PmTreeNode pm) {
     return new Binding();
   }
-  
+
   protected class Binding extends PbCompositeChildToPmBase<Composite, PmTreeNode>.Binding {
     private PmTreeNode currentDetailsPm;
 
@@ -75,7 +75,7 @@ public class PbTreeNodeDetails extends PbCompositeChildToPmBase<Composite, PmTre
       if (currentDetailsPm == pm) {
         return;
       }
-      
+
       if (pm != null) {
         PmObject detailsPm = pm.getNodeDetailsPm();
         PbFactory<?> detailsPbFactory = pbMatcher.findPbFactory(detailsPm);
@@ -87,7 +87,7 @@ public class PbTreeNodeDetails extends PbCompositeChildToPmBase<Composite, PmTre
       currentDetailsPm = pm;
       SwtUtil.reDisplay(view);
     }
-    
+
     @Override
     public void unbind() {
       super.unbind();
@@ -95,11 +95,11 @@ public class PbTreeNodeDetails extends PbCompositeChildToPmBase<Composite, PmTre
       for (Control c : view.getChildren()) {
         c.dispose();
       }
-      
+
       currentDetailsPm = null;
     }
   }
-  
+
   public PbMatcherMapped getPbMatcher() {
     return pbMatcher;
   }

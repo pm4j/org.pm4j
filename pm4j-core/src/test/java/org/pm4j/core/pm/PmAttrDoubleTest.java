@@ -12,9 +12,10 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.annotation.PmAttrDoubleCfg;
+import org.pm4j.core.pm.api.PmValidationApi;
 import org.pm4j.core.pm.impl.PmAttrDoubleImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
-import org.pm4j.tools.test.PmAssert;
+import org.pm4j.tools.test._PmAssert;
 
 /**
  * If you modify this test, please consider at least {@link PmAttrDoubleTest}.
@@ -84,7 +85,7 @@ public class PmAttrDoubleTest {
 
   private void assertValue(PmAttrDouble pm, String number, boolean isValid) {
     pm.setValueAsString(number);
-    pm.pmValidate();
+    PmValidationApi.validate(pm);
     assertEquals(number, pm.getValueAsString());
     assertEquals(new Double(number), pm.getValue());
   }
@@ -114,11 +115,11 @@ public class PmAttrDoubleTest {
 
     //Validate too short
     myPm.minLen2.setValue(1d);
-    PmAssert.validateNotSuccessful(myPm.minLen2, "Please enter at least 2 characters in field \"pmAttrDoubleTest.MyPm.minLen2\".");
+    _PmAssert.validateNotSuccessful(myPm.minLen2, "Please enter at least 2 characters in field \"pmAttrDoubleTest.MyPm.minLen2\".");
 
     //Validate correct
     myPm.minLen2.setValue(12d);
-    PmAssert.validateSuccessful(myPm.minLen2);
+    _PmAssert.validateSuccessful(myPm.minLen2);
   }
 
   @Test
@@ -130,18 +131,18 @@ public class PmAttrDoubleTest {
 
     //Validate too big
     myPm.maxLen6.setValue(1234567d);
-    PmAssert.validateNotSuccessful(myPm.maxLen6, "Please enter maximal 6 characters in field \"pmAttrDoubleTest.MyPm.maxLen6\".");
+    _PmAssert.validateNotSuccessful(myPm.maxLen6, "Please enter maximal 6 characters in field \"pmAttrDoubleTest.MyPm.maxLen6\".");
 
     //Validate correct
     myPm.maxLen6.setValue(123456d);
-    PmAssert.validateSuccessful(myPm);
+    _PmAssert.validateSuccessful(myPm);
   }
 
 
   @Test
   public void testRoundingHalfDown() {
     myPm.roundingHalfDown.setValueAsString("1.005");
-    myPm.roundingHalfDown.pmValidate();
+    PmValidationApi.validate(myPm.roundingHalfDown);
     assertEquals("0.005 will be removed because of the format and rounding", "1.00", myPm.roundingHalfDown.getValueAsString());
     assertEquals("Should have been rounded and formatted", new Double("1.0"), myPm.roundingHalfDown.getValue());
   }
@@ -149,7 +150,7 @@ public class PmAttrDoubleTest {
   @Test
   public void testRoundingHalfUp() {
     myPm.roundingHalfUp.setValueAsString("1.005");
-    myPm.roundingHalfUp.pmValidate();
+    PmValidationApi.validate(myPm.roundingHalfUp);
     // the 0.005 will be rounded because of the format and rounding mode
     assertEquals("0.005 will be added because of the format and rounding", "1.01", myPm.roundingHalfUp.getValueAsString());
     assertEquals("Should have been rounded and formatted", new Double("1.01"), myPm.roundingHalfUp.getValue());
@@ -177,9 +178,7 @@ public class PmAttrDoubleTest {
   @Test
   public void testValidateZero() {
     myPm.roundingHalfUp.setValueAsString("0.0");
-    myPm.roundingHalfUp.pmValidate();
-    myPm.roundingHalfUp.isPmValid();
-    assertTrue(myPm.roundingHalfUp.isPmValid());
+    assertTrue(PmValidationApi.validate(myPm.roundingHalfUp));
   }
 
   @Test
@@ -245,7 +244,7 @@ public class PmAttrDoubleTest {
 
   @Test
   public void testValueType() {
-    assertEquals(Double.class, myPm.bare.getValueType());
+    assertEquals(Double.class, myPm.bare.getValueClass());
   }
 
 }

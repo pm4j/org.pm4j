@@ -24,12 +24,12 @@ import org.pm4j.core.pm.api.PmValidationApi;
  * @param <T_DETAILS_PM>
  *          Type of the supported details PM.
  */
-public class DetailsPmHandlerImpl<T_DETAILS_PM extends PmDataInput, T_MASTER_RECORD> implements DetailsPmHandler {
+public class DetailsPmHandlerImpl<T_DETAILS_PM extends PmObject, T_MASTER_RECORD> implements DetailsPmHandler {
 
   /** The details area PM. */
   private final T_DETAILS_PM detailsPm;
 
-  /** Additional decorators to apply on {@link #canSwitchMasterRecord()} and {@link #afterMasterRecordChange(Object)}. */
+  /** Additional decorators to apply on {@link #beforeMasterRecordChange(Object, Object)} ()} and {@link #afterMasterRecordChange(Object)}. */
   private final List<PmCommandDecorator> decorators = new ArrayList<PmCommandDecorator>();
 
   /**
@@ -75,8 +75,11 @@ public class DetailsPmHandlerImpl<T_DETAILS_PM extends PmDataInput, T_MASTER_REC
    * @param newMasterBean The master bean to select.
    * @return <code>true</code> if this handler agrees to the switch. <code>false</code> prevents the switch.
    */
-  protected boolean beforeMasterRecordChangeImpl(T_MASTER_RECORD oldMasterBean, T_MASTER_RECORD newMasterRecord) {
-    if (!canSwitchMasterRecord()) {
+  protected boolean beforeMasterRecordChangeImpl(T_MASTER_RECORD oldMasterBean, T_MASTER_RECORD newMasterBean) {
+    boolean valid = detailsPm != null
+            ? PmValidationApi.validateSubTree(detailsPm)
+            : true;
+    if (!valid) {
       return false;
     }
     for (PmCommandDecorator d : decorators) {
@@ -85,14 +88,6 @@ public class DetailsPmHandlerImpl<T_DETAILS_PM extends PmDataInput, T_MASTER_REC
       }
     }
     return true;
-  }
-
-  @Override
-  @Deprecated
-  public boolean canSwitchMasterRecord() {
-    return detailsPm != null
-        ? PmValidationApi.validateSubTree((PmDataInput)detailsPm)
-        : true;
   }
 
   /**

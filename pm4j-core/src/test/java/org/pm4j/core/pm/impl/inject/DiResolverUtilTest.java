@@ -1,8 +1,5 @@
 package org.pm4j.core.pm.impl.inject;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -15,14 +12,15 @@ import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmInject;
 import org.pm4j.core.pm.impl.PmConversationImpl;
-import org.pm4j.core.pm.impl.PmElementImpl;
 import org.pm4j.core.pm.impl.PmInitApi;
+import org.pm4j.core.pm.impl.PmObjectBase;
 import org.pm4j.core.pm.impl.pathresolver.PathResolver;
 import org.pm4j.core.pm.impl.pathresolver.PmExpressionPathResolver;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+
+import static org.junit.Assert.*;
 
 public class DiResolverUtilTest {
 
@@ -32,7 +30,7 @@ public class DiResolverUtilTest {
   @Rule
   public final ExpectedException expectedException = ExpectedException.none();
 
-  public final class MyPm extends PmElementImpl {
+  public final class MyPm extends PmObjectBase {
 
     public MyPm(PmObject pmParent) {
       super(pmParent);
@@ -242,6 +240,6 @@ public class DiResolverUtilTest {
 
   // this is not in @Before to be able to test different scenarios
   private void initMyPm() {
-    myPm = PmInitApi.ensurePmSubTreeInitialization(new MyPm(pmConversation));
+    myPm = PmInitApi.initPmTree(new MyPm(pmConversation));
   }
 }

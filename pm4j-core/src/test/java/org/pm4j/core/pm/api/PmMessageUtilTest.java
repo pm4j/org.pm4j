@@ -48,7 +48,7 @@ public class PmMessageUtilTest {
    */
   @Test
   public void testRequiredDefaultMessage() {
-    testPm.pmValidate();
+    PmValidationApi.validate(testPm);
     Assert.assertEquals("Please enter a value into \"Attr 1\".", PmMessageApi.getMessages(testPm.attrWithDefaultRequiredMessage).get(0).getTitle());
   }
 
@@ -57,7 +57,7 @@ public class PmMessageUtilTest {
    */
   @Test
   public void testRequiredResourceDefinedSpecialMessage() {
-    testPm.pmValidate();
+    PmValidationApi.validate(testPm);
     Assert.assertEquals("The attribute Attr 2 is really required ;-)", PmMessageApi.getMessages(testPm.attrWithIndividualRequiredMessage).get(0).getTitle());
   }
 

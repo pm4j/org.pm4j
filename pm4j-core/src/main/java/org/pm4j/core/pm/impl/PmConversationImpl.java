@@ -1,25 +1,9 @@
 package org.pm4j.core.pm.impl;
 
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.TimeZone;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.pm4j.core.pm.PmCommandHistory;
-import org.pm4j.core.pm.PmConversation;
-import org.pm4j.core.pm.PmDefaults;
-import org.pm4j.core.pm.PmMessage;
+import org.pm4j.core.pm.*;
 import org.pm4j.core.pm.PmMessage.Severity;
-import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmFactoryCfg;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmValidationApi;
@@ -30,6 +14,10 @@ import org.pm4j.core.pm.impl.inject.NamedObjectResolverChain;
 import org.pm4j.core.pm.impl.message.AddPmMessageCallback;
 import org.pm4j.navi.NaviHistory;
 
+import java.lang.ref.WeakReference;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * Basic PM conversation implementation.
  * <p>
@@ -38,7 +26,7 @@ import org.pm4j.navi.NaviHistory;
  *
  * @author olaf boede
  */
-public class PmConversationImpl extends PmElementBase implements PmConversation {
+public class PmConversationImpl extends PmObjectBase implements PmConversation {
 
   private static final Log LOG = LogFactory.getLog(PmConversationImpl.class);
 
@@ -51,7 +39,6 @@ public class PmConversationImpl extends PmElementBase implements PmConversation 
 
   /** Callback to modify an {@link PmMessage} before it is added to the message list */
   private AddPmMessageCallback addMessageCallback;
-
 
   /**
    * A chain of {@link NamedObjectResolver}s that is used to resolve
@@ -605,14 +592,12 @@ public class PmConversationImpl extends PmElementBase implements PmConversation 
     this.bufferedPmValueMode = bufferedMode;
   }
 
-  // TODO olaf: conversation based pm value commit is not yet implemented...
   @Override
   public void rollbackBufferedPmChanges() {
     if (LOG.isWarnEnabled()) {
       LOG.warn("!!! WARNING !!! Conversation based pm value commit implementation is not yet completed.\n" +
         "Operation will only be applied on attributes of this instance.");
     }
-    super.rollbackBufferedPmChanges();
   }
 
   @Override
@@ -621,7 +606,6 @@ public class PmConversationImpl extends PmElementBase implements PmConversation 
       LOG.warn("!!! WARNING !!! Conversation based pm value commit implementation is not yet completed.\n" +
         "Operation will only be applied on attributes of this instance.");
     }
-    super.commitBufferedPmChanges();
   }
 
   /**

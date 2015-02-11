@@ -42,7 +42,7 @@ public class PmAttrEnumImpl<T_ENUM extends Enum<T_ENUM>> extends PmAttrBase<T_EN
    * Because of that we simply provide the known type by overriding this method.
    */
   @Override
-  public Class<?> getValueType() {
+  public Class<?> getValueClass() {
     return getEnumClass();
   }
 

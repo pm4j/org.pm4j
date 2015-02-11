@@ -1,16 +1,12 @@
 package org.pm4j.core.pm;
 
-import static org.junit.Assert.assertEquals;
-import static org.pm4j.tools.test.PmAssert.setValueAsString;
-
 import org.junit.Test;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.annotation.PmAttrCfg.AttrAccessKind;
-import org.pm4j.core.pm.impl.PmAttrIntegerImpl;
-import org.pm4j.core.pm.impl.PmAttrStringImpl;
-import org.pm4j.core.pm.impl.PmBeanImpl;
-import org.pm4j.core.pm.impl.PmConversationImpl;
-import org.pm4j.core.pm.impl.PmInitApi;
+import org.pm4j.core.pm.impl.*;
+
+import static org.junit.Assert.assertEquals;
+import static org.pm4j.tools.test._PmAssert.setValueAsString;
 
 /**
  * Tests the an attribute is generated dynamically to support different value types, depending on some business condition.
@@ -22,27 +18,27 @@ import org.pm4j.core.pm.impl.PmInitApi;
 public class PolymorphAttrPmTest {
 
   PmConversation convPm = new PmConversationImpl();
-  TestItemPm pmWithStringAttr = PmInitApi.ensurePmInitialization(new TestItemPm(convPm, new TestBean(false)));
-  TestItemPm pmWithIntAttr = PmInitApi.ensurePmInitialization(new TestItemPm(convPm, new TestBean(true)));
+  TestItemPm pmWithStringAttr = PmInitApi.initPmTree(new TestItemPm(convPm, new TestBean(false)));
+  TestItemPm pmWithIntAttr = PmInitApi.initPmTree(new TestItemPm(convPm, new TestBean(true)));
 
   @Test
   public void testStringAttr() {
-    assertEquals(String.class, pmWithStringAttr.polymorphAttr.getValueType());
+    assertEquals(String.class, pmWithStringAttr.polymorphAttr.getValueClass());
     setValueAsString(pmWithStringAttr.polymorphAttr, "1");
     assertEquals("1", pmWithStringAttr.polymorphAttr.getValue());
   }
 
   @Test
   public void testIntegerAttr() {
-    assertEquals(Integer.class, pmWithIntAttr.polymorphAttr.getValueType());
+    assertEquals(Integer.class, pmWithIntAttr.polymorphAttr.getValueClass());
     setValueAsString(pmWithIntAttr.polymorphAttr, "1");
     assertEquals(new Integer(1), pmWithIntAttr.polymorphAttr.getValue());
   }
 
   @Test
   public void testBothAttrTypes() {
-    assertEquals(Integer.class, pmWithIntAttr.polymorphAttr.getValueType());
-    assertEquals(String.class, pmWithStringAttr.polymorphAttr.getValueType());
+    assertEquals(Integer.class, pmWithIntAttr.polymorphAttr.getValueClass());
+    assertEquals(String.class, pmWithStringAttr.polymorphAttr.getValueClass());
 
     setValueAsString(pmWithIntAttr.polymorphAttr, "1");
     setValueAsString(pmWithStringAttr.polymorphAttr, "1");
@@ -58,7 +54,7 @@ public class PolymorphAttrPmTest {
     }
   }
 
-  public static class TestItemPm extends PmBeanImpl<TestBean> {
+  public static class TestItemPm extends PmBeanBase<TestBean> {
     @PmAttrCfg(accessKind=AttrAccessKind.LOCALVALUE)
     public final PmAttr<?> polymorphAttr = getPmBean().makeIntAttr
         ? new PmAttrIntegerImpl(this)

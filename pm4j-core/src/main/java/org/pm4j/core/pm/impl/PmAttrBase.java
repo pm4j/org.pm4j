@@ -1,25 +1,5 @@
 package org.pm4j.core.pm.impl;
 
-import static org.pm4j.core.pm.api.PmCacheApi.clearPmCache;
-
-import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-import java.util.TimeZone;
-
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-import javax.validation.metadata.BeanDescriptor;
-import javax.validation.metadata.ConstraintDescriptor;
-import javax.validation.metadata.PropertyDescriptor;
-
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -31,29 +11,14 @@ import org.pm4j.common.converter.value.ValueConverter;
 import org.pm4j.common.converter.value.ValueConverterDefault;
 import org.pm4j.common.expr.Expression.SyntaxVersion;
 import org.pm4j.common.util.CompareUtil;
-import org.pm4j.common.util.reflection.BeanAttrAccessor;
-import org.pm4j.common.util.reflection.BeanAttrAccessorImpl;
-import org.pm4j.common.util.reflection.ClassUtil;
-import org.pm4j.common.util.reflection.GenericTypeUtil;
-import org.pm4j.common.util.reflection.ReflectionException;
+import org.pm4j.common.util.reflection.*;
 import org.pm4j.core.exception.PmConverterException;
 import org.pm4j.core.exception.PmResourceData;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.exception.PmValidationException;
-import org.pm4j.core.pm.PmAttr;
-import org.pm4j.core.pm.PmAttrString;
-import org.pm4j.core.pm.PmBean;
-import org.pm4j.core.pm.PmCommandDecorator;
-import org.pm4j.core.pm.PmConstants;
-import org.pm4j.core.pm.PmDataInput;
-import org.pm4j.core.pm.PmEvent;
-import org.pm4j.core.pm.PmMessage;
+import org.pm4j.core.pm.*;
 import org.pm4j.core.pm.PmMessage.Severity;
-import org.pm4j.core.pm.PmObject;
-import org.pm4j.core.pm.PmOption;
-import org.pm4j.core.pm.PmOptionSet;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
-import org.pm4j.core.pm.annotation.PmAttrCfg.HideIf;
 import org.pm4j.core.pm.annotation.PmAttrCfg.Restriction;
 import org.pm4j.core.pm.annotation.PmAttrCfg.Validate;
 import org.pm4j.core.pm.annotation.PmCommandCfg;
@@ -63,13 +28,8 @@ import org.pm4j.core.pm.annotation.PmObjectCfg.Visible;
 import org.pm4j.core.pm.annotation.PmOptionCfg;
 import org.pm4j.core.pm.annotation.PmOptionCfg.NullOption;
 import org.pm4j.core.pm.annotation.PmTitleCfg;
-import org.pm4j.core.pm.api.PmCacheApi;
+import org.pm4j.core.pm.api.*;
 import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
-import org.pm4j.core.pm.api.PmEventApi;
-import org.pm4j.core.pm.api.PmExpressionApi;
-import org.pm4j.core.pm.api.PmLocalizeApi;
-import org.pm4j.core.pm.api.PmMessageApi;
-import org.pm4j.core.pm.api.PmMessageUtil;
 import org.pm4j.core.pm.impl.InternalPmCacheCfgUtil.CacheMetaData;
 import org.pm4j.core.pm.impl.converter.PmConverterErrorMessage;
 import org.pm4j.core.pm.impl.converter.PmConverterOptionBased;
@@ -80,6 +40,18 @@ import org.pm4j.core.pm.impl.pathresolver.PassThroughPathResolver;
 import org.pm4j.core.pm.impl.pathresolver.PathResolver;
 import org.pm4j.core.pm.impl.pathresolver.PmExpressionPathResolver;
 import org.pm4j.navi.NaviLink;
+
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import javax.validation.metadata.BeanDescriptor;
+import javax.validation.metadata.ConstraintDescriptor;
+import javax.validation.metadata.PropertyDescriptor;
+import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.*;
+
+import static org.pm4j.core.pm.api.PmCacheApi.clearPmCache;
 
 /**
  * <p> Basic implementation for PM attributes.  </p>
@@ -103,7 +75,7 @@ import org.pm4j.navi.NaviLink;
  * @author olaf boede
  */
 public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
-        extends PmDataInputBase
+        extends PmObjectBase
         implements PmAttr<T_PM_VALUE> {
 
   private static final Log LOG = LogFactory.getLog(PmAttrBase.class);
@@ -270,28 +242,12 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   }
 
   @Override
-  public final boolean isPmEnabled() {
-    // link enable status to read only even if the default impl of isPmEnabledImpl is overwritten
-    // The read-only check is done first because some domain implementations of isPmEnabledImpl()
-    // are implemented in a way that fails under some read-only conditions (e.g. in case of a missing backing bean).
-    return !isPmReadonly() && super.isPmEnabled();
-  }
-
-  @Override
   protected boolean isPmVisibleImpl() {
     boolean visible = super.isPmVisibleImpl();
-    MetaData metaData = getOwnMetaData();
-
     if (visible &&
-       (metaData.getVisibilityCfg() == Visible.IF_NOT_EMPTY ||
-        metaData.hideIfEmptyValue) ) {
+       (getOwnMetaData().getVisibilityCfg() == Visible.IF_NOT_EMPTY) ) {
       visible = !isEmptyValue(getValue());
     }
-
-    if (visible && metaData.hideIfDefaultValue) {
-      visible = !ObjectUtils.equals(getValue(), getDefaultValue());
-    }
-
     return visible;
   }
 
@@ -594,9 +550,11 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   /**
    *
    * @return
+   * @deprecated please call getValue and override only getBackingValueImpl.
    */
   // TODO oboede: is there a use case that is not covered by overriding getBackingValueImpl()?
   // Can we make this method final and private?
+  @Deprecated
   protected T_PM_VALUE getValueImpl() {
     try {
       // the method will try to populate pmValue with different approaches
@@ -656,7 +614,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
    * @return <code>true</code> when the attribute value was really changed.
    */
   // TODO oboede: make it final or package private? Which functionality is not covered by setBackingValueImpl()?
-  protected boolean setValueImpl(SetValueContainer<T_PM_VALUE> value) {
+  boolean setValueImpl(SetValueContainer<T_PM_VALUE> value) {
     PmEventApi.ensureThreadEventSource(this);
     MetaData metaData = getOwnMetaData();
 
@@ -1226,7 +1184,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   // ======== Buffered data input support ======== //
 
   public boolean isBufferedPmValueMode() {
-  PmDataInput parentPmCtxt = PmUtil.getPmParentOfType(this, PmDataInput.class);
+    PmDataInput parentPmCtxt = PmUtil.getPmParentOfType(this, PmDataInput.class);
     return parentPmCtxt.isBufferedPmValueMode();
   }
 
@@ -1427,7 +1385,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   }
 
   @Override
-  public Class<?> getValueType() {
+  public Class<?> getValueClass() {
     Type t = GenericTypeUtil.resolveGenericArgument(PmAttrBase.class, getClass(), 0);
     if (t instanceof ParameterizedType) {
       t = ((ParameterizedType)t).getRawType();
@@ -1500,6 +1458,10 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
       throw new PmRuntimeException(this, "An attribute is alway only enabled in an editable context. The configured value is redundant for PmAttr.");
     }
 
+    if (metaData.getEnablementCfg() == Enable.IN_EDITABLE_CTXT) {
+      throw new PmRuntimeException(this, "An attribute is alway only enabled in an editable context. The configured value is redundant for PmAttr.");
+    }
+
     myMetaData.embeddedAttr = getPmParent() instanceof PmAttr;
 
     PmAttrCfg fieldAnnotation = AnnotationUtil.findAnnotation(this, PmAttrCfg.class);
@@ -1544,18 +1506,6 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     PmAttrCfg.AttrAccessKind accessKindCfgValue = PmAttrCfg.AttrAccessKind.DEFAULT;
     boolean useReflection = true;
     if (fieldAnnotation != null) {
-      myMetaData.hideIfEmptyValue = fieldAnnotation.hideWhenEmpty();
-      // The HideIf enum is the leading attribute. So override the value of hideIfEmptyValue
-      // even it is set by fieldAnnotation.hideWhenEmpty().
-      for (HideIf hideIf : fieldAnnotation.hideIf()) {
-        if (HideIf.DEFAULT_VALUE == hideIf) {
-          myMetaData.hideIfDefaultValue = true;
-        } else if (HideIf.EMPTY_VALUE == hideIf) {
-          myMetaData.hideIfEmptyValue = true;
-        } else {
-          throw new PmRuntimeException(this, "Unknown value: " + hideIf.name());
-        }
-      }
       myMetaData.setReadOnly((fieldAnnotation.valueRestriction() == Restriction.READ_ONLY) || fieldAnnotation.readOnly());
 
       // The pm can force more constraints. It should not define less constraints as
@@ -1723,8 +1673,6 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     /* package */ BeanAttrAccessor          beanAttrAccessor;
     private PmOptionSetDef<PmAttr<?>>       optionSetDef            = OptionSetDefNoOption.INSTANCE;
     private PmOptionCfg.NullOption          nullOption              = NullOption.DEFAULT;
-    private boolean                         hideIfDefaultValue      = false;
-    private boolean                         hideIfEmptyValue        = false;
     private boolean                         required;
     private Restriction                     valueRestriction        = Restriction.NONE;
     /* package */ boolean                   primitiveType;
@@ -1766,6 +1714,15 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
       InternalPmCacheCfgUtil.registerClearOnListeners(pm, CacheKind.OPTIONS, optionsCache.cacheClearOn);
       InternalPmCacheCfgUtil.registerClearOnListeners(pm, CacheKind.VALUE, valueCache.cacheClearOn);
     }
+
+    @Override
+    protected boolean isPmEnabled(PmObjectBase pm) {
+      // link enable status to read only even if the default impl of isPmEnabledImpl is overwritten
+      // The read-only check is done first because some domain implementations of isPmEnabledImpl()
+      // are implemented in a way that fails under some read-only conditions (e.g. in case of a missing backing bean).
+      return !pm.isPmReadonly() && super.isPmEnabled(pm);
+    }
+
 
     /** @return The statically defined option set algorithm. */
     public PmOptionSetDef<PmAttr<?>> getOptionSetDef() { return optionSetDef; }
@@ -2004,7 +1961,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     }
 
     @Override @SuppressWarnings("unchecked")
-    protected void doItImpl() throws Exception {
+    protected void doItImpl()  {
       ((PmAttrBase<Object, ?>)getPmParent()).setValue(newValue);
     }
 

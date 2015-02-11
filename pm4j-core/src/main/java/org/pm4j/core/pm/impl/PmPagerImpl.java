@@ -8,7 +8,6 @@ import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmAttrLong;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmCommandDecorator;
-import org.pm4j.core.pm.PmLabel;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmPager;
 import org.pm4j.core.pm.annotation.PmBeanCfg;
@@ -95,7 +94,7 @@ public class PmPagerImpl
       }
   };
 
-  public final PmLabel itemXtillYofZ = new PmLabelImpl(this) {
+  public final PmObject itemXtillYofZ = new PmObjectBase(this) {
     @Override
     protected String getPmTitleImpl() {
         PageableCollection<?> ps = getPmBean();
@@ -258,7 +257,7 @@ public class PmPagerImpl
   @Override
   public PmCommand getCmdLastPage() { return cmdLast; }
   @Override
-  public PmLabel getItemXtillYofZ() { return itemXtillYofZ; }
+  public PmObject getItemXtillYofZ() { return itemXtillYofZ; }
   @Override
   public PmAttrLong getCurrentPageIdx() { return currentPageIdx; }
   @Override

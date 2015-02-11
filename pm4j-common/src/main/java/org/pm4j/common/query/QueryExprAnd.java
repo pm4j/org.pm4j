@@ -19,13 +19,21 @@ import org.pm4j.common.util.collection.IterableUtil;
  */
 public class QueryExprAnd implements QueryExpr, Serializable {
 
+  @Deprecated
+  public static QueryExpr joinToAnd(Collection<? extends QueryExpr> expressions) {
+    return join(expressions);
+  }
+  public static QueryExpr joinToAnd(QueryExpr... expressions) {
+    return join(expressions);
+  }
+
   /**
    * A static helper method that joins the given set of expressions to an and-combined expression.
    *
    * @param expressions a set of expressions. May be empty or <code>null</code> or may contain <code>null</code> items.
    * @return the resulting expression. May be <code>null</code> if the given parameter was empty or <code>null</code>.
    */
-  public static QueryExpr joinToAnd(Collection<? extends QueryExpr> expressions) {
+  public static QueryExpr join(Collection<? extends QueryExpr> expressions) {
     List<? extends QueryExpr> list = IterableUtil.shallowCopyWithoutNulls(expressions);
     if (list.isEmpty()) {
       return null;
@@ -42,8 +50,8 @@ public class QueryExprAnd implements QueryExpr, Serializable {
    * @param expressions a set of expressions. May be empty.
    * @return the resulting expression. May be <code>null</code> if the given parameter was empty or <code>null</code>.
    */
-  public static QueryExpr joinToAnd(QueryExpr... expressions) {
-    return joinToAnd(Arrays.asList(expressions));
+  public static QueryExpr join(QueryExpr... expressions) {
+    return join(Arrays.asList(expressions));
   }
 
   private static final long serialVersionUID = 1L;

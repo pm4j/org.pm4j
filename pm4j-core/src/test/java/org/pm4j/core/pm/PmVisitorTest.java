@@ -1,11 +1,5 @@
 package org.pm4j.core.pm;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.pm4j.core.pm.annotation.PmBeanCfg;
@@ -14,12 +8,13 @@ import org.pm4j.core.pm.api.PmVisitorApi;
 import org.pm4j.core.pm.api.PmVisitorApi.PmVisitCallBack;
 import org.pm4j.core.pm.api.PmVisitorApi.PmVisitHint;
 import org.pm4j.core.pm.api.PmVisitorApi.PmVisitResult;
-import org.pm4j.core.pm.impl.PmAttrPmListImpl;
-import org.pm4j.core.pm.impl.PmAttrStringImpl;
-import org.pm4j.core.pm.impl.PmBeanBase;
-import org.pm4j.core.pm.impl.PmConversationImpl;
-import org.pm4j.core.pm.impl.PmElementImpl;
-import org.pm4j.core.pm.impl.PmLabelImpl;
+import org.pm4j.core.pm.impl.*;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
 
 public class PmVisitorTest {
 
@@ -151,7 +146,7 @@ public class PmVisitorTest {
     assertEquals(expected, calls.toString());
   }
 
-  public static class MyRootPm extends PmElementImpl {
+  public static class MyRootPm extends PmObjectBase {
     public final MyPmChild myChPm1 = new MyPmChild(this);
     public final MyPmChild myChPm2 = new MyPmChild(this);
     @PmFactoryCfg(beanPmClasses = MyBeanPm.class)
@@ -167,14 +162,14 @@ public class PmVisitorTest {
     }
   }
 
-  public static class MyPmChild extends PmElementImpl {
-    public final PmLabel disabled = new PmLabelImpl(this) {
-      public boolean isPmEnabled() {
+  public static class MyPmChild extends PmObjectBase {
+    public final PmObject disabled = new PmObjectBase(this) {
+      protected boolean isPmEnabledImpl() {
         return false;
       };
     };
     public final PmConversation convImpl = new PmConversationImpl(this);
-    public final PmLabel readOnly = new PmLabelImpl(this) {
+    public final PmObject readOnly = new PmObjectBase(this) {
       protected boolean isPmReadonlyImpl() {
         return true;
       };

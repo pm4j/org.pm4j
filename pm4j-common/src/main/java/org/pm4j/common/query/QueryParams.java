@@ -19,7 +19,7 @@ import org.pm4j.common.util.beanproperty.PropertyChangeSupportedBase;
  * <p>
  * See {@link InMemQueryEvaluator} and {@link PageQueryService} for usage examples.
  *
- * @author Olaf Boede
+ * @author Olaf Boedese
  */
 public class QueryParams extends PropertyChangeSupportedBase implements Cloneable, Serializable {
 
@@ -33,8 +33,8 @@ public class QueryParams extends PropertyChangeSupportedBase implements Cloneabl
 
   private SortOrder sortOrder;
   private SortOrder defaultSortOrder;
-  private QueryExpr filterExpression;
-  private Map<String, Object> baseQueryParams = new HashMap<String, Object>();
+  private QueryExpr queryExpression;
+  private Map<String, Object> propertyMap = new HashMap<String, Object>();
   /** A switch to allow/prevent query execution. */
   private boolean execQuery = true;
   private Long maxResults;
@@ -54,18 +54,18 @@ public class QueryParams extends PropertyChangeSupportedBase implements Cloneabl
   }
 
   /**
-   * @param filterExpression Defines a filter expression to be used.
+   * @param queryExpression Defines a filter expression to be used.
    */
-  public QueryParams(QueryExpr filterExpression) {
-    this(filterExpression, null);
+  public QueryParams(QueryExpr queryExpression) {
+    this(queryExpression, null);
   }
 
   /**
-   * @param filterExpression Defines a filter expression to be used.
+   * @param queryExpression Defines a filter expression to be used.
    * @param defaultSortOrder The default sort order.
    */
-  public QueryParams(QueryExpr filterExpression, SortOrder defaultSortOrder) {
-    this.filterExpression = filterExpression;
+  public QueryParams(QueryExpr queryExpression, SortOrder defaultSortOrder) {
+    this.queryExpression = queryExpression;
     this.defaultSortOrder = defaultSortOrder;
   }
 
@@ -78,8 +78,8 @@ public class QueryParams extends PropertyChangeSupportedBase implements Cloneabl
    */
   public void copyParamValues(QueryParams src) {
     // TODO oboede: smart fire of filter change is not yet implemented.
-    this.filterExpression = src.getFilterExpression();
-    this.baseQueryParams = new HashMap<String, Object>(src.baseQueryParams);
+    this.queryExpression = src.getQueryExpression();
+    this.propertyMap = new HashMap<String, Object>(src.propertyMap);
     setSortOrder(src.getSortOrder());
     setDefaultSortOrder(src.getDefaultSortOrder());
     this.execQuery = src.isExecQuery();
@@ -158,12 +158,12 @@ public class QueryParams extends PropertyChangeSupportedBase implements Cloneabl
   }
 
   /**
-   * Defines a new filter expression to be used.
+   * Defines a new query expression to be used.
    *
-   * @param expr the new expression. May be <code>null</code> if filtering should be switched off.
+   * @param expr the new expression. May be <code>null</code> if no query constraints should be used.
    */
-  public void setFilterExpression(QueryExpr expr) {
-    QueryExpr old = this.filterExpression;
+  public void setQueryExpression(QueryExpr expr) {
+    QueryExpr old = this.queryExpression;
     // TODO: 136039 Vetoable property change does not work with FilterExpressions
     //  try {
     //      fireVetoableChange(PROP_EFFECTIVE_FILTER, old, expr);
@@ -171,7 +171,7 @@ public class QueryParams extends PropertyChangeSupportedBase implements Cloneabl
     //      // XXX log here?
     //      return;
     //  }
-    this.filterExpression = expr;
+    this.queryExpression = expr;
 
     firePropertyChange(PROP_EFFECTIVE_FILTER, old, expr);
   }
@@ -181,8 +181,8 @@ public class QueryParams extends PropertyChangeSupportedBase implements Cloneabl
    *
    * @return the current filter expression. May be <code>null</code>.
    */
-  public QueryExpr getFilterExpression() {
-    return filterExpression;
+  public QueryExpr getQueryExpression() {
+    return queryExpression;
   }
 
   /**
@@ -190,8 +190,8 @@ public class QueryParams extends PropertyChangeSupportedBase implements Cloneabl
    *
    * @return the value set by {@link #setBaseQueryParam(Object)}.
    */
-  public Object getBaseQueryParam(String name) {
-    return baseQueryParams.get(name);
+  public Object getQueryProperty(String name) {
+    return propertyMap.get(name);
   }
 
   /**
@@ -209,9 +209,9 @@ public class QueryParams extends PropertyChangeSupportedBase implements Cloneabl
    * @param baseQueryParam
    *          the new parameter. May be <code>null</code>.
    */
-  public void setBaseQueryParam(String name, Object baseQueryParam) {
-    Object oldBaseQueryParam = this.baseQueryParams.get(name);
-    this.baseQueryParams.put(name, baseQueryParam);
+  public void setQueryProperty(String name, Object baseQueryParam) {
+    Object oldBaseQueryParam = this.propertyMap.get(name);
+    this.propertyMap.put(name, baseQueryParam);
     firePropertyChange(PROP_EFFECTIVE_FILTER, oldBaseQueryParam, baseQueryParam);
   }
 

@@ -9,7 +9,7 @@ import org.pm4j.core.pm.PmAttrLong;
 import org.pm4j.core.pm.PmAttrPmList;
 import org.pm4j.core.pm.PmAttrString;
 import org.pm4j.core.pm.PmConversation;
-import org.pm4j.core.pm.PmTreeNode;
+import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmBeanCfg;
 import org.pm4j.core.pm.annotation.PmFactoryCfg;
 import org.pm4j.core.pm.annotation.PmTitleCfg;
@@ -46,7 +46,7 @@ public class FileTreeCheck {
       };
     };
 
-    protected List<? extends PmTreeNode> getPmChildNodesImpl() {
+    protected List<? extends PmObject> getPmChildNodesImpl() {
       return subDirs.getValue();
     };
   }

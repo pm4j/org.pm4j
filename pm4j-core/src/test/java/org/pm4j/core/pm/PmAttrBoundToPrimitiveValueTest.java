@@ -1,8 +1,8 @@
 package org.pm4j.core.pm;
 
 import static org.junit.Assert.assertEquals;
-import static org.pm4j.tools.test.PmAssert.assertMessage;
-import static org.pm4j.tools.test.PmAssert.assertNoMessagesInSubTree;
+import static org.pm4j.tools.test._PmAssert.assertMessage;
+import static org.pm4j.tools.test._PmAssert.assertNoMessagesInSubTree;
 
 import java.util.Locale;
 

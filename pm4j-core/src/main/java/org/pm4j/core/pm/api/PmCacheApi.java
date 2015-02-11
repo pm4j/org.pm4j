@@ -25,14 +25,17 @@ public class PmCacheApi {
     TITLE,
     VALUE,
     OPTIONS,
+    NODES,
     ALL;
 
     public static final Set<CacheKind> ALL_SET = Collections.unmodifiableSet(
-        new HashSet<CacheKind>(Arrays.asList(CacheKind.VISIBILITY,
+        new HashSet<CacheKind>(Arrays.asList(
+            CacheKind.VISIBILITY,
             CacheKind.ENABLEMENT,
             CacheKind.TITLE,
             CacheKind.VALUE,
-            CacheKind.OPTIONS)));
+            CacheKind.OPTIONS,
+            CacheKind.NODES)));
   }
 
   private static final PmCacheApiHandler apiHandler = new PmCacheApiHandler();

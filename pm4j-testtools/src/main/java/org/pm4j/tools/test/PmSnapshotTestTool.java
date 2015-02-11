@@ -111,7 +111,7 @@ public class PmSnapshotTestTool {
      * @param hideMatchers
      * @return the tool for inline usage.
      */
-    public PmSnapshotTestTool excludeAspects(VisibleStateAspectMatcher... hideMatchers) {
+    public PmSnapshotTestTool exclude(VisibleStateAspectMatcher... hideMatchers) {
         excludedAspects.addAll(Arrays.asList(hideMatchers));
         return this;
     }
@@ -152,7 +152,7 @@ public class PmSnapshotTestTool {
      *            The aspects to exclude for all matching PMs.
      */
     public void exclude(PmMatcher pmMatcher, VisibleStateAspect... aspects) {
-        excludeAspects(new VisibleStateAspectMatcher(pmMatcher, aspects));
+        exclude(new VisibleStateAspectMatcher(pmMatcher, aspects));
     }
 
     /**
@@ -164,7 +164,7 @@ public class PmSnapshotTestTool {
      *            The aspects to exclude for all matching PM(s).
      */
     public void exclude(Class<?> pmClass, VisibleStateAspect... aspects) {
-        excludeAspects(new VisibleStateAspectMatcher(pmClass, aspects));
+        exclude(new VisibleStateAspectMatcher(pmClass, aspects));
     }
 
     /**

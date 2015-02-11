@@ -1,7 +1,5 @@
 package org.pm4j.deprecated.core.sample.admin.remote_sample.client;
 
-import static org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO.CLEAR;
-
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmAttrString;
 import org.pm4j.core.pm.PmCommand;
@@ -11,12 +9,14 @@ import org.pm4j.core.pm.annotation.PmCommandCfg;
 import org.pm4j.core.pm.impl.PmAttrImpl;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
 import org.pm4j.core.pm.impl.PmCommandImpl;
-import org.pm4j.core.pm.impl.PmElementImpl;
+import org.pm4j.core.pm.impl.PmObjectBase;
 import org.pm4j.deprecated.core.sample.admin.remote_sample.annotations.PmClientCfg;
 import org.pm4j.deprecated.core.sample.admin.remote_sample.shared.LoginState;
 
+import static org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO.CLEAR;
+
 @PmClientCfg(serverPm="#loginSrvPm")
-public class LoginPm extends PmElementImpl {
+public class LoginPm extends PmObjectBase {
 
   @PmAttrCfg(minLen=3)
   public final PmAttrString userName = new PmAttrStringImpl(this);

@@ -1,13 +1,12 @@
 package org.pm4j.core.pm;
 
-import static org.junit.Assert.assertEquals;
-
 import org.junit.Test;
 import org.pm4j.core.pm.annotation.PmInject;
 import org.pm4j.core.pm.annotation.PmInject.Mode;
 import org.pm4j.core.pm.impl.PmConversationImpl;
-import org.pm4j.core.pm.impl.PmElementImpl;
-import org.pm4j.core.pm.impl.PmLabelImpl;
+import org.pm4j.core.pm.impl.PmObjectBase;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Demonstrates the injection of a parent interface within a PM subtree member.
@@ -17,7 +16,7 @@ import org.pm4j.core.pm.impl.PmLabelImpl;
 public class PmInjectParentOfTypeTest {
 
   /**
-   * 
+   *
    */
   @Test
   public void testInjectedParentInterface() {
@@ -46,9 +45,9 @@ public class PmInjectParentOfTypeTest {
     }
   }
 
-  public static class MyElementPm extends PmElementImpl {
+  public static class MyElementPm extends PmObjectBase {
 
-    public final PmLabel userInfo = new PmLabelImpl(this) {
+    public final PmObject userInfo = new PmObjectBase(this) {
       @PmInject(mode=Mode.PARENT_OF_TYPE)
       UserInfoProvider userInfoProvider;
 

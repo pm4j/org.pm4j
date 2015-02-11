@@ -229,10 +229,10 @@ public abstract class PageableCollectionTestBase<T> {
 
   @Test
   public void testFilterItems() {
-    collection.getQueryParams().setFilterExpression(getFilterNameStartsWith("b"));
+    collection.getQueryParams().setQueryExpression(getFilterNameStartsWith("b"));
     assertEquals("Filtered item set.", "[b]", IterableUtil.shallowCopy(collection).toString());
 
-    collection.getQueryParams().setFilterExpression(null);
+    collection.getQueryParams().setQueryExpression(null);
     assertEquals("We get all items after resetting the filter.", "[a, b, c, d, e, f]", IterableUtil.shallowCopy(collection).toString());
 
     assertEquals("Add event count", 0, pclAdd.getPropChangeEventCount());

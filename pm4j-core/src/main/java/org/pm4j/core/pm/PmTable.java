@@ -15,7 +15,7 @@ import org.pm4j.common.selection.SelectionHandler;
  *
  * @param <T_ROW_PM> The type used for rows.
  */
-public interface PmTable<T_ROW_PM> extends PmObject, PmDataInput {
+public interface PmTable<T_ROW_PM> extends PmObject {
 
   /** Identifier for things that may be cleared by calling {@link PmTable#updatePmTable(UpdateAspect...)} */
   public enum UpdateAspect {

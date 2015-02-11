@@ -14,7 +14,7 @@ import org.pm4j.core.pm.impl.PmInitApi;
  */
 public class MasterPmTableHandlerImplTest {
 
-  private MasterPmTableHandlerImplTestDlg dlg = PmInitApi.ensurePmInitialization(new MasterPmTableHandlerImplTestDlg());
+  private MasterPmTableHandlerImplTestDlg dlg = PmInitApi.initPmTree(new MasterPmTableHandlerImplTestDlg());
 
   @Before
   public void setUp() {

@@ -1,7 +1,5 @@
 package org.pm4j.deprecated.core.pm.impl;
 
-import static junit.framework.Assert.assertEquals;
-
 import org.junit.Ignore;
 import org.junit.Test;
 import org.pm4j.core.pm.PmConversation;
@@ -10,8 +8,8 @@ import org.pm4j.core.pm.impl.PmConversationImpl;
 import org.pm4j.core.pm.impl.PmElementImpl;
 import org.pm4j.core.pm.impl.PmUtil;
 import org.pm4j.deprecated.core.pm.DeprPmTableCol;
-import org.pm4j.deprecated.core.pm.impl.DeprPmTableColImpl;
-import org.pm4j.deprecated.core.pm.impl.DeprPmTableImpl;
+
+import static junit.framework.Assert.assertEquals;
 
 public class PmTableDynamicTest {
   private int numOfCols = 3;

@@ -2,7 +2,7 @@ package org.pm4j.core.pm.joda.impl;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
-import static org.pm4j.tools.test.PmAssert.setValueAsString;
+import static org.pm4j.tools.test._PmAssert.setValueAsString;
 
 import java.util.Locale;
 
@@ -11,8 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.impl.PmConversationImpl;
-import org.pm4j.core.pm.joda.impl.PmAttrLocalDateImpl;
-import org.pm4j.tools.test.PmAssert;
+import org.pm4j.tools.test._PmAssert;
 
 public class PmAttrLocalDateImplTest {
 
@@ -29,7 +28,7 @@ public class PmAttrLocalDateImplTest {
         PmAttrLocalDateImpl datePm = new PmAttrLocalDateImpl(conversation);
         datePm.setValueAsString("20/Apr/2012");
         assertFalse(datePm.isPmValid());
-        PmAssert.assertSingleErrorMessage(datePm, "The value of the field \"pmAttrLocalDateImpl\" cannot be interpreted. Please use the format \"dd/MM/yyyy\".");
+        _PmAssert.assertSingleErrorMessage(datePm, "The value of the field \"pmAttrLocalDateImpl\" cannot be interpreted. Please use the format \"dd/MM/yyyy\".");
     }
 
     @Test

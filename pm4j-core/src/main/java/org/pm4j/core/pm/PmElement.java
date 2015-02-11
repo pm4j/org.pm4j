@@ -7,7 +7,10 @@ package org.pm4j.core.pm;
  * Such models and their attributes are intended to be visualized in form displays.
  *
  * @author olaf boede
+ *
+ * @deprecated Please use {@link org.pm4j.core.pm.PmObject}.
  */
-public interface PmElement extends PmDataInput, PmTreeNode {
+@Deprecated
+public interface PmElement extends PmObject {
 
 }

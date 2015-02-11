@@ -3,7 +3,7 @@ package org.pm4j.deprecated.core.pm;
 import org.pm4j.core.pm.PmAttrInteger;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmCommandDecorator;
-import org.pm4j.core.pm.PmLabel;
+import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmPager;
 import org.pm4j.deprecated.core.pm.pageable.DeprPageableCollection;
 
@@ -55,7 +55,7 @@ public interface DeprPmPager {
   /**
    * @return A label presenting a text like 'Element 5 - 10 of 54'.
    */
-  PmLabel getItemXtillYofZ();
+  PmObject getItemXtillYofZ();
 
   /**
    * @return The total number of items (on all pages).

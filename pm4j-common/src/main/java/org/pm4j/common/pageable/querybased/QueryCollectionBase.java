@@ -73,11 +73,11 @@ public abstract class QueryCollectionBase<T_ITEM, T_ID> extends PageableCollecti
         }
         else {
             QueryParams qParams = getQueryParams().clone();
-            QueryExpr queryFilterExpr = qParams.getFilterExpression();
+            QueryExpr queryFilterExpr = qParams.getQueryExpression();
             QueryExpr removedItemsFilterExpr = modificationHandler.getRemovedItemsFilterExpr(queryFilterExpr);
-            qParams.setFilterExpression(queryFilterExpr != null
-                ? new QueryExprAnd(queryFilterExpr, removedItemsFilterExpr)
-                : removedItemsFilterExpr);
+            qParams.setQueryExpression(queryFilterExpr != null
+                    ? new QueryExprAnd(queryFilterExpr, removedItemsFilterExpr)
+                    : removedItemsFilterExpr);
             queryParamsWithRemovedItems = qParams;
         }
     }

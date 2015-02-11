@@ -19,9 +19,9 @@ import org.pm4j.navi.NaviHistory;
  * <li>named objects within the scope</li>
  * </ul>
  *
- * @author olaf boede
+ * @author Olaf Boede
  */
-public interface PmConversation extends PmElement {
+public interface PmConversation extends PmDataInput {
 
   /**
    * @return The optional parent conversation context.

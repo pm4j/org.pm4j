@@ -10,7 +10,7 @@ import org.pm4j.core.exception.PmRuntimeException;
  *
  * @author olaf boede
  */
-public interface PmTabSet extends PmDataInput {
+public interface PmTabSet extends PmObject {
 
   /**
    * This method gets called whenever the user or internal UI logic attempts

@@ -1,9 +1,5 @@
 package org.pm4j.core.pm.impl;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.pm4j.common.converter.string.StringConverter;
@@ -15,15 +11,19 @@ import org.pm4j.core.pm.PmAttrPmList;
 import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmObject;
-import org.pm4j.core.pm.PmTreeNode;
 import org.pm4j.core.pm.annotation.PmAttrPmListCfg;
 import org.pm4j.core.pm.annotation.PmOptionCfg.NullOption;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmFactoryApi;
+import org.pm4j.core.pm.api.PmValidationApi;
 import org.pm4j.core.pm.impl.commands.PmListAddItemCommand;
 import org.pm4j.core.pm.impl.commands.PmListRemoveItemCommand;
 import org.pm4j.core.pm.impl.converter.PmConverterOptionBased;
 import org.pm4j.core.pm.impl.pathresolver.ExpressionPathResolver;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Implements an attribute that represents a list of beans as a list of PM's.
@@ -155,25 +155,12 @@ public class PmAttrPmListImpl<T_ITEM_PM extends PmBean<T_BEAN>, T_BEAN> extends 
   }
 
 
-  // ======== PmTreeNode implementation ======== //
-
-  private PmObject nodeDetailsPm;
-  @Override
-  public PmObject getNodeDetailsPm() {
-    if (nodeDetailsPm == null) {
-      nodeDetailsPm = getNodeDetailsPmImpl();
-    }
-    return nodeDetailsPm;
-  }
-
-  protected PmObject getNodeDetailsPmImpl() {
-    return null;
-  }
+  // ======== Tree node implementation ======== //
 
   @SuppressWarnings("unchecked")
   @Override
-  public List<PmTreeNode> getPmChildNodes() {
-    return (List<PmTreeNode>)(Object)getValue();
+  protected List<PmObject> getPmChildNodesImpl() {
+    return (List<PmObject>)(Object) getValue();
   }
 
   /**
@@ -210,7 +197,7 @@ public class PmAttrPmListImpl<T_ITEM_PM extends PmBean<T_BEAN>, T_BEAN> extends 
     List<T_ITEM_PM> value = getValue();
     if (value != null) {
       for (T_ITEM_PM pm : value) {
-        pm.pmValidate();
+        PmValidationApi.validate(pm);
       }
     }
   }
@@ -268,7 +255,7 @@ public class PmAttrPmListImpl<T_ITEM_PM extends PmBean<T_BEAN>, T_BEAN> extends 
     super.initMetaData(metaData);
     MetaData myMetaData = (MetaData) metaData;
     myMetaData.setValidateLengths(false);
-    
+
     PmAttrPmListCfg annotation = AnnotationUtil.findAnnotation(this, PmAttrPmListCfg.class);
     if (annotation != null) {
       myMetaData.provideInvisibleItems = annotation.provideInvisibleItems();

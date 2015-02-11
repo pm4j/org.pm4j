@@ -1,7 +1,5 @@
 package org.pm4j.core.pm;
 
-import static org.junit.Assert.assertEquals;
-
 import org.junit.Test;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
@@ -14,13 +12,9 @@ import org.pm4j.core.pm.annotation.PmCacheCfg2.Clear;
 import org.pm4j.core.pm.annotation.PmCacheCfg2.Observe;
 import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
-import org.pm4j.core.pm.impl.PmAttrStringImpl;
-import org.pm4j.core.pm.impl.PmAttrUtil;
-import org.pm4j.core.pm.impl.PmBeanImpl;
-import org.pm4j.core.pm.impl.PmConversationImpl;
-import org.pm4j.core.pm.impl.PmElementBase;
-import org.pm4j.core.pm.impl.PmElementImpl;
-import org.pm4j.core.pm.impl.PmInitApi;
+import org.pm4j.core.pm.impl.*;
+
+import static org.junit.Assert.assertEquals;
 
 public class PmAttrCacheTest2 {
 
@@ -131,7 +125,7 @@ public class PmAttrCacheTest2 {
   public void testClearedOnValueChangeInHierarcy() {
     MyPojo p = new MyPojo();
     MyPojoPm pPm = new MyPojoPm(new PmConversationImpl(), p);
-    PmInitApi.ensurePmSubTreeInitialization(pPm);
+    PmInitApi.initPmTree(pPm);
 
     p.s = "INITIAL";
     assertEquals("INITIAL", pPm.s.getValue());
@@ -173,13 +167,13 @@ public class PmAttrCacheTest2 {
   @Test
   public void testMixedAnnotations() {
     try {
-      PmInitApi.ensurePmSubTreeInitialization(new MyPmWithMixedAnnotations(new PmConversationImpl()));
+      PmInitApi.initPmTree(new MyPmWithMixedAnnotations(new PmConversationImpl()));
     } catch (PmRuntimeException e) {
       assertEquals(PmRuntimeException.class, e.getCause().getClass());
     }
 
     try {
-      PmInitApi.ensurePmSubTreeInitialization(new MyPmWithMixedAnnotations2(new PmConversationImpl()));
+      PmInitApi.initPmTree(new MyPmWithMixedAnnotations2(new PmConversationImpl()));
     } catch (PmRuntimeException e) {
       assertEquals(PmRuntimeException.class, e.getCause().getClass());
     }
@@ -202,7 +196,7 @@ public class PmAttrCacheTest2 {
   // -- Presentation models --
 
   @PmBeanCfg(beanClass=MyPojo.class)
-  public static class MyPojoPm extends PmBeanImpl<MyPojo> {
+  public static class MyPojoPm extends PmBeanBase<MyPojo> {
 
     public final PmAttrString s = new PmAttrStringImpl(this);
 
@@ -265,7 +259,7 @@ public class PmAttrCacheTest2 {
   };
 
   @PmCacheCfg2(@Cache(property = CacheKind.ALL))
-  public static class MyPmWithMixedAnnotations extends PmBeanImpl<MyPojo> {
+  public static class MyPmWithMixedAnnotations extends PmBeanBase<MyPojo> {
 
     public MyPmWithMixedAnnotations(PmObject pmParent) {
       super(pmParent);
@@ -276,7 +270,7 @@ public class PmAttrCacheTest2 {
   }
 
   @PmCacheCfg(all=org.pm4j.core.pm.annotation.PmCacheCfg.CacheMode.ON)
-  public static class MyPmWithMixedAnnotations2 extends PmBeanImpl<MyPojo> {
+  public static class MyPmWithMixedAnnotations2 extends PmBeanBase<MyPojo> {
 
     public MyPmWithMixedAnnotations2(PmObject pmParent) {
       super(pmParent);
@@ -286,7 +280,7 @@ public class PmAttrCacheTest2 {
     public final PmAttrString s = new PmAttrStringImpl(this);
   }
 
-  public static class MyTab extends PmElementImpl implements PmTab {
+  public static class MyTab extends PmObjectBase implements PmTab {
     public MyTab(PmObject pmParent) {
       super(pmParent);
     }

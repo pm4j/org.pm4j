@@ -6,7 +6,6 @@ import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmAttrInteger;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmCommandDecorator;
-import org.pm4j.core.pm.PmLabel;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmBeanCfg;
 import org.pm4j.core.pm.annotation.PmCommandCfg;
@@ -16,7 +15,7 @@ import org.pm4j.core.pm.impl.PmAttrIntegerImpl;
 import org.pm4j.core.pm.impl.PmBeanBase;
 import org.pm4j.core.pm.impl.PmCommandDecoratorSetImpl;
 import org.pm4j.core.pm.impl.PmCommandImpl;
-import org.pm4j.core.pm.impl.PmLabelImpl;
+import org.pm4j.core.pm.impl.PmObjectBase;
 import org.pm4j.core.pm.impl.PmPagerImpl;
 import org.pm4j.deprecated.core.pm.DeprPmPager;
 import org.pm4j.deprecated.core.pm.pageable.DeprPageableCollection;
@@ -104,7 +103,7 @@ public class DeprPmPagerImpl
       }
   };
 
-  public final PmLabel itemXtillYofZ = new PmLabelImpl(this) {
+  public final PmObject itemXtillYofZ = new PmObjectBase(this) {
     @Override
     protected String getPmTitleImpl() {
         DeprPageableCollection<?> ps = getPmBean();
@@ -252,7 +251,7 @@ public class DeprPmPagerImpl
   @Override
   public PmCommand getCmdLastPage() { return cmdLast; }
   @Override
-  public PmLabel getItemXtillYofZ() { return itemXtillYofZ; }
+  public PmObject getItemXtillYofZ() { return itemXtillYofZ; }
   @Override
   public PmAttrInteger getCurrentPageIdx() { return currentPageIdx; }
   @Override

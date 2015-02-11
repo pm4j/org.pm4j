@@ -83,7 +83,7 @@ public class QueryServiceUtil {
   @SuppressWarnings("unchecked")
   public static <T> List<T> findItems(QueryService<T, ?> s, QueryExpr itemExpr, int maxNumOfItems) {
     QueryParams qp = new QueryParams();
-    qp.setFilterExpression(itemExpr);
+    qp.setQueryExpression(itemExpr);
     if (s instanceof PageQueryService) {
       List<T> items = ((PageQueryService<T, ?>) s).getItems(qp, 0, maxNumOfItems);
       return items;

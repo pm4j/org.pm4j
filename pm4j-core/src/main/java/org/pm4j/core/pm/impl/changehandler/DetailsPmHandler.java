@@ -20,10 +20,6 @@ public interface DetailsPmHandler {
    */
   PmObject getDetailsPm();
 
-  /** @deprecated Please use {@link #beforeMasterRecordChange(Object)}. */
-  @Deprecated
-  boolean canSwitchMasterRecord();
-
   /**
    * Performs the checks and logic to be applied before the master selection may be switched
    * from the given master record to another one.

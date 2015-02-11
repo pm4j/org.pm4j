@@ -34,7 +34,7 @@ public class PmInitTest {
   }
 
 
-  public static class MyElement extends PmElementImpl {
+  public static class MyElement extends PmObjectBase {
     public final PmAttrStringImpl s = new PmAttrStringImpl(this);
 
     public MyElement(PmObject pmParent) {

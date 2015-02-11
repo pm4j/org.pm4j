@@ -1,21 +1,19 @@
 package org.pm4j.core.pm;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-import java.math.BigDecimal;
-import java.util.Locale;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.pm4j.core.pm.impl.PmAttrBigDecimalImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
-import org.pm4j.core.pm.impl.PmElementImpl;
+import org.pm4j.core.pm.impl.PmObjectBase;
+
+import java.math.BigDecimal;
+import java.util.Locale;
+
+import static org.junit.Assert.*;
 
 public class PmAttrValueAsStringFormatTest {
 
-  public static class MyPm extends PmElementImpl {
+  public static class MyPm extends PmObjectBase {
 
     /** Default format: <code>#.####...</code> */
     public final PmAttrBigDecimal bigDecimalWithDefaultFormat = new PmAttrBigDecimalImpl(this);

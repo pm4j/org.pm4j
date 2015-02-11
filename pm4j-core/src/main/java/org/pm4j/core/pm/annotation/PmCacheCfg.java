@@ -1,6 +1,5 @@
 package org.pm4j.core.pm.annotation;
 
-import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -87,6 +86,11 @@ public @interface PmCacheCfg {
   CacheMode options() default CacheMode.NOT_SPECIFIED;
 
   /**
+   * @return The tree view child nodes caching strategy..
+   */
+  CacheMode nodes() default CacheMode.NOT_SPECIFIED;
+
+  /**
    * A cache definition is by default only applied for the PM that you annotate.
    * <p>
    * In some cases it's useful to define a cache mode for a whole sub tree of PM's.
@@ -112,5 +116,5 @@ public @interface PmCacheCfg {
   public static final String ATTR_TITLE = "title";
   public static final String ATTR_VALUE = "value";
   public static final String ATTR_OPTIONS = "options";
-
+  public static final String ATTR_NODES = "nodes";
 }

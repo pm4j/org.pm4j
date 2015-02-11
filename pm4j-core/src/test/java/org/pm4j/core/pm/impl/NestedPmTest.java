@@ -11,7 +11,7 @@ public class NestedPmTest extends TestCase {
     public final ChildPm childElem = new ChildPm(this);
   }
 
-  public static class ChildPm extends PmElementImpl {
+  public static class ChildPm extends PmObjectBase {
     public ChildPm(PmObject pmParent) {
       super(pmParent);
     }

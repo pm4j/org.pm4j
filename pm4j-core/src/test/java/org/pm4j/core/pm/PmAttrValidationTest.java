@@ -1,33 +1,33 @@
 package org.pm4j.core.pm;
 
-import java.util.Locale;
-
 import org.junit.Test;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.annotation.PmTitleCfg;
 import org.pm4j.core.pm.impl.PmAttrIntegerImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
-import org.pm4j.core.pm.impl.PmElementImpl;
 import org.pm4j.core.pm.impl.PmInitApi;
-import org.pm4j.tools.test.PmAssert;
+import org.pm4j.core.pm.impl.PmObjectBase;
+import org.pm4j.tools.test._PmAssert;
+
+import java.util.Locale;
 
 public class PmAttrValidationTest {
 
-  private TestPm pm = PmInitApi.ensurePmInitialization(new TestPm(new TestConversationPm()));
+  private TestPm pm = PmInitApi.initPmTree(new TestPm(new TestConversationPm()));
 
   @Test
   public void testValidateVisibleAttr() {
-    PmAssert.validateNotSuccessful(pm, "Please enter a value into \"Required Integer\".");
+    _PmAssert.validateNotSuccessful(pm, "Please enter a value into \"Required Integer\".");
   }
 
   @Test
   public void testDontValidateInvisibleAttr() {
     pm.requiredIntVisible = false;
-    PmAssert.validateSuccessful(pm);
+    _PmAssert.validateSuccessful(pm);
   }
 
 
-  public static class TestPm extends PmElementImpl {
+  public static class TestPm extends PmObjectBase {
     boolean requiredIntVisible = true;
 
     @PmAttrCfg(required=true)

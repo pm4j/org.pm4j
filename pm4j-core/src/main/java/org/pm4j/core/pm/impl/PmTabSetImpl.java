@@ -26,7 +26,7 @@ import org.pm4j.navi.NaviLink;
  *
  * @author Olaf Boede
  */
-public class PmTabSetImpl extends PmElementImpl implements PmTabSet {
+public class PmTabSetImpl extends PmObjectBase implements PmTabSet {
 
   private static final Log LOG = LogFactory.getLog(PmTabSetImpl.class);
 
@@ -69,7 +69,7 @@ public class PmTabSetImpl extends PmElementImpl implements PmTabSet {
 
     // ensure that the to-tab is initialized (was an issue in domain specific
     // unit tests):
-    PmInitApi.ensurePmInitialization(toTab);
+    PmInitApi.initPmTree(toTab);
 
     // Delegate to an undoable command.
     PmTabChangeCommand tabChangeCommand = new PmTabChangeCommand(this, _fromTab, toTab);
@@ -110,18 +110,18 @@ public class PmTabSetImpl extends PmElementImpl implements PmTabSet {
    * For more generic logic you may consider using
    * {@link #addTabSwitchCommandDecorator(PmTab, PmTab, PmCommandDecorator)}.
    *
-   * @param tabChangeCmd
-   *          Unused. Will disappear soon.
    * @param fromTab
    *          The tab to leave.
    * @param toTab
    *          The tab to enter.
+   * @param tabChangeCmd
+   *          The internally used tab change command. May be used for command confirmation scenarios.
+   *
    * @return <code>true</code> if the switch is allowed.<br>
    *         <code>false</code> prevents the tab switch.
    *
    */
-  // TODO: rename to beforeSwitch and add an afterSwitch; remove the command reference.
-  protected boolean switchToTabPmImpl(@Deprecated PmCommand tabChangeCmd, PmTab fromTab, PmTab toTab) {
+  protected boolean beforeSwitch(PmTab fromTab, PmTab toTab, PmCommand tabChangeCmd) {
     return true;
   }
 
@@ -130,7 +130,7 @@ public class PmTabSetImpl extends PmElementImpl implements PmTabSet {
    */
   @Override
   public PmTab getCurrentTabPm() {
-    PmInitApi.ensurePmInitialization(this);
+    PmInitApi.initThisPmOnly(this);
     return (currentTabPm != null)
             ? currentTabPm
             : getFirstTabPm();
@@ -249,10 +249,7 @@ public class PmTabSetImpl extends PmElementImpl implements PmTabSet {
     protected boolean beforeDo() {
       boolean canDo = super.beforeDo();
       if (canDo) {
-        // XXX olaf: a strange solution. This should happen in doItImpl()...
-        // A split off to canSwitch and switch could make it clearer. But that makes
-        // it harder to express some business constraints. Check!
-        canDo = tabSet.switchToTabPmImpl(this, fromTab, toTab);
+        canDo = tabSet.beforeSwitch(fromTab, toTab, this);
       }
       return canDo;
     }

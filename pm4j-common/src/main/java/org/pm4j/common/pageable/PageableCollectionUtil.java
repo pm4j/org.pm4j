@@ -296,7 +296,7 @@ public final class PageableCollectionUtil {
    */
   public static <T_ID> QueryParams makeSelectionQueryParams(QueryAttr idAttr, QueryParams queryParams, ClickedIds<T_ID> clickedIds) {
     QueryParams qp = queryParams.clone();
-    qp.setFilterExpression(makeSelectionQueryParams(idAttr, qp.getFilterExpression(), clickedIds));
+    qp.setQueryExpression(makeSelectionQueryParams(idAttr, qp.getQueryExpression(), clickedIds));
     return qp;
   }
 

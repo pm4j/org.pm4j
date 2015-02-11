@@ -1,15 +1,5 @@
 package org.pm4j.core.pm;
 
-import static org.junit.Assert.assertEquals;
-import static org.pm4j.common.pageable.PageableCollection.EVENT_REMOVE_SELECTION;
-import static org.pm4j.tools.test.PmAssert.setValue;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-
 import org.apache.commons.lang.StringUtils;
 import org.junit.Assert;
 import org.junit.Before;
@@ -26,31 +16,24 @@ import org.pm4j.common.query.inmem.InMemSortOrder;
 import org.pm4j.common.selection.SelectMode;
 import org.pm4j.common.util.CompareUtil;
 import org.pm4j.core.pm.PmTable.UpdateAspect;
-import org.pm4j.core.pm.annotation.PmAttrCfg;
-import org.pm4j.core.pm.annotation.PmBeanCfg;
-import org.pm4j.core.pm.annotation.PmBoolean;
-import org.pm4j.core.pm.annotation.PmFactoryCfg;
-import org.pm4j.core.pm.annotation.PmTableCfg;
-import org.pm4j.core.pm.annotation.PmTableColCfg;
-import org.pm4j.core.pm.annotation.PmTitleCfg;
+import org.pm4j.core.pm.annotation.*;
 import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
 import org.pm4j.core.pm.api.PmEventApi;
-import org.pm4j.core.pm.impl.BroadcastPmEventProcessor;
-import org.pm4j.core.pm.impl.PmAttrIntegerImpl;
-import org.pm4j.core.pm.impl.PmAttrStringImpl;
-import org.pm4j.core.pm.impl.PmBeanImpl;
-import org.pm4j.core.pm.impl.PmConversationImpl;
-import org.pm4j.core.pm.impl.PmInitApi;
-import org.pm4j.core.pm.impl.PmTableColImpl;
-import org.pm4j.core.pm.impl.PmTableImpl;
-import org.pm4j.tools.test.RecordingPmEventListener;
-import org.pm4j.tools.test.RecordingPropertyChangeListener;
+import org.pm4j.core.pm.impl.*;
+import org.pm4j.tools.test._RecordingPmEventListener;
+import org.pm4j.tools.test._RecordingPropertyChangeListener;
+
+import java.util.*;
+
+import static org.junit.Assert.assertEquals;
+import static org.pm4j.common.pageable.PageableCollection.EVENT_REMOVE_SELECTION;
+import static org.pm4j.tools.test._PmAssert.setValue;
 
 public class PmTableTest {
 
   private MyTablePm myTablePm;
-  private RecordingPmEventListener valueChangeEventListener = new RecordingPmEventListener();
+  private _RecordingPmEventListener valueChangeEventListener = new _RecordingPmEventListener();
 
   private List<RowBean> editedRowBeanList = new ArrayList<RowBean>(Arrays.asList(
       new RowBean("b", "a 'b'", 2),
@@ -76,7 +59,7 @@ public class PmTableTest {
     };
     PmEventApi.addPmEventListener(myTablePm, PmEvent.VALUE_CHANGE, valueChangeEventListener);
 
-    PmInitApi.ensurePmSubTreeInitialization(myTablePm);
+    PmInitApi.initPmTree(myTablePm);
   }
 
   @Test
@@ -216,7 +199,7 @@ public class PmTableTest {
     myTablePm.setNumOfPageRowPms(10);
     assertEquals("[a, b, c]", myTablePm.getRowPms().toString());
     QueryExprCompare notA = new QueryExprCompare(RowBean.ATTR_NAME, CompOpNotEquals.class, "a");
-    myTablePm.getPmPageableBeanCollection().getQueryParams().setFilterExpression(notA);
+    myTablePm.getPmPageableBeanCollection().getQueryParams().setQueryExpression(notA);
     assertEquals("[b, c]", myTablePm.getRowPms().toString());
   }
 
@@ -241,7 +224,7 @@ public class PmTableTest {
 
     // Nevertheless try to register a filter that filters any 'a'
     QueryExprCompare noA = new QueryExprCompare(RowBean.ATTR_NAME, CompOpNotEquals.class, "a");
-    myTablePm.getPmPageableBeanCollection().getQueryParams().setFilterExpression(noA);
+    myTablePm.getPmPageableBeanCollection().getQueryParams().setQueryExpression(noA);
 
     // The added Filter does not apply because the filter change decorator prevents the application.
     assertEquals("[a, b, c]", myTablePm.getRowPms().toString());
@@ -252,8 +235,8 @@ public class PmTableTest {
     PageableCollection<RowPm> pc = myTablePm.getPmPageableCollection();
     pc.getSelectionHandler().setSelectMode(SelectMode.SINGLE);
     assertEquals("[a, b]", myTablePm.getRowPms().toString());
-    RecordingPropertyChangeListener deletePropertyChangeListener = new RecordingPropertyChangeListener();
-    RecordingPropertyChangeListener deleteBeanPropertyChangeListener = new RecordingPropertyChangeListener();
+    _RecordingPropertyChangeListener deletePropertyChangeListener = new _RecordingPropertyChangeListener();
+    _RecordingPropertyChangeListener deleteBeanPropertyChangeListener = new _RecordingPropertyChangeListener();
     pc.addPropertyAndVetoableListener(EVENT_REMOVE_SELECTION, deletePropertyChangeListener);
     myTablePm.getPmPageableBeanCollection().addPropertyAndVetoableListener(EVENT_REMOVE_SELECTION, deleteBeanPropertyChangeListener);
 
@@ -274,8 +257,8 @@ public class PmTableTest {
     PageableCollection<RowBean> pc = myTablePm.getPmPageableBeanCollection();
     pc.getSelectionHandler().setSelectMode(SelectMode.SINGLE);
     assertEquals("[a, b]", myTablePm.getRowPms().toString());
-    RecordingPropertyChangeListener deletePropertyChangeListener = new RecordingPropertyChangeListener();
-    RecordingPropertyChangeListener deleteBeanPropertyChangeListener = new RecordingPropertyChangeListener();
+    _RecordingPropertyChangeListener deletePropertyChangeListener = new _RecordingPropertyChangeListener();
+    _RecordingPropertyChangeListener deleteBeanPropertyChangeListener = new _RecordingPropertyChangeListener();
     pc.addPropertyAndVetoableListener(EVENT_REMOVE_SELECTION, deletePropertyChangeListener);
     myTablePm.getPmPageableBeanCollection().addPropertyAndVetoableListener(EVENT_REMOVE_SELECTION, deleteBeanPropertyChangeListener);
 
@@ -299,7 +282,7 @@ public class PmTableTest {
    */
   @Test
   public void testRowsAreNotVisitedOnBroadCastAllChangeEvents() {
-    RecordingPmEventListener l = new RecordingPmEventListener();
+    _RecordingPmEventListener l = new _RecordingPmEventListener();
     PmEventApi.addPmEventListener(myTablePm.getRowPms().get(0), PmEvent.ALL_CHANGE_EVENTS, l);
     BroadcastPmEventProcessor.broadcastAllChangeEvent(myTablePm, 0);
 
@@ -349,7 +332,7 @@ public class PmTableTest {
   }
 
   @PmBeanCfg(beanClass=RowBean.class)
-  public static class RowPm extends PmBeanImpl<RowBean> {
+  public static class RowPm extends PmBeanBase<RowBean> {
     public final PmAttrString name = new PmAttrStringImpl(this);
     public final PmAttrString description = new PmAttrStringImpl(this);
     public final PmAttrInteger counter = new PmAttrIntegerImpl(this);

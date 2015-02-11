@@ -406,6 +406,9 @@ public class PmBeanBase<T_BEAN>
     if (annotation != null) {
       myMetaData.autoCreateBean = annotation.autoCreateBean();
       myMetaData.beanPropertyKey = StringUtils.trimToEmpty(annotation.findBeanExpr());
+      if (StringUtils.isEmpty(myMetaData.beanPropertyKey)) {
+        myMetaData.beanPropertyKey = StringUtils.trimToEmpty(annotation.valuePath());
+      }
       myMetaData.setReadOnly(annotation.readOnly());
     }
 
@@ -445,7 +448,7 @@ public class PmBeanBase<T_BEAN>
 
   // TODO oboede: remove in v0.9x, keep it for now to check whether we break old code.
   public static class ValueChangeEventProcessor extends BroadcastPmEventProcessor {
-    public ValueChangeEventProcessor(PmDataInput rootPm, boolean isReloadEvent) {
+    public ValueChangeEventProcessor(PmObject rootPm, boolean isReloadEvent) {
       super(rootPm,
           isReloadEvent
               ? PmEvent.ALL_CHANGE_EVENTS | PmEvent.RELOAD
@@ -476,7 +479,7 @@ public class PmBeanBase<T_BEAN>
 
       // FIXME olaf: this is done AFTER the main visit to keep some old code alive.
       // See: RoleEditorBeanTabPm...
-      ((PmDataInput)rootPm).setPmValueChanged(false);
+      rootPm.setPmValueChanged(false);
     }
 
   };

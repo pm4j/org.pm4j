@@ -1,7 +1,7 @@
 package org.pm4j.core.pm;
 
 import static org.junit.Assert.assertEquals;
-import static org.pm4j.tools.test.PmAssert.setValue;
+import static org.pm4j.tools.test._PmAssert.setValue;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -11,6 +11,7 @@ import org.pm4j.core.pm.api.PmFactoryApi;
 import org.pm4j.core.pm.impl.PmAttrIntegerImpl;
 import org.pm4j.core.pm.impl.PmBeanBase;
 import org.pm4j.core.pm.impl.PmConversationImpl;
+import org.pm4j.core.pm.impl.PmDataInputUtil;
 
 public class BufferedPmValueTest {
   private PmConversation pmConversation = new PmConversationImpl(MyBeanClassPm.class);
@@ -28,14 +29,14 @@ public class BufferedPmValueTest {
     assertEquals(1, beanPm.i.getValue().intValue());
     assertEquals(0, bean.i);
 
-    beanPm.commitBufferedPmChanges();
+    PmDataInputUtil.commitBufferedPmChanges(beanPm);
     assertEquals(1, bean.i);
 
     beanPm.i.setValue(2);
     assertEquals(2, beanPm.i.getValue().intValue());
     assertEquals(1, bean.i);
 
-    beanPm.rollbackBufferedPmChanges();
+    PmDataInputUtil.rollbackBufferedPmChanges(beanPm);
     assertEquals(1, beanPm.i.getValue().intValue());
     assertEquals(1, bean.i);
   }
@@ -49,13 +50,13 @@ public class BufferedPmValueTest {
     assertEquals(0, bean.i);
     assertEquals(0, bean.j);
 
-    beanPm.i.commitBufferedPmChanges();
+    PmDataInputUtil.commitBufferedPmChanges(beanPm.i);
     assertEquals(1, beanPm.i.getValue().intValue());
     assertEquals(1, beanPm.j.getValue().intValue());
     assertEquals(1, bean.i);
     assertEquals(0, bean.j);
 
-    beanPm.rollbackBufferedPmChanges();
+    PmDataInputUtil.rollbackBufferedPmChanges(beanPm);
     assertEquals(1, beanPm.i.getValue().intValue());
     assertEquals(0, beanPm.j.getValue().intValue());
     assertEquals(1, bean.i);
@@ -66,7 +67,7 @@ public class BufferedPmValueTest {
   public void testSetAndReset() {
     setValue(beanPm.i, 1);
     assertEquals(0, bean.i);
-    beanPm.i.commitBufferedPmChanges();
+    PmDataInputUtil.commitBufferedPmChanges(beanPm.i);
     assertEquals(1, beanPm.i.getValue().intValue());
     assertEquals(1, bean.i);
 
@@ -74,7 +75,7 @@ public class BufferedPmValueTest {
     assertEquals(13, beanPm.i.getValue().intValue());
     assertEquals("It's buffered. Also a reset should be committed",
                  1, bean.i);
-    beanPm.i.commitBufferedPmChanges();
+    PmDataInputUtil.commitBufferedPmChanges(beanPm.i);
     assertEquals(13, bean.i);
   }
 

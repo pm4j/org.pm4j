@@ -68,7 +68,7 @@ public class PmCommandNaviBack extends PmCommandImpl {
    * state.
    */
   @Override
-  protected void doItImpl() throws Exception {
+  protected void doItImpl()  {
     navigateBack(linksToSkip);
   }
 

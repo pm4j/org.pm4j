@@ -15,7 +15,6 @@ import org.pm4j.core.pm.PmObject.PmMatcher;
 import org.pm4j.core.pm.PmTab;
 import org.pm4j.core.pm.PmTabSet;
 import org.pm4j.core.pm.PmTable;
-import org.pm4j.core.pm.PmTreeNode;
 import org.pm4j.core.pm.api.PmVisitorApi.PmVisitCallBack;
 import org.pm4j.core.pm.api.PmVisitorApi.PmVisitHierarchyCallBack;
 import org.pm4j.core.pm.api.PmVisitorApi.PmVisitHint;
@@ -185,7 +184,7 @@ public class PmVisitorImpl {
       if (hints.contains(PmVisitHint.SKIP_NOT_INITIALIZED)) {
         return false;
       } else {
-        PmInitApi.ensurePmInitialization(pm);
+        PmInitApi.initThisPmOnly(pm);
       }
     }
 
@@ -269,9 +268,8 @@ public class PmVisitorImpl {
           if (pm instanceof PmTable) {
               ListUtil.addItemsNotYetInCollection(allChildren, ((PmTable<PmObject>)pm).getRowPms());
           }
-          if (pm instanceof PmTreeNode) {
-              ListUtil.addItemsNotYetInCollection(allChildren, (Collection<PmObject>)(Object)((PmTreeNode)pm).getPmChildNodes());
-          }
+          // TODO: prevent double visits for PmAttrPmList children. Children may appear in different PM tree levels again.
+          ListUtil.addItemsNotYetInCollection(allChildren, (Collection<PmObject>)pm.getPmChildNodes());
       }
       ListUtil.addItemsNotYetInCollection(allChildren, ((PmObjectBase) pm).getFactoryGeneratedChildPms());
     }

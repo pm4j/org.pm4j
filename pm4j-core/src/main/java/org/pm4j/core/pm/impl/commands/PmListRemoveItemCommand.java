@@ -5,8 +5,8 @@ import java.util.Collection;
 import java.util.List;
 
 import org.pm4j.core.pm.PmAttrPmList;
+import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmCommand;
-import org.pm4j.core.pm.PmElement;
 import org.pm4j.core.pm.impl.PmCommandImpl;
 
 /**
@@ -16,24 +16,24 @@ import org.pm4j.core.pm.impl.PmCommandImpl;
  */
 public class PmListRemoveItemCommand extends PmCommandImpl implements PmCommand {
 
-  private final Collection<PmElement> removedItems;
+  private final Collection<PmBean<?>> removedItems;
 
   @SuppressWarnings("unchecked")
   public PmListRemoveItemCommand(PmAttrPmList<?> pmListAttr, List<?> removedItems) {
     super(pmListAttr);
-    this.removedItems = (Collection<PmElement>)removedItems;
+    this.removedItems = (Collection<PmBean<?>>)removedItems;
 //    setUndoCommand(new PmListAddItemCommand());
   }
 
-  public PmListRemoveItemCommand(PmAttrPmList<?> presentationModel, PmElement removedItem) {
+  public PmListRemoveItemCommand(PmAttrPmList<?> presentationModel, PmBean<?> removedItem) {
     this(presentationModel, Arrays.asList(removedItem));
   }
 
   @Override
-  protected void doItImpl() throws Exception {
+  protected void doItImpl() {
     @SuppressWarnings("unchecked")
-    PmAttrPmList<PmElement> pmAttrList = (PmAttrPmList<PmElement>) getPmParent();
-    for (PmElement pm : removedItems) {
+    PmAttrPmList<PmBean<?>> pmAttrList = (PmAttrPmList<PmBean<?>>) getPmParent();
+    for (PmBean<?> pm : removedItems) {
       pmAttrList.remove(pm);
     }
   }

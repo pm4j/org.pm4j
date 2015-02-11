@@ -113,15 +113,6 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
   }
 
   /**
-   * Base functionality (includes initialization etc.) is finalized here.<p>
-   * Subclasses may place their logic in {@link #isPmEnabledImpl()}.
-   */
-  @Override
-  public final boolean isPmEnabled() {
-  return super.isPmEnabled();
-  }
-
-  /**
    * @param commandDecorator The decorator to add to the command execution logic.
    */
   @Override
@@ -139,17 +130,6 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
    */
   protected NaviLink actionReturnOnFailure(NaviLink suggestedNaviLink) {
     return suggestedNaviLink;
-  }
-
-  @Override
-  protected boolean isPmVisibleImpl() {
-    if ((! isPmEnabled()) &&
-        getOwnMetaData().hideWhenNotEnabled) {
-      return false;
-    }
-    else {
-      return super.isPmVisibleImpl();
-    }
   }
 
   /**
@@ -202,7 +182,7 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
   public PmCommand doIt(boolean changeCommandHistory) {
     PmCommandImpl cmd = zz_doCloneAndRegisterEventSource();
 
-    if (cmd.beforeDo()) {
+    if (cmd._beforeDo()) {
       NaviLink link = null;
       try {
         cmd.doItImpl();
@@ -246,7 +226,7 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
     PmCommandImpl cmd = zz_doCloneAndRegisterEventSource();
     NaviLink link = null;
 
-    if (!cmd.beforeDo()) {
+    if (!cmd._beforeDo()) {
       cmd.commandState = CommandState.BEFORE_DO_RETURNED_FALSE;
       link = cmd.actionReturnOnFailure(null);
     }
@@ -311,10 +291,8 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
    * @throws PmUserMessageException
    *           In case of handled failures that should be reported with a
    *           localized error message in the UI.
-   * @throws Exception
-   *           In case of an unexpected failure.
    */
-  protected void doItImpl() throws Exception {
+  protected void doItImpl() {
   }
 
   /**
@@ -551,7 +529,7 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
   protected Set<BEFORE_DO> getBeforeDoActions() {
     return getOwnMetaData().beforeDo;
   }
-  
+
   /**
    * @return Defines what happens after {@link #doItImpl()} gets called.
    */
@@ -579,12 +557,16 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
    * <p>
    * It will only be considered if the command validates before execution.
    * <p>
-   * The default implementation provides the next parent of type {@link PmDataInput}.
+   * The default implementation provides the next parent that is not of type {@link PmCommand}.
    *
    * @return the PM tree root object to validate before execution.
    */
-  protected PmDataInput getValidationExecRootPm() {
-    return PmUtil.getPmParentOfType(this, PmDataInput.class);
+  protected PmObject getValidationExecRootPm() {
+    PmObject o = getPmParent();
+    while (o instanceof PmCommand) {
+      o = o.getPmParent();
+    }
+    return o;
   }
 
   /**
@@ -625,9 +607,7 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
       PmMessageApi.clearPmTreeMessages(getValidationErrorRootPm());
     }
 
-    vetoCommandDecorator = commandDecorators.beforeDoReturnVetoDecorator(this);
-    // before-do was successful if all decorators agree.
-    return vetoCommandDecorator == null;
+    return true;
   }
 
   protected NaviLink afterDo(boolean changeCommandHistory) {
@@ -636,7 +616,7 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
     }
 
     if (getAfterDoActions().contains(AFTER_DO.RESET_VALUE_CHANGED_STATE)) {
-      PmDataInput validationParentPm = getValidationExecRootPm();
+      PmObject validationParentPm = getValidationExecRootPm();
       validationParentPm.setPmValueChanged(false);
     }
 
@@ -669,7 +649,16 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
     return naviLink;
   }
 
-
+  /** Calls domain specific {@link #beforeDo()} and after that the before-do logic of configured decorators. */
+  boolean _beforeDo() {
+    if (!beforeDo()) {
+      return false;
+    } else {
+      vetoCommandDecorator = commandDecorators.beforeDoReturnVetoDecorator(this);
+      // before-do was successful if all decorators agree.
+      return vetoCommandDecorator == null;
+    }
+  }
 
   /**
    * Provides the command decorator that returned <code>false</code> for its call of
@@ -771,18 +760,17 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
       myMetaData.beforeDo = new HashSet<BEFORE_DO>(Arrays.asList(annotation.beforeDo()));
       myMetaData.afterDo = new HashSet<AFTER_DO>(Arrays.asList(annotation.afterDo()));
       myMetaData.cmdKind = annotation.cmdKind();
-      myMetaData.hideWhenNotEnabled = annotation.hideWhenNotEnabled();
       if (annotation.clearCaches().length > 0) {
         myMetaData.clearCachesSet = new TreeSet<PmCacheApi.CacheKind>(Arrays.asList(annotation.clearCaches()));
       }
     } else {
-    	myMetaData.beforeDo = new HashSet<BEFORE_DO>(Arrays.asList(new BEFORE_DO[] {BEFORE_DO.DEFAULT}));
-    	myMetaData.afterDo = new HashSet<AFTER_DO>(Arrays.asList(new AFTER_DO[] {AFTER_DO.DEFAULT}));
+      myMetaData.beforeDo = new HashSet<BEFORE_DO>(Arrays.asList(new BEFORE_DO[] {BEFORE_DO.DEFAULT}));
+      myMetaData.afterDo = new HashSet<AFTER_DO>(Arrays.asList(new AFTER_DO[] {AFTER_DO.DEFAULT}));
     }
 
     if (myMetaData.beforeDo.contains(BEFORE_DO.DEFAULT)) {
       if (myMetaData.beforeDo.size() > 1) {
-    	  throw new PmRuntimeException(this, "beforeDo can not contain other values if default is specified.");
+        throw new PmRuntimeException(this, "beforeDo can not contain other values if default is specified.");
       }
       myMetaData.beforeDo = PmDefaults.getInstance().getBeforeDoCommandDefault();
     }
@@ -791,7 +779,7 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
           throw new PmRuntimeException(this, "afterDo can not contain other values if default is specified.");
       }
       if (myMetaData.beforeDo.contains(BEFORE_DO.VALIDATE)) {
-    	  myMetaData.afterDo.add(AFTER_DO.RESET_VALUE_CHANGED_STATE);
+        myMetaData.afterDo.add(AFTER_DO.RESET_VALUE_CHANGED_STATE);
       }
       myMetaData.afterDo.add(AFTER_DO.CLEAR_CACHES);
     }
@@ -806,18 +794,6 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
     private Set<PmCommandCfg.AFTER_DO> afterDo;
     private CmdKind cmdKind = CmdKind.COMMAND;
     private Set<PmCacheApi.CacheKind> clearCachesSet = Collections.emptySet();
-    
-    /**
-     * Should the command be hidden when not applicable. Defaults to <code>false</code>.
-     */
-    private boolean hideWhenNotEnabled = false;
-
-    public boolean isHideWhenNotEnabled() {
-      return hideWhenNotEnabled;
-    }
-    public void setHideWhenNotEnabled(boolean hideWhenNotEnabled) {
-      this.hideWhenNotEnabled = hideWhenNotEnabled;
-    }
     public CmdKind getCmdKind() {
       return cmdKind;
     }
@@ -828,6 +804,23 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
 
   private final MetaData getOwnMetaData() {
     return (MetaData) getPmMetaData();
+  }
+
+  // FIXME oboede: methods needed to identify direct usages (which shouldn't exist in the old code)
+  // Make base methods final and remove this implementations after doing that.
+  @Override
+  public boolean isPmValueChanged() {
+    return super.isPmValueChanged();
+  }
+
+  @Override
+  public void setPmValueChanged(boolean changed) {
+    super.setPmValueChanged(changed);
+  }
+
+  @Override
+  public void resetPmValues() {
+    super.resetPmValues();
   }
 
 }

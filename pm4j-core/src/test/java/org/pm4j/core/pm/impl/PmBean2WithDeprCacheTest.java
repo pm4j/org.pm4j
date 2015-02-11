@@ -1,9 +1,5 @@
 package org.pm4j.core.pm.impl;
 
-import static junit.framework.Assert.assertNull;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
-
 import org.junit.Ignore;
 import org.junit.Test;
 import org.pm4j.core.exception.PmRuntimeException;
@@ -15,7 +11,11 @@ import org.pm4j.core.pm.annotation.PmCacheCfg.CacheMode;
 import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
 import org.pm4j.core.pm.api.PmEventApi;
-import org.pm4j.tools.test.RecordingPmEventListener;
+import org.pm4j.tools.test._RecordingPmEventListener;
+
+import static junit.framework.Assert.assertNull;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 
 public class PmBean2WithDeprCacheTest {
 
@@ -90,7 +90,7 @@ public class PmBean2WithDeprCacheTest {
     assertEquals("No value change broadcast for unused, not initialized PMs.", 0, pm.uncached.sValueChangeListener.getCallCount());
     assertEquals("No getter called.", 0, pm.uncached.callCount_getPmBeanImpl);
 
-    PmInitApi.ensurePmInitialization(pm);
+    PmInitApi.initPmTree(pm);
     BroadcastPmEventProcessor.broadcastAllChangeEvent(pm, 0);
     assertEquals("Each sub-PM gets informed.", 1, pm.valueChangeListener.getCallCount());
     assertEquals("Each sub-PM gets informed.", 1, pm.uncached.valueChangeListener.getCallCount());
@@ -126,7 +126,7 @@ public class PmBean2WithDeprCacheTest {
     BroadcastPmEventProcessor.broadcastAllChangeEvent(pm, 0);
     assertEquals("No value change broadcast for unused, not initialized PMs.", 0, pm.valueChangeListener.getCallCount());
 
-    PmInitApi.ensurePmInitialization(pm);
+    PmInitApi.initPmTree(pm);
     BroadcastPmEventProcessor.broadcastAllChangeEvent(pm, 0);
     assertEquals("Initialized PMs get informed.", 1, pm.valueChangeListener.getCallCount());
 
@@ -161,8 +161,8 @@ public class PmBean2WithDeprCacheTest {
     int callCount_getPmBeanImpl = 0;
     Bean b;
     boolean postponeEvents;
-    RecordingPmEventListener valueChangeListener = new RecordingPmEventListener();
-    RecordingPmEventListener sValueChangeListener = new RecordingPmEventListener();
+    _RecordingPmEventListener valueChangeListener = new _RecordingPmEventListener();
+    _RecordingPmEventListener sValueChangeListener = new _RecordingPmEventListener();
 
 
     public TestPmBase() {

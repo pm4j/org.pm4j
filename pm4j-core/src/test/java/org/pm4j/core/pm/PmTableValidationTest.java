@@ -1,22 +1,18 @@
 package org.pm4j.core.pm;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
+import org.pm4j.core.pm.annotation.PmBeanCfg;
+import org.pm4j.core.pm.annotation.PmFactoryCfg;
+import org.pm4j.core.pm.annotation.PmTableCfg.RowsToValidate;
+import org.pm4j.core.pm.impl.*;
+import org.pm4j.tools.test._PmAssert;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import org.junit.Test;
-import org.pm4j.core.pm.annotation.PmBeanCfg;
-import org.pm4j.core.pm.annotation.PmFactoryCfg;
-import org.pm4j.core.pm.annotation.PmTableCfg.RowsToValidate;
-import org.pm4j.core.pm.impl.PmAttrStringImpl;
-import org.pm4j.core.pm.impl.PmBeanImpl;
-import org.pm4j.core.pm.impl.PmConversationImpl;
-import org.pm4j.core.pm.impl.PmTableColImpl;
-import org.pm4j.core.pm.impl.PmTableImpl;
-import org.pm4j.tools.test.PmAssert;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Tests {@link PmTableImpl.TableValidator}.
@@ -34,7 +30,7 @@ public class PmTableValidationTest {
       }
     };
 
-    PmAssert.validateSuccessful(t);
+    _PmAssert.validateSuccessful(t);
     assertEquals("[a, b, c]", t.validatedRows.toString());
   }
 
@@ -47,7 +43,7 @@ public class PmTableValidationTest {
       }
     };
 
-    PmAssert.validateSuccessful(t);
+    _PmAssert.validateSuccessful(t);
     assertEquals("[a, b]", t.validatedRows.toString());
   }
 
@@ -60,11 +56,11 @@ public class PmTableValidationTest {
       }
     };
 
-    PmAssert.validateSuccessful(t);
+    _PmAssert.validateSuccessful(t);
     assertEquals(0, t.validatedRows.size());
 
     t.getPmPageableBeanCollection().getModificationHandler().addItem(new RowBean("added"));
-    PmAssert.validateSuccessful(t);
+    _PmAssert.validateSuccessful(t);
     assertEquals("[added]", t.validatedRows.toString());
   }
 
@@ -77,11 +73,11 @@ public class PmTableValidationTest {
       }
     };
 
-    PmAssert.validateSuccessful(t);
+    _PmAssert.validateSuccessful(t);
     assertEquals(0, t.validatedRows.size());
 
-    PmAssert.setValue(t.getRowPms().get(0).name, "updated name");
-    PmAssert.validateSuccessful(t);
+    _PmAssert.setValue(t.getRowPms().get(0).name, "updated name");
+    _PmAssert.validateSuccessful(t);
     assertEquals("[updated name]", t.validatedRows.toString());
   }
 
@@ -94,13 +90,13 @@ public class PmTableValidationTest {
       }
     };
 
-    PmAssert.validateSuccessful(t);
+    _PmAssert.validateSuccessful(t);
     assertEquals("[]", t.validatedRows.toString());
 
     // perform some changes to demonstrate that they are not validated.
-    PmAssert.setValue(t.getRowPms().get(0).name, "updated name");
+    _PmAssert.setValue(t.getRowPms().get(0).name, "updated name");
     t.getPmPageableBeanCollection().getModificationHandler().addItem(new RowBean("added"));
-    PmAssert.validateSuccessful(t);
+    _PmAssert.validateSuccessful(t);
     assertEquals("[]", t.validatedRows.toString());
   }
 
@@ -113,15 +109,15 @@ public class PmTableValidationTest {
       }
     };
 
-    PmAssert.validateSuccessful(t);
+    _PmAssert.validateSuccessful(t);
     assertEquals("[]", t.validatedRows.toString());
     t.validatedRows.clear();
 
     // perform some changes to demonstrate that they are not validated.
     t.getPmPageableBeanCollection().getModificationHandler().addItem(new RowBean("added"));
-    PmAssert.setValue(t.getRowPms().get(0).name, "updated name");
+    _PmAssert.setValue(t.getRowPms().get(0).name, "updated name");
 
-    PmAssert.validateSuccessful(t);
+    _PmAssert.validateSuccessful(t);
     assertEquals("[updated name, added]", t.validatedRows.toString());
   }
 
@@ -156,7 +152,7 @@ public class PmTableValidationTest {
   }
 
   @PmBeanCfg(beanClass=RowBean.class)
-  public static class RowPm extends PmBeanImpl<RowBean> {
+  public static class RowPm extends PmBeanBase<RowBean> {
     public final PmAttrString name = new PmAttrStringImpl(this);
 
     @Override

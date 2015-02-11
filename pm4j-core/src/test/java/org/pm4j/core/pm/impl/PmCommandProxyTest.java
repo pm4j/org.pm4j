@@ -41,7 +41,7 @@ public class PmCommandProxyTest {
     @PmTitleCfg(title="SuccessCommand", tooltip="SuccessCommand tooltip")
     public final PmCommand cmdSuccess = new PmCommandImpl(this) {
       @Override
-      protected void doItImpl() throws Exception {
+      protected void doItImpl()  {
        lastExcecutedCommand = this;
       }
     };

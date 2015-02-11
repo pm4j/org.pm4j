@@ -76,7 +76,7 @@ public class PmCommandImplAfterLogicTest {
   /**
    * A PM with some command variations to test.
    */
-  public static class MyTestPm extends PmElementImpl {
+  public static class MyTestPm extends PmObjectBase {
 
     @PmAttrCfg(required=true)
     public final PmAttrString s = new PmAttrStringImpl(this);
@@ -105,7 +105,7 @@ public class PmCommandImplAfterLogicTest {
       }
 
       @Override
-      protected void doItImpl() throws Exception {
+      protected void doItImpl()  {
         doItImplHasBeenExecuted = true;
       }
     }

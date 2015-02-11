@@ -1,14 +1,5 @@
 package org.pm4j.core.pm.impl;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.pm4j.common.cache.CacheStrategy;
 import org.pm4j.common.exception.CheckedExceptionWrapper;
 import org.pm4j.common.util.collection.ListUtil;
@@ -17,8 +8,15 @@ import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.annotation.PmCacheCfg;
 import org.pm4j.core.pm.annotation.PmCacheCfg.CacheMode;
 import org.pm4j.core.pm.annotation.PmCacheCfg.Clear;
-import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
-import org.pm4j.core.pm.impl.InternalPmCacheCfgUtil.CacheMetaData;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Contains algorithms for reading PM annotations.

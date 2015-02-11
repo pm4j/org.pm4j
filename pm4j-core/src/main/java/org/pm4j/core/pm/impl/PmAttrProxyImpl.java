@@ -76,7 +76,7 @@ public class PmAttrProxyImpl<T_VALUE> extends PmAttrImpl<T_VALUE> implements PmA
   }
 
   @Override
-  protected boolean setValueImpl(SetValueContainer<T_VALUE> value) {
+  boolean setValueImpl(SetValueContainer<T_VALUE> value) {
     if (delegate == null) {
       throw new PmRuntimeException(this, "Unable to set an attribute value using a proxy that has no delegate.");
     }

@@ -3,6 +3,8 @@ package org.pm4j.core.pm.impl;
 import org.pm4j.core.pm.PmAttr;
 
 /**
+ * For internal use only!
+ * <p>
  * A value that is not yet or can't be applied to an attribute.
  * 
  * @author olaf boede

@@ -173,7 +173,7 @@ public class PmEventApi {
    * @param rootPm Root of the sub tree to inform.
    * @param eventMask The event mask for the events to fire for all PM's.
    */
-  public static void broadcastPmEvent(PmDataInput rootPm, int eventMask) {
+  public static void broadcastPmEvent(PmObject rootPm, int eventMask) {
     new BroadcastPmEventProcessor(rootPm, eventMask).doIt();
   }
 

@@ -1,15 +1,15 @@
 package org.pm4j.core.pm.impl;
 
 import org.pm4j.core.exception.PmValidationException;
-import org.pm4j.core.pm.PmDataInput;
 import org.pm4j.core.pm.PmMessage.Severity;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.api.PmMessageApi;
+import org.pm4j.core.pm.api.PmValidationApi;
 
 /**
  * Implements the validation logic that was formerly in {@link PmDataInputBase#pmValidate()}.
  */
-class DeprDataInputValidator<T extends PmDataInputBase> implements PmObjectBase.Validator {
+class DeprDataInputValidator<T extends PmObjectBase> implements PmObjectBase.Validator {
   @SuppressWarnings("unchecked")
   @Override
   public void validate(PmObject pm) {
@@ -25,9 +25,9 @@ class DeprDataInputValidator<T extends PmDataInputBase> implements PmObjectBase.
   }
 
   protected void validateImpl(T pm)  throws PmValidationException {
-    for (PmDataInput d : PmUtil.getPmChildrenOfType(pm, PmDataInput.class)) {
+    for (PmObject d : PmUtil.getPmChildren(pm)) {
       if (d.isPmVisible() && !d.isPmReadonly()) {
-        d.pmValidate();
+        PmValidationApi.validate(d);
       }
     }
   }

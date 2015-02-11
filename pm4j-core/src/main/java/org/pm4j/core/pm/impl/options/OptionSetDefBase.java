@@ -13,14 +13,12 @@ import org.pm4j.common.expr.Expression.SyntaxVersion;
 import org.pm4j.common.util.collection.IterableUtil;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmAttr;
-import org.pm4j.core.pm.PmElement;
 import org.pm4j.core.pm.PmOption;
 import org.pm4j.core.pm.PmOptionSet;
 import org.pm4j.core.pm.annotation.PmOptionCfg;
 import org.pm4j.core.pm.annotation.PmOptionCfg.NullOption;
 import org.pm4j.core.pm.api.PmExpressionApi;
 import org.pm4j.core.pm.impl.PmAttrBase;
-import org.pm4j.core.pm.impl.PmUtil;
 import org.pm4j.core.pm.impl.pathresolver.ExpressionPathResolver;
 import org.pm4j.core.pm.impl.pathresolver.PathComparatorFactory;
 import org.pm4j.core.pm.impl.pathresolver.PathResolver;
@@ -92,7 +90,7 @@ public abstract class OptionSetDefBase<T_ATTR extends PmAttrBase<?,?>> implement
     }
     else {
       o = valuesPath != null
-        ? valuesPath.getValue(PmUtil.getPmParentOfType(forAttr, PmElement.class))
+        ? valuesPath.getValue(forAttr.getPmParent())
         : getOptionValues(forAttr);
   }
 

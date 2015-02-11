@@ -14,7 +14,7 @@ import org.pm4j.core.pm.annotation.PmTitleCfg;
 import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
 import org.pm4j.core.pm.api.PmMessageApi;
-import org.pm4j.tools.test.PmAssert;
+import org.pm4j.tools.test._PmAssert;
 
 /**
  * Test @PmObjectCfg annotation effects on PmCommands. 
@@ -32,28 +32,28 @@ public class PmObjectCfgWithPmCommandsTest {
     pm.isReadOnly = true;
 
     // asserts:
-    PmAssert.assertEnabled(
-        pm.cmdDefaultEnabledBehavior, 
-        pm.cmdDefaultVisibility,
-        pm.cmdVisibleIfEditable
+    _PmAssert.assertEnabled(
+            pm.cmdDefaultEnabledBehavior,
+            pm.cmdDefaultVisibility,
+            pm.cmdVisibleIfEditable
     );
 
-    PmAssert.assertNotEnabled(
-        pm.attrDefaultEnabledBehavior,
-        pm.cmdEnabledInEditCtxt, 
-        pm.cmdEnabledIfEditableAndVisibleWhenEnabled
+    _PmAssert.assertNotEnabled(
+            pm.attrDefaultEnabledBehavior,
+            pm.cmdEnabledInEditCtxt,
+            pm.cmdEnabledIfEditableAndVisibleWhenEnabled
     );
     
-    PmAssert.assertVisible(
-        pm.attrDefaultEnabledBehavior,
-        pm.cmdDefaultEnabledBehavior, 
-        pm.cmdDefaultVisibility,
-        pm.cmdEnabledInEditCtxt
+    _PmAssert.assertVisible(
+            pm.attrDefaultEnabledBehavior,
+            pm.cmdDefaultEnabledBehavior,
+            pm.cmdDefaultVisibility,
+            pm.cmdEnabledInEditCtxt
     );
 
-    PmAssert.assertNotVisible(
-        pm.cmdVisibleIfEditable, 
-        pm.cmdEnabledIfEditableAndVisibleWhenEnabled
+    _PmAssert.assertNotVisible(
+            pm.cmdVisibleIfEditable,
+            pm.cmdEnabledIfEditableAndVisibleWhenEnabled
     );
 
     assertsForPmObjectsWithImmutableState(pm);
@@ -63,22 +63,22 @@ public class PmObjectCfgWithPmCommandsTest {
   public void testEditableParentPmBehavior() {
     pm.isReadOnly = false;
 
-    PmAssert.assertEnabled(
-        pm.cmdEnabledInEditCtxt, 
-        pm.cmdDefaultEnabledBehavior, 
-        pm.cmdDefaultVisibility,
-        pm.cmdVisibleWhenEnabled, 
-        pm.cmdVisibleIfEditable,
-        pm.cmdEnabledIfEditableAndVisibleWhenEnabled
+    _PmAssert.assertEnabled(
+            pm.cmdEnabledInEditCtxt,
+            pm.cmdDefaultEnabledBehavior,
+            pm.cmdDefaultVisibility,
+            pm.cmdVisibleWhenEnabled,
+            pm.cmdVisibleIfEditable,
+            pm.cmdEnabledIfEditableAndVisibleWhenEnabled
     );
     
-    PmAssert.assertVisible(
-        pm.cmdDefaultEnabledBehavior, 
-        pm.cmdDefaultVisibility,
-        pm.cmdVisibleWhenEnabled, 
-        pm.cmdEnabledInEditCtxt,
-        pm.cmdVisibleIfEditable, 
-        pm.cmdEnabledIfEditableAndVisibleWhenEnabled
+    _PmAssert.assertVisible(
+            pm.cmdDefaultEnabledBehavior,
+            pm.cmdDefaultVisibility,
+            pm.cmdVisibleWhenEnabled,
+            pm.cmdEnabledInEditCtxt,
+            pm.cmdVisibleIfEditable,
+            pm.cmdEnabledIfEditableAndVisibleWhenEnabled
     );
 
     assertsForPmObjectsWithImmutableState(pm);
@@ -89,14 +89,14 @@ public class PmObjectCfgWithPmCommandsTest {
    * @PmObjectCfg(enabled = Enable.IN_EDITABLE_CTXT)
    */
   @Test
-  public void testEnabledInEditableCtxtWhenCacheIsOff() {  
+  public void testEnabledInEditableCtxtWhenCacheIsOff() {
     pm.isReadOnly = false;
     
-    PmAssert.assertEnabled(pm.cmdWithDisabledCache);
+    _PmAssert.assertEnabled(pm.cmdWithDisabledCache);
     
     pm.isReadOnly = true;
     
-    PmAssert.assertNotEnabled(pm.cmdWithDisabledCache);
+    _PmAssert.assertNotEnabled(pm.cmdWithDisabledCache);
   }
   
   /*
@@ -104,19 +104,18 @@ public class PmObjectCfgWithPmCommandsTest {
    * @PmObjectCfg(enabled = Enable.IN_EDITABLE_CTXT)
    */
   @Test
-  public void testEnabledInEditableCtxtWhenCacheIsOn() {   
+  public void testEnabledInEditableCtxtWhenCacheIsOn() {
     pm.isReadOnly = false;
     
-    PmAssert.assertEnabled(pm.cmdWithEnabledCache);
+    _PmAssert.assertEnabled(pm.cmdWithEnabledCache);
     
     pm.isReadOnly = true;
     
-    PmAssert.assertEnabled(pm.cmdWithEnabledCache);
+    _PmAssert.assertEnabled(pm.cmdWithEnabledCache);
     
     PmCacheApi.clearPmCache(pm.cmdWithEnabledCache, CacheKind.ENABLEMENT);
     
-    PmAssert.assertNotEnabled(pm.cmdWithDisabledCache);
-    
+    _PmAssert.assertNotEnabled(pm.cmdWithDisabledCache);
   }
   
   /*
@@ -127,11 +126,11 @@ public class PmObjectCfgWithPmCommandsTest {
   public void testVisibleInEditableCtxtWhenCacheIsOff() {
     pm.isReadOnly = false;
     
-    PmAssert.assertVisible(pm.cmdWithVisiblityCacheOff);
+    _PmAssert.assertVisible(pm.cmdWithVisiblityCacheOff);
     
     pm.isReadOnly = true;
     
-    PmAssert.assertNotVisible(pm.cmdWithVisiblityCacheOff);
+    _PmAssert.assertNotVisible(pm.cmdWithVisiblityCacheOff);
   }
   
   /*
@@ -142,11 +141,11 @@ public class PmObjectCfgWithPmCommandsTest {
   public void testVisibleInEditableCtxtWhenCacheIsOn() {
     pm.isReadOnly = false;
     
-    PmAssert.assertVisible(pm.cmdWithVisiblityCacheOn);
+    _PmAssert.assertVisible(pm.cmdWithVisiblityCacheOn);
     
     pm.isReadOnly = true;
     
-    PmAssert.assertVisible(pm.cmdWithVisiblityCacheOn);
+    _PmAssert.assertVisible(pm.cmdWithVisiblityCacheOn);
   }
   
   /*
@@ -161,25 +160,25 @@ public class PmObjectCfgWithPmCommandsTest {
   public void testVisibilityDependsOnCachedEnablement() {
     pm.isReadOnly = true;
     
-    PmAssert.assertNotVisible(pm.cmdVisibilityDependsOnCachedEnablement);
-    PmAssert.assertNotEnabled(pm.cmdVisibilityDependsOnCachedEnablement);
+    _PmAssert.assertNotVisible(pm.cmdVisibilityDependsOnCachedEnablement);
+    _PmAssert.assertNotEnabled(pm.cmdVisibilityDependsOnCachedEnablement);
     
     pm.isReadOnly = false;
     
-    PmAssert.assertNotVisible(pm.cmdVisibilityDependsOnCachedEnablement);
-    PmAssert.assertNotEnabled(pm.cmdVisibilityDependsOnCachedEnablement);
+    _PmAssert.assertNotVisible(pm.cmdVisibilityDependsOnCachedEnablement);
+    _PmAssert.assertNotEnabled(pm.cmdVisibilityDependsOnCachedEnablement);
   }
  
   /*
    * Those should remain in the same state no matter what
    */
   private void assertsForPmObjectsWithImmutableState(HelperParentPm parentPm) {
-    PmAssert.assertNotEnabled(parentPm.cmdAlwaysDisabled);
-    PmAssert.assertNotVisible(parentPm.cmdAlwaysInvisible);
+    _PmAssert.assertNotEnabled(parentPm.cmdAlwaysDisabled);
+    _PmAssert.assertNotVisible(parentPm.cmdAlwaysInvisible);
   }
 
   private static class HelperParentPm extends PmConversationImpl {
-    
+
     private boolean isReadOnly = false;
     
     @Override

@@ -1,7 +1,7 @@
 package org.pm4j.core.pm.joda.impl;
 
 import static org.junit.Assert.assertEquals;
-import static org.pm4j.tools.test.PmAssert.setValueAsString;
+import static org.pm4j.tools.test._PmAssert.setValueAsString;
 
 import java.util.Locale;
 import java.util.TimeZone;

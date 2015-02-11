@@ -1,8 +1,8 @@
 package org.pm4j.core.pm;
 
 import static org.junit.Assert.assertEquals;
-import static org.pm4j.tools.test.PmAssert.assertNoMessagesInSubTree;
-import static org.pm4j.tools.test.PmAssert.setValueAsString;
+import static org.pm4j.tools.test._PmAssert.assertNoMessagesInSubTree;
+import static org.pm4j.tools.test._PmAssert.setValueAsString;
 
 import java.util.Locale;
 
@@ -13,7 +13,7 @@ import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.impl.PmAttrIntegerImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
-import org.pm4j.tools.test.PmAssert;
+import org.pm4j.tools.test._PmAssert;
 
 public class PmAttrIntegerTest {
 
@@ -37,7 +37,7 @@ public class PmAttrIntegerTest {
 
   @Test
   public void testValueType() {
-    assertEquals(Integer.class, new MyPm().i.getValueType());
+    assertEquals(Integer.class, new MyPm().i.getValueClass());
   }
 
   @Test
@@ -115,11 +115,11 @@ public class PmAttrIntegerTest {
 
     //Validate too short
     pm.minLen2.setValue(1);
-    PmAssert.validateNotSuccessful(pm.minLen2, "Please enter at least 2 characters in field \"pmAttrIntegerTest.MyPm.minLen2\".");
+    _PmAssert.validateNotSuccessful(pm.minLen2, "Please enter at least 2 characters in field \"pmAttrIntegerTest.MyPm.minLen2\".");
 
     //Validate correct
     pm.minLen2.setValue(12);
-    PmAssert.validateSuccessful(pm.minLen2);
+    _PmAssert.validateSuccessful(pm.minLen2);
   }
 
   @Test
@@ -131,11 +131,11 @@ public class PmAttrIntegerTest {
 
     //Validate too big
     pm.maxLen6.setValue(1234567);
-    PmAssert.validateNotSuccessful(pm.maxLen6, "Please enter maximal 6 characters in field \"pmAttrIntegerTest.MyPm.maxLen6\".");
+    _PmAssert.validateNotSuccessful(pm.maxLen6, "Please enter maximal 6 characters in field \"pmAttrIntegerTest.MyPm.maxLen6\".");
 
     //Validate correct
     pm.maxLen6.setValue(123456);
-    PmAssert.validateSuccessful(pm);
+    _PmAssert.validateSuccessful(pm);
 
   }
 

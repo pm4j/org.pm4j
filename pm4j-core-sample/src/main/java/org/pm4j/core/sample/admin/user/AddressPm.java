@@ -4,9 +4,9 @@ import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmAttrString;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.annotation.PmBeanCfg;
-import org.pm4j.core.pm.annotation.PmCacheCfg;
-import org.pm4j.core.pm.annotation.PmCacheCfg.CacheMode;
+import org.pm4j.core.pm.annotation.PmCacheCfg2;
 import org.pm4j.core.pm.annotation.PmOptionCfg;
+import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.impl.PmAttrImpl;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
 import org.pm4j.core.pm.impl.PmBeanBase;
@@ -20,7 +20,7 @@ public class AddressPm extends PmBeanBase<Address> {
   @PmAttrCfg(valuePath="pmBean.address.city")
   public final PmAttr<City> city   = new PmAttrImpl<City>(this);
 
-  @PmCacheCfg(all=CacheMode.ON, value=CacheMode.REQUEST)
+  @PmCacheCfg2(@PmCacheCfg2.Cache(property = PmCacheApi.CacheKind.ALL, mode = PmCacheCfg2.CacheMode.REQUEST))
   public final PmAttrString street = new PmAttrStringImpl(this);
 
   public final PmAttrString nr     = new PmAttrStringImpl(this);

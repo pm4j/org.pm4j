@@ -7,7 +7,7 @@ import org.pm4j.core.pm.annotation.PmObjectCfg;
 import org.pm4j.core.pm.annotation.PmObjectCfg.Enable;
 import org.pm4j.core.pm.annotation.PmObjectCfg.Visible;
 import org.pm4j.core.pm.annotation.PmTitleCfg;
-import org.pm4j.tools.test.PmAssert;
+import org.pm4j.tools.test._PmAssert;
 
 /**
  * Test @PmObjectCfg annotation effects on PmTables
@@ -25,7 +25,7 @@ public class PmObjectCfgWithPmTablesAndAttrsTest {
     pm.tableNotVisibleIfEmpty.numberOfPmRows = 0L;
     
     // act & assert:
-    PmAssert.assertNotVisible(pm.tableNotVisibleIfEmpty);
+    _PmAssert.assertNotVisible(pm.tableNotVisibleIfEmpty);
   }
   
   @Test
@@ -34,7 +34,7 @@ public class PmObjectCfgWithPmTablesAndAttrsTest {
     pm.tableNotVisibleIfEmpty.numberOfPmRows = 1L;
     
     // act & assert: 
-    PmAssert.assertVisible(pm.tableNotVisibleIfEmpty);
+    _PmAssert.assertVisible(pm.tableNotVisibleIfEmpty);
   }
   
   @Test
@@ -43,7 +43,7 @@ public class PmObjectCfgWithPmTablesAndAttrsTest {
     pm.tableWithDefaultVisibility.numberOfPmRows = 0;
     
     // act & assert:
-    PmAssert.assertVisible(pm.tableWithDefaultVisibility);
+    _PmAssert.assertVisible(pm.tableWithDefaultVisibility);
   }
   
   @Test
@@ -52,7 +52,7 @@ public class PmObjectCfgWithPmTablesAndAttrsTest {
     pm.tableWithDefaultVisibility.numberOfPmRows = 0;
     
     // act & assert:
-    PmAssert.assertVisible(pm.tableWithDefaultVisibility);
+    _PmAssert.assertVisible(pm.tableWithDefaultVisibility);
   }
   
   @Test
@@ -62,7 +62,7 @@ public class PmObjectCfgWithPmTablesAndAttrsTest {
     pm.tableNotVisibleIfEmpty.setPmVisible(false);
     
     // act & assert:
-    PmAssert.assertNotVisible(pm.tableNotVisibleIfEmpty);
+    _PmAssert.assertNotVisible(pm.tableNotVisibleIfEmpty);
   }
   
   @Test
@@ -71,8 +71,8 @@ public class PmObjectCfgWithPmTablesAndAttrsTest {
     pm.isReadOnly = true;
    
     // act & assert:
-    PmAssert.assertNotVisible(pm.tableWithEditableAndVisibleInEditableCtx);
-    PmAssert.assertNotEnabled(pm.tableWithEditableAndVisibleInEditableCtx);
+    _PmAssert.assertNotVisible(pm.tableWithEditableAndVisibleInEditableCtx);
+    _PmAssert.assertNotEnabled(pm.tableWithEditableAndVisibleInEditableCtx);
   }
   
   @Test
@@ -81,8 +81,8 @@ public class PmObjectCfgWithPmTablesAndAttrsTest {
     pm.isReadOnly = false;
    
     // act & assert:
-    PmAssert.assertVisible(pm.tableWithEditableAndVisibleInEditableCtx);
-    PmAssert.assertEnabled(pm.tableWithEditableAndVisibleInEditableCtx);
+    _PmAssert.assertVisible(pm.tableWithEditableAndVisibleInEditableCtx);
+    _PmAssert.assertEnabled(pm.tableWithEditableAndVisibleInEditableCtx);
   }
   
   private static class HelperParentPm extends PmConversationImpl {

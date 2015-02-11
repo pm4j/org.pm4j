@@ -6,7 +6,7 @@ import org.pm4j.core.pm.annotation.PmBeanCfg;
 import org.pm4j.core.pm.annotation.PmObjectCfg;
 import org.pm4j.core.pm.annotation.PmObjectCfg.Visible;
 import org.pm4j.core.pm.impl.PmObjectCfgWithPmBeanImpls2Test.Bean;
-import org.pm4j.tools.test.PmAssert;
+import org.pm4j.tools.test._PmAssert;
 
 /**
  * Test @PmObjectCfg annotation effects on PmBeans
@@ -20,20 +20,20 @@ public class PmObjectCfgWithPmBeanImplsTest {
 
   @Test
   public void testBeanPmImplWithValue() {
-    PmAssert.assertNotVisible(pm.pmBeanImpl);
+    _PmAssert.assertNotVisible(pm.pmBeanImpl);
   }
 
   @Test
   public void testBeanPmImplWithoutValue() {
     pm.pmBeanImpl.setPmBean(new Bean());
 
-    PmAssert.assertVisible(pm.pmBeanImpl);
+    _PmAssert.assertVisible(pm.pmBeanImpl);
   }
 
   private static class HelperParentPm extends PmConversationImpl {
     
     @PmBeanCfg(beanClass = Bean.class)
     @PmObjectCfg(visible = Visible.IF_NOT_EMPTY)
-    public final PmBean<Bean> pmBeanImpl = new PmBeanImpl<Bean>(this);
+    public final PmBean<Bean> pmBeanImpl = new PmBeanBase<Bean>(this);
   }
 }

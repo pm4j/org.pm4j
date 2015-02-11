@@ -6,7 +6,7 @@ import org.pm4j.core.pm.PmAttrString;
 import org.pm4j.core.pm.annotation.PmObjectCfg;
 import org.pm4j.core.pm.annotation.PmObjectCfg.Enable;
 import org.pm4j.core.pm.annotation.PmObjectCfg.Visible;
-import org.pm4j.tools.test.PmAssert;
+import org.pm4j.tools.test._PmAssert;
 
 /**
  * Test @PmObjectCfg annotation effects on PmTables
@@ -20,8 +20,8 @@ public class PmObjectCfgWithPmAttrsTest {
   @Test
   public void testVisibleIfNotEmpty() {
     
-    PmAssert.setValue(pm.visibleIfNotEmpty, "SOME VALUE");
-    PmAssert.assertVisible(pm.visibleIfNotEmpty);
+    _PmAssert.setValue(pm.visibleIfNotEmpty, "SOME VALUE");
+    _PmAssert.assertVisible(pm.visibleIfNotEmpty);
   }
   
   @Test
@@ -29,26 +29,26 @@ public class PmObjectCfgWithPmAttrsTest {
     // assign
     pm.isReadOnly = true;
 
-    PmAssert.assertNotEnabled(
-        pm.attrDefaultEnabledAndVisibleBehavior,
-        pm.alwaysDisabled,
-        pm.neverVisible,
-        pm.visibleIfEnabled,
-        pm.visibleIfEnabledNo,
-        pm.visibleIfNotEmpty,
-        pm.visibleInEditableContext
+    _PmAssert.assertNotEnabled(
+            pm.attrDefaultEnabledAndVisibleBehavior,
+            pm.alwaysDisabled,
+            pm.neverVisible,
+            pm.visibleIfEnabled,
+            pm.visibleIfEnabledNo,
+            pm.visibleIfNotEmpty,
+            pm.visibleInEditableContext
     );
     
-    PmAssert.assertVisible(
-        pm.attrDefaultEnabledAndVisibleBehavior,
-        pm.alwaysDisabled
+    _PmAssert.assertVisible(
+            pm.attrDefaultEnabledAndVisibleBehavior,
+            pm.alwaysDisabled
     );
     
-    PmAssert.assertNotVisible(
-        pm.neverVisible,
-        pm.visibleIfEnabled,
-        pm.visibleIfNotEmpty,
-        pm.visibleInEditableContext
+    _PmAssert.assertNotVisible(
+            pm.neverVisible,
+            pm.visibleIfEnabled,
+            pm.visibleIfNotEmpty,
+            pm.visibleInEditableContext
     );
   }
 
@@ -56,29 +56,29 @@ public class PmObjectCfgWithPmAttrsTest {
   public void testEditableParentPmBehavior() {
     pm.isReadOnly = false;
     
-    PmAssert.assertEnabled(
-        pm.attrDefaultEnabledAndVisibleBehavior,
-        pm.neverVisible,
-        pm.visibleIfEnabled,
-        pm.visibleIfNotEmpty,
-        pm.visibleInEditableContext
+    _PmAssert.assertEnabled(
+            pm.attrDefaultEnabledAndVisibleBehavior,
+            pm.neverVisible,
+            pm.visibleIfEnabled,
+            pm.visibleIfNotEmpty,
+            pm.visibleInEditableContext
     );
     
-    PmAssert.assertNotEnabled(
-        pm.visibleIfEnabledNo,
-        pm.alwaysDisabled
+    _PmAssert.assertNotEnabled(
+            pm.visibleIfEnabledNo,
+            pm.alwaysDisabled
     );
     
-    PmAssert.assertVisible(
-        pm.attrDefaultEnabledAndVisibleBehavior,
-        pm.visibleIfEnabled,
-        pm.alwaysDisabled,
-        pm.visibleInEditableContext
+    _PmAssert.assertVisible(
+            pm.attrDefaultEnabledAndVisibleBehavior,
+            pm.visibleIfEnabled,
+            pm.alwaysDisabled,
+            pm.visibleInEditableContext
     );
     
-    PmAssert.assertNotVisible(
-        pm.neverVisible,
-        pm.visibleIfNotEmpty
+    _PmAssert.assertNotVisible(
+            pm.neverVisible,
+            pm.visibleIfNotEmpty
     );
     
   }
@@ -87,7 +87,7 @@ public class PmObjectCfgWithPmAttrsTest {
   public void testUnnessesarilyAnnotatedPmAttrThrowsException() {
     UnnessesaryAnnotationUsage testPm = new UnnessesaryAnnotationUsage();
     
-    PmAssert.assertEnabled(testPm.unnessesarilyAnnotatedPm);
+    _PmAssert.assertEnabled(testPm.unnessesarilyAnnotatedPm);
   }
 
   

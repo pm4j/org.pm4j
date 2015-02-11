@@ -12,7 +12,7 @@ import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.annotation.PmAttrListCfg;
 import org.pm4j.core.pm.impl.PmAttrListImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
-import org.pm4j.tools.test.PmAssert;
+import org.pm4j.tools.test._PmAssert;
 
 public class PmAttrListTest {
 
@@ -41,18 +41,18 @@ public class PmAttrListTest {
 
   @Test
   public void testValueType() {
-    assertEquals(List.class, testPm.listOfStrings.getValueType());
-    assertEquals(List.class, testPm.listOfLongs.getValueType());
+    assertEquals(List.class, testPm.listOfStrings.getValueClass());
+    assertEquals(List.class, testPm.listOfLongs.getValueClass());
   }
 
   @Test
   public void setAndGetListOfStringValues() {
-      PmAssert.setValue(testPm.listOfStrings, Arrays.asList("a", "b"));
+      _PmAssert.setValue(testPm.listOfStrings, Arrays.asList("a", "b"));
   }
 
   @Test
   public void setAndGetListOfStringValuesAsString() {
-      PmAssert.setValueAsString(testPm.listOfStrings, "a,b");
+      _PmAssert.setValueAsString(testPm.listOfStrings, "a,b");
       assertEquals("[a, b]", testPm.listOfStrings.getValue().toString());
   }
 

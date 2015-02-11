@@ -43,7 +43,7 @@ public abstract class DetailsPmTableHandlerBase<T_MASTER_BEAN, T_DETAILS_BEAN> e
     PmEventApi.addPmEventListener(getDetailsPm().getPmParent(), PmEvent.ALL_CHANGE_EVENTS, new PmEventListener() {
       @Override
       public void handleEvent(PmEvent event) {
-        if (event.isInitializationEvent() || event.isReloadEvent()) {
+        if (event.isAllChangedEvent() || event.isReloadEvent()) {
           onParentCtxtValueInitialization(event);
         }
       }

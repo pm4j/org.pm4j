@@ -1,14 +1,5 @@
 package org.pm4j.core.pm;
 
-import java.util.Locale;
-import java.util.Set;
-
-import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
 import org.hibernate.validator.constraints.ScriptAssert;
 import org.junit.After;
 import org.junit.Assert;
@@ -18,12 +9,18 @@ import org.pm4j.core.pm.annotation.PmBeanCfg;
 import org.pm4j.core.pm.annotation.PmBoolean;
 import org.pm4j.core.pm.annotation.PmValidationCfg;
 import org.pm4j.core.pm.api.PmValidationApi;
-import org.pm4j.core.pm.impl.PmAttrIntegerImpl;
-import org.pm4j.core.pm.impl.PmAttrStringImpl;
-import org.pm4j.core.pm.impl.PmBeanImpl;
-import org.pm4j.core.pm.impl.PmCommandImpl;
-import org.pm4j.core.pm.impl.PmConversationImpl;
-import org.pm4j.core.pm.impl.PmElementBase;
+import org.pm4j.core.pm.impl.*;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.util.Locale;
+import java.util.Set;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests JSR-303 bean validation support.
@@ -50,7 +47,7 @@ public class PmBeanValidationTest {
   }
 
   @PmBeanCfg(beanClass=MyBean.class)
-  public static class MyBeanPm extends PmBeanImpl<MyBean> {
+  public static class MyBeanPm extends PmBeanBase<MyBean> {
     public final PmAttrString s = new PmAttrStringImpl(this);
     public final PmAttrInteger i = new PmAttrIntegerImpl(this);
     public final PmAttrInteger j = new PmAttrIntegerImpl(this);
@@ -91,10 +88,10 @@ public class PmBeanValidationTest {
     myBeanPm.setPmBean(new MyBean(null, null, null));
     Assert.assertEquals("The @Size.max constraint is read from the bean restriction.", 4, myBeanPm.s.getMaxLen());
 
-    myBeanPm.pmValidate();
-    Assert.assertTrue(myBeanPm.s.isPmValid());
-    Assert.assertFalse(myBeanPm.i.isPmValid());
-    Assert.assertFalse(myBeanPm.j.isPmValid());
+    PmValidationApi.validate(myBeanPm);
+    assertTrue(myBeanPm.s.isPmValid());
+    assertFalse(myBeanPm.i.isPmValid());
+    assertFalse(myBeanPm.j.isPmValid());
   }
 
   @Test
@@ -103,18 +100,15 @@ public class PmBeanValidationTest {
     Assert.assertEquals("The @Size.max constraint is read from the bean restriction.", 4, myBeanPm.s.getMaxLen());
 
     myBeanPm.cmdTriggeringValidation.doIt();
-    Assert.assertTrue(myBeanPm.s.isPmValid());
-    Assert.assertFalse(myBeanPm.i.isPmValid());
-    Assert.assertFalse(myBeanPm.j.isPmValid());
+    assertTrue(myBeanPm.s.isPmValid());
+    assertFalse(myBeanPm.i.isPmValid());
+    assertFalse(myBeanPm.j.isPmValid());
   }
 
   @Test
   public void testValidationOfBeanTriggeredByPmBean() {
     myBeanPm.setPmBean(new MyBean("hi", 2, 1));
-
-    myBeanPm.pmValidate();
-    Assert.assertFalse(myBeanPm.isPmValid());
-
+    assertFalse(PmValidationApi.validate(myBeanPm));
   }
 
 

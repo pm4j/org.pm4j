@@ -19,7 +19,6 @@ import org.pm4j.common.selection.SelectionHandler;
 import org.pm4j.common.util.beanproperty.PropertyChangeSupportedBase;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmBean;
-import org.pm4j.core.pm.PmDataInput;
 import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmEvent.ValueChangeKind;
 import org.pm4j.core.pm.PmEventListener;
@@ -437,7 +436,7 @@ public class PmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> extends Prope
       @SuppressWarnings("unchecked")
       @Override
       public void handleEvent(PmEvent event) {
-        PmDataInput itemPm = findChildItemToObserve(event.pm);
+        PmObject itemPm = findChildItemToObserve(event.pm);
         // TODO oboede: Un-register of an update change is currently not possible.
         //
         // The item (the row-PM) must not be in a changed state if a change in a details area
@@ -452,7 +451,7 @@ public class PmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> extends Prope
         }
       }
 
-      protected PmDataInput findChildItemToObserve(PmObject changedItem) {
+      protected PmObject findChildItemToObserve(PmObject changedItem) {
         if (changedItem == pmCtxt) {
           return null;
         }
@@ -462,7 +461,7 @@ public class PmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> extends Prope
           if (p.getPmParent() == pmCtxt) {
             // Only PM's of the considered type are considered (e.g. row-PM type in case of tables).
             if (itemPmClass.isAssignableFrom(p.getClass())) {
-              return (PmDataInput)p;
+              return p;
             }
             else {
               return null;

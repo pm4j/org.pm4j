@@ -1,7 +1,5 @@
 package org.pm4j.core.pm.impl.changehandler;
 
-import static org.junit.Assert.assertEquals;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.pm4j.core.pm.PmAttrInteger;
@@ -12,7 +10,9 @@ import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.impl.PmAttrIntegerImpl;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
-import org.pm4j.core.pm.impl.PmElementImpl;
+import org.pm4j.core.pm.impl.PmObjectBase;
+
+import static org.junit.Assert.assertEquals;
 
 public class ChangedChildStateRegistryTest {
 
@@ -119,7 +119,7 @@ public class ChangedChildStateRegistryTest {
       }
 
 
-  public static class ComplexItemPm extends PmElementImpl {
+  public static class ComplexItemPm extends PmObjectBase {
     public final PmAttrInteger i = new PmAttrIntegerImpl(this);
     public ComplexItemPm(PmObject parentPm) {
       super(parentPm);

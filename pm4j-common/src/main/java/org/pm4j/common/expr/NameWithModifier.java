@@ -1,11 +1,11 @@
 package org.pm4j.common.expr;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.pm4j.common.exception.CheckedExceptionWrapper;
 import org.pm4j.common.expr.parser.ParseCtxt;
 import org.pm4j.common.expr.parser.ParseException;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Parses a name with its modifier specification.
@@ -55,9 +55,6 @@ public class NameWithModifier implements Cloneable {
   public static enum Modifier {
     OPTIONAL("o"),
     EXISTS_OPTIONALLY("x"),
-    // TODO oboede:
-    /** @deprecated check for usages and remove the undocumented '*' modifier. */
-    REPEATED("*"),
     ALIAS("as:") {
       @Override
       protected boolean applyModifierIfMatching(ParseCtxt ctxt, String nextPart, NameWithModifier n) {

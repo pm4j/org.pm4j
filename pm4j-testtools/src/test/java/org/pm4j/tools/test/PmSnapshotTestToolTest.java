@@ -15,7 +15,6 @@ import org.pm4j.core.pm.PmAttrString;
 import org.pm4j.core.pm.annotation.PmTitleCfg;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
-import org.pm4j.tools.test.PmSnapshotTestTool.TestMode;
 
 /**
  * Tests for {@link PmSnapshotTestTool}.
@@ -42,7 +41,7 @@ public class PmSnapshotTestToolTest {
 
   @Test
   public void testWriteSnapshot() {
-    snap.setTestMode(TestMode.AUTO_CREATE);
+    snap.setTestMode(PmSnapshotTestTool.TestMode.AUTO_CREATE);
     File file = null;
     try {
       file = snap.snapshot(new MiniTestPm(), "testWriteSnapshot");
@@ -65,7 +64,7 @@ public class PmSnapshotTestToolTest {
   @Test
   public void testWriteAndCompareSameSnapshot() {
     // create the snapshot
-    snap.setTestMode(TestMode.AUTO_CREATE);
+    snap.setTestMode(PmSnapshotTestTool.TestMode.AUTO_CREATE);
     File file = null;
 
     try {
@@ -85,7 +84,7 @@ public class PmSnapshotTestToolTest {
   
   @Test(expected= AssertionError.class)
   public void testWriteSnapshotInStrictMode() {
-    snap.setTestMode(TestMode.STRICT);
+    snap.setTestMode(PmSnapshotTestTool.TestMode.STRICT);
     snap.snapshot(new MiniTestPm(), "testWriteSnapshotInStrictMode");
   }
   
@@ -95,7 +94,7 @@ public class PmSnapshotTestToolTest {
     // create the snapshot
     final String fileBaseName = "overrideMe";
     MiniTestPm pm = new MiniTestPm();
-    snap.setTestMode(TestMode.AUTO_CREATE);
+    snap.setTestMode(PmSnapshotTestTool.TestMode.AUTO_CREATE);
     File expectedStateFileSrc = null;
     File expectedStateFile = getExpectedFile(fileBaseName);
 
@@ -111,14 +110,14 @@ public class PmSnapshotTestToolTest {
       FileUtil.copyFile(expectedStateFileSrc, expectedStateFile);
 
       // override snapshot
-      snap.setTestMode(TestMode.WRITE);
+      snap.setTestMode(PmSnapshotTestTool.TestMode.WRITE);
       snap.snapshot(pm, fileBaseName);
 
       // Copy the overridden expected state
       FileUtil.copyFile(expectedStateFileSrc, expectedStateFile);
       
       // now test in STRICT MODE
-      snap.setTestMode(TestMode.STRICT);
+      snap.setTestMode(PmSnapshotTestTool.TestMode.STRICT);
       snap.snapshot(pm, "overrideMe");
 
     } finally {
@@ -129,7 +128,7 @@ public class PmSnapshotTestToolTest {
 
   @Test
   public void testWriteAndCompareDifferentSnapshot() {
-    snap.setTestMode(TestMode.AUTO_CREATE);
+    snap.setTestMode(PmSnapshotTestTool.TestMode.AUTO_CREATE);
     final String fileBaseName = "testWriteAndCompareDifferentSnapshot";
     File expectedStateFileSrc = snap.getExpectedStateSrcFile(fileBaseName);
     File currentStateFile = snap.getActualStateFile(fileBaseName);

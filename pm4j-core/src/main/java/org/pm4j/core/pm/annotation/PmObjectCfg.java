@@ -44,8 +44,8 @@ public @interface PmObjectCfg {
      * <code>true</code> if its method {@link PmObject#isPmReadonly()} returns
      * <code>false</code>. <br>
      * {@link PmAttr}s do that by default. That's why attempts to apply this
-     * option to {@link PmAttr}s are redundant, thus unnecessary and will result
-     * in {@link PmRuntimeException}.
+     * option to {@link PmAttr}s are redundant and will result in a
+     * {@link PmRuntimeException}.
      */
     IN_EDITABLE_CTXT
   }

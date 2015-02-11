@@ -14,11 +14,11 @@ import org.pm4j.swt.pb.base.PbCompositeChildToPmBase;
 
 /**
  * A sash form with a tree in one panel and details for the selected node in the other one.
- * 
+ *
  * @author olaf boede
  */
 public class PbTreeWithDetails extends PbCompositeChildToPmBase<SashForm, PmElement> {
-  
+
   /** Defines the PM to view mapping for the details display area. */
   private PbMatcherMapped detailsBinderMap = new PbMatcherMapped();
 
@@ -43,11 +43,11 @@ public class PbTreeWithDetails extends PbCompositeChildToPmBase<SashForm, PmElem
   protected PbBinding makeBinding(PmElement pm) {
     return new Binding();
   }
-  
+
   protected class Binding extends PbCompositeChildToPmBase<SashForm, PmElement>.Binding {
     PbTreeNodeDetails detailView;
     Composite detailComposite;
-    
+
     public SashForm makeView(Composite parentComponent, PmElement pm) {
       return new SashForm(parentComponent, swtStyle);
     }
@@ -58,12 +58,12 @@ public class PbTreeWithDetails extends PbCompositeChildToPmBase<SashForm, PmElem
 
       PbTree treePb = new PbTree();
       Tree tree = treePb.makeView(view, pm);
-      
+
       detailView = new PbTreeNodeDetails();
       detailView.setPbMatcher(detailsBinderMap);
-      
-      detailComposite = detailView.makeView(view, pm);
-      
+     // TODO: tree nodes are no longer supported
+     // detailComposite = detailView.makeView(view, pm);
+
       tree.addSelectionListener(new SelectionAdapter() {
         @Override public void widgetSelected(SelectionEvent e) {
           if (e.item.getData() instanceof PmObject) {
@@ -76,7 +76,7 @@ public class PbTreeWithDetails extends PbCompositeChildToPmBase<SashForm, PmElem
       treePb.bind(tree, pm);
       detailView.bind(detailComposite, null);
     }
-    
+
     @Override
     public void unbind() {
       super.unbind();
@@ -84,12 +84,12 @@ public class PbTreeWithDetails extends PbCompositeChildToPmBase<SashForm, PmElem
         c.dispose();
       }
     }
-    
+
   }
-  
-  
+
+
   public PbMatcherMapped getDetailsBinderMap() {
     return detailsBinderMap;
   }
-  
+
 }

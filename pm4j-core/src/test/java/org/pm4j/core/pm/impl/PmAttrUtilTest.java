@@ -10,7 +10,7 @@ import org.pm4j.core.pm.PmAttrString;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.annotation.PmAttrCfg.AttrAccessKind;
 import org.pm4j.core.pm.annotation.PmTitleCfg;
-import org.pm4j.tools.test.PmAssert;
+import org.pm4j.tools.test._PmAssert;
 
 /**
  * Tests for {@link PmAttrUtil}.
@@ -23,9 +23,9 @@ public class PmAttrUtilTest {
 
   @Before
   public void setUp() {
-    PmAssert.setValue(testPm.s, "V1");
-    PmAssert.setValue(testPm.sWithDefault, "V2");
-    PmAssert.assertChanged(testPm, testPm.s, testPm.sWithDefault);
+    _PmAssert.setValue(testPm.s, "V1");
+    _PmAssert.setValue(testPm.sWithDefault, "V2");
+    _PmAssert.assertChanged(testPm, testPm.s, testPm.sWithDefault);
   }
 
   @Test

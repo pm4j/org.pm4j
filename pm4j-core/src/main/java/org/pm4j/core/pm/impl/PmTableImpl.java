@@ -1,17 +1,5 @@
 package org.pm4j.core.pm.impl;
 
-import java.lang.reflect.Type;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -43,17 +31,8 @@ import org.pm4j.common.util.collection.MapUtil;
 import org.pm4j.common.util.reflection.ClassUtil;
 import org.pm4j.common.util.reflection.GenericTypeUtil;
 import org.pm4j.core.exception.PmRuntimeException;
-import org.pm4j.core.pm.PmBean;
-import org.pm4j.core.pm.PmCommandDecorator;
-import org.pm4j.core.pm.PmDefaults;
-import org.pm4j.core.pm.PmElement;
-import org.pm4j.core.pm.PmEvent;
+import org.pm4j.core.pm.*;
 import org.pm4j.core.pm.PmEvent.ValueChangeKind;
-import org.pm4j.core.pm.PmEventListener;
-import org.pm4j.core.pm.PmObject;
-import org.pm4j.core.pm.PmPager;
-import org.pm4j.core.pm.PmTable;
-import org.pm4j.core.pm.PmTableCol;
 import org.pm4j.core.pm.annotation.PmCacheCfg;
 import org.pm4j.core.pm.annotation.PmCacheCfg.CacheMode;
 import org.pm4j.core.pm.annotation.PmObjectCfg.Visible;
@@ -69,8 +48,11 @@ import org.pm4j.core.pm.impl.pageable.PmBeanCollection;
 import org.pm4j.core.pm.impl.pathresolver.PathResolver;
 import org.pm4j.core.pm.impl.pathresolver.PmExpressionPathResolver;
 
+import java.lang.reflect.Type;
+import java.util.*;
+
 /**
- * A table that presents the content of a set of {@link PmElement}s.
+ * Implementation for @{link PmTable}.
  * <p>
  * The table data related logic is provided by a {@link PageableCollection}.
  * This collection supports the logic for
@@ -86,7 +68,7 @@ import org.pm4j.core.pm.impl.pathresolver.PmExpressionPathResolver;
  */
 public class PmTableImpl
         <T_ROW_PM extends PmBean<T_ROW_BEAN>, T_ROW_BEAN>
-        extends PmDataInputBase
+        extends PmObjectBase
         implements PmTable<T_ROW_PM> {
 
   /**
@@ -700,7 +682,7 @@ public class PmTableImpl
   }
 
   /**
-   * Reads the {@link QueryOptions} to using the information provided by the given {@link TablePm2}
+   * Reads the {@link QueryOptions} to using the information provided by the given {@link org.pm4j.core.pm.PmTable}
    * and {@link QueryService}.
    *
    * @return The evaluated {@link QueryOptions} instance. Never <code>null</code>.
@@ -822,7 +804,7 @@ public class PmTableImpl
    * </ul>
    * Sub classes may override this method to extend this logic.
    *
-   * @param pageableCollection the collection to initialize.
+   * @param pc the collection to initialize.
    */
   protected void assignPmPageableCollection(final PmBeanCollection<T_ROW_PM, T_ROW_BEAN> pc) {
     this.pmPageableCollection = pc;
@@ -1007,7 +989,7 @@ public class PmTableImpl
   }
 
   @Override
-  protected void initMetaData(PmDataInputBase.MetaData metaData) {
+  protected void initMetaData(PmObjectBase.MetaData metaData) {
     super.initMetaData(metaData);
     @SuppressWarnings("unchecked")
     MetaData myMetaData = (MetaData) metaData;
@@ -1053,7 +1035,7 @@ public class PmTableImpl
     }
   }
 
-  protected class MetaData extends PmDataInputBase.MetaData {
+  protected class MetaData extends PmObjectBase.MetaData {
     private SelectMode rowSelectMode = SelectMode.DEFAULT;
     private int numOfPageRowPms = DEFAULT_NUM_OF_PAGE_ROW_PMS;
     private PathResolver valuePathResolver;

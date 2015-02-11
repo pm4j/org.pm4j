@@ -6,7 +6,9 @@ import org.pm4j.core.pm.PmObject;
  * A presentation model that is not in front of a bean. It holds its data values locally.
  *
  * @author olaf boede
+ * @deprecated Please use {@link org.pm4j.core.pm.impl.PmObjectBase}.
  */
+@Deprecated
 public class PmElementImpl extends PmElementBase {
 
   /**

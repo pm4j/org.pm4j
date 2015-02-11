@@ -1,12 +1,5 @@
 package org.pm4j.core.pm.impl;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertTrue;
-import static org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO.CLEAR;
-import static org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO.DO_NOTHING;
-import static org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO.VALIDATE;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.pm4j.core.pm.PmAttrString;
@@ -20,6 +13,9 @@ import org.pm4j.core.pm.annotation.PmCommandCfg;
 import org.pm4j.core.pm.api.PmMessageApi;
 import org.pm4j.core.pm.api.PmMessageUtil;
 import org.pm4j.navi.NaviLink;
+
+import static junit.framework.Assert.*;
+import static org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO.*;
 
 /**
  * Tests for the command logic that should happen before it gets executed.
@@ -121,7 +117,7 @@ public class PmCommandImplBeforeLogicTest {
   /**
    * A PM with some command variations to test.
    */
-  public static class MyTestPm extends PmElementImpl {
+  public static class MyTestPm extends PmObjectBase {
 
     @PmAttrCfg(required=true)
     public final PmAttrString s = new PmAttrStringImpl(this);
@@ -140,7 +136,7 @@ public class PmCommandImplBeforeLogicTest {
     @PmCommandCfg(beforeDo=DO_NOTHING)
     public final PmCommand cmdThatDoesNothingBeforeDoButFails = new ExecReportingCmdPm() {
       @Override
-      protected void doItImpl() throws Exception {
+      protected void doItImpl()  {
         throw new RuntimeException("This command intentially fails.");
       }
     };
@@ -160,7 +156,7 @@ public class PmCommandImplBeforeLogicTest {
       }
 
       @Override
-      protected void doItImpl() throws Exception {
+      protected void doItImpl()  {
         doItImplHasBeenExecuted = true;
       }
     }

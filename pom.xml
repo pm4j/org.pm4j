@@ -3,7 +3,7 @@
 
   <groupId>org.pm4j</groupId>
   <artifactId>main</artifactId>
-  <version>0.9.21-SNAPSHOT</version>
+  <version>0.9.35-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>pm4j parent pom</name>
@@ -51,6 +51,7 @@
   <modules>
     <module>pm4j-common</module>
     <module>pm4j-core</module>
+    <module>pm4j-testtools</module>
     <module>pm4j-core-sample</module>
     <module>pm4j-facelets</module>
     <module>pm4j-deprecated</module>

@@ -1,18 +1,19 @@
 package org.pm4j.core.pm.impl;
 
-import java.util.Map;
-
 import org.pm4j.common.cache.CacheStrategy;
 import org.pm4j.common.cache.CacheStrategyNoCache;
 import org.pm4j.common.util.collection.MapUtil;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.annotation.PmCacheCfg;
+import org.pm4j.core.pm.annotation.PmCacheCfg2;
 import org.pm4j.core.pm.annotation.PmCacheCfg2.Cache;
 import org.pm4j.core.pm.annotation.PmCacheCfg2.CacheMode;
 import org.pm4j.core.pm.annotation.PmCacheCfg2.Clear;
 import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
 import org.pm4j.core.pm.impl.cache.CacheStrategyBase;
 import org.pm4j.core.pm.impl.cache.CacheStrategyRequest;
+
+import java.util.Map;
 
 // TODO oboede: distribute as protected embedded classes of related PM classes.
 class InternalCacheStrategyFactory {
@@ -48,6 +49,8 @@ class InternalCacheStrategyFactory {
         return new CacheStrategyForTitle(cache.clear());
       case VISIBILITY:
         return new CacheStrategyForVisibility(cache.clear());
+      case NODES:
+        return new CacheStrategyForNodes(cache.clear());
       default:
         return null;
       }
@@ -97,6 +100,24 @@ class InternalCacheStrategyFactory {
     }
     @Override protected void clearImpl(PmObjectBase pm) {
       pm.pmEnabledCache = null;
+    }
+  };
+
+  static class CacheStrategyForNodes extends CacheStrategyBase<PmObjectBase> {
+    public CacheStrategyForNodes(PmCacheCfg2.Clear cacheClear) {
+      super("CACHE_NODES_LOCAL", cacheClear);
+    }
+
+    @Override protected Object readRawValue(PmObjectBase pm) {
+      return pm.pmChildNodesCache;
+    }
+
+    @Override protected void writeRawValue(PmObjectBase pm, Object value) {
+      pm.pmChildNodesCache = value;
+    }
+
+    @Override protected void clearImpl(PmObjectBase pm) {
+      pm.pmChildNodesCache = null;
     }
   };
 
