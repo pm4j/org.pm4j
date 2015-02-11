@@ -146,7 +146,7 @@ public class ItemSetSelectionHandler<T_ITEM> extends SelectionHandlerBase<T_ITEM
   @SuppressWarnings("unchecked")
   private boolean setSelection(Set<T_ITEM> selectedItems) {
     return setSelection(selectedItems.isEmpty()
-                    ? selection = (ItemSetSelection<T_ITEM>) EMPTY_SELECTION
+                    ? (ItemSetSelection<T_ITEM>) EMPTY_SELECTION
                     : new ItemSetSelection<T_ITEM>(selectedItems));
   }
 

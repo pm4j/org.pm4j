@@ -14,6 +14,8 @@ import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.filter.FilterDefinition;
 import org.pm4j.common.query.inmem.InMemSortOrder;
 import org.pm4j.common.selection.SelectMode;
+import org.pm4j.common.selection.Selection;
+import org.pm4j.common.selection.SelectionHandler;
 import org.pm4j.common.util.CompareUtil;
 import org.pm4j.core.pm.PmTable.UpdateAspect;
 import org.pm4j.core.pm.annotation.*;
@@ -21,9 +23,12 @@ import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.impl.*;
+import org.pm4j.core.pm.impl.pageable.PmBeanSelection;
 import org.pm4j.tools.test._RecordingPmEventListener;
 import org.pm4j.tools.test._RecordingPropertyChangeListener;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.*;
 
 import static org.junit.Assert.assertEquals;
@@ -287,6 +292,41 @@ public class PmTableTest {
     BroadcastPmEventProcessor.broadcastAllChangeEvent(myTablePm, 0);
 
     assertEquals(0, l.getCallCount());
+  }
+  
+  /**
+   * Test to select and deselect all items of {@link MyTablePm}. When selecting all items the old selected item set 
+   * should be empty and the new selected item set should have the three items [b, c, a] selected. When deselecting
+   * all items the old selected item set should have the three items [b, c, a] selected and the new selected item set 
+   * should be empty. 
+   */
+  @Test
+  public void testChangeSelection() {
+    MyPropertyChangeListener changeListener = new MyPropertyChangeListener();
+    
+    myTablePm.getPmPageableCollection().getSelectionHandler().addPropertyChangeListener(SelectionHandler.PROP_SELECTION, changeListener);
+    
+    myTablePm.getPmPageableCollection().getSelectionHandler().setSelectMode(SelectMode.MULTI);
+    myTablePm.getPmPageableCollection().getSelectionHandler().selectAll(true);
+    assertEquals("ItemSetSelection[]", changeListener.oldValue.toString());
+    assertEquals("ItemSetSelection[b, c, a]", changeListener.newValue.toString());
+    
+    myTablePm.getPmPageableCollection().getSelectionHandler().selectAll(false);
+    assertEquals("ItemSetSelection[b, c, a]", changeListener.oldValue.toString());
+    assertEquals("ItemSetSelection[]", changeListener.newValue.toString());
+  }
+  
+  public static class MyPropertyChangeListener implements PropertyChangeListener {
+    
+    private Selection<RowBean> oldValue;
+    private Selection<RowBean> newValue;
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void propertyChange(PropertyChangeEvent evt) {
+      oldValue = ((PmBeanSelection<PmBean<RowBean>, RowBean>) evt.getOldValue()).getBeanSelection();
+      newValue = ((PmBeanSelection<PmBean<RowBean>, RowBean>) evt.getNewValue()).getBeanSelection();
+    }
   }
 
   @PmTableCfg(initialSortCol="name")
