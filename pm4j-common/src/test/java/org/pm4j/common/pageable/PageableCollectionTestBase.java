@@ -516,7 +516,7 @@ public abstract class PageableCollectionTestBase<T> {
    */
   @Test
   public void testChangeSelection() {
-    MyPropertyChangeListener<T> changeListener = new MyPropertyChangeListener<T>();
+    LastChangeReportingChangeListener<T> changeListener = new LastChangeReportingChangeListener<T>();
     
     collection.getSelectionHandler().addPropertyChangeListener(SelectionHandler.PROP_SELECTION, changeListener);
     
@@ -547,7 +547,7 @@ public abstract class PageableCollectionTestBase<T> {
     return list;
   }
   
-public static class MyPropertyChangeListener<T> implements PropertyChangeListener {
+public static class LastChangeReportingChangeListener<T> implements PropertyChangeListener {
     
     private Selection<T> oldValue;
     private Selection<T> newValue;
