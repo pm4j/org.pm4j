@@ -4,6 +4,7 @@ import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 
 import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,14 +15,15 @@ import org.junit.Test;
 import org.pm4j.common.itemnavigator.ItemNavigator;
 import org.pm4j.common.pageable.inmem.InMemCollectionItemNavigator;
 import org.pm4j.common.query.CompOpStartsWith;
-import org.pm4j.common.query.QueryExpr;
 import org.pm4j.common.query.QueryAttr;
+import org.pm4j.common.query.QueryExpr;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.QueryUtil;
 import org.pm4j.common.query.SortOrder;
 import org.pm4j.common.query.filter.FilterDefinition;
 import org.pm4j.common.selection.SelectMode;
 import org.pm4j.common.selection.Selection;
+import org.pm4j.common.selection.SelectionHandler;
 import org.pm4j.common.util.beanproperty.PropertyAndVetoableChangeListener;
 import org.pm4j.common.util.collection.IterableUtil;
 
@@ -505,6 +507,28 @@ public abstract class PageableCollectionTestBase<T> {
     long numOfItems = collection.getNumOfItems();
     assertEquals("The number of items must be six.", 6, numOfItems);
   }
+  
+  /**
+   * Test to select and deselect all items of {@link MyTablePm}. When selecting all items the old selected item set 
+   * should be empty and the new selected item set should have the three items [b, c, a] selected. When deselecting
+   * all items the old selected item set should have the three items [b, c, a] selected and the new selected item set 
+   * should be empty. 
+   */
+  @Test
+  public void testChangeSelection() {
+    LastChangeReportingChangeListener<T> changeListener = new LastChangeReportingChangeListener<T>();
+    
+    collection.getSelectionHandler().addPropertyChangeListener(SelectionHandler.PROP_SELECTION, changeListener);
+    
+    collection.getSelectionHandler().setSelectMode(SelectMode.MULTI);
+    collection.getSelectionHandler().selectAll(true);
+    assertEquals("Empty selection returns no items.", "[]", IterableUtil.shallowCopy(changeListener.oldValue).toString());
+    assertEquals("All items selected.", "[a, b, c, d, e, f]", IterableUtil.shallowCopy(changeListener.newValue).toString());
+    
+    collection.getSelectionHandler().selectAll(false);
+    assertEquals("All items selected.", "[a, b, c, d, e, f]", IterableUtil.shallowCopy(changeListener.oldValue).toString());
+    assertEquals("Empty selection returns no items.", "[]", IterableUtil.shallowCopy(changeListener.newValue).toString());
+  }
 
   // -- Test infrastructure --
 
@@ -521,6 +545,19 @@ public abstract class PageableCollectionTestBase<T> {
       }
     }
     return list;
+  }
+  
+public static class LastChangeReportingChangeListener<T> implements PropertyChangeListener {
+    
+    private Selection<T> oldValue;
+    private Selection<T> newValue;
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void propertyChange(PropertyChangeEvent evt) {
+      oldValue = (Selection<T>) evt.getOldValue();
+      newValue = (Selection<T>) evt.getNewValue();
+    }   
   }
 
 
