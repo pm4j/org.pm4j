@@ -23,6 +23,7 @@ public class PmCacheApi {
     VISIBILITY,
     ENABLEMENT,
     TITLE,
+    TOOLTIP,
     VALUE,
     OPTIONS,
     NODES,
@@ -33,6 +34,7 @@ public class PmCacheApi {
             CacheKind.VISIBILITY,
             CacheKind.ENABLEMENT,
             CacheKind.TITLE,
+            CacheKind.TOOLTIP,
             CacheKind.VALUE,
             CacheKind.OPTIONS,
             CacheKind.NODES)));

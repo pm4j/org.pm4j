@@ -85,6 +85,11 @@ public class PmObjectBase implements PmObject {
    */
   /* package */  String pmCachedTitle;
 
+  /**
+   * Optional tooltip cache.
+   */
+  /* package */  String pmCachedTooltip;
+
   public enum PmInitState {
     NOT_INITIALIZED,
     FIELD_BOUND_CHILD_META_DATA_INITIALIZED,
@@ -158,7 +163,19 @@ public class PmObjectBase implements PmObject {
 
   @Override
   public final String getPmTooltip() {
-    String toolTip = getPmTooltipImpl();
+    
+    CacheStrategy strategy = getPmMetaData().tooltipCache.cacheStrategy;
+    Object cachedValue = strategy.getCachedValue(this);
+
+    String toolTip = null;
+    if (cachedValue != CacheStrategy.NO_CACHE_VALUE) {
+      // just use the cache hit (if there was one)
+      toolTip = (String) cachedValue;
+    }
+    else {
+      toolTip = (String) strategy.setAndReturnCachedValue(this, getPmTooltipImpl());
+    }
+    
     // XXX olaf: a kind of decorator could add some flexibility for
     //           different error display requirements...
     if (getPmMetaData().addErrorMessagesToTooltip &&
@@ -581,6 +598,9 @@ public class PmObjectBase implements PmObject {
 
     if (cacheSet.contains(PmCacheApi.CacheKind.TITLE))
       md.titleCache.cacheStrategy.clear(this);
+
+    if (cacheSet.contains(PmCacheApi.CacheKind.TOOLTIP))
+      md.tooltipCache.cacheStrategy.clear(this);
 
     for (PmObject p : getPmChildrenAndFactoryPms()) {
       if (p instanceof PmObjectBase) {
@@ -1234,6 +1254,7 @@ public class PmObjectBase implements PmObject {
     List cacheAnnotations = InternalPmCacheCfgUtil.findCacheCfgsInPmHierarchy(this, new ArrayList());
     if (!cacheAnnotations.isEmpty()) {
       metaData.titleCache = InternalPmCacheCfgUtil.readCacheMetaData(this, CacheKind.TITLE, cacheAnnotations, InternalCacheStrategyFactory.INSTANCE);
+      metaData.tooltipCache = InternalPmCacheCfgUtil.readCacheMetaData(this, CacheKind.TOOLTIP, cacheAnnotations, InternalCacheStrategyFactory.INSTANCE);
       metaData.enablementCache = InternalPmCacheCfgUtil.readCacheMetaData(this, CacheKind.ENABLEMENT, cacheAnnotations, InternalCacheStrategyFactory.INSTANCE);
       metaData.visibilityCache = InternalPmCacheCfgUtil.readCacheMetaData(this, CacheKind.VISIBILITY, cacheAnnotations, InternalCacheStrategyFactory.INSTANCE);
       metaData.nodesCache      = InternalPmCacheCfgUtil.readCacheMetaData(this, CacheKind.NODES, InternalPmBeanCacheStrategyFactory.INSTANCE);
@@ -1317,6 +1338,7 @@ public class PmObjectBase implements PmObject {
      */
     protected void onPmInit(PmObjectBase pm) {
       InternalPmCacheCfgUtil.registerClearOnListeners(pm, CacheKind.TITLE, titleCache.cacheClearOn);
+      InternalPmCacheCfgUtil.registerClearOnListeners(pm, CacheKind.TOOLTIP, tooltipCache.cacheClearOn);
       InternalPmCacheCfgUtil.registerClearOnListeners(pm, CacheKind.ENABLEMENT, enablementCache.cacheClearOn);
       InternalPmCacheCfgUtil.registerClearOnListeners(pm, CacheKind.VISIBILITY, visibilityCache.cacheClearOn);
       InternalPmCacheCfgUtil.registerClearOnListeners(pm, CacheKind.NODES, nodesCache.cacheClearOn);
@@ -1392,6 +1414,7 @@ public class PmObjectBase implements PmObject {
     private Visible visibilityCfg = Visible.DEFAULT;
 
     private CacheMetaData titleCache      = CacheMetaData.NO_CACHE;
+    private CacheMetaData tooltipCache    = CacheMetaData.NO_CACHE;
     private CacheMetaData enablementCache = CacheMetaData.NO_CACHE;
     private CacheMetaData visibilityCache = CacheMetaData.NO_CACHE;
     private CacheMetaData nodesCache      = CacheMetaData.NO_CACHE;

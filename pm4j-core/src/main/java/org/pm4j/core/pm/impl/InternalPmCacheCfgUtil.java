@@ -263,6 +263,19 @@ class DeprInternalPmCacheCfgUtil {
     }
   };
 
+  // what is this for? seems mot to be used
+  private static final CacheStrategy CACHE_TOOLTIP_LOCAL = new CacheStrategyBase<PmObjectBase>("CACHE_TOOLTIP_LOCAL") {
+    @Override protected Object readRawValue(PmObjectBase pm) {
+      return pm.pmCachedTooltip;
+    }
+    @Override protected void writeRawValue(PmObjectBase pm, Object value) {
+      pm.pmCachedTooltip = (String)value;
+    }
+    @Override protected void clearImpl(PmObjectBase pm) {
+      pm.pmCachedTooltip = null;
+    }
+  };
+
   private static final CacheStrategy CACHE_VISIBLE_LOCAL = new CacheStrategyBase<PmObjectBase>("CACHE_VISIBLE_LOCAL") {
     @Override protected Object readRawValue(PmObjectBase pm) {
       return pm.pmVisibleCache;
@@ -326,6 +339,13 @@ class DeprInternalPmCacheCfgUtil {
       CacheMode.REQUEST,  new CacheStrategyRequest("CACHE_TITLE_IN_REQUEST", "ti")
     );
 
+  private static final Map<CacheMode, CacheStrategy> CACHE_STRATEGIES_FOR_TOOLTIP =
+      MapUtil.makeFixHashMap(
+        CacheMode.OFF,      CacheStrategyNoCache.INSTANCE,
+        CacheMode.ON,       CACHE_TOOLTIP_LOCAL,
+        CacheMode.REQUEST,  new CacheStrategyRequest("CACHE_TOOLTIP_IN_REQUEST", "tt")
+      );
+
   private static final Map<CacheMode, CacheStrategy> CACHE_STRATEGIES_FOR_ENABLEMENT =
     MapUtil.makeFixHashMap(
       CacheMode.OFF,      CacheStrategyNoCache.INSTANCE,
@@ -366,6 +386,7 @@ class DeprInternalPmCacheCfgUtil {
       CacheKind.ENABLEMENT, CACHE_STRATEGIES_FOR_ENABLEMENT,
       CacheKind.OPTIONS,    CACHE_STRATEGIES_FOR_OPTIONS,
       CacheKind.TITLE,      CACHE_STRATEGIES_FOR_TITLE,
+      CacheKind.TOOLTIP,    CACHE_STRATEGIES_FOR_TOOLTIP,
       CacheKind.VALUE,      CACHE_STRATEGIES_FOR_ATTR_VALUE,
       CacheKind.VISIBILITY, CACHE_STRATEGIES_FOR_VISIBILITY,
       CacheKind.NODES,CACHE_STRATEGIES_FOR_NODES
@@ -376,6 +397,7 @@ class DeprInternalPmCacheCfgUtil {
       CacheKind.ENABLEMENT, PmCacheCfg.ATTR_ENABLEMENT,
       CacheKind.OPTIONS,    PmCacheCfg.ATTR_OPTIONS,
       CacheKind.TITLE,      PmCacheCfg.ATTR_TITLE,
+      CacheKind.TOOLTIP,    PmCacheCfg.ATTR_TOOLTIP,
       CacheKind.VALUE,      PmCacheCfg.ATTR_VALUE,
       CacheKind.VISIBILITY, PmCacheCfg.ATTR_VISIBILITY,
       CacheKind.NODES,      PmCacheCfg.ATTR_NODES
