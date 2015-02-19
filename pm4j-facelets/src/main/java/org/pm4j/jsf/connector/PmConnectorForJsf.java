@@ -4,8 +4,8 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.impl.connector.PmToViewTechnologyConnector;
@@ -30,7 +30,7 @@ import org.pm4j.web.UrlInfo;
 public class PmConnectorForJsf implements PmToViewTechnologyConnector {
 
   @SuppressWarnings("unused")
-  private static final Log LOG = LogFactory.getLog(PmConnectorForJsf.class);
+  private static final Logger LOG = LoggerFactory.getLogger(PmConnectorForJsf.class);
 
   /**
    * A name resolver that may be configured to resolve named JSF objects.

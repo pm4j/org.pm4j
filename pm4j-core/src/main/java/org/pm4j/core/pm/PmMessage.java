@@ -5,8 +5,8 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.pm4j.core.exception.PmResourceData;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.api.PmLocalizeApi;
@@ -17,7 +17,7 @@ import org.pm4j.core.pm.impl.PmCommandImpl;
  */
 public class PmMessage {
 
-  private static final Log LOG = LogFactory.getLog(PmMessage.class);
+  private static final Logger LOG = LoggerFactory.getLogger(PmMessage.class);
 
   public enum Severity {
     /** Normal user feedback. */

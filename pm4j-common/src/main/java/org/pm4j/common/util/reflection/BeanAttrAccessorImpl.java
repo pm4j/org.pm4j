@@ -8,15 +8,15 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Olaf Boede
  */
 public class BeanAttrAccessorImpl implements BeanAttrAccessor {
 
-  private static final Log    LOGGER            = LogFactory.getLog(BeanAttrAccessorImpl.class);
+  private static final Logger    LOGGER            = LoggerFactory.getLogger(BeanAttrAccessorImpl.class);
 
   public static final Class<?>[] EMPTY_CLASS_ARRAY = new Class[] {};
 

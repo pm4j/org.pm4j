@@ -7,15 +7,15 @@ import java.util.Map;
 import java.util.WeakHashMap;
 
 import org.apache.commons.lang.ObjectUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmObject;
 
 class BeanPmCacheImpl implements BeanPmCache {
 
-  private static final Log LOG = LogFactory.getLog(BeanPmCacheImpl.class);
+  private static final Logger LOG = LoggerFactory.getLogger(BeanPmCacheImpl.class);
 
   private Map<Object, WeakReference<PmBean<?>>> beanEqualToPmMap = new WeakHashMap<Object, WeakReference<PmBean<?>>>();
   private Map<BeanIdentity, WeakReference<PmBean<?>>> beanIdentityToPmMap = new WeakHashMap<BeanIdentity, WeakReference<PmBean<?>>>();

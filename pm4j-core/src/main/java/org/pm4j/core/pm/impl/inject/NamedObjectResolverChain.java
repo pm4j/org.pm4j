@@ -3,8 +3,8 @@ package org.pm4j.core.pm.impl.inject;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A {@link NamedObjectResolver} that iterates over a list of resolvers to
@@ -17,7 +17,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class NamedObjectResolverChain implements NamedObjectResolver {
 
-  private static final Log LOG = LogFactory.getLog(NamedObjectResolverChain.class);
+  private static final Logger LOG = LoggerFactory.getLogger(NamedObjectResolverChain.class);
 
   private List<NamedObjectResolver> resolvers = new ArrayList<NamedObjectResolver>();
 

@@ -8,8 +8,8 @@ import java.text.ParseException;
 import java.util.Locale;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.pm4j.common.converter.string.StringConverterBigDecimal;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.exception.PmValidationException;
@@ -27,7 +27,7 @@ public class PmAttrBigDecimalImpl extends PmAttrNumBase<BigDecimal> implements P
 
   public static final int MAX_LENGTH_DEFAULT = 80;
 
-  private static final Log LOG = LogFactory.getLog(PmAttrBigDecimalImpl.class);
+  private static final Logger LOG = LoggerFactory.getLogger(PmAttrBigDecimalImpl.class);
 
   public PmAttrBigDecimalImpl(PmObject pmParent) {
     super(pmParent);

@@ -7,8 +7,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.pm4j.common.pageable.PageableCollection;
 
 /**
@@ -22,7 +22,7 @@ import org.pm4j.common.pageable.PageableCollection;
  * @param <T_ITEM> type of items to select.
  */
 public class SelectionHandlerWithAdditionalItems<T_ITEM> extends SelectionHandlerBase<T_ITEM> {
-  private static final Log                     LOG            = LogFactory.getLog(SelectionHandlerWithAdditionalItems.class);
+  private static final Logger                     LOG            = LoggerFactory.getLogger(SelectionHandlerWithAdditionalItems.class);
 
   private SelectionWithAdditionalItems<T_ITEM> emptySelection = new SelectionWithAdditionalItems<T_ITEM>(
                                                                  EmptySelection.<T_ITEM> getEmptySelection(), null);

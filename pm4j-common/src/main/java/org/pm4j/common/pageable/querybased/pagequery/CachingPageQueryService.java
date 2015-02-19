@@ -5,8 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.util.beanproperty.ReleaseOnPropChangeRef;
 
@@ -24,7 +24,7 @@ import org.pm4j.common.util.beanproperty.ReleaseOnPropChangeRef;
  * @param <T_ID> type of collection item id's.
  */
 class CachingPageQueryService<T_ITEM, T_ID> implements PageQueryService<T_ITEM, T_ID> {
-  private static final Log LOG = LogFactory.getLog(CachingPageQueryService.class);
+  private static final Logger LOG = LoggerFactory.getLogger(CachingPageQueryService.class);
 
   private final PageQueryService<T_ITEM, T_ID> baseService;
   private final CachingPageQueryService.Cache<T_ITEM, T_ID> cache;

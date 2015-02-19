@@ -6,8 +6,8 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Cursor;
@@ -37,7 +37,7 @@ import org.eclipse.swt.widgets.Display;
  */
 public class SWTResourceManager {
 
-	private static final Log logger = LogFactory.getLog(SWTResourceManager.class);
+	private static final Logger logger = LoggerFactory.getLogger(SWTResourceManager.class);
 	
 
 	////////////////////////////////////////////////////////////////////////////

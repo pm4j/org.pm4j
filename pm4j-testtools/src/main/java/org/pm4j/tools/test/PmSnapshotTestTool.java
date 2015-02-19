@@ -10,8 +10,8 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.junit.ComparisonFailure;
 import org.pm4j.common.exception.CheckedExceptionWrapper;
 import org.pm4j.common.util.io.FileUtil;
@@ -68,7 +68,7 @@ public class PmSnapshotTestTool {
     }
 
     private static final char CLASSLOADER_RESOURCE_SEPARATOR = '/';
-    private static final Log LOG = LogFactory.getLog(PmSnapshotTestTool.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PmSnapshotTestTool.class);
     private static final String SYS_PROP_TEST_MODE = "pmSnapshotTestMode";
 
     private final Class<?> testCtxtClass;

@@ -1,7 +1,7 @@
 package org.pm4j.core.pm.api;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.PmMessage;
@@ -24,7 +24,7 @@ import java.util.List;
  */
 public final class PmValidationApi {
 
-  private static final Log LOG = LogFactory.getLog(PmValidationApi.class);
+  private static final Logger LOG = LoggerFactory.getLogger(PmValidationApi.class);
 
   /**
    * Validates the sub tree of the given PM.

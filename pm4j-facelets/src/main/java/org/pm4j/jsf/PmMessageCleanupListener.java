@@ -6,8 +6,8 @@ import javax.faces.event.PhaseEvent;
 import javax.faces.event.PhaseId;
 import javax.faces.event.PhaseListener;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.impl.PmConversationImpl;
@@ -27,7 +27,7 @@ import org.pm4j.core.pm.impl.PmUtil;
 public class PmMessageCleanupListener implements PhaseListener {
 
   private static final long serialVersionUID = 1L;
-  private static final Log LOG = LogFactory.getLog(PmMessageCleanupListener.class);
+  private static final Logger LOG = LoggerFactory.getLogger(PmMessageCleanupListener.class);
 
   private static PmMessageCleanupListener instance;
 

@@ -20,8 +20,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.pm4j.common.exception.CheckedExceptionWrapper;
 import org.pm4j.navi.impl.NaviRuntimeException;
 import org.pm4j.web.UrlInfo;
@@ -33,7 +33,7 @@ import org.pm4j.web.UrlInfo;
  */
 public class JsfUtil {
 
-  private static final Log LOG = LogFactory.getLog(JsfUtil.class);
+  private static final Logger LOG = LoggerFactory.getLogger(JsfUtil.class);
 
   private static final String HIDDEN_VALUE="<value not displayed>";
 

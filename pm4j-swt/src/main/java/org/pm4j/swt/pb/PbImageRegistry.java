@@ -2,8 +2,8 @@ package org.pm4j.swt.pb;
 
 import java.net.URL;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
@@ -12,7 +12,7 @@ import org.pm4j.core.pm.impl.PmUtil;
 
 public class PbImageRegistry {
 
-  private static final Log LOG = LogFactory.getLog(PbImageRegistry.class);
+  private static final Logger LOG = LoggerFactory.getLogger(PbImageRegistry.class);
 
   // FIXME: implement a package-structured registry tree...
   //        otherwise we violate the package oriented resource logic.

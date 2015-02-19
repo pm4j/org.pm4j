@@ -2,8 +2,8 @@ package org.pm4j.core.pm.impl.converter;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.pm4j.core.pm.PmOption;
 import org.pm4j.core.pm.PmOptionSet;
 import org.pm4j.core.pm.impl.AttrConverterCtxt;
@@ -22,7 +22,7 @@ import org.pm4j.core.pm.impl.pathresolver.PathResolver;
  */
 public class PmConverterOptionBased extends AttrStringConverterBase<Object> {
 
-  private static final Log log = LogFactory.getLog(PmConverterOptionBased.class);
+  private static final Logger log = LoggerFactory.getLogger(PmConverterOptionBased.class);
 
   private PathResolver idPath;
 

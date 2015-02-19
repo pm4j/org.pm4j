@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.api.PmLocalizeApi;
 import org.pm4j.core.pm.impl.PmObjectBase;
@@ -21,7 +21,7 @@ import org.pm4j.core.pm.impl.PmObjectBase;
  */
 public final class TagFn {
 
-  private static final Log log = LogFactory.getLog(TagFn.class);
+  private static final Logger log = LoggerFactory.getLogger(TagFn.class);
 
   public static Object conditionalValue(boolean condition, Object trueReturn,
       Object falseReturn) {

@@ -3,7 +3,8 @@ package org.pm4j.core.pm.impl;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.pm4j.common.pageable.PageableCollection;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.QueryParams;
@@ -20,7 +21,7 @@ import org.pm4j.core.pm.impl.pageable.PmBeanCollection;
  */
 public final class PmTableUtil {
 
-  private static Logger LOG = Logger.getLogger(PmTableUtil.class);
+  private static Logger LOG = LoggerFactory.getLogger(PmTableUtil.class);
 
   /**
    * <b><i>IMPORTANT: If you use this method, the value binding mechanism of the related table will be switched off!<br>

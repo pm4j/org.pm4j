@@ -2,8 +2,8 @@ package org.pm4j.core.pm.impl;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.pm4j.common.cache.CacheStrategy;
 import org.pm4j.common.converter.string.StringConverter;
 import org.pm4j.common.converter.string.StringConverterParseException;
@@ -78,7 +78,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
         extends PmObjectBase
         implements PmAttr<T_PM_VALUE> {
 
-  private static final Log LOG = LogFactory.getLog(PmAttrBase.class);
+  private static final Logger LOG = LoggerFactory.getLogger(PmAttrBase.class);
 
   /**
    * Indicates if the value was explicitly set. This information is especially

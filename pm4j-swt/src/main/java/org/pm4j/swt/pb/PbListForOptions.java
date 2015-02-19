@@ -1,8 +1,8 @@
 package org.pm4j.swt.pb;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -20,7 +20,7 @@ public class PbListForOptions extends PbControlToAttrBase<List, PmAttr<?>> {
 
   private static final String OPTION_ID_DATA_KEY = "pmOptionIds";
 
-  private static final Log log = LogFactory.getLog(PbListForOptions.class);
+  private static final Logger log = LoggerFactory.getLogger(PbListForOptions.class);
 
   public PbListForOptions() {
     this(SWT.NONE);

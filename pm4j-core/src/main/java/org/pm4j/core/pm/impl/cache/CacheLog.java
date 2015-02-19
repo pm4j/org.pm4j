@@ -3,8 +3,8 @@ package org.pm4j.core.pm.impl.cache;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.impl.PmUtil;
 
@@ -13,7 +13,7 @@ public final class CacheLog {
 
   public static final CacheLog INSTANCE = new CacheLog();
 
-  private static final Log LOG = LogFactory.getLog(CacheLog.class);
+  private static final Logger LOG = LoggerFactory.getLogger(CacheLog.class);
 
   private Map<String, Long> pmCacheHitMap = new ConcurrentHashMap<String, Long>();
   private Map<String, Long> pmCacheInitMap = new ConcurrentHashMap<String, Long>();

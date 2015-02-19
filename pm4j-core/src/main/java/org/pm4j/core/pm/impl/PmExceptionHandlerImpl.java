@@ -1,7 +1,7 @@
 package org.pm4j.core.pm.impl;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.pm4j.core.exception.PmResourceData;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.exception.PmUserMessageException;
@@ -25,7 +25,7 @@ import org.pm4j.navi.NaviRuleLink;
  */
 public class PmExceptionHandlerImpl implements PmExceptionHandler {
 
-  private static final Log LOG = LogFactory.getLog(PmExceptionHandlerImpl.class);
+  private static final Logger LOG = LoggerFactory.getLogger(PmExceptionHandlerImpl.class);
 
   private String errorPageNaviString = "to_error_page";
 

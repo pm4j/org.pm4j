@@ -5,12 +5,12 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class UrlParamCoderJsonTest extends TestCase {
 
-  private static final Log LOG = LogFactory.getLog(UrlParamCoderJsonTest.class);
+  private static final Logger LOG = LoggerFactory.getLogger(UrlParamCoderJsonTest.class);
   
   public void testCoder() {
     UrlParamCoderJson coder = new UrlParamCoderJson();

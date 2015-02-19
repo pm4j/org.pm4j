@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.exception.PmUserMessageException;
 import org.pm4j.core.pm.PmCommand;
@@ -44,7 +44,7 @@ import org.pm4j.navi.impl.NaviLinkImpl;
  */
 public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable {
 
-  private static final Log LOG = LogFactory.getLog(PmCommandImpl.class);
+  private static final Logger LOG = LoggerFactory.getLogger(PmCommandImpl.class);
 
   /** Internal marker object. */
   protected static final String PERFORMED_REDIRECT = "- redirect -";

@@ -8,8 +8,8 @@ import java.io.ObjectInputStream;
 import java.io.OutputStream;
 
 import org.apache.commons.lang.SerializationUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.pm4j.common.expr.ThisExpr;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmConversation;
@@ -37,7 +37,7 @@ import org.pm4j.deprecated.core.pm.DeprPmAspect;
  */
 public class DeprPmContentSerializer {
 
-  private static Log LOG = LogFactory.getLog(DeprPmContentSerializer.class);
+  private static Logger LOG = LoggerFactory.getLogger(DeprPmContentSerializer.class);
   private DeprPmContentCfg pmContentCfg;
 
   /**

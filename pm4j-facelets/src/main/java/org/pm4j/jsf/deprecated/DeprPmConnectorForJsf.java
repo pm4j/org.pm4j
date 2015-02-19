@@ -2,8 +2,8 @@ package org.pm4j.jsf.deprecated;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.impl.connector.PmToViewTechnologyConnector;
@@ -32,7 +32,7 @@ import org.pm4j.web.UrlInfo;
 public class DeprPmConnectorForJsf implements PmToViewTechnologyConnector {
 
   @SuppressWarnings("unused")
-  private static final Log LOG = LogFactory.getLog(DeprPmConnectorForJsf.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DeprPmConnectorForJsf.class);
 
   /**
    * The JSF API is only used via this connector. That allows unit-testability

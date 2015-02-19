@@ -9,8 +9,8 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.lang.ObjectUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.pm4j.common.converter.string.StringConverterUtil;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmObject;
@@ -19,7 +19,7 @@ import org.pm4j.core.pm.impl.title.ResourceStringProvider;
 
 public class PmLocalizeApiHandler {
 
-  private static final Log LOG = LogFactory.getLog(PmLocalizeApiHandler.class);
+  private static final Logger LOG = LoggerFactory.getLogger(PmLocalizeApiHandler.class);
 
   private ResourceStringProvider resourceStringProvider = new ClassPathResourceStringProvider();
 

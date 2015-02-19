@@ -1,8 +1,8 @@
 package org.pm4j.core.pm.impl;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.pm4j.common.cache.CacheStrategy;
 import org.pm4j.common.cache.CacheStrategyNoCache;
 import org.pm4j.common.modifications.ModificationHandler;
@@ -77,7 +77,7 @@ public class PmTableImpl
    */
   public static final int DEFAULT_NUM_OF_PAGE_ROW_PMS = 10;
 
-  private static final Log LOG = LogFactory.getLog(PmTableImpl.class);
+  private static final Logger LOG = LoggerFactory.getLogger(PmTableImpl.class);
 
   /** The content this table is based on. */
   private PmBeanCollection<T_ROW_PM, T_ROW_BEAN> pmPageableCollection;

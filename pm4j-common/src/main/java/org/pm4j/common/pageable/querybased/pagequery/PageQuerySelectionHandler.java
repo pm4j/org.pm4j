@@ -7,8 +7,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.pm4j.common.pageable.querybased.QueryService;
 import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.selection.SelectMode;
@@ -38,7 +38,7 @@ import org.pm4j.common.util.CloneUtil;
  */
 public abstract class PageQuerySelectionHandler<T_ITEM, T_ID> extends SelectionHandlerBase<T_ITEM> {
 
-  private static final Log LOG = LogFactory.getLog(PageQuerySelectionHandler.class);
+  private static final Logger LOG = LoggerFactory.getLogger(PageQuerySelectionHandler.class);
 
   private final PageQueryService<T_ITEM, T_ID> service;
   private final ItemIdSelection<T_ITEM, T_ID> emptySelection;

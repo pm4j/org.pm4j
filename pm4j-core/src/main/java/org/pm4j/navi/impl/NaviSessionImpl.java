@@ -10,8 +10,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang.SerializationUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.pm4j.navi.NaviHistoryCfg;
 import org.pm4j.navi.NaviLink;
 import org.pm4j.navi.NaviManager;
@@ -26,7 +26,7 @@ import org.pm4j.navi.NaviManager.NaviMode;
  */
 class NaviSessionImpl {
 
-  private static final Log LOG = LogFactory.getLog(NaviSessionImpl.class);
+  private static final Logger LOG = LoggerFactory.getLogger(NaviSessionImpl.class);
 
   /** The instance that is responsible for handling this session. */
   private final NaviManagerImpl naviManager;
