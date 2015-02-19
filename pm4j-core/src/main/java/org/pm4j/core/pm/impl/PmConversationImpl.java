@@ -1,7 +1,7 @@
 package org.pm4j.core.pm.impl;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.pm4j.core.pm.*;
 import org.pm4j.core.pm.PmMessage.Severity;
 import org.pm4j.core.pm.annotation.PmFactoryCfg;
@@ -28,7 +28,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class PmConversationImpl extends PmObjectBase implements PmConversation {
 
-  private static final Log LOG = LogFactory.getLog(PmConversationImpl.class);
+  private static final Logger LOG = LoggerFactory.getLogger(PmConversationImpl.class);
 
   // initialized with self-reference which indicates that the reference is not yet resolved.
   private PmConversationImpl pmParentConversation = this;

@@ -5,13 +5,13 @@ import java.lang.reflect.Type;
 import java.util.Collection;
 
 import org.apache.commons.lang.ClassUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.pm4j.common.util.reflection.PrefixUtil;
 
 public class AttrInfo {
 
-  private static final Log LOG = LogFactory.getLog(AttrInfo.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AttrInfo.class);
 
   private final String name;
   private final Method getterMethod;

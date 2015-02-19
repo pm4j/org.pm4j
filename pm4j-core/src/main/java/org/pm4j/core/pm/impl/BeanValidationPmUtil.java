@@ -8,8 +8,8 @@ import javax.validation.ValidationException;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.pm4j.core.pm.PmConstants;
 import org.pm4j.core.pm.PmObject;
 
@@ -22,7 +22,7 @@ import org.pm4j.core.pm.PmObject;
  */
 public class BeanValidationPmUtil {
 
-  private static Log LOG = LogFactory.getLog(BeanValidationPmUtil.class);
+  private static Logger LOG = LoggerFactory.getLogger(BeanValidationPmUtil.class);
 
   /** The optional JSR-303 bean validator to be considered. */
   private static Validator beanValidator = getBeanValidator();

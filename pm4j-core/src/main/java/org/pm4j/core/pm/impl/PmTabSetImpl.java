@@ -3,8 +3,8 @@ package org.pm4j.core.pm.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmCommand.CommandState;
@@ -28,7 +28,7 @@ import org.pm4j.navi.NaviLink;
  */
 public class PmTabSetImpl extends PmObjectBase implements PmTabSet {
 
-  private static final Log LOG = LogFactory.getLog(PmTabSetImpl.class);
+  private static final Logger LOG = LoggerFactory.getLogger(PmTabSetImpl.class);
 
   /** The set of tab switch command decorator definitions. */
   private List<TabSwitchDecoratorDefintion> pmCmdDecoratorDefinitions = new ArrayList<TabSwitchDecoratorDefintion>();

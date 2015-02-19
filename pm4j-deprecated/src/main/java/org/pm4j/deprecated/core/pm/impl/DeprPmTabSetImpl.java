@@ -3,8 +3,8 @@ package org.pm4j.deprecated.core.pm.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmCommand.CommandState;
 import org.pm4j.core.pm.PmCommandDecorator;
@@ -31,7 +31,7 @@ import org.pm4j.navi.NaviLink;
 @Deprecated
 public class DeprPmTabSetImpl extends PmElementImpl implements DeprPmTabSet {
 
-  private static final Log LOG = LogFactory.getLog(DeprPmTabSetImpl.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DeprPmTabSetImpl.class);
 
   /** The set of tab switch command decorator definitions. */
   private List<TabSwitchDecoratorDefintion> pmCmdDecoratorDefinitions = new ArrayList<TabSwitchDecoratorDefintion>();

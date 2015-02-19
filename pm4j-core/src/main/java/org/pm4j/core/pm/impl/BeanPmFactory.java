@@ -9,8 +9,8 @@ import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang.ClassUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmObject;
@@ -27,7 +27,7 @@ import org.pm4j.core.pm.annotation.PmBeanCfg;
  */
 class BeanPmFactory {
 
-  private static final Log LOG = LogFactory.getLog(BeanPmFactory.class);
+  private static final Logger LOG = LoggerFactory.getLogger(BeanPmFactory.class);
 
   /** A cache that prevents repeated reflection analysis loops. */
   private Map<Class<?>, Constructor<PmBean<?>>> beanClassToPmConstructorMap = new ConcurrentHashMap<Class<?>, Constructor<PmBean<?>>>();

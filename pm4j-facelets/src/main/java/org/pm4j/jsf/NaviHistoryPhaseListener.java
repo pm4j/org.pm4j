@@ -12,8 +12,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.pm4j.jsf.util.JsfUtil;
 import org.pm4j.jsf.util.NaviJsfUtil;
 import org.pm4j.jsf.util.PmJsfUtil;
@@ -36,7 +36,7 @@ import org.pm4j.web.UrlInfo;
 public class NaviHistoryPhaseListener implements PhaseListener {
 
   private static final long serialVersionUID = -7489565064238366392L;
-  private static final Log LOG = LogFactory.getLog(NaviHistoryPhaseListener.class);
+  private static final Logger LOG = LoggerFactory.getLogger(NaviHistoryPhaseListener.class);
 
   private static final String REQ_ATTR_REDIRECT_TO = "pm4j.navi.phaseListnerRedirectUrl";
   private static final String REQ_ATTR_OLD_HISTORY = "pm4j.navi.oldHistory";

@@ -1,8 +1,8 @@
 package org.pm4j.core.pm.impl.connector;
 
 import org.apache.commons.lang.ObjectUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.impl.inject.NamedObjectResolver;
 import org.pm4j.navi.NaviHistory;
@@ -17,7 +17,7 @@ import org.pm4j.navi.impl.NaviLinkImpl;
  */
 public class PmToNoViewTechnologyConnector implements PmToViewTechnologyConnector {
 
-  private static final Log LOG = LogFactory.getLog(PmToNoViewTechnologyConnector.class);
+  private static final Logger LOG = LoggerFactory.getLogger(PmToNoViewTechnologyConnector.class);
   private NaviLink lastNaviLink;
   private NamedObjectResolver namedObjectResolver = new NamedObjectResolver() {
     @Override

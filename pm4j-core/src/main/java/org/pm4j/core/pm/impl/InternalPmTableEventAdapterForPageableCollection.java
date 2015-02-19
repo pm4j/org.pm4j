@@ -4,8 +4,8 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.pm4j.common.pageable.PageableCollection;
 import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.selection.SelectionHandler;
@@ -22,7 +22,7 @@ import org.pm4j.core.pm.api.PmEventApi;
  * @author Olaf Boede
  */
 class InternalPmTableEventAdapterForPageableCollection {
-  private static Log LOG = LogFactory.getLog(InternalPmTableEventAdapterForPageableCollection.class);
+  private static Logger LOG = LoggerFactory.getLogger(InternalPmTableEventAdapterForPageableCollection.class);
 
   private final PmTableImpl<?, ?> pmTable;
   private final PageableCollection<?> pageableCollection;

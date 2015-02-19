@@ -3,8 +3,8 @@ package org.pm4j.jsf;
 import javax.faces.application.ViewHandler;
 import javax.faces.context.FacesContext;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.pm4j.jsf.util.NaviJsfUtil;
 import org.pm4j.jsf.util.ViewHandlerWrapper;
 import org.pm4j.navi.NaviHistory;
@@ -18,7 +18,7 @@ import org.pm4j.navi.NaviHistory;
 public class NaviHistoryViewHandler extends ViewHandlerWrapper {
 
   @SuppressWarnings("unused")
-  private static final Log log = LogFactory.getLog(NaviHistoryViewHandler.class);
+  private static final Logger log = LoggerFactory.getLogger(NaviHistoryViewHandler.class);
 
 	private ViewHandler base;
 

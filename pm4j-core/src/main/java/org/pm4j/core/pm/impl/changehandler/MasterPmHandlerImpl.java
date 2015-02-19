@@ -7,8 +7,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.pm4j.common.modifications.ModificationHandler;
 import org.pm4j.common.modifications.Modifications;
 import org.pm4j.common.selection.Selection;
@@ -38,7 +38,7 @@ import org.pm4j.core.pm.impl.PmUtil;
  */
 public abstract class MasterPmHandlerImpl<T_MASTER_BEAN> implements MasterPmHandler {
 
-  private static final Log    LOG                = LogFactory.getLog(MasterPmHandlerImpl.class);
+  private static final Logger    LOG                = LoggerFactory.getLogger(MasterPmHandlerImpl.class);
 
   private final PmObject masterPm;
   private final SelectionHandler<T_MASTER_BEAN> selectionHandler;

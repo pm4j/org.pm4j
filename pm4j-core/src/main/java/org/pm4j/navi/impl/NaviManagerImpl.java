@@ -6,8 +6,8 @@ import java.util.Map;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.pm4j.navi.NaviHistory;
 import org.pm4j.navi.NaviHistoryCfg;
 import org.pm4j.navi.NaviLink;
@@ -22,7 +22,7 @@ import org.pm4j.navi.NaviManager;
  */
 public class NaviManagerImpl implements NaviManager {
 
-  private static final Log LOG = LogFactory.getLog(NaviManagerImpl.class);
+  private static final Logger LOG = LoggerFactory.getLogger(NaviManagerImpl.class);
 
   /**
    * The navigation configuration.
@@ -132,7 +132,7 @@ public class NaviManagerImpl implements NaviManager {
         idToSessionMap.put(forkedSession.getSessionId(), forkedSession);
         session = forkedSession;
 
-        // XXX olaf: Sollte das Log nicht in der SessionImpl gemacht werden (bei der Fork Herstellung)
+        // XXX olaf: Sollte das Logger nicht in der SessionImpl gemacht werden (bei der Fork Herstellung)
         if (LOG.isDebugEnabled())
           LOG.debug("Created a navigation session fork: " + forkedSession +
                     " for " + naviCfg.getVersionParamName() + "=" + versionString + "" +

@@ -1,2 +1,19 @@
 **/pom.xml merge=ours
 pom.xml merge=ours
+
+# All files identified as text will get crlf changed to lf upon checkin:
+* text=auto
+
+# These files are text files:
+*.adoc text
+*.css text
+*.gradle text
+*.html text
+*.java text
+*.js text
+*.md text
+*.properties text
+*.sh
+*.txt text
+*.xhtml text
+*.xml text

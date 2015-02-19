@@ -5,8 +5,8 @@ import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.pm4j.common.cache.CacheStrategy;
 import org.pm4j.common.util.collection.ListUtil;
 import org.pm4j.common.util.reflection.BeanAttrAccessor;
@@ -51,7 +51,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
  */
 public class PmObjectBase implements PmObject {
 
-  private static final Log LOG = LogFactory.getLog(PmObjectBase.class);
+  private static final Logger LOG = LoggerFactory.getLogger(PmObjectBase.class);
 
   /** Indicator for view adapters . */
   private static String PM_TO_VIEW_CONNECTOR_NOT_YET_INITIALIZED = "The PM to view connector is not yet initialized.";
@@ -1797,7 +1797,7 @@ public class PmObjectBase implements PmObject {
  * @author olaf boede
  */
 class PmEventTable {
-  private static final Log log = LogFactory.getLog(PmEventTable.class);
+  private static final Logger LOG = LoggerFactory.getLogger(PmEventTable.class);
 
   private final Map<PmEventListener, Integer> pmEventListeners;
 
@@ -1819,7 +1819,7 @@ class PmEventTable {
     }
     else {
       if (foundMask == eventMask) {
-        log.warn("Duplicate listerner registration call. Listener: " + listener);
+        LOG.warn("Duplicate listerner registration call. Listener: " + listener);
       }
 
       int newMask = foundMask | eventMask;
@@ -1854,8 +1854,8 @@ class PmEventTable {
   /* package */ void fireEvent(final PmEvent event, boolean preProcess) {
     boolean hasListeners = !pmEventListeners.isEmpty();
 
-    if (log.isTraceEnabled())
-      log.trace("fireChange[" + event + "] for event source   : " + PmEventApi.getThreadEventSource() +
+    if (LOG.isTraceEnabled())
+      LOG.trace("fireChange[" + event + "] for event source   : " + PmEventApi.getThreadEventSource() +
           (hasListeners ? "\n\teventListeners: " + pmEventListeners : ""));
 
     if (hasListeners) {

@@ -6,8 +6,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.pm4j.common.selection.SelectMode;
 import org.pm4j.common.selection.Selection;
 import org.pm4j.common.selection.SelectionHandler;
@@ -24,7 +24,7 @@ import org.pm4j.common.selection.SelectionHandlerBase;
  */
 public abstract class IdQuerySelectionHandler<T_ITEM, T_ID> extends SelectionHandlerBase<T_ITEM> {
 
-  private static final Log LOG = LogFactory.getLog(IdQuerySelectionHandler.class);
+  private static final Logger LOG = LoggerFactory.getLogger(IdQuerySelectionHandler.class);
 
   /** Used to provide empty selections. */
   private final IdQuerySelectionBase<T_ITEM, T_ID> emptySelection;

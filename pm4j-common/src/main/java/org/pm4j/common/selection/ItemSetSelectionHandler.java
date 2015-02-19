@@ -5,8 +5,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.pm4j.common.util.collection.IterableUtil;
 
 /**
@@ -22,7 +22,7 @@ import org.pm4j.common.util.collection.IterableUtil;
  */
 public class ItemSetSelectionHandler<T_ITEM> extends SelectionHandlerBase<T_ITEM>{
 
-  private static final Log LOG = LogFactory.getLog(ItemSetSelectionHandler.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ItemSetSelectionHandler.class);
 
   @SuppressWarnings("unchecked")
   private static final ItemSetSelection<?> EMPTY_SELECTION = new ItemSetSelection<Object>(Collections.EMPTY_SET);

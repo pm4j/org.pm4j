@@ -8,8 +8,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.pm4j.common.modifications.ModificationHandler;
 import org.pm4j.common.pageable.PageableCollection;
 import org.pm4j.common.pageable.PageableCollectionUtil;
@@ -39,7 +39,7 @@ import org.pm4j.common.util.collection.ListUtil;
  */
 public class IdQueryCollectionImpl<T_ITEM, T_ID> extends QueryCollectionBase<T_ITEM, T_ID> {
 
-  private static final Log LOG = LogFactory.getLog(IdQueryCollectionImpl.class);
+  private static final Logger LOG = LoggerFactory.getLogger(IdQueryCollectionImpl.class);
 
   private final IdQueryService<T_ITEM, T_ID>    service;
   /** The collection type specific selection handler. */

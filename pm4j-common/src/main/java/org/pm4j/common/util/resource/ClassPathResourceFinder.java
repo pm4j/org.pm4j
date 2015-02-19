@@ -7,15 +7,15 @@ import java.util.ResourceBundle;
 
 import org.apache.commons.lang.ClassUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Finds a resource string in packages related to a given class.
  */
 public class ClassPathResourceFinder {
 
-  private static final Log LOG = LogFactory.getLog(ClassPathResourceFinder.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ClassPathResourceFinder.class);
 
   private boolean lenient = true;
 

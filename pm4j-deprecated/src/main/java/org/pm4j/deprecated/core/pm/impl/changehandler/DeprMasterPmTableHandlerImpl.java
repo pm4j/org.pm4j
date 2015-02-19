@@ -8,8 +8,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.pm4j.common.modifications.Modifications;
 import org.pm4j.common.selection.EmptySelection;
 import org.pm4j.common.selection.Selection;
@@ -49,7 +49,7 @@ import org.pm4j.deprecated.core.pm.DeprPmTable.TableChange;
 @Deprecated
 public class DeprMasterPmTableHandlerImpl<T_MASTER_BEAN> implements MasterPmHandler {
 
-  private static final Log    LOG                = LogFactory.getLog(DeprMasterPmTableHandlerImpl.class);
+  private static final Logger    LOG                = LoggerFactory.getLogger(DeprMasterPmTableHandlerImpl.class);
 
   private final DeprPmTable<?>    masterTablePm;
   private Set<T_MASTER_BEAN>  changedMasterBeans = new HashSet<T_MASTER_BEAN>();

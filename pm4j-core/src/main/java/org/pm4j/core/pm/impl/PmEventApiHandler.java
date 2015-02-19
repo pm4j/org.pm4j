@@ -2,8 +2,8 @@ package org.pm4j.core.pm.impl;
 
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmCommandDecorator;
 import org.pm4j.core.pm.PmConversation;
@@ -24,7 +24,7 @@ import org.pm4j.core.pm.impl.PmObjectBase.PmInitState;
  */
 public class PmEventApiHandler {
 
-  private static final Log LOG = LogFactory.getLog(PmEventApiHandler.class);
+  private static final Logger LOG = LoggerFactory.getLogger(PmEventApiHandler.class);
 
   /**
    * A handler that can hold a reference to an event source within the current thread.<br>

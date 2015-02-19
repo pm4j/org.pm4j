@@ -14,8 +14,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.pm4j.common.exception.CheckedExceptionWrapper;
 
 /**
@@ -23,7 +23,7 @@ import org.pm4j.common.exception.CheckedExceptionWrapper;
  */
 public class ClassUtil {
 
-  private static final Log LOG = LogFactory.getLog(ClassUtil.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ClassUtil.class);
 
   private static final Class<?>[] EMPTY_CLASS_ARRAY = {};
 

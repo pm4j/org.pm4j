@@ -3,8 +3,8 @@ package org.pm4j.core.pm.impl;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.pm4j.common.util.reflection.GenericTypeUtil;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.exception.PmValidationException;
@@ -36,7 +36,7 @@ public class PmBeanBase<T_BEAN>
       implements PmBean<T_BEAN> {
 
   /** Logger of this class. */
-  private final static Log LOG = LogFactory.getLog(PmBeanBase.class);
+  private final static Logger LOG = LoggerFactory.getLogger(PmBeanBase.class);
 
   /** The bean data object behind this PM. */
   private T_BEAN pmBean;

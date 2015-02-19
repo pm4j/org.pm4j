@@ -20,8 +20,8 @@ import javax.faces.event.PhaseListener;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.pm4j.jsf.preprocess.PagePreprocessLogic.RequestKind;
 import org.pm4j.jsf.util.JsfUtil;
 import org.pm4j.jsf.util.NaviJsfUtil;
@@ -45,7 +45,7 @@ public class PreprocessPhaseListener implements PhaseListener {
 
   private static final long   serialVersionUID = 1L;
   private static final String ATTR_SESSION_START_HANDLED = "pm4j.session_start_handled";
-  private static final Log    log = LogFactory.getLog(PreprocessPhaseListener.class);
+  private static final Logger    log = LoggerFactory.getLogger(PreprocessPhaseListener.class);
 
   /** Marker instance for pages without preprocess logic. */
   protected static final PagePreprocessLogic NO_PREPROCESS_LOGIC = new PagePreprocessLogic() {
@@ -225,7 +225,7 @@ public class PreprocessPhaseListener implements PhaseListener {
 	      }
 	    }
 	  } catch (Exception e) {
-		  // Log the case and navigate to the default time out page.
+		  // Logger the case and navigate to the default time out page.
 		  log.error("Unable to apply preprocessing logic that was registered for page '" +
 				  requestUrlInfo + "'\n http request kind: '" + requestKind + "'", e);
 

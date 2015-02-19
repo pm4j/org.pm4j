@@ -1,7 +1,7 @@
 package org.pm4j.deprecated.core.pm.impl;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmElement;
 import org.pm4j.core.pm.PmObject;
@@ -29,7 +29,7 @@ import java.util.List;
 public class DeprPmTableGenericRowImpl<T_ROW_ELEMENT extends PmElement> implements DeprPmTableGenericRow<T_ROW_ELEMENT> {
 
   @SuppressWarnings("unused")
-  private static final Log LOG = LogFactory.getLog(DeprPmTableGenericRowImpl.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DeprPmTableGenericRowImpl.class);
 
   private final DeprPmTable<T_ROW_ELEMENT> pmTable;
   private final T_ROW_ELEMENT rowElement;

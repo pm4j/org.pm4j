@@ -10,8 +10,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Scanner;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.pm4j.common.exception.CheckedExceptionWrapper;
 
 /**
@@ -21,7 +21,7 @@ import org.pm4j.common.exception.CheckedExceptionWrapper;
  */
 public class FileUtil {
 
-  private static final Log LOG = LogFactory.getLog(FileUtil.class);
+  private static final Logger LOG = LoggerFactory.getLogger(FileUtil.class);
 
   /**
    * Reads a complete text file.

@@ -6,8 +6,8 @@ package org.pm4j.common.converter.string;
 import java.text.ParseException;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Base implementation to be used by converters to support parsing of multiple input formats.
@@ -20,7 +20,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public abstract class MultiFormatParserBase<T> {
 
-  private static final Log LOG = LogFactory.getLog(MultiFormatParserBase.class);
+  private static final Logger LOG = LoggerFactory.getLogger(MultiFormatParserBase.class);
 
   /**
    * Support subsequent parsing of the input String using multiple input formats.

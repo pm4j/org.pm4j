@@ -8,8 +8,8 @@ import java.util.Map;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.pm4j.jsf.NaviHistoryPhaseListener;
 import org.pm4j.navi.NaviHistory;
 import org.pm4j.navi.NaviHistoryCfg;
@@ -22,7 +22,7 @@ import org.pm4j.web.UrlInfo;
 
 public class NaviJsfUtil {
 
-  private static final Log LOG = LogFactory.getLog(NaviJsfUtil.class);
+  private static final Logger LOG = LoggerFactory.getLogger(NaviJsfUtil.class);
 
   /** Name of the session attribute that stores the navigation manager. */
   private static final String NAVI_MGR_ATTR = "pm4j.navi.mgr";

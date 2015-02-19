@@ -9,8 +9,8 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmOption;
@@ -23,8 +23,7 @@ public class PbJListForOptions extends PbJComponentToAttrBase<JList, PmAttr<?>> 
 
   private static final String OPTION_ID_DATA_KEY = "pmOptionIds";
 
-  private static final Log    log                = LogFactory
-                                                     .getLog(PbJListForOptions.class);
+  private static final Logger log = LoggerFactory.getLogger(PbJListForOptions.class);
 
   public PbJListForOptions() {
   }

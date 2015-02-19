@@ -1,7 +1,7 @@
 package org.pm4j.core.pm.impl;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.pm4j.common.converter.string.StringConverter;
 import org.pm4j.common.converter.string.StringConverterList;
 import org.pm4j.common.converter.value.ValueConverter;
@@ -36,7 +36,7 @@ import java.util.List;
 public class PmAttrPmListImpl<T_ITEM_PM extends PmBean<T_BEAN>, T_BEAN> extends PmAttrBase<List<T_ITEM_PM>, Collection<T_BEAN>> implements PmAttrPmList<T_ITEM_PM> {
 
   @SuppressWarnings("unused")
-  private static final Log LOG = LogFactory.getLog(PmAttrPmListImpl.class);
+  private static final Logger LOG = LoggerFactory.getLogger(PmAttrPmListImpl.class);
 
   public PmAttrPmListImpl(PmObject pmParent) {
     super(pmParent);
