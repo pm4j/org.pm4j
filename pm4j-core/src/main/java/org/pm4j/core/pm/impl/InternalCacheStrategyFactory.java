@@ -47,6 +47,8 @@ class InternalCacheStrategyFactory {
         return new CacheStrategyForEnablement(cache.clear());
       case TITLE:
         return new CacheStrategyForTitle(cache.clear());
+      case TOOLTIP:
+        return new CacheStrategyForTooltip(cache.clear());
       case VISIBILITY:
         return new CacheStrategyForVisibility(cache.clear());
       case NODES:
@@ -85,6 +87,21 @@ class InternalCacheStrategyFactory {
     }
     @Override protected void clearImpl(PmObjectBase pm) {
       pm.pmCachedTitle = null;
+    }
+  };
+
+  private static class CacheStrategyForTooltip extends CacheStrategyBase<PmObjectBase> {
+    private CacheStrategyForTooltip(Clear cacheClear) {
+      super("CACHE_TOOLTIP_LOCAL", cacheClear);
+    }
+    @Override protected Object readRawValue(PmObjectBase pm) {
+      return pm.pmCachedTooltip;
+    }
+    @Override protected void writeRawValue(PmObjectBase pm, Object value) {
+      pm.pmCachedTooltip = (String)value;
+    }
+    @Override protected void clearImpl(PmObjectBase pm) {
+      pm.pmCachedTooltip = null;
     }
   };
 

@@ -179,6 +179,36 @@ public class PmAttrCacheTest2 {
     }
   }
 
+  @Test
+  public void testTitleCache() {
+    MyPojo p = new MyPojo();
+    MyPojoPm pPm = new MyPojoPm(new PmConversationImpl(), p);
+
+    p.s = "abc";
+    assertEquals("abc Title", pPm.sCachedTitleAndTooltip.getPmTitle());
+
+    p.s = "123";
+    assertEquals("abc Title", pPm.sCachedTitleAndTooltip.getPmTitle());
+
+    PmCacheApi.clearPmCache(pPm);
+    assertEquals("123 Title", pPm.sCachedTitleAndTooltip.getPmTitle());
+  }
+
+  @Test
+  public void testTooltipCache() {
+    MyPojo p = new MyPojo();
+    MyPojoPm pPm = new MyPojoPm(new PmConversationImpl(), p);
+
+    p.s = "abc";
+    assertEquals("abc Tooltip", pPm.sCachedTitleAndTooltip.getPmTooltip());
+
+    p.s = "123";
+    assertEquals("abc Tooltip", pPm.sCachedTitleAndTooltip.getPmTooltip());
+
+    PmCacheApi.clearPmCache(pPm);
+    assertEquals("123 Tooltip", pPm.sCachedTitleAndTooltip.getPmTooltip());
+  }
+
   // -- Domain model --
 
   public static class MyPojo {
@@ -203,6 +233,20 @@ public class PmAttrCacheTest2 {
     public final PmAttrString s2 = new PmAttrStringImpl(this);
 
     public final MyTab tab = new MyTab(this);
+
+    @PmCacheCfg2(@Cache(property={CacheKind.TOOLTIP, CacheKind.TITLE}))
+    @PmAttrCfg(valuePath="pmBean.s")
+    public final PmAttrString sCachedTitleAndTooltip = new PmAttrStringImpl(this) {
+      @Override
+      protected String getPmTitleImpl() {
+        return getValueAsString() + " Title";
+      };
+
+      @Override
+      protected String getPmTooltipImpl() {
+        return getValueAsString() + " Tooltip";
+      };
+    };
 
     @PmCacheCfg2(@Cache(property=CacheKind.ALL))
     @PmAttrCfg(valuePath="pmBean.s")

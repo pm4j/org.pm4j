@@ -72,8 +72,7 @@ public @interface PmCacheCfg {
   /**
    * @return <code>true</code> when tooltip's should be cached.
    */
-// XXX olaf: not yet done because it was not in the profiler hit list.
-//  CacheMode tooltip() default CacheMode.UNKNOWN;
+ CacheMode tooltip() default CacheMode.NOT_SPECIFIED;
 
   /**
    * @return The value caching strategy.
@@ -114,6 +113,7 @@ public @interface PmCacheCfg {
   public static final String ATTR_VISIBILITY = "visibility";
   public static final String ATTR_ENABLEMENT = "enablement";
   public static final String ATTR_TITLE = "title";
+  public static final String ATTR_TOOLTIP = "tooltip";
   public static final String ATTR_VALUE = "value";
   public static final String ATTR_OPTIONS = "options";
   public static final String ATTR_NODES = "nodes";
