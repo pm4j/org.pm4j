@@ -151,17 +151,17 @@ public class PmTableImpl
       updatePmTable();
     }
   }
-  
+
   @Override
   protected boolean isPmVisibleImpl() {
     if(!super.isPmVisibleImpl()) {
       return false;
     }
-    
+
     if(getOwnMetaData().getVisibilityCfg() == Visible.IF_NOT_EMPTY) {
       return getTotalNumOfPmRows() > 0;
     }
-    
+
     return true;
   }
 
@@ -688,9 +688,13 @@ public class PmTableImpl
    * @return The evaluated {@link QueryOptions} instance. Never <code>null</code>.
    */
   protected QueryOptions getPmQueryOptions() {
+    QueryOptions opts = null;
     QueryOptionProvider qop = getPmQueryOptionProvider();
-    return (qop != null)
-        ? qop.getQueryOptions()
+    if (qop != null) {
+      opts = qop.getQueryOptions();
+    }
+    return (opts != null)
+        ? opts
         : new QueryOptions();
   }
 
@@ -750,8 +754,8 @@ public class PmTableImpl
 
   /**
    * Defines the data set to be presented by the table.
-   * 
-   * <p>ATTENTION: Some unit test setups might be easier using this method, but it 's strongly 
+   *
+   * <p>ATTENTION: Some unit test setups might be easier using this method, but it 's strongly
    * discouraged to use it in production code; some features might not work properly, e.g. filtering.
    * For production code, overriding {@link #getPmBeansImpl()} is recommended.</p>
    *
