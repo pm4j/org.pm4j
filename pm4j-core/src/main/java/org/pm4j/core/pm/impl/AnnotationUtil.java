@@ -168,6 +168,22 @@ public class AnnotationUtil {
 
     return foundAnnotations;
   }
+  
+  public static <A extends Annotation> List<A> findAnnotationsInClassTree(Class<?> classToAnalyze, Class<A> annotationClass) {
+    List<A> foundAnnotations = new ArrayList<A>();
+    
+    do {
+      A annotation = classToAnalyze.getAnnotation(annotationClass);
+      if (annotation != null) {
+        foundAnnotations.add(annotation);
+      }
+      
+      classToAnalyze = classToAnalyze.getSuperclass();      
+    } while (classToAnalyze != null);
+      
+    
+    return foundAnnotations;
+  }
 
 }
 

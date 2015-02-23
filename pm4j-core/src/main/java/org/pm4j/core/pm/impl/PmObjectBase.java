@@ -1196,25 +1196,27 @@ public class PmObjectBase implements PmObject {
     }
 
     // -- Language resource configuration --
-    PmTitleCfg annotation = AnnotationUtil.findAnnotation(this, PmTitleCfg.class);
-    if (annotation != null) {
-      metaData.resKey = StringUtils.defaultIfEmpty(annotation.resKey(), null);
-      metaData.resKeyBase = StringUtils.defaultIfEmpty(annotation.resKeyBase(), null);
-      metaData.tooltipUsesTitle = annotation.tooltipUsesTitle();
+    List<PmTitleCfg> annotations = AnnotationUtil.findAnnotationsInClassTree(this.getClass(), PmTitleCfg.class);
+    
+    if (annotations != null && !annotations.isEmpty()) {
+      metaData.resKey = StringUtils.defaultIfEmpty(annotations.get(0).resKey(), null);
+//      metaData.resKeyBase = StringUtils.defaultIfEmpty(annotations.get(0).resKeyBase(), null);
+      metaData.resKeyBase = getResKeyBase(annotations);
+      metaData.tooltipUsesTitle = annotations.get(0).tooltipUsesTitle();
 
-      if (!annotation.titleProvider().equals(Void.class)) {
+      if (!annotations.get(0).titleProvider().equals(Void.class)) {
         try {
-          metaData.pmTitleProvider = (PmTitleProvider) annotation.titleProvider().newInstance();
+          metaData.pmTitleProvider = (PmTitleProvider) annotations.get(0).titleProvider().newInstance();
         } catch (Exception e) {
           throw new PmRuntimeException(this, e);
         }
-      } else if (StringUtils.isNotBlank(annotation.attrValue())) {
-        metaData.pmTitleProvider = new TitleProviderAttrValueBased(annotation.attrValue(), this instanceof PmElement);
+      } else if (StringUtils.isNotBlank(annotations.get(0).attrValue())) {
+        metaData.pmTitleProvider = new TitleProviderAttrValueBased(annotations.get(0).attrValue(), this instanceof PmElement);
       }
       // TODO: check if only a tooltip or icon is provided...
-      else if (! "".equals(annotation.title())) {
+      else if (! "".equals(annotations.get(0).title())) {
         metaData.pmTitleProvider = new PmTitleProviderValuebased(
-            annotation.title(), annotation.tooltip(), annotation.icon());
+            annotations.get(0).title(), annotations.get(0).tooltip(), annotations.get(0).icon());
       }
     }
 
@@ -1274,6 +1276,19 @@ public class PmObjectBase implements PmObject {
     metaData.deprValidation = isDeprValidation();
     metaData.validator = makePmValidator();
     assert metaData.validator != null;
+  }
+
+  private String getResKeyBase(List<PmTitleCfg> annotations) {
+    String resKeyBase = null;
+    
+    for (PmTitleCfg annotation : annotations) {
+      resKeyBase = annotation.resKeyBase();
+      if(StringUtils.isNotBlank(resKeyBase)) {
+        break;
+      }
+    }
+
+    return resKeyBase;
   }
 
   /**
