@@ -1,0 +1,11 @@
+// OBO: should be moved to the Globe specific hotlink docu.
+
+You can read these parameter in the target object like this:
+
+[source]
+@Override
+    protected void afterDialogInitialization() {
+        String value = Jsf2Util.readRequestParameter("name");
+		... more parameter ...
+    }
+}

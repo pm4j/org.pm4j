@@ -1,0 +1,38 @@
+// OBO: Den Validierungsblock würde ich weglassen. Die Doku sollte sich auf beforeDo und afterDo beschränken.
+// die validate() Methode ist m.E. durchaus ein Löschkandidat.
+=== Validation of a PM area ===
+
+The validation of a command element is automatically called before executing the command. The default implementation of PMCommand 
+triggers the validation of the parent element, whereat the parent is the first parent that implements the PmDataInput interface.
+This means that the validation process validates the sub tree of this parent element, so that the attribute configuration 
+(e.g. @PmAttrCfg(required = true)) and the implemented validation method of every element of the sub tree are executed. 
+After validating the parent element the validation process checks if there are any error messages. 
+
+If the developer wants to have a different kind of validation he just has to override the validate method of PmCommand.
+
+[source] 
+@Override
+protected boolean validate() {
+    // some specific validation
+    ...
+}
+
+To implement some specific validation rules for an element of the subtree the developer just has override the validation method of that element (e.g. PmAttrString).
+
+[source]
+------------------------------------------------------------------------
+@PmAttrCfg(required = true)
+public final PmAttrString myAttribute = new PmAttrStringImpl(this) {
+
+    @Override
+    protected void validate(String value) throws PmValidationException {
+        super.validate(value);
+
+        // more validation actions
+        ...
+    }
+};
+------------------------------------------------------------------------
+
+NOTE: Be careful: Do not forget to call the super implementation of validate. Otherwise you will get a completely independent validation implementation. 
+This means that you will loose all inherited validation actions like checking configured annotations (e.g. @PmAttrCfg). 
