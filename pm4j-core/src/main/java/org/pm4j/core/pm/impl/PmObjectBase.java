@@ -30,6 +30,7 @@ import org.pm4j.core.pm.api.PmVisitorApi.PmVisitHint;
 import org.pm4j.core.pm.api.PmVisitorApi.PmVisitResult;
 import org.pm4j.core.pm.impl.InternalPmCacheCfgUtil.CacheMetaData;
 import org.pm4j.core.pm.impl.PmObjectBase.MetaData.MetaDataId;
+import org.pm4j.core.pm.impl.PmTitleCfgUtil.PmTitleCfgParameter;
 import org.pm4j.core.pm.impl.inject.DiResolver;
 import org.pm4j.core.pm.impl.inject.DiResolverUtil;
 import org.pm4j.core.pm.impl.title.PmTitleProvider;
@@ -1197,13 +1198,16 @@ public class PmObjectBase implements PmObject {
 
     // -- Language resource configuration --
     List<PmTitleCfg> annotations = AnnotationUtil.findAnnotationsInClassTree(this.getClass(), PmTitleCfg.class);
-    
-    if (annotations != null && !annotations.isEmpty()) {
+
+    if (!annotations.isEmpty()) {
       metaData.resKey = StringUtils.defaultIfEmpty(annotations.get(0).resKey(), null);
-//      metaData.resKeyBase = StringUtils.defaultIfEmpty(annotations.get(0).resKeyBase(), null);
-      metaData.resKeyBase = getResKeyBase(annotations);
+      // TODO: For GLOBE00145358
+      // metaData.resKey = PmTitleCfgUtil.getPmTitleCfgValue(annotations,
+      // PmTitleCfgParameter.RES_KEY, null);
+      metaData.resKeyBase = PmTitleCfgUtil.getPmTitleCfgValue(annotations, PmTitleCfgParameter.RES_KEY_BASE, null);
       metaData.tooltipUsesTitle = annotations.get(0).tooltipUsesTitle();
 
+      // TODO: GLOBE00145358 - Check the titleProvider implementation
       if (!annotations.get(0).titleProvider().equals(Void.class)) {
         try {
           metaData.pmTitleProvider = (PmTitleProvider) annotations.get(0).titleProvider().newInstance();
@@ -1211,12 +1215,13 @@ public class PmObjectBase implements PmObject {
           throw new PmRuntimeException(this, e);
         }
       } else if (StringUtils.isNotBlank(annotations.get(0).attrValue())) {
-        metaData.pmTitleProvider = new TitleProviderAttrValueBased(annotations.get(0).attrValue(), this instanceof PmElement);
+        metaData.pmTitleProvider = new TitleProviderAttrValueBased(annotations.get(0).attrValue(),
+            this instanceof PmElement);
       }
       // TODO: check if only a tooltip or icon is provided...
-      else if (! "".equals(annotations.get(0).title())) {
-        metaData.pmTitleProvider = new PmTitleProviderValuebased(
-            annotations.get(0).title(), annotations.get(0).tooltip(), annotations.get(0).icon());
+      else if (!"".equals(annotations.get(0).title())) {
+        metaData.pmTitleProvider = new PmTitleProviderValuebased(annotations.get(0).title(), annotations.get(0)
+            .tooltip(), annotations.get(0).icon());
       }
     }
 
