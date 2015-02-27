@@ -170,11 +170,9 @@ public class AnnotationUtil {
   }
   
   public static <A extends Annotation> List<A> findAnnotationsInClassTree(PmObjectBase pm, Class<A> annotationClass) {
-    List<A> foundAnnotations = new ArrayList<A>();
-    
-    if (pm.getPmMetaDataWithoutPmInitCall().isPmField) {
-      foundAnnotations.addAll(findAnnotationsInClassTree(pm.getPmParent().getClass(), pm.getPmName(), annotationClass));
-    }
+    List<A> foundAnnotations = pm.getPmMetaDataWithoutPmInitCall().isPmField
+        ? findAnnotationsInClassTree(pm.getPmParent().getClass(), pm.getPmName(), annotationClass)
+        : new ArrayList<A>();
     
     foundAnnotations.addAll(findAnnotationsInClassTree(pm.getClass(), annotationClass));
     
@@ -208,9 +206,9 @@ public class AnnotationUtil {
   private static <A extends Annotation> List<A> findAnnotationsInClassTree(Class<?> clazz, Class<A> annotationClass) {
     List<A> foundAnnotations = new ArrayList<A>();
     
-    do {
-      
+    do {      
       A annotation = clazz.getAnnotation(annotationClass);
+      
       if (annotation != null) {
         foundAnnotations.add(annotation);
       }
