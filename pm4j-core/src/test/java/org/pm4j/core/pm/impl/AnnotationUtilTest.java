@@ -19,7 +19,7 @@ public class AnnotationUtilTest {
   @Test
   public void shouldFindTwoAnnotationsInClassTree() {
     // When
-    List<Author> annotations = AnnotationUtil.findAnnotationsInClassTree(Cherry.class, Author.class);
+    List<Author> annotations = AnnotationUtil.findAnnotationsInClassTree(new Cherry(new PmConversationImpl()), Author.class);
     
     // Then
     assertEquals(2, annotations.size());
@@ -35,16 +35,23 @@ public class AnnotationUtilTest {
   }
   
   @Author(name="Max Mustermann")  
-  private static class Food {
-    
+  private static class Food extends PmObjectBase {
+    public Food(PmObjectBase pmParent) {
+      super(pmParent);
+    }
   }
   
   private static class Fruit extends Food  {
-    
+    public Fruit(PmObjectBase pmParent) {
+      super(pmParent);
+    }
   }
   
   @Author(name="Peter Pan") 
   private static class Cherry extends Fruit  {
     
+    public Cherry(PmObjectBase pmParent) {
+      super(pmParent);
+    }
   }
 }

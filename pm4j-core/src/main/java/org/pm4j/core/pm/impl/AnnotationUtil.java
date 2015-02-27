@@ -169,17 +169,54 @@ public class AnnotationUtil {
     return foundAnnotations;
   }
   
-  public static <A extends Annotation> List<A> findAnnotationsInClassTree(Class<?> classToAnalyze, Class<A> annotationClass) {
+  public static <A extends Annotation> List<A> findAnnotationsInClassTree(PmObjectBase pm, Class<A> annotationClass) {
+    List<A> foundAnnotations = new ArrayList<A>();
+    
+    if (pm.getPmMetaDataWithoutPmInitCall().isPmField) {
+      foundAnnotations.addAll(findAnnotationsInClassTree(pm.getPmParent().getClass(), pm.getPmName(), annotationClass));
+    }
+    
+    foundAnnotations.addAll(findAnnotationsInClassTree(pm.getClass(), annotationClass));
+    
+    return foundAnnotations;
+  }
+  
+  private static <A extends Annotation> List<A> findAnnotationsInClassTree(Class<?> clazz, String fieldName, Class<A> annotationClass) {
     List<A> foundAnnotations = new ArrayList<A>();
     
     do {
-      A annotation = classToAnalyze.getAnnotation(annotationClass);
+      Field field;
+      
+      try {
+        field = clazz.getField(fieldName);
+        A annotation = field.getAnnotation(annotationClass);
+
+        if (annotation != null) {
+          foundAnnotations.add(annotation);
+        }
+      } catch (NoSuchFieldException e) {
+        // may be OK, because the attribute may use something like getters or
+        // xPath.
+      }      
+      
+      clazz = clazz.getSuperclass();
+    } while (clazz != null);      
+    
+    return foundAnnotations;
+  }
+  
+  private static <A extends Annotation> List<A> findAnnotationsInClassTree(Class<?> clazz, Class<A> annotationClass) {
+    List<A> foundAnnotations = new ArrayList<A>();
+    
+    do {
+      
+      A annotation = clazz.getAnnotation(annotationClass);
       if (annotation != null) {
         foundAnnotations.add(annotation);
       }
       
-      classToAnalyze = classToAnalyze.getSuperclass();      
-    } while (classToAnalyze != null);
+      clazz = clazz.getSuperclass();      
+    } while (clazz != null);
       
     
     return foundAnnotations;

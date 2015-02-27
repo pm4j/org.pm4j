@@ -1197,7 +1197,7 @@ public class PmObjectBase implements PmObject {
     }
 
     // -- Language resource configuration --
-    List<PmTitleCfg> annotations = AnnotationUtil.findAnnotationsInClassTree(this.getClass(), PmTitleCfg.class);
+    List<PmTitleCfg> annotations = AnnotationUtil.findAnnotationsInClassTree(this, PmTitleCfg.class);
 
     if (!annotations.isEmpty()) {
       metaData.resKey = StringUtils.defaultIfEmpty(annotations.get(0).resKey(), null);
