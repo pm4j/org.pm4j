@@ -30,7 +30,6 @@ import org.pm4j.core.pm.api.PmVisitorApi.PmVisitHint;
 import org.pm4j.core.pm.api.PmVisitorApi.PmVisitResult;
 import org.pm4j.core.pm.impl.InternalPmCacheCfgUtil.CacheMetaData;
 import org.pm4j.core.pm.impl.PmObjectBase.MetaData.MetaDataId;
-import org.pm4j.core.pm.impl.PmTitleCfgUtil.PmTitleCfgParameter;
 import org.pm4j.core.pm.impl.inject.DiResolver;
 import org.pm4j.core.pm.impl.inject.DiResolverUtil;
 import org.pm4j.core.pm.impl.title.PmTitleProvider;
@@ -1201,10 +1200,7 @@ public class PmObjectBase implements PmObject {
 
     if (!annotations.isEmpty()) {
       metaData.resKey = StringUtils.defaultIfEmpty(annotations.get(0).resKey(), null);
-      // TODO: For GLOBE00145358
-      // metaData.resKey = PmTitleCfgUtil.getPmTitleCfgValue(annotations,
-      // PmTitleCfgParameter.RES_KEY, null);
-      metaData.resKeyBase = PmTitleCfgUtil.getPmTitleCfgValue(annotations, PmTitleCfgParameter.RES_KEY_BASE, null);
+      metaData.resKeyBase = InternalPmTitleCfgUtil.getResKeyBase(annotations, null);
       metaData.tooltipUsesTitle = annotations.get(0).tooltipUsesTitle();
 
       // TODO: GLOBE00145358 - Check the titleProvider implementation
@@ -1281,19 +1277,6 @@ public class PmObjectBase implements PmObject {
     metaData.deprValidation = isDeprValidation();
     metaData.validator = makePmValidator();
     assert metaData.validator != null;
-  }
-
-  private String getResKeyBase(List<PmTitleCfg> annotations) {
-    String resKeyBase = null;
-    
-    for (PmTitleCfg annotation : annotations) {
-      resKeyBase = annotation.resKeyBase();
-      if(StringUtils.isNotBlank(resKeyBase)) {
-        break;
-      }
-    }
-
-    return resKeyBase;
   }
 
   /**

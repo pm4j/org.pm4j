@@ -22,14 +22,14 @@ public class PmTitleCfgResKeyBaseTest {
    */
   @Test
   public void testResKeyBaseSettingsOfGrandparentContainerPm() {
-    GrandparentContainerPm container = new GrandparentContainerPm(new PmConversationImpl());
+    ContainerPm container = new ContainerPm(new PmConversationImpl());
 
     // Container
-    assertEquals("pmTitleCfgResKeyBaseTest.GrandparentContainerPm", container.getPmResKeyBase());
+    assertEquals("pmTitleCfgResKeyBaseTest.ContainerPm", container.getPmResKeyBase());
 
     // Field
-    assertEquals("pmTitleCfgResKeyBaseTest.GrandparentContainerPm.grandparentField",
-        container.grandparentField.getPmResKeyBase());
+    assertEquals("pmTitleCfgResKeyBaseTest.ContainerPm.field1",
+        container.field1.getPmResKeyBase());
   }
 
   /**
@@ -38,14 +38,14 @@ public class PmTitleCfgResKeyBaseTest {
    */
   @Test
   public void testResKeyBaseSettingsOfParentContainerPm() {
-    ParentContainerPm container = new ParentContainerPm(new PmConversationImpl());
+    ContainerWithResKeyBasePm container = new ContainerWithResKeyBasePm(new PmConversationImpl());
 
     // Container
-    assertEquals("parentResKeyBase", container.getPmResKeyBase());
+    assertEquals("resKeyBase", container.getPmResKeyBase());
 
     // Fields
-    assertEquals("parentResKeyBase.grandparentField", container.grandparentField.getPmResKeyBase());
-    assertEquals("parentResKeyBase.parentField", container.parentField.getPmResKeyBase());
+    assertEquals("resKeyBase.field1", container.field1.getPmResKeyBase());
+    assertEquals("resKeyBase.field2", container.field2.getPmResKeyBase());
   }
 
   /**
@@ -54,38 +54,38 @@ public class PmTitleCfgResKeyBaseTest {
    */
   @Test
   public void testResKeyBaseSettingsOfChildContainerPm() {
-    ChildContainerPm container = new ChildContainerPm(new PmConversationImpl());
+    ContainerWithTitleCfgPm container = new ContainerWithTitleCfgPm(new PmConversationImpl());
 
     // Container
 
     // Fields
-    assertEquals("parentResKeyBase.grandparentField", container.grandparentField.getPmResKeyBase());
-    assertEquals("parentResKeyBase.parentField", container.parentField.getPmResKeyBase());
+    assertEquals("resKeyBase.field1", container.field1.getPmResKeyBase());
+    assertEquals("resKeyBase.field2", container.field2.getPmResKeyBase());
   }
 
-  public static class GrandparentContainerPm extends PmObjectBase {
+  public static class ContainerPm extends PmObjectBase {
 
-    public GrandparentContainerPm(PmObject pmParent) {
+    public ContainerPm(PmObject pmParent) {
       super(pmParent);
     }
 
-    public final PmObjectBase grandparentField = new PmObjectBase(this);
+    public final PmObjectBase field1 = new PmObjectBase(this);
   }
 
-  @PmTitleCfg(resKeyBase = "parentResKeyBase")
-  public static class ParentContainerPm extends GrandparentContainerPm {
+  @PmTitleCfg(resKeyBase = "resKeyBase")
+  public static class ContainerWithResKeyBasePm extends ContainerPm {
 
-    public ParentContainerPm(PmObject pmParent) {
+    public ContainerWithResKeyBasePm(PmObject pmParent) {
       super(pmParent);
     }
 
-    public final PmObjectBase parentField = new PmObjectBase(this);
+    public final PmObjectBase field2 = new PmObjectBase(this);
   }
 
-  @PmTitleCfg(title = "Child")
-  public static final class ChildContainerPm extends ParentContainerPm {
+  @PmTitleCfg(title = "title")
+  public static final class ContainerWithTitleCfgPm extends ContainerWithResKeyBasePm {
 
-    public ChildContainerPm(PmObject pmParent) {
+    public ContainerWithTitleCfgPm(PmObject pmParent) {
       super(pmParent);
     }
   }
