@@ -46,7 +46,8 @@ public @interface PmTitleCfg {
    *
    * @return The title provider to be used for this presententation model.
    */
-  Class<?> titleProvider() default Void.class;
+  @SuppressWarnings("rawtypes")
+  Class<PmTitleProvider> titleProvider() default PmTitleProvider.class;
 
   /**
    * Specifies a fix resource key to be used for the title, tooltip and
@@ -86,7 +87,7 @@ public @interface PmTitleCfg {
   /**
    * @return <code>true</code> when the title should be use as toolTip too.
    */
-  boolean tooltipUsesTitle() default false;
+  TooltipUsesTitleEnum tooltipUsesTitle() default TooltipUsesTitleEnum.UNKNOWN;
 
   /**
    * Specifies a fix title value to be used.<br>

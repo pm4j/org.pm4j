@@ -21,7 +21,7 @@ public class PmTitleCfgResKeyBaseTest {
    * configuration.
    */
   @Test
-  public void testResKeyBaseSettingsOfGrandparentContainerPm() {
+  public void testResKeyBaseSettingsOfContainerPm() {
     ContainerPm container = new ContainerPm(new PmConversationImpl());
 
     // Container
@@ -37,7 +37,7 @@ public class PmTitleCfgResKeyBaseTest {
    * configuration.
    */
   @Test
-  public void testResKeyBaseSettingsOfParentContainerPm() {
+  public void testResKeyBaseSettingsOfContainerWithResKeyPm() {
     ContainerWithResKeyBasePm container = new ContainerWithResKeyBasePm(new PmConversationImpl());
 
     // Container
@@ -53,10 +53,11 @@ public class PmTitleCfgResKeyBaseTest {
    * configuration via inheritance.
    */
   @Test
-  public void testResKeyBaseSettingsOfChildContainerPm() {
+  public void testResKeyBaseSettingsOfContainerWithTitleCfgPm() {
     ContainerWithTitleCfgPm container = new ContainerWithTitleCfgPm(new PmConversationImpl());
 
     // Container
+    assertEquals("resKeyBase", container.getPmResKey());
 
     // Fields
     assertEquals("resKeyBase.field1", container.field1.getPmResKeyBase());

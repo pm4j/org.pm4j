@@ -1199,25 +1199,30 @@ public class PmObjectBase implements PmObject {
     List<PmTitleCfg> annotations = AnnotationUtil.findAnnotationsInClassTree(this, PmTitleCfg.class);
 
     if (!annotations.isEmpty()) {
-      metaData.resKey = StringUtils.defaultIfEmpty(annotations.get(0).resKey(), null);
+      String attrValue;
+      String title;
+
+      metaData.resKey = InternalPmTitleCfgUtil.getResKey(annotations, null);
       metaData.resKeyBase = InternalPmTitleCfgUtil.getResKeyBase(annotations, null);
-      metaData.tooltipUsesTitle = annotations.get(0).tooltipUsesTitle();
+      metaData.tooltipUsesTitle = InternalPmTitleCfgUtil.getTooltipUsesTitle(annotations, TooltipUsesTitleEnum.FALSE) 
+          == TooltipUsesTitleEnum.TRUE ? true : false;
 
       // TODO: GLOBE00145358 - Check the titleProvider implementation
-      if (!annotations.get(0).titleProvider().equals(Void.class)) {
+      Class<PmTitleProvider> titleProvider = InternalPmTitleCfgUtil.getTitleProvider(annotations, PmTitleProvider.class);
+      if (!titleProvider.equals(PmTitleProvider.class)) {
         try {
-          metaData.pmTitleProvider = (PmTitleProvider) annotations.get(0).titleProvider().newInstance();
+          metaData.pmTitleProvider = (PmTitleProvider) titleProvider.newInstance();
         } catch (Exception e) {
           throw new PmRuntimeException(this, e);
         }
-      } else if (StringUtils.isNotBlank(annotations.get(0).attrValue())) {
-        metaData.pmTitleProvider = new TitleProviderAttrValueBased(annotations.get(0).attrValue(),
+      } else if (StringUtils.isNotBlank(attrValue = InternalPmTitleCfgUtil.getAttrValue(annotations, ""))) {
+        metaData.pmTitleProvider = new TitleProviderAttrValueBased(attrValue,
             this instanceof PmElement);
       }
       // TODO: check if only a tooltip or icon is provided...
-      else if (!"".equals(annotations.get(0).title())) {
-        metaData.pmTitleProvider = new PmTitleProviderValuebased(annotations.get(0).title(), annotations.get(0)
-            .tooltip(), annotations.get(0).icon());
+      else if (StringUtils.isNotBlank(title = InternalPmTitleCfgUtil.getTitle(annotations, ""))) {
+        metaData.pmTitleProvider = new PmTitleProviderValuebased(title, 
+            InternalPmTitleCfgUtil.getTooltip(annotations, ""), InternalPmTitleCfgUtil.getIcon(annotations, ""));
       }
     }
 
