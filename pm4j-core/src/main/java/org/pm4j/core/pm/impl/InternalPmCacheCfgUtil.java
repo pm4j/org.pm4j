@@ -19,7 +19,9 @@ import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmExpressionApi;
 import org.pm4j.core.pm.impl.InternalCacheStrategyFactory.CacheStrategyForNodes;
-import org.pm4j.core.pm.impl.InternalPmBeanCacheStrategyFactory.CacheStrategyForPmBeanValue;
+import org.pm4j.core.pm.impl.PmBeanImpl2.InternalPmBeanCacheStrategyFactory;
+import org.pm4j.core.pm.impl.PmBeanImpl2.InternalPmBeanCacheStrategyFactory.CacheStrategyForPmBeanValue;
+import org.pm4j.core.pm.impl.PmTableImpl.InternalTableImplCacheStrategyFactory;
 import org.pm4j.core.pm.impl.cache.CacheStrategyBase;
 import org.pm4j.core.pm.impl.cache.CacheStrategyRequest;
 
@@ -108,7 +110,7 @@ class InternalPmCacheCfgUtil {
   static CacheMetaData readCacheMetaData(PmObjectBase pm, CacheKind aspect, InternalCacheStrategyFactory factory) {
     List<Object> cacheAnnotations = InternalPmCacheCfgUtil.findCacheCfgsInPmHierarchy(pm, new ArrayList<Object>());
     return (!cacheAnnotations.isEmpty())
-        ? InternalPmCacheCfgUtil.readCacheMetaData(pm, aspect, cacheAnnotations, InternalPmBeanCacheStrategyFactory.INSTANCE)
+        ? InternalPmCacheCfgUtil.readCacheMetaData(pm, aspect, cacheAnnotations, factory)
         : CacheMetaData.NO_CACHE;
 
   }
@@ -121,9 +123,14 @@ class InternalPmCacheCfgUtil {
           ? CacheMetaData.NO_CACHE
           : new CacheMetaData(factory.create(aspect, cache), cache);
     } else {
-      Map<CacheMode, CacheStrategy> map = ((aspect == CacheKind.VALUE && pm instanceof PmBeanImpl2)
-            ? InternalPmBeanCacheStrategyFactory.DEPR_CACHE_STRATEGIES_FOR_PM_BEAN_VALUE
-            : DeprInternalPmCacheCfgUtil.MODE_TO_STRATEGY_MAP_FOR_CACHE_KIND.get(aspect));
+      Map<CacheMode, CacheStrategy> map; 
+      if (aspect == CacheKind.VALUE && pm instanceof PmTableImpl) {
+            map = InternalTableImplCacheStrategyFactory.CACHE_STRATEGIES_FOR_IN_MEM_COLLECTION;
+          } else if (aspect == CacheKind.VALUE && pm instanceof PmBeanImpl2) {
+            map =  InternalPmBeanCacheStrategyFactory.DEPR_CACHE_STRATEGIES_FOR_PM_BEAN_VALUE;
+          } else {
+            map = DeprInternalPmCacheCfgUtil.MODE_TO_STRATEGY_MAP_FOR_CACHE_KIND.get(aspect);
+          }
 
       CacheStrategy strategy = DeprAnnotationUtil.evaluateCacheStrategy(pm, DeprInternalPmCacheCfgUtil.ATTR_CONSTANT_FOR_ASPECT.get(aspect), cacheAnnotations, map);
 

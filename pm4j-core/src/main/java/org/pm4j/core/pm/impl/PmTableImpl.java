@@ -35,6 +35,7 @@ import org.pm4j.core.pm.*;
 import org.pm4j.core.pm.PmEvent.ValueChangeKind;
 import org.pm4j.core.pm.annotation.PmCacheCfg;
 import org.pm4j.core.pm.annotation.PmCacheCfg.CacheMode;
+import org.pm4j.core.pm.annotation.PmCacheCfg2.Cache;
 import org.pm4j.core.pm.annotation.PmObjectCfg.Visible;
 import org.pm4j.core.pm.annotation.PmTableCfg;
 import org.pm4j.core.pm.annotation.PmTableCfg.RowsToValidate;
@@ -98,14 +99,6 @@ public class PmTableImpl
 
   /** A cached reference to the selected master row. */
   /* package */ T_ROW_PM masterRowPm;
-
-  /** The set of supported cache strategies. */
-  private static final Map<CacheMode, CacheStrategy> CACHE_STRATEGIES_FOR_IN_MEM_COLLECTION =
-      MapUtil.makeFixHashMap(
-        CacheMode.OFF,      CacheStrategyNoCache.INSTANCE,
-        CacheMode.ON,       new CacheStrategyImMemCollectionReference("CACHE_TABLE_COLLECTION_LOCALLY"),
-        CacheMode.REQUEST,  new CacheStrategyRequest("CACHE_TABLE_COLLECTION_IN_REQUEST", "tc")
-      );
 
   /** An optionally used cache for in-memory backing collections. */
   private Object pmInMemCollectionCache;
@@ -848,7 +841,7 @@ public class PmTableImpl
      */
     public InMemTableBeanCollection(QueryOptions queryOptions) {
       super(queryOptions);
-      setCacheStrategy(getOwnMetaData().inMemCollectionCacheStragegy, PmTableImpl.this);
+      setCacheStrategy(getOwnMetaData().inMemCollectionCacheStrategy, PmTableImpl.this);
     }
 
     @Override
@@ -1030,8 +1023,8 @@ public class PmTableImpl
       if (StringUtils.isNotBlank(valuePath)) {
         myMetaData.valuePathResolver = PmExpressionPathResolver.parse(valuePath, PmExpressionApi.getSyntaxVersion(this));
       }
-      // TODO oboede: Missing support for new cache annotation.
-      myMetaData.inMemCollectionCacheStragegy = DeprAnnotationUtil.readCacheStrategy(this, PmCacheCfg.ATTR_VALUE, CACHE_STRATEGIES_FOR_IN_MEM_COLLECTION);
+      // TODO oboede: Missing support for new cache annotation
+      myMetaData.inMemCollectionCacheStrategy = InternalPmCacheCfgUtil.readCacheMetaData(this, CacheKind.VALUE, InternalTableImplCacheStrategyFactory.INSTANCE).cacheStrategy;
     }
   }
 
@@ -1044,7 +1037,7 @@ public class PmTableImpl
     private boolean sortable;
     private Class<?> initialBeanSortComparatorClass = null;
     private String initialSortColName = null;
-    private CacheStrategy inMemCollectionCacheStragegy = CacheStrategyNoCache.INSTANCE;
+    private CacheStrategy inMemCollectionCacheStrategy = CacheStrategyNoCache.INSTANCE;
 
     /** May be used to define a different default value. */
     public void setNumOfPageRowPms(int numOfPageRowPms) { this.numOfPageRowPms = numOfPageRowPms; }
@@ -1058,6 +1051,29 @@ public class PmTableImpl
   @SuppressWarnings("unchecked")
   private final MetaData getOwnMetaDataWithoutPmInitCall() {
     return (MetaData) getPmMetaDataWithoutPmInitCall();
+  }
+  
+  static class InternalTableImplCacheStrategyFactory extends InternalCacheStrategyFactory {
+
+    public static final InternalTableImplCacheStrategyFactory INSTANCE = new InternalTableImplCacheStrategyFactory();
+
+    /** The set of supported cache strategies. */
+    static final Map<PmCacheCfg.CacheMode, CacheStrategy> CACHE_STRATEGIES_FOR_IN_MEM_COLLECTION =
+        MapUtil.makeFixHashMap(
+            PmCacheCfg.CacheMode.OFF,      CacheStrategyNoCache.INSTANCE,
+            PmCacheCfg.CacheMode.ON,       new CacheStrategyImMemCollectionReference("CACHE_TABLE_COLLECTION_LOCALLY"),
+            PmCacheCfg.CacheMode.REQUEST,  new CacheStrategyRequest("CACHE_TABLE_COLLECTION_IN_REQUEST", "tc")
+        );
+    
+    @Override
+    protected CacheStrategy createImpl(CacheKind aspect, Cache cache) {
+      switch (aspect) {
+      case VALUE:
+        return new CacheStrategyImMemCollectionReference("CACHE_TABLE_COLLECTION_LOCALLY");
+      default:
+        return super.createImpl(aspect, cache);
+      }
+    }
   }
 
 }

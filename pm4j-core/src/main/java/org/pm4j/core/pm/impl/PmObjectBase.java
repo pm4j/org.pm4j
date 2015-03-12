@@ -29,6 +29,7 @@ import org.pm4j.core.pm.api.PmVisitorApi.PmVisitCallBack;
 import org.pm4j.core.pm.api.PmVisitorApi.PmVisitHint;
 import org.pm4j.core.pm.api.PmVisitorApi.PmVisitResult;
 import org.pm4j.core.pm.impl.InternalPmCacheCfgUtil.CacheMetaData;
+import org.pm4j.core.pm.impl.PmBeanImpl2.InternalPmBeanCacheStrategyFactory;
 import org.pm4j.core.pm.impl.PmObjectBase.MetaData.MetaDataId;
 import org.pm4j.core.pm.impl.inject.DiResolver;
 import org.pm4j.core.pm.impl.inject.DiResolverUtil;

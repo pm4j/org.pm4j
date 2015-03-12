@@ -21,6 +21,8 @@ import org.pm4j.core.pm.PmMessage.Severity;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.annotation.PmAttrCfg.Restriction;
 import org.pm4j.core.pm.annotation.PmAttrCfg.Validate;
+import org.pm4j.core.pm.annotation.PmCacheCfg2.Cache;
+import org.pm4j.core.pm.annotation.PmCacheCfg2.Clear;
 import org.pm4j.core.pm.annotation.PmCommandCfg;
 import org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO;
 import org.pm4j.core.pm.annotation.PmObjectCfg.Enable;
@@ -31,6 +33,7 @@ import org.pm4j.core.pm.annotation.PmTitleCfg;
 import org.pm4j.core.pm.api.*;
 import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
 import org.pm4j.core.pm.impl.InternalPmCacheCfgUtil.CacheMetaData;
+import org.pm4j.core.pm.impl.cache.CacheStrategyBase;
 import org.pm4j.core.pm.impl.converter.PmConverterErrorMessage;
 import org.pm4j.core.pm.impl.converter.PmConverterOptionBased;
 import org.pm4j.core.pm.impl.options.GenericOptionSetDef;
@@ -1995,5 +1998,67 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
       return (PmAttr<T_VALUE>) getPmParent();
     }
   }
+  
+  static class InternalAttrCacheStrategyFactory extends InternalCacheStrategyFactory {
 
+    public static final InternalAttrCacheStrategyFactory INSTANCE = new InternalAttrCacheStrategyFactory();
+
+    @Override
+    protected CacheStrategy createImpl(CacheKind aspect, Cache cache) {
+      switch (aspect) {
+      case OPTIONS:
+        return new CacheStrategyForOptions(cache.clear());
+      case VALUE:
+        return new CacheStrategyForValue(cache.clear());
+      default:
+        return super.createImpl(aspect, cache);
+      }
+    }
+
+    private static class CacheStrategyForOptions extends CacheStrategyBase<PmAttrBase<?, ?>> {
+      private CacheStrategyForOptions(Clear cacheClear) {
+        super("CACHE_OPTIONS_LOCAL", cacheClear);
+      }
+
+      @Override
+      protected Object readRawValue(PmAttrBase<?, ?> pm) {
+        return (pm.dataContainer != null) ? pm.dataContainer.cachedOptionSet : null;
+      }
+
+      @Override
+      protected void writeRawValue(PmAttrBase<?, ?> pm, Object value) {
+        pm.zz_getDataContainer().cachedOptionSet = value;
+      }
+
+      @Override
+      protected void clearImpl(PmAttrBase<?, ?> pm) {
+        if (pm.dataContainer != null) {
+          pm.dataContainer.cachedOptionSet = null;
+        }
+      }
+    };
+
+    private static class CacheStrategyForValue extends CacheStrategyBase<PmAttrBase<?, ?>> {
+      private CacheStrategyForValue(Clear cacheClear) {
+        super("CACHE_VALUE_LOCAL", cacheClear);
+      }
+
+      @Override
+      protected Object readRawValue(PmAttrBase<?, ?> pm) {
+        return (pm.dataContainer != null) ? pm.dataContainer.cachedValue : null;
+      }
+
+      @Override
+      protected void writeRawValue(PmAttrBase<?, ?> pm, Object value) {
+        pm.zz_getDataContainer().cachedValue = value;
+      }
+
+      @Override
+      protected void clearImpl(PmAttrBase<?, ?> pm) {
+        if (pm.dataContainer != null) {
+          pm.dataContainer.cachedValue = null;
+        }
+      }
+    };
+  }
 }
