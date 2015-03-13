@@ -2,9 +2,7 @@ package org.pm4j.core.pm.impl.cache;
 
 import org.pm4j.common.cache.CacheStrategy;
 import org.pm4j.core.pm.PmObject;
-import org.pm4j.core.pm.annotation.PmCacheCfg.Clear;
 import org.pm4j.core.pm.annotation.PmCacheCfg2;
-import org.pm4j.core.pm.impl.InternalPmImplUtil;
 import org.pm4j.core.pm.impl.PmObjectBase;
 
 /**
@@ -46,11 +44,6 @@ public abstract class CacheStrategyBase<PM extends PmObjectBase> implements Cach
     if (cacheClear != null) {
       // new annotation style using PmCacheCfg2
       if (cacheClear == PmCacheCfg2.Clear.DEFAULT) {
-        clearImpl(pm);
-      }
-    } else {
-      // old annotation style using PmCacheCfg
-      if (InternalPmImplUtil.getPmCacheClear(pm).equals(Clear.DEFAULT)) {
         clearImpl(pm);
       }
     }

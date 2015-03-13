@@ -1,5 +1,6 @@
 package org.pm4j.core.pm;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.annotation.PmBeanCfg;
@@ -12,6 +13,7 @@ import org.pm4j.core.pm.impl.*;
 import static org.junit.Assert.assertEquals;
 
 @Deprecated
+@Ignore("Since PmCacheCfg is no longer supported, I suggest removing this class")
 public class PmAttrCacheTest {
 
   @Test

@@ -1,7 +1,9 @@
 package org.pm4j.core.pm.impl;
 
 import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmAttrString;
 import org.pm4j.core.pm.PmEvent;
@@ -13,13 +15,16 @@ import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.tools.test._RecordingPmEventListener;
 
-import static junit.framework.Assert.assertNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 
 public class PmBean2WithDeprCacheTest {
 
   private Bean bean = new Bean("InitialBean");
+  
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
 
   @Test
   public void readBeanPmWithGetterLogic() {
@@ -39,6 +44,9 @@ public class PmBean2WithDeprCacheTest {
 
   @Test
   public void readBeanPmCached() {
+    expectedException.expectMessage("@PmCacheCfg annotation is no longer supported. Please use @PmCacheCfg2");
+    expectedException.expect(PmRuntimeException.class);
+    
     TestPmBase pm = new TestPmCached().provideTestBean(bean);
     assertSame(bean, pm.getPmBean());
     assertEquals(1, pm.callCount_getPmBeanImpl);
@@ -72,6 +80,9 @@ public class PmBean2WithDeprCacheTest {
 
   @Test
   public void assignBeanToFixCachedPmBean() {
+    
+    expectedException.expectMessage("@PmCacheCfg annotation is no longer supported. Please use @PmCacheCfg2");
+    expectedException.expect(PmRuntimeException.class);
     TestPmBase pm = new TestPmCachedNeverCleared();
     pm.setPmBean(new Bean("NewBean"));
     assertEquals("NewBean", pm.getPmBean().s);
@@ -80,6 +91,9 @@ public class PmBean2WithDeprCacheTest {
 
   @Test
   public void eventPropagationOnDeferredSubPmBeanUncached() {
+    expectedException.expectMessage("@PmCacheCfg annotation is no longer supported. Please use @PmCacheCfg2");
+    expectedException.expect(PmRuntimeException.class);
+    
     TestPm pm = new TestPm();
 
     pm.uncached.provideTestBean(bean);

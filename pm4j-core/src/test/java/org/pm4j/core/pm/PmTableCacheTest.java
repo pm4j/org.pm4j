@@ -1,6 +1,5 @@
 package org.pm4j.core.pm;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.pm4j.common.query.QueryAttr;
 import org.pm4j.common.query.SortOrder;

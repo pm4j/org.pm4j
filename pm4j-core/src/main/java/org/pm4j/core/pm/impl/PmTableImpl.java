@@ -27,15 +27,13 @@ import org.pm4j.common.selection.Selection;
 import org.pm4j.common.selection.SelectionHandler;
 import org.pm4j.common.selection.SelectionHandlerUtil;
 import org.pm4j.common.util.collection.IterableUtil;
-import org.pm4j.common.util.collection.MapUtil;
 import org.pm4j.common.util.reflection.ClassUtil;
 import org.pm4j.common.util.reflection.GenericTypeUtil;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.*;
 import org.pm4j.core.pm.PmEvent.ValueChangeKind;
-import org.pm4j.core.pm.annotation.PmCacheCfg;
-import org.pm4j.core.pm.annotation.PmCacheCfg.CacheMode;
 import org.pm4j.core.pm.annotation.PmCacheCfg2.Cache;
+import org.pm4j.core.pm.annotation.PmCacheCfg2.Clear;
 import org.pm4j.core.pm.annotation.PmObjectCfg.Visible;
 import org.pm4j.core.pm.annotation.PmTableCfg;
 import org.pm4j.core.pm.annotation.PmTableCfg.RowsToValidate;
@@ -44,7 +42,6 @@ import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmExpressionApi;
 import org.pm4j.core.pm.impl.cache.CacheStrategyBase;
-import org.pm4j.core.pm.impl.cache.CacheStrategyRequest;
 import org.pm4j.core.pm.impl.pageable.PmBeanCollection;
 import org.pm4j.core.pm.impl.pathresolver.PathResolver;
 import org.pm4j.core.pm.impl.pathresolver.PmExpressionPathResolver;
@@ -830,7 +827,7 @@ public class PmTableImpl
   /**
    * An in-memory collection that uses the table specific context:
    * <ul>
-   * <li>uses the table value cache strategy, configured in {@link PmCacheCfg#value()}, to control the frequency of <code>getPmBeansImpl()</code> calls.</li>
+   * <li>uses the table value cache strategy, configured in {@link PmCacheCfg2#value()}, to control the frequency of <code>getPmBeansImpl()</code> calls.</li>
    * <li>binds the backing collection to {@link PmTableImpl#getPmBeansImpl()}.</li>
    * </ul>
    */
@@ -922,29 +919,7 @@ public class PmTableImpl
     }
   }
 
-  /** Caches the backing collection locally in {@link PmTableImpl#pmInMemCollectionCache}. */
-  protected static class CacheStrategyImMemCollectionReference extends CacheStrategyBase<PmTableImpl<?, ?>> {
-
-    /** @param cacheName A cache name for reporting only. */
-    public CacheStrategyImMemCollectionReference(String cacheName) {
-      super(cacheName);
-    }
-
-    @Override
-    protected Object readRawValue(PmTableImpl<?, ?> pm) {
-      return pm.pmInMemCollectionCache;
-    }
-
-    @Override
-    protected void writeRawValue(PmTableImpl<?, ?> pm, Object value) {
-      pm.pmInMemCollectionCache = value;
-    }
-
-    @Override
-    protected void clearImpl(PmTableImpl<?, ?> pm) {
-      pm.pmInMemCollectionCache = null;
-    }
-  };
+  
 
   /** Implements controlled implementation layer access for other PM classes. */
   protected class TableDetailsImpl implements ImplDetails {
@@ -1055,25 +1030,43 @@ public class PmTableImpl
   
   static class InternalTableImplCacheStrategyFactory extends InternalCacheStrategyFactory {
 
+    private static final String CACHE_TABLE_COLLECTION_NAME = "CACHE_TABLE_COLLECTION_LOCALLY";
+    
     public static final InternalTableImplCacheStrategyFactory INSTANCE = new InternalTableImplCacheStrategyFactory();
 
-    /** The set of supported cache strategies. */
-    static final Map<PmCacheCfg.CacheMode, CacheStrategy> CACHE_STRATEGIES_FOR_IN_MEM_COLLECTION =
-        MapUtil.makeFixHashMap(
-            PmCacheCfg.CacheMode.OFF,      CacheStrategyNoCache.INSTANCE,
-            PmCacheCfg.CacheMode.ON,       new CacheStrategyImMemCollectionReference("CACHE_TABLE_COLLECTION_LOCALLY"),
-            PmCacheCfg.CacheMode.REQUEST,  new CacheStrategyRequest("CACHE_TABLE_COLLECTION_IN_REQUEST", "tc")
-        );
-    
     @Override
     protected CacheStrategy createImpl(CacheKind aspect, Cache cache) {
       switch (aspect) {
       case VALUE:
-        return new CacheStrategyImMemCollectionReference("CACHE_TABLE_COLLECTION_LOCALLY");
+        return new CacheStrategyImMemCollectionReference(cache.clear());
       default:
         return super.createImpl(aspect, cache);
       }
     }
+    
+    /** Caches the backing collection locally in {@link PmTableImpl#pmInMemCollectionCache}. */
+    private static class CacheStrategyImMemCollectionReference extends CacheStrategyBase<PmTableImpl<?, ?>> {
+
+      /** @param cacheClear PmCacheCfg2.Cache.clear() settings. */
+      public CacheStrategyImMemCollectionReference(Clear cacheClear) {
+        super(CACHE_TABLE_COLLECTION_NAME, cacheClear);
+      }
+
+      @Override
+      protected Object readRawValue(PmTableImpl<?, ?> pm) {
+        return pm.pmInMemCollectionCache;
+      }
+
+      @Override
+      protected void writeRawValue(PmTableImpl<?, ?> pm, Object value) {
+        pm.pmInMemCollectionCache = value;
+      }
+
+      @Override
+      protected void clearImpl(PmTableImpl<?, ?> pm) {
+        pm.pmInMemCollectionCache = null;
+      }
+    };
   }
 
 }
