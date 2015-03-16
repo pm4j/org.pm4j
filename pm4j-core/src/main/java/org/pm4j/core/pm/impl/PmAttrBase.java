@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.pm4j.common.cache.CacheStrategy;
 import org.pm4j.common.converter.string.StringConverter;
 import org.pm4j.common.converter.string.StringConverterParseException;
+import org.pm4j.common.converter.value.ValueConverterChain;
 import org.pm4j.common.converter.value.ValueConverter;
 import org.pm4j.common.converter.value.ValueConverterDefault;
 import org.pm4j.common.expr.Expression.SyntaxVersion;
@@ -46,6 +47,7 @@ import javax.validation.constraints.Size;
 import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.ConstraintDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
+
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -79,7 +81,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
         implements PmAttr<T_PM_VALUE> {
 
   private static final Logger LOG = LoggerFactory.getLogger(PmAttrBase.class);
-
+  
   /**
    * Indicates if the value was explicitly set. This information is especially
    * important for the default value logic. Default values may have only effect
@@ -1564,8 +1566,13 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
           throw new PmRuntimeException(this, "Unknown annotation kind: " + fieldAnnotation.accessKind());
       }
 
-      if (fieldAnnotation.valueConverter() != ValueConverter.class) {
-        myMetaData.valueConverter = ClassUtil.newInstance(fieldAnnotation.valueConverter());
+      // Initialize ValueConverters
+      Class<? extends ValueConverter>[] valueConvertersFromConfig = fieldAnnotation.valueConverter();
+      if (valueConvertersFromConfig.length > 1) {
+        // more than one converter defined -> wrap into a chain
+        myMetaData.valueConverter = new ValueConverterChain(valueConvertersFromConfig);
+      } else if(valueConvertersFromConfig.length == 1) {
+        myMetaData.valueConverter = ClassUtil.newInstance(valueConvertersFromConfig[0]);
       }
     }
 
