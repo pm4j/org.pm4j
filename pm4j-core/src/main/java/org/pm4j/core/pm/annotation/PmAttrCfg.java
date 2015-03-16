@@ -1,5 +1,6 @@
 package org.pm4j.core.pm.annotation;
 
+import org.pm4j.common.converter.value.ValueConverterChain;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -202,13 +203,17 @@ public @interface PmAttrCfg {
   }
 
   /**
-   * Configures the value converter used to convert between external and backing attribute values.
+   * Configures the value converter(s) used to convert between external and backing attribute values. <br/>
+   * You can specify more than one converter to be used. Converters are executed in the order provided here.
    *
-   * @return The converter class to use.<br>
-   *         <b>Important:</b> It needs to have a public default constructor.
+   * @return The converter class (or array of converters classes) to use.<br>
+   *         <b>Important:</b> All the converter classes need to have a public default constructor.
+   *         
+   * @see ValueConverter
+   * @see ValueConverterChain
    */
   @SuppressWarnings("rawtypes")
-  Class<? extends ValueConverter> valueConverter() default ValueConverter.class;
+  Class<? extends ValueConverter>[] valueConverter() default {};
 
   /**
    * Defines attribute validation strategies.<br>
