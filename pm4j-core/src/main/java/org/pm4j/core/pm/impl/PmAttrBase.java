@@ -83,12 +83,6 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   private static final Logger LOG = LoggerFactory.getLogger(PmAttrBase.class);
   
   /**
-   * A default (non-specified) value for {@link PmAttrCfg#valueConverter()} field.
-   */
-  @SuppressWarnings("rawtypes")
-  private static final Class[] VALUE_CONVERTER_UNSPECIFIED =  new Class[] {ValueConverter.class};
-
-  /**
    * Indicates if the value was explicitly set. This information is especially
    * important for the default value logic. Default values may have only effect
    * on values that are not explicitly set.
@@ -1572,15 +1566,13 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
           throw new PmRuntimeException(this, "Unknown annotation kind: " + fieldAnnotation.accessKind());
       }
 
-      //Initialize ValueConverters
+      // Initialize ValueConverters
       Class<? extends ValueConverter>[] valueConvertersFromConfig = fieldAnnotation.valueConverter();
-      if (!Arrays.equals(valueConvertersFromConfig, VALUE_CONVERTER_UNSPECIFIED)) {
-        if(valueConvertersFromConfig.length > 1) {
-          //more than one converter defined -> wrap into a chain
-          myMetaData.valueConverter = ValueConverterChain.of(valueConvertersFromConfig);
-        } else {
-          myMetaData.valueConverter = ClassUtil.newInstance(valueConvertersFromConfig[0]);
-        }
+      if (valueConvertersFromConfig.length > 1) {
+        // more than one converter defined -> wrap into a chain
+        myMetaData.valueConverter = new ValueConverterChain(valueConvertersFromConfig);
+      } else if(valueConvertersFromConfig.length == 1) {
+        myMetaData.valueConverter = ClassUtil.newInstance(valueConvertersFromConfig[0]);
       }
     }
 

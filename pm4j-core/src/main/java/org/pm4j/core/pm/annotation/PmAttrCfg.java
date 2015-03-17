@@ -183,7 +183,7 @@ public @interface PmAttrCfg {
    * @see ValueConverterChain
    */
   @SuppressWarnings("rawtypes")
-  Class<? extends ValueConverter>[] valueConverter() default ValueConverter.class;
+  Class<? extends ValueConverter>[] valueConverter() default {};
 
   /**
    * Defines attribute validation strategies.<br>
