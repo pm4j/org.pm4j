@@ -1028,7 +1028,7 @@ public class PmTableImpl
     return (MetaData) getPmMetaDataWithoutPmInitCall();
   }
   
-  static class InternalTableImplCacheStrategyFactory extends InternalCacheStrategyFactory {
+  protected static class InternalTableImplCacheStrategyFactory extends CacheStrategyFactoryImpl {
 
     private static final String CACHE_TABLE_COLLECTION_NAME = "CACHE_TABLE_COLLECTION_LOCALLY";
     

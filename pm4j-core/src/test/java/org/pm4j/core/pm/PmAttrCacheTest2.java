@@ -1,10 +1,8 @@
 package org.pm4j.core.pm;
 
 import org.junit.Test;
-import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.annotation.PmBeanCfg;
-import org.pm4j.core.pm.annotation.PmCacheCfg;
 import org.pm4j.core.pm.annotation.PmCacheCfg2;
 import org.pm4j.core.pm.annotation.PmCacheCfg2.Cache;
 import org.pm4j.core.pm.annotation.PmCacheCfg2.CacheMode;
@@ -165,21 +163,6 @@ public class PmAttrCacheTest2 {
   }
 
   @Test
-  public void testMixedAnnotations() {
-    try {
-      PmInitApi.initPmTree(new MyPmWithMixedAnnotations(new PmConversationImpl()));
-    } catch (PmRuntimeException e) {
-      assertEquals(PmRuntimeException.class, e.getCause().getClass());
-    }
-
-    try {
-      PmInitApi.initPmTree(new MyPmWithMixedAnnotations2(new PmConversationImpl()));
-    } catch (PmRuntimeException e) {
-      assertEquals(PmRuntimeException.class, e.getCause().getClass());
-    }
-  }
-
-  @Test
   public void testTitleCache() {
     MyPojo p = new MyPojo();
     MyPojoPm pPm = new MyPojoPm(new PmConversationImpl(), p);
@@ -297,32 +280,10 @@ public class PmAttrCacheTest2 {
 
   @PmCacheCfg2(@Cache(property = CacheKind.ALL))
   public static class MyCachedAttrClass extends PmAttrStringImpl {
-    public MyCachedAttrClass(PmElementBase pmParentBean) {
+    public MyCachedAttrClass(PmObjectBase pmParentBean) {
       super(pmParentBean);
     }
   };
-
-  @PmCacheCfg2(@Cache(property = CacheKind.ALL))
-  public static class MyPmWithMixedAnnotations extends PmBeanBase<MyPojo> {
-
-    public MyPmWithMixedAnnotations(PmObject pmParent) {
-      super(pmParent);
-    }
-
-    @PmCacheCfg(title=org.pm4j.core.pm.annotation.PmCacheCfg.CacheMode.OFF)
-    public final PmAttrString s = new PmAttrStringImpl(this);
-  }
-
-  @PmCacheCfg(all=org.pm4j.core.pm.annotation.PmCacheCfg.CacheMode.ON)
-  public static class MyPmWithMixedAnnotations2 extends PmBeanBase<MyPojo> {
-
-    public MyPmWithMixedAnnotations2(PmObject pmParent) {
-      super(pmParent);
-    }
-
-    @PmCacheCfg2(@Cache(property = CacheKind.TITLE, mode = CacheMode.OFF))
-    public final PmAttrString s = new PmAttrStringImpl(this);
-  }
 
   public static class MyTab extends PmObjectBase implements PmTab {
     public MyTab(PmObject pmParent) {

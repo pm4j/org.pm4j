@@ -1,5 +1,10 @@
 package org.pm4j.core.pm.impl;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+
 import org.pm4j.common.cache.CacheStrategy;
 import org.pm4j.common.cache.CacheStrategyNoCache;
 import org.pm4j.core.exception.PmRuntimeException;
@@ -7,7 +12,6 @@ import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmEventListener;
 import org.pm4j.core.pm.PmObject;
-import org.pm4j.core.pm.annotation.PmCacheCfg;
 import org.pm4j.core.pm.annotation.PmCacheCfg2;
 import org.pm4j.core.pm.annotation.PmCacheCfg2.Cache;
 import org.pm4j.core.pm.annotation.PmCacheCfg2.Clear;
@@ -16,18 +20,15 @@ import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmExpressionApi;
-
-import java.util.*;
+import org.pm4j.core.pm.impl.PmObjectBase.CacheStrategyFactory;
 
 /**
- * Contains helper methods to work with {@link PmCacheCfg} and {@link PmCacheCfg2} annotation.
+ * Contains helper methods to work {@link PmCacheCfg2} annotation.
  *
- * @author SDOLKE
+ * @author SDOLKE, jhetmans
  *
  */
 class InternalPmCacheCfgUtil {
-
-  private static final String PM_CACHE_CFG_NO_LONGER_SUPPORTED_MSG = "@PmCacheCfg annotation is no longer supported. Please use @PmCacheCfg2";
 
   /**
    * Finds all {@link PmCacheCfg} and {@link PmCacheCfg2} annotations in the
@@ -48,8 +49,6 @@ class InternalPmCacheCfgUtil {
    */
   static List<PmCacheCfg2> findCacheCfgsInPmHierarchy(PmObjectBase pm, List<PmCacheCfg2> foundAnnotations) {
     
-    assertNoPmCacheCfgPresent(pm);
-    
     PmCacheCfg2 cfg = AnnotationUtil.findAnnotation(pm, PmCacheCfg2.class);
     if (cfg != null) {
       foundAnnotations.add(cfg);
@@ -62,13 +61,6 @@ class InternalPmCacheCfgUtil {
     }
 
     return foundAnnotations;
-  }
-
-  private static void assertNoPmCacheCfgPresent(PmObjectBase pm) {
-    PmCacheCfg cfgOld = AnnotationUtil.findAnnotation(pm, PmCacheCfg.class);
-    if (cfgOld != null) {
-      throw new PmRuntimeException(PM_CACHE_CFG_NO_LONGER_SUPPORTED_MSG);
-    }
   }
 
   /**
@@ -104,7 +96,7 @@ class InternalPmCacheCfgUtil {
     return null;
   }
 
-  static CacheMetaData readCacheMetaData(PmObjectBase pm, CacheKind aspect, InternalCacheStrategyFactory factory) {
+  static CacheMetaData readCacheMetaData(PmObjectBase pm, CacheKind aspect, CacheStrategyFactory factory) {
     List<PmCacheCfg2> cacheAnnotations = InternalPmCacheCfgUtil.findCacheCfgsInPmHierarchy(pm, new ArrayList<PmCacheCfg2>());
     return (!cacheAnnotations.isEmpty())
         ? InternalPmCacheCfgUtil.readCacheMetaData(pm, aspect, cacheAnnotations, factory)
@@ -112,7 +104,7 @@ class InternalPmCacheCfgUtil {
 
   }
 
-  static CacheMetaData readCacheMetaData(PmObjectBase pm, CacheKind aspect, List<PmCacheCfg2> cacheAnnotations, InternalCacheStrategyFactory factory) {
+  static CacheMetaData readCacheMetaData(PmObjectBase pm, CacheKind aspect, List<PmCacheCfg2> cacheAnnotations, CacheStrategyFactory factory) {
       Cache cache = findCacheForAspectInPmHierarchy(pm, aspect, cacheAnnotations);
       return (cache == null)
           ? CacheMetaData.NO_CACHE

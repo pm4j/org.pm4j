@@ -1999,7 +1999,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     }
   }
   
-  static class InternalAttrCacheStrategyFactory extends InternalCacheStrategyFactory {
+  private static class InternalAttrCacheStrategyFactory extends CacheStrategyFactoryImpl {
 
     public static final InternalAttrCacheStrategyFactory INSTANCE = new InternalAttrCacheStrategyFactory();
 
