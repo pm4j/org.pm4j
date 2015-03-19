@@ -41,15 +41,6 @@ public @interface PmTitleCfg {
   String attrValue() default "";
 
   /**
-   * When the default title provider does not match your requirements, you may specify
-   * here one that supports your special use case.
-   *
-   * @return The title provider to be used for this presententation model.
-   */
-  @SuppressWarnings("rawtypes")
-  Class<PmTitleProvider> titleProvider() default PmTitleProvider.class;
-
-  /**
    * Specifies a fix resource key to be used for the title, tooltip and
    * icon of this PM.
    * <p>

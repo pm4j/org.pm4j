@@ -60,17 +60,6 @@ class InternalPmTitleCfgUtil {
     return defaultValue;
   }
 
-  @SuppressWarnings("rawtypes")
-  static Class<PmTitleProvider> getTitleProvider(List<PmTitleCfg> annotations, Class<PmTitleProvider> defaultValue) {
-    for (PmTitleCfg annotation : annotations) {
-      if (annotation.titleProvider() != PmTitleProvider.class) {
-        return annotation.titleProvider();
-      }
-    }
-
-    return defaultValue;
-  }
-
   static String getTooltip(List<PmTitleCfg> annotations, String defaultValue) {
     for (PmTitleCfg annotation : annotations) {
       if (StringUtils.isNotBlank(annotation.tooltip())) {

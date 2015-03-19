@@ -1207,15 +1207,7 @@ public class PmObjectBase implements PmObject {
       metaData.tooltipUsesTitle = InternalPmTitleCfgUtil.getTooltipUsesTitle(annotations, TooltipUsesTitleEnum.FALSE) 
           == TooltipUsesTitleEnum.TRUE ? true : false;
 
-      // TODO: GLOBE00145358 - Check the titleProvider implementation
-      Class<PmTitleProvider> titleProvider = InternalPmTitleCfgUtil.getTitleProvider(annotations, PmTitleProvider.class);
-      if (!titleProvider.equals(PmTitleProvider.class)) {
-        try {
-          metaData.pmTitleProvider = (PmTitleProvider) titleProvider.newInstance();
-        } catch (Exception e) {
-          throw new PmRuntimeException(this, e);
-        }
-      } else if (StringUtils.isNotBlank(attrValue = InternalPmTitleCfgUtil.getAttrValue(annotations, ""))) {
+      if (StringUtils.isNotBlank(attrValue = InternalPmTitleCfgUtil.getAttrValue(annotations, ""))) {
         metaData.pmTitleProvider = new TitleProviderAttrValueBased(attrValue,
             this instanceof PmElement);
       }
