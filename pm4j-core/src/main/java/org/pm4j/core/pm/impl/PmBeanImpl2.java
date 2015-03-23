@@ -403,7 +403,7 @@ public class PmBeanImpl2<T_BEAN>
       }
     }
 
-    myMetaData.valueCache = InternalPmCacheCfgUtil.readCacheMetaData(this, CacheKind.VALUE, InternalPmBeanCacheStrategyFactory.INSTANCE);
+    myMetaData.valueCache = InternalPmCacheCfgUtil.readCacheMetaData(this, CacheKind.VALUE, CacheStrategyFactory.INSTANCE);
   }
 
   /**
@@ -453,10 +453,11 @@ public class PmBeanImpl2<T_BEAN>
       }
     }
   }
-  
-  protected static class InternalPmBeanCacheStrategyFactory extends CacheStrategyFactoryImpl {
 
-    public static final InternalPmBeanCacheStrategyFactory INSTANCE = new InternalPmBeanCacheStrategyFactory();
+  /** Supports caching for bean values. */
+  protected static class CacheStrategyFactory extends PmObjectBase.CacheStrategyFactory {
+
+    public static final CacheStrategyFactory INSTANCE = new CacheStrategyFactory();
 
     @Override
     protected CacheStrategy createImpl(CacheKind aspect, Cache cache) {

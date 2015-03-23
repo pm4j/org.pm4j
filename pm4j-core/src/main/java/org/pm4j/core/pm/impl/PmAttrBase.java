@@ -1605,8 +1605,8 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     // -- Cache configuration --
     List cacheAnnotations = InternalPmCacheCfgUtil.findCacheCfgsInPmHierarchy(this, new ArrayList());
     if (!cacheAnnotations.isEmpty()) {
-      myMetaData.optionsCache = InternalPmCacheCfgUtil.readCacheMetaData(this, CacheKind.OPTIONS, cacheAnnotations, InternalAttrCacheStrategyFactory.INSTANCE);
-      myMetaData.valueCache = InternalPmCacheCfgUtil.readCacheMetaData(this, CacheKind.VALUE, cacheAnnotations, InternalAttrCacheStrategyFactory.INSTANCE);
+      myMetaData.optionsCache = InternalPmCacheCfgUtil.readCacheMetaData(this, CacheKind.OPTIONS, cacheAnnotations, CacheStrategyFactory.INSTANCE);
+      myMetaData.valueCache = InternalPmCacheCfgUtil.readCacheMetaData(this, CacheKind.VALUE, cacheAnnotations, CacheStrategyFactory.INSTANCE);
     }
   }
 
@@ -1998,10 +1998,12 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
       return (PmAttr<T_VALUE>) getPmParent();
     }
   }
-  
-  private static class InternalAttrCacheStrategyFactory extends CacheStrategyFactoryImpl {
 
-    public static final InternalAttrCacheStrategyFactory INSTANCE = new InternalAttrCacheStrategyFactory();
+
+  /** Supports in addition to the base class caching of options and values. */
+  protected static class CacheStrategyFactory extends PmObjectBase.CacheStrategyFactory {
+
+    public static final CacheStrategyFactory INSTANCE = new CacheStrategyFactory();
 
     @Override
     protected CacheStrategy createImpl(CacheKind aspect, Cache cache) {

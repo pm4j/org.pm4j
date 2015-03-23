@@ -141,17 +141,17 @@ public class PmTableImpl
       updatePmTable();
     }
   }
-  
+
   @Override
   protected boolean isPmVisibleImpl() {
     if(!super.isPmVisibleImpl()) {
       return false;
     }
-    
+
     if(getOwnMetaData().getVisibilityCfg() == Visible.IF_NOT_EMPTY) {
       return getTotalNumOfPmRows() > 0;
     }
-    
+
     return true;
   }
 
@@ -740,8 +740,8 @@ public class PmTableImpl
 
   /**
    * Defines the data set to be presented by the table.
-   * 
-   * <p>ATTENTION: Some unit test setups might be easier using this method, but it 's strongly 
+   *
+   * <p>ATTENTION: Some unit test setups might be easier using this method, but it 's strongly
    * discouraged to use it in production code; some features might not work properly, e.g. filtering.
    * For production code, overriding {@link #getPmBeansImpl()} is recommended.</p>
    *
@@ -919,7 +919,7 @@ public class PmTableImpl
     }
   }
 
-  
+
 
   /** Implements controlled implementation layer access for other PM classes. */
   protected class TableDetailsImpl implements ImplDetails {
@@ -998,8 +998,7 @@ public class PmTableImpl
       if (StringUtils.isNotBlank(valuePath)) {
         myMetaData.valuePathResolver = PmExpressionPathResolver.parse(valuePath, PmExpressionApi.getSyntaxVersion(this));
       }
-      // TODO oboede: Missing support for new cache annotation
-      myMetaData.inMemCollectionCacheStrategy = InternalPmCacheCfgUtil.readCacheMetaData(this, CacheKind.VALUE, InternalTableImplCacheStrategyFactory.INSTANCE).cacheStrategy;
+      myMetaData.inMemCollectionCacheStrategy = InternalPmCacheCfgUtil.readCacheMetaData(this, CacheKind.VALUE, CacheStrategyFactory.INSTANCE).cacheStrategy;
     }
   }
 
@@ -1027,12 +1026,12 @@ public class PmTableImpl
   private final MetaData getOwnMetaDataWithoutPmInitCall() {
     return (MetaData) getPmMetaDataWithoutPmInitCall();
   }
-  
-  protected static class InternalTableImplCacheStrategyFactory extends CacheStrategyFactoryImpl {
+
+  protected static class CacheStrategyFactory extends PmObjectBase.CacheStrategyFactory {
 
     private static final String CACHE_TABLE_COLLECTION_NAME = "CACHE_TABLE_COLLECTION_LOCALLY";
-    
-    public static final InternalTableImplCacheStrategyFactory INSTANCE = new InternalTableImplCacheStrategyFactory();
+
+    public static final CacheStrategyFactory INSTANCE = new CacheStrategyFactory();
 
     @Override
     protected CacheStrategy createImpl(CacheKind aspect, Cache cache) {
@@ -1043,7 +1042,7 @@ public class PmTableImpl
         return super.createImpl(aspect, cache);
       }
     }
-    
+
     /** Caches the backing collection locally in {@link PmTableImpl#pmInMemCollectionCache}. */
     private static class CacheStrategyImMemCollectionReference extends CacheStrategyBase<PmTableImpl<?, ?>> {
 
