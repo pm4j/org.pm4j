@@ -1627,7 +1627,7 @@ public class PmObjectBase implements PmObject {
    * <p>
    * If your node can have child nodes, please override this method to provide them.
    * <p>
-   * This set may be cached if you define a {@link PmCacheCfg2} value cache.
+   * This set may be cached if you define a {@link PmCacheCfg2} nodes cache.
    *
    * @return The set of child nodes. <code>null</code> in case of leaf nodes.
    */
@@ -1635,6 +1635,11 @@ public class PmObjectBase implements PmObject {
     return null;
   }
 
+  /**
+   * If {@link #getPmChildNodes()} returns <code>null</code> we know that the node may never manage
+   * child nodes.<br>
+   * If it provides a collection, it may have children and is most likely not a leaf node.
+   */
   @Override
   public boolean isPmTreeLeaf() {
     return getPmChildNodes() == null;
