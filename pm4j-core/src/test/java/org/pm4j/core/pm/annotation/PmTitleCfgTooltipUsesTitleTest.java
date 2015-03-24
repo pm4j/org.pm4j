@@ -50,7 +50,7 @@ public class PmTitleCfgTooltipUsesTitleTest {
     }
   }
 
-  @PmTitleCfg(tooltipUsesTitle = TooltipUsesTitleEnum.TRUE, title = "Title")
+  @PmTitleCfg(tooltipUsesTitle = PmBoolean.TRUE, title = "Title")
   public static class ContainerWithTooltipUsesTitlePm extends ContainerPm {
 
     public ContainerWithTooltipUsesTitlePm(PmObject pmParent) {

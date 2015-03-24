@@ -6,14 +6,12 @@ import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.annotation.PmBeanCfg;
 import org.pm4j.core.pm.annotation.PmFactoryCfg;
-import org.pm4j.core.pm.annotation.PmTitleCfg;
 import org.pm4j.core.pm.api.PmFactoryApi;
 import org.pm4j.core.pm.impl.PmAttrPmListImpl;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
 import org.pm4j.core.pm.impl.PmBeanBase;
 import org.pm4j.core.pm.impl.PmCommandImpl;
 
-@PmTitleCfg(attrValue="name")
 @PmBeanCfg(beanClass=Domain.class)
 public class DomainPm extends PmBeanBase<Domain> {
 
@@ -38,5 +36,10 @@ public class DomainPm extends PmBeanBase<Domain> {
       UserPm userPm = PmFactoryApi.getPmForBean(this, new User());
       users.add(userPm);
     }
+  };
+
+  @Override
+  protected String getPmTitleImpl() {
+    return name.getValue();
   };
 }
