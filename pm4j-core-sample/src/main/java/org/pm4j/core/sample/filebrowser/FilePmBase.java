@@ -16,7 +16,6 @@ import java.io.File;
 import java.util.Date;
 
 @PmBeanCfg(beanClass=File.class)
-@PmTitleCfg(attrValue="name")
 public class FilePmBase extends PmBeanBase<File> {
 
   /** References by reflection the 'name' property of the File object. */
@@ -47,5 +46,10 @@ public class FilePmBase extends PmBeanBase<File> {
   };
 
   public final PmCommand cmdSeparator = new PmCommandSeparator(this);
+
+  @Override
+  protected String getPmTitleImpl() {
+    return name.getValue();
+  }
 
 }

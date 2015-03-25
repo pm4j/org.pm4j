@@ -24,7 +24,6 @@ import org.pm4j.core.pm.impl.PmDataInputUtil;
 import org.pm4j.deprecated.core.pm.DeprPmAttrPmRef;
 import org.pm4j.deprecated.core.pm.impl.DeprPmAttrPmRefImpl;
 
-@PmTitleCfg(attrValue="name")
 @PmBeanCfg(beanClass=User.class)
 public class UserPm extends PmBeanBase<User> implements PmBean<User> {
 
@@ -84,6 +83,11 @@ public class UserPm extends PmBeanBase<User> implements PmBean<User> {
 
   public UserPm(PmObject parentPm, User user) {
     super(parentPm, user);
+  }
+
+  @Override
+  protected String getPmTitleImpl() {
+    return name.getValue();
   }
 
 }
