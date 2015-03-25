@@ -1,28 +1,12 @@
 package org.pm4j.core.pm.impl;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.WeakHashMap;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArraySet;
-
 import org.apache.commons.lang.ClassUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.pm4j.common.cache.CacheStrategy;
+import org.pm4j.common.cache.CacheStrategyNoCache;
 import org.pm4j.common.util.collection.ListUtil;
 import org.pm4j.common.util.reflection.BeanAttrAccessor;
 import org.pm4j.common.util.reflection.BeanAttrAccessorImpl;
@@ -40,8 +24,10 @@ import org.pm4j.core.pm.PmMessage;
 import org.pm4j.core.pm.PmMessage.Severity;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmBoolean;
-import org.pm4j.core.pm.annotation.PmCacheCfg.Clear;
+import org.pm4j.core.pm.annotation.PmCacheCfg2.Clear;
 import org.pm4j.core.pm.annotation.PmCacheCfg2;
+import org.pm4j.core.pm.annotation.PmCacheCfg2.Cache;
+import org.pm4j.core.pm.annotation.PmCacheCfg2.CacheMode;
 import org.pm4j.core.pm.annotation.PmFactoryCfg;
 import org.pm4j.core.pm.annotation.PmInit;
 import org.pm4j.core.pm.annotation.PmObjectCfg;
@@ -61,10 +47,20 @@ import org.pm4j.core.pm.api.PmVisitorApi.PmVisitHint;
 import org.pm4j.core.pm.api.PmVisitorApi.PmVisitResult;
 import org.pm4j.core.pm.impl.InternalPmCacheCfgUtil.CacheMetaData;
 import org.pm4j.core.pm.impl.PmObjectBase.MetaData.MetaDataId;
+import org.pm4j.core.pm.impl.cache.CacheStrategyBase;
+import org.pm4j.core.pm.impl.cache.CacheStrategyRequest;
 import org.pm4j.core.pm.impl.inject.DiResolver;
 import org.pm4j.core.pm.impl.inject.DiResolverUtil;
 import org.pm4j.core.pm.impl.title.PmTitleProvider;
 import org.pm4j.core.pm.impl.title.PmTitleProviderValuebased;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArraySet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -187,7 +183,7 @@ public class PmObjectBase implements PmObject {
 
   @Override
   public final String getPmTooltip() {
-
+    
     CacheStrategy strategy = getPmMetaData().tooltipCache.cacheStrategy;
     Object cachedValue = strategy.getCachedValue(this);
 
@@ -199,7 +195,7 @@ public class PmObjectBase implements PmObject {
     else {
       toolTip = (String) strategy.setAndReturnCachedValue(this, getPmTooltipImpl());
     }
-
+    
     // XXX olaf: a kind of decorator could add some flexibility for
     //           different error display requirements...
     if (getPmMetaData().addErrorMessagesToTooltip &&
@@ -1209,8 +1205,6 @@ public class PmObjectBase implements PmObject {
     return new MetaData();
   }
 
-
-  @SuppressWarnings({ "rawtypes", "deprecation" })
   protected void initMetaData(MetaData metaData) {
     // -- Enablement & visibility configuration --
     PmObjectCfg objectCfg = AnnotationUtil.findAnnotation(this, PmObjectCfg.class);
@@ -1273,14 +1267,13 @@ public class PmObjectBase implements PmObject {
     }
 
     // -- Cache configuration --
-    List cacheAnnotations = InternalPmCacheCfgUtil.findCacheCfgsInPmHierarchy(this, new ArrayList());
+    List<PmCacheCfg2> cacheAnnotations = InternalPmCacheCfgUtil.findCacheCfgsInPmHierarchy(this, new ArrayList<PmCacheCfg2>());
     if (!cacheAnnotations.isEmpty()) {
-      metaData.titleCache = InternalPmCacheCfgUtil.readCacheMetaData(this, CacheKind.TITLE, cacheAnnotations, InternalCacheStrategyFactory.INSTANCE);
-      metaData.tooltipCache = InternalPmCacheCfgUtil.readCacheMetaData(this, CacheKind.TOOLTIP, cacheAnnotations, InternalCacheStrategyFactory.INSTANCE);
-      metaData.enablementCache = InternalPmCacheCfgUtil.readCacheMetaData(this, CacheKind.ENABLEMENT, cacheAnnotations, InternalCacheStrategyFactory.INSTANCE);
-      metaData.visibilityCache = InternalPmCacheCfgUtil.readCacheMetaData(this, CacheKind.VISIBILITY, cacheAnnotations, InternalCacheStrategyFactory.INSTANCE);
-      metaData.nodesCache      = InternalPmCacheCfgUtil.readCacheMetaData(this, CacheKind.NODES, InternalPmBeanCacheStrategyFactory.INSTANCE);
-      metaData.cacheClearBehavior = DeprInternalPmCacheCfgUtil.evaluateCacheClearBehavior(this, cacheAnnotations);
+      metaData.titleCache      = InternalPmCacheCfgUtil.readCacheMetaData(this, CacheKind.TITLE, cacheAnnotations, metaData.getCacheStrategyFactory());
+      metaData.tooltipCache    = InternalPmCacheCfgUtil.readCacheMetaData(this, CacheKind.TOOLTIP, cacheAnnotations, metaData.getCacheStrategyFactory());
+      metaData.enablementCache = InternalPmCacheCfgUtil.readCacheMetaData(this, CacheKind.ENABLEMENT, cacheAnnotations, metaData.getCacheStrategyFactory());
+      metaData.visibilityCache = InternalPmCacheCfgUtil.readCacheMetaData(this, CacheKind.VISIBILITY, cacheAnnotations, metaData.getCacheStrategyFactory());
+      metaData.nodesCache      = InternalPmCacheCfgUtil.readCacheMetaData(this, CacheKind.NODES, metaData.getCacheStrategyFactory());
     }
 
     // -- Check for registered domain specific annotations
@@ -1295,7 +1288,7 @@ public class PmObjectBase implements PmObject {
     // -- validator strategy --
     metaData.deprValidation = isDeprValidation();
     metaData.validator = makePmValidator();
-    assert metaData.validator != null;
+    Validate.notNull(metaData.validator);
   }
 
   /**
@@ -1440,9 +1433,7 @@ public class PmObjectBase implements PmObject {
     private CacheMetaData enablementCache = CacheMetaData.NO_CACHE;
     private CacheMetaData visibilityCache = CacheMetaData.NO_CACHE;
     private CacheMetaData nodesCache      = CacheMetaData.NO_CACHE;
-    @Deprecated /* package */ Clear   cacheClearBehavior         = Clear.DEFAULT;
 
-//    private boolean cacheTooltip = false;
     /** An optional factory that is responsible for creating PMs for beans. */
     private BeanPmFactory pmElementFactory;
 
@@ -1466,6 +1457,11 @@ public class PmObjectBase implements PmObject {
 
     /** all methods annotated with {@link PmInit} */
     private List<Method> initMethods;
+
+    /** Provides the PM type specific {@link CacheStrategyFactory}. */
+    protected CacheStrategyFactory getCacheStrategyFactory() {
+      return CacheStrategyFactory.INSTANCE;
+    }
 
     public String getName() { return name; }
     /* package */ String getAbsoluteName() { return absoluteName; }
@@ -1805,6 +1801,130 @@ public class PmObjectBase implements PmObject {
                 ? title
                 : PmUtil.getPmLogString(pm);
     }
+  }
+
+  /** Factory for PM aspect specific and cache live time specific cache strategies.<br>
+   * Supports caching of titles, tooltips, enablement, visibility and sub-nodes. */
+  protected static class CacheStrategyFactory {
+
+    public static final CacheStrategyFactory INSTANCE = new CacheStrategyFactory();
+
+    /**
+     * Creates a cache strategy for the given cache aspect.
+     *
+     * @param aspect the cache aspect to create a cache strategy for
+     * @param cache the cache definition
+     * @return a cache strategy
+     */
+    public final CacheStrategy create(CacheKind aspect, Cache cache) {
+      CacheMode mode = (cache != null) ? cache.mode() : CacheMode.OFF;
+      switch (mode) {
+      case OFF:
+        return CacheStrategyNoCache.INSTANCE;
+      case ON:
+        return createImpl(aspect, cache);
+      case REQUEST:
+        return new CacheStrategyRequest("CACHE_"+aspect+"_IN_REQUEST", aspect.toString().substring(0, 2).toLowerCase());
+      default:
+        throw new PmRuntimeException("Unable to find cache strategy for CacheMode '" + cache.mode() + "'.");
+      }
+    }
+
+    protected CacheStrategy createImpl(CacheKind aspect, Cache cache) {
+      switch (aspect) {
+      case ENABLEMENT:
+        return new CacheStrategyForEnablement(cache.clear());
+      case TITLE:
+        return new CacheStrategyForTitle(cache.clear());
+      case TOOLTIP:
+        return new CacheStrategyForTooltip(cache.clear());
+      case VISIBILITY:
+        return new CacheStrategyForVisibility(cache.clear());
+      case NODES:
+        return new CacheStrategyForNodes(cache.clear());
+      default:
+        return null;
+      }
+    }
+
+    private static class CacheStrategyForVisibility extends CacheStrategyBase<PmObjectBase> {
+      private CacheStrategyForVisibility(Clear cacheClear) {
+        super("CACHE_VISIBLE_LOCAL", cacheClear);
+      }
+
+      @Override protected Object readRawValue(PmObjectBase pm) {
+        return pm.pmVisibleCache;
+      }
+      @Override protected void writeRawValue(PmObjectBase pm, Object value) {
+        pm.pmVisibleCache = value;
+      }
+      @Override protected void clearImpl(PmObjectBase pm) {
+        pm.pmVisibleCache = null;
+      }
+    };
+
+    private static class CacheStrategyForTitle extends CacheStrategyBase<PmObjectBase> {
+      private CacheStrategyForTitle(Clear cacheClear) {
+        super("CACHE_TITLE_LOCAL", cacheClear);
+      }
+      @Override protected Object readRawValue(PmObjectBase pm) {
+        return pm.pmCachedTitle;
+      }
+      @Override protected void writeRawValue(PmObjectBase pm, Object value) {
+        pm.pmCachedTitle = (String)value;
+      }
+      @Override protected void clearImpl(PmObjectBase pm) {
+        pm.pmCachedTitle = null;
+      }
+    };
+
+    private static class CacheStrategyForTooltip extends CacheStrategyBase<PmObjectBase> {
+      private CacheStrategyForTooltip(Clear cacheClear) {
+        super("CACHE_TOOLTIP_LOCAL", cacheClear);
+      }
+      @Override protected Object readRawValue(PmObjectBase pm) {
+        return pm.pmCachedTooltip;
+      }
+      @Override protected void writeRawValue(PmObjectBase pm, Object value) {
+        pm.pmCachedTooltip = (String)value;
+      }
+      @Override protected void clearImpl(PmObjectBase pm) {
+        pm.pmCachedTooltip = null;
+      }
+    };
+
+    private static class CacheStrategyForEnablement extends CacheStrategyBase<PmObjectBase> {
+      private CacheStrategyForEnablement(Clear cacheClear) {
+        super("CACHE_ENABLED_LOCAL", cacheClear);
+      }
+      @Override protected Object readRawValue(PmObjectBase pm) {
+        return pm.pmEnabledCache;
+      }
+      @Override protected void writeRawValue(PmObjectBase pm, Object value) {
+        pm.pmEnabledCache = value;
+      }
+      @Override protected void clearImpl(PmObjectBase pm) {
+        pm.pmEnabledCache = null;
+      }
+    };
+
+    static class CacheStrategyForNodes extends CacheStrategyBase<PmObjectBase> {
+      public CacheStrategyForNodes(Clear cacheClear) {
+        super("CACHE_NODES_LOCAL", cacheClear);
+      }
+
+      @Override protected Object readRawValue(PmObjectBase pm) {
+        return pm.pmChildNodesCache;
+      }
+
+      @Override protected void writeRawValue(PmObjectBase pm, Object value) {
+        pm.pmChildNodesCache = value;
+      }
+
+      @Override protected void clearImpl(PmObjectBase pm) {
+        pm.pmChildNodesCache = null;
+      }
+    };
   }
 
 } // end of PmObjectBase

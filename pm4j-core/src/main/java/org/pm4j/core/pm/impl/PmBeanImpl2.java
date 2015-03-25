@@ -14,12 +14,14 @@ import org.pm4j.core.pm.annotation.PmBoolean;
 import org.pm4j.core.pm.annotation.PmCacheCfg2;
 import org.pm4j.core.pm.annotation.PmCacheCfg2.Cache;
 import org.pm4j.core.pm.annotation.PmCacheCfg2.CacheMode;
+import org.pm4j.core.pm.annotation.PmCacheCfg2.Clear;
 import org.pm4j.core.pm.annotation.PmObjectCfg.Visible;
 import org.pm4j.core.pm.annotation.PmValidationCfg;
 import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
 import org.pm4j.core.pm.api.PmMessageApi;
 import org.pm4j.core.pm.impl.InternalPmCacheCfgUtil.CacheMetaData;
+import org.pm4j.core.pm.impl.cache.CacheStrategyBase;
 import org.pm4j.core.pm.impl.pathresolver.PathResolver;
 import org.pm4j.core.pm.impl.pathresolver.PmExpressionPathResolver;
 
@@ -401,14 +403,14 @@ public class PmBeanImpl2<T_BEAN>
       }
     }
 
-    myMetaData.valueCache = InternalPmCacheCfgUtil.readCacheMetaData(this, CacheKind.VALUE, InternalPmBeanCacheStrategyFactory.INSTANCE);
+    myMetaData.valueCache = InternalPmCacheCfgUtil.readCacheMetaData(this, CacheKind.VALUE, myMetaData.getCacheStrategyFactory());
   }
 
   /**
    * Shared meta data for all PM's of the same kind.
    * E.g. for all 'myapp.myForm' attributes.
    */
-  protected static class MetaData extends PmElementBase.MetaData {
+  protected static class MetaData extends PmObjectBase.MetaData {
     private Class<?>        beanClass;
     private boolean         autoCreateBean             = false;
     private PathResolver    beanPathResolver           = null;
@@ -419,6 +421,11 @@ public class PmBeanImpl2<T_BEAN>
     protected void onPmInit(PmObjectBase pm) {
       super.onPmInit(pm);
       InternalPmCacheCfgUtil.registerClearOnListeners(pm, CacheKind.VALUE, valueCache.cacheClearOn);
+    }
+
+    @Override
+    protected org.pm4j.core.pm.impl.PmObjectBase.CacheStrategyFactory getCacheStrategyFactory() {
+      return CacheStrategyFactory.INSTANCE;
     }
 
   }
@@ -452,6 +459,37 @@ public class PmBeanImpl2<T_BEAN>
     }
   }
 
+  /** Supports caching for bean values. */
+  protected static class CacheStrategyFactory extends PmObjectBase.CacheStrategyFactory {
+
+    public static final CacheStrategyFactory INSTANCE = new CacheStrategyFactory();
+
+    @Override
+    protected CacheStrategy createImpl(CacheKind aspect, Cache cache) {
+      switch (aspect) {
+        case VALUE:
+          return new CacheStrategyForPmBeanValue(cache.clear());
+        default:
+          return super.createImpl(aspect, cache);
+      }
+    }
+
+    static class CacheStrategyForPmBeanValue extends CacheStrategyBase<PmBeanImpl2<Object>> {
+      CacheStrategyForPmBeanValue(Clear cacheClear) {
+        super("CACHE_VALUE_LOCAL", cacheClear);
+      }
+
+      @Override protected Object readRawValue(PmBeanImpl2<Object> pm) {
+        return pm.pmBeanCache;
+      }
+      @Override protected void writeRawValue(PmBeanImpl2<Object> pm, Object value) {
+        pm.pmBeanCache = value;
+      }
+      @Override protected void clearImpl(PmBeanImpl2<Object> pm) {
+        pm.pmBeanCache = null;
+      }
+    };
+  }
 }
 
 class InternalPmBeanUtil {
@@ -488,7 +526,6 @@ class InternalPmBeanUtil {
     }
     return beanClass;
   }
-
 }
 
 // XXX oboede: check if needed.

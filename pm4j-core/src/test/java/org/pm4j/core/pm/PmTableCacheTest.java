@@ -1,6 +1,5 @@
 package org.pm4j.core.pm;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.pm4j.common.query.QueryAttr;
 import org.pm4j.common.query.SortOrder;
@@ -55,8 +54,7 @@ public class PmTableCacheTest {
   }
 
   @Test
-  // FIXME oboede: happened when changing the annotations
-  @Ignore
+  // JHE: after enabling PmCacheCfg2 this test actually works
   public void testBackingCollectionExchangeForCachedTable() {
     assertEquals(2, tablePmWithCachedCollectionRef.getTotalNumOfPmRows());
     list = listWithOneItem;

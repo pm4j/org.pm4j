@@ -37,7 +37,6 @@ import org.pm4j.common.selection.Selection;
 import org.pm4j.common.selection.SelectionHandler;
 import org.pm4j.common.selection.SelectionHandlerUtil;
 import org.pm4j.common.util.collection.IterableUtil;
-import org.pm4j.common.util.collection.MapUtil;
 import org.pm4j.common.util.reflection.ClassUtil;
 import org.pm4j.common.util.reflection.GenericTypeUtil;
 import org.pm4j.core.exception.PmRuntimeException;
@@ -51,8 +50,8 @@ import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmPager;
 import org.pm4j.core.pm.PmTable;
 import org.pm4j.core.pm.PmTableCol;
-import org.pm4j.core.pm.annotation.PmCacheCfg;
-import org.pm4j.core.pm.annotation.PmCacheCfg.CacheMode;
+import org.pm4j.core.pm.annotation.PmCacheCfg2.Cache;
+import org.pm4j.core.pm.annotation.PmCacheCfg2.Clear;
 import org.pm4j.core.pm.annotation.PmObjectCfg.Visible;
 import org.pm4j.core.pm.annotation.PmTableCfg;
 import org.pm4j.core.pm.annotation.PmTableCfg.RowsToValidate;
@@ -62,7 +61,6 @@ import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmExpressionApi;
 import org.pm4j.core.pm.api.PmMessageApi;
 import org.pm4j.core.pm.impl.cache.CacheStrategyBase;
-import org.pm4j.core.pm.impl.cache.CacheStrategyRequest;
 import org.pm4j.core.pm.impl.pageable.PmBeanCollection;
 import org.pm4j.core.pm.impl.pathresolver.PathResolver;
 import org.pm4j.core.pm.impl.pathresolver.PmExpressionPathResolver;
@@ -116,14 +114,6 @@ public class PmTableImpl
 
   /** A cached reference to the selected master row. */
   /* package */ T_ROW_PM masterRowPm;
-
-  /** The set of supported cache strategies. */
-  private static final Map<CacheMode, CacheStrategy> CACHE_STRATEGIES_FOR_IN_MEM_COLLECTION =
-      MapUtil.makeFixHashMap(
-        CacheMode.OFF,      CacheStrategyNoCache.INSTANCE,
-        CacheMode.ON,       new CacheStrategyImMemCollectionReference("CACHE_TABLE_COLLECTION_LOCALLY"),
-        CacheMode.REQUEST,  new CacheStrategyRequest("CACHE_TABLE_COLLECTION_IN_REQUEST", "tc")
-      );
 
   /** An optionally used cache for in-memory backing collections. */
   private Object pmInMemCollectionCache;
@@ -861,7 +851,7 @@ public class PmTableImpl
   /**
    * An in-memory collection that uses the table specific context:
    * <ul>
-   * <li>uses the table value cache strategy, configured in {@link PmCacheCfg#value()}, to control the frequency of <code>getPmBeansImpl()</code> calls.</li>
+   * <li>uses the table value cache strategy, configured in {@link PmCacheCfg2#value()}, to control the frequency of <code>getPmBeansImpl()</code> calls.</li>
    * <li>binds the backing collection to {@link PmTableImpl#getPmBeansImpl()}.</li>
    * </ul>
    */
@@ -872,7 +862,7 @@ public class PmTableImpl
      */
     public InMemTableBeanCollection(QueryOptions queryOptions) {
       super(queryOptions);
-      setCacheStrategy(getOwnMetaData().inMemCollectionCacheStragegy, PmTableImpl.this);
+      setCacheStrategy(getOwnMetaData().inMemCollectionCacheStrategy, PmTableImpl.this);
     }
 
     @Override
@@ -953,29 +943,7 @@ public class PmTableImpl
     }
   }
 
-  /** Caches the backing collection locally in {@link PmTableImpl#pmInMemCollectionCache}. */
-  protected static class CacheStrategyImMemCollectionReference extends CacheStrategyBase<PmTableImpl<?, ?>> {
 
-    /** @param cacheName A cache name for reporting only. */
-    public CacheStrategyImMemCollectionReference(String cacheName) {
-      super(cacheName);
-    }
-
-    @Override
-    protected Object readRawValue(PmTableImpl<?, ?> pm) {
-      return pm.pmInMemCollectionCache;
-    }
-
-    @Override
-    protected void writeRawValue(PmTableImpl<?, ?> pm, Object value) {
-      pm.pmInMemCollectionCache = value;
-    }
-
-    @Override
-    protected void clearImpl(PmTableImpl<?, ?> pm) {
-      pm.pmInMemCollectionCache = null;
-    }
-  };
 
   /** Implements controlled implementation layer access for other PM classes. */
   protected class TableDetailsImpl implements ImplDetails {
@@ -1054,8 +1022,7 @@ public class PmTableImpl
       if (StringUtils.isNotBlank(valuePath)) {
         myMetaData.valuePathResolver = PmExpressionPathResolver.parse(valuePath, PmExpressionApi.getSyntaxVersion(this));
       }
-      // TODO oboede: Missing support for new cache annotation.
-      myMetaData.inMemCollectionCacheStragegy = DeprAnnotationUtil.readCacheStrategy(this, PmCacheCfg.ATTR_VALUE, CACHE_STRATEGIES_FOR_IN_MEM_COLLECTION);
+      myMetaData.inMemCollectionCacheStrategy = InternalPmCacheCfgUtil.readCacheMetaData(this, CacheKind.VALUE, myMetaData.getCacheStrategyFactory()).cacheStrategy;
     }
   }
 
@@ -1068,10 +1035,15 @@ public class PmTableImpl
     private boolean sortable;
     private Class<?> initialBeanSortComparatorClass = null;
     private String initialSortColName = null;
-    private CacheStrategy inMemCollectionCacheStragegy = CacheStrategyNoCache.INSTANCE;
+    private CacheStrategy inMemCollectionCacheStrategy = CacheStrategyNoCache.INSTANCE;
 
     /** May be used to define a different default value. */
     public void setNumOfPageRowPms(int numOfPageRowPms) { this.numOfPageRowPms = numOfPageRowPms; }
+
+    @Override
+    protected org.pm4j.core.pm.impl.PmObjectBase.CacheStrategyFactory getCacheStrategyFactory() {
+      return CacheStrategyFactory.INSTANCE;
+    }
   }
 
   @SuppressWarnings("unchecked")
@@ -1082,6 +1054,47 @@ public class PmTableImpl
   @SuppressWarnings("unchecked")
   private final MetaData getOwnMetaDataWithoutPmInitCall() {
     return (MetaData) getPmMetaDataWithoutPmInitCall();
+  }
+
+  protected static class CacheStrategyFactory extends PmObjectBase.CacheStrategyFactory {
+
+    private static final String CACHE_TABLE_COLLECTION_NAME = "CACHE_TABLE_COLLECTION_LOCALLY";
+
+    public static final CacheStrategyFactory INSTANCE = new CacheStrategyFactory();
+
+    @Override
+    protected CacheStrategy createImpl(CacheKind aspect, Cache cache) {
+      switch (aspect) {
+      case VALUE:
+        return new CacheStrategyImMemCollectionReference(cache.clear());
+      default:
+        return super.createImpl(aspect, cache);
+      }
+    }
+
+    /** Caches the backing collection locally in {@link PmTableImpl#pmInMemCollectionCache}. */
+    private static class CacheStrategyImMemCollectionReference extends CacheStrategyBase<PmTableImpl<?, ?>> {
+
+      /** @param cacheClear PmCacheCfg2.Cache.clear() settings. */
+      public CacheStrategyImMemCollectionReference(Clear cacheClear) {
+        super(CACHE_TABLE_COLLECTION_NAME, cacheClear);
+      }
+
+      @Override
+      protected Object readRawValue(PmTableImpl<?, ?> pm) {
+        return pm.pmInMemCollectionCache;
+      }
+
+      @Override
+      protected void writeRawValue(PmTableImpl<?, ?> pm, Object value) {
+        pm.pmInMemCollectionCache = value;
+      }
+
+      @Override
+      protected void clearImpl(PmTableImpl<?, ?> pm) {
+        pm.pmInMemCollectionCache = null;
+      }
+    };
   }
 
 }
