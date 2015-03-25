@@ -209,12 +209,26 @@ public @interface PmAttrCfg {
    * @return The converter class (or array of converters classes) to use.<br>
    *         <b>Important:</b> All the converter classes need to have a public default constructor.
    *         
+   * <br/><br/>
+   * <b>Note: this is only a backport for 2.1.5. From version 2.2 on please use valueConverter parameter that has the same signature. 
+   *  Moreover it cannot be used together with {@link #valueConverter()}</b>
+   *         
    * @see ValueConverter
    * @see ValueConverterChain
    */
   @SuppressWarnings("rawtypes")
-  Class<? extends ValueConverter>[] valueConverter() default {};
+  Class<? extends ValueConverter>[] valueConverters() default {};
 
+  /**
+   * Configures the value converter used to convert between external and backing attribute values.
+   *
+   * @return The converter class to use.<br>
+   *         <b>Important:</b> It needs to have a public default constructor.
+   */
+  @SuppressWarnings("rawtypes")
+  Class<? extends ValueConverter> valueConverter() default ValueConverter.class;
+
+  
   /**
    * Defines attribute validation strategies.<br>
    * Each attribute gets validated when {@link PmDataInput#pmValidate()} gets called.

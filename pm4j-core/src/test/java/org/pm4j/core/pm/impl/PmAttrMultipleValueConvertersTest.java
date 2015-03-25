@@ -73,7 +73,7 @@ public class PmAttrMultipleValueConvertersTest {
     @PmAttrCfg(valueConverter = IncreaseBy2Converter.class)
     public final PmAttrIntegerImpl singleConverterAttr = new PmAttrIntegerImpl(this);
 
-    @PmAttrCfg(valueConverter = { IncreaseBy2Converter.class, MultipleBy2Converter.class })
+    @PmAttrCfg(valueConverters = { IncreaseBy2Converter.class, MultipleBy2Converter.class })
     public final PmAttrIntegerImpl multipleConvertedAttr = new PmAttrIntegerImpl(this);
 
   }

@@ -1,5 +1,6 @@
 package org.pm4j.core.pm.impl;
 
+import static org.apache.commons.lang.Validate.isTrue;
 import static org.pm4j.core.pm.api.PmCacheApi.clearPmCache;
 
 import java.lang.reflect.Method;
@@ -1604,12 +1605,16 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
       }
 
       // Initialize ValueConverters
-      Class<? extends ValueConverter>[] valueConvertersFromConfig = fieldAnnotation.valueConverter();
+      Class<? extends ValueConverter>[] valueConvertersFromConfig = fieldAnnotation.valueConverters();
       if (valueConvertersFromConfig.length > 1) {
         // more than one converter defined -> wrap into a chain
+        isTrue(fieldAnnotation.valueConverter() == ValueConverter.class, "PmAttrCfg fields valueConverter and valueConverters cannot be used together.");
         myMetaData.valueConverter = new ValueConverterChain(valueConvertersFromConfig);
       } else if(valueConvertersFromConfig.length == 1) {
+        isTrue(fieldAnnotation.valueConverter() == ValueConverter.class, "PmAttrCfg fields valueConverter and valueConverters cannot be used together.");
         myMetaData.valueConverter = ClassUtil.newInstance(valueConvertersFromConfig[0]);
+      } else if (fieldAnnotation.valueConverter() != ValueConverter.class) { //default way
+          myMetaData.valueConverter = ClassUtil.newInstance(fieldAnnotation.valueConverter());
       }
     }
 
