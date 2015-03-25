@@ -998,7 +998,7 @@ public class PmTableImpl
       if (StringUtils.isNotBlank(valuePath)) {
         myMetaData.valuePathResolver = PmExpressionPathResolver.parse(valuePath, PmExpressionApi.getSyntaxVersion(this));
       }
-      myMetaData.inMemCollectionCacheStrategy = InternalPmCacheCfgUtil.readCacheMetaData(this, CacheKind.VALUE, CacheStrategyFactory.INSTANCE).cacheStrategy;
+      myMetaData.inMemCollectionCacheStrategy = InternalPmCacheCfgUtil.readCacheMetaData(this, CacheKind.VALUE, myMetaData.getCacheStrategyFactory()).cacheStrategy;
     }
   }
 
@@ -1015,6 +1015,11 @@ public class PmTableImpl
 
     /** May be used to define a different default value. */
     public void setNumOfPageRowPms(int numOfPageRowPms) { this.numOfPageRowPms = numOfPageRowPms; }
+
+    @Override
+    protected org.pm4j.core.pm.impl.PmObjectBase.CacheStrategyFactory getCacheStrategyFactory() {
+      return CacheStrategyFactory.INSTANCE;
+    }
   }
 
   @SuppressWarnings("unchecked")

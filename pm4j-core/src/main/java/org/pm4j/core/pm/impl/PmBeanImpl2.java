@@ -403,7 +403,7 @@ public class PmBeanImpl2<T_BEAN>
       }
     }
 
-    myMetaData.valueCache = InternalPmCacheCfgUtil.readCacheMetaData(this, CacheKind.VALUE, CacheStrategyFactory.INSTANCE);
+    myMetaData.valueCache = InternalPmCacheCfgUtil.readCacheMetaData(this, CacheKind.VALUE, myMetaData.getCacheStrategyFactory());
   }
 
   /**
@@ -421,6 +421,11 @@ public class PmBeanImpl2<T_BEAN>
     protected void onPmInit(PmObjectBase pm) {
       super.onPmInit(pm);
       InternalPmCacheCfgUtil.registerClearOnListeners(pm, CacheKind.VALUE, valueCache.cacheClearOn);
+    }
+
+    @Override
+    protected org.pm4j.core.pm.impl.PmObjectBase.CacheStrategyFactory getCacheStrategyFactory() {
+      return CacheStrategyFactory.INSTANCE;
     }
 
   }

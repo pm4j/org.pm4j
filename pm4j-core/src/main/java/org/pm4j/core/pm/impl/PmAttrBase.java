@@ -1605,8 +1605,8 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     // -- Cache configuration --
     List cacheAnnotations = InternalPmCacheCfgUtil.findCacheCfgsInPmHierarchy(this, new ArrayList());
     if (!cacheAnnotations.isEmpty()) {
-      myMetaData.optionsCache = InternalPmCacheCfgUtil.readCacheMetaData(this, CacheKind.OPTIONS, cacheAnnotations, CacheStrategyFactory.INSTANCE);
-      myMetaData.valueCache = InternalPmCacheCfgUtil.readCacheMetaData(this, CacheKind.VALUE, cacheAnnotations, CacheStrategyFactory.INSTANCE);
+      myMetaData.optionsCache = InternalPmCacheCfgUtil.readCacheMetaData(this, CacheKind.OPTIONS, cacheAnnotations, metaData.getCacheStrategyFactory());
+      myMetaData.valueCache = InternalPmCacheCfgUtil.readCacheMetaData(this, CacheKind.VALUE, cacheAnnotations, metaData.getCacheStrategyFactory());
     }
   }
 
@@ -1702,6 +1702,11 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
     /** Creates meta data using a maxDefaultLen of 255. */
     public MetaData() {
       this(255);
+    }
+
+    @Override
+    protected org.pm4j.core.pm.impl.PmObjectBase.CacheStrategyFactory getCacheStrategyFactory() {
+      return CacheStrategyFactory.INSTANCE;
     }
 
     /**

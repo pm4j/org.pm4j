@@ -31,7 +31,6 @@ import org.pm4j.core.pm.api.PmVisitorApi.PmVisitCallBack;
 import org.pm4j.core.pm.api.PmVisitorApi.PmVisitHint;
 import org.pm4j.core.pm.api.PmVisitorApi.PmVisitResult;
 import org.pm4j.core.pm.impl.InternalPmCacheCfgUtil.CacheMetaData;
-import org.pm4j.core.pm.impl.PmBeanImpl2.CacheStrategyFactory;
 import org.pm4j.core.pm.impl.PmObjectBase.MetaData.MetaDataId;
 import org.pm4j.core.pm.impl.cache.CacheStrategyBase;
 import org.pm4j.core.pm.impl.cache.CacheStrategyRequest;
@@ -1258,11 +1257,11 @@ public class PmObjectBase implements PmObject {
     // -- Cache configuration --
     List<PmCacheCfg2> cacheAnnotations = InternalPmCacheCfgUtil.findCacheCfgsInPmHierarchy(this, new ArrayList<PmCacheCfg2>());
     if (!cacheAnnotations.isEmpty()) {
-      metaData.titleCache      = InternalPmCacheCfgUtil.readCacheMetaData(this, CacheKind.TITLE, cacheAnnotations, CacheStrategyFactory.INSTANCE);
-      metaData.tooltipCache    = InternalPmCacheCfgUtil.readCacheMetaData(this, CacheKind.TOOLTIP, cacheAnnotations, CacheStrategyFactory.INSTANCE);
-      metaData.enablementCache = InternalPmCacheCfgUtil.readCacheMetaData(this, CacheKind.ENABLEMENT, cacheAnnotations, CacheStrategyFactory.INSTANCE);
-      metaData.visibilityCache = InternalPmCacheCfgUtil.readCacheMetaData(this, CacheKind.VISIBILITY, cacheAnnotations, CacheStrategyFactory.INSTANCE);
-      metaData.nodesCache      = InternalPmCacheCfgUtil.readCacheMetaData(this, CacheKind.NODES, CacheStrategyFactory.INSTANCE);
+      metaData.titleCache      = InternalPmCacheCfgUtil.readCacheMetaData(this, CacheKind.TITLE, cacheAnnotations, metaData.getCacheStrategyFactory());
+      metaData.tooltipCache    = InternalPmCacheCfgUtil.readCacheMetaData(this, CacheKind.TOOLTIP, cacheAnnotations, metaData.getCacheStrategyFactory());
+      metaData.enablementCache = InternalPmCacheCfgUtil.readCacheMetaData(this, CacheKind.ENABLEMENT, cacheAnnotations, metaData.getCacheStrategyFactory());
+      metaData.visibilityCache = InternalPmCacheCfgUtil.readCacheMetaData(this, CacheKind.VISIBILITY, cacheAnnotations, metaData.getCacheStrategyFactory());
+      metaData.nodesCache      = InternalPmCacheCfgUtil.readCacheMetaData(this, CacheKind.NODES, metaData.getCacheStrategyFactory());
     }
 
     // -- Check for registered domain specific annotations
@@ -1277,7 +1276,7 @@ public class PmObjectBase implements PmObject {
     // -- validator strategy --
     metaData.deprValidation = isDeprValidation();
     metaData.validator = makePmValidator();
-    assert metaData.validator != null;
+    Validate.notNull(metaData.validator);
   }
 
   /**
@@ -1423,7 +1422,6 @@ public class PmObjectBase implements PmObject {
     private CacheMetaData visibilityCache = CacheMetaData.NO_CACHE;
     private CacheMetaData nodesCache      = CacheMetaData.NO_CACHE;
 
-//    private boolean cacheTooltip = false;
     /** An optional factory that is responsible for creating PMs for beans. */
     private BeanPmFactory pmElementFactory;
 
@@ -1447,6 +1445,11 @@ public class PmObjectBase implements PmObject {
 
     /** all methods annotated with {@link PmInit} */
     private List<Method> initMethods;
+
+    /** Provides the PM type specific {@link CacheStrategyFactory}. */
+    protected CacheStrategyFactory getCacheStrategyFactory() {
+      return CacheStrategyFactory.INSTANCE;
+    }
 
     public String getName() { return name; }
     /* package */ String getAbsoluteName() { return absoluteName; }
