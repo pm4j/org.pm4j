@@ -158,5 +158,56 @@ public class AnnotationUtil {
 
     return foundAnnotations;
   }
+  
+  public static <A extends Annotation> List<A> findAnnotationsInClassTree(PmObjectBase pm, Class<A> annotationClass) {
+    List<A> foundAnnotations = pm.getPmMetaDataWithoutPmInitCall().isPmField
+        ? findAnnotationsInClassTree(pm.getPmParent().getClass(), pm.getPmName(), annotationClass)
+        : new ArrayList<A>();
+    
+    foundAnnotations.addAll(findAnnotationsInClassTree(pm.getClass(), annotationClass));
+    
+    return foundAnnotations;
+  }
+  
+  private static <A extends Annotation> List<A> findAnnotationsInClassTree(Class<?> clazz, String fieldName, Class<A> annotationClass) {
+    List<A> foundAnnotations = new ArrayList<A>();
+    
+    do {
+      Field field;
+      
+      try {
+        field = clazz.getField(fieldName);
+        A annotation = field.getAnnotation(annotationClass);
+
+        if (annotation != null) {
+          foundAnnotations.add(annotation);
+        }
+      } catch (NoSuchFieldException e) {
+        // may be OK, because the attribute may use something like getters or
+        // xPath.
+      }      
+      
+      clazz = clazz.getSuperclass();
+    } while (clazz != null);      
+    
+    return foundAnnotations;
+  }
+  
+  private static <A extends Annotation> List<A> findAnnotationsInClassTree(Class<?> clazz, Class<A> annotationClass) {
+    List<A> foundAnnotations = new ArrayList<A>();
+    
+    do {      
+      A annotation = clazz.getAnnotation(annotationClass);
+      
+      if (annotation != null) {
+        foundAnnotations.add(annotation);
+      }
+      
+      clazz = clazz.getSuperclass();      
+    } while (clazz != null);
+      
+    
+    return foundAnnotations;
+  }
 
 }

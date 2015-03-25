@@ -5,8 +5,6 @@ import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.pm4j.common.cache.CacheStrategy;
 import org.pm4j.common.cache.CacheStrategyNoCache;
 import org.pm4j.common.util.collection.ListUtil;
@@ -16,17 +14,34 @@ import org.pm4j.common.util.reflection.BeanAttrArrayList;
 import org.pm4j.common.util.reflection.ClassUtil;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.exception.PmValidationException;
-import org.pm4j.core.pm.*;
+import org.pm4j.core.pm.PmBean;
+import org.pm4j.core.pm.PmCommand;
+import org.pm4j.core.pm.PmConversation;
+import org.pm4j.core.pm.PmDefaults;
+import org.pm4j.core.pm.PmEvent;
+import org.pm4j.core.pm.PmEventListener;
+import org.pm4j.core.pm.PmMessage;
 import org.pm4j.core.pm.PmMessage.Severity;
-import org.pm4j.core.pm.annotation.*;
+import org.pm4j.core.pm.PmObject;
+import org.pm4j.core.pm.annotation.PmBoolean;
+import org.pm4j.core.pm.annotation.PmCacheCfg2.Clear;
+import org.pm4j.core.pm.annotation.PmCacheCfg2;
 import org.pm4j.core.pm.annotation.PmCacheCfg2.Cache;
 import org.pm4j.core.pm.annotation.PmCacheCfg2.CacheMode;
+import org.pm4j.core.pm.annotation.PmFactoryCfg;
+import org.pm4j.core.pm.annotation.PmInit;
+import org.pm4j.core.pm.annotation.PmObjectCfg;
 import org.pm4j.core.pm.annotation.PmObjectCfg.Enable;
 import org.pm4j.core.pm.annotation.PmObjectCfg.Visible;
+import org.pm4j.core.pm.annotation.PmTitleCfg;
 import org.pm4j.core.pm.annotation.customize.CustomizedAnnotationUtil;
 import org.pm4j.core.pm.annotation.customize.PmAnnotationApi;
-import org.pm4j.core.pm.api.*;
+import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
+import org.pm4j.core.pm.api.PmEventApi;
+import org.pm4j.core.pm.api.PmMessageApi;
+import org.pm4j.core.pm.api.PmValidationApi;
+import org.pm4j.core.pm.api.PmVisitorApi;
 import org.pm4j.core.pm.api.PmVisitorApi.PmVisitCallBack;
 import org.pm4j.core.pm.api.PmVisitorApi.PmVisitHint;
 import org.pm4j.core.pm.api.PmVisitorApi.PmVisitResult;
@@ -38,7 +53,6 @@ import org.pm4j.core.pm.impl.inject.DiResolver;
 import org.pm4j.core.pm.impl.inject.DiResolverUtil;
 import org.pm4j.core.pm.impl.title.PmTitleProvider;
 import org.pm4j.core.pm.impl.title.PmTitleProviderValuebased;
-import org.pm4j.core.pm.impl.title.TitleProviderAttrValueBased;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -47,6 +61,8 @@ import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Provides common presentation model base functionality.
@@ -167,7 +183,7 @@ public class PmObjectBase implements PmObject {
 
   @Override
   public final String getPmTooltip() {
-
+    
     CacheStrategy strategy = getPmMetaData().tooltipCache.cacheStrategy;
     Object cachedValue = strategy.getCachedValue(this);
 
@@ -179,7 +195,7 @@ public class PmObjectBase implements PmObject {
     else {
       toolTip = (String) strategy.setAndReturnCachedValue(this, getPmTooltipImpl());
     }
-
+    
     // XXX olaf: a kind of decorator could add some flexibility for
     //           different error display requirements...
     if (getPmMetaData().addErrorMessagesToTooltip &&
@@ -1189,8 +1205,6 @@ public class PmObjectBase implements PmObject {
     return new MetaData();
   }
 
-
-  @SuppressWarnings({ "rawtypes", "deprecation" })
   protected void initMetaData(MetaData metaData) {
     // -- Enablement & visibility configuration --
     PmObjectCfg objectCfg = AnnotationUtil.findAnnotation(this, PmObjectCfg.class);
@@ -1200,26 +1214,16 @@ public class PmObjectBase implements PmObject {
     }
 
     // -- Language resource configuration --
-    PmTitleCfg annotation = AnnotationUtil.findAnnotation(this, PmTitleCfg.class);
-    if (annotation != null) {
-      metaData.resKey = StringUtils.defaultIfEmpty(annotation.resKey(), null);
-      metaData.resKeyBase = StringUtils.defaultIfEmpty(annotation.resKeyBase(), null);
-      metaData.tooltipUsesTitle = annotation.tooltipUsesTitle();
+    List<PmTitleCfg> annotations = AnnotationUtil.findAnnotationsInClassTree(this, PmTitleCfg.class);
 
-      if (!annotation.titleProvider().equals(Void.class)) {
-        try {
-          metaData.pmTitleProvider = (PmTitleProvider) annotation.titleProvider().newInstance();
-        } catch (Exception e) {
-          throw new PmRuntimeException(this, e);
-        }
-      } else if (StringUtils.isNotBlank(annotation.attrValue())) {
-        metaData.pmTitleProvider = new TitleProviderAttrValueBased(annotation.attrValue(), this instanceof PmElement);
-      }
-      // TODO: check if only a tooltip or icon is provided...
-      else if (! "".equals(annotation.title())) {
-        metaData.pmTitleProvider = new PmTitleProviderValuebased(
-            annotation.title(), annotation.tooltip(), annotation.icon());
-      }
+    if (!annotations.isEmpty()) {
+
+
+
+      metaData.resKey = InternalPmTitleCfgUtil.readResKey(annotations);
+      metaData.resKeyBase = InternalPmTitleCfgUtil.readResKeyBase(annotations);
+      metaData.tooltipUsesTitle = InternalPmTitleCfgUtil.getTooltipUsesTitle(annotations) == PmBoolean.TRUE;
+
     }
 
     if (metaData.resKeyBase == null) {
@@ -1229,8 +1233,16 @@ public class PmObjectBase implements PmObject {
     }
 
 
-    if (metaData.resKey == null) {
+    if (StringUtils.isBlank(metaData.resKey)) {
       metaData.resKey = metaData.resKeyBase;
+
+      // fix string are only considered if there is no resKey defined.
+      String title = InternalPmTitleCfgUtil.getTitle(annotations);
+      String toolTip = InternalPmTitleCfgUtil.getTooltip(annotations);
+      String icon = InternalPmTitleCfgUtil.readIcon(annotations);
+      if (title != null || toolTip != null || icon != null) {
+        metaData.pmTitleProvider = new PmTitleProviderValuebased(title, toolTip, icon);
+      }
     }
 
     // Default title provider:
@@ -1633,7 +1645,7 @@ public class PmObjectBase implements PmObject {
    * <p>
    * If your node can have child nodes, please override this method to provide them.
    * <p>
-   * This set may be cached if you define a {@link PmCacheCfg2} value cache.
+   * This set may be cached if you define a {@link PmCacheCfg2} nodes cache.
    *
    * @return The set of child nodes. <code>null</code> in case of leaf nodes.
    */
@@ -1641,6 +1653,11 @@ public class PmObjectBase implements PmObject {
     return null;
   }
 
+  /**
+   * If {@link #getPmChildNodes()} returns <code>null</code> we know that the node may never manage
+   * child nodes.<br>
+   * If it provides a collection, it may have children and is most likely not a leaf node.
+   */
   @Override
   public boolean isPmTreeLeaf() {
     return getPmChildNodes() == null;
@@ -1831,7 +1848,7 @@ public class PmObjectBase implements PmObject {
     }
 
     private static class CacheStrategyForVisibility extends CacheStrategyBase<PmObjectBase> {
-      private CacheStrategyForVisibility(PmCacheCfg2.Clear cacheClear) {
+      private CacheStrategyForVisibility(Clear cacheClear) {
         super("CACHE_VISIBLE_LOCAL", cacheClear);
       }
 
@@ -1847,7 +1864,7 @@ public class PmObjectBase implements PmObject {
     };
 
     private static class CacheStrategyForTitle extends CacheStrategyBase<PmObjectBase> {
-      private CacheStrategyForTitle(PmCacheCfg2.Clear cacheClear) {
+      private CacheStrategyForTitle(Clear cacheClear) {
         super("CACHE_TITLE_LOCAL", cacheClear);
       }
       @Override protected Object readRawValue(PmObjectBase pm) {
@@ -1862,7 +1879,7 @@ public class PmObjectBase implements PmObject {
     };
 
     private static class CacheStrategyForTooltip extends CacheStrategyBase<PmObjectBase> {
-      private CacheStrategyForTooltip(PmCacheCfg2.Clear cacheClear) {
+      private CacheStrategyForTooltip(Clear cacheClear) {
         super("CACHE_TOOLTIP_LOCAL", cacheClear);
       }
       @Override protected Object readRawValue(PmObjectBase pm) {
@@ -1877,7 +1894,7 @@ public class PmObjectBase implements PmObject {
     };
 
     private static class CacheStrategyForEnablement extends CacheStrategyBase<PmObjectBase> {
-      private CacheStrategyForEnablement(PmCacheCfg2.Clear cacheClear) {
+      private CacheStrategyForEnablement(Clear cacheClear) {
         super("CACHE_ENABLED_LOCAL", cacheClear);
       }
       @Override protected Object readRawValue(PmObjectBase pm) {
@@ -1892,7 +1909,7 @@ public class PmObjectBase implements PmObject {
     };
 
     static class CacheStrategyForNodes extends CacheStrategyBase<PmObjectBase> {
-      public CacheStrategyForNodes(PmCacheCfg2.Clear cacheClear) {
+      public CacheStrategyForNodes(Clear cacheClear) {
         super("CACHE_NODES_LOCAL", cacheClear);
       }
 
@@ -2051,7 +2068,6 @@ final class PmObjectUtil {
       throw new PmRuntimeException(pm, e);
     }
   }
+
 }
-
-
 

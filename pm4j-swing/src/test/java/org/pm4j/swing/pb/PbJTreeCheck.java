@@ -61,7 +61,6 @@ public class PbJTreeCheck {
 
   /** The PM that represents the {@link MyBean} content tree. */
   @PmBeanCfg(beanClass=MyBean.class)
-  @PmTitleCfg(attrValue="name")
   public static class MyBeanPm extends PmBeanBase<MyBean> {
 
     public final PmAttrString name = new PmAttrStringImpl(this);
@@ -76,6 +75,11 @@ public class PbJTreeCheck {
     @Override
     protected List<? extends PmObject> getPmChildNodesImpl() {
       return list1.getValue();
+    }
+
+    @Override
+    protected String getPmTitleImpl() {
+      return name.getValue();
     }
   }
 

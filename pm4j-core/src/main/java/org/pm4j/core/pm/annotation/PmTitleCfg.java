@@ -31,24 +31,6 @@ import org.pm4j.core.pm.impl.title.PmTitleProvider;
 public @interface PmTitleCfg {
 
   /**
-   * Name of an attribute that should be used to get the title value.
-   * <p>
-   * Example: The value of the user name should be used as title value for user objects.
-   * To get that, specify that attribute name ('name') in this field.
-   *
-   * @return Name of an attribute that should be used for the title.
-   */
-  String attrValue() default "";
-
-  /**
-   * When the default title provider does not match your requirements, you may specify
-   * here one that supports your special use case.
-   *
-   * @return The title provider to be used for this presententation model.
-   */
-  Class<?> titleProvider() default Void.class;
-
-  /**
    * Specifies a fix resource key to be used for the title, tooltip and
    * icon of this PM.
    * <p>
@@ -86,7 +68,7 @@ public @interface PmTitleCfg {
   /**
    * @return <code>true</code> when the title should be use as toolTip too.
    */
-  boolean tooltipUsesTitle() default false;
+  PmBoolean tooltipUsesTitle() default PmBoolean.UNDEFINED;
 
   /**
    * Specifies a fix title value to be used.<br>
