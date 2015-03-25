@@ -183,7 +183,7 @@ public class PmObjectBase implements PmObject {
 
   @Override
   public final String getPmTooltip() {
-    
+
     CacheStrategy strategy = getPmMetaData().tooltipCache.cacheStrategy;
     Object cachedValue = strategy.getCachedValue(this);
 
@@ -195,7 +195,7 @@ public class PmObjectBase implements PmObject {
     else {
       toolTip = (String) strategy.setAndReturnCachedValue(this, getPmTooltipImpl());
     }
-    
+
     // XXX olaf: a kind of decorator could add some flexibility for
     //           different error display requirements...
     if (getPmMetaData().addErrorMessagesToTooltip &&
@@ -1217,13 +1217,9 @@ public class PmObjectBase implements PmObject {
     List<PmTitleCfg> annotations = AnnotationUtil.findAnnotationsInClassTree(this, PmTitleCfg.class);
 
     if (!annotations.isEmpty()) {
-
-
-
       metaData.resKey = InternalPmTitleCfgUtil.readResKey(annotations);
       metaData.resKeyBase = InternalPmTitleCfgUtil.readResKeyBase(annotations);
-      metaData.tooltipUsesTitle = InternalPmTitleCfgUtil.getTooltipUsesTitle(annotations) == PmBoolean.TRUE;
-
+      metaData.tooltipUsesTitle = InternalPmTitleCfgUtil.readTooltipUsesTitle(annotations) == PmBoolean.TRUE;
     }
 
     if (metaData.resKeyBase == null) {
@@ -1237,8 +1233,8 @@ public class PmObjectBase implements PmObject {
       metaData.resKey = metaData.resKeyBase;
 
       // fix string are only considered if there is no resKey defined.
-      String title = InternalPmTitleCfgUtil.getTitle(annotations);
-      String toolTip = InternalPmTitleCfgUtil.getTooltip(annotations);
+      String title = InternalPmTitleCfgUtil.readTitle(annotations);
+      String toolTip = InternalPmTitleCfgUtil.readTooltip(annotations);
       String icon = InternalPmTitleCfgUtil.readIcon(annotations);
       if (title != null || toolTip != null || icon != null) {
         metaData.pmTitleProvider = new PmTitleProviderValuebased(title, toolTip, icon);

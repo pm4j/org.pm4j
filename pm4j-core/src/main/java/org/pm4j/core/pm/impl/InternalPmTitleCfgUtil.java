@@ -21,7 +21,7 @@ class InternalPmTitleCfgUtil {
    */
   static String readIcon(List<PmTitleCfg> annotations) {
     for (PmTitleCfg annotation : annotations) {
-      if (StringUtils.isNotBlank(annotation.icon())) {
+      if (StringUtils.isNotEmpty(annotation.icon())) {
         return annotation.icon();
       }
     }
@@ -36,7 +36,7 @@ class InternalPmTitleCfgUtil {
    */
   static String readResKey(List<PmTitleCfg> annotations) {
     for (PmTitleCfg annotation : annotations) {
-      if (StringUtils.isNotBlank(annotation.resKey())) {
+      if (StringUtils.isNotEmpty(annotation.resKey())) {
         return annotation.resKey();
       }
     }
@@ -51,7 +51,7 @@ class InternalPmTitleCfgUtil {
    */
   static String readResKeyBase(List<PmTitleCfg> annotations) {
     for (PmTitleCfg annotation : annotations) {
-      if (StringUtils.isNotBlank(annotation.resKeyBase())) {
+      if (StringUtils.isNotEmpty(annotation.resKeyBase())) {
         return annotation.resKeyBase();
       }
     }
@@ -64,9 +64,9 @@ class InternalPmTitleCfgUtil {
    *          The read operation starts with the first list element.
    * @return The value of the fist found value or <code>null</code> if all values where blank.
    */
-  static String getTitle(List<PmTitleCfg> annotations) {
+  static String readTitle(List<PmTitleCfg> annotations) {
     for (PmTitleCfg annotation : annotations) {
-      if (StringUtils.isNotBlank(annotation.title())) {
+      if (StringUtils.isNotEmpty(annotation.title())) {
         return annotation.title();
       }
     }
@@ -79,9 +79,9 @@ class InternalPmTitleCfgUtil {
    *          The read operation starts with the first list element.
    * @return The value of the fist found value or <code>null</code> if all values where blank.
    */
-  static String getTooltip(List<PmTitleCfg> annotations) {
+  static String readTooltip(List<PmTitleCfg> annotations) {
     for (PmTitleCfg annotation : annotations) {
-      if (StringUtils.isNotBlank(annotation.tooltip())) {
+      if (StringUtils.isNotEmpty(annotation.tooltip())) {
         return annotation.tooltip();
       }
     }
@@ -94,7 +94,7 @@ class InternalPmTitleCfgUtil {
    *          The read operation starts with the first list element.
    * @return The value of the fist found value or {@link PmBoolean#UNDEFINED} if all values where {@link PmBoolean#UNDEFINED}.
    */
-  static PmBoolean getTooltipUsesTitle(List<PmTitleCfg> annotations) {
+  static PmBoolean readTooltipUsesTitle(List<PmTitleCfg> annotations) {
     for (PmTitleCfg annotation : annotations) {
       if (annotation.tooltipUsesTitle() != PmBoolean.UNDEFINED) {
         return annotation.tooltipUsesTitle();
