@@ -7,6 +7,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang.ObjectUtils;
@@ -295,6 +296,52 @@ public abstract class PageableCollectionTestBase<T> {
     assertEquals("the second item is selected", true, collection.getSelection().contains(secondItem));
     assertEquals("2 items are selected", 2, collection.getSelection().getSize());
 
+  }
+  
+  /**
+   * Tests {@link SelectMode#SINGLE} scenarios
+   */
+  @Test
+  public void testSingleSelection() {
+    collection.getSelectionHandler().setSelectMode(SelectMode.SINGLE);
+
+    //select
+    collection.getSelectionHandler().select(true, collection.getItemsOnPage().get(0));
+    assertEquals(true, collection.getSelectionHandler().getSelection().getSize() == 1);
+
+    //try unselect item which is not selected and expect selection not changed
+    collection.getSelectionHandler().select(false, collection.getItemsOnPage().get(1));
+    assertEquals(true, collection.getSelectionHandler().getSelection().getSize() == 1);
+
+    //try unselect previously selected item and expect selection to be gone
+    collection.getSelectionHandler().select(false, collection.getItemsOnPage().get(0));
+    assertEquals(true, collection.getSelectionHandler().getSelection().getSize() == 0);
+  }
+  
+  /**
+   * Checks whether table selection applies the same ordering as the table
+   */
+  @Test
+  public void testSelectionOrdering() {
+    
+    // select all items and check for proper ordering
+    collection.setPageSize(3);
+    collection.getQueryParams().setSortOrder(nameSortOrder.getReverseSortOrder());
+    collection.getSelectionHandler().setSelectMode(SelectMode.MULTI);
+    collection.getSelectionHandler().selectAll(true);
+    
+    assertEquals(true, collection.getSelectionHandler().getSelection().getSize() > 1);
+    assertEquals("Selection sorted according to backing collection order", "[f, e, d, c, b, a]", IterableUtil.asCollection(collection.getSelection()).toString());
+
+    //clear selection and select only 2 first items
+    collection.getSelectionHandler().selectAll(false);
+    collection.getQueryParams().setSortOrder(nameSortOrder);
+    @SuppressWarnings("unchecked")
+    List<T> itemsToSelect = Arrays.asList(collection.getItemsOnPage().get(1), collection.getItemsOnPage().get(2));
+    collection.getSelectionHandler().select(true, itemsToSelect);
+    collection.getSelectionHandler().select(true, collection.getItemsOnPage().get(0)); 
+
+    assertEquals("Selection sorted according to backing collection order", "[a, b, c]", IterableUtil.asCollection(collection.getSelection()).toString());
   }
 
   @Test

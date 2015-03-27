@@ -40,12 +40,18 @@ public class IterableUtil {
    * @return The shallow copy.
    */
   public static <T> List<T> shallowCopy(Iterable<T> ori) {
-    ArrayList<T> copy = new ArrayList<T>();
+    ArrayList<T> copy;
 
-    for (T t : ori) {
-      copy.add(t);
+    if (ori instanceof Collection) {
+      //some collections implementations provide more optimized way
+      copy = new ArrayList<T>((Collection<T>) ori);
+    } else {
+      copy = new ArrayList<T>();
+
+      for (T t : ori) {
+        copy.add(t);
+      }
     }
-
     return copy;
   }
 
@@ -134,6 +140,41 @@ public class IterableUtil {
   public static boolean isEmpty(Iterable<?> i) {
     return i == null ||
            !i.iterator().hasNext();
+  }
+  
+  /**
+   * Checks whether two instances of {@link Iterable} are equal. Iterables are considered as equal when the following conditions takes place:
+   * <ul>
+   * <li> They have the same number of elements </li>
+   * <li> Elements are stored in the same order </li>
+   * <li> All elements are equal to each other according to their {@link #equals(Object)} implementation</li>
+   * </ul>
+   * @param a first iterable
+   * @param b second iterable
+   * @return {@code true} if iterables are equal.
+   */
+  public static <T> boolean areEqual(Iterable<T> a, Iterable<T> b) {
+    if(a == b) {
+      return true;
+    }
+    if(a == null || b == null) {
+      return false;
+    }
+    
+    Iterator<T> firstIterator = a.iterator();
+    Iterator<T> secondIterator = b.iterator();
+    
+    while(firstIterator.hasNext() || secondIterator.hasNext()) {
+      if(firstIterator.hasNext() && secondIterator.hasNext()) {
+        if(!firstIterator.next().equals(secondIterator.next())) {
+          return false;
+        }
+      } else {
+        return false;
+      }
+    }
+    
+    return true;
   }
 
   private IterableUtil() {

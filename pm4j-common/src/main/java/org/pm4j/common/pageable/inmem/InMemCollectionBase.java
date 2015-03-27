@@ -47,7 +47,12 @@ public abstract class InMemCollectionBase<T_ITEM>
   implements InMemCollection<T_ITEM> {
 
   /** The collection type specific selection handler. */
-  private SelectionHandler<T_ITEM> selectionHandler = new ItemSetSelectionHandler<T_ITEM>(this);
+  private SelectionHandler<T_ITEM> selectionHandler = new ItemSetSelectionHandler<T_ITEM>() {
+    @Override
+    protected Collection<T_ITEM> getAllCollection() {
+      return _getObjects();
+    };
+  };
   /** In-memory specific item set modification handler. */
   private ModificationHandler<T_ITEM> modificationHandler = new InMemModificationHandler();
   /** Interpreter for filtering query expressions. */

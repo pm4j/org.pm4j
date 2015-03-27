@@ -1,17 +1,22 @@
 package org.pm4j.common.pageable.querybased.idquery;
 
+import static org.apache.commons.lang.Validate.notNull;
+
 import java.beans.PropertyVetoException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.pm4j.common.selection.SelectMode;
 import org.pm4j.common.selection.Selection;
 import org.pm4j.common.selection.SelectionHandler;
 import org.pm4j.common.selection.SelectionHandlerBase;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -21,6 +26,7 @@ import org.pm4j.common.selection.SelectionHandlerBase;
  * @param <T_ID> type of item id's.
  *
  * @author Olaf Boede
+ * @author alech
  */
 public abstract class IdQuerySelectionHandler<T_ITEM, T_ID> extends SelectionHandlerBase<T_ITEM> {
 
@@ -45,46 +51,69 @@ public abstract class IdQuerySelectionHandler<T_ITEM, T_ID> extends SelectionHan
   }
 
   /**
-   * Sub classes should provide an implementation. Used for the 'selectAll' functionality.
-   *
-   * @return all item id's.
+   * @return a collection containing all available item ids possible to select
    */
   protected abstract Collection<T_ID> getAllIds();
 
-
    @Override
   public boolean select(boolean select, T_ITEM item) {
-    Set<T_ID> set = getModifiableIdSet();
-    T_ID id = idQueryService.getIdForItem(item);
-    if (select) {
-      beforeAddSingleItemSelection(set);
-      set.add(id);
+    notNull(item, "item cannot be null");
+    Set<T_ID> newSelection = new LinkedHashSet<T_ID>((int) selection.getSize() + 1);
+    T_ID itemId = idQueryService.getIdForItem(item);
+    
+    //rebuild selection maintaining original order
+    
+    if (select) { //select
+      if (getSelectMode().equals(SelectMode.SINGLE)) {
+        newSelection.add(itemId);
+      } else if (getSelectMode().equals(SelectMode.MULTI)) {
+        for (T_ID allCollectionItemId : getAllIds()) {
+          if (selection.getIds().contains(allCollectionItemId) || allCollectionItemId.equals(itemId)) {
+            //item was previously selected or is intended to -> pass it to the new selection set
+            newSelection.add(allCollectionItemId);
+          }
+          if (newSelection.size() ==  selection.getSize() + 1) {
+            break; // got them all!
+          }
+        }
+      } else {
+        throw new RuntimeException("Selection for select mode '" + getSelectMode() + "' is not supported.");
+      }
+    } else { //unselect
+      newSelection.addAll(selection.getIds());
+      newSelection.remove(itemId);
     }
-    else {
-      set.remove(id);
-    }
-    return setSelection(set);
+    
+    return setSelection(newSelection);
   }
 
   @Override
   public boolean select(boolean select, Iterable<T_ITEM> items) {
-    Set<T_ID> ids = getModifiableIdSet();
+    Set<T_ID> newSelection = new LinkedHashSet<T_ID>();
 
-    if (getSelectMode() == SelectMode.SINGLE && select) {
-      ids.clear();
+    //prepare ids
+    List<T_ID> itemIds = new LinkedList<T_ID>();
+    for(T_ITEM item : items) {
+      itemIds.add(idQueryService.getIdForItem(item));
+    }
+     
+    //rebuild selection maintaining original order
+    if (select) { //select
+      for (T_ID allCollectionItemId : getAllIds()) {
+        if (selection.getIds().contains(allCollectionItemId) || itemIds.contains(allCollectionItemId)) {
+          newSelection.add(allCollectionItemId);
+        }
+        if (newSelection.size() == selection.getSize() + itemIds.size()) {
+          break; // got them all!
+        }
+      }
+    } else { //unselect
+      newSelection.addAll(selection.getIds());
+      newSelection.removeAll(itemIds);
     }
 
-    for (T_ITEM i : items) {
-      if (select) {
-        ids.add(idQueryService.getIdForItem(i));
-      }
-      else {
-        ids.remove(idQueryService.getIdForItem(i));
-      }
-    }
-
-    checkMultiSelectResult(ids);
-    return setSelection(ids);
+    checkMultiSelectResult(newSelection);
+    return setSelection(newSelection);
   }
 
   @SuppressWarnings("unchecked")
@@ -95,7 +124,7 @@ public abstract class IdQuerySelectionHandler<T_ITEM, T_ID> extends SelectionHan
         throw new RuntimeException("Select all for current select mode is not supported: " + getSelectMode());
       }
 
-      return setSelection(new HashSet<T_ID>(getAllIds()));
+      return setSelection(new LinkedHashSet<T_ID>(getAllIds()));
     }
     else {
       return setSelection(Collections.EMPTY_SET);
@@ -108,7 +137,7 @@ public abstract class IdQuerySelectionHandler<T_ITEM, T_ID> extends SelectionHan
       throw new RuntimeException("Invert selection is not supported for select mode: " + getSelectMode());
     }
 
-    Set<T_ID> newSelectedIds = new HashSet<T_ID>(getAllIds());
+    Set<T_ID> newSelectedIds = new LinkedHashSet<T_ID>(getAllIds());
     newSelectedIds.removeAll(selection.getIds());
 
     return setSelection(newSelectedIds);
@@ -152,10 +181,6 @@ public abstract class IdQuerySelectionHandler<T_ITEM, T_ID> extends SelectionHan
     return setSelection(selectedIds.isEmpty()
         ? emptySelection
         : new IdQuerySelectionBase<T_ITEM, T_ID>(idQueryService, selectedIds));
-  }
-
-  private Set<T_ID> getModifiableIdSet() {
-    return new HashSet<T_ID>(selection.getIds());
   }
 
 }

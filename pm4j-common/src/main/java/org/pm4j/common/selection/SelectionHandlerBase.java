@@ -47,14 +47,6 @@ public abstract class SelectionHandlerBase<T_ITEM> extends PropertyChangeSupport
     ensureSelectionStateCalled = false;
   }
 
-  protected void beforeAddSingleItemSelection(Collection<?> currentSelection) {
-    switch (selectMode) {
-      case SINGLE: currentSelection.clear(); break;
-      case MULTI: break;
-      default: throw new RuntimeException("Selection for select mode '" + selectMode + "' is not supported.");
-    }
-  }
-
   protected void checkMultiSelectResult(Collection<?> newSelection) {
     switch (selectMode) {
       case SINGLE: if (newSelection.size() > 1) {
