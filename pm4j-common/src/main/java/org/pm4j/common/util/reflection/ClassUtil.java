@@ -470,59 +470,6 @@ public class ClassUtil {
 
 
   /**
-   * Walks up the class hierarchy starting with the given class to find all
-   * methods with a particular annotation. Methods that are declared deeper in
-   * the class hierarchy will be returned first.
-   *
-   * @param type
-   *          start point in the class hierarchy
-   * @param annotation
-   *          the annotation in question
-   * @return all methods with the given annotation, an empty list if no
-   *         annotated methods where found
-   */
-  public static List<Method> findAnnotatedMethodsBottomUp(final Class<?> type,
-      final Class<? extends Annotation> annotation) {
-    assert type != null;
-    assert annotation != null;
-
-    List<Method> methods = new ArrayList<Method>();
-    Class<?> clazz = type;
-
-    // walk up the class hierarchy
-    while (clazz != Object.class) {
-      List<Method> allMethods = new ArrayList<Method>(Arrays.asList(clazz.getDeclaredMethods()));
-      for (Method method : allMethods) {
-        if (method.isAnnotationPresent(annotation)) {
-          methods.add(method);
-        }
-      }
-      clazz = clazz.getSuperclass();
-    }
-
-    return methods;
-  }
-
-  /**
-   * Walks down the class hierarchy from java.lang Object to the given class to
-   * find all methods with a particular annotation. Methods that are declared
-   * higher in the class hierarchy will be returned first.
-   *
-   * @param type
-   *          finish point in the class hierarchy
-   * @param annotation
-   *          the annotation in question
-   * @return all methods with the given annotation, an empty list if no
-   *         annotated methods where found
-   */
-  public static List<Method> findAnnotatedMethodsTopDown(final Class<?> type,
-      final Class<? extends Annotation> annotation) {
-    List<Method> methods = findAnnotatedMethodsBottomUp(type, annotation);
-    Collections.reverse(methods);
-    return methods;
-  }
-
-  /**
    *
    */
   private ClassUtil() {

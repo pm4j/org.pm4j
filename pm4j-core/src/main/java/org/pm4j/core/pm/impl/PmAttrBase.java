@@ -1,24 +1,56 @@
 package org.pm4j.core.pm.impl;
 
+import static org.pm4j.core.pm.api.PmCacheApi.clearPmCache;
+
+import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+import java.util.TimeZone;
+
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import javax.validation.metadata.BeanDescriptor;
+import javax.validation.metadata.ConstraintDescriptor;
+import javax.validation.metadata.PropertyDescriptor;
+
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.pm4j.common.cache.CacheStrategy;
 import org.pm4j.common.converter.string.StringConverter;
 import org.pm4j.common.converter.string.StringConverterParseException;
-import org.pm4j.common.converter.value.ValueConverterChain;
 import org.pm4j.common.converter.value.ValueConverter;
+import org.pm4j.common.converter.value.ValueConverterChain;
 import org.pm4j.common.converter.value.ValueConverterDefault;
 import org.pm4j.common.expr.Expression.SyntaxVersion;
 import org.pm4j.common.util.CompareUtil;
-import org.pm4j.common.util.reflection.*;
+import org.pm4j.common.util.reflection.BeanAttrAccessor;
+import org.pm4j.common.util.reflection.BeanAttrAccessorImpl;
+import org.pm4j.common.util.reflection.ClassUtil;
+import org.pm4j.common.util.reflection.GenericTypeUtil;
+import org.pm4j.common.util.reflection.ReflectionException;
 import org.pm4j.core.exception.PmConverterException;
 import org.pm4j.core.exception.PmResourceData;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.exception.PmValidationException;
-import org.pm4j.core.pm.*;
+import org.pm4j.core.pm.PmAttr;
+import org.pm4j.core.pm.PmAttrString;
+import org.pm4j.core.pm.PmBean;
+import org.pm4j.core.pm.PmCommandDecorator;
+import org.pm4j.core.pm.PmConstants;
+import org.pm4j.core.pm.PmDataInput;
+import org.pm4j.core.pm.PmEvent;
+import org.pm4j.core.pm.PmMessage;
 import org.pm4j.core.pm.PmMessage.Severity;
+import org.pm4j.core.pm.PmObject;
+import org.pm4j.core.pm.PmOption;
+import org.pm4j.core.pm.PmOptionSet;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.annotation.PmAttrCfg.Restriction;
 import org.pm4j.core.pm.annotation.PmAttrCfg.Validate;
@@ -31,8 +63,13 @@ import org.pm4j.core.pm.annotation.PmObjectCfg.Visible;
 import org.pm4j.core.pm.annotation.PmOptionCfg;
 import org.pm4j.core.pm.annotation.PmOptionCfg.NullOption;
 import org.pm4j.core.pm.annotation.PmTitleCfg;
-import org.pm4j.core.pm.api.*;
+import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
+import org.pm4j.core.pm.api.PmEventApi;
+import org.pm4j.core.pm.api.PmExpressionApi;
+import org.pm4j.core.pm.api.PmLocalizeApi;
+import org.pm4j.core.pm.api.PmMessageApi;
+import org.pm4j.core.pm.api.PmMessageUtil;
 import org.pm4j.core.pm.impl.InternalPmCacheCfgUtil.CacheMetaData;
 import org.pm4j.core.pm.impl.cache.CacheStrategyBase;
 import org.pm4j.core.pm.impl.converter.PmConverterErrorMessage;
@@ -44,19 +81,8 @@ import org.pm4j.core.pm.impl.pathresolver.PassThroughPathResolver;
 import org.pm4j.core.pm.impl.pathresolver.PathResolver;
 import org.pm4j.core.pm.impl.pathresolver.PmExpressionPathResolver;
 import org.pm4j.navi.NaviLink;
-
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-import javax.validation.metadata.BeanDescriptor;
-import javax.validation.metadata.ConstraintDescriptor;
-import javax.validation.metadata.PropertyDescriptor;
-
-import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.util.*;
-
-import static org.pm4j.core.pm.api.PmCacheApi.clearPmCache;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p> Basic implementation for PM attributes.  </p>
@@ -1599,7 +1625,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
         if (ClassUtil.findMethods(getClass(), "getBackingValueImpl").size() > 1) {
           myMetaData.valueAccessStrategy = ValueAccessOverride.INSTANCE;
         } else {
-          PmObjectUtil.throwAsPmRuntimeException(this, e);
+          PmRuntimeException.throwAsPmRuntimeException(this, e);
         }
       }
     }

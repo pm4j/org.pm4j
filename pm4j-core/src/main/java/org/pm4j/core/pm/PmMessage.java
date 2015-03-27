@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.lang.Validate;
 import org.pm4j.core.exception.PmResourceData;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.api.PmLocalizeApi;
 import org.pm4j.core.pm.impl.PmCommandImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A string resource based presentation model message.
@@ -55,7 +55,7 @@ public class PmMessage {
   /**
    * Used to order PmMessage. Sorts first for severity descending and second for
    * message text alphabetically.
-   * 
+   *
    * @author okossak
    */
   public static class MessageComparator implements Comparator<PmMessage> {
@@ -87,9 +87,9 @@ public class PmMessage {
    *          Arguments for the resource string.
    */
   public PmMessage(final PmObject pm, Severity severity, String msgKey, Object... msgArgs) {
-    assert pm != null;
-    assert severity != null;
-    assert StringUtils.isNotBlank(msgKey);
+    Validate.notNull(pm);
+    Validate.notNull(severity);
+    Validate.notEmpty(msgKey);
 
     this.severity = severity;
 
@@ -343,7 +343,7 @@ public class PmMessage {
     }
 
   }
-  
+
   /**
    * Set the severity.
    * @param severity the new severity

@@ -4,8 +4,11 @@ import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmConversation;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -158,23 +161,23 @@ public class AnnotationUtil {
 
     return foundAnnotations;
   }
-  
+
   public static <A extends Annotation> List<A> findAnnotationsInClassTree(PmObjectBase pm, Class<A> annotationClass) {
     List<A> foundAnnotations = pm.getPmMetaDataWithoutPmInitCall().isPmField
         ? findAnnotationsInClassTree(pm.getPmParent().getClass(), pm.getPmName(), annotationClass)
         : new ArrayList<A>();
-    
+
     foundAnnotations.addAll(findAnnotationsInClassTree(pm.getClass(), annotationClass));
-    
+
     return foundAnnotations;
   }
-  
+
   private static <A extends Annotation> List<A> findAnnotationsInClassTree(Class<?> clazz, String fieldName, Class<A> annotationClass) {
     List<A> foundAnnotations = new ArrayList<A>();
-    
+
     do {
       Field field;
-      
+
       try {
         field = clazz.getField(fieldName);
         A annotation = field.getAnnotation(annotationClass);
@@ -185,29 +188,83 @@ public class AnnotationUtil {
       } catch (NoSuchFieldException e) {
         // may be OK, because the attribute may use something like getters or
         // xPath.
-      }      
-      
+      }
+
       clazz = clazz.getSuperclass();
-    } while (clazz != null);      
-    
+    } while (clazz != null);
+
     return foundAnnotations;
   }
-  
+
   private static <A extends Annotation> List<A> findAnnotationsInClassTree(Class<?> clazz, Class<A> annotationClass) {
     List<A> foundAnnotations = new ArrayList<A>();
-    
-    do {      
+
+    do {
       A annotation = clazz.getAnnotation(annotationClass);
-      
+
       if (annotation != null) {
         foundAnnotations.add(annotation);
       }
-      
-      clazz = clazz.getSuperclass();      
+
+      clazz = clazz.getSuperclass();
     } while (clazz != null);
-      
-    
+
+
     return foundAnnotations;
   }
+
+  /**
+   * Walks up the class hierarchy starting with the given class to find all
+   * methods with a particular annotation. Methods that are declared deeper in
+   * the class hierarchy will be returned first.
+   *
+   * @param type
+   *          start point in the class hierarchy
+   * @param annotation
+   *          the annotation in question
+   * @return all methods with the given annotation, an empty list if no
+   *         annotated methods where found
+   */
+  private static List<Method> findAnnotatedMethodsBottomUp(final Class<?> type,
+      final Class<? extends Annotation> annotation) {
+    assert type != null;
+    assert annotation != null;
+
+    List<Method> methods = new ArrayList<Method>();
+    Class<?> clazz = type;
+
+    // walk up the class hierarchy
+    while (clazz != Object.class) {
+      List<Method> allMethods = new ArrayList<Method>(Arrays.asList(clazz.getDeclaredMethods()));
+      for (Method method : allMethods) {
+        if (method.isAnnotationPresent(annotation)) {
+          methods.add(method);
+        }
+      }
+      clazz = clazz.getSuperclass();
+    }
+
+    return methods;
+  }
+
+  /**
+   * Walks down the class hierarchy from java.lang Object to the given class to
+   * find all methods with a particular annotation. Methods that are declared
+   * higher in the class hierarchy will be returned first.
+   *
+   * @param type
+   *          finish point in the class hierarchy
+   * @param annotation
+   *          the annotation in question
+   * @return all methods with the given annotation, an empty list if no
+   *         annotated methods where found
+   */
+  public static List<Method> findAnnotatedMethodsTopDown(final Class<?> type,
+      final Class<? extends Annotation> annotation) {
+    List<Method> methods = findAnnotatedMethodsBottomUp(type, annotation);
+    Collections.reverse(methods);
+    return methods;
+  }
+
 
 }
