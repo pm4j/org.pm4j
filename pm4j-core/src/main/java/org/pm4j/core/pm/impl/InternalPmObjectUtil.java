@@ -7,7 +7,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmInit;
 
@@ -60,22 +59,6 @@ final class InternalPmObjectUtil {
     }
 
     return initMethods;
-  }
-
-  /**
-   * Tries to ensure that the given PM context gets reported within the thrown exception.
-   *
-   * @param pm The PM to report.
-   * @param e The exception that caused the throw activity.
-   */
-  static void throwAsPmRuntimeException(PmObjectBase pm, RuntimeException e) {
-    // generate the most informative exception
-    if (e instanceof PmRuntimeException) {
-      throw e;
-    }
-    else {
-      throw new PmRuntimeException(pm, e);
-    }
   }
 
 }

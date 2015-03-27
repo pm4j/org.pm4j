@@ -3,13 +3,10 @@ package org.pm4j.core.pm.impl;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.pm4j.common.util.reflection.GenericTypeUtil;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.exception.PmValidationException;
 import org.pm4j.core.pm.PmBean;
-import org.pm4j.core.pm.PmDataInput;
 import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmEvent.ValueChangeKind;
 import org.pm4j.core.pm.PmMessage.Severity;
@@ -22,6 +19,8 @@ import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.api.PmExpressionApi;
 import org.pm4j.core.pm.api.PmFactoryApi;
 import org.pm4j.core.pm.api.PmMessageApi;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A PM that handles a bean.

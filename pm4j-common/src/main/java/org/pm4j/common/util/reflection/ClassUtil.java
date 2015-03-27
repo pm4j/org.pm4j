@@ -1,7 +1,6 @@
 package org.pm4j.common.util.reflection;
 
 import java.io.File;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -14,9 +13,9 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
+import org.pm4j.common.exception.CheckedExceptionWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.pm4j.common.exception.CheckedExceptionWrapper;
 
 /**
  * Some functions that make it easier to use of some reflection features.
