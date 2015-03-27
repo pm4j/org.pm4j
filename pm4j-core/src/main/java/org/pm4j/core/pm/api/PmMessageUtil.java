@@ -6,7 +6,6 @@ import java.util.TreeSet;
 import org.pm4j.common.util.collection.ArrayUtil;
 import org.pm4j.core.exception.PmResourceData;
 import org.pm4j.core.exception.PmUserMessageException;
-import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmConstants;
 import org.pm4j.core.pm.PmMessage;
 import org.pm4j.core.pm.PmMessage.Severity;
@@ -108,26 +107,6 @@ public class PmMessageUtil {
   }
 
   /**
-   * Generates a warning that indicates that a required value is not provided.
-   * <p>
-   * For attributes with options the resource
-   * {@link #MSGKEY_VALIDATION_MISSING_REQUIRED_SELECTION} is used.<br>
-   * For attributes without options the resource
-   * {@link #MSGKEY_VALIDATION_MISSING_REQUIRED_VALUE} is used.
-   * <p>
-   * When a custom resource key with the postfix
-   * {@link #RESKEY_POSTFIX_REQUIRED_MSG} is provided, that key will be used for
-   * message generation.
-   *
-   * @return The resource data for the required attribute value warning.
-   *
-   * @deprecated use {@link PmMessageApi#makeRequiredMessageResData(PmAttr)}
-   */
-  public static PmResourceData makeRequiredWarning(PmAttr<?> pm) {
-    return PmMessageApi.makeRequiredMessageResData(pm);
-  }
-
-  /**
    * @param pm
    * @return
    *
@@ -145,26 +124,6 @@ public class PmMessageUtil {
    */
   public static List<PmMessage> getPmErrors(PmObject pm) {
     return PmMessageApi.getMessages(pm, Severity.ERROR);
-  }
-
-  /**
-   * @return Warning messages that are related to this presentation model.<br>
-   *         In case of no messages an empty collection.
-   *
-   * @deprecated Please use {@link PmMessageApi#getMessages(PmObject, Severity)} with {@link Severity#WARN}.
-   */
-  public static List<PmMessage> getPmWarnings(PmObject pm) {
-    return PmMessageApi.getMessages(pm, Severity.WARN);
-  }
-
-  /**
-   * @return Info messages that are related to this presentation model.<br>
-   *         In case of no messages an empty collection.
-   *
-   * @deprecated Please use {@link PmMessageApi#getMessages(PmObject, Severity)} with {@link Severity#INFO}.
-   */
-  public static List<PmMessage> getPmInfos(PmObject pm) {
-    return PmMessageApi.getMessages(pm, Severity.INFO);
   }
 
   /**

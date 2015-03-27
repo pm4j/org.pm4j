@@ -44,7 +44,7 @@ public class PmMessageUtilTest {
   }
 
   /**
-   * Tests the logic that is implemented in {@link PmMessageUtil#makeRequiredWarning(org.pm4j.core.pm.PmAttr)}
+   * Tests the default required attribute value message.
    */
   @Test
   public void testRequiredDefaultMessage() {
@@ -53,7 +53,7 @@ public class PmMessageUtilTest {
   }
 
   /**
-   * Tests the logic that is implemented in {@link PmMessageUtil#makeRequiredWarning(org.pm4j.core.pm.PmAttr)}
+   * Tests the a resource-postfix defined individual required attribute value message.
    */
   @Test
   public void testRequiredResourceDefinedSpecialMessage() {
