@@ -9,6 +9,7 @@ import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmCommand.CommandState;
 import org.pm4j.core.pm.PmCommandDecorator;
+import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmTab;
 import org.pm4j.core.pm.PmTabSet;
@@ -43,6 +44,43 @@ public class PmTabSetImpl extends PmObjectBase implements PmTabSet {
    */
   public PmTabSetImpl(PmObject pmParent) {
     super(pmParent);
+  }
+
+  @Override
+  protected void onPmDataExchangeEvent(PmEvent parentEvent) {
+    super.onPmDataExchangeEvent(parentEvent);
+    invalidateNotUsefulCurrentTab();
+  }
+
+  /**
+   * If the currentTabPm is not useful to be shown, it will be marked as
+   * invalid.
+   * 
+   * @return <code>true</code> if the current tab got invalidated
+   */
+  public boolean invalidateNotUsefulCurrentTab() {
+    if (currentTabPm == null) {
+      return false;
+    }
+    if (!isTabUseful(currentTabPm)) {
+      // don't show that tab as current tab.
+      currentTabPm = null;
+      return true;
+      // {@link #getCurrentTabPm} already finds the next useful tab if current
+      // is tab is null.
+    }
+    return false;
+  }
+
+  /**
+   * Defines if <code>tab</code> is useful to be shown.
+   *
+   * @param tab
+   *          to be tested
+   * @return <code>true</code>, if the tab is useful to be shown.
+   */
+  protected boolean isTabUseful(PmTab tab) {
+    return tab.isPmVisible() && tab.isPmEnabled();
   }
 
   /**
