@@ -3,12 +3,11 @@ package org.pm4j.core.pm.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmCommand.CommandState;
 import org.pm4j.core.pm.PmCommandDecorator;
+import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmTab;
 import org.pm4j.core.pm.PmTabSet;
@@ -16,6 +15,8 @@ import org.pm4j.core.pm.annotation.PmCommandCfg;
 import org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO;
 import org.pm4j.core.pm.impl.connector.PmTabSetConnector;
 import org.pm4j.navi.NaviLink;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Basic implementation of a {@link PmTabSet}.
@@ -35,6 +36,8 @@ public class PmTabSetImpl extends PmObjectBase implements PmTabSet {
 
   /** PM of the currently active tab. */
   private PmTab currentTabPm;
+  /** Reference to tab that was formerly the current one but was de-selected by a {@link #resetCurrentTabPmIfInactive()} call. */
+  private PmTab resettedCurrentTabPm;
 
   /**
    * Creates the tab set PM.
@@ -43,6 +46,36 @@ public class PmTabSetImpl extends PmObjectBase implements PmTabSet {
    */
   public PmTabSetImpl(PmObject pmParent) {
     super(pmParent);
+  }
+
+  @Override
+  protected void onPmDataExchangeEvent(PmEvent parentEvent) {
+    super.onPmDataExchangeEvent(parentEvent);
+    resetCurrentTabPmIfInactive();
+  }
+
+  /**
+   * If the currentTabPm is not visible or not enabled the internal {@link #currentTabPm} reference
+   * will be reset to <code>null</code>. The next call to {@link #getCurrentTabPm()} will re-calculate
+   * the current tab using the logic provided by {@link #getFirstTabPm()}.
+   */
+  public void resetCurrentTabPmIfInactive() {
+    if (currentTabPm != null && !isTabActive(currentTabPm)) {
+      resettedCurrentTabPm = currentTabPm;
+      currentTabPm = null;
+    }
+  }
+
+  /**
+   * Defines if <code>tab</code> may be opened.<br>
+   * This can be only be done it the tab is visible and enabled.
+   *
+   * @param tab
+   *          to be tested
+   * @return <code>true</code>, if the tab may be opened.
+   */
+  protected boolean isTabActive(PmTab tab) {
+    return tab.isPmVisible() && tab.isPmEnabled();
   }
 
   /**
@@ -60,8 +93,11 @@ public class PmTabSetImpl extends PmObjectBase implements PmTabSet {
 
   @Override
   public boolean switchToTabPm(PmTab toTab) {
-    PmTab _fromTab = getCurrentTabPm();
+    PmTab _fromTab = currentTabPm != null ? currentTabPm : getFirstTabPm();
+    return _switchToTabPm(_fromTab, toTab);
+  }
 
+  private boolean _switchToTabPm(PmTab _fromTab, PmTab toTab) {
     if (_fromTab == toTab) {
       // nothing to do. 'successfully' done.
       return true;
@@ -126,14 +162,47 @@ public class PmTabSetImpl extends PmObjectBase implements PmTabSet {
   }
 
   /**
+   * Gets called after a successful tab switch operation.
+   *
+   * @param fromTab
+   *          The tab that was left.
+   * @param toTab
+   *          The tab new current tab.
+   */
+  protected void afterSwitch(PmTab fromTab, PmTab toTab) {
+  }
+
+  /**
+   * Provides the currently active tab.
+   * <p>
+   * The initial call uses {@link #getFirstTabPm()} to evaluate the tab to open
+   * initially.
+   * <p>
+   * In case of an automatic tab-switch caused by
+   * {@link #resetCurrentTabPmIfInactive()} we have to notify the registered tab
+   * switch decorators. We can't call <code>beforeDo()</code> because we can't
+   * handle vetos. But we can call <code>afterDo()</code> here to make clear
+   * that a switch happened.
+   *
    * @return The currently active tab.
    */
   @Override
   public PmTab getCurrentTabPm() {
     PmInitApi.initThisPmOnly(this);
-    return (currentTabPm != null)
-            ? currentTabPm
-            : getFirstTabPm();
+    if (currentTabPm == null) {
+      currentTabPm = getFirstTabPm();
+      if (resettedCurrentTabPm != null) {
+        if (!_switchToTabPm(resettedCurrentTabPm, currentTabPm)) {
+          currentTabPm = null;
+          throw new PmRuntimeException(this, "Unable to leave the inactive tab '" +
+                      resettedCurrentTabPm.getPmName() +
+                      ". Please check your beforeDo veto logic. It should be less restrictive for this case.");
+        }
+        resettedCurrentTabPm = null;
+      }
+    }
+
+    return currentTabPm;
   }
 
   /**
@@ -168,17 +237,22 @@ public class PmTabSetImpl extends PmObjectBase implements PmTabSet {
    * The default implementation just provides the first sub-element.<br>
    * It should be overridden if the first tab is not the first sub-element.
    *
-   * @return The first tab of the tab set.
+   * @return The first tab of the tab set. Never <code>null</code>.
    */
   protected PmTab getFirstTabPm() {
     List<PmTab> tabs = getTabPms();
-    if (tabs.size() > 0) {
-      return tabs.get(0);
+    if (tabs == null || tabs.isEmpty()) {
+      throw new PmRuntimeException(this, "Tab set without tabs can't be used.");
     }
-    else {
-      LOG.warn("Tabset '" + getPmRelativeName() + "' has no sub tab PMs.");
-      return null;
+
+    for (PmTab t : tabs) {
+      if (isTabActive(t)) {
+        return t;
+      }
     }
+
+    LOG.warn("Tabset '" + getPmRelativeName() + "' has no sub active tab PMs. The first inactive tab gets the current one.");
+    return getTabPms().get(0);
   }
 
   /**
@@ -267,6 +341,7 @@ public class PmTabSetImpl extends PmObjectBase implements PmTabSet {
     @Override
     protected NaviLink afterDo(boolean changeCommandHistory) {
       tabSet.currentTabPm = toTab;
+      tabSet.afterSwitch(fromTab, toTab);
       return super.afterDo(changeCommandHistory);
     }
   }

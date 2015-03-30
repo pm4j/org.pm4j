@@ -3,13 +3,17 @@ package org.pm4j.core.pm.impl.changehandler;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.Validate;
 import org.pm4j.core.pm.PmCommandDecorator;
 import org.pm4j.core.pm.PmDataInput;
+import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
+import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmMessageApi;
 import org.pm4j.core.pm.api.PmValidationApi;
+import org.pm4j.core.pm.impl.PmTabSetImpl;
 
 /**
  * A details handler that allows a master record switch only if the details area is valid.
@@ -44,7 +48,7 @@ public class DetailsPmHandlerImpl<T_DETAILS_PM extends PmObject, T_MASTER_RECORD
    * @param detailsPm The details PM to handle.
    */
   public DetailsPmHandlerImpl(T_DETAILS_PM detailsPm) {
-    assert detailsPm != null;
+    Validate.notNull(detailsPm);
     this.detailsPm = detailsPm;
   }
 
