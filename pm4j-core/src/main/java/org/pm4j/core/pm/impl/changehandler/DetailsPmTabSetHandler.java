@@ -1,22 +1,30 @@
 package org.pm4j.core.pm.impl.changehandler;
 
-import org.pm4j.core.pm.PmObject;
+import org.pm4j.core.pm.PmTabSet;
 import org.pm4j.core.pm.impl.PmTabSetImpl;
 
 /**
- * Special details handler concerning tab set related behavior
+ * Special details handler concerning {@link PmTabSet} related behavior.
+ * <p>
+ * On master record switch it
+ * <ul>
+ * <li>clears any cached information and messages (logic is provided by
+ * DetailsPmHandlerImpl)</li>
+ * <li>resets the current tab if it got invisible or disabled</li>
+ * </ul>
  *
  * @author Dietmar Zabel
- * @param <T_DETAILS_PM>
  * @param <T_MASTER_RECORD>
+ *          The master record type used as parameter for
+ *          <code>before/afterMasterRecordSwitchImpl()</code>.
  */
-public class DetailsPmTabSetHandler<T_DETAILS_PM extends PmTabSetImpl, T_MASTER_RECORD> extends DetailsPmHandlerImpl<T_DETAILS_PM, T_MASTER_RECORD> {
+public class DetailsPmTabSetHandler<T_MASTER_RECORD> extends DetailsPmHandlerImpl<PmTabSetImpl, T_MASTER_RECORD> {
 
     /**
      * Constructor
      * @param detailsPm
      */
-    public DetailsPmTabSetHandler(T_DETAILS_PM detailsPm) {
+    public DetailsPmTabSetHandler(PmTabSetImpl detailsPm) {
         super(detailsPm);
     }
 
@@ -28,6 +36,6 @@ public class DetailsPmTabSetHandler<T_DETAILS_PM extends PmTabSetImpl, T_MASTER_
     @Override
     protected void afterMasterRecordChangeImpl(T_MASTER_RECORD newMasterBean) {
         super.afterMasterRecordChangeImpl(newMasterBean);
-        detailsPm.invalidateNotUsefulCurrentTab();
+        getTypedDetailsPm().resetCurrentTabPmIfInactive();
     }
 }

@@ -31,7 +31,7 @@ import org.pm4j.core.pm.impl.PmTabSetImpl;
 public class DetailsPmHandlerImpl<T_DETAILS_PM extends PmObject, T_MASTER_RECORD> implements DetailsPmHandler {
 
   /** The details area PM. */
-  protected final T_DETAILS_PM detailsPm;
+  private final T_DETAILS_PM detailsPm;
 
   /** Additional decorators to apply on {@link #beforeMasterRecordChange(Object, Object)} ()} and {@link #afterMasterRecordChange(Object)}. */
   private final List<PmCommandDecorator> decorators = new ArrayList<PmCommandDecorator>();
