@@ -92,7 +92,7 @@ public abstract class IdQuerySelectionHandler<T_ITEM, T_ID> extends SelectionHan
     Set<T_ID> newSelection = new LinkedHashSet<T_ID>();
 
     //prepare ids
-    List<T_ID> itemIds = new LinkedList<T_ID>();
+    Set<T_ID> itemIds = new LinkedHashSet<T_ID>();
     for(T_ITEM item : items) {
       itemIds.add(idQueryService.getIdForItem(item));
     }

@@ -113,7 +113,7 @@ public abstract class ItemSetSelectionHandler<T_ITEM> extends SelectionHandlerBa
       throw new RuntimeException("Invert selection is not supported for select mode: " + getSelectMode());
     }
 
-    Set<T_ITEM> newSelectedItems = new HashSet<T_ITEM>(getAllCollection());
+    Set<T_ITEM> newSelectedItems = new LinkedHashSet<T_ITEM>(getAllCollection());
     newSelectedItems.removeAll(selection.selectedItems);
 
     return setSelection(newSelectedItems);
