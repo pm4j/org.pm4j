@@ -6,8 +6,7 @@ import java.util.TreeMap;
 /**
  * A call counter intended for test cases.
  *
- * @author oboede
- *
+ * @author Olaf Boede
  */
 public class CallCounter {
 
