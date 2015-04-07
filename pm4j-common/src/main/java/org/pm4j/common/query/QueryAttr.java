@@ -8,9 +8,25 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.pm4j.common.exception.CheckedExceptionWrapper;
 
 /**
- * Descriptor for a query attribute to filter or to sort by.
+ * A descriptor for a query field descriptors.<br>
+ * It usually describes an entity field.
+ * <p>
+ * Descriptor fields:
+ * <ul>
+ *  <li><b>path</b>: A string expression referencing the location of the entity attribute in relation to the
+ *            root instance.<br>
+ *            Examples: <code>code</code> or <code>subEntity.code</code> or
+ *                      <code>(o)entityLink.name</code></li>
+ *  <li><b>name</b>: An optional identifier, usually used for binding query attribute related
+ *            options (sort and filter options) to table columns.</li>
+ *  <li><b>type</b>: The entity field class. Is usually used to identify corresponding type specific attribute
+ *            condition evaluators and to select the type specific UI attribute in table filter
+ *            dialogs.</li>
+ *  <li><b>title</b>: An optional string that may be used as data input label in filter condition
+ *            dialogs.</li>
+ * </ul>
  *
- * @author olaf boede
+ * @author Olaf Boede
  */
 public class QueryAttr implements Serializable, Cloneable {
 
