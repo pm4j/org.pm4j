@@ -19,9 +19,11 @@ import java.lang.annotation.Target;
  *
  * @author SDOLKE
  *
+ * @deprecated please override <code>onOmInit()</code> of your PM.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.METHOD })
+@Deprecated
 public @interface PmInit {
 
 }

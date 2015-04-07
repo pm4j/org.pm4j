@@ -193,7 +193,11 @@ public class DiResolverUtilTest {
   @Test
   public void setValueWithInvalidValueThrowsExceptionForNullValueIfNullNotAllowed() {
     expectedException.expect(PmRuntimeException.class);
-    expectedException.expectMessage("Found value for dependency injection of 'private java.lang.String org.pm4j.core.pm.impl.inject.DiResolverUtilTest$MyPm.myFieldInitializedNullProp' was null. But null value is not allowed. You may configure null-value handling using @PmInject(nullAllowed=...).");
+    // @formatter:off
+    expectedException.expectMessage(
+        "Found value for dependency injection of '" + myFieldInitializedNullPropField + "' was null." +
+        "\nPlease check your managed objects or configure lazy null-value handling using @PmInject(nullAllowed=true).");
+    // @formatter:on
     DiResolverUtil.setValue(myPm, myFieldInitializedNullPropField, false, null);
   }
 

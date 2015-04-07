@@ -152,8 +152,8 @@ public class DiResolverUtil  {
   static private void validateValidValue(PmObject pm, AccessibleObject target, boolean nullAllowed, Object value) {
     if (value == null && !nullAllowed) {
       throw new PmRuntimeException(pm, "Found value for dependency injection of '" + target +
-          "' was null. But null value is not allowed. " +
-          "You may configure null-value handling using @PmInject(nullAllowed=...).");
+          "' was null." +
+          "\nPlease check your managed objects or configure lazy null-value handling using @PmInject(nullAllowed=true).");
     }
   }
 }

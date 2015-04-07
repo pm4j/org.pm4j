@@ -14,7 +14,7 @@ import org.pm4j.core.pm.impl.PmUtil;
 /**
  * DI resolver for setter methods annotated with {@link PmInject} using {@link PmInject#mode()} PARENT_OF_TYPE.
  *
- * @author olaf boede
+ * @author Olaf Boede
  */
 public class DiResolverFactoryPmInjectSetterByParentOfType implements DiResolverFactory {
 

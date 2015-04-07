@@ -18,7 +18,6 @@ import org.pm4j.core.pm.impl.inject.DiResolverFactoryPmInjectFieldByExpression;
 import org.pm4j.core.pm.impl.inject.DiResolverFactoryPmInjectFieldByParentOfType;
 import org.pm4j.core.pm.impl.inject.DiResolverFactoryPmInjectSetterByExpression;
 import org.pm4j.core.pm.impl.inject.DiResolverFactoryPmInjectSetterByParentOfType;
-import org.pm4j.core.pm.impl.inject.DiResolverFactoryPmProduces;
 import org.pm4j.core.pm.impl.title.AsteriskAttrTitleProvider;
 import org.pm4j.core.pm.impl.title.PmTitleProvider;
 import org.pm4j.core.pm.impl.title.TitleProviderPmResBased;
@@ -27,7 +26,7 @@ import org.pm4j.core.pm.impl.title.TitleProviderPmResBased;
  * A singleton that knows about the application wide defined default
  * presentation model implementation strategies.
  *
- * @author olaf boede
+ * @author Olaf Boede
  */
 @SuppressWarnings("rawtypes")
 public class PmDefaults implements Cloneable {
@@ -83,7 +82,7 @@ public class PmDefaults implements Cloneable {
    * that do not define this attribute explicitly.
    */
   private PmCommandCfg.BEFORE_DO[] beforeDoCommandDefault = new BEFORE_DO[] {BEFORE_DO.VALIDATE};
-  
+
   /**
    * Defines, if validation error messages should be added to the tool tip text of
    * the affected attributes.
@@ -108,8 +107,6 @@ public class PmDefaults implements Cloneable {
    * The default implementation supports {@link PmInject}.
    */
   private DiResolverFactory[] diResolverFactories = {
-      // Producer factories need to be placed in front of injection resolver factories.
-      new DiResolverFactoryPmProduces(),
       new DiResolverFactoryPmInjectFieldByExpression(),
       new DiResolverFactoryPmInjectSetterByExpression(),
       new DiResolverFactoryPmInjectFieldByParentOfType(),
