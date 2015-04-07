@@ -29,8 +29,6 @@ public class IdQuerySelectionBase<T_ITEM, T_ID>
   /** Serialization class version. Increment on member structure change. */
   private static final long serialVersionUID = 1L;
 
-  // TODO: preseve the sort order according to some user defined stuff
-  //  For large selections an array would be more memory efficient. But it would slow down the contains() functionality...
   private final Set<T_ID> ids;
 
   private int iterationReadBlockSize = 50;

@@ -1,13 +1,17 @@
 package org.pm4j.common.selection;
 
+import static org.apache.commons.lang.Validate.notNull;
+
 import java.beans.PropertyVetoException;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
+import org.pm4j.common.util.collection.IterableUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.pm4j.common.util.collection.IterableUtil;
 
 /**
  * A {@link SelectionHandler} implementation that handles the selected items using {@link Set}.
@@ -19,65 +23,73 @@ import org.pm4j.common.util.collection.IterableUtil;
  * @param <T_ITEM> the type of handled items.
  *
  * @author olaf boede
+ * @author alech
  */
-public class ItemSetSelectionHandler<T_ITEM> extends SelectionHandlerBase<T_ITEM>{
+public abstract class ItemSetSelectionHandler<T_ITEM> extends SelectionHandlerBase<T_ITEM>{
 
   private static final Logger LOG = LoggerFactory.getLogger(ItemSetSelectionHandler.class);
 
   @SuppressWarnings("unchecked")
   private static final ItemSetSelection<?> EMPTY_SELECTION = new ItemSetSelection<Object>(Collections.EMPTY_SET);
 
-  /** The collection to handle selected items for. */
-  // XXX oboede: should be changed to a real collection interface.
-  private Iterable<T_ITEM> collection;
-
   /** The set of currently selected items. */
   @SuppressWarnings("unchecked")
   private ItemSetSelection<T_ITEM> selection = new ItemSetSelection<T_ITEM>(Collections.EMPTY_SET);
 
-  /**
-   * @param collection the collection to handle selected items for.
-   */
-  public ItemSetSelectionHandler(Iterable<T_ITEM> collection) {
-    assert collection != null;
-
-    this.collection = collection;
-  }
-
   @Override
   public boolean select(boolean select, T_ITEM item) {
-    assert item != null;
-    Set<T_ITEM> set = getModifyableItemSet();
-
-    if (select) {
-      beforeAddSingleItemSelection(set);
-      set.add(item);
+    notNull(item, "item cannot be null");
+    Set<T_ITEM> newSelection = new LinkedHashSet<T_ITEM>((int) selection.getSize() + 1);
+    
+    //rebuild selection maintaining original order
+    
+    if(select) { //select
+      if (getSelectMode().equals(SelectMode.SINGLE)) {
+        newSelection.add(item);
+      } else if (getSelectMode().equals(SelectMode.MULTI)) {
+        for (T_ITEM allCollectionItem : getAllCollection()) {
+          if (selection.contains(allCollectionItem) || allCollectionItem.equals(item)) {
+            //item was previously selected or is intended to -> pass it to the new selection set
+            newSelection.add(allCollectionItem);
+          }
+          if (newSelection.size() ==  selection.getSize() + 1) {
+            break; // got them all!
+          }
+        }
+      } else {
+        throw new RuntimeException("Selection for select mode '" + getSelectMode() + "' is not supported.");
+      }
+    }  else {  //unselect
+      newSelection.addAll(IterableUtil.asCollection(selection));
+      newSelection.remove(item);
     }
-    else {
-      set.remove(item);
-    }
-    return setSelection(set);
+    
+    return setSelection(newSelection);
   }
 
   @Override
   public boolean select(boolean select, Iterable<T_ITEM> items) {
-    assert items != null;
-    Set<T_ITEM> set = getModifyableItemSet();
+    notNull(items, "items cannot be null");
+    Set<T_ITEM> newSelection = new LinkedHashSet<T_ITEM>();
+    Set<T_ITEM> itemsToProcess = new LinkedHashSet<T_ITEM>(IterableUtil.asCollection(items));
 
-    if (getSelectMode() == SelectMode.SINGLE && select) {
-      set.clear();
-    }
-
-    for (T_ITEM i : items) {
-      if (select) {
-        set.add(i);
-      } else {
-        set.remove(i);
+    // rebuild selection maintaining original order
+    if (select) { // select
+      for (T_ITEM allCollectionItem : getAllCollection()) {
+        if (selection.contains(allCollectionItem) || itemsToProcess.contains(allCollectionItem)) {
+          newSelection.add(allCollectionItem);
+        }
+        if (newSelection.size() == selection.getSize() + itemsToProcess.size()) {
+          break; // got them all!
+        }
       }
+    } else { // unselect
+      newSelection.addAll(IterableUtil.asCollection(selection));
+      newSelection.removeAll(itemsToProcess);
     }
 
-    checkMultiSelectResult(set);
-    return setSelection(set);
+    checkMultiSelectResult(newSelection);
+    return setSelection(newSelection);
   }
 
   @SuppressWarnings("unchecked")
@@ -88,7 +100,7 @@ public class ItemSetSelectionHandler<T_ITEM> extends SelectionHandlerBase<T_ITEM
         throw new RuntimeException("Select all is not supported for select mode: " + getSelectMode());
       }
 
-      return select(select, IterableUtil.shallowCopy(collection));
+      return setSelection(new LinkedHashSet<T_ITEM>(getAllCollection()));
     }
     else {
       return setSelection(Collections.EMPTY_SET);
@@ -101,7 +113,7 @@ public class ItemSetSelectionHandler<T_ITEM> extends SelectionHandlerBase<T_ITEM
       throw new RuntimeException("Invert selection is not supported for select mode: " + getSelectMode());
     }
 
-    Set<T_ITEM> newSelectedItems = new HashSet<T_ITEM>(IterableUtil.asCollection(collection));
+    Set<T_ITEM> newSelectedItems = new LinkedHashSet<T_ITEM>(getAllCollection());
     newSelectedItems.removeAll(selection.selectedItems);
 
     return setSelection(newSelectedItems);
@@ -139,7 +151,7 @@ public class ItemSetSelectionHandler<T_ITEM> extends SelectionHandlerBase<T_ITEM
 
   @Override
   public Selection<T_ITEM> getAllItemsSelection() {
-    return new ItemSetSelection<T_ITEM>(new HashSet<T_ITEM>(IterableUtil.asCollection(collection)));
+    return new ItemSetSelection<T_ITEM>(new LinkedHashSet<T_ITEM>(getAllCollection()));
   }
 
 
@@ -149,9 +161,11 @@ public class ItemSetSelectionHandler<T_ITEM> extends SelectionHandlerBase<T_ITEM
                     ? (ItemSetSelection<T_ITEM>) EMPTY_SELECTION
                     : new ItemSetSelection<T_ITEM>(selectedItems));
   }
-
-  private Set<T_ITEM> getModifyableItemSet() {
-    return new HashSet<T_ITEM>(selection.selectedItems);
-  }
+  
+  /**
+   * 
+   * @return a collection containing all available items possible to select
+   */
+  protected abstract Collection<T_ITEM> getAllCollection();
 
 }

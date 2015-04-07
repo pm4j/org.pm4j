@@ -59,8 +59,16 @@ public abstract class PageQuerySelectionHandler<T_ITEM, T_ID> extends SelectionH
     Set<T_ID> idSet = getClickedIdSet();
     boolean inverse = isInverse();
 
-    if (select && ! inverse) {
-      beforeAddSingleItemSelection(idSet);
+    if (select && !inverse) {
+      switch (getSelectMode()) {
+      case SINGLE:
+        idSet.clear();
+        break;
+      case MULTI:
+        break;
+      default:
+        throw new RuntimeException("Selection for select mode '" + getSelectMode() + "' is not supported.");
+      }
     }
 
     if (select ^ inverse) {

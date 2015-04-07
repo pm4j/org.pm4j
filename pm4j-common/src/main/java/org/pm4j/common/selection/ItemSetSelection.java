@@ -9,8 +9,6 @@ import java.util.Set;
 /**
  * A selection based on a set of objects.
  * <p>
- * TODO olaf: missing sort order
- *
  * @param <T_ITEM> the type of selected items.
  *
  * @author olaf boede
