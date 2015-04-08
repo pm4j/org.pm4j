@@ -23,6 +23,7 @@ import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.pm4j.common.cache.CacheStrategy;
 import org.pm4j.common.cache.CacheStrategyNoCache;
+import org.pm4j.common.util.collection.IterableUtil;
 import org.pm4j.common.util.collection.ListUtil;
 import org.pm4j.common.util.reflection.BeanAttrAccessor;
 import org.pm4j.common.util.reflection.BeanAttrAccessorImpl;
@@ -169,6 +170,11 @@ public class PmObjectBase implements PmObject {
         if (event.isAllChangedEvent() || event.isReloadEvent()) {
           onPmDataExchangeEvent(event);
         }
+      }
+
+      @Override
+      public String toString() {
+        return PmObjectBase.class.getSimpleName() + "#dataExchange";
       }
     });
 
@@ -2005,6 +2011,11 @@ class PmEventTable {
   @SuppressWarnings("unchecked")
   private synchronized Map.Entry<PmEventListener, Integer>[] eventListenersCopy() {
     return pmEventListeners.entrySet().toArray(new Map.Entry[pmEventListeners.size()]);
+  }
+
+  @Override
+  public String toString() {
+    return "[" + IterableUtil.itemsToString(pmEventListeners.keySet()) + "]" + System.identityHashCode(this);
   }
 } // end of PmEventTable
 

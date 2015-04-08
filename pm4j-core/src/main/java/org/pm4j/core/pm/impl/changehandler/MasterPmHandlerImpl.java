@@ -132,6 +132,11 @@ public abstract class MasterPmHandlerImpl<T_MASTER_BEAN> implements MasterPmHand
           registerDetailsChangeForMasterBean(selectedMasterBean);
         }
       }
+
+      @Override
+      public String toString() {
+        return MasterPmHandlerImpl.class.getSimpleName() + "#valueChangePropagation";
+      }
     };
 
     for (DetailsPmHandler dh : detailsHandlers) {

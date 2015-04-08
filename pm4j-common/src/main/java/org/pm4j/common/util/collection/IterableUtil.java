@@ -141,7 +141,7 @@ public class IterableUtil {
     return i == null ||
            !i.iterator().hasNext();
   }
-  
+
   /**
    * Checks whether two instances of {@link Iterable} are equal. Iterables are considered as equal when the following conditions takes place:
    * <ul>
@@ -160,10 +160,10 @@ public class IterableUtil {
     if(a == null || b == null) {
       return false;
     }
-    
+
     Iterator<T> firstIterator = a.iterator();
     Iterator<T> secondIterator = b.iterator();
-    
+
     while(firstIterator.hasNext() || secondIterator.hasNext()) {
       if(firstIterator.hasNext() && secondIterator.hasNext()) {
         if(!firstIterator.next().equals(secondIterator.next())) {
@@ -173,7 +173,7 @@ public class IterableUtil {
         return false;
       }
     }
-    
+
     return true;
   }
 
@@ -241,5 +241,23 @@ public class IterableUtil {
       };
     }
 
+  }
+
+  /**
+   * Generates a comma separated string based on the <code>toString()</code> result
+   * of the given items.
+   *
+   * @param items
+   * @return The comma separated string.
+   */
+  public static String itemsToString(Iterable<?> items) {
+    StringBuilder b = new StringBuilder(100);
+    for (Object o : items) {
+      if (b.length() > 0) {
+        b.append(", ");
+      }
+      b.append(o);
+    }
+    return b.toString();
   }
 }

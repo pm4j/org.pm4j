@@ -451,6 +451,11 @@ public class PmBeanCollection<T_PM extends PmBean<T_BEAN>, T_BEAN> extends Prope
         }
       }
 
+      @Override
+      public String toString() {
+        return PmBeanCollection.class.getSimpleName() + "#treeValueChange";
+      }
+
       protected PmObject findChildItemToObserve(PmObject changedItem) {
         if (changedItem == pmCtxt) {
           return null;
