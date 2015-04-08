@@ -8,15 +8,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.exception.PmUserMessageException;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmCommandDecorator;
 import org.pm4j.core.pm.PmConstants;
 import org.pm4j.core.pm.PmConversation;
-import org.pm4j.core.pm.PmDataInput;
 import org.pm4j.core.pm.PmDefaults;
 import org.pm4j.core.pm.PmElement;
 import org.pm4j.core.pm.PmEvent;
@@ -36,6 +33,8 @@ import org.pm4j.navi.NaviHistory;
 import org.pm4j.navi.NaviLink;
 import org.pm4j.navi.NaviRuleLink;
 import org.pm4j.navi.impl.NaviLinkImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Implementation for {@link PmCommand}.
@@ -488,7 +487,7 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
   }
 
   @Override
-  protected PmCommandImpl clone() {
+  public PmCommandImpl clone() {
     try {
       PmCommandImpl clone = (PmCommandImpl)super.clone();
       clone.templateCommand = this;
