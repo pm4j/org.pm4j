@@ -27,22 +27,22 @@ public class PmResourceData {
   /** @deprecated Please use {@link #getMsgKey()}. */
   public final String msgKey;
   /** @deprecated Please use {@link #getMsgArgs()}. */
-  public Object[] msgArgs;
-  /** @deprecated Please use {@link #getMsgArgs()}. */
+  public final Object[] msgArgs;
+  /** @deprecated Please use {@link #getPm()}. */
   public final PmObject pm;
 
   public PmResourceData(PmObject pm, String msgKey, Object... msgArgs) {
     this.pm = pm;
     this.msgKey = msgKey;
-    this.msgArgs = msgArgs;
 
-    if (pm != null) {
-      if (msgArgs.length == 0 || ! (msgArgs[msgArgs.length-1] instanceof LazyPmObjectTitleProvider)) {
-        this.msgArgs = Arrays.copyOf(msgArgs, msgArgs.length+1);
-        this.msgArgs[msgArgs.length] = new LazyPmObjectTitleProvider();
-      } else {
-        this.msgArgs = msgArgs;
-      }
+    if (pm != null &&
+        (msgArgs.length == 0 ||
+         ! (msgArgs[msgArgs.length-1] instanceof LazyPmObjectTitleProvider))
+       ) {
+      this.msgArgs = Arrays.copyOf(msgArgs, msgArgs.length+1);
+      this.msgArgs[msgArgs.length] = new LazyPmObjectTitleProvider();
+    } else {
+      this.msgArgs = msgArgs;
     }
   }
 
