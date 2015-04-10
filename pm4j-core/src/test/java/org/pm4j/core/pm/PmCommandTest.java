@@ -5,7 +5,6 @@ import static org.pm4j.tools.test._PmAssert.doIt;
 
 import org.junit.Test;
 import org.pm4j.common.util.CloneUtil;
-import org.pm4j.core.event.impl.RecordingTestListener;
 import org.pm4j.core.pm.PmCommand.CommandState;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.annotation.PmCommandCfg;
@@ -14,6 +13,7 @@ import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
 import org.pm4j.core.pm.impl.PmCommandImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
+import org.pm4j.tools.test._RecordingPmEventListener;
 
 public class PmCommandTest {
 
@@ -51,7 +51,7 @@ public class PmCommandTest {
 
   @Test
   public void testAttachEventListenerToCloneOnly() {
-    RecordingTestListener listener = new RecordingTestListener();
+    _RecordingPmEventListener listener = new _RecordingPmEventListener();
     PmCommand cmdClone = CloneUtil.clone(testPm.cmdThatDoesNothingBefore);
     PmEventApi.addPmEventListener(cmdClone, PmEvent.EXEC_COMMAND, listener);
 

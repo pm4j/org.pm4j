@@ -224,7 +224,7 @@ public class PmTableColImpl extends PmObjectBase implements PmTableCol {
       super(pmParent, PmSortOrder.class);
 
       /** Adjusts the sort order whenever the table's sort order changes. */
-      PmEventListener tableSortOrderChangeListener = new PmEventListener() {
+      PmEventListener tableSortOrderChangeListener = new PmEventListenerBase(SortOrderAttr.class.getSimpleName() + "#TableSortOrderChange") {
         @Override
         public void handleEvent(PmEvent event) {
           // Checks if the event source is not this column to prevent set value ping-pong games.

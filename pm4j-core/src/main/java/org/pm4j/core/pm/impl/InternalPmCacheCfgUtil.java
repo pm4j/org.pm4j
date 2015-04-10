@@ -48,7 +48,7 @@ class InternalPmCacheCfgUtil {
    *           if the PM hierarchy contains mixed annotations e.g. old and new
    */
   static List<PmCacheCfg2> findCacheCfgsInPmHierarchy(PmObjectBase pm, List<PmCacheCfg2> foundAnnotations) {
-    
+
     PmCacheCfg2 cfg = AnnotationUtil.findAnnotation(pm, PmCacheCfg2.class);
     if (cfg != null) {
       foundAnnotations.add(cfg);
@@ -125,7 +125,7 @@ class InternalPmCacheCfgUtil {
       return;
     }
 
-    PmEventListener e = new PmEventListener() {
+    PmEventListener e = new PmEventListenerBase(InternalPmCacheCfgUtil.class.getSimpleName() + "#ClearPmCache") {
       @Override
       public void handleEvent(PmEvent event) {
         PmCacheApi.clearPmCache(pmObject, aspect);

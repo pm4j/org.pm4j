@@ -166,17 +166,12 @@ public class PmObjectBase implements PmObject {
     this.pmParent = (PmObjectBase) pmParent;
 
     // load/reload new data leads to an unchanged state.
-    PmEventApi.addPmEventListener(this, PmEvent.VALUE_CHANGE, new PmEventListener() {
+    PmEventApi.addPmEventListener(this, PmEvent.VALUE_CHANGE, new PmEventListenerBase(PmObjectBase.class.getSimpleName() + "#dataExchange") {
       @Override
       public void handleEvent(PmEvent event) {
         if (event.isAllChangedEvent() || event.isReloadEvent()) {
           onPmDataExchangeEvent(event);
         }
-      }
-
-      @Override
-      public String toString() {
-        return PmObjectBase.class.getSimpleName() + "#dataExchange";
       }
     });
 

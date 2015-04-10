@@ -266,7 +266,7 @@ public class PmTableTest {
     assertEquals(1, deletePropertyChangeListener.getNumOfVetoableChangesCalls());
     assertEquals(1, deleteBeanPropertyChangeListener.getNumOfPropertyChangesCalls());
     assertEquals(1, deleteBeanPropertyChangeListener.getNumOfVetoableChangesCalls());
-    assertEquals(1, valueChangeEventListener.getCallCount());
+    assertEquals(1, valueChangeEventListener.getEventCount());
   }
 
   @Test
@@ -288,7 +288,7 @@ public class PmTableTest {
     assertEquals(1, deletePropertyChangeListener.getNumOfVetoableChangesCalls());
     assertEquals(1, deleteBeanPropertyChangeListener.getNumOfPropertyChangesCalls());
     assertEquals(1, deleteBeanPropertyChangeListener.getNumOfVetoableChangesCalls());
-    assertEquals(1, valueChangeEventListener.getCallCount());
+    assertEquals(1, valueChangeEventListener.getEventCount());
   }
 
   /**
@@ -303,7 +303,7 @@ public class PmTableTest {
     PmEventApi.addPmEventListener(myTablePm.getRowPms().get(0), PmEvent.ALL_CHANGE_EVENTS, l);
     BroadcastPmEventProcessor.broadcastAllChangeEvent(myTablePm, 0);
 
-    assertEquals(0, l.getCallCount());
+    assertEquals(0, l.getEventCount());
   }
 
   @PmTableCfg(initialSortCol="name")

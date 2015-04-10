@@ -5,12 +5,12 @@ import org.joda.time.LocalDateTime;
 import org.joda.time.LocalTime;
 import org.pm4j.core.exception.PmValidationException;
 import org.pm4j.core.pm.PmEvent;
-import org.pm4j.core.pm.PmEventListener;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmLocalizeApi;
 import org.pm4j.core.pm.api.PmMessageApi;
+import org.pm4j.core.pm.impl.PmEventListenerBase;
 
 /**
  * A {@link LocalDateTime} attribute that has embedded sub models for the date- and the time- part.
@@ -39,7 +39,7 @@ public class PmAttrLocalDateAndTimeImpl extends PmAttrLocalDateTimeImpl {
         super(pmParent);
         // After setting (and re-loading) a complete date-time value all locally stored partial
         // values are no longer relevant.
-        PmEventApi.addPmEventListener(this, PmEvent.VALUE_CHANGE, new PmEventListener() {
+        PmEventApi.addPmEventListener(this, PmEvent.VALUE_CHANGE, new PmEventListenerBase(PmAttrLocalDateAndTimeImpl.class.getSimpleName() + "#ValueChangeResetsLocalStore") {
             @Override
             public void handleEvent(PmEvent event) {
                 localStore.reset();

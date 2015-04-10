@@ -7,10 +7,10 @@ import java.util.Map;
 import org.pm4j.common.modifications.Modifications;
 import org.pm4j.common.util.CloneUtil;
 import org.pm4j.core.pm.PmEvent;
-import org.pm4j.core.pm.PmEventListener;
 import org.pm4j.core.pm.PmTable;
 import org.pm4j.core.pm.PmTable.UpdateAspect;
 import org.pm4j.core.pm.api.PmEventApi;
+import org.pm4j.core.pm.impl.PmEventListenerBase;
 import org.pm4j.core.pm.impl.PmTableImpl;
 
 /**
@@ -40,7 +40,7 @@ public abstract class DetailsPmTableHandlerBase<T_MASTER_BEAN, T_DETAILS_BEAN> e
   @Override
   public void startObservers() {
     super.startObservers();
-    PmEventApi.addPmEventListener(getDetailsPm().getPmParent(), PmEvent.ALL_CHANGE_EVENTS, new PmEventListener() {
+    PmEventApi.addPmEventListener(getDetailsPm().getPmParent(), PmEvent.ALL_CHANGE_EVENTS, new PmEventListenerBase(DetailsPmTableHandlerBase.class.getSimpleName() + "#allChangedOrReload") {
       @Override
       public void handleEvent(PmEvent event) {
         if (event.isAllChangedEvent() || event.isReloadEvent()) {

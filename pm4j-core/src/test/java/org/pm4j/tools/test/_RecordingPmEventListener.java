@@ -14,29 +14,29 @@ import org.pm4j.core.pm.PmEventListener;
  * @author Olaf Boede
  */
 public class _RecordingPmEventListener implements PmEventListener {
-  private List<PmEvent> receivedEvents = new ArrayList<PmEvent>();
+  private List<PmEvent> events = new ArrayList<PmEvent>();
 
   @Override
   public void handleEvent(PmEvent event) {
-    receivedEvents.add(event);
+    events.add(event);
   }
 
   /**
    * @return the callCount
    */
-  public int getCallCount() {
-    return receivedEvents.size();
+  public int getEventCount() {
+    return events.size();
   }
 
   /**
    * @return the receivedEvents
    */
-  public List<PmEvent> getReceivedEvents() {
-    return Collections.unmodifiableList(receivedEvents);
+  public List<PmEvent> getEvents() {
+    return Collections.unmodifiableList(events);
   }
 
   /** Forgets the received events. */
   public void clear() {
-    receivedEvents.clear();
+    events.clear();
   }
 }

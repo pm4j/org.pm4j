@@ -7,8 +7,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.pm4j.common.modifications.ModificationHandler;
 import org.pm4j.common.modifications.Modifications;
 import org.pm4j.common.selection.Selection;
@@ -18,7 +16,10 @@ import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmEventListener;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.api.PmEventApi;
+import org.pm4j.core.pm.impl.PmEventListenerBase;
 import org.pm4j.core.pm.impl.PmUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A master-details handler for a master record selection with an associated details PM that displays
@@ -120,7 +121,7 @@ public abstract class MasterPmHandlerImpl<T_MASTER_BEAN> implements MasterPmHand
 
     // A listener that reacts on pure VALUE_CHANGE events as they
     // get triggered by <b>user data entry events</b>.
-    PmEventListener el = new PmEventListener() {
+    PmEventListener el = new PmEventListenerBase(MasterPmHandlerImpl.class.getSimpleName() + "#valueChangePropagation") {
       @Override
       public void handleEvent(PmEvent event) {
         // Only propagations of pure sub-PM value changes should be considered.
@@ -131,11 +132,6 @@ public abstract class MasterPmHandlerImpl<T_MASTER_BEAN> implements MasterPmHand
           T_MASTER_BEAN selectedMasterBean = getSelectedMasterBean();
           registerDetailsChangeForMasterBean(selectedMasterBean);
         }
-      }
-
-      @Override
-      public String toString() {
-        return MasterPmHandlerImpl.class.getSimpleName() + "#valueChangePropagation";
       }
     };
 

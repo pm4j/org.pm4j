@@ -86,37 +86,37 @@ public class PmBean2Test {
     pm.uncached.provideTestBean(bean);
 
     BroadcastPmEventProcessor.broadcastAllChangeEvent(pm, 0);
-    assertEquals("No value change broadcast for unused, not initialized PMs.", 0, pm.valueChangeListener.getCallCount());
-    assertEquals("No value change broadcast for unused, not initialized PMs.", 0, pm.uncached.valueChangeListener.getCallCount());
-    assertEquals("No value change broadcast for unused, not initialized PMs.", 0, pm.uncached.sValueChangeListener.getCallCount());
+    assertEquals("No value change broadcast for unused, not initialized PMs.", 0, pm.valueChangeListener.getEventCount());
+    assertEquals("No value change broadcast for unused, not initialized PMs.", 0, pm.uncached.valueChangeListener.getEventCount());
+    assertEquals("No value change broadcast for unused, not initialized PMs.", 0, pm.uncached.sValueChangeListener.getEventCount());
     assertEquals("No getter called.", 0, pm.uncached.callCount_getPmBeanImpl);
 
     PmInitApi.initPmTree(pm);
     BroadcastPmEventProcessor.broadcastAllChangeEvent(pm, 0);
-    assertEquals("Each sub-PM gets informed.", 1, pm.valueChangeListener.getCallCount());
-    assertEquals("Each sub-PM gets informed.", 1, pm.uncached.valueChangeListener.getCallCount());
-    assertEquals("Each sub-PM gets informed.", 1, pm.uncached.sValueChangeListener.getCallCount());
+    assertEquals("Each sub-PM gets informed.", 1, pm.valueChangeListener.getEventCount());
+    assertEquals("Each sub-PM gets informed.", 1, pm.uncached.valueChangeListener.getEventCount());
+    assertEquals("Each sub-PM gets informed.", 1, pm.uncached.sValueChangeListener.getEventCount());
     assertEquals("No getter called.", 0, pm.uncached.callCount_getPmBeanImpl);
 
     pm.uncached.postponeEvents = true;
     pm.uncached.provideTestBean(null);
     BroadcastPmEventProcessor.broadcastAllChangeEvent(pm, PmEvent.VALUE_CHANGE_TO_NULL);
-    assertEquals("A to-null change gets always propagated.", 2, pm.valueChangeListener.getCallCount());
-    assertEquals("A to-null change gets always propagated.", 2, pm.uncached.valueChangeListener.getCallCount());
-    assertEquals("A to-null change gets always propagated.", 2, pm.uncached.sValueChangeListener.getCallCount());
+    assertEquals("A to-null change gets always propagated.", 2, pm.valueChangeListener.getEventCount());
+    assertEquals("A to-null change gets always propagated.", 2, pm.uncached.valueChangeListener.getEventCount());
+    assertEquals("A to-null change gets always propagated.", 2, pm.uncached.sValueChangeListener.getEventCount());
     assertEquals("No getter called.", 0, pm.uncached.callCount_getPmBeanImpl);
 
     BroadcastPmEventProcessor.broadcastAllChangeEvent(pm, 0);
-    assertEquals("Main PM has is not deferred. Event immediately fired.", 3, pm.valueChangeListener.getCallCount());
-    assertEquals("Broadcast will be deferred till next getPmBean() call.", 2, pm.uncached.valueChangeListener.getCallCount());
-    assertEquals("Broadcast will be deferred till next getPmBean() call.", 2, pm.uncached.sValueChangeListener.getCallCount());
+    assertEquals("Main PM has is not deferred. Event immediately fired.", 3, pm.valueChangeListener.getEventCount());
+    assertEquals("Broadcast will be deferred till next getPmBean() call.", 2, pm.uncached.valueChangeListener.getEventCount());
+    assertEquals("Broadcast will be deferred till next getPmBean() call.", 2, pm.uncached.sValueChangeListener.getEventCount());
     assertEquals("No getter called.", 0, pm.uncached.callCount_getPmBeanImpl);
 
     assertNull(pm.uncached.getPmBean());
-    assertEquals("Main PM listener count stays as it is.", 3, pm.valueChangeListener.getCallCount());
-    assertEquals("Deferred event propagated in getPmBean() call.", 3, pm.uncached.valueChangeListener.getCallCount());
-    assertEquals("Deferred event propagated in getPmBean() call.", 3, pm.uncached.sValueChangeListener.getCallCount());
-    assertEquals("Main PM unchanged if a sub-PM fires deferred events.", 3, pm.valueChangeListener.getCallCount());
+    assertEquals("Main PM listener count stays as it is.", 3, pm.valueChangeListener.getEventCount());
+    assertEquals("Deferred event propagated in getPmBean() call.", 3, pm.uncached.valueChangeListener.getEventCount());
+    assertEquals("Deferred event propagated in getPmBean() call.", 3, pm.uncached.sValueChangeListener.getEventCount());
+    assertEquals("Main PM unchanged if a sub-PM fires deferred events.", 3, pm.valueChangeListener.getEventCount());
     assertEquals("Getter called.", 1, pm.uncached.callCount_getPmBeanImpl);
   }
 
@@ -125,25 +125,25 @@ public class PmBean2Test {
     TestPmBase pm = new TestPmBase().provideTestBean(bean);
 
     BroadcastPmEventProcessor.broadcastAllChangeEvent(pm, 0);
-    assertEquals("No value change broadcast for unused, not initialized PMs.", 0, pm.valueChangeListener.getCallCount());
+    assertEquals("No value change broadcast for unused, not initialized PMs.", 0, pm.valueChangeListener.getEventCount());
 
     PmInitApi.initPmTree(pm);
     BroadcastPmEventProcessor.broadcastAllChangeEvent(pm, 0);
-    assertEquals("Initialized PMs get informed.", 1, pm.valueChangeListener.getCallCount());
+    assertEquals("Initialized PMs get informed.", 1, pm.valueChangeListener.getEventCount());
 
     pm.postponeEvents = true;
     pm.provideTestBean(null);
     BroadcastPmEventProcessor.broadcastAllChangeEvent(pm, PmEvent.VALUE_CHANGE_TO_NULL);
-    assertEquals("A to-null change gets always propagated.", 2, pm.valueChangeListener.getCallCount());
+    assertEquals("A to-null change gets always propagated.", 2, pm.valueChangeListener.getEventCount());
 
     BroadcastPmEventProcessor.broadcastAllChangeEvent(pm, 0);
-    assertEquals("Events are deferred.", 2, pm.valueChangeListener.getCallCount());
+    assertEquals("Events are deferred.", 2, pm.valueChangeListener.getEventCount());
     assertNull(pm.getPmBean());
-    assertEquals("Deferred events are fired on getPmBean()", 3, pm.valueChangeListener.getCallCount());
+    assertEquals("Deferred events are fired on getPmBean()", 3, pm.valueChangeListener.getEventCount());
     pm.provideTestBean(bean);
     assertSame(bean, pm.getPmBean());
     assertEquals("A getter that provides another bean value does not automatically lead to a value change event.",
-                 3, pm.valueChangeListener.getCallCount());
+                 3, pm.valueChangeListener.getEventCount());
   }
 
   // -- Test infrastructure --
