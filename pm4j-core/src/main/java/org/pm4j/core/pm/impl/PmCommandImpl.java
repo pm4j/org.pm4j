@@ -15,7 +15,6 @@ import org.pm4j.core.pm.PmCommandDecorator;
 import org.pm4j.core.pm.PmConstants;
 import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.PmDefaults;
-import org.pm4j.core.pm.PmElement;
 import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmMessage;
 import org.pm4j.core.pm.PmMessage.Severity;
@@ -179,7 +178,7 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
    * @return
    */
   public PmCommand doIt(boolean changeCommandHistory) {
-    PmCommandImpl cmd = zz_doCloneAndRegisterEventSource();
+    PmCommandImpl cmd = clone();
 
     if (cmd._beforeDo()) {
       NaviLink link = null;
@@ -222,7 +221,7 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
 
   // TODO olaf: 80% code copy of doIt(boolean)...
   public final String doItReturnString() {
-    PmCommandImpl cmd = zz_doCloneAndRegisterEventSource();
+    PmCommandImpl cmd = clone();
     NaviLink link = null;
 
     if (!cmd._beforeDo()) {
@@ -490,17 +489,8 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
   public PmCommandImpl clone() {
     PmCommandImpl clone = (PmCommandImpl)super.clone();
     clone.templateCommand = this;
-    clone.commandDecorators = commandDecorators.clone();
-    return clone;
-  }
-
-  private PmCommandImpl zz_doCloneAndRegisterEventSource() {
-    // Only the original command instance should do this once.
-    // All other instances should share its meta data.
-    zz_ensurePmInitialization();
-
-    PmCommandImpl clone = clone();
     clone.commandState = CommandState.CLONED;
+    clone.commandDecorators = commandDecorators.clone();
     return clone;
   }
 
@@ -623,8 +613,8 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
         do {
           PmCacheApi.clearPmCache(pmToClear, md.clearCachesSet);
           pmToClear = pmToClear.getPmParent();
-        } while (! (pmToClear instanceof PmElement));
-        // Don't forget the enclosing element:
+        } while (pmToClear instanceof PmCommand);
+        // Don't forget the enclosing non-command parent PM:
         PmCacheApi.clearPmCache(pmToClear, md.clearCachesSet);
       }
     }
