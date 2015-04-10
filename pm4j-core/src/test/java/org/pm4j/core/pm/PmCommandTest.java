@@ -1,12 +1,16 @@
 package org.pm4j.core.pm;
 
+import static org.junit.Assert.assertEquals;
 import static org.pm4j.tools.test._PmAssert.doIt;
 
 import org.junit.Test;
+import org.pm4j.common.util.CloneUtil;
+import org.pm4j.core.event.impl.RecordingTestListener;
 import org.pm4j.core.pm.PmCommand.CommandState;
 import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.annotation.PmCommandCfg;
 import org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO;
+import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
 import org.pm4j.core.pm.impl.PmCommandImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
@@ -43,6 +47,36 @@ public class PmCommandTest {
     testPm.attrToValidate.setValue("abc");
     doIt("Command can also be exectuted in a valid PM context.",
         testPm.cmdWithInheritedDoNothingBefore, CommandState.EXECUTED);
+  }
+
+  @Test
+  public void testAttachEventListenerToCloneOnly() {
+    RecordingTestListener listener = new RecordingTestListener();
+    PmCommand cmdClone = CloneUtil.clone(testPm.cmdThatDoesNothingBefore);
+    PmEventApi.addPmEventListener(cmdClone, PmEvent.EXEC_COMMAND, listener);
+
+    doIt(testPm.cmdThatDoesNothingBefore);
+    assertEquals("A call to the clone template should have an effect to listeners of the clone.",
+                 0, listener.getEventCount());
+
+    doIt(cmdClone);
+    assertEquals("A call to the clone should have an effect to listeners of the clone.",
+                 1, listener.getEventCount());
+  }
+
+  @Test
+  public void testAttachDecoratorToCloneOnly() {
+    RecordingCommandDecorator decorator = new RecordingCommandDecorator();
+    PmCommand cmdClone = CloneUtil.clone(testPm.cmdThatDoesNothingBefore);
+    cmdClone.addCommandDecorator(decorator);
+
+    doIt(testPm.cmdThatDoesNothingBefore);
+    assertEquals("A call to the clone template should have an effect to listeners of the clone.",
+                 0, decorator.getBeforeCallCount());
+
+    doIt(cmdClone);
+    assertEquals("A call to the clone should have an effect to listeners of the clone.",
+                 1, decorator.getBeforeCallCount());
   }
 
 

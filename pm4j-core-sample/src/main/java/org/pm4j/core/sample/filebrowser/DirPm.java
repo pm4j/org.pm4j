@@ -93,10 +93,11 @@ public class DirPm extends FilePmBase {
     return Arrays.asList(cmdMakeSubDir, cmdDelete);
   };
 
-  /** Provides the tree-view sub-nodes. */
+  /** Provides the tree-view sub-nodes. A <code>null</code> if there are no children (indicator for a leaf node). */
   @Override
   protected List<PmObject> getPmChildNodesImpl() {
-    return ListUtil.collectionsToList(subDirs.getValue(), files.getValue());
+    List<PmObject> children = ListUtil.collectionsToList(subDirs.getValue(), files.getValue());
+    return ListUtil.emptyListToNull(children);
   };
 
   /** Show details as a table of files. */
@@ -105,11 +106,6 @@ public class DirPm extends FilePmBase {
 //  public PmObject getNodeDetailsPm() {
 //    return files.getNodeDetailsPm();
 //  };
-
-  @Override
-  public boolean isPmTreeLeaf() {
-    return false;
-  }
 
   /** Convenience PM factory method. */
   public static DirPm makeDirPm(String path) {

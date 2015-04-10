@@ -488,14 +488,10 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
 
   @Override
   public PmCommandImpl clone() {
-    try {
-      PmCommandImpl clone = (PmCommandImpl)super.clone();
-      clone.templateCommand = this;
-      return clone;
-    }
-    catch (CloneNotSupportedException e) {
-      throw new PmRuntimeException(this, "This command is not cloneable.");
-    }
+    PmCommandImpl clone = (PmCommandImpl)super.clone();
+    clone.templateCommand = this;
+    clone.commandDecorators = commandDecorators.clone();
+    return clone;
   }
 
   private PmCommandImpl zz_doCloneAndRegisterEventSource() {

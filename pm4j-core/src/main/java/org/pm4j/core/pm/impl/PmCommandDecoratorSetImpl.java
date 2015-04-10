@@ -3,7 +3,9 @@ package org.pm4j.core.pm.impl;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
+import org.pm4j.common.exception.CheckedExceptionWrapper;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmCommandDecorator;
 
@@ -13,15 +15,25 @@ import org.pm4j.core.pm.PmCommandDecorator;
  *
  * @author olaf boede
  */
-public class PmCommandDecoratorSetImpl implements PmCommandDecorator.WithExceptionHandling {
+public class PmCommandDecoratorSetImpl implements PmCommandDecorator.WithExceptionHandling, Cloneable {
 
-  private Collection<PmCommandDecorator> decorators = Collections.emptyList();
+  /** The set of decorators. Copy-on-write is done on every {@link #addDecorator(PmCommandDecorator)} call. */
+  private List<PmCommandDecorator> decorators = Collections.emptyList();
+
+  @Override
+  protected PmCommandDecoratorSetImpl clone() {
+    try {
+      return (PmCommandDecoratorSetImpl) super.clone();
+    } catch (CloneNotSupportedException e) {
+      throw new CheckedExceptionWrapper(e);
+    }
+  }
 
   public void addDecorator(PmCommandDecorator d) {
-    Collection<PmCommandDecorator> newDecorators = new ArrayList<PmCommandDecorator>(decorators.size()+1);
+    List<PmCommandDecorator> newDecorators = new ArrayList<PmCommandDecorator>(decorators.size()+1);
     newDecorators.addAll(decorators);
     newDecorators.add(d);
-    decorators = Collections.unmodifiableCollection(newDecorators);
+    decorators = Collections.unmodifiableList(newDecorators);
   }
 
   static boolean execBeforeDo(PmCommand cmd, Collection<PmCommandDecorator> decorators) {

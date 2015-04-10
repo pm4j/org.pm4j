@@ -108,7 +108,8 @@ public final class CloneUtil {
 
     if (cloneMethod == null) {
       try {
-        cloneMethod = objClass.getMethod("clone");
+        cloneMethod = objClass.getDeclaredMethod("clone");
+        cloneMethod.setAccessible(true);
       } catch (Exception e) {
         CheckedExceptionWrapper.throwAsRuntimeException(e);
       }

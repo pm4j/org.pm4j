@@ -54,6 +54,18 @@ public final class ListUtil {
   }
 
   /**
+   * Provides <code>null</code> if the given list is <code>null</code> or empty.
+   *
+   * @param list
+   * @return The list if it is not empty. Otherwise <code>null</code>.
+   */
+  public static <T> List<T> emptyListToNull(List<T> list) {
+      return list == null || list.isEmpty()
+          ? null
+          : list;
+  }
+
+  /**
    * Identifies the index position of the given item within the provided list.
    * <p>
    * Uses the <code>equals</code> implementation to compare the given item with

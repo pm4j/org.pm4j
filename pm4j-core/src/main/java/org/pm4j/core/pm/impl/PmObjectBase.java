@@ -23,6 +23,8 @@ import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.pm4j.common.cache.CacheStrategy;
 import org.pm4j.common.cache.CacheStrategyNoCache;
+import org.pm4j.common.exception.CheckedExceptionWrapper;
+import org.pm4j.common.util.CloneUtil;
 import org.pm4j.common.util.collection.IterableUtil;
 import org.pm4j.common.util.collection.ListUtil;
 import org.pm4j.common.util.reflection.BeanAttrAccessor;
@@ -178,6 +180,20 @@ public class PmObjectBase implements PmObject {
       }
     });
 
+  }
+
+  /** Clone support for sub classes (PmCommandImpl). */
+  @Override
+  protected PmObjectBase clone() {
+    zz_ensurePmInitialization();
+    try {
+      PmObjectBase clone = (PmObjectBase) super.clone();
+      clone.pmEventTable = CloneUtil.clone(pmEventTable);
+      clone.pmWeakEventTable = CloneUtil.clone(pmWeakEventTable);
+      return clone;
+    } catch (CloneNotSupportedException e) {
+      throw new CheckedExceptionWrapper(e);
+    }
   }
 
 
@@ -1911,19 +1927,36 @@ public class PmObjectBase implements PmObject {
  *
  * @author olaf boede
  */
-class PmEventTable {
+class PmEventTable implements Cloneable {
   private static final Logger LOG = LoggerFactory.getLogger(PmEventTable.class);
 
-  private final Map<PmEventListener, Integer> pmEventListeners;
+  private Map<PmEventListener, Integer> pmEventListeners;
 
   public PmEventTable(boolean isWeak) {
     // Initial map size reduced to 2 to optimize memory consumption.
     // XXX oboede: further memory reduction may be achieved by performing standard observer operations
     // in methods instead of using observer instances. See PmDataInputBase ctor.
     // A table example test pointed out that this would reduce the sample screen PM footprint by 15%.
-    pmEventListeners = isWeak
-          ? new WeakHashMap<PmEventListener, Integer>(2)
-          : new HashMap<PmEventListener, Integer>(2);
+    pmEventListeners = createMap(isWeak, 2);
+  }
+
+  private Map<PmEventListener, Integer> createMap(boolean isWeak, int capacity) {
+    return isWeak
+        ? new WeakHashMap<PmEventListener, Integer>(capacity)
+        : new HashMap<PmEventListener, Integer>(capacity);
+  }
+
+
+  @Override
+  protected PmEventTable clone() {
+    try {
+      PmEventTable clone = (PmEventTable) super.clone();
+      clone.pmEventListeners = createMap(pmEventListeners instanceof WeakHashMap, pmEventListeners.size());
+      clone.pmEventListeners.putAll(pmEventListeners);
+      return clone;
+    } catch (CloneNotSupportedException e) {
+      throw new CheckedExceptionWrapper(e);
+    }
   }
 
   public synchronized void addListener(int eventMask, PmEventListener listener) {
