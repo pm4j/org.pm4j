@@ -39,10 +39,10 @@ public class PmExceptionHandlerImpl implements PmExceptionHandler {
       if (throwable instanceof PmUserMessageException) {
         PmResourceData resData = ((PmUserMessageException)throwable).getResourceData();
         if (resData != null) {
-          PmMessage message = PmMessageApi.addMessage(pmObject, Severity.ERROR, resData.msgKey, resData.msgArgs);
+          PmMessage message = PmMessageApi.addMessage(pmObject, Severity.ERROR, resData.getMsgKey(), resData.getMsgArgs());
 
           if (LOG.isInfoEnabled()) {
-            LOG.info("Exception with resource key '" + resData.msgKey +
+            LOG.info("Exception with resource key '" + resData.getMsgKey() +
                       "' was used to create the user error message '" + message.getTitle() + "'.", throwable);
           }
 

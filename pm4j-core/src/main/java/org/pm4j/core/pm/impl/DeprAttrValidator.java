@@ -28,7 +28,7 @@ class DeprAttrValidator<T_VALUE> extends DeprDataInputValidator<PmAttrBase<T_VAL
         }
         catch (PmValidationException e) {
           PmResourceData exResData = e.getResourceData();
-          conversation.addPmMessage(new PmValidationMessage(pm, exResData.msgKey, exResData.msgArgs));
+          conversation.addPmMessage(new PmValidationMessage(pm, exResData.getMsgKey(), exResData.getMsgArgs()));
         }
         catch (RuntimeException e) {
           conversation.getPmExceptionHandler().onExceptionInPmValidation(pm, e);

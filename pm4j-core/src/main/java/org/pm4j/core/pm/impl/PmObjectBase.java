@@ -884,7 +884,7 @@ public class PmObjectBase implements PmObject {
           validateImpl(ipm);
         } catch (PmValidationException e) {
           // XXX: severity will be configurable when we implement the warning concept.
-          PmMessageApi.addMessage(ipm, Severity.ERROR, e.getResourceData().msgKey, e.getResourceData().msgArgs);
+          PmMessageApi.addMessage(ipm, Severity.ERROR, e.getResourceData().getMsgKey(), e.getResourceData().getMsgArgs());
         } catch (RuntimeException e) {
           ipm.getPmConversationImpl().getPmExceptionHandler().onExceptionInPmValidation(pm, e);
         }

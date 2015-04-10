@@ -19,7 +19,7 @@ class DeprDataInputValidator<T extends PmObjectBase> implements PmObjectBase.Val
       try {
         validateImpl((T)pm);
       } catch (PmValidationException e) {
-        PmMessageApi.addMessage(pm, Severity.ERROR, e.getResourceData().msgKey, e.getResourceData().msgArgs);
+        PmMessageApi.addMessage(pm, Severity.ERROR, e.getResourceData().getMsgKey(), e.getResourceData().getMsgArgs());
       }
     }
   }

@@ -48,7 +48,7 @@ public class PmMessageUtil {
       // XXX olaf: internalize handling of not internationalized strings: use a standard resource that just provides the message.
       PmResourceData rd = ((PmUserMessageException) e).getResourceData();
       msg = (rd != null)
-          ? new PmMessage(pm, severity, rd.msgKey, rd.msgArgs)
+          ? new PmMessage(pm, severity, rd.getMsgKey(), rd.getMsgArgs())
           : new PmMessage(pm, severity, e, PmConstants.MSGKEY_FIRST_MSG_PARAM, e.getMessage());
     }
     else {

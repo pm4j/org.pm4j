@@ -6,7 +6,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -38,6 +37,7 @@ import org.pm4j.common.util.reflection.ReflectionException;
 import org.pm4j.core.exception.PmConverterException;
 import org.pm4j.core.exception.PmResourceData;
 import org.pm4j.core.exception.PmRuntimeException;
+import org.pm4j.core.exception.PmUserMessageException;
 import org.pm4j.core.exception.PmValidationException;
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmAttrString;
@@ -110,7 +110,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
         implements PmAttr<T_PM_VALUE> {
 
   private static final Logger LOG = LoggerFactory.getLogger(PmAttrBase.class);
-  
+
   /**
    * Indicates if the value was explicitly set. This information is especially
    * important for the default value logic. Default values may have only effect
@@ -491,17 +491,14 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
           setInvalidValue(vc);
           getPmConversationImpl().getPmExceptionHandler().onException(this, e, false);
         } else {
-          setAndPropagateValueConverterMessage(vc, e, resData.msgKey, resData.msgArgs);
+          setAndPropagateValueConverterMessage(vc, e);
           if (LOG.isDebugEnabled()) {
             LOG.debug("String to value conversion failed in attribute '" + PmUtil.getPmLogString(this) + "'. String value: " + text);
           }
         }
         return;
       } catch (PmConverterException e) {
-        PmResourceData resData = e.getResourceData();
-        Object[] args = Arrays.copyOf(resData.msgArgs, resData.msgArgs.length+1);
-        args[resData.msgArgs.length] = getPmTitle();
-        setAndPropagateValueConverterMessage(vc, e, resData.msgKey, args);
+        setAndPropagateValueConverterMessage(vc, e);
         if (LOG.isDebugEnabled()) {
           Throwable cause = e.getParseException() != null ? e.getParseException() : e.getCause();
           LOG.debug("String to value conversion failed in attribute '" + PmUtil.getPmLogString(this) +
@@ -680,7 +677,7 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
         // TODO: we have to handle other validation exceptions too.
         catch (PmValidationException e) {
           PmResourceData resData = e.getResourceData();
-          setAndPropagateInvalidValue(value, resData.msgKey, resData.msgArgs);
+          setAndPropagateInvalidValue(value, resData.getMsgKey(), resData.getMsgArgs());
           return false;
         }
       }
@@ -1046,14 +1043,11 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   /**
    * @param invValue
    *          The invalid value.
-   * @param msgKey
-   *          Key for the user message.
-   * @param msgArgs
-   *          Values for the user message.
+   * @param cause
+   *          The exception that reported the converter problem.
    */
-  private void setAndPropagateValueConverterMessage(SetValueContainer<T_PM_VALUE> invValue, Throwable cause, String msgKey,
-      Object... msgArgs) {
-    this.getPmConversationImpl().addPmMessage(new PmConverterErrorMessage(this, invValue, cause, msgKey, msgArgs));
+  private void setAndPropagateValueConverterMessage(SetValueContainer<T_PM_VALUE> invValue, PmUserMessageException cause) {
+    this.getPmConversationImpl().addPmMessage(new PmConverterErrorMessage(this, invValue, cause));
     setInvalidValue(invValue);
   }
 

@@ -9,15 +9,11 @@ import org.pm4j.core.exception.PmResourceData;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.api.PmLocalizeApi;
 import org.pm4j.core.pm.impl.PmCommandImpl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A string resource based presentation model message.
  */
 public class PmMessage {
-
-  private static final Logger LOG = LoggerFactory.getLogger(PmMessage.class);
 
   public enum Severity {
     /** Normal user feedback. */
@@ -93,39 +89,16 @@ public class PmMessage {
 
     this.severity = severity;
 
-    int argCount = msgArgs != null ? msgArgs.length : 0;
-
-    // A copy of the provide arguments with the related PM as an additional default argument.
-    Object [] newMsgArgs = new Object[argCount + 1];
+    // TODO: Check if the sub message concept can be removed.
+    // Inject parent reference for sub messages.
     for (int i=0; i<msgArgs.length; ++i) {
       Object arg = msgArgs[i];
-
-      // Inject parent reference for submessages.
       if (arg instanceof SubMessageList) {
         ((SubMessageList)arg).parentMessage = this;
       }
-
-      newMsgArgs[i] = arg;
     }
 
-    // The title gets provided by a proxy to prevent problems with PM initialization states.
-    // It also prevents unnecessary getPmTitle() calls if the title is not relevant for the
-    // resource string.
-    newMsgArgs[argCount] = new Object() {
-      @Override
-      public String toString() {
-        try {
-          return pm.getPmTitle();
-        }
-        catch (RuntimeException e) {
-          // a fall back if the title is not accessible:
-          LOG.info("Unable to resolve a title parameter for a message. Related PM: " + pm.getPmRelativeName());
-          return pm.getPmRelativeName();
-        }
-      }
-    };
-
-    this.resourceData = new PmResourceData(pm, msgKey, newMsgArgs);
+    this.resourceData = new PmResourceData(pm, msgKey, msgArgs);
   }
 
   /**
@@ -157,14 +130,14 @@ public class PmMessage {
    * @param msgResourceData Message resource data.
    */
   public PmMessage(PmObject pm, Severity severity, PmResourceData msgResourceData) {
-    this(pm, severity, msgResourceData.msgKey, msgResourceData.msgArgs);
+    this(pm, severity, msgResourceData.getMsgKey(), msgResourceData.getMsgArgs());
   }
 
   /**
    * @return The related PM instance. Is never <code>null</code>.
    */
   public PmObject getPm() {
-    return resourceData.pm;
+    return resourceData.getPm();
   }
 
   public Severity getSeverity() {
@@ -221,19 +194,19 @@ public class PmMessage {
   }
 
   public String getMsgKey() {
-    return resourceData.msgKey;
+    return resourceData.getMsgKey();
   }
 
   public Object[] getMsgArgs() {
-    return resourceData.msgArgs;
+    return resourceData.getMsgArgs();
   }
 
   public String getTitle() {
-    return localize(resourceData.msgKey, resourceData.msgArgs);
+    return localize(resourceData.getMsgKey(), resourceData.getMsgArgs());
   }
 
   public String getTooltip() {
-    return localizeOptional(resourceData.msgKey + PmConstants.RESKEY_POSTFIX_TOOLTIP, resourceData.msgArgs);
+    return localizeOptional(resourceData.getMsgKey() + PmConstants.RESKEY_POSTFIX_TOOLTIP, resourceData.getMsgArgs());
   }
 
   /**
@@ -258,21 +231,21 @@ public class PmMessage {
       return getTitle();
     }
     catch (RuntimeException e) {
-      return "PmMessage key=" + resourceData.msgKey +
-              (resourceData.msgArgs.length > 0
-                   ? " args=" + resourceData.msgArgs
+      return "PmMessage key=" + resourceData.getMsgKey() +
+              (resourceData.getMsgArgs().length > 0
+                   ? " args=" + resourceData.getMsgArgs()
                    : "");
     }
   }
 
   protected String localize(String resKey, Object... resStringArgs) {
     Object[] args = getArgsWithSubMessages(resStringArgs);
-    return PmLocalizeApi.localize(resourceData.pm, resKey, args);
+    return PmLocalizeApi.localize(resourceData.getPm(), resKey, args);
   }
 
   protected String localizeOptional(String resKey, Object... resStringArgs) {
     Object[] args = getArgsWithSubMessages(resStringArgs);
-    return PmLocalizeApi.findLocalization(resourceData.pm, resKey, args);
+    return PmLocalizeApi.findLocalization(resourceData.getPm(), resKey, args);
   }
 
   private Object[] getArgsWithSubMessages(Object... resStringArgs) {
