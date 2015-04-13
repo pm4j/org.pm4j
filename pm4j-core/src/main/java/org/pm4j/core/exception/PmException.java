@@ -15,9 +15,10 @@ public class PmException extends Exception implements PmUserMessageException {
   private PmResourceData resourceData;
 
   public PmException(PmObject pm, String msgKey, Object... msgArgs) {
-    super(msgKey + " on " + pm + " " + msgArgs);
-    this.resourceData = new PmResourceData(pm, msgKey, msgArgs);
+    this(new PmResourceData(pm, msgKey, msgArgs), null);
   }
+
+
 
   public PmException(PmResourceData resourceData, Throwable cause) {
     super(ObjectUtils.toString(resourceData), cause);

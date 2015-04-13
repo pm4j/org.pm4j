@@ -2,9 +2,10 @@ package org.pm4j.core.exception;
 
 import java.util.Arrays;
 
+import org.apache.commons.lang.StringUtils;
 import org.pm4j.core.pm.PmObject;
+import org.pm4j.core.pm.api.PmLocalizeApi;
 import org.pm4j.core.pm.impl.PmExceptionHandlerImpl;
-import org.pm4j.core.pm.impl.PmUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,9 +53,14 @@ public class PmResourceData {
 
   @Override
   public String toString() {
-    return msgKey +
-           (msgArgs.length > 0 ? " args: " + msgArgs : "") +
-           (pm != null ? " pm=" + PmUtil.getPmLogString(pm) : "");
+    if (pm != null) {
+      String s = PmLocalizeApi.findLocalization(pm, msgKey, msgArgs);
+      if (StringUtils.isNotBlank(s)) {
+        return s;
+      }
+    }
+    // fall back:
+    return msgKey + (msgArgs.length > 0 ? " args: " + msgArgs : "");
   }
 
   /**

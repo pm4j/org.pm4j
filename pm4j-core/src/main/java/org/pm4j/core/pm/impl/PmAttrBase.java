@@ -486,34 +486,19 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
                           ? stringToValueImpl(text)
                           : null);
       } catch (PmRuntimeException e) {
-        PmResourceData resData = e.getResourceData();
-        if (resData == null) {
-          setInvalidValue(vc);
-          getPmConversationImpl().getPmExceptionHandler().onException(this, e, false);
+        // only exceptions with user messages have resource data
+        if (e.getResourceData() == null) {
+          handleStringConverterRuntimeException(e, vc);
+          return;
         } else {
-          setAndPropagateValueConverterMessage(vc, e);
-          if (LOG.isDebugEnabled()) {
-            LOG.debug("String to value conversion failed in attribute '" + PmUtil.getPmLogString(this) + "'. String value: " + text);
-          }
+          handleConverterExceptionInSetValueAsString(vc, e);
         }
         return;
       } catch (PmConverterException e) {
-        setAndPropagateValueConverterMessage(vc, e);
-        if (LOG.isDebugEnabled()) {
-          Throwable cause = e.getParseException() != null ? e.getParseException() : e.getCause();
-          LOG.debug("String to value conversion failed in attribute '" + PmUtil.getPmLogString(this) +
-              "'. String value: '" + text +
-              "'. Caused by: " + e.getMessage(),
-              cause);
-        }
+        handleConverterExceptionInSetValueAsString(vc, e);
         return;
       } catch (RuntimeException e) {
-        setInvalidValue(vc);
-        getPmConversationImpl().getPmExceptionHandler().onException(this, e, false);
-        if (LOG.isDebugEnabled()) {
-          LOG.debug("String to value conversion failed in attribute '" + PmUtil.getPmLogString(this) + "'. String value: " + text,
-              e);
-        }
+        handleStringConverterRuntimeException(e, vc);
         return;
       }
 
@@ -524,6 +509,16 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
       PmMessageUtil.makeExceptionMsg(this, Severity.ERROR, pme);
       LOG.error("setValueAsString failed to set value '" + vc.getStringValue() + "'", pme);
       throw pme;
+    }
+  }
+
+  private void handleStringConverterRuntimeException(RuntimeException e, SetValueContainer<T_PM_VALUE> vc) {
+    setInvalidValue(vc);
+    getPmConversationImpl().getPmExceptionHandler().onException(this, e, false);
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("String to value conversion failed in attribute '" + PmUtil.getPmLogString(this) +
+                "'. String value: " + vc.getStringValue(),
+          e);
     }
   }
 
@@ -1041,16 +1036,31 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
   }
 
   /**
-   * @param invValue
+   * Gets called when {@link #stringToValueImpl(String)} throws a
+   * {@link PmConverterException} or {@link PmRuntimeException}.
+   *
+   * @param vc
    *          The invalid value.
    * @param cause
    *          The exception that reported the converter problem.
    */
-  private void setAndPropagateValueConverterMessage(SetValueContainer<T_PM_VALUE> invValue, PmUserMessageException cause) {
-    this.getPmConversationImpl().addPmMessage(new PmConverterErrorMessage(this, invValue, cause));
-    setInvalidValue(invValue);
-  }
+  protected void handleConverterExceptionInSetValueAsString(SetValueContainer<T_PM_VALUE> vc, PmUserMessageException cause) {
+    this.getPmConversationImpl().addPmMessage(new PmConverterErrorMessage(this, vc, cause));
+    setInvalidValue(vc);
 
+    if (LOG.isDebugEnabled()) {
+      if (cause instanceof PmConverterException) {
+        PmConverterException pce = (PmConverterException)cause;
+        Throwable rootCause = pce.getParseException() != null ? pce.getParseException() : pce.getCause();
+        LOG.debug("String to value conversion failed in attribute '" + PmUtil.getPmLogString(this) +
+            "'. String value: '" + vc.getStringValue() +
+            (rootCause != null ? ("'. Caused by: " + rootCause.getMessage()) : ""),
+            rootCause);
+      } else {
+        LOG.debug("String to value conversion failed in attribute '" + PmUtil.getPmLogString(this) + "'. String value: " + vc.getStringValue());
+      }
+    }
+  }
 
   /**
    * @return <code>true</code> when there is an invalid user data entry.
