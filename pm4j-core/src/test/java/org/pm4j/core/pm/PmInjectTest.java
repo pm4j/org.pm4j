@@ -87,7 +87,7 @@ public class PmInjectTest {
   @Test
   public void testNotResolvableInjectionWithLenientConfiguration() {
     InvalidPm pm = new InvalidPm();
-    pm.getPmDefaults().setDiResolverLenientNullCheck(true);
+    pm.getPmDefaults().setDiResolverNullCheckLenient(true);
     assertEquals("The test should ignore the unused and not resolvable @PmInject.",
                  "PM with not resolvable PmInject.", pm.getPmTitle());
   }

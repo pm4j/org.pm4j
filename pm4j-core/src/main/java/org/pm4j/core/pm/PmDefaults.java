@@ -119,7 +119,7 @@ public class PmDefaults implements Cloneable {
    * It is recommended to leave the default value <code>false</code> for production
    * environments.
    */
-  private boolean diResolverLenientNullCheck = false;
+  private boolean diResolverNullCheckLenient = false;
 
   /**
    * The expression syntax may be configured here globally or per conversation.
@@ -262,15 +262,15 @@ public class PmDefaults implements Cloneable {
   /**
    * @return the diResolverNullCheck
    */
-  public boolean isDiResolverLenientNullCheck() {
-    return diResolverLenientNullCheck;
+  public boolean isDiResolverNullCheckLenient() {
+    return diResolverNullCheckLenient;
   }
 
   /**
    * @param diResolverNullCheck the diResolverNullCheck to set
    */
-  public void setDiResolverLenientNullCheck(boolean diResolverNullCheck) {
-    this.diResolverLenientNullCheck = diResolverNullCheck;
+  public void setDiResolverNullCheckLenient(boolean diResolverNullCheck) {
+    this.diResolverNullCheckLenient = diResolverNullCheck;
   }
 
 }
