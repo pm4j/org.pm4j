@@ -150,10 +150,12 @@ public class DiResolverUtil  {
    * @param value the value to validate
    */
   static private void validateValidValue(PmObject pm, AccessibleObject target, boolean nullAllowed, Object value) {
-    if (value == null && !nullAllowed) {
-      throw new PmRuntimeException(pm, "Found value for dependency injection of '" + target +
-          "' was null." +
-          "\nPlease check your managed objects or configure lazy null-value handling using @PmInject(nullAllowed=true).");
+    if (value == null && !nullAllowed &&
+        !pm.getPmConversation().getPmDefaults().isDiResolverLenientNullCheck()) {
+          throw new PmRuntimeException(pm, "Found value for dependency injection of '" + target +
+              "' was null." +
+              "\nPlease check your managed objects or configure lazy null-value handling using @PmInject(nullAllowed=true)." +
+              "\nFor unit test setups you may consider calling myPmConversation.getPmDefaults().setDiResolverLenientNullCheck(true).");
     }
   }
 }
