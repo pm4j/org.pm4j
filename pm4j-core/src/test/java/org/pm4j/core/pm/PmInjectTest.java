@@ -1,16 +1,17 @@
 package org.pm4j.core.pm;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.annotation.PmInject;
 import org.pm4j.core.pm.annotation.PmInject.Mode;
+import org.pm4j.core.pm.annotation.PmTitleCfg;
 import org.pm4j.core.pm.impl.PmConversationImpl;
 import org.pm4j.core.pm.impl.PmInitApi;
 import org.pm4j.core.pm.impl.PmObjectBase;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 /**
  * Tests some PmInject variants.
@@ -83,6 +84,16 @@ public class PmInjectTest {
     }
   }
 
+  @Test
+  public void testNotResolvableInjectionWithLenientConfiguration() {
+    InvalidPm pm = new InvalidPm();
+    pm.getPmDefaults().setDiResolverNullCheckLenient(true);
+    assertEquals("The test should ignore the unused and not resolvable @PmInject.",
+                 "PM with not resolvable PmInject.", pm.getPmTitle());
+  }
+
+
+  @PmTitleCfg(title="PM with not resolvable PmInject.")
   public final class InvalidPm extends PmConversationImpl {
     @PmInject private String nullNotAllowedProperty;
   }

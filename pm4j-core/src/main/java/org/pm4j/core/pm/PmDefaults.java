@@ -114,6 +114,14 @@ public class PmDefaults implements Cloneable {
   };
 
   /**
+   * Controls if a not resolvable dependency injection leads to an exception or
+   * will be accepted silently.<br>
+   * It is recommended to leave the default value <code>false</code> for production
+   * environments.
+   */
+  private boolean diResolverNullCheckLenient = false;
+
+  /**
    * The expression syntax may be configured here globally or per conversation.
    */
   private SyntaxVersion expressionSyntaxVersion = SyntaxVersion.VERSION_2;
@@ -249,6 +257,20 @@ public class PmDefaults implements Cloneable {
    */
   public void setExpressionSyntaxVersion(SyntaxVersion expressionSyntaxVersion) {
     this.expressionSyntaxVersion = expressionSyntaxVersion;
+  }
+
+  /**
+   * @return the diResolverNullCheck
+   */
+  public boolean isDiResolverNullCheckLenient() {
+    return diResolverNullCheckLenient;
+  }
+
+  /**
+   * @param diResolverNullCheck the diResolverNullCheck to set
+   */
+  public void setDiResolverNullCheckLenient(boolean diResolverNullCheck) {
+    this.diResolverNullCheckLenient = diResolverNullCheck;
   }
 
 }

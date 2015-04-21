@@ -142,11 +142,16 @@ public class PmConversationImpl extends PmObjectBase implements PmConversation {
 
   @Override
   public PmDefaults getPmDefaults() {
-    return (pmDefaults != null)
-              ? pmDefaults
-              : (getPmParentConversation() != null)
-                  ? getPmParentConversation().getPmDefaults()
-                  : PmDefaults.getInstance();
+    if (pmDefaults == null) {
+      if (getPmParentConversation() != null) {
+        return getPmParentConversation().getPmDefaults();
+      }
+      // The root conversation needs its own instance.
+      // The shared default can't be used directly to prevent side effects
+      // of test setups etc.
+      pmDefaults = PmDefaults.getInstance().clone();
+    }
+    return pmDefaults;
   }
 
   /**
