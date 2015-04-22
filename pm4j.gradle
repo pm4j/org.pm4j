@@ -1,8 +1,8 @@
-if (!hasProperty('artifactory_globe')) ext.artifactory_globe = 'globe-virt'
+import groovy.util.slurpersupport.GPathResult
+
+if (!hasProperty('artifactoryLibrariesRepo')) ext.artifactoryLibrariesRepo = 'thirdparty-release'
 repositories {
-    maven {
-        url "${artifactory_url}/${artifactory_globe}"
-	}
+    maven { url "${artifactoryUrl}/${artifactoryLibrariesRepo}" }
     mavenLocal()
     mavenCentral()
 }
@@ -10,8 +10,11 @@ repositories {
 apply plugin: 'maven'
 apply plugin: 'java'
 
-group = 'org.pm4j'
-version = '0.9.16-SNAPSHOT'
+File pomFile = file('../pom.xml')
+assert pomFile.exists() : "The file $pomFile does not exist"
+GPathResult pomXml = new XmlSlurper().parse(pomFile)
+group = pomXml.groupId.text()
+version = pomXml.version.text()
 
 sourceCompatibility = 1.6
 targetCompatibility = 1.6
