@@ -151,25 +151,13 @@ public class InMemQueryEvaluator<T_ITEM> {
    * Sub classes may define here other value resolution algorithms.
    */
   public Object getAttrValue(Object item, QueryAttr attr) {
-    if (attr instanceof QueryAttrMulti) {
-      QueryAttrMulti mattr = (QueryAttrMulti) attr;
-
-      List<QueryAttr> partAttrDefs = mattr.getParts();
-      Object[] values = new Object[partAttrDefs.size()];
-      for (int i=0; i<partAttrDefs.size(); ++i) {
-        values[i] = getAttrValue(item, partAttrDefs.get(i));
-      }
-      return new MultiObjectValue(values);
+    Expression expr = queryAttrToPathExpressionCache.get(attr);
+    if (expr == null) {
+      expr = PathExpressionChain.parse(attr.getPath());
+      queryAttrToPathExpressionCache.put(attr, expr);
     }
-    else  {
-      Expression expr = queryAttrToPathExpressionCache.get(attr);
-      if (expr == null) {
-        expr = PathExpressionChain.parse(attr.getPath());
-        queryAttrToPathExpressionCache.put(attr, expr);
-      }
-      Object value = expr.getValue(item);
-      return value;
-    }
+    Object value = expr.getValue(item);
+    return value;
   }
 
   /**

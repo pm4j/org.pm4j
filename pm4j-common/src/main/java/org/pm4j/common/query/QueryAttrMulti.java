@@ -1,111 +1,91 @@
 package org.pm4j.common.query;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-
-import org.pm4j.common.expr.ExprExecCtxt;
-import org.pm4j.common.expr.Expression;
-import org.pm4j.common.expr.PathExpressionChain;
-import org.pm4j.common.expr.parser.ParseCtxt;
-import org.pm4j.common.util.CloneUtil;
-import org.pm4j.common.util.collection.MultiObjectValue;
 
 
 /**
- * Descriptor for an attribute that is defined by a set for individual fields.
+ * Descriptor for a virtual {@link QueryAttr} that is defined by a set for
+ * individual fields.
  * <p>
- * A typical use case is a business key comprising multiple fields.
+ * Typical use case:<br>
+ * You have to check for a set of fields if any of these matches a query
+ * condition.
  * <p>
- * The path of this kind of attribute is <code>null</code> because the multi field attribute - in
- * difference to a composite attribute - usually has not common path for all
- * parts.
+ * Example:<br>
+ * We search for all records having the string 'hello' either in the name or in
+ * the description field:
  *
- * @author olaf boede
+ * <pre>
+ * multiAttr = new QueryAttrMulti(QA_NAME, QA_DESCR);
+ * expr = new QueryExprCompare(multiAttr, CompOpLike.class, &quot;%hello%&quot;);
+ * found = QueryServiceUtil.findItems(queryService, expr, 100);
+ * </pre>
+ *
+ * <p>
+ * Please notice a difference to the base class {@link QueryAttr}:<br>
+ * {@link QueryAttrMulti#getPath()} returns always <code>null</code> because the
+ * multi-field attribute - in difference to a composite attribute - usually does
+ * not have a common path part for its items.
+ *
+ * @author Olaf Boede
  */
 public class QueryAttrMulti extends QueryAttr {
 
   private static final long serialVersionUID = 1L;
 
   /** The set of attribute fields. */
-  private List<QueryAttr> parts = new ArrayList<QueryAttr>();
+  private final List<QueryAttr> parts;
 
-
-  public QueryAttrMulti(String name) {
-    this(name, name);
-  }
-
-  public QueryAttrMulti(String name, String title) {
-    super(name, null, MultiObjectValue.class, title);
-  }
+  /** Conditions for the attribute parts a by default or-combined. */
+  private boolean orCombined = true;
 
   /**
-   * Adds an attribute field set part.
-   * <p>
-   * Please notice that the pathName of the part is <b>not</b> relative to the main attribute.
-   *
-   * @param part the field set part to add.
-   * @return the whole multi field attribute for inline usage.
+   * @param name The name (and title) of the attribute.
+   * @param parts The set of attributes represented by this virtual attribute.
    */
-  public QueryAttrMulti addPart(QueryAttr part) {
-    assert part != null;
-    parts.add(part);
+  public QueryAttrMulti(String name, QueryAttr... parts) {
+    this(name, null, parts);
+  }
+
+  public QueryAttrMulti orCombined() {
+    orCombined = true;
+    return this;
+  }
+
+  public QueryAttrMulti andCombined() {
+    orCombined = false;
     return this;
   }
 
   /**
-   * Adds an attribute field set part.
-   * <p>
-   * Please notice that the pathName of the part is <b>not</b> relative to the main attribute.
-   *
-   * @param path the relative path of the multi field part to add.
-   * @param type the field part type.
-   * @return the whole multi field attribute for inline usage.
+   * @param name The name (and title) of the attribute.
+   * @param title An optional kind of title string for this attribute.
+   * @param parts The set of attributes represented by this virtual attribute.
    */
-  public QueryAttrMulti addPart(String path, Class<?> type) {
-    return addPart(new QueryAttr(path, type));
-  }
-
-  //@Override
-  public List<QueryAttr> getParts() {
-    if (parts.isEmpty()) {
+  public QueryAttrMulti(String name, String title, QueryAttr... parts) {
+    super(name, null, QueryAttrMulti.class, title);
+    if (parts.length == 0) {
       throw new IllegalStateException("Multi field attribute '" + this +
           "'has no parts. Please add all parts before using the method getParts()");
     }
+    this.parts = Arrays.asList(parts);
+  }
+
+  public List<QueryAttr> getParts() {
     return parts;
   }
 
-  @Override
-  public QueryAttrMulti clone() {
-    QueryAttrMulti clone = (QueryAttrMulti) super.clone();
-    clone.parts = CloneUtil.cloneList(this.getParts(), true);
-    return clone;
+  /**
+   * @return the orCombined
+   */
+  public boolean isOrCombined() {
+    return orCombined;
   }
 
   @Override
   public String toString() {
-    return super.toString() + parts.toString();
-  }
-
-  /**
-   * A reflection based helper method to generate a value object from a multi field attribute
-   * definition.
-   * <p>
-   * The path strings of the attribute parts are used to get the values by reflection.
-   *
-   * @param item the object to retrieve the attribute values from.
-   * @param fd the multi field attribute descriptor.
-   * @return a value object that represents all the attribute part values.
-   */
-  // XXX olaf: check how the algorithm of InMemQueryEvaluator can be used directly.
-  public static MultiObjectValue makeValueObject(Object item, QueryAttrMulti fd) {
-    List<QueryAttr> parts = fd.getParts();
-    Object[] values = new Object[parts.size()];
-    for (int i=0; i< parts.size(); ++i) {
-      QueryAttr d = parts.get(i);
-      Expression ex = PathExpressionChain.parse(d.getPath());
-      values[i] = ex.getValue(item);
-    }
-    return new MultiObjectValue(values);
+    return getName() + parts.toString();
   }
 
 }

@@ -1,4 +1,4 @@
-package org.pm4j.common.query;
+package org.pm4j.common.query.experimental;
 
 
 import static org.junit.Assert.assertEquals;
@@ -7,6 +7,10 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.pm4j.common.query.CompOp;
+import org.pm4j.common.query.CompOpEquals;
+import org.pm4j.common.query.CompOpGt;
+import org.pm4j.common.query.CompOpLike;
 
 public class CompOpCompatibilityCheckerTest {
 

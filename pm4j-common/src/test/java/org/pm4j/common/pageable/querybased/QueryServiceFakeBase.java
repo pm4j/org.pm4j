@@ -46,7 +46,7 @@ public abstract class QueryServiceFakeBase<T_ITEM, T_ID>
   public T_ID getIdForItem(T_ITEM item) {
     try {
       return getIdAttrAccessor(item).getBeanAttrValue(item);
-    } catch (Exception e1) {
+    } catch (RuntimeException e1) {
         throw new RuntimeException("Please check if your query result item has a matching getId method. Alternatively you may override this method.", e1);
     }
   }

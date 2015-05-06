@@ -10,6 +10,7 @@ import java.util.Arrays;
  * the corresponding item results.
  *
  * @author olaf boede
+ * @deprecated It's in an experimental state. Please don't use it.
  */
 public class MultiObjectValue implements Serializable {
 

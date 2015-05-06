@@ -1,6 +1,8 @@
 package org.pm4j.common.query;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.pm4j.common.query.filter.FilterDefinition;
@@ -26,6 +28,26 @@ public final class QueryExprUtil {
     QueryAttr attr = new QueryAttr(attrPath, attrClass);
     return new QueryExprCompare(attr, compOpClass, compareValue);
   }
+
+  /**
+   * Only for expression having an attribute of type {@link QueryAttrMulti}!
+   * <p>
+   * Generates the related AND or OR combined query expression.
+   *
+   * @param expr
+   * @return
+   */
+  public static QueryExpr makeMultiPartCompareExpr(QueryExprCompare expr) {
+    QueryAttrMulti multiAttr = ((QueryAttrMulti) expr.getAttr());
+    List<QueryExpr> partExprList = new ArrayList<QueryExpr>(multiAttr.getParts().size());
+    for (QueryAttr a : multiAttr.getParts()) {
+      partExprList.add(new QueryExprCompare(a, expr.getCompOp(), expr.getValue()));
+    }
+    return multiAttr.isOrCombined()
+        ? new QueryExprOr(partExprList)
+        : new QueryExprAnd(partExprList);
+  }
+
 
   /**
    * Scans the given collection of {@link FilterDefinition}s to find the

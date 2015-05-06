@@ -1,8 +1,25 @@
-package org.pm4j.common.query;
+package org.pm4j.common.query.experimental;
 
 import java.util.Collection;
 
 import org.apache.commons.lang.StringUtils;
+import org.pm4j.common.query.CompOp;
+import org.pm4j.common.query.CompOpContains;
+import org.pm4j.common.query.CompOpEquals;
+import org.pm4j.common.query.CompOpGe;
+import org.pm4j.common.query.CompOpGt;
+import org.pm4j.common.query.CompOpIn;
+import org.pm4j.common.query.CompOpIsNull;
+import org.pm4j.common.query.CompOpLe;
+import org.pm4j.common.query.CompOpLike;
+import org.pm4j.common.query.CompOpLt;
+import org.pm4j.common.query.CompOpNotContains;
+import org.pm4j.common.query.CompOpNotEquals;
+import org.pm4j.common.query.CompOpNotNull;
+import org.pm4j.common.query.CompOpStartsWith;
+import org.pm4j.common.query.QueryExpr;
+import org.pm4j.common.query.QueryExprCompare;
+import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.filter.FilterDefinition;
 
 /**

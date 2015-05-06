@@ -1,5 +1,6 @@
 package org.pm4j.common.query.inmem;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.pm4j.common.query.CompOpContains;
@@ -16,6 +17,7 @@ import org.pm4j.common.query.CompOpNotEquals;
 import org.pm4j.common.query.CompOpNotNull;
 import org.pm4j.common.query.CompOpStartsWith;
 import org.pm4j.common.query.QueryAttr;
+import org.pm4j.common.query.QueryAttrMulti;
 import org.pm4j.common.query.QueryEvaluatorSet;
 import org.pm4j.common.query.QueryExpr;
 import org.pm4j.common.query.QueryExprAnd;
@@ -23,6 +25,7 @@ import org.pm4j.common.query.QueryExprCompare;
 import org.pm4j.common.query.QueryExprInMemCondition;
 import org.pm4j.common.query.QueryExprNot;
 import org.pm4j.common.query.QueryExprOr;
+import org.pm4j.common.query.QueryExprUtil;
 
 /**
  * The default set of in memory evaluators.
@@ -102,12 +105,19 @@ public class InMemQueryEvaluatorSet extends QueryEvaluatorSet {
   public static class CompareEvaluator extends InMemExprEvaluatorBase<QueryExprCompare> {
     @Override
     protected boolean evalImpl(InMemQueryEvaluator<?> ctxt, Object item, QueryExprCompare expr) {
-      InMemCompOpEvaluator coEval = ctxt.getCompOpEvaluator(expr);
       QueryAttr attr = expr.getAttr();
-      Object attrValue = ctxt.getAttrValue(item, attr);
-      return coEval.eval(ctxt, expr.getCompOp(), attrValue, expr.getValue());
+      if (attr instanceof QueryAttrMulti) {
+        QueryExpr multiPartExpr = QueryExprUtil.makeMultiPartCompareExpr(expr);
+        InMemExprEvaluator exprEvaluator = (InMemExprEvaluator) ctxt.getEvaluatorSet().getExprEvaluator(multiPartExpr);
+        return exprEvaluator.eval(ctxt, item, multiPartExpr);
+      } else {
+        Object attrValue = ctxt.getAttrValue(item, attr);
+        InMemCompOpEvaluator compOpEvaluator = ctxt.getCompOpEvaluator(expr);
+        return compOpEvaluator.eval(ctxt, expr.getCompOp(), attrValue, expr.getValue());
+      }
     }
-  }
+
+}
 
   /** Evaluates logical NOT expressions. */
   public static class NotEvaluator extends InMemExprEvaluatorBase<QueryExprNot> {
