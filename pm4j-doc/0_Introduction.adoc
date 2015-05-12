@@ -1,0 +1,14 @@
+= pm4j Introduction =
+:author: Olaf Boede
+:doctype: book
+:toc:
+:lang: en
+:encoding: iso-8859-1
+
+pm4j is a java framework that allows writing java UI applications efficiently. 
+
+pm4j supports the implementation of presentation models as described by Martin Fowler (see: http://www.martinfowler.com/eaaDev/PresentationModel.html). 
+
+pm4j is not a replacement for java-view technologies like JSF, SWT, Swing, etc. 
+It only makes a richer base of information available to the view layer.
+
