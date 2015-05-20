@@ -38,8 +38,6 @@ class MyFormPm extends PmBeanImpl<MyBean> {
 
 The strict 1:1 relation between view controls and their UI logic models (PMs) minimizes the risk of getting unstructured UI logic code.
 
-The following text explains that this maintainable structure will be preserved, even if the UI logic gets more complex.
-
 === UI logic for each control defined in one place === 
 
 Each PM may be customized using annotations and by overriding some API methods.
@@ -74,7 +72,7 @@ pm4j prevents repeated boiler plate code by supporting the following ideoms:
 - Data binding +
   __Bean data may be bound to PM's using no code (by convention) or using powerful expressions.__
 - Support for standard Java bean validations +
-  __Validations, coded once on bean level, is considered by PM's representing such beans.__
+  __Validations, coded once on bean level, are considered by PM's representing such beans.__
 - Re-use of UI logic supported +
   __You may define domain specific PM modules (e.g. special tables, form parts...).__
   
@@ -84,9 +82,9 @@ pm4j helps to separate UI logic code and layout code strictly. +
 UI logic is located in the PM layer. +
 The view layer contains pure layout code. It defines where to place the controls and the required style information (e.g. CSS code).
 
-That's an advantage for development teams having co-operating UI logic- and layout experts.
+That is an advantage for development teams having co-operating UI logic- and layout experts.
 
-That clear separation helps to keep the UI logic code as well as the layout code maintainable.
+The clear separation helps to keep the UI logic code as well as the layout code maintainable.
 
 == Loose coupled (replaceable) view technology ==
 

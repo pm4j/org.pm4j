@@ -9,13 +9,13 @@
 
 == UI Application Layers ==
 
-This chapter provides an overview about the layers that are relevant for a UI application and their responsibilities.
+This chapter provides an overview about UI application layers and their responsibilities.
 
 image:resources/Introduction_PmLayers.png[]
 
 === View Layer ===
 
-Defines where and how to display the UI controls.
+The view layer defines where and how to display the UI controls.
 
 Each control gets a link to its corresponding PM that provides the UI states for the view control (E.g. value, tooltip, enablement).
 
@@ -28,10 +28,12 @@ Some layout information may be added here as well. E.g. by placing __div__-eleme
 
 === PM Layer ===
 
-Defines the Presentation Models for the view components. They provide:
+The PM layer contains Presentation Models for the view components. 
+
+PMs are responsible for
 
 * State information for various UI aspects (value, title, tooltip, options, enablement, visibility ...)
-* The UI logic. E.g.
+* UI logic. E.g.
 ** Operations to perform on a command button click.
 ** Operations to perform on a field value change.
 ** Calculated UI aspects. E.g. a field is only visible or enabled for specific users.

@@ -21,7 +21,7 @@ Main advantages are maintainability, testability and view technology independenc
 
 But there are also challenges for applications using the PM approach:
 
-- state synchronization between the view and PM layer (view binding)
+- Synchronization between the view and PM layer (view binding)
 
 __Imagine a form having 10 input controls. +
 That form would require on the PM side to have more than 100 getters for all the UI aspects 
@@ -29,16 +29,15 @@ That form would require on the PM side to have more than 100 getters for all the
 On the view side you would also have to write more than 100 statements to read all details from the PM. +
 Here its useful to use a PM framework that prevents writing such boiler plate code.__
 
-- synchronization and between PM's and service layer (bean data binding)
+- Synchronization and between PM's and service layer (bean data binding)
 
-__In our form sample we may have to read/write form data from/to a service layer bean. +
-A kind of data binding would be a useful PM framework feature to prevent such boiler plate code as well.__
+__In our form sample we assume that we have to read/write form data from/to a service layer bean. 
+That would cause 20 statements (or methods) to transfer the 10 field values between the PM and bean.  +
+A kind of data binding would be a nice PM framework feature to prevent such boiler plate code as well.__
 
 pm4j provides standard implementations for these common challenges. +
 It provides PM classes for a rich set of commonly used UI controls (input fields, command buttons, tables, trees etc.).
 
 Applications using pm4j may concentrate on their domain specific UI logic. +
-The UI business logic code may be written clear and well structured. +
+UI business logic code may be written clear and well structured. +
 It must not be polluted with much technology or pattern related boiler plate code.
-
-
