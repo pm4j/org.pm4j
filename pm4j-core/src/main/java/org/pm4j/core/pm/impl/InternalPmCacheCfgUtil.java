@@ -142,7 +142,7 @@ class InternalPmCacheCfgUtil {
 
     for (Observe clearOn : clearOns) {
       for (String expression : clearOn.pm()) {
-        PmObject pmToObserve = PmExpressionApi.getByExpression(pmObject, expression, PmObject.class);
+        PmObject pmToObserve = PmExpressionApi.getByExpression(pmObject.getPmParent(), expression, PmObject.class);
         if (clearOn.observePmTree()) {
           PmEventApi.addWeakHierarchyListener(pmToObserve, PmEvent.VALUE_CHANGE, e);
         } else {
