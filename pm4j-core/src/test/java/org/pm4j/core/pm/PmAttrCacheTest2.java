@@ -251,11 +251,11 @@ public class PmAttrCacheTest2 {
     @PmAttrCfg(valuePath="pmBean.s")
     public final PmAttrString sCachedButClearNever = new MyCachedAttrClass(this);
 
-    @PmCacheCfg2(@Cache(property = CacheKind.ALL, clearOn=@Observe(pm={"pmParent.s", "pmParent.s2"})))
+    @PmCacheCfg2(@Cache(property = CacheKind.ALL, clearOn=@Observe(pm={"s", "s2"})))
     @PmAttrCfg(valuePath="pmBean.s")
     public final PmAttrString sCachedAndClearedOnValueChange = new PmAttrStringImpl(this);
 
-    @PmCacheCfg2(@Cache(property = CacheKind.ALL, clearOn=@Observe(pm={"pmParent.tab"}, observePmTree=true)))
+    @PmCacheCfg2(@Cache(property = CacheKind.ALL, clearOn=@Observe(pm={"tab"}, observePmTree=true)))
     @PmAttrCfg(valuePath="pmBean.s")
     public final PmAttrString sCachedAndClearedOnValueChangeInHierarcy = new PmAttrStringImpl(this);
 
