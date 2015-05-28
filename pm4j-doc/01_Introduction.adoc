@@ -1,4 +1,4 @@
-= pm4j =
+= pm4j
 :author: Olaf Boede
 :doctype: book
 :toc:
@@ -8,6 +8,51 @@
 ifdef::env-github[:outfilesuffix: .adoc]
 
 pm4j is a framework that allows writing maintainable Java UI applications efficiently.
+
+Ok. That's the intention of every UI framework. +
+So: What's the special motivation for yet another UI framework?
+
+== Why does pm4j exist?
+
+Implementing and maintaining UI's using view technologies such as __Swing, SWT, Struts, JSF__ may be fun.
+Many nice UI controls are well supported and you get quickly a visible results of your work.
+
+But there are also common UI development problems that often re-appear:
+
+*Testability:*
+
+The UI logic is often distributed to view technology specific places such as scripts, listeners, controllers and/or backing beans. 
+
+UI logic unit tests get expensive if UI logic is distributed this way. 
+
+In __JSF__ for example you may define validations and type conversions in __xhtml__ files. +
+Its hardly possible to write a simple JUnit test covering that logic. You usually need to use a technology specific test framework. +
+Sometime it's so difficult or expensive to write UI logic unit tests that projects only do few of them or even none.
+
+*Maintainability:*
+
+Distributed UI logic makes if also hard to fix a bug or to extend UI functionality. 
+
+Several view technologies mix layout and UI logic code in the same set of source files. +
+That makes co-operation for layout and logic experts also not easy.
+
+View technologies often don't provide much guidance for structuring UI logic code. +
+JSF for example uses backing bean classes for providing data and some UI logic. +
+It's up to the discipline of the developer to keep this place somehow structured. 
+For larger project it's a risk of getting unstructured code that's hard to maintain. 
+ 
+*View technology dependency:*
+
+UI logic mixed with view technology specific code made it hard (or sometimes impossible) to upgrade to a new view framework release.
+
+It's hardly possible to re-use domain specific UI logic between applications using different view libraries. 
+  
+Upgrades to new view framework releases are sometimes needed for implementing some new requirements. +
+If this is hard to achieve because of mixed view technology and business logic code, this may get a risk for loosing the business logic investments.
+
+
+These reasons caused thoughts about de-coupling UI logic from view logic. +
+Finally they led to the development of the UI logic framework pm4j. 
 
 pm4j supports the implementation of presentation models as described by Martin Fowler (see: http://www.martinfowler.com/eaaDev/PresentationModel.html). 
 
@@ -24,20 +69,20 @@ But there are also challenges for applications using the PM approach:
 - Synchronization between the view and PM layer (view binding)
 
 __Imagine a form having 10 input controls. +
-That form would require on the PM side to have more than 100 getters for all the UI aspects 
-(title, tool tip, icon, visibility, enablement, value, options etc.) of each control. +
-On the view side you would also have to write more than 100 statements to read all details from the PM. +
-Here its useful to use a PM framework that prevents writing such boiler plate code.__
+That form would require on the PM side to have more than many getters for all the UI aspects 
+(title, tool tip, icon, visibility, enablement, value, options etc.) that have to be provided for each control. +
+On the view side you would also have to write also a lot of statements for reading all details from the PM. +
+Here its useful to use a PM framework like pm4j that prevents writing such boiler plate code.__
 
-- Synchronization and between PM's and service layer (bean data binding)
+- Synchronization between PM's and service layer (bean data binding)
 
 __In our form sample we assume that we have to read/write form data from/to a service layer bean. 
 That would cause 20 statements (or methods) to transfer the 10 field values between the PM and bean.  +
-A kind of data binding would be a nice PM framework feature to prevent such boiler plate code as well.__
+A kind of data binding would prevent such boiler plate code.__
 
 pm4j provides standard implementations for these common challenges. +
 It provides PM classes for a rich set of commonly used UI controls (input fields, command buttons, tables, trees etc.).
 
 Applications using pm4j may concentrate on their domain specific UI logic. +
-UI business logic code may be written clear and well structured. +
-It must not be polluted with much technology or pattern related boiler plate code.
+pm4j helps to structure UI business logic code. +
+There is no longer a need to mix it with much view technology or pattern related boiler plate code.

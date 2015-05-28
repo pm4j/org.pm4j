@@ -24,7 +24,9 @@ Example view code (here: a snippet of a JSF view): +
   <pm4j:inputText pm="#{form.name}" />
 
 That code declares an input field and its binding to a corresponding PM. +
-Some layout information may be added here as well. E.g. by placing __div__-elements or defining CCS styles using __styleClass="xyz"__.
+Some layout information may be added here as well. E.g. by placing __div__-elements or defining CCS styles using __styleClass="xyz"__. +
+Please notice: There is no logic code for controlling visibility, enablement etc. in the view layer.
+
 
 === PM Layer ===
 
