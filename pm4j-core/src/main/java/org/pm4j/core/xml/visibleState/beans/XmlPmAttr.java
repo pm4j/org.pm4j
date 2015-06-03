@@ -16,8 +16,8 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlRootElement(name="attr")
 @XmlType(propOrder = {
-    // attributes (in reverese order for Java 1.6. In java 1.7 in opposite direction :-( ):
-    "styleClass", "icon", "title", "enabled", "isTab", "name",
+    // attributes:
+    "name", "isTab", "enabled", "title", "icon", "styleClass",
     // elements:
     "tooltip", "value", "options", "messages", "children" })
 public class XmlPmAttr extends XmlPmObjectBase {
