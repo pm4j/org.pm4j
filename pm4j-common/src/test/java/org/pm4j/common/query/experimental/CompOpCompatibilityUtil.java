@@ -2,7 +2,6 @@ package org.pm4j.common.query.experimental;
 
 import java.util.Collection;
 
-import org.apache.commons.lang.StringUtils;
 import org.pm4j.common.query.CompOp;
 import org.pm4j.common.query.CompOpContains;
 import org.pm4j.common.query.CompOpEquals;
@@ -17,17 +16,13 @@ import org.pm4j.common.query.CompOpNotContains;
 import org.pm4j.common.query.CompOpNotEquals;
 import org.pm4j.common.query.CompOpNotNull;
 import org.pm4j.common.query.CompOpStartsWith;
-import org.pm4j.common.query.QueryExpr;
-import org.pm4j.common.query.QueryExprCompare;
-import org.pm4j.common.query.QueryOptions;
-import org.pm4j.common.query.filter.FilterDefinition;
 
 /**
  * Utilities for the abstract query functionality.
  *
  * @author Olaf Boede
  */
-public class QueryUtil {
+public class CompOpCompatibilityUtil {
 
   /**
    * Registers the default {@link CompOp} to value type matches that most
@@ -53,37 +48,4 @@ public class QueryUtil {
     return checker;
   }
 
-  public static FilterDefinition findFilterDefinitionByName(QueryOptions queryOptions, String name) {
-    for (FilterDefinition d : queryOptions.getCompareDefinitions()) {
-      if (StringUtils.equals(d.getAttr().getName(), name)) {
-        return d;
-      }
-    }
-    // not found
-    return null;
-  }
-
-  public static CompOp findCompOp(FilterDefinition d, String opName) {
-    for (CompOp c : d.getCompOps()) {
-      if (StringUtils.equals(c.getName(), opName)) {
-        return c;
-      }
-    }
-    // not found
-    return null;
-  }
-
-  public static QueryExpr getFilter(QueryOptions queryOptions, String predicateName, String compOpName, Object value) {
-    FilterDefinition d = findFilterDefinitionByName(queryOptions, predicateName);
-    if (d == null) {
-      throw new RuntimeException("Missing filter definition for attribute '" + predicateName + "'");
-    }
-
-    CompOp c = findCompOp(d, compOpName);
-    if (c == null) {
-      throw new RuntimeException("Missing compare operator definition '" + compOpName + "' in filter definition '" + predicateName + "'.");
-    }
-
-    return new QueryExprCompare(d.getAttr(), c, value);
-  }
 }

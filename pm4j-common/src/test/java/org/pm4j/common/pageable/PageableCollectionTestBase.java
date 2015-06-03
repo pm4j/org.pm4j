@@ -20,7 +20,7 @@ import org.pm4j.common.query.QueryAttr;
 import org.pm4j.common.query.QueryExpr;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.SortOrder;
-import org.pm4j.common.query.experimental.QueryUtil;
+import org.pm4j.common.query.QueryUtil;
 import org.pm4j.common.query.filter.FilterDefinition;
 import org.pm4j.common.selection.SelectMode;
 import org.pm4j.common.selection.Selection;

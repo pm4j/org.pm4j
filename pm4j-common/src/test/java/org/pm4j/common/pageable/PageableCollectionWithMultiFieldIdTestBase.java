@@ -16,7 +16,7 @@ import org.pm4j.common.query.CompOpStartsWith;
 import org.pm4j.common.query.QueryExpr;
 import org.pm4j.common.query.QueryAttr;
 import org.pm4j.common.query.SortOrder;
-import org.pm4j.common.query.experimental.QueryUtil;
+import org.pm4j.common.query.QueryUtil;
 import org.pm4j.common.selection.SelectMode;
 import org.pm4j.common.util.beanproperty.PropertyAndVetoableChangeListener;
 import org.pm4j.common.util.collection.IterableUtil;

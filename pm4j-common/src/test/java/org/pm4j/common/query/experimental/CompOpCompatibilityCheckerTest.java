@@ -5,7 +5,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import org.junit.Assert;
 import org.junit.Test;
 import org.pm4j.common.query.CompOp;
 import org.pm4j.common.query.CompOpEquals;
@@ -14,7 +13,7 @@ import org.pm4j.common.query.CompOpLike;
 
 public class CompOpCompatibilityCheckerTest {
 
-  private CompOpCompatibilityChecker checker = QueryUtil.registerDefaultCompOpValueMatches(new CompOpCompatibilityChecker());
+  private CompOpCompatibilityChecker checker = CompOpCompatibilityUtil.registerDefaultCompOpValueMatches(new CompOpCompatibilityChecker());
 
   @Test
   public void testCompOpApplicableForValueClass() {
