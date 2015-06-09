@@ -1,15 +1,12 @@
 package org.pm4j.common.pageable.querybased.idquery;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-import org.pm4j.common.pageable.querybased.idquery.IdQueryService;
 import org.pm4j.common.query.QueryParams;
 
 /**
@@ -40,7 +37,11 @@ public class IdQueryServiceProxyForMinimzedGetItemCalls<T_BEAN, T_ID> implements
   @Override
   public T_BEAN getItemForId(T_ID id) {
     T_BEAN b = idToBeanMap.get(id);
-    return b != null ? b : delegate.getItemForId(id);
+    if (b == null) {
+      b = delegate.getItemForId(id);
+      idToBeanMap.put(id, b);
+    }
+    return b;
   }
 
   @Override
@@ -62,7 +63,7 @@ public class IdQueryServiceProxyForMinimzedGetItemCalls<T_BEAN, T_ID> implements
       }
     }
 
-    // 1.a: All items are already
+    // 1.a: All items are already loaded.
     if (idsToQuery.isEmpty()) {
       return new ArrayList<T_BEAN>(itemsInMap.values());
     }
@@ -70,11 +71,15 @@ public class IdQueryServiceProxyForMinimzedGetItemCalls<T_BEAN, T_ID> implements
     // 2. Get the missing items from the service.
     List<T_BEAN> queryResultItems = delegate.getItems(idsToQuery);
     if (itemsInMap.isEmpty()) {
+      // 2.a: No items loaded: Add them to the map and return the item set.
       for (T_BEAN item : queryResultItems) {
         idToBeanMap.put(getIdForItem(item), item);
       }
       return queryResultItems;
     } else {
+      // 2.b: Some items are already in memory.
+      //      The in-memory instance will be used in favor to the service provided instance.
+      //      This preserves any changed done in the already loaded instance.
       List<T_BEAN> allItems = new ArrayList<T_BEAN>(ids.size());
       Iterator<T_BEAN> queryResultIterator = queryResultItems.iterator();
       for (T_ID id : ids) {
@@ -86,7 +91,8 @@ public class IdQueryServiceProxyForMinimzedGetItemCalls<T_BEAN, T_ID> implements
             allItems.add(next);
             idToBeanMap.put(getIdForItem(next), next);
           } else {
-            // TODO olaf: not yet complete. See also TODO in IdQueryCollectionImpl.AddItemStrategyAtTheEnd.getCurrentPageIds
+            // Not found items are just gaps. Possibly object deleted by other users.
+            // They will be handled by the logic of the caller (pageable collection).
           }
         }
       }
