@@ -13,6 +13,7 @@ import org.pm4j.common.pageable.PageableCollectionTestBase;
  */
 public class IdQueryServiceProxyForMinimzedGetItemCallsTest extends PageableCollectionTestBase<PageableCollectionTestBase.Bean> {
   TestService service = new TestService();
+  IdQueryServiceProxyForMinimzedGetItemCalls<Bean, Integer> serviceProxy = new IdQueryServiceProxyForMinimzedGetItemCalls<Bean, Integer>(service);
 
   @Override
   protected PageableCollection<Bean> makePageableCollection(String... strings) {
@@ -22,7 +23,7 @@ public class IdQueryServiceProxyForMinimzedGetItemCallsTest extends PageableColl
         service.save(new Bean(s));
       }
     }
-    return new IdQueryCollectionImpl<Bean, Integer>(new IdQueryServiceProxyForMinimzedGetItemCalls<Bean, Integer>(service), getQueryOptions());
+    return new IdQueryCollectionImpl<Bean, Integer>(serviceProxy, getQueryOptions());
   }
 
   @Override
@@ -33,8 +34,9 @@ public class IdQueryServiceProxyForMinimzedGetItemCallsTest extends PageableColl
   @Override
   public void setUp() {
     super.setUp();
-    assertEquals("Call count stability check.", "{findIds=1, getItemForId=7, getItems=1}", service.callCounter.toString());
+    assertEquals("Call count stability check.", "{findIds=1, getItemForId=7}", service.callCounter.toString());
     service.callCounter.reset();
+    serviceProxy.clearWeakMap();
   }
 
   @Test
@@ -61,7 +63,7 @@ public class IdQueryServiceProxyForMinimzedGetItemCallsTest extends PageableColl
   @Test @Override
   public void testSwitchQueryExecOffAndOn() {
     super.testSwitchQueryExecOffAndOn();
-    assertEquals("Call count stability check.", "{findIds=2, getItemForId=10}", service.callCounter.toString());
+    assertEquals("Call count stability check.", "{findIds=2, getItemForId=6}", service.callCounter.toString());
   }
 
   @Test @Override
@@ -73,13 +75,13 @@ public class IdQueryServiceProxyForMinimzedGetItemCallsTest extends PageableColl
   @Override @Test
   public void testSortItems() {
     super.testSortItems();
-    assertEquals("Call count stability check.", "{findIds=4, getItemForId=20}", service.callCounter.toString());
+    assertEquals("Call count stability check.", "{findIds=4, getItemForId=6}", service.callCounter.toString());
   }
 
   @Override @Test
   public void testDefaultSortOrder() {
     super.testDefaultSortOrder();
-    assertEquals("Call count stability check.", "{findIds=5, getItemForId=14, getItems=2}", service.callCounter.toString());
+    assertEquals("Call count stability check.", "{findIds=5, getItemForId=6}", service.callCounter.toString());
   }
 
   @Override @Test
@@ -103,7 +105,7 @@ public class IdQueryServiceProxyForMinimzedGetItemCallsTest extends PageableColl
   @Override @Test
   public void testAddItem() {
     super.testAddItem();
-    assertEquals("Call count stability check.", "{findIds=2, getItemForId=5, getItems=2}", service.callCounter.toString());
+    assertEquals("Call count stability check.", "{findIds=2, getItemForId=6}", service.callCounter.toString());
   }
 
   @Override @Test
@@ -115,7 +117,7 @@ public class IdQueryServiceProxyForMinimzedGetItemCallsTest extends PageableColl
   @Override @Test
   public void testAddItemInMultiSelectMode() {
     super.testAddItemInMultiSelectMode();
-    assertEquals("Call count stability check.", "{findIds=2, getItemForId=5, getItems=2}", service.callCounter.toString());
+    assertEquals("Call count stability check.", "{findIds=2, getItemForId=6}", service.callCounter.toString());
   }
 
   @Override @Test

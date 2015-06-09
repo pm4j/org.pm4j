@@ -105,4 +105,12 @@ public class IdQueryServiceProxyForMinimzedGetItemCalls<T_BEAN, T_ID> implements
     return delegate.getItemCount(query);
   }
 
+  /**
+   * Clears the internal hash map.<p>
+   * May be used to force reloading of all items again.
+   */
+  public void clearWeakMap() {
+    idToBeanMap.clear();
+  }
+
 }
