@@ -17,13 +17,13 @@ image:resources/Introduction_PmLayers.png[]
 
 The view layer defines where and how to display the UI controls.
 
-Each control gets a link to its corresponding PM that provides the UI states for the view control (E.g. value, tooltip, enablement).
+Each control gets a link to it's corresponding PM that provides the UI states for the view control (E.g. value, tooltip, enablement).
 
 Example view code (here: a snippet of a JSF view): +
 
   <pm4j:inputText pm="#{form.name}" />
 
-That code declares an input field and its binding to a corresponding PM. +
+That code declares an input field and it's binding to a corresponding PM. +
 Some layout information may be added here as well. E.g. by placing __div__-elements or defining CCS styles using __styleClass="xyz"__. +
 Please notice: There is no logic code for controlling visibility, enablement etc. in the view layer.
 

@@ -11,7 +11,7 @@ pm4j is intended to help writing UI applications having the following design pro
 - Loose coupled (even replaceable) view technology
 - Good testability
 
-The following text provide more details for these design goals.
+The following text provides more details for these design goals.
 
 == Maintainable UI code structure ==
 
@@ -54,21 +54,21 @@ Additionally it should only be enabled if the field _name_ is filled.
           return name.getValue() != null;   
       }
 
-All functionality related to _cmdSend_ functionality (regardless if its a fix annotation or an algorithm) is defined in one place. 
+All functionality related to _cmdSend_ functionality (regardless if it's a fix annotation or an algorithm) is defined in one place. 
 
 The UI logic code structure is uniform and predictable. +
 There is no code distributed to other controllers, handlers or listeners. That helps keeping UI logic code maintainable.
 
 === Compact code ===
 
-pm4j prevents repeated boiler plate code by supporting the following ideoms:
+pm4j prevents repeated boiler plate code by supporting the following idioms:
 
 - Convention over configuration +
   __No code is required for default behaviour.__
 - Annotations used to implement standard aspects +
   __One or two words needed for defining basic features like titles, caches etc.__  
 - View binding +
-  __Predefined view binding (e.g. xhtml tags) allow to implement and bind a view control for a PM using just a single line of code.__
+  __Predefined view binding (e.g. xhtml tags) allows to implement and bind a view control for a PM using just a single line of code.__
 - Data binding +
   __Bean data may be bound to PM's using no code (by convention) or using powerful expressions.__
 - Support for standard Java bean validations +

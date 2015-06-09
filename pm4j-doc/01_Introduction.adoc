@@ -15,7 +15,7 @@ So: What's the special motivation for yet another UI framework?
 == Why does pm4j exist?
 
 Implementing and maintaining UI's using view technologies such as __Swing, SWT, Struts, JSF__ may be fun.
-Many nice UI controls are well supported and you get quickly a visible results of your work.
+Many nice UI controls are well supported and you get a visible result of your work, quickly.
 
 But there are also common UI development problems that often re-appear:
 
@@ -26,7 +26,7 @@ The UI logic is often distributed to view technology specific places such as scr
 UI logic unit tests get expensive if UI logic is distributed this way. 
 
 In __JSF__ for example you may define validations and type conversions in __xhtml__ files. +
-Its hardly possible to write a simple JUnit test covering that logic. You usually need to use a technology specific test framework. +
+It's hardly possible to write a simple JUnit test covering that logic. You usually need to use a technology specific test framework. +
 Sometime it's so difficult or expensive to write UI logic unit tests that projects only do few of them or even none.
 
 *Maintainability:*
@@ -48,7 +48,7 @@ UI logic mixed with view technology specific code made it hard (or sometimes imp
 It's hardly possible to re-use domain specific UI logic between applications using different view libraries. 
   
 Upgrades to new view framework releases are sometimes needed for implementing some new requirements. +
-If this is hard to achieve because of mixed view technology and business logic code, this may get a risk for loosing the business logic investments.
+If this is hard to achieve because of mixed view technology and business logic code, this may get a risk for losing the business logic investments.
 
 
 These reasons caused thoughts about de-coupling UI logic from view logic. +
@@ -72,7 +72,7 @@ __Imagine a form having 10 input controls. +
 That form would require on the PM side to have more than many getters for all the UI aspects 
 (title, tool tip, icon, visibility, enablement, value, options etc.) that have to be provided for each control. +
 On the view side you would also have to write also a lot of statements for reading all details from the PM. +
-Here its useful to use a PM framework like pm4j that prevents writing such boiler plate code.__
+Here it's useful to use a PM framework like pm4j that prevents writing such boiler plate code.__
 
 - Synchronization between PM's and service layer (bean data binding)
 
