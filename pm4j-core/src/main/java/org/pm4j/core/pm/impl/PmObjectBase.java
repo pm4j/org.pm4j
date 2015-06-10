@@ -170,6 +170,17 @@ public class PmObjectBase implements PmObject {
       @Override
       public void handleEvent(PmEvent event) {
         if (event.isAllChangedEvent() || event.isReloadEvent()) {
+          // This kind event gets recursively applied to a PM tree (part). Because of that we don't need to
+          // handle the child PMs.
+          _setPmValueChangedForThisInstanceOnly(PmObjectBase.this, false);
+          // XXX needs to be optimized: iterates repeated over the PM tree
+          clearCachedPmValues(CacheKind.ALL_SET);
+
+          // Cleanup gaps in listener array whenever a completely new data scenario appears.
+          if (!event.isReloadEvent() && pmEventListenerRefs != null) {
+            pmEventListenerRefs.compact();
+          }
+
           onPmDataExchangeEvent(event);
         }
       }
@@ -183,8 +194,9 @@ public class PmObjectBase implements PmObject {
     zz_ensurePmInitialization();
     try {
       PmObjectBase clone = (PmObjectBase) super.clone();
-      clone.pmEventTable = CloneUtil.clone(pmEventTable);
-      clone.pmWeakEventTable = CloneUtil.clone(pmWeakEventTable);
+      if (pmEventListenerRefs != null) {
+        clone.pmEventListenerRefs = pmEventListenerRefs.clone();
+      }
       return clone;
     } catch (CloneNotSupportedException e) {
       throw new CheckedExceptionWrapper(e);
@@ -436,9 +448,7 @@ public class PmObjectBase implements PmObject {
   }
 
   /** The set of event listeners. */
-  /* package */ PmEventTable pmEventTable;
-  /* package */ PmEventTable pmWeakEventTable;
-
+  /* package */ InternalPmEventListenerRefs pmEventListenerRefs;
 
   /**
    * Is called whenever an event with the flag {@link PmEvent#VALUE_CHANGE}
@@ -463,15 +473,10 @@ public class PmObjectBase implements PmObject {
    * propagated to the related PM sub-tree. See:
    * {@link PmBean#setPmBean(Object)}.
    *
-   * @param parentEvent
-   *          The event that was received by the parent.
+   * @param event
+   *          The event that was received.
    */
-  protected void onPmDataExchangeEvent(PmEvent parentEvent) {
-    // This kind event gets recursively applied to a PM tree (part). Because of that we don't need to
-    // handle the child PMs.
-    _setPmValueChangedForThisInstanceOnly(this, false);
-    // XXX needs to be optimized: iterates repeated over the PM tree
-    clearCachedPmValues(CacheKind.ALL_SET);
+  protected void onPmDataExchangeEvent(PmEvent event) {
   }
 
 
@@ -1907,143 +1912,4 @@ public class PmObjectBase implements PmObject {
   }
 
 } // end of PmObjectBase
-
-
-/**
- * A container for registered event listener - event mask pairs.
- * <p>
- * FIXME olaf: Currently the listener references are weak.
- *             An binding implementation with complete unbind support should be able
- *             to handle strong references too...
- * <p>
- * XXX olaf: The implementation is not really optimized for size and speed.
- *           Have a look the SWT EventTable for a better performing implementation.<br>
- *           Usage of the {@link CopyOnWriteArraySet} may also be a good choice.
- *
- * @author olaf boede
- */
-class PmEventTable implements Cloneable {
-  private static final Logger LOG = LoggerFactory.getLogger(PmEventTable.class);
-
-  private Map<PmEventListener, Integer> pmEventListeners;
-
-  public PmEventTable(boolean isWeak) {
-    // Initial map size reduced to 2 to optimize memory consumption.
-    // XXX oboede: further memory reduction may be achieved by performing standard observer operations
-    // in methods instead of using observer instances. See PmDataInputBase ctor.
-    // A table example test pointed out that this would reduce the sample screen PM footprint by 15%.
-    pmEventListeners = createMap(isWeak, 2);
-  }
-
-  private Map<PmEventListener, Integer> createMap(boolean isWeak, int capacity) {
-    return isWeak
-        ? new WeakHashMap<PmEventListener, Integer>(capacity)
-        : new HashMap<PmEventListener, Integer>(capacity);
-  }
-
-
-  @Override
-  protected PmEventTable clone() {
-    try {
-      PmEventTable clone = (PmEventTable) super.clone();
-      clone.pmEventListeners = createMap(pmEventListeners instanceof WeakHashMap, pmEventListeners.size());
-      clone.pmEventListeners.putAll(pmEventListeners);
-      return clone;
-    } catch (CloneNotSupportedException e) {
-      throw new CheckedExceptionWrapper(e);
-    }
-  }
-
-  public synchronized void addListener(int eventMask, PmEventListener listener) {
-    Integer foundMask = pmEventListeners.get(listener);
-
-    if (foundMask == null) {
-      pmEventListeners.put(listener, eventMask);
-    }
-    else {
-      if (foundMask == eventMask) {
-        LOG.warn("Duplicate listerner registration call. Listener: " + listener);
-      }
-
-      int newMask = foundMask | eventMask;
-      pmEventListeners.put(listener, newMask);
-    }
-  }
-
-  public synchronized void removeListener(PmEventListener listener) {
-    pmEventListeners.remove(listener);
-  }
-
-  public synchronized void removeListener(int eventMask, PmEventListener listener) {
-    Integer foundMask = pmEventListeners.get(listener);
-
-    if (foundMask != null) {
-      int negEventMask = (eventMask ^ PmEvent.ALL);
-      int newMask = foundMask.intValue() & negEventMask;
-      if (newMask == 0) {
-        pmEventListeners.remove(listener);
-      }
-      else {
-        pmEventListeners.put(listener, newMask);
-      }
-    }
-  }
-
-  /**
-   * @param event the event to handle.
-   * @param preProcess if set to <code>true</code>, only the pre process part will be done for each listener.<br>
-   *                   if set to <code>false</code>, only the handle part will be done for each listener.<br>
-   */
-  /* package */ void fireEvent(final PmEvent event, boolean preProcess) {
-    boolean hasListeners = !pmEventListeners.isEmpty();
-
-    if (LOG.isTraceEnabled())
-      LOG.trace("fireChange[" + event + "] for event source   : " + PmEventApi.getThreadEventSource() +
-          (hasListeners ? "\n\teventListeners: " + pmEventListeners : ""));
-
-    if (hasListeners) {
-      boolean isPropagationEvent = event.isPropagationEvent();
-      // copy the listener list to prevent problems with listener
-      // set changes within the notification processing loop.
-      for (Map.Entry<PmEventListener, Integer> e : eventListenersCopy()) {
-        // could be null because of WeakReferences.
-        if(e == null || e.getValue() == null) {
-          continue;
-        }
-        int listenerMask = e.getValue().intValue();
-        boolean isPropagationListener = ((listenerMask & PmEvent.IS_EVENT_PROPAGATION) != 0);
-        // Propagation events have to be passed only to listeners that observe that special flag.
-        // Standard events will be passed to listeners that don't have set this flag.
-        boolean listenerMaskMatch = (listenerMask & event.getChangeMask()) != 0;
-        if (listenerMaskMatch &&
-            (isPropagationEvent == isPropagationListener)) {
-          if (preProcess) {
-            // XXX olaf: prevent this permanent base class check to optimize runtime.
-            if (e.getKey() instanceof PmEventListener.WithPreprocessCallback) {
-              ((PmEventListener.WithPreprocessCallback)e.getKey()).preProcess(event);
-            }
-          } else {
-            e.getKey().handleEvent(event);
-          }
-        }
-      }
-    }
-  }
-
-  boolean isEmpty() {
-    return pmEventListeners.isEmpty();
-  }
-
-  /** Provides a shallow copy of all event listener entries. Used to prevent concurrent
-   * modification problems with listeners changing the event listener set. */
-  @SuppressWarnings("unchecked")
-  private synchronized Map.Entry<PmEventListener, Integer>[] eventListenersCopy() {
-    return pmEventListeners.entrySet().toArray(new Map.Entry[pmEventListeners.size()]);
-  }
-
-  @Override
-  public String toString() {
-    return "[" + IterableUtil.itemsToString(pmEventListeners.keySet()) + "]" + System.identityHashCode(this);
-  }
-} // end of PmEventTable
 

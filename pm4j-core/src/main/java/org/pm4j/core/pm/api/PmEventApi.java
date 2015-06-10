@@ -3,14 +3,13 @@ package org.pm4j.core.pm.api;
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmCommandDecorator;
-import org.pm4j.core.pm.PmDataInput;
 import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmEvent.ValueChangeKind;
 import org.pm4j.core.pm.PmEventListener;
 import org.pm4j.core.pm.PmObject;
+import org.pm4j.core.pm.impl.BroadcastPmEventProcessor;
 import org.pm4j.core.pm.impl.PmAttrValueChangeDecorator;
 import org.pm4j.core.pm.impl.PmEventApiHandler;
-import org.pm4j.core.pm.impl.BroadcastPmEventProcessor;
 
 /**
  * Defines methods that allow to register and un-register event listeners for PM events.
@@ -133,10 +132,6 @@ public class PmEventApi {
    */
   public static void removePmEventListener(PmObject pm, PmEventListener listener) {
     apiHandler.removePmEventListener(pm, listener);
-  }
-
-  public static void removePmEventListener(PmObject pm, int eventMask, PmEventListener listener) {
-    apiHandler.removePmEventListener(pm, eventMask, listener);
   }
 
   /**

@@ -62,10 +62,10 @@ public class PmEventApiHandler {
 
   public void addPmEventListener(PmObject pm, int eventMask, PmEventListener listener) {
     PmObjectBase pmImpl = (PmObjectBase)pm;
-    if (pmImpl.pmEventTable == null)
-      pmImpl.pmEventTable = new PmEventTable(false);
+    if (pmImpl.pmEventListenerRefs == null)
+      pmImpl.pmEventListenerRefs = new InternalPmEventListenerRefs();
 
-    pmImpl.pmEventTable.addListener(eventMask, listener);
+    pmImpl.pmEventListenerRefs.addListenerRef(eventMask, listener);
 
     if (LOG.isTraceEnabled())
       LOG.trace("Added PM-event listener '" + listener + "' for '" + PmUtil.getPmLogString(pmImpl) + "'.");
@@ -73,10 +73,10 @@ public class PmEventApiHandler {
 
   public void addWeakPmEventListener(PmObject pm, int eventMask, PmEventListener listener) {
     PmObjectBase pmImpl = (PmObjectBase)pm;
-    if (pmImpl.pmWeakEventTable == null)
-      pmImpl.pmWeakEventTable = new PmEventTable(true);
+    if (pmImpl.pmEventListenerRefs == null)
+      pmImpl.pmEventListenerRefs = new InternalPmEventListenerRefs();
 
-    pmImpl.pmWeakEventTable.addListener(eventMask, listener);
+    pmImpl.pmEventListenerRefs.addWeakListenerRef(eventMask, listener);
 
     if (LOG.isTraceEnabled())
       LOG.trace("Added weak PM-event listener '" + listener + "' for '" + PmUtil.getPmLogString(pmImpl) + "'.");
@@ -91,33 +91,9 @@ public class PmEventApiHandler {
   public void removePmEventListener(PmObject pm, PmEventListener listener) {
     PmObjectBase pmImpl = (PmObjectBase)pm;
 
-    if (pmImpl.pmEventTable != null) {
-      pmImpl.pmEventTable.removeListener(listener);
-      if (pmImpl.pmEventTable.isEmpty()) {
-        pmImpl.pmEventTable = null;
-      }
-    }
-    if (pmImpl.pmWeakEventTable != null) {
-      pmImpl.pmWeakEventTable.removeListener(listener);
-      if (pmImpl.pmWeakEventTable.isEmpty()) {
-        pmImpl.pmWeakEventTable = null;
-      }
-    }
-  }
-
-  public void removePmEventListener(PmObject pm, int eventMask, PmEventListener listener) {
-    PmObjectBase pmImpl = (PmObjectBase)pm;
-
-    if (pmImpl.pmEventTable != null) {
-      pmImpl.pmEventTable.removeListener(eventMask, listener);
-      if (pmImpl.pmEventTable.isEmpty()) {
-        pmImpl.pmEventTable = null;
-      }
-    }
-    if (pmImpl.pmWeakEventTable != null) {
-      pmImpl.pmWeakEventTable.removeListener(eventMask, listener);
-      if (pmImpl.pmWeakEventTable.isEmpty()) {
-        pmImpl.pmWeakEventTable = null;
+    if (pmImpl.pmEventListenerRefs != null) {
+      if (pmImpl.pmEventListenerRefs.removeListenerRef(listener) == 0) {
+        pmImpl.pmEventListenerRefs = null;
       }
     }
   }
@@ -229,11 +205,8 @@ public class PmEventApiHandler {
    */
   /* package */ static void sendToListeners(PmObject pm, PmEvent event, boolean preProcess) {
     PmObjectBase pmImpl = (PmObjectBase)pm;
-    if (pmImpl.pmEventTable != null && !pmImpl.pmEventTable.isEmpty()) {
-      pmImpl.pmEventTable.fireEvent(event, preProcess);
-    }
-    if (pmImpl.pmWeakEventTable != null && !pmImpl.pmWeakEventTable.isEmpty()) {
-      pmImpl.pmWeakEventTable.fireEvent(event, preProcess);
+    if (pmImpl.pmEventListenerRefs != null) {
+      pmImpl.pmEventListenerRefs.fireEvent(event, preProcess);
     }
   }
 
