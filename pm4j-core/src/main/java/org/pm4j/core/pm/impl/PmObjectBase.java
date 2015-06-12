@@ -12,9 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 import org.apache.commons.lang.ClassUtils;
 import org.apache.commons.lang.ObjectUtils;
@@ -24,8 +22,6 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.pm4j.common.cache.CacheStrategy;
 import org.pm4j.common.cache.CacheStrategyNoCache;
 import org.pm4j.common.exception.CheckedExceptionWrapper;
-import org.pm4j.common.util.CloneUtil;
-import org.pm4j.common.util.collection.IterableUtil;
 import org.pm4j.common.util.collection.ListUtil;
 import org.pm4j.common.util.reflection.BeanAttrAccessor;
 import org.pm4j.common.util.reflection.BeanAttrAccessorImpl;
@@ -38,7 +34,6 @@ import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.PmDefaults;
 import org.pm4j.core.pm.PmEvent;
-import org.pm4j.core.pm.PmEventListener;
 import org.pm4j.core.pm.PmMessage;
 import org.pm4j.core.pm.PmMessage.Severity;
 import org.pm4j.core.pm.PmObject;
@@ -149,6 +144,9 @@ public class PmObjectBase implements PmObject {
    * An indicator that may be used to declare this PM as changed.
    */
   private boolean pmExpliciteChangedFlag;
+
+  /** The set of event listeners. */
+  /* package */ InternalPmEventListenerRefs pmEventListenerRefs;
 
   /**
    * Constructor.
@@ -446,9 +444,6 @@ public class PmObjectBase implements PmObject {
       return (String) strategy.setAndReturnCachedValue(this, getPmTitleImpl());
     }
   }
-
-  /** The set of event listeners. */
-  /* package */ InternalPmEventListenerRefs pmEventListenerRefs;
 
   /**
    * Is called whenever an event with the flag {@link PmEvent#VALUE_CHANGE}

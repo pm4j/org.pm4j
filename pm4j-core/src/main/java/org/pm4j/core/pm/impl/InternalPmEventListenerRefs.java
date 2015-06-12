@@ -21,12 +21,12 @@ class InternalPmEventListenerRefs implements Cloneable {
   private static final Logger LOG = LoggerFactory.getLogger(InternalPmEventListenerRefs.class);
 
   /** Placeholder for removed reference. Used to prevent too much repeated array resize operations. */
-  private static ListenerRef NO_LISTENER_REF = new ListenerRef(0) {
+  private static final ListenerRef NO_LISTENER_REF = new ListenerRef(0) {
     @Override PmEventListener getListener() { return null; }
   };
 
   /** Re-used default array. Used for minimizing memory footprint. */
-  private static ListenerRef[] NO_LISTENER_REFS = {};
+  private static final ListenerRef[] NO_LISTENER_REFS = {};
 
   /** The set of registered listener references. */
   private ListenerRef[] listenerRefs = NO_LISTENER_REFS;
@@ -53,11 +53,17 @@ class InternalPmEventListenerRefs implements Cloneable {
 
   /**
    * Removes all references to the given listener.
+   * <p>
+   * It just replaces the array position with an empty reference.
+   * That is done to prevent slow array resize operations on dynamic
+   * remove-and-add listener scenarios.
+   * <p>
+   * The array gaps will be cleaned up on the next add or compact call.
    *
    * @param listener The listener to remove.
    * @return The number of remaining active listeners.
    */
-  public int removeListenerRef(PmEventListener listener) {
+  public synchronized int removeListenerRef(PmEventListener listener) {
     int remainingListenerCount = 0;
     for (int i=0; i<listenerRefs.length; ++i) {
       if (listenerRefs[i].getListener() == listener) {
@@ -76,15 +82,16 @@ class InternalPmEventListenerRefs implements Cloneable {
    *                   if set to <code>false</code>, only the handle part will be done for each listener.<br>
    */
   /* package */ void fireEvent(final PmEvent event, boolean preProcess) {
+    ListenerRef[] refs = this.listenerRefs;
     if (LOG.isTraceEnabled())
       LOG.trace("fireChange[" + event + "] for event source   : " + PmEventApi.getThreadEventSource() +
-                "\n\teventListeners: " + Arrays.asList(listenerRefs));
+                "\n\teventListeners: " + Arrays.asList(refs));
 
-    if (listenerRefs.length > 0) {
+    if (refs.length > 0) {
       boolean isPropagationEvent = event.isPropagationEvent();
       // copy the listener list to prevent problems with listener
       // set changes within the notification processing loop.
-      for (ListenerRef r : Arrays.copyOf(listenerRefs, listenerRefs.length)) {
+      for (ListenerRef r : Arrays.copyOf(refs, refs.length)) {
         PmEventListener listener = r.getListener();
         // could be null because of WeakReferences.
         if (listener == null) {
@@ -125,7 +132,11 @@ class InternalPmEventListenerRefs implements Cloneable {
    * A call to {@link #removeListenerRef(PmEventListener)} does also not compact the array immediately.
    */
   public void compact() {
-    compactAndAllocate(0);
+    if (countUnused(this.listenerRefs) > 0) {
+      synchronized(this) {
+        listenerRefs = compactAndAllocate(listenerRefs, 0);
+      }
+    }
   }
 
   @Override
@@ -134,7 +145,7 @@ class InternalPmEventListenerRefs implements Cloneable {
   }
 
   /** Adds the listener at the last position. Compacts the array as well. */
-  private void addListener(ListenerRef listenerRef) {
+  private synchronized void addListener(ListenerRef listenerRef) {
     if (listenerRefs.length == 0) {
       listenerRefs = new ListenerRef[] { listenerRef };
       return;
@@ -145,42 +156,48 @@ class InternalPmEventListenerRefs implements Cloneable {
       // Optimization for repeating add-weak--garbage-collect scenarios.
       listenerRefs[listenerRefs.length-1] = listenerRef;
     } else {
-      compactAndAllocate(1);
+      listenerRefs = compactAndAllocate(listenerRefs, 1);
     }
 
     listenerRefs[listenerRefs.length-1] = listenerRef;
   }
 
-  /** Should only be called if there is at least one listener reference. */
-  private void compactAndAllocate(int incSizeCount) {
+  private static ListenerRef[] compactAndAllocate(ListenerRef[] refs, int incSizeCount) {
+    ListenerRef[] newRefs = NO_LISTENER_REFS;
+    int unusedCount = countUnused(refs);
+    if (unusedCount == 0) {
+      if (incSizeCount > 0) {
+        newRefs = Arrays.copyOf(refs, refs.length+incSizeCount);
+      }
+    } else {
+      // There are unused references. Reorganize the array:
+      int newSize = refs.length - unusedCount + incSizeCount;
+      if (newSize > 0) {
+        newRefs = new ListenerRef[newSize];
+        int pos = 0;
+        for (ListenerRef r : refs) {
+          if (r != null && r.getListener() != null) {
+            newRefs[pos] = r;
+            pos++;
+          }
+        }
+        // If the GC was active in the middle of the loop,
+        if (pos < newSize - incSizeCount) {
+          newRefs = compactAndAllocate(newRefs, incSizeCount);
+        }
+      }
+    }
+    return newRefs;
+  }
+
+  private static int countUnused(ListenerRef[] refs) {
     int unusedCount = 0;
-    for (ListenerRef r : listenerRefs) {
+    for (ListenerRef r : refs) {
       if (r.getListener() == null) {
         unusedCount++;
       }
     }
-
-    if (unusedCount == 0) {
-      if (incSizeCount > 0) {
-        listenerRefs = Arrays.copyOf(listenerRefs, listenerRefs.length+incSizeCount);
-      }
-    } else {
-      // There are unused references. Reorganize the array:
-      int newSize = listenerRefs.length - unusedCount + incSizeCount;
-      if (newSize > 0) {
-        ListenerRef[] refs = new ListenerRef[newSize];
-        int pos = 0;
-        for (ListenerRef r : listenerRefs) {
-          if (r.getListener() != null) {
-            refs[pos] = r;
-            pos++;
-          }
-        }
-        listenerRefs = refs;
-      } else {
-        listenerRefs = NO_LISTENER_REFS;
-      }
-    }
+    return unusedCount;
   }
 
   /** Abstract listener reference. Concrete references may be hard or weak. */
