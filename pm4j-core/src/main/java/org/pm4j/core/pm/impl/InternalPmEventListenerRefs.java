@@ -5,9 +5,6 @@ import java.util.Arrays;
 
 import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmEventListener;
-import org.pm4j.core.pm.api.PmEventApi;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Container for {@link PmEvent} listeners.
@@ -18,8 +15,6 @@ import org.slf4j.LoggerFactory;
  */
 class InternalPmEventListenerRefs implements Cloneable {
 
-  private static final Logger LOG = LoggerFactory.getLogger(InternalPmEventListenerRefs.class);
-
   /** Placeholder for removed reference. Used to prevent too much repeated array resize operations. */
   private static final ListenerRef NO_LISTENER_REF = new ListenerRef(0) {
     @Override PmEventListener getListener() { return null; }
@@ -29,7 +24,7 @@ class InternalPmEventListenerRefs implements Cloneable {
   private static final ListenerRef[] NO_LISTENER_REFS = {};
 
   /** The set of registered listener references. */
-  private ListenerRef[] listenerRefs = NO_LISTENER_REFS;
+  /* package */ ListenerRef[] listenerRefs = NO_LISTENER_REFS;
 
   /**
    * Adds a hard listener reference.
@@ -76,50 +71,6 @@ class InternalPmEventListenerRefs implements Cloneable {
     return remainingListenerCount;
   }
 
-  /**
-   * @param event the event to handle.
-   * @param preProcess if set to <code>true</code>, only the pre process part will be done for each listener.<br>
-   *                   if set to <code>false</code>, only the handle part will be done for each listener.<br>
-   */
-  /* package */ void fireEvent(final PmEvent event, boolean preProcess) {
-    ListenerRef[] refs = this.listenerRefs;
-    if (LOG.isTraceEnabled())
-      LOG.trace("fireChange[" + event + "] for event source   : " + PmEventApi.getThreadEventSource() +
-                "\n\teventListeners: " + Arrays.asList(refs));
-
-    if (refs.length > 0) {
-      boolean isPropagationEvent = event.isPropagationEvent();
-      // copy the listener list to prevent problems with listener
-      // set changes within the notification processing loop.
-      for (ListenerRef r : Arrays.copyOf(refs, refs.length)) {
-        PmEventListener listener = r.getListener();
-        // could be null because of WeakReferences.
-        if (listener == null) {
-          continue;
-        }
-
-        int listenerMask = r.eventMask;
-        boolean isPropagationListener = ((listenerMask & PmEvent.IS_EVENT_PROPAGATION) != 0);
-        // Propagation events have to be passed only to listeners that observe that special flag.
-        // Standard events will be passed to listeners that don't have set this flag.
-        boolean listenerMaskMatch = (listenerMask & event.getChangeMask()) != 0;
-        if (listenerMaskMatch &&
-            (isPropagationEvent == isPropagationListener)) {
-          if (preProcess) {
-            // XXX olaf: may cause runtime overhead because of repeated base class checks.
-            // Might be optimize by adding a member to ListenerRef. But that affects the memory footprint.
-            // Should be checked by performance tests.
-            if (listener instanceof PmEventListener.WithPreprocessCallback) {
-              ((PmEventListener.WithPreprocessCallback)listener).preProcess(event);
-            }
-          } else {
-            listener.handleEvent(event);
-          }
-        }
-      }
-    }
-  }
-
   @Override
   protected InternalPmEventListenerRefs clone() throws CloneNotSupportedException {
     return (InternalPmEventListenerRefs) super.clone();
@@ -134,7 +85,7 @@ class InternalPmEventListenerRefs implements Cloneable {
   public void compact() {
     if (countUnused(this.listenerRefs) > 0) {
       synchronized(this) {
-        listenerRefs = compactAndAllocate(listenerRefs, 0);
+        listenerRefs = compactAndAllocate(listenerRefs, null);
       }
     }
   }
@@ -151,20 +102,28 @@ class InternalPmEventListenerRefs implements Cloneable {
       return;
     }
 
-    if (listenerRefs[listenerRefs.length-1].getListener() == null) {
+    int firstFreePos = firstFreePos();
+    if (firstFreePos < listenerRefs.length) {
       // Reuse the last place, if it got just empty.
       // Optimization for repeating add-weak--garbage-collect scenarios.
-      listenerRefs[listenerRefs.length-1] = listenerRef;
+      listenerRefs[firstFreePos] = listenerRef;
     } else {
-      listenerRefs = compactAndAllocate(listenerRefs, 1);
+      listenerRefs = compactAndAllocate(listenerRefs, listenerRef);
     }
-
-    listenerRefs[listenerRefs.length-1] = listenerRef;
   }
 
-  private static ListenerRef[] compactAndAllocate(ListenerRef[] refs, int incSizeCount) {
+  private int firstFreePos() {
+    int pos = listenerRefs.length-1;
+    while (listenerRefs[pos].getListener() == null) {
+      --pos;
+    }
+    return pos + 1;
+  }
+
+  private static ListenerRef[] compactAndAllocate(ListenerRef[] refs, ListenerRef newRef) {
     ListenerRef[] newRefs = NO_LISTENER_REFS;
     int unusedCount = countUnused(refs);
+    int incSizeCount = newRef != null ? 1 : 0;
     if (unusedCount == 0) {
       if (incSizeCount > 0) {
         newRefs = Arrays.copyOf(refs, refs.length+incSizeCount);
@@ -176,16 +135,21 @@ class InternalPmEventListenerRefs implements Cloneable {
         newRefs = new ListenerRef[newSize];
         int pos = 0;
         for (ListenerRef r : refs) {
-          if (r != null && r.getListener() != null) {
+          if (r.getListener() != null) {
             newRefs[pos] = r;
             pos++;
           }
         }
-        // If the GC was active in the middle of the loop,
+        // If the GC was active in the middle of the loop the compact algorithm will be
+        // restarted using the original array. The newRefs array can't be used because it
+        // has unsupported null items.
         if (pos < newSize - incSizeCount) {
-          newRefs = compactAndAllocate(newRefs, incSizeCount);
+          return compactAndAllocate(refs, newRef);
         }
       }
+    }
+    if (newRef != null) {
+      newRefs[newRefs.length-1] = newRef;
     }
     return newRefs;
   }

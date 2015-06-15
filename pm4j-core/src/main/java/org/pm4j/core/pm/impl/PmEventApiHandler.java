@@ -1,5 +1,6 @@
 package org.pm4j.core.pm.impl;
 
+import java.util.Arrays;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -13,6 +14,7 @@ import org.pm4j.core.pm.PmEventListener;
 import org.pm4j.core.pm.PmEventListener.PostProcessor;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.api.PmEventApi;
+import org.pm4j.core.pm.impl.InternalPmEventListenerRefs.ListenerRef;
 import org.pm4j.core.pm.impl.PmObjectBase.PmInitState;
 
 /**
@@ -205,9 +207,47 @@ public class PmEventApiHandler {
    */
   /* package */ static void sendToListeners(PmObject pm, PmEvent event, boolean preProcess) {
     PmObjectBase pmImpl = (PmObjectBase)pm;
-    if (pmImpl.pmEventListenerRefs != null) {
-      pmImpl.pmEventListenerRefs.fireEvent(event, preProcess);
+    if (pmImpl.pmEventListenerRefs == null) {
+      return;
     }
+
+    ListenerRef[] refs = pmImpl.pmEventListenerRefs.listenerRefs;
+    if (LOG.isTraceEnabled())
+      LOG.trace("fireChange[" + event + "] for event source   : " + PmEventApi.getThreadEventSource() +
+                "\n\teventListeners: " + Arrays.asList(refs));
+
+    if (refs.length > 0) {
+      boolean isPropagationEvent = event.isPropagationEvent();
+      // copy the listener list to prevent problems with listener
+      // set changes within the notification processing loop.
+      for (ListenerRef r : Arrays.copyOf(refs, refs.length)) {
+        PmEventListener listener = r.getListener();
+        // could be null because of WeakReferences.
+        if (listener == null) {
+          continue;
+        }
+
+        int listenerMask = r.eventMask;
+        boolean isPropagationListener = ((listenerMask & PmEvent.IS_EVENT_PROPAGATION) != 0);
+        // Propagation events have to be passed only to listeners that observe that special flag.
+        // Standard events will be passed to listeners that don't have set this flag.
+        boolean listenerMaskMatch = (listenerMask & event.getChangeMask()) != 0;
+        if (listenerMaskMatch &&
+            (isPropagationEvent == isPropagationListener)) {
+          if (preProcess) {
+            // XXX olaf: may cause runtime overhead because of repeated base class checks.
+            // Might be optimize by adding a member to ListenerRef. But that affects the memory footprint.
+            // Should be checked by performance tests.
+            if (listener instanceof PmEventListener.WithPreprocessCallback) {
+              ((PmEventListener.WithPreprocessCallback)listener).preProcess(event);
+            }
+          } else {
+            listener.handleEvent(event);
+          }
+        }
+      }
+    }
+
   }
 
 }
