@@ -1,13 +1,14 @@
 package org.pm4j.common.pageable;
 
-import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang.ObjectUtils;
@@ -19,8 +20,8 @@ import org.pm4j.common.query.CompOpStartsWith;
 import org.pm4j.common.query.QueryAttr;
 import org.pm4j.common.query.QueryExpr;
 import org.pm4j.common.query.QueryOptions;
-import org.pm4j.common.query.SortOrder;
 import org.pm4j.common.query.QueryUtil;
+import org.pm4j.common.query.SortOrder;
 import org.pm4j.common.query.filter.FilterDefinition;
 import org.pm4j.common.selection.SelectMode;
 import org.pm4j.common.selection.Selection;
@@ -48,6 +49,20 @@ public abstract class PageableCollectionTestBase<T> {
   /** Needs to be implemented by the concrete test classes. */
   protected abstract PageableCollection<T> makePageableCollection(String... strings);
 
+  private PageableCollection<T> makeLargePageableCollection() {
+    PageableCollection<T> largeCollection = makePageableCollection( //
+        "a", "b", " ", "c", "d", //
+        "e", "f", "g", "h", "i", //
+        "j", "k", "l", "m", "n", //
+        "o", "p");
+    largeCollection.setPageSize(5);
+    
+    largeCollection.getSelectionHandler().setSelectMode(SelectMode.MULTI);
+    assertEquals(SelectMode.MULTI, largeCollection.getSelectionHandler().getSelectMode());
+    assertEquals(0, largeCollection.getSelectionHandler().getSelection().getSize());
+    return largeCollection;
+  }
+ 
   protected QueryOptions getQueryOptions() {
     QueryOptions options = new QueryOptions();
     options.addSortOrder(Bean.ATTR_NAME);
@@ -71,8 +86,8 @@ public abstract class PageableCollectionTestBase<T> {
   @Before
   public void setUp() {
     collection = makePageableCollection(" ", "a", "b", "c", "d", "e", "f");
-
     collection.setPageSize(2);
+
     nameSortOrder = getOrderByName();
 
     // to get more test coverage: perform all tests with a single deleted item.
@@ -122,17 +137,15 @@ public abstract class PageableCollectionTestBase<T> {
     collection.getSelectionHandler().select(true, collection.getItemsOnPage().get(1));
     n = getItemNavigator();
     assertEquals(2, n.getNumOfItems());
-    // FIXME olaf: the selection sort order is not yet predictable.
-//    assertEquals("a", n.navigateTo(0).toString());
-//    assertEquals("b", n.navigateTo(1).toString());
+    assertEquals("a", n.navigateTo(0).toString());
+    assertEquals("b", n.navigateTo(1).toString());
 
     // all items selected
     collection.getSelectionHandler().selectAll(true);
     n = getItemNavigator();
     assertEquals(6, n.getNumOfItems());
-    // FIXME olaf: the selection sort order is not yet predictable.
-//    assertEquals("a", n.navigateTo(0).toString());
-//    assertEquals("b", n.navigateTo(1).toString());
+    assertEquals("a", n.navigateTo(0).toString());
+    assertEquals("b", n.navigateTo(1).toString());
   }
 
   @Test
@@ -262,6 +275,66 @@ public abstract class PageableCollectionTestBase<T> {
     assertEquals("Remove event count", 0, pclRemove.getPropChangeEventCount());
     assertEquals("Set page index event count", 0, pclPageIdx.getPropChangeEventCount());
     assertEquals("Set page size event count", 0, pclPageSize.getPropChangeEventCount());
+  }
+
+  @Test
+  public void testSelectedItemsStayInQueryOrderForPositiveSelection() {
+    PageableCollection<T> largeCollection = makeLargePageableCollection();
+
+    doSelect(largeCollection, 0, 2, true, " ");
+    assertTrue(largeCollection.getModificationHandler().removeSelectedItems());
+    doSelect(largeCollection, 0, 0, true, "a");
+    doSelect(largeCollection, 2, 3, true, "n"); // due to remove, positions have moved up by one below 0/2
+    doSelect(largeCollection, 1, 4, true, "j");
+    doSelect(largeCollection, 2, 0, true, "k");
+    
+    assertEquals(4, largeCollection.getSelectionHandler().getSelection().getSize());
+    String selection = iteratorAsList(largeCollection.getSelection().iterator()).toString();
+    assertEquals("[a, j, k, n]" , selection);
+
+    // and after inversion exactly the other items
+    doInvertSelection(largeCollection);
+    assertEquals(12, largeCollection.getSelectionHandler().getSelection().getSize());
+    String invertedSelection = iteratorAsList(largeCollection.getSelection().iterator()).toString();
+    assertEquals("[b, c, d, e, f, g, h, i, l, m, o, p]" , invertedSelection);
+  }
+
+  @Test
+  public void testSelectedItemsStayInQueryOrderForNegativeSelection() {
+    PageableCollection<T> largeCollection = makeLargePageableCollection();
+
+    doSelect(largeCollection, 0, 2, true, " ");
+    assertTrue(largeCollection.getModificationHandler().removeSelectedItems());
+    doSelectAll(largeCollection);
+    doSelect(largeCollection, 0, 0, false, "a");
+    doSelect(largeCollection, 2, 3, false, "n"); // due to remove, positions have moved up by one below 0/2
+    doSelect(largeCollection, 1, 4, false, "j");
+    doSelect(largeCollection, 2, 0, false, "k");
+    
+    assertEquals(12, largeCollection.getSelectionHandler().getSelection().getSize());
+    String selection = iteratorAsList(largeCollection.getSelection().iterator()).toString();
+    assertEquals("[b, c, d, e, f, g, h, i, l, m, o, p]" , selection);
+    
+    // and after inversion exactly the other items
+    doInvertSelection(largeCollection);
+    assertEquals(4, largeCollection.getSelectionHandler().getSelection().getSize());
+    String invertedSelection = iteratorAsList(largeCollection.getSelection().iterator()).toString();
+    assertEquals("[a, j, k, n]" , invertedSelection);
+  }
+
+  private void doSelect(PageableCollection<T> collection, int pageNo, int rowNo, boolean select, String expectedItem) {
+    collection.setPageIdx(pageNo);
+    T item = collection.getItemsOnPage().get(rowNo);
+    assertEquals(expectedItem, item.toString());
+    assertTrue(collection.getSelectionHandler().select(select, item));
+  }
+
+  private void doSelectAll(PageableCollection<T> collection) {
+    assertTrue(collection.getSelectionHandler().selectAll(true));
+  }
+
+  private void doInvertSelection(PageableCollection<T> collection) {
+    assertTrue(collection.getSelectionHandler().invertSelection());
   }
 
   @Test
@@ -679,6 +752,13 @@ public static class LastChangeReportingChangeListener<T> implements PropertyChan
       return receivedPropChangeEvents.isEmpty() ? null : receivedPropChangeEvents.get(receivedPropChangeEvents.size()-1);
     }
 
+  }
+  
+  public static <T> List<T> iteratorAsList(Iterator<T> iter) {
+    List<T> list = new ArrayList<T>();
+    while (iter.hasNext())
+        list.add(iter.next());
+    return list;
   }
 
 }

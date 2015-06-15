@@ -112,13 +112,24 @@ public class QueryCollectionModificationHandlerBase<T_ITEM, T_ID>  implements Mo
       modifications.setRemovedItems(oldRemovedItemSelection.isEmpty()
           // XXX oboede: here was the cached internal service used. But i suspect that the external service isn't less
           // efficient.
-          ? new ItemIdSelection<T_ITEM, T_ID>(service, ids)
+          ? createItemIdSelection(service, ids)
           : new ItemIdSelection<T_ITEM, T_ID>((ItemIdSelection<T_ITEM, T_ID>)oldRemovedItemSelection, ids));
     }
 
     pageableCollection.clearCaches();
     pageableCollection.firePropertyChange(PageableCollection.EVENT_REMOVE_SELECTION, selectedItems, null);
     return true;
+  }
+
+  /**
+   * Can be overridden if the concrete collection needs a special strategy.
+   * 
+   * @param queryService
+   * @param ids
+   * @return a newly created ItemIdSelection
+   */
+  protected ItemIdSelection<T_ITEM, T_ID> createItemIdSelection(QueryService<T_ITEM, T_ID> queryService, Collection<T_ID> ids) {
+    return new ItemIdSelection<T_ITEM, T_ID>(queryService, ids); 
   }
 
   @Override

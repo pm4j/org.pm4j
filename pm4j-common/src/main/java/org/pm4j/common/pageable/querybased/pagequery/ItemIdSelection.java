@@ -18,6 +18,8 @@ public class ItemIdSelection<T_ITEM, T_ID> extends PageQuerySelectionHandler.Que
 
   private final Collection<T_ID> ids;
 
+  private int readBlockSize = 1;
+
   /**
    * Creates a selection based on a set of selected id's.
    *
@@ -56,9 +58,23 @@ public class ItemIdSelection<T_ITEM, T_ID> extends PageQuerySelectionHandler.Que
     return new ItemIterator();
   }
 
-  /** Block size has currently no effect on this iterator implementation. This may be changed in the future. */
+  /** Sets the number of rows to retrieve at once to reduce number of SQL calls.
+   * Not all implementations might support the block size.
+   * For UI, e.g. record navigators, block size 1 is to preferred to avoid outdated records.
+   * For bulk data processes, e.g. generating reports, a larger block size should be set. 
+   * 
+   * @param readBlockSize number of rows, default is null
+   */
   @Override
   public void setIteratorBlockSizeHint(int readBlockSize) {
+    this.readBlockSize = readBlockSize; 
+  }
+
+  /**
+   * return the suggested number of rows to retrieve at once to reduce number of SQL calls.
+   */
+  public int getIteratorBlockSizeHint() {
+    return readBlockSize;
   }
 
   protected Collection<T_ID> getSelectedOrDeselectedIds() {

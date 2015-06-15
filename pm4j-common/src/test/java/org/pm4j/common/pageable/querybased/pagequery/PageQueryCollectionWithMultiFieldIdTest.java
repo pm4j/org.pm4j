@@ -8,8 +8,6 @@ import java.util.Map;
 import org.junit.Ignore;
 import org.pm4j.common.pageable.PageableCollection;
 import org.pm4j.common.pageable.PageableCollectionWithMultiFieldIdTestBase;
-import org.pm4j.common.pageable.querybased.pagequery.PageQueryCollection;
-import org.pm4j.common.pageable.querybased.pagequery.PageQueryService;
 import org.pm4j.common.query.CompOpStartsWith;
 import org.pm4j.common.query.QueryAttr;
 import org.pm4j.common.query.QueryAttrMulti;

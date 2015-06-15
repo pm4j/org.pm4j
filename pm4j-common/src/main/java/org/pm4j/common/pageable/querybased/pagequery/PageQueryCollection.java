@@ -1,6 +1,7 @@
 package org.pm4j.common.pageable.querybased.pagequery;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -10,6 +11,7 @@ import org.pm4j.common.pageable.PageableCollection;
 import org.pm4j.common.pageable.PageableCollectionUtil;
 import org.pm4j.common.pageable.querybased.QueryCollectionBase;
 import org.pm4j.common.pageable.querybased.QueryCollectionModificationHandlerBase;
+import org.pm4j.common.pageable.querybased.QueryService;
 import org.pm4j.common.pageable.querybased.idquery.MaxQueryResultsViolationException;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.QueryParams;
@@ -43,7 +45,11 @@ public class PageQueryCollection<T_ITEM, T_ID> extends QueryCollectionBase<T_ITE
 
     this.service = service;
     this.cachingService = new CachingPageQueryService<T_ITEM, T_ID>(service);
-    this.modificationHandler = new QueryCollectionModificationHandlerBase<T_ITEM, T_ID>(this, cachingService);
+    this.modificationHandler = new QueryCollectionModificationHandlerBase<T_ITEM, T_ID>(this, cachingService) {
+      protected ItemIdSelection<T_ITEM,T_ID> createItemIdSelection(QueryService<T_ITEM,T_ID> queryService, Collection<T_ID> ids) {
+          return new PageableItemIdSelection<T_ITEM, T_ID>((PageQueryService<T_ITEM, T_ID>)queryService, getQueryParamsWithRemovedItems(), ids);
+      }
+    };
 
     // Handling of transient and persistent item selection is separated by a handler composition.
     SelectionHandler<T_ITEM> querySelectionHandler = new PageQuerySelectionHandler<T_ITEM, T_ID>(cachingService) {
@@ -56,7 +62,7 @@ public class PageQueryCollection<T_ITEM, T_ID> extends QueryCollectionBase<T_ITE
     this.selectionHandler = new SelectionHandlerWithAdditionalItems<T_ITEM>(this, querySelectionHandler);
 
   }
-
+  
   /** In addition: reset the page item cache on sort order change. */
   @Override
   protected void onSortOrderChange() {

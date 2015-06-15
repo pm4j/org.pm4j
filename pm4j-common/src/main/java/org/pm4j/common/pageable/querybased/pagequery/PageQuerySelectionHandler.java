@@ -7,14 +7,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.pm4j.common.pageable.querybased.QueryService;
 import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.selection.SelectMode;
 import org.pm4j.common.selection.Selection;
 import org.pm4j.common.selection.SelectionHandlerBase;
 import org.pm4j.common.util.CloneUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Handler for a {@link PageQueryCollection} based selection.
@@ -49,7 +49,7 @@ public abstract class PageQuerySelectionHandler<T_ITEM, T_ID> extends SelectionH
     assert service != null;
 
     this.service = service;
-    this.emptySelection = new ItemIdSelection<T_ITEM, T_ID>(service, Collections.EMPTY_LIST);
+    this.emptySelection = new PageableItemIdSelection<T_ITEM, T_ID>(service, getQueryParams(), Collections.EMPTY_LIST);
     this.currentSelection = emptySelection;
   }
 
@@ -120,7 +120,7 @@ public abstract class PageQuerySelectionHandler<T_ITEM, T_ID> extends SelectionH
     }
 
     return setSelection(isInverse()
-        ? new ItemIdSelection<T_ITEM, T_ID>(service, currentSelection.getClickedIds().getIds())
+        ? new PageableItemIdSelection<T_ITEM, T_ID>(service, getQueryParams(), currentSelection.getClickedIds().getIds())
         : new InvertedSelection<T_ITEM, T_ID>(service, getQueryParams(), currentSelection));
   }
 
@@ -196,7 +196,7 @@ public abstract class PageQuerySelectionHandler<T_ITEM, T_ID> extends SelectionH
   private boolean setSelection(Set<T_ID> selectedIds) {
     ItemIdSelection<T_ITEM, T_ID> idSelection = selectedIds.isEmpty()
                   ? emptySelection
-                  : new ItemIdSelection<T_ITEM, T_ID>(service, selectedIds);
+                  : new PageableItemIdSelection<T_ITEM, T_ID>(service, getQueryParams(), selectedIds);
 
     return setSelection(isInverse()
                   ? new InvertedSelection<T_ITEM, T_ID>(service, getQueryParams(), idSelection)

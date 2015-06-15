@@ -25,92 +25,104 @@ public class PageQueryCollectionTest extends PageableCollectionTestBase<Pageable
   @Override
   public void setUp() {
     super.setUp();
-    assertEquals("Call count stability check.", "{getItemCount=5, getItemForId=2, getItems=5}", service.callCounter.toString());
+    service.callCounter.assertCalls("Precondition failed:", "{getItemCount=5, getItems=7}");
     service.callCounter.reset();
-  }
+  } 
 
-  @Override
+  @Override     
   public void testItemNavigator() {
     super.testItemNavigator();
-    assertEquals("Call count stability check.", "{getItemCount=2, getItemForId=3, getItems=2}", service.callCounter.toString());
+    service.callCounter.assertCalls("{getItemCount=2, getItems=5}");
   }
 
   @Override
   public void testSwitchQueryExecOffAndOn() {
     super.testSwitchQueryExecOffAndOn();
-    assertEquals("Call count stability check.", "{getItemCount=8, getItems=6}", service.callCounter.toString());
+    service.callCounter.assertCalls("{getItemCount=8, getItems=6}");
   }
 
   @Test @Override
   public void testItemsOnPage() {
     super.testItemsOnPage();
-    assertEquals("Call count stability check.", "{getItemCount=1, getItems=6}", service.callCounter.toString());
+    service.callCounter.assertCalls("{getItemCount=1, getItems=6}");
   }
 
   @Override
   public void testSortItems() {
     super.testSortItems();
-    assertEquals("Call count stability check.", "{getItemCount=16, getItems=12}", service.callCounter.toString());
+    service.callCounter.assertCalls("{getItemCount=16, getItems=12}");
   }
 
   @Override
   public void testDefaultSortOrder() {
     super.testDefaultSortOrder();
-    assertEquals("Call count stability check.", "{getItemCount=20, getItems=20}", service.callCounter.toString());
+    service.callCounter.assertCalls("{getItemCount=20, getItems=20}");
   }
 
   @Override
   public void testFilterItems() {
     super.testFilterItems();
-    assertEquals("Call count stability check.", "{getItemCount=6, getItems=4}", service.callCounter.toString());
+    service.callCounter.assertCalls("{getItemCount=6, getItems=4}");
   }
 
   @Override
   public void testSelectItems() {
     super.testSelectItems();
-    assertEquals("Call count stability check.", "{getItemCount=3, getItems=1}", service.callCounter.toString());
+    service.callCounter.assertCalls("{getItemCount=3, getItems=1}");
+  }
+  
+  @Override
+  public void testSelectedItemsStayInQueryOrderForPositiveSelection() {
+    super.testSelectedItemsStayInQueryOrderForPositiveSelection();
+    service.callCounter.assertCalls("{getItemCount=3, getItems=10}");
+  }
+  
+  @Override
+  public void testSelectedItemsStayInQueryOrderForNegativeSelection() {
+    super.testSelectedItemsStayInQueryOrderForNegativeSelection();
+    service.callCounter.assertCalls("{getItemCount=7, getItems=10}");
   }
 
   @Override
   public void testSelectInvertAndDeselect() {
     super.testSelectInvertAndDeselect();
-    assertEquals("Call count stability check.", "{getItemCount=3, getItems=1}", service.callCounter.toString());
+    service.callCounter.assertCalls("{getItemCount=3, getItems=1}");
   }
 
   @Override
   public void testAddItem() {
     super.testAddItem();
-    assertEquals("Call count stability check.", "{getItemCount=6, getItems=7}", service.callCounter.toString());
+    service.callCounter.assertCalls("{getItemCount=6, getItems=7}");
   }
 
   @Override
   public void testAddItemToEmptyCollection() {
     super.testAddItemToEmptyCollection();
-    assertEquals("Call count stability check.", "{getItemCount=2}", service.callCounter.toString());
+    service.callCounter.assertCalls("{getItemCount=2}");
   }
 
   @Override
   public void testAddItemInMultiSelectMode() {
     super.testAddItemInMultiSelectMode();
-    assertEquals("Call count stability check.", "{getItemCount=6, getItems=7}", service.callCounter.toString());
+    service.callCounter.assertCalls("{getItemCount=6, getItems=7}");
   }
 
   @Override
   public void testRemoveItems() {
     super.testRemoveItems();
-    assertEquals("Call count stability check.", "{getItemCount=4, getItems=3}", service.callCounter.toString());
+    service.callCounter.assertCalls("{getItemCount=4, getItems=3}");
   }
 
   @Override
   public void testRemoveOfAddedAndUpdatedItems() {
     super.testRemoveOfAddedAndUpdatedItems();
-    assertEquals("Call count stability check.", "{getItemCount=3, getItems=2}", service.callCounter.toString());
+    service.callCounter.assertCalls("{getItemCount=3, getItems=2}");
   }
 
   @Override
   public void testIterateAllSelectionWithBlockSize3() {
     super.testIterateAllSelectionWithBlockSize3();
-    assertEquals("Call count stability check.", "{getItems=3}", service.callCounter.toString());
+    service.callCounter.assertCalls("{getItems=3}");
   }
 
   @Override @Test
@@ -118,25 +130,25 @@ public class PageQueryCollectionTest extends PageableCollectionTestBase<Pageable
     super.testIterateAllSelectionWithBlockSize6();
     // Two calls, because the first block was completely filled.
     // The second call is in that case needed to find out that there are no more items.
-    assertEquals("Call count stability check.", "{getItems=2}", service.callCounter.toString());
+    service.callCounter.assertCalls("{getItems=2}");
   }
 
   @Override @Test
   public void testIteratePositiveSelectionOf3ItemsWithBlockSize2() {
     super.testIteratePositiveSelectionOf3ItemsWithBlockSize2();
-    assertEquals("Call count stability check.", "{getItemForId=3}", service.callCounter.toString());
+    service.callCounter.assertCalls("{getItems=2}");
   }
 
   @Override @Test
   public void testIterateAllSelectionMinusOneWithBlockSize2() {
     super.testIterateAllSelectionMinusOneWithBlockSize2();
-    assertEquals("Call count stability check.", "{getItems=4}", service.callCounter.toString());
+    service.callCounter.assertCalls("{getItems=4}");
   }
 
   @Override @Test
   public void testIterateEmptySelection() {
     super.testIterateEmptySelection();
-    assertEquals("Call count stability check.", "{}", service.callCounter.toString());
+    service.callCounter.assertCalls("{}");
   }
 
 
@@ -148,7 +160,7 @@ public class PageQueryCollectionTest extends PageableCollectionTestBase<Pageable
     assertEquals(7L, selection.getSize());
     assertEquals("[ , a, b, c, d, e, f]", IterableUtil.asCollection(selection).toString());
 
-    assertEquals("Call count stability check.", "{getItemCount=1, getItems=1}", service.callCounter.toString());
+    service.callCounter.assertCalls("{getItemCount=1, getItems=1}");
 
     QueryParams queryParams = new QueryParams();
     queryParams.setQueryExpression(new QueryExprCompare(Bean.ATTR_NAME, CompOpNotEquals.class, " "));
@@ -190,5 +202,4 @@ public class PageQueryCollectionTest extends PageableCollectionTestBase<Pageable
   protected Bean createItem(int id, String name) {
     return new Bean(id, name);
   }
-
 }
