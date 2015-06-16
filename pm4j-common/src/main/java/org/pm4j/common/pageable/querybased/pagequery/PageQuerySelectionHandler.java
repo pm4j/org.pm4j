@@ -7,7 +7,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import javax.validation.constraints.NotNull;
+
 import org.pm4j.common.pageable.querybased.QueryService;
+import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.selection.SelectMode;
 import org.pm4j.common.selection.Selection;
@@ -44,12 +47,14 @@ public abstract class PageQuerySelectionHandler<T_ITEM, T_ID> extends SelectionH
   private final ItemIdSelection<T_ITEM, T_ID> emptySelection;
   private QuerySelectionWithClickedIds<T_ITEM, T_ID> currentSelection;
 
+
+  // TODO MHOENNIG: check whether this could better take the PageQueryCollection as the only parameter 
   @SuppressWarnings("unchecked")
   public PageQuerySelectionHandler(PageQueryService<T_ITEM, T_ID> service) {
     assert service != null;
 
     this.service = service;
-    this.emptySelection = new PageableItemIdSelection<T_ITEM, T_ID>(service, getQueryParams(), Collections.EMPTY_LIST);
+    this.emptySelection = new PageableItemIdSelection<T_ITEM, T_ID>(service, getQueryOptions(), getQueryParams(), Collections.EMPTY_LIST);
     this.currentSelection = emptySelection;
   }
 
@@ -120,7 +125,7 @@ public abstract class PageQuerySelectionHandler<T_ITEM, T_ID> extends SelectionH
     }
 
     return setSelection(isInverse()
-        ? new PageableItemIdSelection<T_ITEM, T_ID>(service, getQueryParams(), currentSelection.getClickedIds().getIds())
+        ? new PageableItemIdSelection<T_ITEM, T_ID>(service, getQueryOptions(),  getQueryParams(), currentSelection.getClickedIds().getIds())
         : new InvertedSelection<T_ITEM, T_ID>(service, getQueryParams(), currentSelection));
   }
 
@@ -177,6 +182,13 @@ public abstract class PageQuerySelectionHandler<T_ITEM, T_ID> extends SelectionH
   protected abstract QueryParams getQueryParams();
 
   /**
+   * Sub classes provide here the query options.
+   *
+   * @return the query options set. Never <code>null</code>.
+   */
+  protected abstract QueryOptions getQueryOptions();
+
+  /**
    * @return <code>true</code> if the actual query is a kind of {@link InvertedSelection}.
    */
   protected final boolean isInverse() {
@@ -196,7 +208,7 @@ public abstract class PageQuerySelectionHandler<T_ITEM, T_ID> extends SelectionH
   private boolean setSelection(Set<T_ID> selectedIds) {
     ItemIdSelection<T_ITEM, T_ID> idSelection = selectedIds.isEmpty()
                   ? emptySelection
-                  : new PageableItemIdSelection<T_ITEM, T_ID>(service, getQueryParams(), selectedIds);
+                  : new PageableItemIdSelection<T_ITEM, T_ID>(service, getQueryOptions(), getQueryParams(), selectedIds);
 
     return setSelection(isInverse()
                   ? new InvertedSelection<T_ITEM, T_ID>(service, getQueryParams(), idSelection)

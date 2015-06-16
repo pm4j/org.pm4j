@@ -40,14 +40,14 @@ public class PageQueryCollection<T_ITEM, T_ID> extends QueryCollectionBase<T_ITE
    * @param queryOptions
    *          defined the id-attribute as well as the available sort and filter options.
    */
-  public PageQueryCollection(PageQueryService<T_ITEM, T_ID> service, QueryOptions queryOptions) {
+  public PageQueryCollection(PageQueryService<T_ITEM, T_ID> service, final QueryOptions queryOptions) {
     super(queryOptions);
 
     this.service = service;
     this.cachingService = new CachingPageQueryService<T_ITEM, T_ID>(service);
     this.modificationHandler = new QueryCollectionModificationHandlerBase<T_ITEM, T_ID>(this, cachingService) {
       protected ItemIdSelection<T_ITEM,T_ID> createItemIdSelection(QueryService<T_ITEM,T_ID> queryService, Collection<T_ID> ids) {
-          return new PageableItemIdSelection<T_ITEM, T_ID>((PageQueryService<T_ITEM, T_ID>)queryService, getQueryParamsWithRemovedItems(), ids);
+          return new PageableItemIdSelection<T_ITEM, T_ID>((PageQueryService<T_ITEM, T_ID>)queryService, queryOptions, getQueryParamsWithRemovedItems(), ids);
       }
     };
 
@@ -56,6 +56,11 @@ public class PageQueryCollection<T_ITEM, T_ID> extends QueryCollectionBase<T_ITE
       @Override
       protected QueryParams getQueryParams() {
         return getQueryParamsWithRemovedItems();
+      }
+
+      @Override
+      protected QueryOptions getQueryOptions() {
+        return queryOptions;
       }
     };
     querySelectionHandler.setFirePropertyEvents(false);

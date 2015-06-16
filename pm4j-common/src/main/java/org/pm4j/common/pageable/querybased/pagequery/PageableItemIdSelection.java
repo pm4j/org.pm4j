@@ -11,6 +11,7 @@ import org.pm4j.common.query.QueryAttr;
 import org.pm4j.common.query.QueryExpr;
 import org.pm4j.common.query.QueryExprAnd;
 import org.pm4j.common.query.QueryExprCompare;
+import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.QueryParams;
 
 /**
@@ -27,36 +28,23 @@ public class PageableItemIdSelection<T_ITEM, T_ID> extends ItemIdSelection<T_ITE
    * Creates a selection based on a set of selected id's.
    *
    * @param service the service used to retrieve items for the selected id's.
+   * @param queryOptions 
    * @param queryParams 
    * @param ids the set of selected id's.
    */
-  public PageableItemIdSelection(PageQueryService<T_ITEM, T_ID> service, QueryParams queryParams, Collection<T_ID> ids) {
+  public PageableItemIdSelection(PageQueryService<T_ITEM, T_ID> service, QueryOptions queryOptions, QueryParams queryParams, Collection<T_ID> ids) {
     super(service, ids);
-    this.queryParams = addItemIds(queryParams, ids);
+    this.queryParams = addItemIds(queryParams, ids, queryOptions.getIdAttribute());
   }
 
-  /**
-   * Creates a selection based on another selection and some additional items.
-   *
-   * @param srcSelection the base selection.
-   * @param ids the set of additional items.
-   */
-  public PageableItemIdSelection(PageableItemIdSelection<T_ITEM, T_ID> srcSelection, Collection<T_ID> ids) {
-    super(srcSelection.getService(), ids);
-    
-    // XXX MHOENNIG this creates two nested "AND IN ..." conditions, maybe we should store the origQueryParams and then only need one IN condition? 
-    this.queryParams = addItemIds(srcSelection.queryParams, ids);
-  }
-  
   @Override
   protected PageQueryService<T_ITEM, T_ID> getService() {
     return (PageQueryService<T_ITEM, T_ID>) super.getService();
   }
   
-  private static QueryParams addItemIds(QueryParams origQueryParams, Collection<?> ids) {
+  private static QueryParams addItemIds(QueryParams origQueryParams, Collection<?> ids, QueryAttr idQueryAttr) {
     QueryParams queryParams = origQueryParams.clone();
-    QueryAttr idAttr = new QueryAttr("id", Long.class); // TODO MHOENNIG we need this from domain developer
-    QueryExpr inIdsQuery = new QueryExprCompare(idAttr, CompOpIn.class, ids);
+    QueryExpr inIdsQuery = new QueryExprCompare(idQueryAttr, CompOpIn.class, ids);
     queryParams.setQueryExpression(and(origQueryParams.getQueryExpression(), inIdsQuery));
     return queryParams;
   }
