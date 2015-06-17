@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.Iterator;
 
 import org.pm4j.common.pageable.querybased.NoItemForKeyFoundException;
-import org.pm4j.common.pageable.querybased.QueryService;
 import org.pm4j.common.util.collection.ListUtil;
 
 /**
@@ -27,7 +26,7 @@ public class ItemIdSelection<T_ITEM, T_ID> extends PageQuerySelectionHandler.Que
    * @param ids the set of selected id's.
    */
   @SuppressWarnings("unchecked")
-  public ItemIdSelection(QueryService<T_ITEM, T_ID> service, Collection<T_ID> ids) {
+  public ItemIdSelection(PageQueryService<T_ITEM, T_ID> service, Collection<T_ID> ids) {
     super(service);
     this.ids = (ids != null) ? Collections.unmodifiableCollection(ids) : Collections.EMPTY_LIST;
   }

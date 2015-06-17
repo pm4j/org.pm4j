@@ -45,9 +45,10 @@ public class PageQueryCollection<T_ITEM, T_ID> extends QueryCollectionBase<T_ITE
 
     this.service = service;
     this.cachingService = new CachingPageQueryService<T_ITEM, T_ID>(service);
-    this.modificationHandler = new QueryCollectionModificationHandlerBase<T_ITEM, T_ID>(this, cachingService) {
+    this.modificationHandler = new PageQueryCollectionModificationHandler<T_ITEM, T_ID>(this, cachingService) {
+      // TODO 
       @Override
-      protected ItemIdSelection<T_ITEM,T_ID> createItemIdSelection(Collection<T_ID> ids) {
+      protected ItemIdSelection<T_ITEM, T_ID> createItemIdSelection(Collection<T_ID> ids) {
           return new PageableItemIdSelection<T_ITEM, T_ID>(cachingService, getQueryOptions().getIdAttribute(), getQueryParamsWithRemovedItems(), ids);
       }
     };

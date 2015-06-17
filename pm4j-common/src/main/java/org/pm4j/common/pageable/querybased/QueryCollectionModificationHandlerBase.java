@@ -11,7 +11,6 @@ import org.pm4j.common.modifications.ModificationsImpl;
 import org.pm4j.common.pageable.PageableCollection;
 import org.pm4j.common.pageable.PageableCollectionBase;
 import org.pm4j.common.pageable.PageableCollectionUtil;
-import org.pm4j.common.pageable.querybased.pagequery.ClickedIds;
 import org.pm4j.common.pageable.querybased.pagequery.ItemIdSelection;
 import org.pm4j.common.query.QueryAttr;
 import org.pm4j.common.query.QueryExpr;
@@ -29,28 +28,25 @@ import org.pm4j.common.util.collection.ListUtil;
  * @param <T_ITEM> Type of collection items.
  * @param <T_ID> Item identifier type.
  */
-public class QueryCollectionModificationHandlerBase<T_ITEM, T_ID>  implements ModificationHandler<T_ITEM> {
+public abstract class QueryCollectionModificationHandlerBase<T_ITEM, T_ID, T_SERVICE extends QueryService<T_ITEM, T_ID>>  implements ModificationHandler<T_ITEM> {
 
   private ModificationsImpl<T_ITEM> modifications = new ModificationsImpl<T_ITEM>();
   private final PageableCollectionBase<T_ITEM> pageableCollection;
   /** The service that provides the data to handle. */
-  private final QueryService<T_ITEM, T_ID> service;
+  private final T_SERVICE service;
 
-  public QueryCollectionModificationHandlerBase(PageableCollectionBase<T_ITEM> pageableCollection, QueryService<T_ITEM, T_ID> service) {
+  public QueryCollectionModificationHandlerBase(PageableCollectionBase<T_ITEM> pageableCollection, T_SERVICE service) {
     assert pageableCollection != null;
     assert service != null;
     this.pageableCollection = pageableCollection;
     this.service = service;
   }
-
-  public QueryExpr getRemovedItemsFilterExpr(QueryExpr queryFilterExpr) {
-    @SuppressWarnings("unchecked")
-    ClickedIds<T_ID> ids = modifications.getRemovedItems().isEmpty()
-        ? new ClickedIds<T_ID>()
-        : ((ItemIdSelection<T_ITEM, T_ID>)modifications.getRemovedItems()).getClickedIds();
-    QueryAttr idAttr = pageableCollection.getQueryOptions().getIdAttribute();
-    return new QueryExprNot(PageableCollectionUtil.makeSelectionQueryParams(idAttr, queryFilterExpr, ids));
+  
+  protected final T_SERVICE getService() {
+    return service;
   }
+  
+  protected abstract QueryExpr getRemovedItemsFilterExpr(QueryExpr queryFilterExpr);
 
   @Override
   public boolean removeSelectedItems() {
@@ -85,48 +81,16 @@ public class QueryCollectionModificationHandlerBase<T_ITEM, T_ID>  implements Mo
       persistentRemovedItemSelection = ((SelectionWithAdditionalItems<T_ITEM>)selectedItems).getBaseSelection();
     }
 
-    registerRemovedItems(modifications, persistentRemovedItemSelection);
+    registerRemovedItems(persistentRemovedItemSelection);
 
     pageableCollection.clearCaches();
     pageableCollection.firePropertyChange(PageableCollection.EVENT_REMOVE_SELECTION, selectedItems, null);
     return true;
   }
+  
 
-  // TODO
-  protected void registerRemovedItems(ModificationsImpl<T_ITEM> modifications, Selection<T_ITEM> persistentRemovedItemSelection) {
-    // Remember the previous set of removed items. It needs to be extended by some additional items to remove.
-    Selection<T_ITEM> oldRemovedItemSelection = modifications.getRemovedItems();
-    // XXX oboede: currently ItemIdSelection is an internal precondition
-    if (oldRemovedItemSelection.isEmpty() && persistentRemovedItemSelection instanceof ItemIdSelection)
-    {
-      modifications.setRemovedItems(persistentRemovedItemSelection);
-    } else {
-      if (! (persistentRemovedItemSelection instanceof ItemIdSelection)) {
-        // TODO olaf: big inverted selections are not yet supported
-        long newSize = persistentRemovedItemSelection.getSize() + oldRemovedItemSelection.getSize();
-        if (newSize > 1000) {
-          throw new IndexOutOfBoundsException("Maximum 1000 rows can be removed within a single save operation.");
-        }
-      }
-
-      Collection<T_ID> ids = ListUtil.collectionsToList(getItemIds(persistentRemovedItemSelection), getItemIds(oldRemovedItemSelection));
-      modifications.setRemovedItems(createItemIdSelection(ids));
-    }
-  }
-
-  /**
-   * Can be overridden if the concrete collection needs a special strategy.
-   *
-   * @param queryService
-   * @param ids
-   * @return a newly created ItemIdSelection
-   */
-  protected ItemIdSelection<T_ITEM, T_ID> createItemIdSelection(Collection<T_ID> ids) {
-    return new ItemIdSelection<T_ITEM, T_ID>(service, ids);
-  }
-
-  @Override
-  public void registerRemovedItems(Iterable<T_ITEM> items) {
+  // TODO abstract?
+  protected void registerRemovedItems(Selection<T_ITEM> persistentRemovedItemSelection) {
     throw new UnsupportedOperationException("registerRemovedItems() is not yet implemented for query based collections.");
   }
 
@@ -183,18 +147,13 @@ public class QueryCollectionModificationHandlerBase<T_ITEM, T_ID>  implements Mo
     assert modifications != null;
     this.modifications = (ModificationsImpl<T_ITEM>) modifications;
   }
-
-  @SuppressWarnings("unchecked")
-  private Collection<T_ID> getItemIds(Selection<T_ITEM> selection) {
-    if (selection instanceof ItemIdSelection) {
-      return ((ItemIdSelection<T_ITEM, T_ID>)selection).getClickedIds().getIds();
-    } else {
-      Collection<T_ID> ids = new ArrayList<T_ID>((int)selection.getSize());
-      for (T_ITEM i : selection) {
-        ids.add(service.getIdForItem(i));
-      }
-      return ids;
-    }
+  
+  /**
+   * @return the pageable collection
+   */
+  protected final PageableCollectionBase<T_ITEM> getPageableCollection() {
+    return pageableCollection;
   }
-}
 
+  protected abstract Collection<T_ID> getItemIds(Selection<T_ITEM> selection);
+}

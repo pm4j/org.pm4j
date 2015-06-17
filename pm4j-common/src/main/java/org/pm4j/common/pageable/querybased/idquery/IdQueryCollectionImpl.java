@@ -110,7 +110,7 @@ public class IdQueryCollectionImpl<T_ITEM, T_ID> extends QueryCollectionBase<T_I
     querySelectionHandler.setFirePropertyEvents(false);
     this.selectionHandler = new SelectionHandlerWithAdditionalItems<T_ITEM>(this, querySelectionHandler);
 
-    this.modificationHandler = new QueryCollectionModificationHandlerBase<T_ITEM, T_ID>(this, service);
+    this.modificationHandler = new IdQueryCollectionModificationHandler<T_ITEM, T_ID>(this, service);
 
     PropertyChangeListener resetItemsOnQueryChangeListener = new PropertyChangeListener() {
       @Override public void propertyChange(PropertyChangeEvent evt) {
