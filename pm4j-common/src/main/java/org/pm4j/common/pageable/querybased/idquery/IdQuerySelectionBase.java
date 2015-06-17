@@ -115,9 +115,7 @@ public class IdQuerySelectionBase<T_ITEM, T_ID>
       ++idIdx;
       T_ITEM item = readBlock.get(readBlockIdx++);
       if (item == null) {
-        throw new NoItemForKeyFoundException("No item found for ID: " + ids.get(idIdx-1) +
-            ". It may have been deleted by a concurrent operation." +
-            "\n\tUsed query service: " + service);
+        throw new NoItemForKeyFoundException(ids.get(idIdx-1), service);
       }
       return item;
     }

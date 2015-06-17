@@ -110,7 +110,9 @@ public final class ListUtil {
   public static <T> List<T> collectionsToList(Collection... collections) {
     List<T> list = new ArrayList<T>();
     for (Collection coll : collections) {
-      list.addAll(coll);
+      if (coll != null) {
+        list.addAll(coll);
+      }
     }
     return list;
   }

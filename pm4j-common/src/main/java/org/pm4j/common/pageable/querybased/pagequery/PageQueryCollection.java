@@ -46,8 +46,9 @@ public class PageQueryCollection<T_ITEM, T_ID> extends QueryCollectionBase<T_ITE
     this.service = service;
     this.cachingService = new CachingPageQueryService<T_ITEM, T_ID>(service);
     this.modificationHandler = new QueryCollectionModificationHandlerBase<T_ITEM, T_ID>(this, cachingService) {
-      protected ItemIdSelection<T_ITEM,T_ID> createItemIdSelection(QueryService<T_ITEM,T_ID> queryService, Collection<T_ID> ids) {
-          return new PageableItemIdSelection<T_ITEM, T_ID>((PageQueryService<T_ITEM, T_ID>)queryService, queryOptions, getQueryParamsWithRemovedItems(), ids);
+      @Override
+      protected ItemIdSelection<T_ITEM,T_ID> createItemIdSelection(Collection<T_ID> ids) {
+          return new PageableItemIdSelection<T_ITEM, T_ID>(cachingService, getQueryOptions().getIdAttribute(), getQueryParamsWithRemovedItems(), ids);
       }
     };
 
@@ -67,7 +68,7 @@ public class PageQueryCollection<T_ITEM, T_ID> extends QueryCollectionBase<T_ITE
     this.selectionHandler = new SelectionHandlerWithAdditionalItems<T_ITEM>(this, querySelectionHandler);
 
   }
-  
+
   /** In addition: reset the page item cache on sort order change. */
   @Override
   protected void onSortOrderChange() {
