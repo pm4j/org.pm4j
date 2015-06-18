@@ -27,7 +27,7 @@ public class IdQueryCollectionImplWithSingleQueryStrategyTest extends PageableCo
   @Override
   public void setUp() {
     super.setUp();
-    service.callCounter.assertCalls("Precondition failed: ", "{findIds=1, getItemForId=8, getItems=4}");
+    service.callCounter.assertCalls("Precondition failed: ", "{findIds=1, getItemForId=7, getItems=4}");
     service.callCounter.reset();
   }
 
@@ -97,7 +97,7 @@ public class IdQueryCollectionImplWithSingleQueryStrategyTest extends PageableCo
   @Override @Test
   public void testAddItem() {
     super.testAddItem();
-    service.callCounter.assertCalls("{findIds=2, getItemForId=6, getItems=6}");
+    service.callCounter.assertCalls("{findIds=2, getItemForId=6, getItems=5}");
   }
 
   @Override @Test
@@ -109,19 +109,19 @@ public class IdQueryCollectionImplWithSingleQueryStrategyTest extends PageableCo
   @Override @Test
   public void testAddItemInMultiSelectMode() {
     super.testAddItemInMultiSelectMode();
-    service.callCounter.assertCalls("{findIds=2, getItemForId=6, getItems=6}");
+    service.callCounter.assertCalls("{findIds=2, getItemForId=6, getItems=5}");
   }
 
   @Override @Test
   public void testRemoveItems() {
     super.testRemoveItems();
-    service.callCounter.assertCalls("{findIds=2, getItemForId=4, getItems=3}");
+    service.callCounter.assertCalls("{findIds=2, getItemForId=4, getItems=2}");
   }
 
   @Override @Test
   public void testRemoveOfAddedAndUpdatedItems() {
     super.testRemoveOfAddedAndUpdatedItems();
-    service.callCounter.assertCalls("{findIds=2, getItems=3}");
+    service.callCounter.assertCalls("{findIds=2, getItems=2}");
   }
 
   @Override @Test

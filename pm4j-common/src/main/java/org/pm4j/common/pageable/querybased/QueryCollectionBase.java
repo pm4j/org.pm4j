@@ -74,7 +74,7 @@ public abstract class QueryCollectionBase<T_ITEM, T_ID> extends PageableCollecti
         else {
             QueryParams qParams = getQueryParams().clone();
             QueryExpr queryFilterExpr = qParams.getQueryExpression();
-            QueryExpr removedItemsFilterExpr = modificationHandler.getRemovedItemsFilterExpr(queryFilterExpr);
+            QueryExpr removedItemsFilterExpr = modificationHandler.createRemovedItemsExpr(queryFilterExpr);
             qParams.setQueryExpression(queryFilterExpr != null
                     ? new QueryExprAnd(queryFilterExpr, removedItemsFilterExpr)
                     : removedItemsFilterExpr);

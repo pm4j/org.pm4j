@@ -33,20 +33,20 @@ public abstract class IdQuerySelectionHandler<T_ITEM, T_ID> extends SelectionHan
   private static final Logger LOG = LoggerFactory.getLogger(IdQuerySelectionHandler.class);
 
   /** Used to provide empty selections. */
-  private final IdQuerySelectionBase<T_ITEM, T_ID> emptySelection;
+  private final IdQuerySelection<T_ITEM, T_ID> emptySelection;
 
   /** The converter used to get items for the internally handled id's. */
   private final IdQueryService<T_ITEM, T_ID> idQueryService;
 
   /** The current selection. */
-  private IdQuerySelectionBase<T_ITEM, T_ID> selection;
+  private IdQuerySelection<T_ITEM, T_ID> selection;
 
   @SuppressWarnings("unchecked")
   public IdQuerySelectionHandler(IdQueryService<T_ITEM, T_ID> idQueryService) {
     assert idQueryService != null;
 
     this.idQueryService = idQueryService;
-    this.emptySelection = new IdQuerySelectionBase<T_ITEM, T_ID>(idQueryService, Collections.EMPTY_SET);
+    this.emptySelection = new IdQuerySelection<T_ITEM, T_ID>(idQueryService, Collections.EMPTY_SET);
     this.selection = emptySelection;
   }
 
@@ -60,9 +60,9 @@ public abstract class IdQuerySelectionHandler<T_ITEM, T_ID> extends SelectionHan
     notNull(item, "item cannot be null");
     Set<T_ID> newSelection = new LinkedHashSet<T_ID>((int) selection.getSize() + 1);
     T_ID itemId = idQueryService.getIdForItem(item);
-    
+
     //rebuild selection maintaining original order
-    
+
     if (select) { //select
       if (getSelectMode().equals(SelectMode.SINGLE)) {
         newSelection.add(itemId);
@@ -83,7 +83,7 @@ public abstract class IdQuerySelectionHandler<T_ITEM, T_ID> extends SelectionHan
       newSelection.addAll(selection.getIds());
       newSelection.remove(itemId);
     }
-    
+
     return setSelection(newSelection);
   }
 
@@ -96,7 +96,7 @@ public abstract class IdQuerySelectionHandler<T_ITEM, T_ID> extends SelectionHan
     for(T_ITEM item : items) {
       itemIds.add(idQueryService.getIdForItem(item));
     }
-     
+
     //rebuild selection maintaining original order
     if (select) { //select
       for (T_ID allCollectionItemId : getAllIds()) {
@@ -163,7 +163,7 @@ public abstract class IdQuerySelectionHandler<T_ITEM, T_ID> extends SelectionHan
 
     try {
       fireVetoableChange(PROP_SELECTION, oldSelection, newSelection);
-      this.selection = (IdQuerySelectionBase<T_ITEM, T_ID>) newSelection;
+      this.selection = (IdQuerySelection<T_ITEM, T_ID>) newSelection;
       firePropertyChange(PROP_SELECTION, oldSelection, newSelection);
       return true;
     } catch (PropertyVetoException e) {
@@ -174,13 +174,13 @@ public abstract class IdQuerySelectionHandler<T_ITEM, T_ID> extends SelectionHan
 
   @Override
   public Selection<T_ITEM> getAllItemsSelection() {
-    return new IdQuerySelectionBase<T_ITEM, T_ID>(idQueryService, new HashSet<T_ID>(getAllIds()));
+    return new IdQuerySelection<T_ITEM, T_ID>(idQueryService, getAllIds());
   }
 
   private boolean setSelection(Set<T_ID> selectedIds) {
     return setSelection(selectedIds.isEmpty()
         ? emptySelection
-        : new IdQuerySelectionBase<T_ITEM, T_ID>(idQueryService, selectedIds));
+        : new IdQuerySelection<T_ITEM, T_ID>(idQueryService, selectedIds));
   }
 
 }

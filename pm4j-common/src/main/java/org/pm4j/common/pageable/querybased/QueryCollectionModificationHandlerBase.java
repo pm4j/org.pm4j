@@ -10,15 +10,10 @@ import org.pm4j.common.modifications.Modifications;
 import org.pm4j.common.modifications.ModificationsImpl;
 import org.pm4j.common.pageable.PageableCollection;
 import org.pm4j.common.pageable.PageableCollectionBase;
-import org.pm4j.common.pageable.PageableCollectionUtil;
-import org.pm4j.common.pageable.querybased.pagequery.ItemIdSelection;
-import org.pm4j.common.query.QueryAttr;
 import org.pm4j.common.query.QueryExpr;
-import org.pm4j.common.query.QueryExprNot;
 import org.pm4j.common.selection.Selection;
 import org.pm4j.common.selection.SelectionHandlerUtil;
 import org.pm4j.common.selection.SelectionWithAdditionalItems;
-import org.pm4j.common.util.collection.ListUtil;
 
 /**
  * Modification handler for query service based collections.
@@ -41,12 +36,10 @@ public abstract class QueryCollectionModificationHandlerBase<T_ITEM, T_ID, T_SER
     this.pageableCollection = pageableCollection;
     this.service = service;
   }
-  
+
   protected final T_SERVICE getService() {
     return service;
   }
-  
-  protected abstract QueryExpr getRemovedItemsFilterExpr(QueryExpr queryFilterExpr);
 
   @Override
   public boolean removeSelectedItems() {
@@ -81,18 +74,21 @@ public abstract class QueryCollectionModificationHandlerBase<T_ITEM, T_ID, T_SER
       persistentRemovedItemSelection = ((SelectionWithAdditionalItems<T_ITEM>)selectedItems).getBaseSelection();
     }
 
-    registerRemovedItems(persistentRemovedItemSelection);
+    setRemovedItemsImpl(persistentRemovedItemSelection);
 
     pageableCollection.clearCaches();
     pageableCollection.firePropertyChange(PageableCollection.EVENT_REMOVE_SELECTION, selectedItems, null);
     return true;
   }
-  
 
-  // TODO abstract?
-  protected void registerRemovedItems(Selection<T_ITEM> persistentRemovedItemSelection) {
+  @Override
+  public void registerRemovedItems(Iterable<T_ITEM> items) {
     throw new UnsupportedOperationException("registerRemovedItems() is not yet implemented for query based collections.");
   }
+
+  protected abstract QueryExpr createRemovedItemsExpr(QueryExpr queryFilterExpr);
+
+  protected abstract void setRemovedItemsImpl(Selection<T_ITEM> persistentRemovedItemSelection);
 
   /**
    * Add and register add are the same for query collections.<br>
@@ -147,7 +143,11 @@ public abstract class QueryCollectionModificationHandlerBase<T_ITEM, T_ID, T_SER
     assert modifications != null;
     this.modifications = (ModificationsImpl<T_ITEM>) modifications;
   }
-  
+
+  protected ModificationsImpl<T_ITEM> getModificationsImpl() {
+    return modifications;
+  }
+
   /**
    * @return the pageable collection
    */
@@ -155,5 +155,4 @@ public abstract class QueryCollectionModificationHandlerBase<T_ITEM, T_ID, T_SER
     return pageableCollection;
   }
 
-  protected abstract Collection<T_ID> getItemIds(Selection<T_ITEM> selection);
 }

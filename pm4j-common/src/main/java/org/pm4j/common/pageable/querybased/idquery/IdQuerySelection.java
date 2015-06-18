@@ -3,6 +3,7 @@ package org.pm4j.common.pageable.querybased.idquery;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -22,7 +23,7 @@ import org.pm4j.common.util.collection.ListUtil;
  *
  * @author Olaf Boede
  */
-public class IdQuerySelectionBase<T_ITEM, T_ID>
+public class IdQuerySelection<T_ITEM, T_ID>
     extends QuerySelectionBase<T_ITEM, T_ID>
     implements Selection<T_ITEM>, Serializable, ItemIdBasedSelection<T_ITEM, T_ID> {
 
@@ -33,9 +34,10 @@ public class IdQuerySelectionBase<T_ITEM, T_ID>
 
   private int iterationReadBlockSize = 50;
 
-  public IdQuerySelectionBase(IdQueryService<T_ITEM, T_ID> service, Set<T_ID> ids) {
+  public IdQuerySelection(IdQueryService<T_ITEM, T_ID> service, Collection<T_ID> ids) {
     super(service);
-    this.ids = Collections.unmodifiableSet(ids);
+    // TODO: adds overhead for empty sets.
+    this.ids = Collections.unmodifiableSet((ids instanceof Set) ? (Set<T_ID>)ids : new HashSet<T_ID>(ids));
   }
 
   @Override
@@ -67,6 +69,11 @@ public class IdQuerySelectionBase<T_ITEM, T_ID>
   public void setIteratorBlockSizeHint(int readBlockSize) {
     Validate.isTrue(readBlockSize > 0, "Iterator read block size must be greater than zero.");
     this.iterationReadBlockSize = readBlockSize;
+  }
+
+  @Override
+  public String toString() {
+    return ids.toString();
   }
 
   /**
