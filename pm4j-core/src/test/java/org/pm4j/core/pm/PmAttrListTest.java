@@ -5,10 +5,10 @@ import static org.junit.Assert.assertEquals;
 import java.util.Arrays;
 import java.util.List;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.pm4j.common.converter.string.StringConverterLong;
 import org.pm4j.common.converter.string.StringConverterString;
-import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.annotation.PmAttrListCfg;
 import org.pm4j.core.pm.impl.PmAttrListImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
@@ -18,6 +18,12 @@ public class PmAttrListTest {
 
   private MyTestElement testPm = new MyTestElement();
 
+  @Test
+  public void testListOfLongsWithoutHelperImpl() {
+    testPm.listOfLongsWithoutHelperImpl.setValue(Arrays.asList(1L, 2L, 3L));
+    Assert.assertEquals("1,2,3", testPm.listOfLongsWithoutHelperImpl.getValueAsString());
+  }
+  
   @Test
   public void testGetAndSetValueForAListOfLongs() {
     testGetAndSetValueForAListOfLongs(testPm.listOfLongs, ",");
@@ -56,9 +62,10 @@ public class PmAttrListTest {
       assertEquals("[a, b]", testPm.listOfStrings.getValue().toString());
   }
 
-  @Test(expected=PmRuntimeException.class)
-  public void getValueAsStringDoesNotWorkWithoutItemConverter() {
-      testPm.listOfStringsWithoutItemConverter.getValueAsString();
+  @Test
+  public void getValueAsStringDoesNotWorkWithDefaultItemConverter() {
+      testPm.listOfStringsWithDefaultConverter.setValue(Arrays.asList("One", "Two", "Three"));
+      assertEquals("One,Two,Three", testPm.listOfStringsWithDefaultConverter.getValueAsString());
   }
 
   /** Test PM */
@@ -71,8 +78,9 @@ public class PmAttrListTest {
     @PmAttrListCfg(itemStringConverter=StringConverterString.class)
     public final PmAttrList<String> listOfStrings = new PmAttrListImpl<String>(this);
 
-    public final PmAttrList<String> listOfStringsWithoutItemConverter = new PmAttrListImpl<String>(this);
+    public final PmAttrList<String> listOfStringsWithDefaultConverter = new PmAttrListImpl<String>(this);
 
+    public final PmAttrList<Long> listOfLongsWithoutHelperImpl = new PmAttrListImpl<Long>(this);
   }
 
 }

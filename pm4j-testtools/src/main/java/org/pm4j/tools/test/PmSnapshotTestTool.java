@@ -168,18 +168,19 @@ public class PmSnapshotTestTool {
     }
 
     /**
-     * Excludes {@link VisibleStateAspect}s of the specified PM's from XML snapshot test.
+     * Excludes {@link VisibleStateAspect}s of the specified parent PM's fields from XML snapshot test.
      * 
-     * @param pmClass
-     *            The PM class.
-     * @param name
-     *            Name of the PM field(s) of the given class.<br>
+     * @param parentPmClass
+     *            The parent PM class.
+     * @param fields
+     *            Name of the PM field(s) of the given parentPm class<br>
      *            RegExpressions like <code>cmd*</code> are supported.
      * @param aspects
      *            The aspects to exclude for all matching PM(s).
      */
-    public void exclude(Class<?> pmClass, String name, VisibleStateAspect... aspects) {
-        PmMatcher pmMatcher = new PmMatcherBuilder().pmClass(pmClass).name(name).build();
+    public void exclude(Class<?> parentPmClass, String fields, VisibleStateAspect... aspects) {
+        PmMatcherBuilder matcherBuilder = new PmMatcherBuilder();
+        PmMatcher pmMatcher = matcherBuilder.parent(matcherBuilder.pmClass(parentPmClass).build()).name(fields).build();
         exclude(pmMatcher, aspects);
     }
 
@@ -243,7 +244,7 @@ public class PmSnapshotTestTool {
 
         try {
             // Disturbing Windows carriage return characters need to be removed.
-            String expectedStateXmlString = FileUtil.fileToString(expectedFile).replaceAll("\r\n", "\n");
+            String expectedStateXmlString = FileUtil.fileToString(expectedFile, "UTF-8").replaceAll("\r\n", "\n");
             assertEquals("Compare " + fileNameBase + "\nExpected: " + expectedFile + "\nCurrent: " + actualStateFile, expectedStateXmlString, actualStateXmlString);
             return expectedFile;
         } catch (ComparisonFailure e) {

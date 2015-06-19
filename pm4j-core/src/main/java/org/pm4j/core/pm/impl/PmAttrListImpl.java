@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import org.pm4j.common.converter.string.OneWayToStringConverter;
 import org.pm4j.common.converter.string.StringConverter;
 import org.pm4j.common.converter.string.StringConverterInteger;
 import org.pm4j.common.converter.string.StringConverterList;
@@ -27,6 +28,7 @@ import org.pm4j.core.pm.annotation.PmOptionCfg.NullOption;
  *
  * @param <T> List item type
  */
+@PmAttrListCfg(itemStringConverter = OneWayToStringConverter.class)
 public class PmAttrListImpl<T> extends PmAttrBase<List<T>, List<T>> implements PmAttrList<T> {
 
   /** Binds to a {@link Collection} of {@link Long}s. */

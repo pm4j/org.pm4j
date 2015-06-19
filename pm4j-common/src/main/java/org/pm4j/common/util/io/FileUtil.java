@@ -30,8 +30,18 @@ public class FileUtil {
    * @return the file content.
    */
   public static String fileToString(File file) {
+    return fileToString(file, null);
+  }
+  
+  /**
+   * Reads a complete text file with specified encoding.
+   *
+   * @param file The text file to read.
+   * @return the file content.
+   */
+  public static String fileToString(File file, String charsetName) {
     try {
-      return new Scanner(file).useDelimiter("\\Z").next();
+      return  (charsetName == null ? new Scanner(file) : new Scanner(file, charsetName)).useDelimiter("\\Z").next();
     } catch (FileNotFoundException e) {
       throw new RuntimeException("Failed to read file: " + file, e);
     }
@@ -44,9 +54,19 @@ public class FileUtil {
    * @param string
    */
   public static void stringToFile(File file, String string) {
+    stringToFile(file, string, null);
+  }
+  
+  /**
+   * Writes the given {@link String} to a file using specified charset.
+   *
+   * @param file The file to write.
+   * @param string
+   */
+  public static void stringToFile(File file, String string, String charsetName) {
     PrintWriter pw = null;
     try {
-      pw = new PrintWriter(file);
+      pw = charsetName == null ? new PrintWriter(file) : new PrintWriter(file, charsetName);
       pw.print(string);
     } catch (Exception e) {
       throw new RuntimeException("Failed to write to file " + file, e);
