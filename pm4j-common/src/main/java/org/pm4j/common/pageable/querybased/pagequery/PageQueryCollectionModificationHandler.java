@@ -14,8 +14,9 @@ import org.pm4j.common.query.QueryExprNot;
 import org.pm4j.common.selection.Selection;
 import org.pm4j.common.util.collection.ListUtil;
 
-// TODOC: Limitations; Advantage of current implementation: No bad surprise by deleting unwanted records.
-public class PageQueryCollectionModificationHandler<T_ITEM, T_ID> extends QueryCollectionModificationHandlerBase<T_ITEM, T_ID, PageQueryService<T_ITEM, T_ID>> {
+/*package*/ class PageQueryCollectionModificationHandler<T_ITEM, T_ID> extends QueryCollectionModificationHandlerBase<T_ITEM, T_ID, PageQueryService<T_ITEM, T_ID>> {
+
+  private static final long MAX_SELECTION_SIZE = 1000;
 
   public PageQueryCollectionModificationHandler(PageableCollectionBase<T_ITEM> pageableCollection, PageQueryService<T_ITEM, T_ID> service) {
     super(pageableCollection, service);
@@ -38,6 +39,10 @@ public class PageQueryCollectionModificationHandler<T_ITEM, T_ID> extends QueryC
        }
      }
 
+     // We are using a collection of IDs instead of a direct database query,
+     // because otherwise by combining the selection of distinct IDs, inverting deselecting distinct IDs
+     // and inverting again, otherwise it could happen that items are contained in the selection which 
+     // have not explicitly been selected; this is fatal especially if this selection is used for deletion later on.
      Collection<T_ID> ids = ListUtil.collectionsToList(getItemIds(persistentRemovedItemSelection), getItemIds(oldRemovedItemSelection));
      getModificationsImpl().setRemovedItems(createItemIdSelection(ids));
    }
@@ -52,9 +57,16 @@ public class PageQueryCollectionModificationHandler<T_ITEM, T_ID> extends QueryC
   * @return a newly created ItemIdSelection
   */
  protected PageQueryItemIdSelection<T_ITEM, T_ID> createItemIdSelection(Collection<T_ID> ids) {
+   // TODO
+   //return new PageableItemIdSelection<T_ITEM, T_ID>(getPageQueryCollection().getCachingService(), getQueryOptions().getIdAttribute(), getQueryParamsWithRemovedItems(), ids);
    return new PageQueryItemIdSelection<T_ITEM, T_ID>(getService(), ids);
  }
 
+ @SuppressWarnings("unchecked")
+final PageQueryCollection<T_ITEM, T_ID> getPageQueryCollection() {
+   return (PageQueryCollection<T_ITEM, T_ID>) getPageableCollection();
+ }
+ 
  @Override
  protected QueryExpr createRemovedItemsExpr(QueryExpr queryFilterExpr) {
    // TODO: That's a simplification working only for limited selections.
@@ -77,11 +89,10 @@ public class PageQueryCollectionModificationHandler<T_ITEM, T_ID> extends QueryC
       return ((PageQueryItemIdSelection<T_ITEM, T_ID>)selection).getClickedIds().getIds();
     }
 
+    if ( selection.getSize() > MAX_SELECTION_SIZE ) {
+      throw new MaxItemIdSelectionExceededException(MAX_SELECTION_SIZE, selection.getSize());
+    }
     List<T_ID> ids = new ArrayList<T_ID>((int)selection.getSize());
-
-    // TODO oboede: that may take long in case of large selections (1 mio items selected...)
-    // add a limit and throw an exception.
-
     for (T_ITEM i : selection) {
       ids.add(getService().getIdForItem(i));
     }

@@ -47,6 +47,7 @@ public class PageQueryCollection<T_ITEM, T_ID> extends QueryCollectionBase<T_ITE
       // TODO 
       @Override
       protected PageQueryItemIdSelection<T_ITEM, T_ID> createItemIdSelection(Collection<T_ID> ids) {
+//        super.createItemIdSelection(ids); // FIXME - remove!
           return new PageableItemIdSelection<T_ITEM, T_ID>(cachingService, getQueryOptions().getIdAttribute(), getQueryParamsWithRemovedItems(), ids);
       }
     };
@@ -143,7 +144,6 @@ public class PageQueryCollection<T_ITEM, T_ID> extends QueryCollectionBase<T_ITE
   public PageQueryService<T_ITEM, T_ID> getService() {
     return service;
   }
-
 }
 
 /**
@@ -186,7 +186,7 @@ class PageableQueryCollectionIterator<T_ITEM> implements Iterator<T_ITEM> {
   public void remove() {
     throw new UnsupportedOperationException();
   }
-
+  
   private void readNext() {
     next = null;
     ++pageRowIdx;

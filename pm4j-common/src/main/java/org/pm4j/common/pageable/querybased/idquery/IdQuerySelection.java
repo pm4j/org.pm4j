@@ -36,8 +36,11 @@ public class IdQuerySelection<T_ITEM, T_ID>
 
   public IdQuerySelection(IdQueryService<T_ITEM, T_ID> service, Collection<T_ID> ids) {
     super(service);
-    // TODO: adds overhead for empty sets.
-    this.ids = Collections.unmodifiableSet((ids instanceof Set) ? (Set<T_ID>)ids : new HashSet<T_ID>(ids));
+    if ( ids.size() == 0 ) {
+      this.ids = Collections.emptySet();
+    } else {
+      this.ids = Collections.unmodifiableSet((ids instanceof Set) ? (Set<T_ID>)ids : new HashSet<T_ID>(ids));
+    }
   }
 
   @Override

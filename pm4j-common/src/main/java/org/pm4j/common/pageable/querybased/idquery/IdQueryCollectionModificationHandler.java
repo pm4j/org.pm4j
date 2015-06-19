@@ -13,7 +13,7 @@ import org.pm4j.common.query.QueryExprCompare;
 import org.pm4j.common.query.QueryExprNot;
 import org.pm4j.common.selection.Selection;
 
-public class IdQueryCollectionModificationHandler<T_ITEM, T_ID> extends QueryCollectionModificationHandlerBase<T_ITEM, T_ID, QueryService<T_ITEM, T_ID>> {
+/*package*/ class IdQueryCollectionModificationHandler<T_ITEM, T_ID> extends QueryCollectionModificationHandlerBase<T_ITEM, T_ID, QueryService<T_ITEM, T_ID>> {
 
   public IdQueryCollectionModificationHandler(PageableCollectionBase<T_ITEM> pageableCollection, QueryService<T_ITEM, T_ID> service) {
     super(pageableCollection, service);
@@ -21,7 +21,7 @@ public class IdQueryCollectionModificationHandler<T_ITEM, T_ID> extends QueryCol
 
 //TODO
 
-  @Override
+ @Override
  protected void setRemovedItemsImpl(Selection<T_ITEM> persistentRemovedItemSelection) {
     HashSet<T_ID> ids = new HashSet<T_ID>(getIds(persistentRemovedItemSelection));
     ids.addAll(getIds(getModifications().getRemovedItems()));

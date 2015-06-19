@@ -3,6 +3,7 @@ package org.pm4j.common.pageable;
 import org.pm4j.common.modifications.ModificationHandler;
 import org.pm4j.common.modifications.Modifications;
 import org.pm4j.common.modifications.ModificationsImpl;
+import org.pm4j.common.pageable.querybased.pagequery.PageQueryService;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.selection.Selection;
@@ -82,5 +83,4 @@ public abstract class PageableCollectionBase<T_ITEM> extends PropertyChangeSuppo
         ? mh.getModifications()
         : new ModificationsImpl<T_ITEM>();
   }
-
 }
