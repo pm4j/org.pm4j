@@ -3,43 +3,48 @@ package org.pm4j.common.pageable.querybased.pagequery;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
 import org.pm4j.common.pageable.querybased.NoItemForKeyFoundException;
-import org.pm4j.common.util.collection.ListUtil;
+import org.pm4j.common.pageable.querybased.QueryService;
+import org.pm4j.common.query.CompOpIn;
+import org.pm4j.common.query.QueryAttr;
+import org.pm4j.common.query.QueryExprCompare;
+import org.pm4j.common.query.QueryParams;
 
 /**
  * A selection that holds the ID's of selected items.
  * <p>
  * It uses a {@link PageQueryService} instance to retrieve the selected instances from the service.
  */
-public class PageQueryItemIdSelection<T_ITEM, T_ID> extends PageQuerySelectionHandler.QuerySelectionWithClickedIds<T_ITEM, T_ID> {
+/*package*/ class PageQueryItemIdSelection<T_ITEM, T_ID> extends PageQuerySelectionHandler.QuerySelectionWithClickedIds<T_ITEM, T_ID> {
   private static final long serialVersionUID = 1L;
 
   private final Collection<T_ID> ids;
 
   private int readBlockSize = 1;
 
-  /**
-   * Creates a selection based on a set of selected id's.
-   *
-   * @param service the service used to retrieve items for the selected id's.
-   * @param ids the set of selected id's.
-   */
-  @SuppressWarnings("unchecked")
-  public PageQueryItemIdSelection(PageQueryService<T_ITEM, T_ID> service, Collection<T_ID> ids) {
-    super(service);
-    this.ids = (ids != null) ? Collections.unmodifiableCollection(ids) : Collections.EMPTY_LIST;
-  }
+  /** The query constraints and sort order for retrieving selected records based on selected IDs. */
+  protected QueryParams selectedIdsQueryParams;
 
   /**
-   * Creates a selection based on another selection and some additional items.
+   * Creates a selection based on a set of selected id's which keeps the original sort order.
    *
-   * @param srcSelection the base selection.
-   * @param ids the set of additional items.
+   * @param service the service used to retrieve items for the selected id's.
+   * @param idAttr the item ID attribute to use.
+   * @param queryParams provides the sort order and custom query properties for the {@link QueryService} that executes the internally used query operation.
+   * @param ids the set of selected id's.
+   * @param sortOrderAware true of the iteration must use the original sort order, false if this is not necessary (more efficient)
    */
-  public PageQueryItemIdSelection(PageQueryItemIdSelection<T_ITEM, T_ID> srcSelection, Collection<T_ID> ids) {
-    super(srcSelection.getService());
-    this.ids = ListUtil.collectionsToList(srcSelection.getClickedIds().getIds(), ids);
+  @SuppressWarnings("unchecked")
+  /*package*/ PageQueryItemIdSelection(PageQueryService<T_ITEM, T_ID> service, QueryAttr idAttr, QueryParams queryParams, Collection<T_ID> ids, boolean sortOrderAware) {
+    super(service);
+    this.ids = (ids != null) ? Collections.unmodifiableCollection(ids) : Collections.EMPTY_LIST;
+    this.selectedIdsQueryParams = queryParams.clone(); // keep parameters like sort order, but use a different query expression
+    if (!sortOrderAware) {
+      queryParams.setSortOrder(null); // to speed up the queries
+    }
+    this.selectedIdsQueryParams.setQueryExpression(new QueryExprCompare(idAttr, CompOpIn.class, ids));
   }
 
   @Override
@@ -50,11 +55,6 @@ public class PageQueryItemIdSelection<T_ITEM, T_ID> extends PageQuerySelectionHa
   @Override
   public boolean contains(T_ITEM item) {
     return ids.contains(getService().getIdForItem(item));
-  }
-
-  @Override
-  public Iterator<T_ITEM> iterator() {
-    return new ItemIterator();
   }
 
   /** Sets the number of rows to retrieve at once to reduce number of SQL calls.
@@ -81,23 +81,48 @@ public class PageQueryItemIdSelection<T_ITEM, T_ID> extends PageQuerySelectionHa
     return new ClickedIds<T_ID>(ids, false);
   }
 
-  class ItemIterator implements Iterator<T_ITEM> {
-    private final Iterator<T_ID> idIterator = ids.iterator();
+  @Override
+  public PageQueryService<T_ITEM, T_ID> getService() {
+    return (PageQueryService<T_ITEM, T_ID>) super.getService();
+  }
+
+  @Override
+  public Iterator<T_ITEM> iterator() {  
+    // sort order relevant (e.g. positive ID selection)
+    if ( selectedIdsQueryParams != null ) {
+      return new PagingItemIterator();
+    } else {
+      // TODO?
+      return new PagingItemIterator();     
+    }
+  }
+  
+  class PagingItemIterator implements Iterator<T_ITEM> {
+
+    private int idIndex = 0;
+    private List<T_ITEM> chunk = null;
+    private int relativeIdIndex = 0;
 
     @Override
     public boolean hasNext() {
-      return idIterator.hasNext();
+      return idIndex<getSize();
     }
 
     @Override
     public T_ITEM next() {
-      T_ID id = idIterator.next();
-      // TODO olaf: not yet optimized to read in blocks
-      T_ITEM item = getService().getItemForId(id);
-      if (item == null) {
-        throw new NoItemForKeyFoundException(id, getService());
+      // If the database changed, we might skip entries.
+      // This can not avoided at 100%, and any try to reduce frequency of this quirk is expensive.
+      if ( chunk == null || relativeIdIndex >= chunk.size() ) {
+        relativeIdIndex = 0;
+        chunk = getService().getItems(selectedIdsQueryParams, idIndex, getIteratorBlockSizeHint());
+        if (chunk.size() == 0) {
+          throw new NoItemForKeyFoundException("No further item found. It may have been deleted by a concurrent operation." +
+              "\n\tUsed query service: " + getService());
+        }
       }
-      return item;
+
+      idIndex++;
+      return chunk.get(relativeIdIndex++);
     }
 
     @Override

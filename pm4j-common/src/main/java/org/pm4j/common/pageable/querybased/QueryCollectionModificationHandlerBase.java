@@ -86,8 +86,10 @@ public abstract class QueryCollectionModificationHandlerBase<T_ITEM, T_ID, T_SER
     throw new UnsupportedOperationException("registerRemovedItems() is not yet implemented for query based collections.");
   }
 
+  // TODOC
   protected abstract QueryExpr createRemovedItemsExpr(QueryExpr queryFilterExpr);
 
+  // TODOC
   protected abstract void setRemovedItemsImpl(Selection<T_ITEM> persistentRemovedItemSelection);
 
   /**

@@ -11,6 +11,7 @@ import org.pm4j.common.pageable.querybased.QueryCollectionModificationHandlerBas
 import org.pm4j.common.query.QueryAttr;
 import org.pm4j.common.query.QueryExpr;
 import org.pm4j.common.query.QueryExprNot;
+import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.selection.Selection;
 import org.pm4j.common.util.collection.ListUtil;
 
@@ -57,9 +58,10 @@ import org.pm4j.common.util.collection.ListUtil;
   * @return a newly created ItemIdSelection
   */
  protected PageQueryItemIdSelection<T_ITEM, T_ID> createItemIdSelection(Collection<T_ID> ids) {
-   // TODO
-   //return new PageableItemIdSelection<T_ITEM, T_ID>(getPageQueryCollection().getCachingService(), getQueryOptions().getIdAttribute(), getQueryParamsWithRemovedItems(), ids);
-   return new PageQueryItemIdSelection<T_ITEM, T_ID>(getService(), ids);
+   // TODO use: getPageQueryCollection().getCachingService(), getQueryOptions().getIdAttribute(), getQueryParamsWithRemovedItems()?
+   QueryAttr itAttr = getPageableCollection().getQueryOptions().getIdAttribute();
+   QueryParams queryParams = getPageableCollection().getQueryParams();
+  return new PageQueryItemIdSelection<T_ITEM, T_ID>(getService(), itAttr, queryParams, ids, false);
  }
 
  @SuppressWarnings("unchecked")

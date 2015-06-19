@@ -48,7 +48,7 @@ public class PageQueryCollection<T_ITEM, T_ID> extends QueryCollectionBase<T_ITE
       @Override
       protected PageQueryItemIdSelection<T_ITEM, T_ID> createItemIdSelection(Collection<T_ID> ids) {
 //        super.createItemIdSelection(ids); // FIXME - remove!
-          return new PageableItemIdSelection<T_ITEM, T_ID>(cachingService, getQueryOptions().getIdAttribute(), getQueryParamsWithRemovedItems(), ids);
+          return new PageQueryItemIdSelection<T_ITEM, T_ID>(cachingService, getQueryOptions().getIdAttribute(), getQueryParamsWithRemovedItems(), ids, false);
       }
     };
 

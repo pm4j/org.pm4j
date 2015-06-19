@@ -19,8 +19,6 @@ import org.pm4j.common.selection.Selection;
     super(pageableCollection, service);
   }
 
-//TODO
-
  @Override
  protected void setRemovedItemsImpl(Selection<T_ITEM> persistentRemovedItemSelection) {
     HashSet<T_ID> ids = new HashSet<T_ID>(getIds(persistentRemovedItemSelection));

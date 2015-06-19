@@ -48,13 +48,12 @@ public abstract class PageQuerySelectionHandler<T_ITEM, T_ID> extends SelectionH
   private QuerySelectionWithClickedIds<T_ITEM, T_ID> currentSelection;
 
 
-  // TODO MHOENNIG: check whether this could better take the PageQueryCollection as the only parameter
   @SuppressWarnings("unchecked")
   public PageQuerySelectionHandler(PageQueryService<T_ITEM, T_ID> service) {
     assert service != null;
 
     this.service = service;
-    this.emptySelection = new PageableItemIdSelection<T_ITEM, T_ID>(service, getQueryOptions().getIdAttribute(), getQueryParams(), Collections.EMPTY_LIST);
+    this.emptySelection = new PageQueryItemIdSelection<T_ITEM, T_ID>(service, getQueryOptions().getIdAttribute(), getQueryParams(), Collections.EMPTY_LIST, false);
     this.currentSelection = emptySelection;
   }
 
@@ -125,7 +124,7 @@ public abstract class PageQuerySelectionHandler<T_ITEM, T_ID> extends SelectionH
     }
 
     return setSelection(isInverse()
-        ? new PageableItemIdSelection<T_ITEM, T_ID>(service, getQueryOptions().getIdAttribute(),  getQueryParams(), currentSelection.getClickedIds().getIds())
+        ? new PageQueryItemIdSelection<T_ITEM, T_ID>(service, getQueryOptions().getIdAttribute(),  getQueryParams(), currentSelection.getClickedIds().getIds(), false)
         : new InvertedSelection<T_ITEM, T_ID>(service, getQueryParams(), currentSelection));
   }
 
@@ -208,7 +207,7 @@ public abstract class PageQuerySelectionHandler<T_ITEM, T_ID> extends SelectionH
   private boolean setSelection(Set<T_ID> selectedIds) {
     PageQueryItemIdSelection<T_ITEM, T_ID> idSelection = selectedIds.isEmpty()
                   ? emptySelection
-                  : new PageableItemIdSelection<T_ITEM, T_ID>(service, getQueryOptions().getIdAttribute(), getQueryParams(), selectedIds);
+                  : new PageQueryItemIdSelection<T_ITEM, T_ID>(service, getQueryOptions().getIdAttribute(), getQueryParams(), selectedIds, true);
 
     return setSelection(isInverse()
                   ? new InvertedSelection<T_ITEM, T_ID>(service, getQueryParams(), idSelection)
