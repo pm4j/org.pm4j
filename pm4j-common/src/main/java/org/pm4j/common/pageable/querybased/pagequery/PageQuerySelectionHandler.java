@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * Two basic selection types are implemented:
  * <ul>
- * <li>{@link ItemIdSelection}: contains the id's of the selected items.</li>
+ * <li>{@link PageQueryItemIdSelection}: contains the id's of the selected items.</li>
  * <li>{@link InvertedSelection}: contains the {@link QueryParams} to represent
  * the 'ALL' selection and a set of de-selected id's.
  * </ul>
@@ -44,7 +44,7 @@ public abstract class PageQuerySelectionHandler<T_ITEM, T_ID> extends SelectionH
   private static final Logger LOG = LoggerFactory.getLogger(PageQuerySelectionHandler.class);
 
   private final PageQueryService<T_ITEM, T_ID> service;
-  private final ItemIdSelection<T_ITEM, T_ID> emptySelection;
+  private final PageQueryItemIdSelection<T_ITEM, T_ID> emptySelection;
   private QuerySelectionWithClickedIds<T_ITEM, T_ID> currentSelection;
 
 
@@ -206,7 +206,7 @@ public abstract class PageQuerySelectionHandler<T_ITEM, T_ID> extends SelectionH
    * @param selectedIds the new set of selected id's. In case if an inverted selection: the new set of de-selected id's.
    */
   private boolean setSelection(Set<T_ID> selectedIds) {
-    ItemIdSelection<T_ITEM, T_ID> idSelection = selectedIds.isEmpty()
+    PageQueryItemIdSelection<T_ITEM, T_ID> idSelection = selectedIds.isEmpty()
                   ? emptySelection
                   : new PageableItemIdSelection<T_ITEM, T_ID>(service, getQueryOptions().getIdAttribute(), getQueryParams(), selectedIds);
 

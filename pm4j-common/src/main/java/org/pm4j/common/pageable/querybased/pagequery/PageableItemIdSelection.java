@@ -16,11 +16,11 @@ import org.pm4j.common.query.QueryParams;
  * <p>
  * It uses a {@link PageQueryService} instance to retrieve the selected instances from the service.
  */
-public class PageableItemIdSelection<T_ITEM, T_ID> extends ItemIdSelection<T_ITEM, T_ID> {
+public class PageableItemIdSelection<T_ITEM, T_ID> extends PageQueryItemIdSelection<T_ITEM, T_ID> {
   private static final long serialVersionUID = 1L;
 
   /** The query constraints and sort order for retrieving selected records based on selected IDs. */
-  private QueryParams selectedIdQueryParams;
+  private QueryParams selectedIdsQueryParams;
 
   /**
    * Creates a selection based on a set of selected id's.
@@ -32,8 +32,8 @@ public class PageableItemIdSelection<T_ITEM, T_ID> extends ItemIdSelection<T_ITE
    */
   public PageableItemIdSelection(PageQueryService<T_ITEM, T_ID> service, QueryAttr idAttr, QueryParams queryParams, Collection<T_ID> ids) {
     super(service, ids);
-    this.selectedIdQueryParams = queryParams.clone();
-    this.selectedIdQueryParams.setQueryExpression(new QueryExprCompare(idAttr, CompOpIn.class, ids));
+    this.selectedIdsQueryParams = queryParams.clone();
+    this.selectedIdsQueryParams.setQueryExpression(new QueryExprCompare(idAttr, CompOpIn.class, ids));
   }
 
   @Override
@@ -63,7 +63,7 @@ public class PageableItemIdSelection<T_ITEM, T_ID> extends ItemIdSelection<T_ITE
       // This can not avoided at 100%, and any try to reduce frequency of this quirk is expensive.
       if ( chunk == null || relativeIdIndex >= chunk.size() ) {
         relativeIdIndex = 0;
-        chunk = getService().getItems(selectedIdQueryParams, idIndex, getIteratorBlockSizeHint());
+        chunk = getService().getItems(selectedIdsQueryParams, idIndex, getIteratorBlockSizeHint());
         if (chunk.size() == 0) {
           throw new NoItemForKeyFoundException("No further item found. It may have been deleted by a concurrent operation." +
               "\n\tUsed query service: " + getService());

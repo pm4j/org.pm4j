@@ -27,11 +27,11 @@ public class PageQueryCollectionModificationHandler<T_ITEM, T_ID> extends QueryC
    // Remember the previous set of removed items. It needs to be extended by some additional items to remove.
    Selection<T_ITEM> oldRemovedItemSelection = getModifications().getRemovedItems();
    // XXX oboede: currently ItemIdSelection is an internal precondition
-   if (oldRemovedItemSelection.isEmpty() && persistentRemovedItemSelection instanceof ItemIdSelection)
+   if (oldRemovedItemSelection.isEmpty() && persistentRemovedItemSelection instanceof PageQueryItemIdSelection)
    {
      getModificationsImpl().setRemovedItems(persistentRemovedItemSelection);
    } else {
-     if (! (persistentRemovedItemSelection instanceof ItemIdSelection)) {
+     if (! (persistentRemovedItemSelection instanceof PageQueryItemIdSelection)) {
        long newSize = persistentRemovedItemSelection.getSize() + oldRemovedItemSelection.getSize();
        if (newSize > 1000) {
          throw new IndexOutOfBoundsException("Maximum 1000 rows can be removed within a single save operation.");
@@ -51,8 +51,8 @@ public class PageQueryCollectionModificationHandler<T_ITEM, T_ID> extends QueryC
   * @param ids
   * @return a newly created ItemIdSelection
   */
- protected ItemIdSelection<T_ITEM, T_ID> createItemIdSelection(Collection<T_ID> ids) {
-   return new ItemIdSelection<T_ITEM, T_ID>(getService(), ids);
+ protected PageQueryItemIdSelection<T_ITEM, T_ID> createItemIdSelection(Collection<T_ID> ids) {
+   return new PageQueryItemIdSelection<T_ITEM, T_ID>(getService(), ids);
  }
 
  @Override
@@ -62,7 +62,7 @@ public class PageQueryCollectionModificationHandler<T_ITEM, T_ID> extends QueryC
     @SuppressWarnings("unchecked")
     ClickedIds<T_ID> ids = getModifications().getRemovedItems().isEmpty()
         ? new ClickedIds<T_ID>()
-        : ((ItemIdSelection<T_ITEM, T_ID>)getModifications().getRemovedItems()).getClickedIds();
+        : ((PageQueryItemIdSelection<T_ITEM, T_ID>)getModifications().getRemovedItems()).getClickedIds();
     QueryAttr idAttr = getPageableCollection().getQueryOptions().getIdAttribute();
     return new QueryExprNot(PageableCollectionUtil.makeSelectionQueryParams(idAttr, queryFilterExpr, ids));
   }
@@ -73,8 +73,8 @@ public class PageQueryCollectionModificationHandler<T_ITEM, T_ID> extends QueryC
       return Collections.emptyList();
     }
 
-    if (selection instanceof ItemIdSelection) {
-      return ((ItemIdSelection<T_ITEM, T_ID>)selection).getClickedIds().getIds();
+    if (selection instanceof PageQueryItemIdSelection) {
+      return ((PageQueryItemIdSelection<T_ITEM, T_ID>)selection).getClickedIds().getIds();
     }
 
     List<T_ID> ids = new ArrayList<T_ID>((int)selection.getSize());

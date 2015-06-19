@@ -10,9 +10,7 @@ import org.pm4j.common.modifications.ModificationHandler;
 import org.pm4j.common.pageable.PageableCollection;
 import org.pm4j.common.pageable.PageableCollectionUtil;
 import org.pm4j.common.pageable.querybased.QueryCollectionBase;
-import org.pm4j.common.pageable.querybased.QueryCollectionModificationHandlerBase;
-import org.pm4j.common.pageable.querybased.QueryService;
-import org.pm4j.common.pageable.querybased.idquery.MaxQueryResultsViolationException;
+import org.pm4j.common.pageable.querybased.MaxQueryResultsViolationException;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.selection.SelectionHandler;
@@ -48,7 +46,7 @@ public class PageQueryCollection<T_ITEM, T_ID> extends QueryCollectionBase<T_ITE
     this.modificationHandler = new PageQueryCollectionModificationHandler<T_ITEM, T_ID>(this, cachingService) {
       // TODO 
       @Override
-      protected ItemIdSelection<T_ITEM, T_ID> createItemIdSelection(Collection<T_ID> ids) {
+      protected PageQueryItemIdSelection<T_ITEM, T_ID> createItemIdSelection(Collection<T_ID> ids) {
           return new PageableItemIdSelection<T_ITEM, T_ID>(cachingService, getQueryOptions().getIdAttribute(), getQueryParamsWithRemovedItems(), ids);
       }
     };

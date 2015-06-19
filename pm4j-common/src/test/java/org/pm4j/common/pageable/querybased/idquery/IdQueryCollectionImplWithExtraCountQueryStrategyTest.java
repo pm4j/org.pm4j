@@ -161,7 +161,14 @@ public class IdQueryCollectionImplWithExtraCountQueryStrategyTest extends Pageab
     assertEquals("Call count stability check.", "{findIds=1, getItemCount=1}", service.callCounter.toString());
   }
 
-  @Test(expected=MaxQueryResultsViolationException.class)
+  // tests just API compatibility for catch, can be removed when the deprecated class is removed
+  @Test(expected=org.pm4j.common.pageable.querybased.idquery.MaxQueryResultsViolationException.class)
+  public void testGetNumOfItemsWithMaxQueryResultsViolationExceptionCompatibility() {
+    collection.getQueryParams().setMaxResults(1L);
+    super.testGetNumOfItems();
+  }
+
+  @Test(expected=org.pm4j.common.pageable.querybased.MaxQueryResultsViolationException.class)
   public void testGetNumOfItemsWithMaxQueryResultsViolationException() {
     collection.getQueryParams().setMaxResults(1L);
     super.testGetNumOfItems();

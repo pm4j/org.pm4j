@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 import org.pm4j.common.pageable.PageableCollection;
 import org.pm4j.common.pageable.PageableCollectionTestBase;
+import org.pm4j.common.pageable.querybased.MaxQueryResultsViolationException;
 
 /**
  * Performs all pageable collection tests for a service having an {@link IdQueryServiceProxyForMinimzedGetItemCalls}.

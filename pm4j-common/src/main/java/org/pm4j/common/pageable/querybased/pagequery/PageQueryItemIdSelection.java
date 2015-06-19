@@ -12,7 +12,7 @@ import org.pm4j.common.util.collection.ListUtil;
  * <p>
  * It uses a {@link PageQueryService} instance to retrieve the selected instances from the service.
  */
-public class ItemIdSelection<T_ITEM, T_ID> extends PageQuerySelectionHandler.QuerySelectionWithClickedIds<T_ITEM, T_ID> {
+public class PageQueryItemIdSelection<T_ITEM, T_ID> extends PageQuerySelectionHandler.QuerySelectionWithClickedIds<T_ITEM, T_ID> {
   private static final long serialVersionUID = 1L;
 
   private final Collection<T_ID> ids;
@@ -26,7 +26,7 @@ public class ItemIdSelection<T_ITEM, T_ID> extends PageQuerySelectionHandler.Que
    * @param ids the set of selected id's.
    */
   @SuppressWarnings("unchecked")
-  public ItemIdSelection(PageQueryService<T_ITEM, T_ID> service, Collection<T_ID> ids) {
+  public PageQueryItemIdSelection(PageQueryService<T_ITEM, T_ID> service, Collection<T_ID> ids) {
     super(service);
     this.ids = (ids != null) ? Collections.unmodifiableCollection(ids) : Collections.EMPTY_LIST;
   }
@@ -37,7 +37,7 @@ public class ItemIdSelection<T_ITEM, T_ID> extends PageQuerySelectionHandler.Que
    * @param srcSelection the base selection.
    * @param ids the set of additional items.
    */
-  public ItemIdSelection(ItemIdSelection<T_ITEM, T_ID> srcSelection, Collection<T_ID> ids) {
+  public PageQueryItemIdSelection(PageQueryItemIdSelection<T_ITEM, T_ID> srcSelection, Collection<T_ID> ids) {
     super(srcSelection.getService());
     this.ids = ListUtil.collectionsToList(srcSelection.getClickedIds().getIds(), ids);
   }

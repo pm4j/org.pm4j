@@ -3,6 +3,7 @@ package org.pm4j.common.pageable.querybased.idquery;
 import org.junit.Test;
 import org.pm4j.common.pageable.PageableCollection;
 import org.pm4j.common.pageable.PageableCollectionTestBase;
+import org.pm4j.common.pageable.querybased.MaxQueryResultsViolationException;
 
 public class IdQueryCollectionImplWithSingleQueryStrategyTest extends PageableCollectionTestBase<PageableCollectionTestBase.Bean> {
 
