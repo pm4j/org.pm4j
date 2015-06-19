@@ -15,6 +15,7 @@ import org.pm4j.core.pm.PmAttrString;
 import org.pm4j.core.pm.annotation.PmTitleCfg;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
+import org.pm4j.core.xml.visibleState.VisibleStateAspect;
 
 /**
  * Tests for {@link PmSnapshotTestTool}.
@@ -44,7 +45,9 @@ public class PmSnapshotTestToolTest {
     snap.setTestMode(PmSnapshotTestTool.TestMode.AUTO_CREATE);
     File file = null;
     try {
-      file = snap.snapshot(new MiniTestPm(), "testWriteSnapshot");
+      MiniTestPm pm = new MiniTestPm();
+      pm.stringAttr.setPmTitle("String Attr");
+      file = snap.snapshot(pm, "testWriteSnapshot");
       assertTrue(file.exists());
       String path = file.getPath().replace('\\', '/');
       assertTrue(path, path.endsWith("src/test/java/org/pm4j/tools/test/pmSnapshotTestToolTest/testWriteSnapshot.xml"));
@@ -53,7 +56,58 @@ public class PmSnapshotTestToolTest {
           "<conversation xmlns=\"http://org.pm4j/xml/visibleState\" name=\"miniTestPm\" title=\"Test PM\">\n" +
           "    <attr name=\"stringAttr\" title=\"String Attr\"/>\n" +
           "</conversation>",
-          FileUtil.fileToString(file));
+          FileUtil.fileToString(file, "UTF-8"));
+    } finally {
+      if (file != null) {
+        FileUtil.deleteFileAndEmptyParentDirs(file);
+      }
+    }
+  }
+  
+  @Test
+  public void testWriteSnapshotWithExcludedTitle() {
+    snap.setTestMode(PmSnapshotTestTool.TestMode.AUTO_CREATE);
+    File file = null;
+    try {
+      MiniTestPm pm = new MiniTestPm();
+      pm.stringAttr.setPmTitle("String Attr");
+      snap.exclude(MiniTestPm.class, "stringAttr", VisibleStateAspect.TITLE);
+      file = snap.snapshot(pm, "testWriteSnapshot");
+      assertTrue(file.exists());
+      String path = file.getPath().replace('\\', '/');
+      assertTrue(path, path.endsWith("src/test/java/org/pm4j/tools/test/pmSnapshotTestToolTest/testWriteSnapshot.xml"));
+      assertEquals(file.getAbsolutePath(),
+          "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
+          "<conversation xmlns=\"http://org.pm4j/xml/visibleState\" name=\"miniTestPm\" title=\"Test PM\">\n" +
+          "    <attr name=\"stringAttr\"/>\n" +
+          "</conversation>",
+          FileUtil.fileToString(file, "UTF-8"));
+    } finally {
+      if (file != null) {
+        FileUtil.deleteFileAndEmptyParentDirs(file);
+      }
+    }
+  }
+  
+  @Test
+  public void testWriteUtf8Snapshot() {
+    snap.setTestMode(PmSnapshotTestTool.TestMode.WRITE);
+    File file = null;
+    
+    try {
+      MiniTestPm pm = new MiniTestPm();
+      pm.stringAttr.setPmTitle("|HAMBURG SÜD|ALIANÇA");
+      file = snap.snapshot(pm, "testWriteSnapshotUtf8");
+      assertTrue(file.exists());
+      String path = file.getPath().replace('\\', '/');
+      assertTrue(path, path.endsWith("src/test/java/org/pm4j/tools/test/pmSnapshotTestToolTest/testWriteSnapshotUtf8.xml"));
+      assertEquals(file.getAbsolutePath(),
+          "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
+          "<conversation xmlns=\"http://org.pm4j/xml/visibleState\" name=\"miniTestPm\" title=\"Test PM\">\n" +
+          "    <attr name=\"stringAttr\" title=\"|HAMBURG SÜD|ALIANÇA\"/>\n" +
+          "</conversation>",
+          FileUtil.fileToString(file.getAbsoluteFile(), "UTF-8"));
+          pm = null;
     } finally {
       if (file != null) {
         FileUtil.deleteFileAndEmptyParentDirs(file);
@@ -186,5 +240,4 @@ public class PmSnapshotTestToolTest {
       super(Locale.ENGLISH);
     }
   }
-
 }

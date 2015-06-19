@@ -66,6 +66,7 @@ public class VisibleStateUtil {
       JAXBContext jc = JAXBContext.newInstance(XmlPmObject.class);
       Marshaller m = jc.createMarshaller();
       m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+      m.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
       m.marshal(xmlObject, os);
     } catch (Exception e) {
       throw new PmRuntimeException(rootPm, "Failed to generate XML file " + file, e);
