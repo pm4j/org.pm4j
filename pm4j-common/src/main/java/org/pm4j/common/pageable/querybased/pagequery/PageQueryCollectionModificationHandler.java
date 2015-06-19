@@ -15,7 +15,7 @@ import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.selection.Selection;
 import org.pm4j.common.util.collection.ListUtil;
 
-/*package*/ class PageQueryCollectionModificationHandler<T_ITEM, T_ID> extends QueryCollectionModificationHandlerBase<T_ITEM, T_ID, PageQueryService<T_ITEM, T_ID>> {
+/*package*/ abstract class PageQueryCollectionModificationHandler<T_ITEM, T_ID> extends QueryCollectionModificationHandlerBase<T_ITEM, T_ID, PageQueryService<T_ITEM, T_ID>> {
 
   private static final long MAX_SELECTION_SIZE = 1000;
 
@@ -23,9 +23,10 @@ import org.pm4j.common.util.collection.ListUtil;
     super(pageableCollection, service);
   }
 
-//TODO
   @Override
  protected void setRemovedItemsImpl(Selection<T_ITEM> persistentRemovedItemSelection) {
+   // XXX MHOENNIG->OBOEDE: I have no idea of how clean this method up with not too much effort
+    
    // Remember the previous set of removed items. It needs to be extended by some additional items to remove.
    Selection<T_ITEM> oldRemovedItemSelection = getModifications().getRemovedItems();
    // XXX oboede: currently ItemIdSelection is an internal precondition
@@ -35,8 +36,8 @@ import org.pm4j.common.util.collection.ListUtil;
    } else {
      if (! (persistentRemovedItemSelection instanceof PageQueryItemIdSelection)) {
        long newSize = persistentRemovedItemSelection.getSize() + oldRemovedItemSelection.getSize();
-       if (newSize > 1000) {
-         throw new IndexOutOfBoundsException("Maximum 1000 rows can be removed within a single save operation.");
+       if (newSize > MAX_SELECTION_SIZE) {
+         throw new MaxItemIdSelectionExceededException(newSize, MAX_SELECTION_SIZE);
        }
      }
 
@@ -49,20 +50,14 @@ import org.pm4j.common.util.collection.ListUtil;
    }
  }
 
- // TODO: check if that is still needed, because the base implementation is never used.
  /**
-  * Can be overridden if the concrete collection needs a special strategy.
+  * Must be overridden to create properly parameterized PageQueryItemIdSelection.
   *
   * @param queryService
   * @param ids
   * @return a newly created ItemIdSelection
   */
- protected PageQueryItemIdSelection<T_ITEM, T_ID> createItemIdSelection(Collection<T_ID> ids) {
-   // TODO use: getPageQueryCollection().getCachingService(), getQueryOptions().getIdAttribute(), getQueryParamsWithRemovedItems()?
-   QueryAttr itAttr = getPageableCollection().getQueryOptions().getIdAttribute();
-   QueryParams queryParams = getPageableCollection().getQueryParams();
-  return new PageQueryItemIdSelection<T_ITEM, T_ID>(getService(), itAttr, queryParams, ids, false);
- }
+ protected abstract PageQueryItemIdSelection<T_ITEM, T_ID> createItemIdSelection(Collection<T_ID> ids);
 
  @SuppressWarnings("unchecked")
 final PageQueryCollection<T_ITEM, T_ID> getPageQueryCollection() {

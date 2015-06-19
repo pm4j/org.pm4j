@@ -44,7 +44,7 @@ public class PageQueryCollection<T_ITEM, T_ID> extends QueryCollectionBase<T_ITE
     this.service = service;
     this.cachingService = new CachingPageQueryService<T_ITEM, T_ID>(service);
     this.modificationHandler = new PageQueryCollectionModificationHandler<T_ITEM, T_ID>(this, cachingService) {
-      // TODO 
+      // TODO try to avoid the anonymous subclass
       @Override
       protected PageQueryItemIdSelection<T_ITEM, T_ID> createItemIdSelection(Collection<T_ID> ids) {
 //        super.createItemIdSelection(ids); // FIXME - remove!

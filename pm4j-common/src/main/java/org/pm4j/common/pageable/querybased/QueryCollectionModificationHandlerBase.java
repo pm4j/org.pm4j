@@ -86,10 +86,20 @@ public abstract class QueryCollectionModificationHandlerBase<T_ITEM, T_ID, T_SER
     throw new UnsupportedOperationException("registerRemovedItems() is not yet implemented for query based collections.");
   }
 
-  // TODOC
+  /**
+   * Override to create a query expression for the removed items.
+   * 
+   * @param queryFilterExpr the base query, not necessary needed in the subclass
+   * @return a new query expression which finds the removed items
+   */
   protected abstract QueryExpr createRemovedItemsExpr(QueryExpr queryFilterExpr);
 
-  // TODOC
+  /**
+   * Override this to store the items which have to be treated as if they are deleted.
+   * This is needed because the deletion was initiated by the user but is not yet in the database. 
+   * 
+   * @param persistentRemovedItemSelection the items to treat as deleted
+   */
   protected abstract void setRemovedItemsImpl(Selection<T_ITEM> persistentRemovedItemSelection);
 
   /**
