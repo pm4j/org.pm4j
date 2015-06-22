@@ -46,8 +46,7 @@ public class PageQueryCollection<T_ITEM, T_ID> extends QueryCollectionBase<T_ITE
     this.modificationHandler = new PageQueryCollectionModificationHandler<T_ITEM, T_ID>(this, cachingService) {
       // TODO try to avoid the anonymous subclass
       @Override
-      protected PageQueryItemIdSelection<T_ITEM, T_ID> createItemIdSelection(Collection<T_ID> ids) {
-//        super.createItemIdSelection(ids); // FIXME - remove!
+      protected PageQueryItemIdSelection<T_ITEM, T_ID> createRemovedItemsSelection(Collection<T_ID> ids) {
           return new PageQueryItemIdSelection<T_ITEM, T_ID>(cachingService, getQueryOptions().getIdAttribute(), getQueryParamsWithRemovedItems(), ids, false);
       }
     };
@@ -186,7 +185,7 @@ class PageableQueryCollectionIterator<T_ITEM> implements Iterator<T_ITEM> {
   public void remove() {
     throw new UnsupportedOperationException();
   }
-  
+
   private void readNext() {
     next = null;
     ++pageRowIdx;

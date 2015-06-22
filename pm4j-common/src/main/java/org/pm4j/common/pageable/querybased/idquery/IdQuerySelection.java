@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -39,7 +40,9 @@ public class IdQuerySelection<T_ITEM, T_ID>
     if ( ids.size() == 0 ) {
       this.ids = Collections.emptySet();
     } else {
-      this.ids = Collections.unmodifiableSet((ids instanceof Set) ? (Set<T_ID>)ids : new HashSet<T_ID>(ids));
+      this.ids = Collections.unmodifiableSet((ids instanceof Set)
+          ? (Set<T_ID>)ids
+          : new LinkedHashSet<T_ID>(ids));
     }
   }
 

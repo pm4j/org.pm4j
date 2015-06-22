@@ -62,7 +62,7 @@ public abstract class PageableCollectionWithMultiFieldIdTestBase<T> {
     nameSortOrder = getOrderByName();
 
     // to get more test coverage: perform all tests with a single deleted item.
-    assertEquals("[ , a, b, c, d, e, f]", IterableUtil.shallowCopy(collection).toString());
+    assertEquals("[ , a, b, c, d, e, f]", PageableCollectionUtil.shallowCopy(collection).toString());
     assertEquals("[ , a]", collection.getItemsOnPage().toString());
     collection.getSelectionHandler().select(true, collection.getItemsOnPage().get(0));
     assertEquals("[ ]", IterableUtil.shallowCopy(collection.getSelection()).toString());
@@ -79,7 +79,7 @@ public abstract class PageableCollectionWithMultiFieldIdTestBase<T> {
 
   @Test
   public void testFullCollectionItersationResult() {
-    assertEquals("[a, b, c, d, e, f]", IterableUtil.shallowCopy(collection).toString());
+    assertEquals("[a, b, c, d, e, f]", PageableCollectionUtil.shallowCopy(collection).toString());
   }
 
   protected ItemNavigator<T> getItemNavigator() {
@@ -120,15 +120,15 @@ public abstract class PageableCollectionWithMultiFieldIdTestBase<T> {
 
   @Test
   public void testSwitchQueryExecOffAndOn() {
-    assertEquals("[a, b, c, d, e, f]", IterableUtil.shallowCopy(collection).toString());
+    assertEquals("[a, b, c, d, e, f]", PageableCollectionUtil.shallowCopy(collection).toString());
 
     collection.getQueryParams().setExecQuery(false);
     assertEquals(0, collection.getNumOfItems());
-    assertEquals("[]", IterableUtil.shallowCopy(collection).toString());
+    assertEquals("[]", PageableCollectionUtil.shallowCopy(collection).toString());
 
     collection.getQueryParams().setExecQuery(true);
     assertEquals(6, collection.getNumOfItems());
-    assertEquals("[a, b, c, d, e, f]", IterableUtil.shallowCopy(collection).toString());
+    assertEquals("[a, b, c, d, e, f]", PageableCollectionUtil.shallowCopy(collection).toString());
 
     assertEquals("Add event count", 0, pclAdd.getPropChangeEventCount());
     assertEquals("Update event count", 0, pclUpdate.getPropChangeEventCount());
@@ -166,16 +166,16 @@ public abstract class PageableCollectionWithMultiFieldIdTestBase<T> {
 
   @Test
   public void testSortItems() {
-    assertEquals("Initial (unsorted) sort order", "[a, b, c, d, e, f]", IterableUtil.shallowCopy(collection).toString());
+    assertEquals("Initial (unsorted) sort order", "[a, b, c, d, e, f]", PageableCollectionUtil.shallowCopy(collection).toString());
 
     collection.getQueryParams().setSortOrder(nameSortOrder);
-    assertEquals("Ascending sort order", "[a, b, c, d, e, f]", IterableUtil.shallowCopy(collection).toString());
+    assertEquals("Ascending sort order", "[a, b, c, d, e, f]", PageableCollectionUtil.shallowCopy(collection).toString());
 
     collection.getQueryParams().setSortOrder(nameSortOrder.getReverseSortOrder());
-    assertEquals("Descending sort order", "[f, e, d, c, b, a]", IterableUtil.shallowCopy(collection).toString());
+    assertEquals("Descending sort order", "[f, e, d, c, b, a]", PageableCollectionUtil.shallowCopy(collection).toString());
 
     collection.getQueryParams().setSortOrder(null);
-    assertEquals("Initial (unsorted) sort order again", "[a, b, c, d, e, f]", IterableUtil.shallowCopy(collection).toString());
+    assertEquals("Initial (unsorted) sort order again", "[a, b, c, d, e, f]", PageableCollectionUtil.shallowCopy(collection).toString());
 
     assertEquals("Add event count", 0, pclAdd.getPropChangeEventCount());
     assertEquals("Update event count", 0, pclUpdate.getPropChangeEventCount());
@@ -187,23 +187,23 @@ public abstract class PageableCollectionWithMultiFieldIdTestBase<T> {
   @Test
   public void testDefaultSortOrder() {
     collection.setPageIdx(2);
-    assertEquals("Initial (unsorted) sort order", "[a, b, c, d, e, f]", IterableUtil.shallowCopy(collection).toString());
+    assertEquals("Initial (unsorted) sort order", "[a, b, c, d, e, f]", PageableCollectionUtil.shallowCopy(collection).toString());
     assertEquals("[e, f]", collection.getItemsOnPage().toString());
 
     collection.getQueryParams().setDefaultSortOrder(nameSortOrder.getReverseSortOrder());
-    assertEquals("New default: Descending sort order", "[f, e, d, c, b, a]", IterableUtil.shallowCopy(collection).toString());
+    assertEquals("New default: Descending sort order", "[f, e, d, c, b, a]", PageableCollectionUtil.shallowCopy(collection).toString());
     assertEquals("[b, a]", collection.getItemsOnPage().toString());
 
     collection.getQueryParams().setSortOrder(nameSortOrder);
-    assertEquals("Sort in ascending order", "[a, b, c, d, e, f]", IterableUtil.shallowCopy(collection).toString());
+    assertEquals("Sort in ascending order", "[a, b, c, d, e, f]", PageableCollectionUtil.shallowCopy(collection).toString());
     assertEquals("[e, f]", collection.getItemsOnPage().toString());
 
     collection.getQueryParams().setSortOrder(null);
-    assertEquals("Sorted in descending default sort order again.", "[f, e, d, c, b, a]", IterableUtil.shallowCopy(collection).toString());
+    assertEquals("Sorted in descending default sort order again.", "[f, e, d, c, b, a]", PageableCollectionUtil.shallowCopy(collection).toString());
     assertEquals("[b, a]", collection.getItemsOnPage().toString());
 
     collection.getQueryParams().setDefaultSortOrder(null);
-    assertEquals("Initial (unsorted) sort order again.", "[a, b, c, d, e, f]", IterableUtil.shallowCopy(collection).toString());
+    assertEquals("Initial (unsorted) sort order again.", "[a, b, c, d, e, f]", PageableCollectionUtil.shallowCopy(collection).toString());
     assertEquals("[e, f]", collection.getItemsOnPage().toString());
 
     assertEquals("Add event count", 0, pclAdd.getPropChangeEventCount());
@@ -216,10 +216,10 @@ public abstract class PageableCollectionWithMultiFieldIdTestBase<T> {
   @Test
   public void testFilterItems() {
     collection.getQueryParams().setQueryExpression(getFilterNameStartsWith("b"));
-    assertEquals("Filtered item set.", "[b]", IterableUtil.shallowCopy(collection).toString());
+    assertEquals("Filtered item set.", "[b]", PageableCollectionUtil.shallowCopy(collection).toString());
 
     collection.getQueryParams().setQueryExpression(null);
-    assertEquals("We get all items after resetting the filter.", "[a, b, c, d, e, f]", IterableUtil.shallowCopy(collection).toString());
+    assertEquals("We get all items after resetting the filter.", "[a, b, c, d, e, f]", PageableCollectionUtil.shallowCopy(collection).toString());
 
     assertEquals("Add event count", 0, pclAdd.getPropChangeEventCount());
     assertEquals("Update event count", 0, pclUpdate.getPropChangeEventCount());
@@ -293,7 +293,7 @@ public abstract class PageableCollectionWithMultiFieldIdTestBase<T> {
     T newItem = createItem("hi");
     collection.getModificationHandler().addItem(newItem);
     assertEquals("New collection size", 7L, collection.getNumOfItems());
-    assertEquals("Collection after add", "[a, b, c, d, e, f, hi]", IterableUtil.shallowCopy(collection).toString());
+    assertEquals("Collection after add", "[a, b, c, d, e, f, hi]", PageableCollectionUtil.shallowCopy(collection).toString());
 
     assertEquals(1, collection.getModifications().getAddedItems().size());
     assertTrue(collection.getModifications().getAddedItems().contains(newItem));
@@ -337,7 +337,7 @@ public abstract class PageableCollectionWithMultiFieldIdTestBase<T> {
 
     collection.getModificationHandler().removeSelectedItems();
     assertEquals("New collection size", 4L, collection.getNumOfItems());
-    assertEquals("Collection after add", "[c, d, e, f]", IterableUtil.shallowCopy(collection).toString());
+    assertEquals("Collection after add", "[c, d, e, f]", PageableCollectionUtil.shallowCopy(collection).toString());
     assertTrue(collection.getSelection().isEmpty());
 
     assertEquals(0, collection.getModifications().getAddedItems().size());
@@ -369,7 +369,7 @@ public abstract class PageableCollectionWithMultiFieldIdTestBase<T> {
 
     collection.getModificationHandler().removeSelectedItems();
     assertEquals("New collection size", 0L, collection.getNumOfItems());
-    assertEquals("Collection after remove all.", "[]", IterableUtil.shallowCopy(collection).toString());
+    assertEquals("Collection after remove all.", "[]", PageableCollectionUtil.shallowCopy(collection).toString());
     assertTrue(collection.getSelection().isEmpty());
 
     assertEquals(0, collection.getModifications().getAddedItems().size());

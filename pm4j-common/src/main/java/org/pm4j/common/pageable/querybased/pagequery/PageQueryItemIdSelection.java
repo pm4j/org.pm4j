@@ -25,7 +25,7 @@ import org.pm4j.common.query.QueryParams;
   private int readBlockSize = 1;
 
   /** The query constraints and sort order for retrieving selected records based on selected IDs. */
-  protected QueryParams selectedIdsQueryParams;
+  protected final QueryParams selectedIdsQueryParams;
 
   /**
    * Creates a selection based on a set of selected id's which keeps the original sort order.
@@ -87,16 +87,10 @@ import org.pm4j.common.query.QueryParams;
   }
 
   @Override
-  public Iterator<T_ITEM> iterator() {  
-    // sort order relevant (e.g. positive ID selection)
-    if ( selectedIdsQueryParams != null ) {
-      return new PagingItemIterator();
-    } else {
-      // TODO?
-      return new PagingItemIterator();     
-    }
+  public Iterator<T_ITEM> iterator() {
+    return new PagingItemIterator();
   }
-  
+
   class PagingItemIterator implements Iterator<T_ITEM> {
 
     private int idIndex = 0;

@@ -25,11 +25,11 @@ public class PageQueryCollectionTest extends PageableCollectionTestBase<Pageable
   @Override
   public void setUp() {
     super.setUp();
-    service.callCounter.assertCalls("Precondition failed:", "{getItemCount=5, getItems=7}");
+    service.callCounter.assertCalls("Precondition failed:", "{getItemCount=1, getItems=4}");
     service.callCounter.reset();
-  } 
+  }
 
-  @Override     
+  @Override
   public void testItemNavigator() {
     super.testItemNavigator();
     service.callCounter.assertCalls("{getItemCount=2, getItems=5}");
@@ -38,7 +38,7 @@ public class PageQueryCollectionTest extends PageableCollectionTestBase<Pageable
   @Override
   public void testSwitchQueryExecOffAndOn() {
     super.testSwitchQueryExecOffAndOn();
-    service.callCounter.assertCalls("{getItemCount=8, getItems=6}");
+    service.callCounter.assertCalls("{getItemCount=1, getItems=2}");
   }
 
   @Test @Override
@@ -50,19 +50,19 @@ public class PageQueryCollectionTest extends PageableCollectionTestBase<Pageable
   @Override
   public void testSortItems() {
     super.testSortItems();
-    service.callCounter.assertCalls("{getItemCount=16, getItems=12}");
+    service.callCounter.assertCalls("{getItems=4}");
   }
 
   @Override
   public void testDefaultSortOrder() {
     super.testDefaultSortOrder();
-    service.callCounter.assertCalls("{getItemCount=20, getItems=20}");
+    service.callCounter.assertCalls("{getItemCount=5, getItems=10}");
   }
 
   @Override
   public void testFilterItems() {
     super.testFilterItems();
-    service.callCounter.assertCalls("{getItemCount=6, getItems=4}");
+    service.callCounter.assertCalls("{getItems=2}");
   }
 
   @Override
@@ -70,13 +70,13 @@ public class PageQueryCollectionTest extends PageableCollectionTestBase<Pageable
     super.testSelectItems();
     service.callCounter.assertCalls("{getItemCount=3, getItems=1}");
   }
-  
+
   @Override
   public void testSelectedItemsStayInQueryOrderForPositiveSelection() {
     super.testSelectedItemsStayInQueryOrderForPositiveSelection();
     service.callCounter.assertCalls("{getItemCount=3, getItems=10}");
   }
-  
+
   @Override
   public void testSelectedItemsStayInQueryOrderForNegativeSelection() {
     super.testSelectedItemsStayInQueryOrderForNegativeSelection();
@@ -92,31 +92,32 @@ public class PageQueryCollectionTest extends PageableCollectionTestBase<Pageable
   @Override
   public void testAddItem() {
     super.testAddItem();
-    service.callCounter.assertCalls("{getItemCount=6, getItems=7}");
+    service.callCounter.assertCalls("{getItemCount=2, getItems=5}");
   }
 
   @Override
   public void testAddItemToEmptyCollection() {
     super.testAddItemToEmptyCollection();
-    service.callCounter.assertCalls("{getItemCount=2}");
+    // TODO oboede: getItems() shouldn't be called when it's clear that there are no items.
+    service.callCounter.assertCalls("{getItemCount=1, getItems=1}");
   }
 
   @Override
   public void testAddItemInMultiSelectMode() {
     super.testAddItemInMultiSelectMode();
-    service.callCounter.assertCalls("{getItemCount=6, getItems=7}");
+    service.callCounter.assertCalls("{getItemCount=2, getItems=5}");
   }
 
   @Override
   public void testRemoveItems() {
     super.testRemoveItems();
-    service.callCounter.assertCalls("{getItemCount=4, getItems=3}");
+    service.callCounter.assertCalls("{getItemCount=2, getItems=2}");
   }
 
   @Override
   public void testRemoveOfAddedAndUpdatedItems() {
     super.testRemoveOfAddedAndUpdatedItems();
-    service.callCounter.assertCalls("{getItemCount=3, getItems=2}");
+    service.callCounter.assertCalls("{getItemCount=3, getItems=3}");
   }
 
   @Override

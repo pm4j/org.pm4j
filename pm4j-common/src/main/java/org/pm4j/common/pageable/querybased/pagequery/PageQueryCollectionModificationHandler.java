@@ -24,17 +24,16 @@ import org.pm4j.common.util.collection.ListUtil;
   }
 
   @Override
- protected void setRemovedItemsImpl(Selection<T_ITEM> persistentRemovedItemSelection) {
+  protected void setRemovedItemsImpl(Selection<T_ITEM> persistentRemovedItemSelection) {
    // XXX MHOENNIG->OBOEDE: I have no idea of how clean this method up with not too much effort
-    
+
    // Remember the previous set of removed items. It needs to be extended by some additional items to remove.
    Selection<T_ITEM> oldRemovedItemSelection = getModifications().getRemovedItems();
-   // XXX oboede: currently ItemIdSelection is an internal precondition
-   if (oldRemovedItemSelection.isEmpty() && persistentRemovedItemSelection instanceof PageQueryItemIdSelection)
-   {
+   if (oldRemovedItemSelection.isEmpty() && persistentRemovedItemSelection instanceof PageQueryItemIdSelection) {
      getModificationsImpl().setRemovedItems(persistentRemovedItemSelection);
    } else {
      if (! (persistentRemovedItemSelection instanceof PageQueryItemIdSelection)) {
+       // Prevent iteration over an unlimited selection.
        long newSize = persistentRemovedItemSelection.getSize() + oldRemovedItemSelection.getSize();
        if (newSize > MAX_SELECTION_SIZE) {
          throw new MaxItemIdSelectionExceededException(newSize, MAX_SELECTION_SIZE);
@@ -43,12 +42,12 @@ import org.pm4j.common.util.collection.ListUtil;
 
      // We are using a collection of IDs instead of a direct database query,
      // because otherwise by combining the selection of distinct IDs, inverting deselecting distinct IDs
-     // and inverting again, otherwise it could happen that items are contained in the selection which 
+     // and inverting again, otherwise it could happen that items are contained in the selection which
      // have not explicitly been selected; this is fatal especially if this selection is used for deletion later on.
      Collection<T_ID> ids = ListUtil.collectionsToList(getItemIds(persistentRemovedItemSelection), getItemIds(oldRemovedItemSelection));
-     getModificationsImpl().setRemovedItems(createItemIdSelection(ids));
+     getModificationsImpl().setRemovedItems(createRemovedItemsSelection(ids));
    }
- }
+  }
 
  /**
   * Must be overridden to create properly parameterized PageQueryItemIdSelection.
@@ -57,13 +56,13 @@ import org.pm4j.common.util.collection.ListUtil;
   * @param ids
   * @return a newly created ItemIdSelection
   */
- protected abstract PageQueryItemIdSelection<T_ITEM, T_ID> createItemIdSelection(Collection<T_ID> ids);
+ protected abstract PageQueryItemIdSelection<T_ITEM, T_ID> createRemovedItemsSelection(Collection<T_ID> ids);
 
  @SuppressWarnings("unchecked")
-final PageQueryCollection<T_ITEM, T_ID> getPageQueryCollection() {
+ final PageQueryCollection<T_ITEM, T_ID> getPageQueryCollection() {
    return (PageQueryCollection<T_ITEM, T_ID>) getPageableCollection();
  }
- 
+
  @Override
  protected QueryExpr createRemovedItemsExpr(QueryExpr queryFilterExpr) {
    // TODO: That's a simplification working only for limited selections.

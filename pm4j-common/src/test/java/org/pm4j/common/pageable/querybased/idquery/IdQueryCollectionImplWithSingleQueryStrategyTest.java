@@ -28,7 +28,7 @@ public class IdQueryCollectionImplWithSingleQueryStrategyTest extends PageableCo
   @Override
   public void setUp() {
     super.setUp();
-    service.callCounter.assertCalls("Precondition failed: ", "{findIds=1, getItemForId=7, getItems=4}");
+    service.callCounter.assertCalls("Precondition failed: ", "{findIds=1, getItems=5}");
     service.callCounter.reset();
   }
 
@@ -56,7 +56,7 @@ public class IdQueryCollectionImplWithSingleQueryStrategyTest extends PageableCo
   @Test @Override
   public void testSwitchQueryExecOffAndOn() {
     super.testSwitchQueryExecOffAndOn();
-    service.callCounter.assertCalls("{findIds=2, getItemForId=12}");
+    service.callCounter.assertCalls("{findIds=2, getItems=2}");
   }
 
   @Test @Override
@@ -68,19 +68,19 @@ public class IdQueryCollectionImplWithSingleQueryStrategyTest extends PageableCo
   @Override @Test
   public void testSortItems() {
     super.testSortItems();
-    service.callCounter.assertCalls("{findIds=4, getItemForId=24}");
+    service.callCounter.assertCalls("{findIds=4, getItems=4}");
   }
 
   @Override @Test
   public void testDefaultSortOrder() {
     super.testDefaultSortOrder();
-    service.callCounter.assertCalls("{findIds=5, getItemForId=30, getItems=5}");
+    service.callCounter.assertCalls("{findIds=5, getItems=10}");
   }
 
   @Override @Test
   public void testFilterItems() {
     super.testFilterItems();
-    service.callCounter.assertCalls("{findIds=2, getItemForId=7}");
+    service.callCounter.assertCalls("{findIds=2, getItems=2}");
   }
 
   @Override @Test
@@ -98,7 +98,7 @@ public class IdQueryCollectionImplWithSingleQueryStrategyTest extends PageableCo
   @Override @Test
   public void testAddItem() {
     super.testAddItem();
-    service.callCounter.assertCalls("{findIds=2, getItemForId=6, getItems=5}");
+    service.callCounter.assertCalls("{findIds=2, getItems=6}");
   }
 
   @Override @Test
@@ -110,13 +110,13 @@ public class IdQueryCollectionImplWithSingleQueryStrategyTest extends PageableCo
   @Override @Test
   public void testAddItemInMultiSelectMode() {
     super.testAddItemInMultiSelectMode();
-    service.callCounter.assertCalls("{findIds=2, getItemForId=6, getItems=5}");
+    service.callCounter.assertCalls("{findIds=2, getItems=6}");
   }
 
   @Override @Test
   public void testRemoveItems() {
     super.testRemoveItems();
-    service.callCounter.assertCalls("{findIds=2, getItemForId=4, getItems=2}");
+    service.callCounter.assertCalls("{findIds=2, getItems=3}");
   }
 
   @Override @Test
