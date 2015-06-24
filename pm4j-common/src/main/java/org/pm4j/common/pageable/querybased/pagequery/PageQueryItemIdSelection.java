@@ -17,7 +17,7 @@ import org.pm4j.common.query.QueryParams;
  * <p>
  * It uses a {@link PageQueryService} instance to retrieve the selected instances from the service.
  */
-/*package*/ class PageQueryItemIdSelection<T_ITEM, T_ID> extends PageQuerySelectionHandler.QuerySelectionWithClickedIds<T_ITEM, T_ID> {
+/* package */ class PageQueryItemIdSelection<T_ITEM, T_ID> extends PageQuerySelectionHandler.QuerySelectionWithClickedIds<T_ITEM, T_ID> {
   private static final long serialVersionUID = 1L;
 
   private final Collection<T_ID> ids;
