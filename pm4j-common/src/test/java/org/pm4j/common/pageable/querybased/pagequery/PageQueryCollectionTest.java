@@ -98,7 +98,6 @@ public class PageQueryCollectionTest extends PageableCollectionTestBase<Pageable
   @Override
   public void testAddItemToEmptyCollection() {
     super.testAddItemToEmptyCollection();
-    // TODO oboede: getItems() shouldn't be called when it's clear that there are no items.
     service.callCounter.assertCalls("{getItemCount=1, getItems=1}");
   }
 
