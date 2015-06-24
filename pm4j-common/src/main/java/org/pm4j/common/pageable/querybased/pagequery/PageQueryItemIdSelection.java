@@ -104,6 +104,13 @@ import org.pm4j.common.query.QueryParams;
 
     @Override
     public T_ITEM next() {
+      
+      if ( getSize() == 1 ) {
+        // for the frequent case of a single selected item, sort order makes no difference
+        idIndex++;
+        return getService().getItemForId(ids.iterator().next());
+      }
+      
       // If the database changed, we might skip entries.
       // This can not avoided at 100%, and any try to reduce frequency of this quirk is expensive.
       if ( chunk == null || relativeIdIndex >= chunk.size() ) {
