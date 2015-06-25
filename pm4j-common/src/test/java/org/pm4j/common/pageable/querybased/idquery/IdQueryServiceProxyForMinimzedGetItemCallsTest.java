@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 import org.pm4j.common.pageable.PageableCollection;
 import org.pm4j.common.pageable.PageableCollectionTestBase;
+import org.pm4j.common.pageable.querybased.MaxQueryResultsViolationException;
 
 /**
  * Performs all pageable collection tests for a service having an {@link IdQueryServiceProxyForMinimzedGetItemCalls}.
@@ -34,7 +35,7 @@ public class IdQueryServiceProxyForMinimzedGetItemCallsTest extends PageableColl
   @Override
   public void setUp() {
     super.setUp();
-    assertEquals("Call count stability check.", "{findIds=1, getItemForId=7}", service.callCounter.toString());
+    assertEquals("Call count stability check.", "{findIds=1, getItems=1}", service.callCounter.toString());
     service.callCounter.reset();
     serviceProxy.clearWeakMap();
   }
@@ -63,7 +64,7 @@ public class IdQueryServiceProxyForMinimzedGetItemCallsTest extends PageableColl
   @Test @Override
   public void testSwitchQueryExecOffAndOn() {
     super.testSwitchQueryExecOffAndOn();
-    assertEquals("Call count stability check.", "{findIds=2, getItemForId=6}", service.callCounter.toString());
+    assertEquals("Call count stability check.", "{findIds=2, getItems=1}", service.callCounter.toString());
   }
 
   @Test @Override
@@ -75,19 +76,19 @@ public class IdQueryServiceProxyForMinimzedGetItemCallsTest extends PageableColl
   @Override @Test
   public void testSortItems() {
     super.testSortItems();
-    assertEquals("Call count stability check.", "{findIds=4, getItemForId=6}", service.callCounter.toString());
+    assertEquals("Call count stability check.", "{findIds=4, getItems=1}", service.callCounter.toString());
   }
 
   @Override @Test
   public void testDefaultSortOrder() {
     super.testDefaultSortOrder();
-    assertEquals("Call count stability check.", "{findIds=5, getItemForId=6}", service.callCounter.toString());
+    assertEquals("Call count stability check.", "{findIds=5, getItems=1}", service.callCounter.toString());
   }
 
   @Override @Test
   public void testFilterItems() {
     super.testFilterItems();
-    assertEquals("Call count stability check.", "{findIds=2, getItemForId=6}", service.callCounter.toString());
+    assertEquals("Call count stability check.", "{findIds=2, getItems=2}", service.callCounter.toString());
   }
 
   @Override @Test
@@ -105,7 +106,7 @@ public class IdQueryServiceProxyForMinimzedGetItemCallsTest extends PageableColl
   @Override @Test
   public void testAddItem() {
     super.testAddItem();
-    assertEquals("Call count stability check.", "{findIds=2, getItemForId=6}", service.callCounter.toString());
+    assertEquals("Call count stability check.", "{findIds=2, getItems=1}", service.callCounter.toString());
   }
 
   @Override @Test
@@ -117,13 +118,13 @@ public class IdQueryServiceProxyForMinimzedGetItemCallsTest extends PageableColl
   @Override @Test
   public void testAddItemInMultiSelectMode() {
     super.testAddItemInMultiSelectMode();
-    assertEquals("Call count stability check.", "{findIds=2, getItemForId=6}", service.callCounter.toString());
+    assertEquals("Call count stability check.", "{findIds=2, getItems=1}", service.callCounter.toString());
   }
 
   @Override @Test
   public void testRemoveItems() {
     super.testRemoveItems();
-    assertEquals("Call count stability check.", "{findIds=2, getItemForId=4, getItems=1}", service.callCounter.toString());
+    assertEquals("Call count stability check.", "{findIds=2, getItems=2}", service.callCounter.toString());
   }
 
   @Override @Test

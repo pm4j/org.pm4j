@@ -21,7 +21,7 @@ import org.pm4j.common.selection.Selection;
 public abstract class QueryCollectionBase<T_ITEM, T_ID> extends PageableCollectionBase<T_ITEM> {
 
   /** Handler for item modifications. */
-  protected QueryCollectionModificationHandlerBase<T_ITEM, T_ID> modificationHandler;
+  protected QueryCollectionModificationHandlerBase<T_ITEM, T_ID, ?> modificationHandler;
 
   /** A cached reference to the query parameters that considers the removed item set too. */
   private QueryParams                                       queryParamsWithRemovedItems;
@@ -74,7 +74,7 @@ public abstract class QueryCollectionBase<T_ITEM, T_ID> extends PageableCollecti
         else {
             QueryParams qParams = getQueryParams().clone();
             QueryExpr queryFilterExpr = qParams.getQueryExpression();
-            QueryExpr removedItemsFilterExpr = modificationHandler.getRemovedItemsFilterExpr(queryFilterExpr);
+            QueryExpr removedItemsFilterExpr = modificationHandler.createRemovedItemsExpr(queryFilterExpr);
             qParams.setQueryExpression(queryFilterExpr != null
                     ? new QueryExprAnd(queryFilterExpr, removedItemsFilterExpr)
                     : removedItemsFilterExpr);

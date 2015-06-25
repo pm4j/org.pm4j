@@ -1,6 +1,7 @@
 package org.pm4j.common.pageable.querybased.pagequery;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -9,8 +10,7 @@ import org.pm4j.common.modifications.ModificationHandler;
 import org.pm4j.common.pageable.PageableCollection;
 import org.pm4j.common.pageable.PageableCollectionUtil;
 import org.pm4j.common.pageable.querybased.QueryCollectionBase;
-import org.pm4j.common.pageable.querybased.QueryCollectionModificationHandlerBase;
-import org.pm4j.common.pageable.querybased.idquery.MaxQueryResultsViolationException;
+import org.pm4j.common.pageable.querybased.MaxQueryResultsViolationException;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.selection.SelectionHandler;
@@ -38,18 +38,29 @@ public class PageQueryCollection<T_ITEM, T_ID> extends QueryCollectionBase<T_ITE
    * @param queryOptions
    *          defined the id-attribute as well as the available sort and filter options.
    */
-  public PageQueryCollection(PageQueryService<T_ITEM, T_ID> service, QueryOptions queryOptions) {
+  public PageQueryCollection(PageQueryService<T_ITEM, T_ID> service, final QueryOptions queryOptions) {
     super(queryOptions);
 
     this.service = service;
     this.cachingService = new CachingPageQueryService<T_ITEM, T_ID>(service);
-    this.modificationHandler = new QueryCollectionModificationHandlerBase<T_ITEM, T_ID>(this, cachingService);
+    this.modificationHandler = new PageQueryCollectionModificationHandler<T_ITEM, T_ID>(this, cachingService) {
+      // TODO try to avoid the anonymous subclass
+      @Override
+      protected PageQueryItemIdSelection<T_ITEM, T_ID> createRemovedItemsSelection(Collection<T_ID> ids) {
+          return new PageQueryItemIdSelection<T_ITEM, T_ID>(cachingService, getQueryOptions().getIdAttribute(), getQueryParamsWithRemovedItems(), ids, false);
+      }
+    };
 
     // Handling of transient and persistent item selection is separated by a handler composition.
     SelectionHandler<T_ITEM> querySelectionHandler = new PageQuerySelectionHandler<T_ITEM, T_ID>(cachingService) {
       @Override
       protected QueryParams getQueryParams() {
         return getQueryParamsWithRemovedItems();
+      }
+
+      @Override
+      protected QueryOptions getQueryOptions() {
+        return queryOptions;
       }
     };
     querySelectionHandler.setFirePropertyEvents(false);
@@ -132,7 +143,6 @@ public class PageQueryCollection<T_ITEM, T_ID> extends QueryCollectionBase<T_ITE
   public PageQueryService<T_ITEM, T_ID> getService() {
     return service;
   }
-
 }
 
 /**

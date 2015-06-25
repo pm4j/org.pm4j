@@ -3,6 +3,8 @@ package org.pm4j.common.util;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.junit.Assert;
+
 /**
  * A call counter intended for test cases.
  *
@@ -45,5 +47,23 @@ public class CallCounter {
   @Override
   public String toString() {
     return nameToCallCountMap.toString();
+  }
+
+  /**
+   * Asserts whether the call counters match the expected value 
+   * @param expected expected value, e.g. "{findIds=2, getItemForId=7}"
+   */
+  public void assertCalls(String expected) {
+    assertCalls("Call count stability check.", expected);
+  }
+
+  /**
+   * Asserts whether the call counters match the expected value
+   * 
+   * @param message special message to show on failure 
+   * @param expected expected value, e.g. "{findIds=2, getItemForId=7}"
+   */
+  public void assertCalls(String message, String expected) {
+    Assert.assertEquals(message, expected, toString());
   }
 }

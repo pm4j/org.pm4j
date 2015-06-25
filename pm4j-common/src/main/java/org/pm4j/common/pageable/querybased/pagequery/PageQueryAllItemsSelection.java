@@ -1,5 +1,6 @@
 package org.pm4j.common.pageable.querybased.pagequery;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -11,7 +12,7 @@ import org.pm4j.common.query.QueryParams;
  * @param <T_ITEM>
  * @param <T_ID>
  *
- * @author olaf boede
+ * @author Olaf Boede
  */
 public class PageQueryAllItemsSelection<T_ITEM, T_ID> extends PageQuerySelectionBase<T_ITEM, T_ID>{
 
@@ -36,7 +37,9 @@ public class PageQueryAllItemsSelection<T_ITEM, T_ID> extends PageQuerySelection
 
   @Override
   public long getSize() {
-    return getPageableQueryService().getItemCount(queryParams);
+    return queryParams.isExecQuery()
+        ? getPageableQueryService().getItemCount(queryParams)
+        : 0L;
   }
 
   @Override
@@ -47,9 +50,12 @@ public class PageQueryAllItemsSelection<T_ITEM, T_ID> extends PageQuerySelection
   @Override
   public Iterator<T_ITEM> iterator() {
     return new PageQueryItemIteratorBase<T_ITEM>(pageSize) {
+      @SuppressWarnings("unchecked")
       @Override
       protected List<T_ITEM> getItems(long startIdx, int blockSize) {
-        return getPageableQueryService().getItems(queryParams, startIdx, blockSize);
+        return queryParams.isExecQuery()
+            ? getPageableQueryService().getItems(queryParams, startIdx, blockSize)
+            : Collections.EMPTY_LIST;
       }
     };
   }

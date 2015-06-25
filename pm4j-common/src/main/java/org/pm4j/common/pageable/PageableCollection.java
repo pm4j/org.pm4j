@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.pm4j.common.modifications.ModificationHandler;
 import org.pm4j.common.modifications.Modifications;
-import org.pm4j.common.pageable.querybased.idquery.MaxQueryResultsViolationException;
+import org.pm4j.common.pageable.querybased.MaxQueryResultsViolationException;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.selection.Selection;

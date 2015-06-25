@@ -53,7 +53,7 @@ public abstract class QuerySelectionBase<T_ITEM, T_ID> implements Selection<T_IT
    * @return
    */
   @SuppressWarnings("unchecked")
-  protected QueryService<T_ITEM, T_ID> getService() {
+  public QueryService<T_ITEM, T_ID> getService() {
     if (service == null) {
       if (serviceProvider != null) {
         service = (QueryService<T_ITEM, T_ID>) serviceProvider.getQueryService();

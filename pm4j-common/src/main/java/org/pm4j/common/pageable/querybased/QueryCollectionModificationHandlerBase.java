@@ -10,12 +10,7 @@ import org.pm4j.common.modifications.Modifications;
 import org.pm4j.common.modifications.ModificationsImpl;
 import org.pm4j.common.pageable.PageableCollection;
 import org.pm4j.common.pageable.PageableCollectionBase;
-import org.pm4j.common.pageable.PageableCollectionUtil;
-import org.pm4j.common.pageable.querybased.pagequery.ClickedIds;
-import org.pm4j.common.pageable.querybased.pagequery.ItemIdSelection;
-import org.pm4j.common.query.QueryAttr;
 import org.pm4j.common.query.QueryExpr;
-import org.pm4j.common.query.QueryExprNot;
 import org.pm4j.common.selection.Selection;
 import org.pm4j.common.selection.SelectionHandlerUtil;
 import org.pm4j.common.selection.SelectionWithAdditionalItems;
@@ -28,30 +23,24 @@ import org.pm4j.common.selection.SelectionWithAdditionalItems;
  * @param <T_ITEM> Type of collection items.
  * @param <T_ID> Item identifier type.
  */
-public class QueryCollectionModificationHandlerBase<T_ITEM, T_ID>  implements ModificationHandler<T_ITEM> {
+public abstract class QueryCollectionModificationHandlerBase<T_ITEM, T_ID, T_SERVICE extends QueryService<T_ITEM, T_ID>>  implements ModificationHandler<T_ITEM> {
 
   private ModificationsImpl<T_ITEM> modifications = new ModificationsImpl<T_ITEM>();
   private final PageableCollectionBase<T_ITEM> pageableCollection;
   /** The service that provides the data to handle. */
-  private QueryService<T_ITEM, T_ID> service;
+  private final T_SERVICE service;
 
-  public QueryCollectionModificationHandlerBase(PageableCollectionBase<T_ITEM> pageableCollection, QueryService<T_ITEM, T_ID> service) {
+  public QueryCollectionModificationHandlerBase(PageableCollectionBase<T_ITEM> pageableCollection, T_SERVICE service) {
     assert pageableCollection != null;
     assert service != null;
     this.pageableCollection = pageableCollection;
     this.service = service;
   }
 
-  public QueryExpr getRemovedItemsFilterExpr(QueryExpr queryFilterExpr) {
-    @SuppressWarnings("unchecked")
-    ClickedIds<T_ID> ids = modifications.getRemovedItems().isEmpty()
-        ? new ClickedIds<T_ID>()
-        : ((ItemIdSelection<T_ITEM, T_ID>)modifications.getRemovedItems()).getClickedIds();
-    QueryAttr idAttr = pageableCollection.getQueryOptions().getIdAttribute();
-    return new QueryExprNot(PageableCollectionUtil.makeSelectionQueryParams(idAttr, queryFilterExpr, ids));
+  protected final T_SERVICE getService() {
+    return service;
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public boolean removeSelectedItems() {
     // Nothing to remove in case of an empty selection.
@@ -71,7 +60,7 @@ public class QueryCollectionModificationHandlerBase<T_ITEM, T_ID>  implements Mo
     SelectionHandlerUtil.forceSelectAll(pageableCollection.getSelectionHandler(), false);
 
     // Identify the sets of persistent and transient items to delete.
-    Selection<T_ITEM> persistentItems = selectedItems;
+    Selection<T_ITEM> persistentRemovedItemSelection = selectedItems;
 
     // In case of a selection with transient items, we have to handle transient items accordingly.
     if (selectedItems instanceof SelectionWithAdditionalItems) {
@@ -82,39 +71,10 @@ public class QueryCollectionModificationHandlerBase<T_ITEM, T_ID>  implements Mo
       }
 
       // Only the persistent sub-set needs to be handled in the following code.
-      persistentItems = ((SelectionWithAdditionalItems<T_ITEM>)selectedItems).getBaseSelection();
+      persistentRemovedItemSelection = ((SelectionWithAdditionalItems<T_ITEM>)selectedItems).getBaseSelection();
     }
 
-    // Remember the previous set of removed items. It needs to be extended by some additional items to remove.
-    Selection<T_ITEM> oldRemovedItemSelection = modifications.getRemovedItems();
-
-
-    if (persistentItems instanceof ItemIdSelection) {
-      if (oldRemovedItemSelection.isEmpty()) {
-        modifications.setRemovedItems((ItemIdSelection<T_ITEM, T_ID>) persistentItems);
-      } else {
-        Collection<T_ID> ids = ((ItemIdSelection<T_ITEM, T_ID>) persistentItems).getClickedIds().getIds();
-        // XXX olaf: assumes that we handle removed items as ItemIdSelection. But that will change as soon
-        // as we add remove handling for inverted selections.
-        modifications.setRemovedItems(new ItemIdSelection<T_ITEM, T_ID>((ItemIdSelection<T_ITEM, T_ID>)oldRemovedItemSelection, ids));
-      }
-    } else {
-   // TODO olaf: inverted selections are not yet handled by query
-//    if (items instanceof PageableQuerySelectionHandler.InvertedSelection) {
-//      removedInvertedItemSelections.addSelection(items);
-      // TODO: add exception interface signature.
-      long newSize = persistentItems.getSize() + oldRemovedItemSelection.getSize();
-      if (newSize > 1000) {
-        throw new IndexOutOfBoundsException("Maximum 1000 rows can be removed within a single save operation.");
-      }
-
-      Collection<T_ID> ids = getItemIds(service, persistentItems);
-      modifications.setRemovedItems(oldRemovedItemSelection.isEmpty()
-          // XXX oboede: here was the cached internal service used. But i suspect that the external service isn't less
-          // efficient.
-          ? new ItemIdSelection<T_ITEM, T_ID>(service, ids)
-          : new ItemIdSelection<T_ITEM, T_ID>((ItemIdSelection<T_ITEM, T_ID>)oldRemovedItemSelection, ids));
-    }
+    setRemovedItemsImpl(persistentRemovedItemSelection);
 
     pageableCollection.clearCaches();
     pageableCollection.firePropertyChange(PageableCollection.EVENT_REMOVE_SELECTION, selectedItems, null);
@@ -125,6 +85,22 @@ public class QueryCollectionModificationHandlerBase<T_ITEM, T_ID>  implements Mo
   public void registerRemovedItems(Iterable<T_ITEM> items) {
     throw new UnsupportedOperationException("registerRemovedItems() is not yet implemented for query based collections.");
   }
+
+  /**
+   * Override to create a query expression for the removed items.
+   * 
+   * @param queryFilterExpr the base query, not necessary needed in the subclass
+   * @return a new query expression which finds the removed items
+   */
+  protected abstract QueryExpr createRemovedItemsExpr(QueryExpr queryFilterExpr);
+
+  /**
+   * Override this to store the items which have to be treated as if they are deleted.
+   * This is needed because the deletion was initiated by the user but is not yet in the database. 
+   * 
+   * @param persistentRemovedItemSelection the items to treat as deleted
+   */
+  protected abstract void setRemovedItemsImpl(Selection<T_ITEM> persistentRemovedItemSelection);
 
   /**
    * Add and register add are the same for query collections.<br>
@@ -180,13 +156,15 @@ public class QueryCollectionModificationHandlerBase<T_ITEM, T_ID>  implements Mo
     this.modifications = (ModificationsImpl<T_ITEM>) modifications;
   }
 
-  private static <T_ITEM, T_ID> Collection<T_ID> getItemIds(QueryService<T_ITEM, T_ID> service, Selection<T_ITEM> items) {
-    Collection<T_ID> ids = new ArrayList<T_ID>((int)items.getSize());
-    for (T_ITEM i : items) {
-      ids.add(service.getIdForItem(i));
-    }
-    return ids;
+  protected ModificationsImpl<T_ITEM> getModificationsImpl() {
+    return modifications;
+  }
+
+  /**
+   * @return the pageable collection
+   */
+  protected final PageableCollectionBase<T_ITEM> getPageableCollection() {
+    return pageableCollection;
   }
 
 }
-

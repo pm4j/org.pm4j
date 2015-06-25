@@ -8,19 +8,19 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.pm4j.common.modifications.ModificationHandler;
 import org.pm4j.common.pageable.PageableCollection;
 import org.pm4j.common.pageable.PageableCollectionUtil;
+import org.pm4j.common.pageable.querybased.MaxQueryResultsViolationException;
 import org.pm4j.common.pageable.querybased.QueryCollectionBase;
-import org.pm4j.common.pageable.querybased.QueryCollectionModificationHandlerBase;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.selection.Selection;
 import org.pm4j.common.selection.SelectionHandler;
 import org.pm4j.common.selection.SelectionHandlerWithAdditionalItems;
 import org.pm4j.common.util.collection.ListUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A {@link PageableCollection} based on an {@link IdQueryService}.
@@ -110,7 +110,7 @@ public class IdQueryCollectionImpl<T_ITEM, T_ID> extends QueryCollectionBase<T_I
     querySelectionHandler.setFirePropertyEvents(false);
     this.selectionHandler = new SelectionHandlerWithAdditionalItems<T_ITEM>(this, querySelectionHandler);
 
-    this.modificationHandler = new QueryCollectionModificationHandlerBase<T_ITEM, T_ID>(this, service);
+    this.modificationHandler = new IdQueryCollectionModificationHandler<T_ITEM, T_ID>(this, service);
 
     PropertyChangeListener resetItemsOnQueryChangeListener = new PropertyChangeListener() {
       @Override public void propertyChange(PropertyChangeEvent evt) {

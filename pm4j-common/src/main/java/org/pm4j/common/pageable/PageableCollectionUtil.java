@@ -13,6 +13,7 @@ import org.pm4j.common.query.QueryExprNot;
 import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.selection.Selection;
 import org.pm4j.common.selection.SelectionHandler;
+import org.pm4j.common.util.collection.IterableUtil;
 
 
 /**
@@ -338,6 +339,19 @@ public final class PageableCollectionUtil {
   @Deprecated
   public static <T_ITEM> Selection<T_ITEM> getAllItemsSelection(PageableCollection<T_ITEM> pc) {
     return pc.getSelectionHandler().getAllItemsSelection();
+  }
+
+  /**
+   * Provides a list containing all items of the given {@link PageableCollection}.
+   * <p>
+   * ATTENTION: Should not be used for large collections, because of bad performance and
+   * memory consumption.
+   *
+   * @param pc The collection to get all line items from.
+   * @return A list containing all items.
+   */
+  public static <T_ITEM> List<T_ITEM> shallowCopy(PageableCollection<T_ITEM> pc) {
+    return IterableUtil.shallowCopy(pc.getSelectionHandler().getAllItemsSelection());
   }
 
 }

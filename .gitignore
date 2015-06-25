@@ -12,6 +12,7 @@
 **/.settings
 **/.classpath
 **/.project
+**/hs_err_pid*.log
 *.sh
 
 *.actual.xml

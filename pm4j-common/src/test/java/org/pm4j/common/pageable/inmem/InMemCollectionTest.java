@@ -9,6 +9,7 @@ import java.util.Collection;
 import org.junit.Test;
 import org.pm4j.common.pageable.PageableCollection;
 import org.pm4j.common.pageable.PageableCollectionTestBase;
+import org.pm4j.common.pageable.PageableCollectionUtil;
 import org.pm4j.common.query.CompOpStartsWith;
 import org.pm4j.common.query.QueryAttr;
 import org.pm4j.common.query.QueryOptions;
@@ -64,7 +65,7 @@ public class InMemCollectionTest extends PageableCollectionTestBase<PageableColl
   }
 
   protected void assertCollectionItems(String itemString) {
-    assertEquals(itemString, shallowCopy(collection).toString());
+    assertEquals(itemString, PageableCollectionUtil.shallowCopy(collection).toString());
   }
 
 }
