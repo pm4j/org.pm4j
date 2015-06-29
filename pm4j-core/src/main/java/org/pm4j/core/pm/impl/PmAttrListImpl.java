@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.pm4j.common.converter.string.OneWayToStringConverter;
+import org.pm4j.common.converter.string.StringConverterToString;
 import org.pm4j.common.converter.string.StringConverter;
 import org.pm4j.common.converter.string.StringConverterInteger;
 import org.pm4j.common.converter.string.StringConverterList;
@@ -28,7 +28,6 @@ import org.pm4j.core.pm.annotation.PmOptionCfg.NullOption;
  *
  * @param <T> List item type
  */
-@PmAttrListCfg(itemStringConverter = OneWayToStringConverter.class)
 public class PmAttrListImpl<T> extends PmAttrBase<List<T>, List<T>> implements PmAttrList<T> {
 
   /** Binds to a {@link Collection} of {@link Long}s. */
@@ -123,20 +122,16 @@ public class PmAttrListImpl<T> extends PmAttrBase<List<T>, List<T>> implements P
     }
     return super.getValueImpl();
   }
-  
+
   /**
    * The item-{@link StringConverter} can be configured using the annotation
    * {@link PmAttrListCfg#itemStringConverter()} or by overriding this method.
    *
-   * @return The {@link tableCfg.defaultSortCol()Converter} used for the list item values.
+   * @return The {@link StringConverter} used for the list item values.
    */
+  @SuppressWarnings("unchecked")
   protected StringConverter<T> getItemStringConverterImpl() {
-    @SuppressWarnings("unchecked")
-    StringConverter<T> c = (StringConverter<T>)getOwnMetaData().itemStringConverter;
-    if (c == null) {
-      throw new PmRuntimeException(this, "Missing item value converter.");
-    }
-    return c;
+    return (StringConverter<T>)getOwnMetaData().itemStringConverter;
   }
 
   @Override
@@ -186,29 +181,33 @@ public class PmAttrListImpl<T> extends PmAttrBase<List<T>, List<T>> implements P
     return new MetaData();
   }
 
-  @SuppressWarnings("unchecked")
   protected void initMetaData(PmObjectBase.MetaData metaData) {
     super.initMetaData(metaData);
     MetaData myMetaData = (MetaData) metaData;
     myMetaData.setValidateLengths(false);
 
+    String itemStringSeparator = PmAttrListCfg.DEFAULT_STRING_ITEM_SEPARATOR;
+
     PmAttrListCfg annotation = AnnotationUtil.findAnnotation(this, PmAttrListCfg.class);
     if (annotation != null) {
-      if (annotation.itemStringConverter() != StringConverter.class) {
+      if (annotation.itemStringConverter() != StringConverterToString.class) {
         myMetaData.itemStringConverter = ClassUtil.newInstance(annotation.itemStringConverter());
+        itemStringSeparator = annotation.valueStringSeparator();
       }
     }
 
-    if (myMetaData.itemStringConverter != null) {
-      StringConverterList<T> stringConverter = new StringConverterList<T>(((StringConverter<T>) myMetaData.itemStringConverter));
-      stringConverter.setStringSeparator(annotation.valueStringSeparator());
-      myMetaData.setStringConverter(stringConverter);
-    }
+    // the java implementation may overrule the configured value.
+    myMetaData.itemStringConverter = getItemStringConverterImpl();
+
+    @SuppressWarnings("unchecked")
+    StringConverterList<T> stringConverter = new StringConverterList<T>((StringConverter<T>)myMetaData.itemStringConverter);
+    stringConverter.setStringSeparator(itemStringSeparator);
+    myMetaData.setStringConverter(stringConverter);
   }
 
   protected static class MetaData extends PmAttrBase.MetaData {
-    private StringConverter<?> itemStringConverter;
-    
+      private StringConverter<?> itemStringConverter = StringConverterToString.INSTANCE;
+
     public MetaData() {
       super(Integer.MAX_VALUE); // maximum valueAsString characters.
     }

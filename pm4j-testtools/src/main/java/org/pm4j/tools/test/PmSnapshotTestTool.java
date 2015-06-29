@@ -35,9 +35,9 @@ import org.pm4j.core.xml.visibleState.VisibleStateUtil;
  * You can configure several test modes for this tool by setting JVM parameter
  * {@code pmSnapshotTestMode} or by calling {@link PmSnapshotTestTool#setTestMode(TestMode)}
  * method.<br>
- * 
+ *
  * @see TestMode
- * 
+ *
  * @author Olaf Boede
  * @author Aleksander Lech
  */
@@ -96,7 +96,7 @@ public class PmSnapshotTestTool {
 
     /**
      * Configures PM items to hide.
-     * 
+     *
      * @param hideMatchers
      * @return the tool for inline usage.
      */
@@ -107,7 +107,7 @@ public class PmSnapshotTestTool {
 
     /**
      * Configures PM aspects to hide.
-     * 
+     *
      * @param hideMatchers
      * @return the tool for inline usage.
      */
@@ -118,7 +118,7 @@ public class PmSnapshotTestTool {
 
     /**
      * Excludes all instances of the given class from XML snapshot test.
-     * 
+     *
      * @param pmClass
      *            The PM class to exclude.
      */
@@ -129,7 +129,7 @@ public class PmSnapshotTestTool {
 
     /**
      * Excludes PM fields of the given class from XML snapshot test.
-     * 
+     *
      * @param pmClass
      *            The PM class to exclude PM fields for.
      * @param names
@@ -145,7 +145,7 @@ public class PmSnapshotTestTool {
 
     /**
      * Excludes some {@link VisibleStateAspect}s from XML snapshot tests.
-     * 
+     *
      * @param pmMatcher
      *            Rule used to identify matching PMs.
      * @param aspects
@@ -157,7 +157,7 @@ public class PmSnapshotTestTool {
 
     /**
      * Excludes some {@link VisibleStateAspect}s from XML snapshot tests.
-     * 
+     *
      * @param pmClass
      *            The PM class to apply this exclude for.
      * @param aspects
@@ -169,7 +169,7 @@ public class PmSnapshotTestTool {
 
     /**
      * Excludes {@link VisibleStateAspect}s of the specified parent PM's fields from XML snapshot test.
-     * 
+     *
      * @param parentPmClass
      *            The parent PM class.
      * @param fields
@@ -179,9 +179,31 @@ public class PmSnapshotTestTool {
      *            The aspects to exclude for all matching PM(s).
      */
     public void exclude(Class<?> parentPmClass, String fields, VisibleStateAspect... aspects) {
-        PmMatcherBuilder matcherBuilder = new PmMatcherBuilder();
-        PmMatcher pmMatcher = matcherBuilder.parent(matcherBuilder.pmClass(parentPmClass).build()).name(fields).build();
-        exclude(pmMatcher, aspects);
+      PmMatcherBuilder matcherBuilder = new PmMatcherBuilder();
+      PmMatcher pmMatcher = matcherBuilder.parent(matcherBuilder.pmClass(parentPmClass).build()).name(fields).build();
+      exclude(pmMatcher, aspects);
+    }
+
+    /**
+     * Excludes {@link VisibleStateAspect}s of the specified PM's from XML snapshot test.
+     *
+     * @param pm
+     *            The PM.
+     * @param aspects
+     *            The aspects to exclude for all matching PM(s).
+     */
+    public void exclude(PmObject pm, VisibleStateAspect... aspects) {
+      exclude(new PmMatcherBuilder().pm(pm).build(), aspects);
+    }
+
+    /**
+     * Excludes the specified PM's from XML snapshot test.
+     *
+     * @param pm
+     *            The PM(s) to exclude.
+     */
+    public void exclude(PmObject... pms) {
+      exclude(new PmMatcherBuilder().pm(pms).build());
     }
 
     /**
@@ -191,7 +213,7 @@ public class PmSnapshotTestTool {
      * <li>Snapshot file exists: The current PM state will be compared to the documented state
      * by {@link #compare(PmObject, String, File)} method.</li>
      * <ol>
-     * 
+     *
      * @param rootPm
      *            The root of the PM tree to verify.
      * @param fileNameBase
@@ -220,7 +242,7 @@ public class PmSnapshotTestTool {
     /**
      * Compares the current PM state will be compared to the documented state stored in
      * {@code expectedFile}.
-     * 
+     *
      * @param rootPm
      *            The root of the PM tree to verify.
      * @param fileNameBase
@@ -229,7 +251,7 @@ public class PmSnapshotTestTool {
      * @param expectedFile
      *            File handle for stored documented state
      * @return The expected file again for inline usage.
-     * 
+     *
      * @throws ComparisonFailure
      *             in case of any encountered difference
      */
@@ -244,7 +266,7 @@ public class PmSnapshotTestTool {
 
         try {
             // Disturbing Windows carriage return characters need to be removed.
-            String expectedStateXmlString = FileUtil.fileToString(expectedFile, "UTF-8").replaceAll("\r\n", "\n");
+            String expectedStateXmlString = FileUtil.fileToString(expectedFile).replaceAll("\r\n", "\n");
             assertEquals("Compare " + fileNameBase + "\nExpected: " + expectedFile + "\nCurrent: " + actualStateFile, expectedStateXmlString, actualStateXmlString);
             return expectedFile;
         } catch (ComparisonFailure e) {
@@ -255,13 +277,13 @@ public class PmSnapshotTestTool {
 
     /**
      * Writes snapshot of {@code rootPm} replacing existing one if any.
-     * 
+     *
      * @param rootPm
      *            PM Object
      * @param fileNameBase
      *            Name of the XML file. Without '.xml' post fix. E.g.
      *            'myTest_afterEnteringData'.
-     * 
+     *
      * @return generated snapshot {@link File} handle
      */
     protected File writeSnapshot(PmObject rootPm, String fileNameBase) {
@@ -279,7 +301,7 @@ public class PmSnapshotTestTool {
     /**
      * Writes a snapshot of {@code rootPm} to an file having a name that ends with
      * '.actual.xml'.
-     * 
+     *
      * @param actualStateFile
      *            is file to write to.
      * @param actualStateXmlString
@@ -307,7 +329,7 @@ public class PmSnapshotTestTool {
      * folder the '.class' file of the test class (testCtxtClass) if located in.
      * <p>
      * This location may be customized by overriding this method.
-     * 
+     *
      * @return the directory to write actual state files to.
      */
     protected File getActualStateDir() {
@@ -322,7 +344,7 @@ public class PmSnapshotTestTool {
      * folder the '.java' file of the test class (testCtxtClass) if located in.
      * <p>
      * This location may be customized by overriding this method.
-     * 
+     *
      * @return the directory to handle the expected state files in or {@code null} if not exist.
      */
     protected File getExpectedStateDir() {
@@ -340,7 +362,7 @@ public class PmSnapshotTestTool {
 
     /**
      * Provides the {@link File} the expected PM state will be read from.
-     * 
+     *
      * @param fileNameBase
      *            The file name base string, provided as argument of
      *            {@link #snapshot(PmObject, String)}.
@@ -357,7 +379,7 @@ public class PmSnapshotTestTool {
 
     /**
      * Provides the {@link File} the actual PM state will be written to.
-     * 
+     *
      * @param fileNameBase
      *            The file name base string, provided as argument of
      *            {@link #snapshot(PmObject, String)}.
@@ -369,7 +391,7 @@ public class PmSnapshotTestTool {
 
     /**
      * Provides the {@link File} the expected PM state will be written to in write mode.
-     * 
+     *
      * @param fileNameBase
      *            The file name base string, provided as argument of
      *            {@link #snapshot(PmObject, String)}.
@@ -402,7 +424,7 @@ public class PmSnapshotTestTool {
     /**
      * Creates a source file structure accessor that matches your specific source/target
      * directory structure.
-     * 
+     *
      * @param testCtxtClass
      *            The test class context. Used to get directory information.
      * @return the {@link SrcFileAccessor} to use.
@@ -423,10 +445,10 @@ public class PmSnapshotTestTool {
      * <br/>
      * <b>Note: This method is for development use only, do not commit any code that uses it<br/>
      * consider using system param <code>-DpmSnapshotTestMode</code></b>
-     * 
+     *
      * @param testMode
      *            the testMode to set
-     * 
+     *
      * @see TestMode
      */
     public final void setTestMode(TestMode testMode) {

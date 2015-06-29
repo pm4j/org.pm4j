@@ -11,6 +11,7 @@ import java.util.Collections;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 
+import org.pm4j.common.util.io.FileUtil;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmObject.PmMatcher;
@@ -66,7 +67,7 @@ public class VisibleStateUtil {
       JAXBContext jc = JAXBContext.newInstance(XmlPmObject.class);
       Marshaller m = jc.createMarshaller();
       m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-      m.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
+      m.setProperty(Marshaller.JAXB_ENCODING, FileUtil.UTF_8);
       m.marshal(xmlObject, os);
     } catch (Exception e) {
       throw new PmRuntimeException(rootPm, "Failed to generate XML file " + file, e);
@@ -93,7 +94,7 @@ public class VisibleStateUtil {
       Marshaller m = jc.createMarshaller();
       m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
       m.marshal(xmlObject, os);
-      return os.toString("UTF-8").trim();
+      return os.toString(FileUtil.UTF_8).trim();
     } catch (Exception e) {
       throw new PmRuntimeException(rootPm, "Failed to generate XML.", e);
     }

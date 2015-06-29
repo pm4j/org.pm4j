@@ -25,6 +25,8 @@ import org.pm4j.core.xml.visibleState.VisibleStateAspect;
 public class PmSnapshotTestToolTest {
 
   private PmSnapshotTestTool snap = new PmSnapshotTestTool(PmSnapshotTestToolTest.class);
+  private MiniTestPm pm = new MiniTestPm();
+
 
   /** Hint: activate that check only after test stabilization. Otherwise it may disturb.
    * But please don't forget to re-activate it before submitting your change. */
@@ -45,68 +47,75 @@ public class PmSnapshotTestToolTest {
     snap.setTestMode(PmSnapshotTestTool.TestMode.AUTO_CREATE);
     File file = null;
     try {
-      MiniTestPm pm = new MiniTestPm();
-      pm.stringAttr.setPmTitle("String Attr");
       file = snap.snapshot(pm, "testWriteSnapshot");
-      assertTrue(file.exists());
-      String path = file.getPath().replace('\\', '/');
-      assertTrue(path, path.endsWith("src/test/java/org/pm4j/tools/test/pmSnapshotTestToolTest/testWriteSnapshot.xml"));
       assertEquals(file.getAbsolutePath(),
           "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
           "<conversation xmlns=\"http://org.pm4j/xml/visibleState\" name=\"miniTestPm\" title=\"Test PM\">\n" +
           "    <attr name=\"stringAttr\" title=\"String Attr\"/>\n" +
           "</conversation>",
-          FileUtil.fileToString(file, "UTF-8"));
+          FileUtil.fileToString(file));
     } finally {
       if (file != null) {
         FileUtil.deleteFileAndEmptyParentDirs(file);
       }
     }
   }
-  
+
   @Test
-  public void testWriteSnapshotWithExcludedTitle() {
+  public void testExcludedTitleByClassAndFieldName() {
     snap.setTestMode(PmSnapshotTestTool.TestMode.AUTO_CREATE);
     File file = null;
     try {
-      MiniTestPm pm = new MiniTestPm();
-      pm.stringAttr.setPmTitle("String Attr");
       snap.exclude(MiniTestPm.class, "stringAttr", VisibleStateAspect.TITLE);
       file = snap.snapshot(pm, "testWriteSnapshot");
-      assertTrue(file.exists());
-      String path = file.getPath().replace('\\', '/');
-      assertTrue(path, path.endsWith("src/test/java/org/pm4j/tools/test/pmSnapshotTestToolTest/testWriteSnapshot.xml"));
       assertEquals(file.getAbsolutePath(),
           "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
           "<conversation xmlns=\"http://org.pm4j/xml/visibleState\" name=\"miniTestPm\" title=\"Test PM\">\n" +
           "    <attr name=\"stringAttr\"/>\n" +
           "</conversation>",
-          FileUtil.fileToString(file, "UTF-8"));
+          FileUtil.fileToString(file));
     } finally {
       if (file != null) {
         FileUtil.deleteFileAndEmptyParentDirs(file);
       }
     }
   }
-  
+
+  @Test
+  public void testExcludedTitleByPmRef() {
+    snap.setTestMode(PmSnapshotTestTool.TestMode.AUTO_CREATE);
+    File file = null;
+    try {
+      pm.stringAttr.setPmTitle("String Attr");
+      snap.exclude(pm.stringAttr, VisibleStateAspect.TITLE);
+      file = snap.snapshot(pm, "testWriteSnapshot");
+      assertEquals(file.getAbsolutePath(),
+          "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
+          "<conversation xmlns=\"http://org.pm4j/xml/visibleState\" name=\"miniTestPm\" title=\"Test PM\">\n" +
+          "    <attr name=\"stringAttr\"/>\n" +
+          "</conversation>",
+          FileUtil.fileToString(file));
+    } finally {
+      if (file != null) {
+        FileUtil.deleteFileAndEmptyParentDirs(file);
+      }
+    }
+  }
+
   @Test
   public void testWriteUtf8Snapshot() {
     snap.setTestMode(PmSnapshotTestTool.TestMode.WRITE);
     File file = null;
-    
+
     try {
-      MiniTestPm pm = new MiniTestPm();
       pm.stringAttr.setPmTitle("|HAMBURG SÜD|ALIANÇA");
       file = snap.snapshot(pm, "testWriteSnapshotUtf8");
-      assertTrue(file.exists());
-      String path = file.getPath().replace('\\', '/');
-      assertTrue(path, path.endsWith("src/test/java/org/pm4j/tools/test/pmSnapshotTestToolTest/testWriteSnapshotUtf8.xml"));
       assertEquals(file.getAbsolutePath(),
           "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
           "<conversation xmlns=\"http://org.pm4j/xml/visibleState\" name=\"miniTestPm\" title=\"Test PM\">\n" +
           "    <attr name=\"stringAttr\" title=\"|HAMBURG SÜD|ALIANÇA\"/>\n" +
           "</conversation>",
-          FileUtil.fileToString(file.getAbsoluteFile(), "UTF-8"));
+          FileUtil.fileToString(file.getAbsoluteFile()));
           pm = null;
     } finally {
       if (file != null) {
@@ -122,11 +131,11 @@ public class PmSnapshotTestToolTest {
     File file = null;
 
     try {
-      file = snap.snapshot(new MiniTestPm(), "testWriteAndCompareSameSnapshot");
+      file = snap.snapshot(pm, "testWriteAndCompareSameSnapshot");
       assertTrue(file.exists());
 
       // compare to the snapshot
-      snap.snapshot(new MiniTestPm(), "testWriteAndCompareSameSnapshot");
+      snap.snapshot(pm, "testWriteAndCompareSameSnapshot");
 
       File currentStateFile = snap.getActualStateFile("testWriteAndCompareSameSnapshot");
       assertFalse("A current state file should not exist in case of no difference.\n" + currentStateFile,
@@ -135,19 +144,18 @@ public class PmSnapshotTestToolTest {
       FileUtil.deleteFileAndEmptyParentDirs(file);
     }
   }
-  
+
   @Test(expected= AssertionError.class)
   public void testWriteSnapshotInStrictMode() {
     snap.setTestMode(PmSnapshotTestTool.TestMode.STRICT);
-    snap.snapshot(new MiniTestPm(), "testWriteSnapshotInStrictMode");
+    snap.snapshot(pm, "testWriteSnapshotInStrictMode");
   }
-  
+
   @Test
   public void testWriteExistingSnapshot() {
 
     // create the snapshot
     final String fileBaseName = "overrideMe";
-    MiniTestPm pm = new MiniTestPm();
     snap.setTestMode(PmSnapshotTestTool.TestMode.AUTO_CREATE);
     File expectedStateFileSrc = null;
     File expectedStateFile = getExpectedFile(fileBaseName);
@@ -158,7 +166,7 @@ public class PmSnapshotTestToolTest {
 
       // modify PM and compare to the changed state
       PmAssert.setValue(pm.stringAttr, "hi");
-      
+
       // Copy the generated expected state file to the binary directory (usually done by the build process).
       // After that we can simulate a regular compare operation.
       FileUtil.copyFile(expectedStateFileSrc, expectedStateFile);
@@ -169,7 +177,7 @@ public class PmSnapshotTestToolTest {
 
       // Copy the overridden expected state
       FileUtil.copyFile(expectedStateFileSrc, expectedStateFile);
-      
+
       // now test in STRICT MODE
       snap.setTestMode(PmSnapshotTestTool.TestMode.STRICT);
       snap.snapshot(pm, "overrideMe");
@@ -192,7 +200,6 @@ public class PmSnapshotTestToolTest {
       assertFalse("File should not exist: " + expectedStateFile, expectedStateFile.exists());
       assertFalse("File should not exist: " + currentStateFile,  currentStateFile.exists());
 
-      MiniTestPm pm = new MiniTestPm();
       // create the snapshot
       File createdSrcFile = snap.snapshot(pm, fileBaseName);
       assertTrue("File should exist: " + createdSrcFile, createdSrcFile.exists());
@@ -219,10 +226,10 @@ public class PmSnapshotTestToolTest {
     }
 
   }
-  
+
   /**
    * This method is to determine possible target expected file destination as {@link PmSnapshotTestTool#getExpectedStateDir()} returns {@code null} when path was not created.
-   * 
+   *
    * @param fileBaseName file base name
    * @return expected file descriptor
    */
