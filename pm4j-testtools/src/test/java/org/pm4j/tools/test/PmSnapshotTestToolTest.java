@@ -31,7 +31,7 @@ public class PmSnapshotTestToolTest {
   /** Hint: activate that check only after test stabilization. Otherwise it may disturb.
    * But please don't forget to re-activate it before submitting your change. */
   // TODO: does not really work reliable with maven.
-  // @After
+  //@After
   public void noTempFilesShouldRemainInSrcDir() {
     File srcXmlDir = new File(snap.getSrcFileAccessor().getSrcPkgDir(), snap.xmlSubDirName());
     File currentStateXmlDir = new File(snap.getSrcFileAccessor().getBinPkgDir(), snap.xmlSubDirName());
@@ -108,12 +108,14 @@ public class PmSnapshotTestToolTest {
     File file = null;
 
     try {
-      pm.stringAttr.setPmTitle("|HAMBURG SÜD|ALIANÇA");
+      pm.stringAttr.setValueAsString("|SÜßIGKEITEN|AÇÚCAR");
       file = snap.snapshot(pm, "testWriteSnapshotUtf8");
       assertEquals(file.getAbsolutePath(),
           "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
           "<conversation xmlns=\"http://org.pm4j/xml/visibleState\" name=\"miniTestPm\" title=\"Test PM\">\n" +
-          "    <attr name=\"stringAttr\" title=\"|HAMBURG SÜD|ALIANÇA\"/>\n" +
+          "    <attr name=\"stringAttr\" title=\"String Attr\">\n" +
+          "        <value>|SÜßIGKEITEN|AÇÚCAR</value>\n" +
+          "    </attr>\n" +
           "</conversation>",
           FileUtil.fileToString(file.getAbsoluteFile()));
           pm = null;
