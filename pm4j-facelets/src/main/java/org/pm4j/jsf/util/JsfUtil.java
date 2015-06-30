@@ -37,18 +37,18 @@ public class JsfUtil {
 
   private static final String HIDDEN_VALUE="<value not displayed>";
 
-	/**
-	 * Helper to read the argument from the RequestParameterMap
-	 *
-	 * @param nameOfArgument
-	 *            the name of the argument in the map
-	 * @return the value of the argument
-	 */
-	public static String readReqParam(String nameOfArgument) {
-		FacesContext context = FacesContext.getCurrentInstance();
-		return context.getExternalContext().getRequestParameterMap()
-				.get(nameOfArgument);
-	}
+  /**
+   * Helper to read the argument from the RequestParameterMap
+   *
+   * @param nameOfArgument
+   *            the name of the argument in the map
+   * @return the value of the argument
+   */
+  public static String readReqParam(String nameOfArgument) {
+    FacesContext context = FacesContext.getCurrentInstance();
+    return context.getExternalContext().getRequestParameterMap()
+        .get(nameOfArgument);
+  }
 
   /**
    * Helper to read and convert the argument from the RequestParameterMap
@@ -60,9 +60,9 @@ public class JsfUtil {
    *              if the parameter is not <code>null</code> but does not
    *              contain a parseable <code>long</code>.
    */
-	public static Long readReqParamAsLong(String nameOfArgument) {
-		return readReqParamAsLong(nameOfArgument, null);
-	}
+  public static Long readReqParamAsLong(String nameOfArgument) {
+    return readReqParamAsLong(nameOfArgument, null);
+  }
 
   /**
    * Helper to read and convert the argument from the RequestParameterMap

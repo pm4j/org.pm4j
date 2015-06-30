@@ -28,7 +28,21 @@ public class PmMatcherBuilder {
    * @return The builder reference for fluent programming style support.
    */
   public PmMatcherBuilder pmClass(Class<?> pmClass) {
-    matcher.pmClass = pmClass;
+    matcher.classOrInstanceMatcher = new PmClassMatcher(pmClass);
+    return this;
+  }
+
+  /**
+   * Adds a match condition:<br>
+   * PM should be one of the given <code>pms</code>.
+   *
+   * @param pm The PMs the match.
+   * @return The builder reference for fluent programming style support.
+   */
+  public PmMatcherBuilder pm(PmObject... pms) {
+    matcher.classOrInstanceMatcher = (pms.length == 1)
+        ? new PmInstanceMatcher(pms[0])
+        : new PmSetMatcher(pms);
     return this;
   }
 
@@ -142,7 +156,7 @@ public class PmMatcherBuilder {
   class PmMatcherImpl implements PmMatcher {
 
     private PmMatcher parentMatcher;
-    private Class<?> pmClass;
+    private PmMatcher classOrInstanceMatcher;
     private String pmNamePattern;
     private Boolean enabled;
     private Boolean visible;
@@ -175,8 +189,8 @@ public class PmMatcherBuilder {
     }
 
     private boolean doesPmClassMatch(PmObject pm) {
-      return pmClass == null ||
-             pmClass.isAssignableFrom(pm.getClass());
+      return classOrInstanceMatcher == null ||
+             classOrInstanceMatcher.doesMatch(pm);
     }
 
     private boolean doesNameMatch(PmObject pm) {
@@ -195,8 +209,8 @@ public class PmMatcherBuilder {
       if (parentMatcher != null) {
         parts.add("parent(" + parentMatcher + ")");
       }
-      if (pmClass != null) {
-        parts.add(pmClass.getSimpleName());
+      if (classOrInstanceMatcher != null) {
+        parts.add(classOrInstanceMatcher.toString());
       }
       if (pmNamePattern != null) {
         parts.add("name=" + pmNamePattern);
@@ -232,6 +246,51 @@ public class PmMatcherBuilder {
     @Override
     public String toString() {
       return pmClass.getSimpleName();
+    }
+  }
+
+  static class PmInstanceMatcher implements PmMatcher {
+    private final PmObject pm;
+
+    public PmInstanceMatcher(PmObject pm) {
+      this.pm = pm;
+    }
+
+    @Override
+    public boolean doesMatch(PmObject pm) {
+      return this.pm == pm;
+    }
+
+    @Override
+    public String toString() {
+      return "pm=" + pm.getPmName();
+    }
+  }
+
+  static class PmSetMatcher implements PmMatcher {
+    private final PmObject[] pms;
+
+    public PmSetMatcher(PmObject... pms) {
+      this.pms = pms;
+    }
+
+    @Override
+    public boolean doesMatch(PmObject pm) {
+      for (PmObject p : pms) {
+        if (p == pm) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    @Override
+    public String toString() {
+      ArrayList<String> names = new ArrayList<String>(pms.length);
+      for (PmObject p : pms) {
+        names.add(p.getPmName());
+      }
+      return "pms=" + names.toString();
     }
   }
 }

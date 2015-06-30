@@ -12,6 +12,7 @@ import java.util.Scanner;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.apache.commons.lang.Validate;
 import org.pm4j.common.exception.CheckedExceptionWrapper;
 
 /**
@@ -23,6 +24,8 @@ public class FileUtil {
 
   private static final Logger LOG = LoggerFactory.getLogger(FileUtil.class);
 
+  public static final String UTF_8 = "UTF-8";
+
   /**
    * Reads a complete text file.
    *
@@ -30,8 +33,20 @@ public class FileUtil {
    * @return the file content.
    */
   public static String fileToString(File file) {
+    return fileToString(file, UTF_8);
+  }
+
+  /**
+   * Reads a complete text file with specified encoding.
+   *
+   * @param file The text file to read.
+   * @param charsetName The encoding to use.
+   * @return the file content.
+   */
+  public static String fileToString(File file, String charsetName) {
+    Validate.notEmpty(charsetName, "Please provide a charsetName.");
     try {
-      return new Scanner(file).useDelimiter("\\Z").next();
+      return  (charsetName == null ? new Scanner(file) : new Scanner(file, charsetName)).useDelimiter("\\Z").next();
     } catch (FileNotFoundException e) {
       throw new RuntimeException("Failed to read file: " + file, e);
     }
@@ -44,9 +59,20 @@ public class FileUtil {
    * @param string
    */
   public static void stringToFile(File file, String string) {
+    stringToFile(file, string, UTF_8);
+  }
+
+  /**
+   * Writes the given {@link String} to a file using specified charset.
+   *
+   * @param file The file to write.
+   * @param string
+   */
+  public static void stringToFile(File file, String string, String charsetName) {
+    Validate.notEmpty(charsetName, "Please provide a charsetName.");
     PrintWriter pw = null;
     try {
-      pw = new PrintWriter(file);
+      pw = charsetName == null ? new PrintWriter(file) : new PrintWriter(file, charsetName);
       pw.print(string);
     } catch (Exception e) {
       throw new RuntimeException("Failed to write to file " + file, e);
