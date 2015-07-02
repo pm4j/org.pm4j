@@ -5,16 +5,15 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.pm4j.common.converter.string.StringConverterToString;
 import org.pm4j.common.converter.string.StringConverter;
 import org.pm4j.common.converter.string.StringConverterInteger;
 import org.pm4j.common.converter.string.StringConverterList;
 import org.pm4j.common.converter.string.StringConverterLong;
 import org.pm4j.common.converter.string.StringConverterParseException;
 import org.pm4j.common.converter.string.StringConverterString;
+import org.pm4j.common.converter.string.StringConverterToString;
 import org.pm4j.common.util.reflection.ClassUtil;
 import org.pm4j.core.exception.PmConverterException;
-import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmAttrList;
 import org.pm4j.core.pm.PmAttrNumber;
 import org.pm4j.core.pm.PmObject;
