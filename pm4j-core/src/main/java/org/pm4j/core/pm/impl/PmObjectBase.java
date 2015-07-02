@@ -957,7 +957,7 @@ public class PmObjectBase implements PmObject {
   /**
    * Provides the PM meta data.
    * <p>
-   * Ensures that the PM is competely initialized.
+   * Ensures that the PM is completely initialized.
    *
    * @return The meta data for this PM.
    */
