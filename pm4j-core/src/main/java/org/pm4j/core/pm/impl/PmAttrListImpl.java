@@ -14,7 +14,6 @@ import org.pm4j.common.converter.string.StringConverterParseException;
 import org.pm4j.common.converter.string.StringConverterString;
 import org.pm4j.common.util.reflection.ClassUtil;
 import org.pm4j.core.exception.PmConverterException;
-import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmAttrList;
 import org.pm4j.core.pm.PmAttrNumber;
 import org.pm4j.core.pm.PmObject;
@@ -131,7 +130,7 @@ public class PmAttrListImpl<T> extends PmAttrBase<List<T>, List<T>> implements P
    */
   @SuppressWarnings("unchecked")
   protected StringConverter<T> getItemStringConverterImpl() {
-    return (StringConverter<T>)getOwnMetaData().itemStringConverter;
+    return (StringConverter<T>)getOwnMetaDataWithoutPmInitCall().itemStringConverter;
   }
 
   @Override
@@ -211,11 +210,10 @@ public class PmAttrListImpl<T> extends PmAttrBase<List<T>, List<T>> implements P
     public MetaData() {
       super(Integer.MAX_VALUE); // maximum valueAsString characters.
     }
-}
-
-  private final MetaData getOwnMetaData() {
-    return (MetaData) getPmMetaData();
   }
 
+  private final MetaData getOwnMetaDataWithoutPmInitCall() {
+    return (MetaData) getPmMetaDataWithoutPmInitCall();
+  }
 }
 
