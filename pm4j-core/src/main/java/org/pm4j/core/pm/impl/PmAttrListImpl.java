@@ -131,7 +131,7 @@ public class PmAttrListImpl<T> extends PmAttrBase<List<T>, List<T>> implements P
    */
   @SuppressWarnings("unchecked")
   protected StringConverter<T> getItemStringConverterImpl() {
-    return (StringConverter<T>)getOwnMetaData().itemStringConverter;
+    return (StringConverter<T>) ((MetaData)getPmMetaDataWithoutPmInitCall()).itemStringConverter;
   }
 
   @Override
@@ -174,6 +174,20 @@ public class PmAttrListImpl<T> extends PmAttrBase<List<T>, List<T>> implements P
     return value;
   }
 
+  /** Lazy initialization of string converter. */
+  @Override
+  protected StringConverter<List<T>> getStringConverterImpl() {
+    MetaData md = getOwnMetaData();
+    // the java implementation may overrule the configured value.
+    md.itemStringConverter = getItemStringConverterImpl();
+
+    @SuppressWarnings("unchecked")
+    StringConverterList<T> stringConverter = new StringConverterList<T>((StringConverter<T>)md.itemStringConverter);
+    stringConverter.setStringSeparator(md.itemStringSeparator);
+
+    return stringConverter;
+  }
+
   // ======== meta data ======== //
 
   @Override
@@ -186,27 +200,18 @@ public class PmAttrListImpl<T> extends PmAttrBase<List<T>, List<T>> implements P
     MetaData myMetaData = (MetaData) metaData;
     myMetaData.setValidateLengths(false);
 
-    String itemStringSeparator = PmAttrListCfg.DEFAULT_STRING_ITEM_SEPARATOR;
-
     PmAttrListCfg annotation = AnnotationUtil.findAnnotation(this, PmAttrListCfg.class);
     if (annotation != null) {
       if (annotation.itemStringConverter() != StringConverterToString.class) {
         myMetaData.itemStringConverter = ClassUtil.newInstance(annotation.itemStringConverter());
-        itemStringSeparator = annotation.valueStringSeparator();
+        myMetaData.itemStringSeparator = annotation.valueStringSeparator();
       }
     }
-
-    // the java implementation may overrule the configured value.
-    myMetaData.itemStringConverter = getItemStringConverterImpl();
-
-    @SuppressWarnings("unchecked")
-    StringConverterList<T> stringConverter = new StringConverterList<T>((StringConverter<T>)myMetaData.itemStringConverter);
-    stringConverter.setStringSeparator(itemStringSeparator);
-    myMetaData.setStringConverter(stringConverter);
   }
 
   protected static class MetaData extends PmAttrBase.MetaData {
       private StringConverter<?> itemStringConverter = StringConverterToString.INSTANCE;
+      private String itemStringSeparator = PmAttrListCfg.DEFAULT_STRING_ITEM_SEPARATOR;
 
     public MetaData() {
       super(Integer.MAX_VALUE); // maximum valueAsString characters.
