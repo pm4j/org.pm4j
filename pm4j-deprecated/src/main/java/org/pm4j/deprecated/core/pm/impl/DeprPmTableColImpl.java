@@ -313,9 +313,11 @@ public class DeprPmTableColImpl extends PmObjectBase implements DeprPmTableCol {
               (getPmTableImpl().getTotalNumOfRows() > 1);
     }
 
-    // XXX olaf: Should not be influenced by the read-only state of a dialog part.
-    //           It should still be possible to sort read-only tables.
-    //           Check if it's the place for this logic.
+    /**
+     * Should not be influenced by the read-only state of a dialog part.<br>
+     * It should still be possible to sort read-only tables.
+     * @return always false
+     */
     @Override
     protected boolean isPmReadonlyImpl() {
       return false;
@@ -324,6 +326,16 @@ public class DeprPmTableColImpl extends PmObjectBase implements DeprPmTableCol {
     @Override
     protected boolean isPmVisibleImpl() {
       return isPmEnabledImpl();
+    }
+
+    /**
+     * A sort order change is by default not handled as a data change.<br>
+     * This information is usually not persistent.
+     * @return always false
+     */
+    @Override
+    protected boolean isPmValueChangedImpl() {
+      return false;
     }
 
     @Override
