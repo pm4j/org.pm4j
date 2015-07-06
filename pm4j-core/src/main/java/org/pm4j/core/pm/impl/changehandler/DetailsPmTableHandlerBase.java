@@ -130,6 +130,15 @@ public abstract class DetailsPmTableHandlerBase<T_MASTER_BEAN, T_DETAILS_BEAN> e
     return (PmTableImpl<?, T_DETAILS_BEAN>) getDetailsPm();
   }
 
+  /**
+   * Removes the registered details modifications (if there where any) for the given master bean.
+   *
+   * @param masterBean The master bean to forget modifications for.
+   */
+  protected final void removeMasterBeanModifications(T_MASTER_BEAN masterBean) {
+    masterBeanToDetailsModificationsMap.remove(masterBean);
+  }
+
   private void updateModificationsMapForMasterBean(T_MASTER_BEAN masterBean, Modifications<T_DETAILS_BEAN> newModifications) {
     if (masterBean == null) {
       return;
@@ -138,7 +147,7 @@ public abstract class DetailsPmTableHandlerBase<T_MASTER_BEAN, T_DETAILS_BEAN> e
     if (newModifications != null && newModifications.isModified()) {
       masterBeanToDetailsModificationsMap.put(masterBean, CloneUtil.clone(newModifications));
     } else {
-      masterBeanToDetailsModificationsMap.remove(masterBean);
+      removeMasterBeanModifications(masterBean);
     }
   }
 

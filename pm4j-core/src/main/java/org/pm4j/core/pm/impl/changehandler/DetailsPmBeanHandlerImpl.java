@@ -21,7 +21,8 @@ public class DetailsPmBeanHandlerImpl<T_MASTER_RECORD> extends
 
   @Override
   protected void afterMasterRecordChangeImpl(T_MASTER_RECORD newMasterBean) {
-    // TODO oboede: why is the base implementation not called here? Doku?
+    // The base implementation not called here, because the all-change event will
+    // be fired by the setPmBean. This prevents event duplication.
     getTypedDetailsPm().setPmBean(newMasterBean);
   }
 

@@ -5,15 +5,14 @@ import java.util.List;
 
 import org.apache.commons.lang.Validate;
 import org.pm4j.core.pm.PmCommandDecorator;
-import org.pm4j.core.pm.PmDataInput;
 import org.pm4j.core.pm.PmEvent;
+import org.pm4j.core.pm.PmEventListener;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmMessageApi;
 import org.pm4j.core.pm.api.PmValidationApi;
-import org.pm4j.core.pm.impl.PmTabSetImpl;
 
 /**
  * A details handler that allows a master record switch only if the details area is valid.
@@ -36,6 +35,12 @@ public class DetailsPmHandlerImpl<T_DETAILS_PM extends PmObject, T_MASTER_RECORD
   /** Additional decorators to apply on {@link #beforeMasterRecordChange(Object, Object)} ()} and {@link #afterMasterRecordChange(Object)}. */
   private final List<PmCommandDecorator> decorators = new ArrayList<PmCommandDecorator>();
 
+  enum EventState {
+    NEUTRAL, ALL_CHANGE_BROADCAST_STARTED,
+  }
+
+  private EventState eventState = EventState.NEUTRAL;
+
   /**
    * Constructor for a handler that just observes the master record switches without handling a details
    * PM directly.
@@ -54,6 +59,26 @@ public class DetailsPmHandlerImpl<T_DETAILS_PM extends PmObject, T_MASTER_RECORD
 
   @Override
   public void startObservers() {
+  if (detailsPm != null) {
+      PmEventApi.addPmEventListener(detailsPm, PmEvent.ALL_CHANGE_EVENTS, new PmEventListener.WithPreprocessCallback() {
+
+        @Override
+        public void handleEvent(PmEvent event) {
+          event.addPostProcessingListener(new PostProcessor<Object>() {
+            @Override
+            public void postProcess(PmEvent event, Object postProcessPayload) {
+              eventState = EventState.NEUTRAL;
+            }
+          }, null);
+
+        }
+
+        @Override
+        public void preProcess(PmEvent event) {
+          eventState = EventState.ALL_CHANGE_BROADCAST_STARTED;
+        }
+      });
+  }
   }
 
   /** Calls <code>beforeDo</code> for all decorators and {@link #beforeMasterRecordChangeImpl(Object)}. */
@@ -101,25 +126,34 @@ public class DetailsPmHandlerImpl<T_DETAILS_PM extends PmObject, T_MASTER_RECORD
   @SuppressWarnings("unchecked")
   @Override
   public final void afterMasterRecordChange(Object newMasterBean) {
-    afterMasterRecordChangeImpl((T_MASTER_RECORD) newMasterBean);
-    for (PmCommandDecorator d : decorators) {
-        d.afterDo(null);
-    }
-  }
-
-  /**
-   * The default implementation just clears the details PM.
-   * <br>
-   * More specific details hander implementations may add here their details area specific
-   * logic.
-   */
-  protected void afterMasterRecordChangeImpl(T_MASTER_RECORD newMasterBean) {
     if (detailsPm != null) {
       // The details area has now a new content to handle. The old messages of
       // that area where related to the record that is no longer active.
       PmMessageApi.clearPmTreeMessages(detailsPm);
       // All cached information within the details area should be refreshed.
       PmCacheApi.clearPmCache(detailsPm, CacheKind.ALL);
+    }
+
+    // apply specific logic. E.g. restore changed state in relation to a re-selected master bean.
+    afterMasterRecordChangeImpl((T_MASTER_RECORD) newMasterBean);
+
+    for (PmCommandDecorator d : decorators) {
+        d.afterDo(null);
+    }
+
+  }
+
+  /**
+   * The default implementation broadcasts an all-changed event.
+   * <br>
+   * More specific details hander implementations may add/place their details area specific
+   * logic by overriding this method.
+   */
+  protected void afterMasterRecordChangeImpl(T_MASTER_RECORD newMasterBean) {
+    // forget all states that was only related to the master selection before.
+    if (eventState != EventState.ALL_CHANGE_BROADCAST_STARTED && detailsPm != null) {
+      // The additional flag allows details to react specifically. E.g. preserving a filter.
+      PmEventApi.broadcastPmEvent(detailsPm, PmEvent.ALL_CHANGE_EVENTS | PmEvent.MASTER_SELECTION_CHANGE);
     }
   }
 

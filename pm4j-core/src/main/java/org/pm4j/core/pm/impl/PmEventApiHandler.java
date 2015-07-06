@@ -3,8 +3,6 @@ package org.pm4j.core.pm.impl;
 import java.util.Arrays;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmCommandDecorator;
 import org.pm4j.core.pm.PmConversation;
@@ -12,10 +10,13 @@ import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmEvent.ValueChangeKind;
 import org.pm4j.core.pm.PmEventListener;
 import org.pm4j.core.pm.PmEventListener.PostProcessor;
+import org.pm4j.core.pm.PmEventListener.PostProcessorWithExceptionHandling;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.impl.InternalPmEventListenerRefs.ListenerRef;
 import org.pm4j.core.pm.impl.PmObjectBase.PmInitState;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A pm4j <b>INTERNAL</b> event handling support class.
@@ -137,10 +138,24 @@ public class PmEventApiHandler {
    * @param event the event to postprocess. It contains a set of registered post processors and related data.
    */
   public static void postProcessEvent(PmEvent event) {
-    for (Map.Entry<PostProcessor<?>, Object> e : event.getPostProcessorToPayloadMap().entrySet()) {
-      @SuppressWarnings("unchecked")
-      PostProcessor<Object> pp = (PostProcessor<Object>) e.getKey();
-      pp.postProcess(event, e.getValue());
+    try {
+      for (Map.Entry<PostProcessor<?>, Object> e : event.getPostProcessorToPayloadMap().entrySet()) {
+        @SuppressWarnings("unchecked")
+        PostProcessor<Object> pp = (PostProcessor<Object>) e.getKey();
+        pp.postProcess(event, e.getValue());
+      }
+    } catch (RuntimeException ex) {
+      for (Map.Entry<PostProcessor<?>, Object> e : event.getPostProcessorToPayloadMap().entrySet()) {
+        if (e.getKey() instanceof PostProcessorWithExceptionHandling) {
+          try {
+            ((PostProcessorWithExceptionHandling<?>)e).onException(event, ex);
+          } catch (RuntimeException ex2) {
+            // ignore
+            // TODO: log
+          }
+
+        }
+      }
     }
   }
 
