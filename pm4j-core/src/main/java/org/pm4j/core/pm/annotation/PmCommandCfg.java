@@ -7,14 +7,13 @@ import java.lang.annotation.Target;
 
 import org.pm4j.core.pm.PmCommand.CmdKind;
 import org.pm4j.core.pm.PmConversation;
-import org.pm4j.core.pm.PmDataInput;
 import org.pm4j.core.pm.PmDefaults;
 import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.impl.PmCommandImpl;
 
 /**
  * Static configuration data for commands.
- * 
+ *
  * @author olaf boede
  */
 @Retention(RetentionPolicy.RUNTIME)
@@ -57,19 +56,19 @@ public @interface PmCommandCfg {
      */
     DEFAULT
   }
-  
+
   public enum AFTER_DO {
 
     /**
-	 * Resets the value change state of the pm that is used as validation root.
-	 */
+   * Resets the value change state of the pm that is used as validation root.
+   */
     RESET_VALUE_CHANGED_STATE,
-	    
+
     /**
-     * Clears the caches of all pm's along the path to the root pm. 
+     * Clears the caches of all pm's along the path to the root pm.
      */
     CLEAR_CACHES,
-	    
+
     /**
      * Does not executes any special operation in the after do method of the command.
      * Has the same effect as if {@link PmCommandCfg#afterDo()} returns an empty array.
@@ -77,7 +76,7 @@ public @interface PmCommandCfg {
     DO_NOTHING,
 
     /**
-     * Default is 
+     * Default is
      * <ul>
      * <li>{@link #CLEAR_CACHES} and</li>
      * <li>{@link #RESET_VALUE_CHANGED_STATE} if and only if {@link BEFORE_DO#VALIDATE} is set
@@ -106,7 +105,7 @@ public @interface PmCommandCfg {
 
   /**
    * Defines the caches to clear within the element context of this command.
-   * 
+   *
    * @return The cache kinds to clear.
    */
   PmCacheApi.CacheKind[] clearCaches() default {};

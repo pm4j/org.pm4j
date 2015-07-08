@@ -11,6 +11,7 @@ import org.pm4j.common.query.filter.FilterDefinitionFactoryImpl;
 import org.pm4j.core.pm.annotation.PmCommandCfg;
 import org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO;
 import org.pm4j.core.pm.annotation.PmInject;
+import org.pm4j.core.pm.impl.PmCommandImpl;
 import org.pm4j.core.pm.impl.PmObjectBase.NameBuilder;
 import org.pm4j.core.pm.impl.PmObjectBase.NameBuilderRelNameWithHashCode;
 import org.pm4j.core.pm.impl.inject.DiResolverFactory;
@@ -80,6 +81,8 @@ public class PmDefaults implements Cloneable {
   /**
    * Defines the default {@link PmCommandCfg#beforeDo()} setting for commands
    * that do not define this attribute explicitly.
+   * <p>
+   * Only used for the old {@link PmCommandImpl}.
    */
   private PmCommandCfg.BEFORE_DO[] beforeDoCommandDefault = new BEFORE_DO[] {BEFORE_DO.VALIDATE};
 

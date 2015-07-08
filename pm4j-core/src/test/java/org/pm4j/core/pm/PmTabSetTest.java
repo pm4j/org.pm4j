@@ -75,6 +75,22 @@ public class PmTabSetTest {
   }
 
   @Test
+  public void testNavigateToFirstTab_DisableAllTabs_FireAllChangedEvent() {
+    assertEquals(myTabSet.tab1, myTabSet.getCurrentTabPm());
+
+    assertTrue(myTabSet.switchToTabPm(myTabSet.tab2));
+
+    myTabSet.tab1.tabEnabled=false;
+    myTabSet.tab2.tabEnabled=false;
+    myTabSet.tab3.tabEnabled=false;
+
+    PmEventApi.broadcastPmEvent(myTabSet, PmEvent.ALL_CHANGE_EVENTS);
+
+    assertEquals(myTabSet.tab1, myTabSet.getCurrentTabPm());
+    assertNoMessagesInConversation(myTabSet);
+  }
+
+  @Test
   public void testFirstTabDisabled() {
     myTabSet.tab1.tabEnabled = false;
 

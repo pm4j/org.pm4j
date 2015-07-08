@@ -3,6 +3,7 @@ package org.pm4j.core.pm.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.Validate;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmCommand.CommandState;
@@ -11,8 +12,6 @@ import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmTab;
 import org.pm4j.core.pm.PmTabSet;
-import org.pm4j.core.pm.annotation.PmCommandCfg;
-import org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO;
 import org.pm4j.core.pm.impl.connector.PmTabSetConnector;
 import org.pm4j.navi.NaviLink;
 import org.slf4j.Logger;
@@ -93,6 +92,13 @@ public class PmTabSetImpl extends PmObjectBase implements PmTabSet {
 
   @Override
   public boolean switchToTabPm(PmTab toTab) {
+    if (!toTab.isPmEnabled()) {
+      LOG.error("Can't switch to disabled tab " + toTab.getPmName() + ".");
+      return false;
+      // TODO: hard reaction should be configurable. It's in most cases a bug to try that.
+      // throw new PmRuntimeException(this, "Can't switch to disabled tab " + toTab.getPmName() + ".");
+    }
+
     PmTab _fromTab = currentTabPm != null ? currentTabPm : getFirstTabPm();
     return _switchToTabPm(_fromTab, toTab);
   }
@@ -297,22 +303,19 @@ public class PmTabSetImpl extends PmObjectBase implements PmTabSet {
    * <p>
    * It supports undo and command decorators.
    */
-  @PmCommandCfg(beforeDo=BEFORE_DO.DO_NOTHING)
-  static class PmTabChangeCommand extends PmCommandImpl {
+  static class PmTabChangeCommand extends PmCommandImpl2 {
 
     private final PmTabSetImpl tabSet;
     private final PmTab fromTab;
     private final PmTab toTab;
 
     public PmTabChangeCommand(PmTabSetImpl tabSet, PmTab fromTab, PmTab toTab) {
-      super(toTab);
+      super(tabSet);
+      Validate.notNull(toTab);
 
       this.tabSet = tabSet;
       this.fromTab = fromTab;
       this.toTab = toTab;
-
-      assert fromTab != null;
-      assert toTab != null;
     }
 
     /**
