@@ -12,6 +12,8 @@ import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmTab;
 import org.pm4j.core.pm.PmTabSet;
+import org.pm4j.core.pm.annotation.PmCommandCfg;
+import org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO;
 import org.pm4j.core.pm.impl.connector.PmTabSetConnector;
 import org.pm4j.navi.NaviLink;
 import org.slf4j.Logger;
@@ -305,6 +307,7 @@ public class PmTabSetImpl extends PmObjectBase implements PmTabSet {
    * <p>
    * It supports undo and command decorators.
    */
+  @PmCommandCfg(beforeDo=BEFORE_DO.DO_NOTHING)
   static class PmTabChangeCommand extends PmCommandImpl {
 
     private final PmTabSetImpl tabSet;
