@@ -305,7 +305,7 @@ public class PmTabSetImpl extends PmObjectBase implements PmTabSet {
    * <p>
    * It supports undo and command decorators.
    */
-  static class PmTabChangeCommand extends PmCommandImpl2 {
+  static class PmTabChangeCommand extends PmCommandImpl {
 
     private final PmTabSetImpl tabSet;
     private final PmTab fromTab;
@@ -348,6 +348,12 @@ public class PmTabSetImpl extends PmObjectBase implements PmTabSet {
       tabSet.currentTabPm = toTab;
       tabSet.afterSwitch(fromTab, toTab);
       return super.afterDo(changeCommandHistory);
+    }
+
+    // TODO: workaround code for bug 148063. The super implementation is wrong.
+    @Override
+    protected boolean isPmEnabledImpl() {
+      return true;
     }
   }
 
