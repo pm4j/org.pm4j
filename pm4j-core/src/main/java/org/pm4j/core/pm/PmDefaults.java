@@ -87,6 +87,11 @@ public class PmDefaults implements Cloneable {
   private PmCommandCfg.BEFORE_DO[] beforeDoCommandDefault = new BEFORE_DO[] {BEFORE_DO.VALIDATE};
 
   /**
+   * Temporary switch. Will be removed when the new behavior is rolled out to all dialogs.
+   */
+  private boolean exceptionOnSwitchToDisabledTab = true;
+
+  /**
    * Defines, if validation error messages should be added to the tool tip text of
    * the affected attributes.
    */
@@ -274,6 +279,20 @@ public class PmDefaults implements Cloneable {
    */
   public void setDiResolverNullCheckLenient(boolean diResolverNullCheck) {
     this.diResolverNullCheckLenient = diResolverNullCheck;
+  }
+
+  /**
+   * @return the exceptionOnSwitchToDisabledTab
+   */
+  public boolean isExceptionOnSwitchToDisabledTab() {
+    return exceptionOnSwitchToDisabledTab;
+  }
+
+  /**
+   * @param exceptionOnSwitchToDisabledTab the exceptionOnSwitchToDisabledTab to set
+   */
+  public void setExceptionOnSwitchToDisabledTab(boolean exceptionOnSwitchToDisabledTab) {
+    this.exceptionOnSwitchToDisabledTab = exceptionOnSwitchToDisabledTab;
   }
 
 }

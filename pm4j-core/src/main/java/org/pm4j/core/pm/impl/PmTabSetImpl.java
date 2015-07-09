@@ -93,10 +93,12 @@ public class PmTabSetImpl extends PmObjectBase implements PmTabSet {
   @Override
   public boolean switchToTabPm(PmTab toTab) {
     if (!toTab.isPmEnabled()) {
-      LOG.error("Can't switch to disabled tab " + toTab.getPmName() + ".");
-      return false;
-      // TODO: hard reaction should be configurable. It's in most cases a bug to try that.
-      // throw new PmRuntimeException(this, "Can't switch to disabled tab " + toTab.getPmName() + ".");
+      if (getPmConversation().getPmDefaults().isExceptionOnSwitchToDisabledTab()) {
+        throw new PmRuntimeException(this, "Can't switch to disabled tab " + toTab.getPmName() + ".");
+      } else {
+        LOG.error("Can't switch to disabled tab " + toTab.getPmName() + ".");
+        return false;
+      }
     }
 
     PmTab _fromTab = currentTabPm != null ? currentTabPm : getFirstTabPm();
