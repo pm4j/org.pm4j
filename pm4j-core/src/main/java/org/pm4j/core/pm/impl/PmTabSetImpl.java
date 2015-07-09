@@ -3,6 +3,7 @@ package org.pm4j.core.pm.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.Validate;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmCommand.CommandState;
@@ -93,6 +94,15 @@ public class PmTabSetImpl extends PmObjectBase implements PmTabSet {
 
   @Override
   public boolean switchToTabPm(PmTab toTab) {
+    if (!toTab.isPmEnabled()) {
+      if (getPmConversation().getPmDefaults().isExceptionOnSwitchToDisabledTab()) {
+        throw new PmRuntimeException(this, "Can't switch to disabled tab " + toTab.getPmName() + ".");
+      } else {
+        LOG.error("Can't switch to disabled tab " + toTab.getPmName() + ".");
+        return false;
+      }
+    }
+
     PmTab _fromTab = currentTabPm != null ? currentTabPm : getFirstTabPm();
     return _switchToTabPm(_fromTab, toTab);
   }
@@ -305,14 +315,12 @@ public class PmTabSetImpl extends PmObjectBase implements PmTabSet {
     private final PmTab toTab;
 
     public PmTabChangeCommand(PmTabSetImpl tabSet, PmTab fromTab, PmTab toTab) {
-      super(toTab);
+      super(tabSet);
+      Validate.notNull(toTab);
 
       this.tabSet = tabSet;
       this.fromTab = fromTab;
       this.toTab = toTab;
-
-      assert fromTab != null;
-      assert toTab != null;
     }
 
     /**
@@ -343,6 +351,12 @@ public class PmTabSetImpl extends PmObjectBase implements PmTabSet {
       tabSet.currentTabPm = toTab;
       tabSet.afterSwitch(fromTab, toTab);
       return super.afterDo(changeCommandHistory);
+    }
+
+    // TODO: workaround code for bug 148063. The super implementation is wrong.
+    @Override
+    protected boolean isPmEnabledImpl() {
+      return true;
     }
   }
 

@@ -1,11 +1,12 @@
 package org.pm4j.core.pm;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.pm4j.tools.test._PmAssert.assertNoMessagesInConversation;
+import junit.framework.Assert;
 
 import org.junit.Test;
+import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.impl.PmConversationImpl;
 import org.pm4j.core.pm.impl.PmObjectBase;
@@ -68,11 +69,32 @@ public class PmTabSetTest {
 
     assertEquals("If there is no active tab, the first (inactive) tab will be the current tab.",
                  myTabSet.tab1, myTabSet.getCurrentTabPm());
+    assertNoMessagesInConversation(myTabSet);
 
-    assertFalse("Switch to inactive tab shouldn't be possible.",
-                myTabSet.switchToTabPm(myTabSet.tab2));
+    try {
+      myTabSet.switchToTabPm(myTabSet.tab2);
+      Assert.fail();
+    } catch (PmRuntimeException e) {
+      assertTrue(e.getMessage().startsWith("Can't switch to disabled tab tab2."));
+    }
+  }
+
+  @Test
+  public void testNavigateToFirstTab_DisableAllTabs_FireAllChangedEvent() {
+    assertEquals(myTabSet.tab1, myTabSet.getCurrentTabPm());
+
+    assertTrue(myTabSet.switchToTabPm(myTabSet.tab2));
+
+    myTabSet.tab1.tabEnabled=false;
+    myTabSet.tab2.tabEnabled=false;
+    myTabSet.tab3.tabEnabled=false;
+
+    PmEventApi.broadcastPmEvent(myTabSet, PmEvent.ALL_CHANGE_EVENTS);
+
+    assertEquals(myTabSet.tab1, myTabSet.getCurrentTabPm());
     assertNoMessagesInConversation(myTabSet);
   }
+
 
   @Test
   public void testFirstTabDisabled() {
@@ -81,11 +103,26 @@ public class PmTabSetTest {
     assertEquals("If the first tab is disabled, the second one will be the initial current tab.",
                  myTabSet.tab2, myTabSet.getCurrentTabPm());
 
-    assertFalse("Switch to inactive tab shouldn't be possible.",
-                myTabSet.switchToTabPm(myTabSet.tab1));
     assertTrue("Switch to active tab should be possible.",
         myTabSet.switchToTabPm(myTabSet.tab3));
     assertNoMessagesInConversation(myTabSet);
+  }
+
+  @Test(expected=PmRuntimeException.class)
+  public void testSwitchToDisabledTabThrowsException() {
+    myTabSet.tab1.tabEnabled = false;
+    assertEquals(myTabSet.tab2, myTabSet.getCurrentTabPm());
+    myTabSet.switchToTabPm(myTabSet.tab1);
+  }
+
+  /** This test will be removed as soon as we switch completely to the exception reaction. */
+  @Test
+  public void testSwitchToDisabledTabWithLenientConfiguration() {
+    myTabSet.getPmConversation().getPmDefaults().setExceptionOnSwitchToDisabledTab(false);
+
+    myTabSet.tab1.tabEnabled = false;
+    assertEquals(myTabSet.tab2, myTabSet.getCurrentTabPm());
+    assertEquals(false, myTabSet.switchToTabPm(myTabSet.tab1));
   }
 
   @Test
