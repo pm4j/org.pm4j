@@ -437,7 +437,7 @@ public class ClassUtil {
     }
 
     // FIXME oboede: Now the old buggy mechanism to preserve some buggy screen expressions for a while.
-    // The following code should be removed asap.
+    // The following code should be removed asap. Will be removed with task 152114
     try {
       Field f = inClass.getDeclaredField(fieldName);
       if (f != null) {
