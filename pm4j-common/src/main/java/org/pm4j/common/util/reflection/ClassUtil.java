@@ -441,7 +441,7 @@ public class ClassUtil {
     try {
       Field f = inClass.getDeclaredField(fieldName);
       if (f != null) {
-        LOG.warn( "!!! Non public field accessed by path. Please make the field public or provide getter/setter.\n"+
+        LOG.debug( "!!! Non public field accessed by path. Please make the field public or provide getter/setter.\n"+
                   "  The illegally accessed field: " + f);
       }
       return f;
