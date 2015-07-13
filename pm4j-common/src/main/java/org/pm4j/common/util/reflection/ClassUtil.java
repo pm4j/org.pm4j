@@ -437,11 +437,11 @@ public class ClassUtil {
     }
 
     // FIXME oboede: Now the old buggy mechanism to preserve some buggy screen expressions for a while.
-    // The following code should be removed asap.
+    // The following code should be removed asap. Will be removed with task 152114
     try {
       Field f = inClass.getDeclaredField(fieldName);
       if (f != null) {
-        LOG.warn( "!!! Non public field accessed by path. Please make the field public or provide getter/setter.\n"+
+        LOG.debug( "!!! Non public field accessed by path. Please make the field public or provide getter/setter.\n"+
                   "  The illegally accessed field: " + f);
       }
       return f;
