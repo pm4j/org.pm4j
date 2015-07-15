@@ -82,13 +82,21 @@ public class MasterPmTableHandlerImpl<T_MASTER_BEAN> extends MasterPmHandlerImpl
     public void propertyChange(PropertyChangeEvent evt) {
       PmTableImpl<?, T_MASTER_BEAN> masterTablePm = getMasterTablePm();
       masterTablePm.clearMasterRowPm();
+
       @SuppressWarnings("unchecked")
       Selection<T_MASTER_BEAN> deletedBeansSelection = (Selection<T_MASTER_BEAN>) evt.getOldValue();
       if ((masterBeanBeforeDeleteOperation != null) &&
           deletedBeansSelection.contains(masterBeanBeforeDeleteOperation)) {
+        // after clearing all selection information an auto-select will fire a selection change
+        // event that triggers a master selection change for all details handlers.
         T_MASTER_BEAN newMasterBean = masterTablePm.getMasterRowPmBean();
-        for (DetailsPmHandler dh : getDetailsPmHandlers()) {
-          dh.afterMasterRecordChange(newMasterBean);
+
+        // only on case of a null selection the details handlers need a additional info about the
+        // change
+        if (newMasterBean == null) {
+          for (DetailsPmHandler dh : getDetailsPmHandlers()) {
+            dh.afterMasterRecordChange(masterBeanBeforeDeleteOperation, newMasterBean);
+          }
         }
       }
     }

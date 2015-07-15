@@ -3,7 +3,7 @@ package org.pm4j.core.pm.impl.changehandler;
 import org.pm4j.core.pm.PmBean;
 
 /**
- * Base class logic extension: {@link #afterMasterRecordChangeImpl(Object)}
+ * Base class logic extension: {@link #afterMasterRecordChangeImpl(Object, Object)}
  * adjusts the details area by calling <code>setPmBean</code> using the new
  * master bean.
  *
@@ -20,10 +20,11 @@ public class DetailsPmBeanHandlerImpl<T_MASTER_RECORD> extends
   }
 
   @Override
-  protected void afterMasterRecordChangeImpl(T_MASTER_RECORD newMasterBean) {
-    // The base implementation not called here, because the all-change event will
-    // be fired by the setPmBean. This prevents event duplication.
-    getTypedDetailsPm().setPmBean(newMasterBean);
+  protected void afterMasterRecordChangeImpl(T_MASTER_RECORD oldMasterBean, T_MASTER_RECORD newMasterBean) {
+    if (oldMasterBean != newMasterBean) {
+      // The base implementation not called here, because setPmBean() calls are required operations.
+      getTypedDetailsPm().setPmBean(newMasterBean);
+    }
   }
 
 }

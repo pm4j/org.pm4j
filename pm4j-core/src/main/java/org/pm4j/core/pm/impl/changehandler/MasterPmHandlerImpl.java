@@ -148,7 +148,7 @@ public abstract class MasterPmHandlerImpl<T_MASTER_BEAN> implements MasterPmHand
     T_MASTER_BEAN selectedMasterBean = getSelectedMasterBean();
     if (selectedMasterBean != null) {
       for (DetailsPmHandler dh : detailsHandlers) {
-        dh.afterMasterRecordChange(selectedMasterBean);
+        dh.afterMasterRecordChange(null, selectedMasterBean);
       }
     }
   }
@@ -186,7 +186,7 @@ public abstract class MasterPmHandlerImpl<T_MASTER_BEAN> implements MasterPmHand
 
   /**
    * Re-adjusts the details area by calling
-   * {@link DetailsPmHandler#afterMasterRecordChange(Object)} with the new
+   * {@link DetailsPmHandler#afterMasterRecordChange(Object, Object)} with the new
    * selected table row.
    */
   // TODO oboede: delegates to a property change listener.
@@ -209,7 +209,7 @@ public abstract class MasterPmHandlerImpl<T_MASTER_BEAN> implements MasterPmHand
 
   /**
    * Re-adjusts the details area by calling
-   * {@link DetailsPmHandler#afterMasterRecordChange(Object)} with the new
+   * {@link DetailsPmHandler#afterMasterRecordChange(Object, Object)} with the new
    * selected table row.
    */
   @Override
@@ -218,14 +218,12 @@ public abstract class MasterPmHandlerImpl<T_MASTER_BEAN> implements MasterPmHand
     T_MASTER_BEAN beanSelectedInBeforeCall = this.beanSelectedInBeforeCall;
     this.beanSelectedInBeforeCall = null;
 
-    if (!ObjectUtils.equals(selectedMasterBean, beanSelectedInBeforeCall)) {
-      if (LOG.isDebugEnabled() && getMasterBeanModifications().isModified()) {
-        LOG.debug("Master record selection changed to " + selectedMasterBean + ". MasterPm: " + PmUtil.getPmLogString(masterPm));
-      }
+    if (LOG.isDebugEnabled() && !ObjectUtils.equals(selectedMasterBean, beanSelectedInBeforeCall)) {
+      LOG.debug("Master record selection changed from " + beanSelectedInBeforeCall + "to " + selectedMasterBean + ". MasterPm: " + PmUtil.getPmLogString(masterPm));
+    }
 
-      for (DetailsPmHandler dh : detailsHandlers) {
-        dh.afterMasterRecordChange(selectedMasterBean);
-      }
+    for (DetailsPmHandler dh : detailsHandlers) {
+      dh.afterMasterRecordChange(beanSelectedInBeforeCall, selectedMasterBean);
     }
   }
 
@@ -272,7 +270,11 @@ public abstract class MasterPmHandlerImpl<T_MASTER_BEAN> implements MasterPmHand
    * @return <code>true</code> if the switch can be performed.
    */
   private boolean beforeSwitch(T_MASTER_BEAN oldMasterBean, T_MASTER_BEAN newMasterBean) {
-    if (oldMasterBean == null) {
+    T_MASTER_BEAN old = oldMasterBean != null
+        ? oldMasterBean
+        : getSelectedMasterBean();
+
+    if (old == null) {
       return true;
     }
 
@@ -282,6 +284,11 @@ public abstract class MasterPmHandlerImpl<T_MASTER_BEAN> implements MasterPmHand
         allDetailsAgree = false;
       }
     }
+
+    if (allDetailsAgree) {
+      beanSelectedInBeforeCall = old;
+    }
+
     return allDetailsAgree;
   }
 

@@ -30,6 +30,9 @@ public interface DetailsPmHandler {
    */
   boolean beforeMasterRecordChange(Object oldMasterBean, Object newMasterBean);
 
+  /** @deprecated Please use {@link #afterMasterRecordChange(Object, Object)}. */
+  void afterMasterRecordChange(Object newMasterBean);
+
   /**
    * Gets called after a master record selection change.
    * <p>
@@ -38,10 +41,12 @@ public interface DetailsPmHandler {
    * In case of a master combo box (PM layer: PmAttr with options) the provided
    * object may represent the selected combo box item.
    *
+   * @param oldMasterBean
+   *          The master record that was de-selected.
    * @param newMasterBean
    *          The new master record. May be <code>null</code>.
    */
-  void afterMasterRecordChange(Object newMasterBean);
+  void afterMasterRecordChange(Object oldMasterBean, Object newMasterBean);
 
   /**
    * Gets called when the instances to observe are initialized.

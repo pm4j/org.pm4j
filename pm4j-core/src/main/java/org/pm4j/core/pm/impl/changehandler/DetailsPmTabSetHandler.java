@@ -34,8 +34,8 @@ public class DetailsPmTabSetHandler<T_MASTER_RECORD> extends DetailsPmHandlerImp
      * @param newMasterBean
      */
     @Override
-    protected void afterMasterRecordChangeImpl(T_MASTER_RECORD newMasterBean) {
-        super.afterMasterRecordChangeImpl(newMasterBean);
+    protected void afterMasterRecordChangeImpl(T_MASTER_RECORD oldMasterBean, T_MASTER_RECORD newMasterBean) {
+        super.afterMasterRecordChangeImpl(oldMasterBean, newMasterBean);
         getTypedDetailsPm().resetCurrentTabPmIfInactive();
     }
 }
