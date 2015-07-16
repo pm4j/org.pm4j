@@ -2,9 +2,9 @@ package org.pm4j.core.pm.impl.changehandler;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.beans.PropertyVetoException;
 import java.util.ArrayList;
 
+import org.apache.commons.lang.Validate;
 import org.pm4j.common.modifications.Modifications;
 import org.pm4j.common.pageable.PageableCollection;
 import org.pm4j.common.selection.Selection;
@@ -25,7 +25,7 @@ public class DetailsPmTableToTableHandler<T_MASTER_BEAN, T_DETAILS_BEAN> extends
 
   public DetailsPmTableToTableHandler(PmTableImpl<?, ? extends T_MASTER_BEAN> masterTablePm, PmTableImpl<?, ? extends T_DETAILS_BEAN> detailsTablePm) {
     super(detailsTablePm);
-    assert masterTablePm != null : "masterTablePm should not be null";
+    Validate.notNull(masterTablePm, "masterTablePm should not be null");
 
     this.masterTablePm = masterTablePm;
   }
@@ -58,6 +58,7 @@ public class DetailsPmTableToTableHandler<T_MASTER_BEAN, T_DETAILS_BEAN> extends
           }
         }
 
+        // TODO: Identify all details-details related to the key of the master...
         // 2. Inform details table listeners about the deletion of the details selection as well.
         //    The dependent details records disappear with the removed master record.
         Selection<T_DETAILS_BEAN> detailsSelection = getDetailsTable().getPmPageableBeanCollection().getSelection();
@@ -75,6 +76,7 @@ public class DetailsPmTableToTableHandler<T_MASTER_BEAN, T_DETAILS_BEAN> extends
     if (oldMasterBean != newMasterBean)
       return true;
 
+    // special execution condition that was introduced to handle delete of the last master record.
     return masterTablePm.getTotalNumOfPmRows() == 0;
   }
 }

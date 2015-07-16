@@ -10,7 +10,6 @@ import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmEvent.ValueChangeKind;
 import org.pm4j.core.pm.PmEventListener;
 import org.pm4j.core.pm.PmEventListener.PostProcessor;
-import org.pm4j.core.pm.PmEventListener.PostProcessorWithExceptionHandling;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.impl.InternalPmEventListenerRefs.ListenerRef;
@@ -138,24 +137,10 @@ public class PmEventApiHandler {
    * @param event the event to postprocess. It contains a set of registered post processors and related data.
    */
   public static void postProcessEvent(PmEvent event) {
-    try {
-      for (Map.Entry<PostProcessor<?>, Object> e : event.getPostProcessorToPayloadMap().entrySet()) {
-        @SuppressWarnings("unchecked")
-        PostProcessor<Object> pp = (PostProcessor<Object>) e.getKey();
-        pp.postProcess(event, e.getValue());
-      }
-    } catch (RuntimeException ex) {
-      for (Map.Entry<PostProcessor<?>, Object> e : event.getPostProcessorToPayloadMap().entrySet()) {
-        if (e.getKey() instanceof PostProcessorWithExceptionHandling) {
-          try {
-            ((PostProcessorWithExceptionHandling<?>)e).onException(event, ex);
-          } catch (RuntimeException ex2) {
-            // ignore
-            // TODO: log
-          }
-
-        }
-      }
+    for (Map.Entry<PostProcessor<?>, Object> e : event.getPostProcessorToPayloadMap().entrySet()) {
+      @SuppressWarnings("unchecked")
+      PostProcessor<Object> pp = (PostProcessor<Object>) e.getKey();
+      pp.postProcess(event, e.getValue());
     }
   }
 

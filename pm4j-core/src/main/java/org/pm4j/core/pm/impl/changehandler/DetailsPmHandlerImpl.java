@@ -100,10 +100,6 @@ public class DetailsPmHandlerImpl<T_DETAILS_PM extends PmObject, T_MASTER_RECORD
     afterMasterRecordChange(null, newMasterBean);
   }
 
-  protected boolean shouldProcessMasterChange(Object oldMasterBean, Object newMasterBean) {
-    return (oldMasterBean != newMasterBean);
-  }
-
   /**
    * Calls {@link #afterMasterRecordChangeImpl(Object, Object)} and calls the <code>afterDo()</code> method for
    * each configured decorator.
@@ -115,8 +111,7 @@ public class DetailsPmHandlerImpl<T_DETAILS_PM extends PmObject, T_MASTER_RECORD
       return;
     }
 
-    if (detailsPm != null &&
-        !ObjectUtils.equals(oldMasterBean, newMasterBean)) {
+    if (detailsPm != null) {
       // The details area has now a new content to handle. The old messages of
       // that area where related to the record that is no longer active.
       PmMessageApi.clearPmTreeMessages(detailsPm);
@@ -135,10 +130,6 @@ public class DetailsPmHandlerImpl<T_DETAILS_PM extends PmObject, T_MASTER_RECORD
 
   /** @deprecated please use and override {@link #afterMasterRecordChangeImpl(Object, Object)}. */
   protected void afterMasterRecordChangeImpl(T_MASTER_RECORD newMasterBean) {
-    // forget all states that was only related to the master selection before.
-    if (detailsPm != null) {
-      PmCacheApi.clearPmCache(detailsPm);
-    }
   }
 
   /**
@@ -151,6 +142,14 @@ public class DetailsPmHandlerImpl<T_DETAILS_PM extends PmObject, T_MASTER_RECORD
     // For logic compatibility: call the old signature to apply all existing overridden code a well.
     // Will disappear soon.
     afterMasterRecordChangeImpl(newMasterBean);
+  }
+
+  /**
+   * Defines whether the given change should trigger before- and after processing.
+   * The default implementation triggers it if both parameters are not the same instance.
+   */
+  protected boolean shouldProcessMasterChange(Object oldMasterBean, Object newMasterBean) {
+    return (oldMasterBean != newMasterBean);
   }
 
   /**

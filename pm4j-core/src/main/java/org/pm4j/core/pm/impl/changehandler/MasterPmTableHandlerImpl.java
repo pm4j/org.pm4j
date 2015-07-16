@@ -2,6 +2,7 @@ package org.pm4j.core.pm.impl.changehandler;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyVetoException;
+import java.lang.ref.WeakReference;
 
 import org.pm4j.common.modifications.ModificationHandler;
 import org.pm4j.common.pageable.PageableCollection;
@@ -15,7 +16,7 @@ import org.pm4j.core.pm.impl.PmTableImpl;
  * @param <T_MASTER_BEAN>
  *          the type of master beans behind the master table rows.
  *
- * @author olaf boede
+ * @author Olaf Boede
  */
 public class MasterPmTableHandlerImpl<T_MASTER_BEAN> extends MasterPmHandlerImpl<T_MASTER_BEAN> {
 
@@ -71,15 +72,20 @@ public class MasterPmTableHandlerImpl<T_MASTER_BEAN> extends MasterPmHandlerImpl
    */
   public class MasterRecordRemoveListener implements PropertyAndVetoableChangeListener {
 
-    private T_MASTER_BEAN masterBeanBeforeDeleteOperation;
+    private WeakReference<T_MASTER_BEAN> masterBeanBeforeDeleteOperation;
 
     @Override
     public void vetoableChange(PropertyChangeEvent evt) throws PropertyVetoException {
-      masterBeanBeforeDeleteOperation = getSelectedMasterBean();
+      T_MASTER_BEAN b = getSelectedMasterBean();
+      masterBeanBeforeDeleteOperation = (b != null)
+          ? new WeakReference<T_MASTER_BEAN>(getSelectedMasterBean())
+          : null;
     }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
+      T_MASTER_BEAN masterBeanBeforeDeleteOperation = this.masterBeanBeforeDeleteOperation != null ? this.masterBeanBeforeDeleteOperation.get() : null;
+
       PmTableImpl<?, T_MASTER_BEAN> masterTablePm = getMasterTablePm();
       masterTablePm.clearMasterRowPm();
 

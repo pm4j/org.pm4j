@@ -270,6 +270,7 @@ public abstract class MasterPmHandlerImpl<T_MASTER_BEAN> implements MasterPmHand
    * @return <code>true</code> if the switch can be performed.
    */
   private boolean beforeSwitch(T_MASTER_BEAN oldMasterBean, T_MASTER_BEAN newMasterBean) {
+    // TODO: a workaround for the old ACE data table connector. Should disappear asap.
     T_MASTER_BEAN old = oldMasterBean != null
         ? oldMasterBean
         : getSelectedMasterBean();

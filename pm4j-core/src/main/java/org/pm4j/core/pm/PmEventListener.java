@@ -56,27 +56,5 @@ public interface PmEventListener {
      *          call.
      */
     void postProcess(PmEvent event, T postProcessPayload);
-
- }
-
-  /**
-   * Receives an additional call back if there an exception occurred during the event processing.
-   */
-  public interface PostProcessorWithExceptionHandling<T> extends PostProcessor<T> {
-
-    /**
-     * Gets called whenever an exception was thrown in the time frame between registering this post processor and
-     * ending complete event processing.
-     *
-     * @param event
-     *          the originally posted event.
-     * @param exception
-     *          the catched exception.
-     * @return <code>true</code> if the standard command exception handling
-     *         should be called.<br>
-     *         <code>false</code> if the standard command exception handling can
-     *         be skipped.
-     */
-    boolean onException(PmEvent event, Exception exception);
   }
 }

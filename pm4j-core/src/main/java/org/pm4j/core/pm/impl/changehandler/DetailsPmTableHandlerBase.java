@@ -110,7 +110,6 @@ public abstract class DetailsPmTableHandlerBase<T_MASTER_BEAN, T_DETAILS_BEAN> e
 
     // In 'after' processing we do not support vetos:
     SelectionHandlerUtil.forceSelectAll(detailsTablePm.getPmPageableCollection().getSelectionHandler(), false);
-    PmCacheApi.clearPmCache(detailsTablePm);
 
     // No super() call. The default implementation does not match here.
   }
