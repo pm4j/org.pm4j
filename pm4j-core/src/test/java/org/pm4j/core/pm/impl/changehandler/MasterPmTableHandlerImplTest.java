@@ -2,6 +2,8 @@ package org.pm4j.core.pm.impl.changehandler;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.pm4j.tools.test._PmAssert.assertChanged;
+import static org.pm4j.tools.test._PmAssert.assertNotChanged;
 import static org.pm4j.tools.test._PmAssert.setValue;
 import static org.pm4j.tools.test._PmTableAssert.assertColStrings;
 
@@ -156,6 +158,68 @@ public class MasterPmTableHandlerImplTest {
     assertEquals("{}", dlg.detailsTableHandler.getMasterBeanToDetailsModificationsMap().toString());
     assertEquals("{}", dlg.detailsDetailsTableHandler.getMasterBeanToDetailsModificationsMap().toString());
   }
+
+  @Test
+  public void testDeleteAndDependendChanges() {
+    assertColStrings("a, b", dlg.masterTable.name);
+    assertColStrings("a.1", dlg.detailsTable.name);
+    assertColStrings("a.1.1", dlg.detailsDetailsTable.name);
+
+    setValue(dlg.detailsDetailsTable.getRowPms().get(0).name, "a.1.1'");
+
+    assertEquals("Modifications{added: 0, updated: 1, removed: 0}", dlg.masterTable.getPmPageableBeanCollection().getModifications().toString());
+    assertEquals("Modifications{added: 0, updated: 1, removed: 0}", dlg.detailsTable.getPmPageableBeanCollection().getModifications().toString());
+    assertEquals("Modifications{added: 0, updated: 1, removed: 0}", dlg.detailsDetailsTable.getPmPageableBeanCollection().getModifications().toString());
+    assertEquals("{a=Modifications{added: 0, updated: 1, removed: 0}}", dlg.detailsTableHandler.getMasterBeanToDetailsModificationsMap().toString());
+    assertEquals("{a.1=Modifications{added: 0, updated: 1, removed: 0}}", dlg.detailsDetailsTableHandler.getMasterBeanToDetailsModificationsMap().toString());
+    assertChanged(dlg.detailsDetailsTable, dlg.detailsTable, dlg.masterTable);
+
+    selectMasterRow(1);
+
+    assertEquals("Modifications{added: 0, updated: 1, removed: 0}", dlg.masterTable.getPmPageableBeanCollection().getModifications().toString());
+    assertEquals("Modifications{}", dlg.detailsTable.getPmPageableBeanCollection().getModifications().toString());
+    assertEquals("Modifications{}", dlg.detailsDetailsTable.getPmPageableBeanCollection().getModifications().toString());
+    assertColStrings("b.1", dlg.detailsTable.name);
+    assertColStrings("b.1.1", dlg.detailsDetailsTable.name);
+    assertChanged(dlg.masterTable);
+    assertNotChanged(dlg.detailsDetailsTable, dlg.detailsTable);
+
+    setValue(dlg.detailsDetailsTable.getRowPms().get(0).name, "b.1.1'");
+
+    assertEquals("Modifications{added: 0, updated: 2, removed: 0}", dlg.masterTable.getPmPageableBeanCollection().getModifications().toString());
+    assertEquals("Modifications{added: 0, updated: 1, removed: 0}", dlg.detailsTable.getPmPageableBeanCollection().getModifications().toString());
+    assertEquals("Modifications{added: 0, updated: 1, removed: 0}", dlg.detailsDetailsTable.getPmPageableBeanCollection().getModifications().toString());
+    assertEquals("{a=Modifications{added: 0, updated: 1, removed: 0}, b=Modifications{added: 0, updated: 1, removed: 0}}", dlg.detailsTableHandler.getMasterBeanToDetailsModificationsMap().toString());
+    assertEquals("{a.1=Modifications{added: 0, updated: 1, removed: 0}, b.1=Modifications{added: 0, updated: 1, removed: 0}}", dlg.detailsDetailsTableHandler.getMasterBeanToDetailsModificationsMap().toString());
+    assertChanged(dlg.detailsDetailsTable, dlg.detailsTable, dlg.masterTable);
+
+    assertTrue(dlg.masterTable.getPmPageableBeanCollection().getModificationHandler().removeSelectedItems());
+
+    assertColStrings("a", dlg.masterTable.name);
+    assertColStrings("a.1", dlg.detailsTable.name);
+    assertColStrings("a.1.1'", dlg.detailsDetailsTable.name);
+    assertEquals("Modifications{added: 0, updated: 1, removed: 1}", dlg.masterTable.getPmPageableBeanCollection().getModifications().toString());
+    assertEquals("Modifications{added: 0, updated: 1, removed: 0}", dlg.detailsTable.getPmPageableBeanCollection().getModifications().toString());
+    assertEquals("Modifications{added: 0, updated: 1, removed: 0}", dlg.detailsDetailsTable.getPmPageableBeanCollection().getModifications().toString());
+    assertEquals("{a=Modifications{added: 0, updated: 1, removed: 0}}", dlg.detailsTableHandler.getMasterBeanToDetailsModificationsMap().toString());
+    assertEquals("{a.1=Modifications{added: 0, updated: 1, removed: 0}}", dlg.detailsDetailsTableHandler.getMasterBeanToDetailsModificationsMap().toString());
+    assertChanged(dlg.detailsDetailsTable, dlg.detailsTable, dlg.masterTable);
+
+    assertTrue(dlg.masterTable.getPmPageableBeanCollection().getModificationHandler().removeSelectedItems());
+
+    assertColStrings("", dlg.masterTable.name);
+    assertColStrings("", dlg.detailsTable.name);
+    assertColStrings("", dlg.detailsDetailsTable.name);
+
+    assertEquals("Modifications{added: 0, updated: 0, removed: 2}", dlg.masterTable.getPmPageableBeanCollection().getModifications().toString());
+    assertEquals("Modifications{}", dlg.detailsTable.getPmPageableBeanCollection().getModifications().toString());
+    assertEquals("Modifications{}", dlg.detailsDetailsTable.getPmPageableBeanCollection().getModifications().toString());
+    assertEquals("{}", dlg.detailsTableHandler.getMasterBeanToDetailsModificationsMap().toString());
+    assertEquals("{}", dlg.detailsDetailsTableHandler.getMasterBeanToDetailsModificationsMap().toString());
+    assertChanged(dlg.masterTable);
+    assertNotChanged(dlg.detailsDetailsTable, dlg.detailsTable);
+  }
+
 
   @Test
   public void testDeleteAllMasterRows() {

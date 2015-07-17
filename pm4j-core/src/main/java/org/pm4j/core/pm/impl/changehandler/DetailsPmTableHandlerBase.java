@@ -2,6 +2,7 @@ package org.pm4j.core.pm.impl.changehandler;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.pm4j.common.modifications.Modifications;
@@ -26,7 +27,7 @@ import org.pm4j.core.pm.impl.PmTableImpl;
  */
 public abstract class DetailsPmTableHandlerBase<T_MASTER_BEAN, T_DETAILS_BEAN> extends DetailsPmHandlerImpl<PmTable<?>, T_MASTER_BEAN> {
 
-  private Map<T_MASTER_BEAN, Modifications<T_DETAILS_BEAN>> masterBeanToDetailsModificationsMap = new HashMap<T_MASTER_BEAN, Modifications<T_DETAILS_BEAN>>();
+  private Map<T_MASTER_BEAN, Modifications<T_DETAILS_BEAN>> masterBeanToDetailsModificationsMap = new LinkedHashMap<T_MASTER_BEAN, Modifications<T_DETAILS_BEAN>>();
 
   /** A temporary storage used to remember the modifications till the next {@link #afterMasterRecordChange(Object, Object)} call. */
   private Modifications<T_DETAILS_BEAN> beforeSwitchModifications;
@@ -140,9 +141,10 @@ public abstract class DetailsPmTableHandlerBase<T_MASTER_BEAN, T_DETAILS_BEAN> e
    * Removes the registered details modifications (if there where any) for the given master bean.
    *
    * @param masterBean The master bean to forget modifications for.
+   * @return The modifications registered for the given master or <code>null</code> if there where none.
    */
-  protected final void removeMasterBeanModifications(T_MASTER_BEAN masterBean) {
-    masterBeanToDetailsModificationsMap.remove(masterBean);
+  protected final Modifications<T_DETAILS_BEAN> removeMasterBeanModifications(T_MASTER_BEAN masterBean) {
+    return masterBeanToDetailsModificationsMap.remove(masterBean);
   }
 
   private void updateModificationsMapForMasterBean(T_MASTER_BEAN masterBean, Modifications<T_DETAILS_BEAN> newModifications) {

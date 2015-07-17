@@ -3,10 +3,13 @@ package org.pm4j.core.pm.impl.changehandler;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.commons.lang.Validate;
 import org.pm4j.common.modifications.Modifications;
 import org.pm4j.common.pageable.PageableCollection;
+import org.pm4j.common.selection.ItemSetSelection;
 import org.pm4j.common.selection.Selection;
 import org.pm4j.common.util.beanproperty.PropertyChangeSupportedBase;
 import org.pm4j.core.pm.impl.PmTableImpl;
@@ -50,21 +53,24 @@ public class DetailsPmTableToTableHandler<T_MASTER_BEAN, T_DETAILS_BEAN> extends
         // 1. Remove all modification entries related to the deleted master.
         @SuppressWarnings("unchecked")
         Selection<T_MASTER_BEAN> deletedMasterSelection = (Selection<T_MASTER_BEAN>) evt.getOldValue();
+        Set<T_DETAILS_BEAN> affectedDetails = new HashSet<T_DETAILS_BEAN>();
         // Iterate over the modifications and not over the selection.
         // Selection iteration may be slow but it's contains() method is fast.
         for (T_MASTER_BEAN b : new ArrayList<T_MASTER_BEAN>(getMasterBeanToDetailsModificationsMap().keySet())) {
           if (deletedMasterSelection.contains(b)) {
-            removeMasterBeanModifications(b);
+            Modifications<T_DETAILS_BEAN> m = removeMasterBeanModifications(b);
+            if (m != null) {
+              affectedDetails.addAll(m.getAddedItems());
+              affectedDetails.addAll(m.getUpdatedItems());
+            }
           }
         }
 
-        // TODO: Identify all details-details related to the key of the master...
         // 2. Inform details table listeners about the deletion of the details selection as well.
         //    The dependent details records disappear with the removed master record.
-        Selection<T_DETAILS_BEAN> detailsSelection = getDetailsTable().getPmPageableBeanCollection().getSelection();
-        if (!detailsSelection.isEmpty()) {
+        if (!affectedDetails.isEmpty()) {
           PropertyChangeSupportedBase pc = (PropertyChangeSupportedBase) getDetailsTable().getPmPageableBeanCollection();
-          pc.firePropertyChange(new PropertyChangeEvent(pc, PageableCollection.EVENT_REMOVE_SELECTION, detailsSelection, null));
+          pc.firePropertyChange(PageableCollection.EVENT_REMOVE_SELECTION, new ItemSetSelection<T_DETAILS_BEAN>(affectedDetails), null);
         }
       }
 
