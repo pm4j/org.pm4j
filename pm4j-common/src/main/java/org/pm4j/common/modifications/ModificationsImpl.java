@@ -124,9 +124,9 @@ public class ModificationsImpl<T_ITEM> implements Modifications<T_ITEM>, Cloneab
   @Override
   public String toString() {
     if (!isModified()) {
-      return "Modifications{}";
+      return "{}";
     } else {
-      StringBuilder sb = new StringBuilder("Modifications{");
+      StringBuilder sb = new StringBuilder("{");
       sb.append("added: " + addedItems.size());
       sb.append(", updated: " + updatedItems.size());
       sb.append(", removed: " + removedItems.getSize());
