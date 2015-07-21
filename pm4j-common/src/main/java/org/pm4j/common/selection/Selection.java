@@ -59,4 +59,16 @@ public interface Selection<T_ITEM> extends Iterable<T_ITEM>, Serializable {
    */
   void setIteratorBlockSizeHint(int readBlockSize);
 
+  /**
+   * A limited compare operation. Usually only selections of the same type
+   * can be compared this way.
+   * <p>
+   * May throw an {@link UnsupportedOperationException} in case of comparing selections
+   * of different types.
+   *
+   * @param other The selection to compare.
+   * @return <code>true</code> if both selections contain the same set of items.
+   */
+  boolean hasSameItemSet(Selection<T_ITEM> other);
+
 }

@@ -11,6 +11,8 @@ import org.pm4j.common.query.CompOpIn;
 import org.pm4j.common.query.QueryAttr;
 import org.pm4j.common.query.QueryExprCompare;
 import org.pm4j.common.query.QueryParams;
+import org.pm4j.common.selection.Selection;
+import org.pm4j.common.util.CompareUtil;
 
 /**
  * A selection that holds the ID's of selected items.
@@ -86,6 +88,16 @@ import org.pm4j.common.query.QueryParams;
     return (PageQueryService<T_ITEM, T_ID>) super.getService();
   }
 
+  @SuppressWarnings("unchecked")
+  @Override
+  public boolean hasSameItemSet(Selection<T_ITEM> other) {
+    // Compare of other selections is currently not supported.
+    if (!(other instanceof PageQueryItemIdSelection)) {
+      throw new UnsupportedOperationException("Unable to compare to: " + other);
+    }
+    return CompareUtil.equalItemSet(ids, ((PageQueryItemIdSelection<T_ITEM, T_ID>)other).ids);
+  }
+
   @Override
   public Iterator<T_ITEM> iterator() {
     return new PagingItemIterator();
@@ -104,13 +116,13 @@ import org.pm4j.common.query.QueryParams;
 
     @Override
     public T_ITEM next() {
-      
+
       if ( getSize() == 1 ) {
         // for the frequent case of a single selected item, sort order makes no difference
         idIndex++;
         return getService().getItemForId(ids.iterator().next());
       }
-      
+
       // If the database changed, we might skip entries.
       // This can not avoided at 100%, and any try to reduce frequency of this quirk is expensive.
       if ( chunk == null || relativeIdIndex >= chunk.size() ) {
@@ -131,4 +143,5 @@ import org.pm4j.common.query.QueryParams;
       throw new UnsupportedOperationException();
     }
   }
+
 }

@@ -30,8 +30,9 @@ public class MasterPmTableHandlerImplTest {
     Assert.assertNotNull(dlg.masterTable.getMasterRowPmBean());
     assertEquals("a", dlg.masterTable.getMasterRowPmBean().toString());
 
-    // TODO: this generates superflous events.
-    //selectMasterRow(0);
+    // An additional (now superflous) call.
+    // Stays in the test to check if additional events will appear.
+    selectMasterRow(0);
 
     assertEquals("a", dlg.masterTable.getMasterRowPmBean().toString());
     assertEquals("a", dlg.detailsArea.getPmBean().toString());

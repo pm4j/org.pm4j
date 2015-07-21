@@ -7,14 +7,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import javax.validation.constraints.NotNull;
-
+import org.apache.commons.lang.ObjectUtils;
 import org.pm4j.common.pageable.querybased.QueryService;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.selection.SelectMode;
 import org.pm4j.common.selection.Selection;
 import org.pm4j.common.selection.SelectionHandlerBase;
+import org.pm4j.common.selection.SelectionHandlerUtil;
 import org.pm4j.common.util.CloneUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -137,6 +137,11 @@ public abstract class PageQuerySelectionHandler<T_ITEM, T_ID> extends SelectionH
   @SuppressWarnings("unchecked")
   @Override
   public boolean setSelection(final Selection<T_ITEM> selectionArg) {
+    // check for noop:
+    if (SelectionHandlerUtil.sameSelection(this.currentSelection, selectionArg)) {
+      return true;
+    }
+
     Selection<T_ITEM> selection;
     // in case of an empty selection we may get a type without 'clicked ids' that's handled here:
     if (selectionArg instanceof QuerySelectionWithClickedIds) {
@@ -151,11 +156,6 @@ public abstract class PageQuerySelectionHandler<T_ITEM, T_ID> extends SelectionH
 
     Selection<T_ITEM> oldSelection = this.currentSelection;
     QuerySelectionWithClickedIds<T_ITEM, T_ID> newSelection = (QuerySelectionWithClickedIds<T_ITEM, T_ID>) selection;
-
-    // check for noop:
-    if (oldSelection.isEmpty() && newSelection.isEmpty()) {
-      return true;
-    }
 
     try {
       fireVetoableChange(PROP_SELECTION, oldSelection, newSelection);
@@ -297,6 +297,17 @@ public abstract class PageQuerySelectionHandler<T_ITEM, T_ID> extends SelectionH
     /** Type access helper */
     protected PageQueryService<T_ITEM, T_ID> getPageableQueryService() {
       return (PageQueryService<T_ITEM, T_ID>) getService();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public boolean hasSameItemSet(Selection<T_ITEM> other) {
+      // Compare of other selections is currently not supported.
+      if (!(other instanceof InvertedSelection)) {
+        throw new UnsupportedOperationException("Unable to compare to: " + other);
+      }
+      return ObjectUtils.equals(query, ((InvertedSelection<T_ITEM, T_ID>)other).query) &&
+         SelectionHandlerUtil.sameSelection(baseSelection, ((InvertedSelection<T_ITEM, T_ID>)other).baseSelection);
     }
 
   }

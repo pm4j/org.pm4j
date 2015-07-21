@@ -5,7 +5,6 @@ import static org.apache.commons.lang.Validate.notNull;
 import java.beans.PropertyVetoException;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -40,9 +39,9 @@ public abstract class ItemSetSelectionHandler<T_ITEM> extends SelectionHandlerBa
   public boolean select(boolean select, T_ITEM item) {
     notNull(item, "item cannot be null");
     Set<T_ITEM> newSelection = new LinkedHashSet<T_ITEM>((int) selection.getSize() + 1);
-    
+
     //rebuild selection maintaining original order
-    
+
     if(select) { //select
       if (getSelectMode().equals(SelectMode.SINGLE)) {
         newSelection.add(item);
@@ -63,7 +62,7 @@ public abstract class ItemSetSelectionHandler<T_ITEM> extends SelectionHandlerBa
       newSelection.addAll(IterableUtil.asCollection(selection));
       newSelection.remove(item);
     }
-    
+
     return setSelection(newSelection);
   }
 
@@ -127,18 +126,17 @@ public abstract class ItemSetSelectionHandler<T_ITEM> extends SelectionHandlerBa
 
   @Override
   public boolean setSelection(Selection<T_ITEM> selection) {
-    Selection<T_ITEM> oldSelection = this.selection;
-    Selection<T_ITEM> newSelection = selection;
+    ItemSetSelection<T_ITEM> oldSelection = this.selection;
+    ItemSetSelection<T_ITEM> newSelection = (ItemSetSelection<T_ITEM>) selection;
 
     // check for noop:
-    if (oldSelection.getSize() == 0 &&
-        newSelection.getSize() == 0) {
+    if (oldSelection == newSelection || oldSelection.hasSameItemSet(newSelection)) {
       return true;
     }
 
     try {
       fireVetoableChange(PROP_SELECTION, oldSelection, newSelection);
-      this.selection = (ItemSetSelection<T_ITEM>)newSelection;
+      this.selection = newSelection;
       firePropertyChange(PROP_SELECTION, oldSelection, newSelection);
       return true;
     } catch (PropertyVetoException e) {
@@ -161,9 +159,9 @@ public abstract class ItemSetSelectionHandler<T_ITEM> extends SelectionHandlerBa
                     ? (ItemSetSelection<T_ITEM>) EMPTY_SELECTION
                     : new ItemSetSelection<T_ITEM>(selectedItems));
   }
-  
+
   /**
-   * 
+   *
    * @return a collection containing all available items possible to select
    */
   protected abstract Collection<T_ITEM> getAllCollection();

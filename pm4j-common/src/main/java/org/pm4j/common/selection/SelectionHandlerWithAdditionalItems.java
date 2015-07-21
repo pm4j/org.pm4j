@@ -7,9 +7,9 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
+import org.pm4j.common.pageable.PageableCollection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.pm4j.common.pageable.PageableCollection;
 
 /**
  * Handles in front of another {@link SelectionHandler} selected transient items.
@@ -218,14 +218,13 @@ public class SelectionHandlerWithAdditionalItems<T_ITEM> extends SelectionHandle
 
   @Override
   public boolean setSelection(Selection<T_ITEM> selection) {
-    assert selection instanceof SelectionWithAdditionalItems;
     assert ! baseSelectionHandler.isFirePropertyEvents();
 
     Selection<T_ITEM> oldSelection = this.selection;
     SelectionWithAdditionalItems<T_ITEM> newSelection = (SelectionWithAdditionalItems<T_ITEM>) selection;
 
     // check for noop:
-    if (oldSelection.isEmpty() && newSelection.isEmpty()) {
+    if (this.selection == selection || this.selection.hasSameItemSet(newSelection)) {
       return true;
     }
 

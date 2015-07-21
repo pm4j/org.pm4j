@@ -3,6 +3,7 @@ package org.pm4j.core.pm.impl.pageable;
 import java.util.Iterator;
 
 import org.pm4j.common.selection.Selection;
+import org.pm4j.common.selection.SelectionHandlerUtil;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmBean;
 import org.pm4j.core.pm.PmObject;
@@ -73,6 +74,15 @@ public class PmBeanSelection<T_PM extends PmBean<T_BEAN>, T_BEAN> implements Sel
 
   public Selection<T_BEAN> getBeanSelection() {
     return beanSelection;
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public boolean hasSameItemSet(Selection<T_PM> other) {
+    if (!(other instanceof PmBeanSelection)) {
+      throw new UnsupportedOperationException("Unable to compare to: " + other);
+    }
+    return SelectionHandlerUtil.sameSelection(beanSelection, ((PmBeanSelection<T_PM, T_BEAN>)other).beanSelection);
   }
 
   @Override

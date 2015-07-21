@@ -3,7 +3,6 @@ package org.pm4j.common.pageable.querybased.idquery;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -14,6 +13,7 @@ import org.pm4j.common.pageable.querybased.NoItemForKeyFoundException;
 import org.pm4j.common.pageable.querybased.QuerySelectionBase;
 import org.pm4j.common.selection.ItemIdBasedSelection;
 import org.pm4j.common.selection.Selection;
+import org.pm4j.common.util.CompareUtil;
 import org.pm4j.common.util.collection.ListUtil;
 
 /**
@@ -26,7 +26,7 @@ import org.pm4j.common.util.collection.ListUtil;
  */
 public class IdQuerySelection<T_ITEM, T_ID>
     extends QuerySelectionBase<T_ITEM, T_ID>
-    implements Selection<T_ITEM>, Serializable, ItemIdBasedSelection<T_ITEM, T_ID> {
+    implements Serializable, ItemIdBasedSelection<T_ITEM, T_ID> {
 
   /** Serialization class version. Increment on member structure change. */
   private static final long serialVersionUID = 1L;
@@ -75,6 +75,16 @@ public class IdQuerySelection<T_ITEM, T_ID>
   public void setIteratorBlockSizeHint(int readBlockSize) {
     Validate.isTrue(readBlockSize > 0, "Iterator read block size must be greater than zero.");
     this.iterationReadBlockSize = readBlockSize;
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public boolean hasSameItemSet(Selection<T_ITEM> other) {
+    // Compare of other selections is currently not supported.
+    if (!(other instanceof IdQuerySelection)) {
+    	throw new UnsupportedOperationException("Unable to compare to: " + other) ;
+    }
+    return CompareUtil.equalItemSet(ids, ((IdQuerySelection<T_ITEM, T_ID>)other).ids);
   }
 
   @Override
