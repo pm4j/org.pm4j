@@ -4,7 +4,9 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.pm4j.common.query.QueryParams;
+import org.pm4j.common.selection.Selection;
 
 /**
  * Provides a selection containing all items provided by the service.
@@ -14,7 +16,7 @@ import org.pm4j.common.query.QueryParams;
  *
  * @author Olaf Boede
  */
-public class PageQueryAllItemsSelection<T_ITEM, T_ID> extends PageQuerySelectionBase<T_ITEM, T_ID>{
+public class PageQueryAllItemsSelection<T_ITEM, T_ID> extends PageQuerySelectionBase<T_ITEM, T_ID> {
 
   private static final long serialVersionUID = 1L;
 
@@ -64,6 +66,17 @@ public class PageQueryAllItemsSelection<T_ITEM, T_ID> extends PageQuerySelection
   public void setIteratorBlockSizeHint(int readBlockSize) {
     assert readBlockSize > 0;
     pageSize = readBlockSize;
+  }
+
+  @Override
+  public boolean hasSameItemSet(Selection<T_ITEM> other) {
+    // Compare of other selections is currently not supported.
+    if (!(other instanceof PageQueryAllItemsSelection)) {
+      throw new UnsupportedOperationException("Unable to compare to: " + other);
+    }
+    @SuppressWarnings("unchecked")
+    PageQueryAllItemsSelection<T_ITEM, T_ID> otherSelection = (PageQueryAllItemsSelection<T_ITEM, T_ID>) other;
+    return ObjectUtils.equals(queryParams, otherSelection.queryParams);
   }
 
   protected PageQueryService<T_ITEM, T_ID> getPageableQueryService() {

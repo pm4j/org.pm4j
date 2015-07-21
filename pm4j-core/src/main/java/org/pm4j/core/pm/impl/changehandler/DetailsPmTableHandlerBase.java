@@ -2,13 +2,16 @@ package org.pm4j.core.pm.impl.changehandler;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.pm4j.common.modifications.Modifications;
+import org.pm4j.common.selection.SelectionHandlerUtil;
 import org.pm4j.common.util.CloneUtil;
 import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmTable;
 import org.pm4j.core.pm.PmTable.UpdateAspect;
+import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.impl.PmEventListenerBase;
 import org.pm4j.core.pm.impl.PmTableImpl;
@@ -24,11 +27,11 @@ import org.pm4j.core.pm.impl.PmTableImpl;
  */
 public abstract class DetailsPmTableHandlerBase<T_MASTER_BEAN, T_DETAILS_BEAN> extends DetailsPmHandlerImpl<PmTable<?>, T_MASTER_BEAN> {
 
-  private Map<T_MASTER_BEAN, Modifications<T_DETAILS_BEAN>> masterBeanToDetailsModificationsMap = new HashMap<T_MASTER_BEAN, Modifications<T_DETAILS_BEAN>>();
+  private Map<T_MASTER_BEAN, Modifications<T_DETAILS_BEAN>> masterBeanToDetailsModificationsMap = new LinkedHashMap<T_MASTER_BEAN, Modifications<T_DETAILS_BEAN>>();
 
-  /** A temporary storage used to remember the modifications till the next {@link #afterMasterRecordChange(Object)} call. */
+  /** A temporary storage used to remember the modifications till the next {@link #afterMasterRecordChange(Object, Object)} call. */
   private Modifications<T_DETAILS_BEAN> beforeSwitchModifications;
-  /** A temporary storage used to remember the old master record till the next {@link #afterMasterRecordChange(Object)} call. */
+  /** A temporary storage used to remember the old master record till the next {@link #afterMasterRecordChange(Object, Object)} call. */
   private T_MASTER_BEAN beforeSwitchMasterBean;
   /** Reference to the latest master bean. */
   private T_MASTER_BEAN currentMasterBean;
@@ -85,8 +88,7 @@ public abstract class DetailsPmTableHandlerBase<T_MASTER_BEAN, T_DETAILS_BEAN> e
   }
 
   @Override
-  protected void afterMasterRecordChangeImpl(T_MASTER_BEAN newMasterBean) {
-    super.afterMasterRecordChangeImpl(newMasterBean);
+  protected void afterMasterRecordChangeImpl(T_MASTER_BEAN oldMasterBean, T_MASTER_BEAN newMasterBean) {
     currentMasterBean = newMasterBean;
     if (beforeSwitchModifications != null) {
       updateModificationsMapForMasterBean(beforeSwitchMasterBean, beforeSwitchModifications);
@@ -95,17 +97,22 @@ public abstract class DetailsPmTableHandlerBase<T_MASTER_BEAN, T_DETAILS_BEAN> e
     }
 
     PmTableImpl<?, T_DETAILS_BEAN> detailsTablePm = getDetailsTable();
-    detailsTablePm.clearMasterRowPm();
     // Resets changed states and selections from the details table.<br>
     // But preserves it's sort order and filter settings.
-    detailsTablePm.updatePmTable(UpdateAspect.CLEAR_CHANGES, UpdateAspect.CLEAR_SELECTION);
+    detailsTablePm.updatePmTable(UpdateAspect.CLEAR_CHANGES);
     // Restores the last known details modification state.
     Modifications<T_DETAILS_BEAN> knownOldDetailsModifications = masterBeanToDetailsModificationsMap.get(currentMasterBean);
     if (knownOldDetailsModifications != null) {
       detailsTablePm.getPmPageableBeanCollection().getModificationHandler().setModifications(knownOldDetailsModifications);
     }
-    // the next getSelection call ensures then the minimal selection state.
-    detailsTablePm.getPmPageableCollection().getSelectionHandler().ensureSelectionStateRequired();
+
+    // Forget any old 'current' details table row.
+    detailsTablePm.clearMasterRowPm();
+
+    // In 'after' processing we do not support vetos:
+    SelectionHandlerUtil.forceSelectAll(detailsTablePm.getPmPageableCollection().getSelectionHandler(), false);
+
+    // No super() call. The default implementation does not match here.
   }
 
   /**
@@ -130,6 +137,16 @@ public abstract class DetailsPmTableHandlerBase<T_MASTER_BEAN, T_DETAILS_BEAN> e
     return (PmTableImpl<?, T_DETAILS_BEAN>) getDetailsPm();
   }
 
+  /**
+   * Removes the registered details modifications (if there where any) for the given master bean.
+   *
+   * @param masterBean The master bean to forget modifications for.
+   * @return The modifications registered for the given master or <code>null</code> if there where none.
+   */
+  protected final Modifications<T_DETAILS_BEAN> removeMasterBeanModifications(T_MASTER_BEAN masterBean) {
+    return masterBeanToDetailsModificationsMap.remove(masterBean);
+  }
+
   private void updateModificationsMapForMasterBean(T_MASTER_BEAN masterBean, Modifications<T_DETAILS_BEAN> newModifications) {
     if (masterBean == null) {
       return;
@@ -138,7 +155,7 @@ public abstract class DetailsPmTableHandlerBase<T_MASTER_BEAN, T_DETAILS_BEAN> e
     if (newModifications != null && newModifications.isModified()) {
       masterBeanToDetailsModificationsMap.put(masterBean, CloneUtil.clone(newModifications));
     } else {
-      masterBeanToDetailsModificationsMap.remove(masterBean);
+      removeMasterBeanModifications(masterBean);
     }
   }
 

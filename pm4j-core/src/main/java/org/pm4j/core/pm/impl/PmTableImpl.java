@@ -17,6 +17,7 @@ import org.pm4j.common.cache.CacheStrategy;
 import org.pm4j.common.cache.CacheStrategyNoCache;
 import org.pm4j.common.modifications.ModificationHandler;
 import org.pm4j.common.pageable.PageableCollection;
+import org.pm4j.common.pageable.PageableCollectionUtil;
 import org.pm4j.common.pageable.inmem.InMemCollection;
 import org.pm4j.common.pageable.inmem.InMemCollectionBase;
 import org.pm4j.common.pageable.inmem.InMemCollectionImpl;
@@ -36,6 +37,7 @@ import org.pm4j.common.selection.SelectMode;
 import org.pm4j.common.selection.Selection;
 import org.pm4j.common.selection.SelectionHandler;
 import org.pm4j.common.selection.SelectionHandlerUtil;
+import org.pm4j.common.selection.SelectionHandler.SelectionHandlerCallback;
 import org.pm4j.common.util.collection.IterableUtil;
 import org.pm4j.common.util.reflection.ClassUtil;
 import org.pm4j.common.util.reflection.GenericTypeUtil;
@@ -276,7 +278,7 @@ public class PmTableImpl
    */
   protected T_ROW_PM getMasterRowPmImpl() {
     if (getPmRowSelectMode() == SelectMode.SINGLE) {
-      Selection<T_ROW_PM> selection = getPmSelectionHandler().getSelection();
+      Selection<T_ROW_PM> selection = getPmPageableCollection().getSelection();
       if (selection.getSize() == 1) {
         return selection.iterator().next();
       }
@@ -308,6 +310,9 @@ public class PmTableImpl
       LOG.trace(this + " - clearing master row.");
     }
     this.masterRowPm = null;
+    // for tables with automatic re-selection, this call ensure that the automatic re-selection
+    // takes place.
+    getPmPageableCollection().getSelectionHandler().ensureSelectionStateRequired();
   }
 
   /**
@@ -388,12 +393,7 @@ public class PmTableImpl
         // the 'current' row corrensponds in most case to the selection. It needs to be re-calculated.
       clearMasterRowPm();
       // In case of a clear call we do not handle vetos.
-        // TODO olaf: Write unit tests to verify that that's not problem in all master details cases.
       SelectionHandlerUtil.forceSelectAll(getPmPageableCollection().getSelectionHandler(), false);
-
-        // Ensure that the minimal standard selection gets re-created on next get-selection request.
-        // TODO: can be part of selectAll(false). Every selection that leads to a no-Selection.
-      getPmPageableCollection().getSelectionHandler().ensureSelectionStateRequired();
       break;
     case CLEAR_SORT_ORDER:
       getPmQueryParams().setSortOrder(getPmQueryOptions().getDefaultSortOrder());
@@ -427,7 +427,6 @@ public class PmTableImpl
     if (cacheSet.contains(CacheKind.VALUE)) {
       getPmPageableCollection().clearCaches();
       clearMasterRowPm();
-      getPmPageableCollection().getSelectionHandler().ensureSelectionStateRequired();
     }
   }
 
@@ -943,7 +942,21 @@ public class PmTableImpl
     }
   }
 
-
+  /** A selection handler callback that ensures that a single item is selected (if
+   * there is more than one) in case of {@link SelectMode#SINGLE}.<br>
+   * If there is nothing selected it selects the first item on the current page. */
+  public class EnsureSingleSelectionCallback implements SelectionHandlerCallback {
+    @Override
+    public void ensureSelectionState() {
+      PageableCollection<T_ROW_BEAN> pc = getPmPageableBeanCollection();
+      if (pc.getSelectionHandler().getSelectMode() == SelectMode.SINGLE &&
+          getTotalNumOfPmRows() > 0) {
+        if ((pc.getSelectionHandler().getSelection().getSize() == 0)) {
+          PageableCollectionUtil.selectFirstOnPage(pc);
+        }
+      }
+    }
+  }
 
   /** Implements controlled implementation layer access for other PM classes. */
   protected class TableDetailsImpl implements ImplDetails {

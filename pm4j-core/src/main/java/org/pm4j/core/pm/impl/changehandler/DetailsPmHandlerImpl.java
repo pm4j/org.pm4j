@@ -3,17 +3,14 @@ package org.pm4j.core.pm.impl.changehandler;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.Validate;
 import org.pm4j.core.pm.PmCommandDecorator;
-import org.pm4j.core.pm.PmDataInput;
-import org.pm4j.core.pm.PmEvent;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.api.PmCacheApi;
 import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
-import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmMessageApi;
 import org.pm4j.core.pm.api.PmValidationApi;
-import org.pm4j.core.pm.impl.PmTabSetImpl;
 
 /**
  * A details handler that allows a master record switch only if the details area is valid.
@@ -33,7 +30,7 @@ public class DetailsPmHandlerImpl<T_DETAILS_PM extends PmObject, T_MASTER_RECORD
   /** The details area PM. */
   private final T_DETAILS_PM detailsPm;
 
-  /** Additional decorators to apply on {@link #beforeMasterRecordChange(Object, Object)} ()} and {@link #afterMasterRecordChange(Object)}. */
+  /** Additional decorators to apply on {@link #beforeMasterRecordChange(Object, Object)} ()} and {@link #afterMasterRecordChange(Object, Object)}. */
   private final List<PmCommandDecorator> decorators = new ArrayList<PmCommandDecorator>();
 
   /**
@@ -59,6 +56,10 @@ public class DetailsPmHandlerImpl<T_DETAILS_PM extends PmObject, T_MASTER_RECORD
   /** Calls <code>beforeDo</code> for all decorators and {@link #beforeMasterRecordChangeImpl(Object)}. */
   @SuppressWarnings("unchecked")
   public final boolean beforeMasterRecordChange(Object oldMasterRecord, Object newMasterRecord) {
+    if (!shouldProcessMasterChange(oldMasterRecord, newMasterRecord)) {
+      return true;
+    }
+
     for (PmCommandDecorator d : decorators) {
       if (!d.beforeDo(null)) {
         return false;
@@ -94,26 +95,22 @@ public class DetailsPmHandlerImpl<T_DETAILS_PM extends PmObject, T_MASTER_RECORD
     return true;
   }
 
+  @Deprecated
+  public final void afterMasterRecordChange(Object newMasterBean) {
+    afterMasterRecordChange(null, newMasterBean);
+  }
+
   /**
-   * Calls {@link #afterMasterRecordChangeImpl(Object)} and calls the <code>afterDo()</code> method for
+   * Calls {@link #afterMasterRecordChangeImpl(Object, Object)} and calls the <code>afterDo()</code> method for
    * each configured decorator.
    */
   @SuppressWarnings("unchecked")
   @Override
-  public final void afterMasterRecordChange(Object newMasterBean) {
-    afterMasterRecordChangeImpl((T_MASTER_RECORD) newMasterBean);
-    for (PmCommandDecorator d : decorators) {
-        d.afterDo(null);
+  public final void afterMasterRecordChange(Object oldMasterBean, Object newMasterBean) {
+    if (!shouldProcessMasterChange(oldMasterBean, newMasterBean)) {
+      return;
     }
-  }
 
-  /**
-   * The default implementation just clears the details PM.
-   * <br>
-   * More specific details hander implementations may add here their details area specific
-   * logic.
-   */
-  protected void afterMasterRecordChangeImpl(T_MASTER_RECORD newMasterBean) {
     if (detailsPm != null) {
       // The details area has now a new content to handle. The old messages of
       // that area where related to the record that is no longer active.
@@ -121,10 +118,42 @@ public class DetailsPmHandlerImpl<T_DETAILS_PM extends PmObject, T_MASTER_RECORD
       // All cached information within the details area should be refreshed.
       PmCacheApi.clearPmCache(detailsPm, CacheKind.ALL);
     }
+
+    // apply specific logic. E.g. restore changed state in relation to a re-selected master bean.
+    afterMasterRecordChangeImpl((T_MASTER_RECORD) oldMasterBean, (T_MASTER_RECORD) newMasterBean);
+
+    for (PmCommandDecorator d : decorators) {
+        d.afterDo(null);
+    }
+
+  }
+
+  /** @deprecated please use and override {@link #afterMasterRecordChangeImpl(Object, Object)}. */
+  protected void afterMasterRecordChangeImpl(T_MASTER_RECORD newMasterBean) {
   }
 
   /**
-   * Adds a decorator to consider in {@link #beforeMasterRecordChange(Object)} and {@link #afterMasterRecordChange(Object)}.
+   * The default implementation broadcasts an all-changed event.
+   * <br>
+   * More specific details hander implementations may add/place their details area specific
+   * logic by overriding this method.
+   */
+  protected void afterMasterRecordChangeImpl(T_MASTER_RECORD oldMasterBean, T_MASTER_RECORD newMasterBean) {
+    // For logic compatibility: call the old signature to apply all existing overridden code a well.
+    // Will disappear soon.
+    afterMasterRecordChangeImpl(newMasterBean);
+  }
+
+  /**
+   * Defines whether the given change should trigger before- and after processing.
+   * The default implementation triggers it if both parameters are not the same instance.
+   */
+  protected boolean shouldProcessMasterChange(Object oldMasterBean, Object newMasterBean) {
+    return (oldMasterBean != newMasterBean);
+  }
+
+  /**
+   * Adds a decorator to consider in {@link #beforeMasterRecordChange(Object, Object)} and {@link #afterMasterRecordChange(Object, Object)}.
    *
    * @param decorator
    */

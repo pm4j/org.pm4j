@@ -6,12 +6,14 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.pm4j.common.util.CompareUtil;
+
 /**
  * A selection based on a set of objects.
  * <p>
  * @param <T_ITEM> the type of selected items.
  *
- * @author olaf boede
+ * @author Olaf Boede
  */
 public class ItemSetSelection<T_ITEM> implements Selection<T_ITEM> {
   private static final long serialVersionUID = 1L;
@@ -52,6 +54,14 @@ public class ItemSetSelection<T_ITEM> implements Selection<T_ITEM> {
   @Override
   public boolean contains(T_ITEM item) {
     return selectedItems.contains(item);
+  }
+
+  @Override
+  public boolean hasSameItemSet(Selection<T_ITEM> other) {
+    if (!(other instanceof ItemSetSelection)) {
+      throw new UnsupportedOperationException("Unable to compare to: " + other);
+    }
+    return CompareUtil.sameItemSet(selectedItems, ((ItemSetSelection<T_ITEM>)other).selectedItems);
   }
 
   @Override

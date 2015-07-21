@@ -179,7 +179,7 @@ public class DeprMasterPmTableHandlerImpl<T_MASTER_BEAN> implements MasterPmHand
 
   /**
    * Sets the handler to an 'unchanged' state by clearing the set of {@link #changedMasterBeans}.
-   * Re-adjusts the details area by calling {@link DetailsPmHandler#afterMasterRecordChange(Object)}
+   * Re-adjusts the details area by calling {@link DetailsPmHandler#afterMasterRecordChange(Object, Object)}
    * with the new selected table row.
    *
    * @param event the master PM value change event.
@@ -198,7 +198,7 @@ public class DeprMasterPmTableHandlerImpl<T_MASTER_BEAN> implements MasterPmHand
 
     T_MASTER_BEAN selectedMasterBean = getSelectedMasterBean();
     for (DetailsPmHandler dh : detailsHandlers) {
-      dh.afterMasterRecordChange(selectedMasterBean);
+      dh.afterMasterRecordChange(null, selectedMasterBean);
     }
   }
 
@@ -339,7 +339,7 @@ public class DeprMasterPmTableHandlerImpl<T_MASTER_BEAN> implements MasterPmHand
 
       T_MASTER_BEAN selectedMasterBean = getSelectedMasterBean();
       for (DetailsPmHandler dh : detailsHandlers) {
-        dh.afterMasterRecordChange(selectedMasterBean);
+        dh.afterMasterRecordChange(changedMasterBean, selectedMasterBean);
       }
       changedMasterBean = null;
     }

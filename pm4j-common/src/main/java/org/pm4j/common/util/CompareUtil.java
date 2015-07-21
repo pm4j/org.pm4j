@@ -1,8 +1,11 @@
 package org.pm4j.common.util;
 
 import java.text.Collator;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
@@ -204,6 +207,98 @@ public class CompareUtil {
     }
     for (int i=0; i<lhs.size(); ++i) {
       if (!ObjectUtils.equals(lhs.get(i), rhs.get(i))) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Checks if both collection contain the same set of items (identical items, not only equal).<br>
+   * The item order does not matter.
+   *
+   * @param lhs
+   * @param rhs
+   * @return <code>true</code> is all items are the same in both sets.
+   */
+  public static <T> boolean sameItemSet(Collection<T> lhs, Collection<T> rhs) {
+	if (lhs == null && rhs == null) {
+		return true;
+	}
+    if (lhs == null || rhs == null) {
+        return false;
+    }
+	  
+    if (lhs.size() != rhs.size()) {
+      return false;
+    }
+    if (lhs.isEmpty()) {
+      return true;
+    }
+
+    return sameItemSet(lhs, rhs, lhs.size());
+  }
+
+  /**
+   * Checks if both {@link Iterable}s contain the same set of items (identical items, not only equal).<br>
+   * The item order does not matter.
+   *
+   * @param lhs
+   * @param rhs
+   * @param sizeHint a hint about the collection size (for internal optimization).
+   * @return <code>true</code> is all items are the same in both sets.
+   */
+  public static <T> boolean sameItemSet(Iterable<T> lhs, Iterable<T> rhs, int sizeHint) {
+    if (lhs == null && rhs == null) {
+      return true;
+    }
+    if (lhs == null || rhs == null) {
+      return false;
+    }
+    Map<T, T> lhsMap = new HashMap<T, T>(sizeHint);
+    for (T i1 : lhs) {
+      lhsMap.put(i1, i1);
+    }
+    int rhsSize = 0;
+    for (T i2 : rhs) {
+      T i1 = lhsMap.get(i2);
+      if (i1 != i2) {
+        return false;
+      }
+      ++rhsSize;
+    }
+    return lhsMap.size() == rhsSize;
+  }
+
+  /**
+   * Checks if both collection contain the equal set of items (equal items, must not be equal).<br>
+   * The item order does not matter.
+   *
+   * @param lhs
+   * @param rhs
+   * @return <code>true</code> is all items are the same in both sets.
+   */
+  public static <T> boolean equalItemSet(Collection<T> lhs, Collection<T> rhs) {
+    if (lhs == null && rhs == null) {
+      return true;
+    }
+    if (lhs == null || rhs == null) {
+      return false;
+    }
+    if (lhs.size() != rhs.size()) {
+      return false;
+    }
+    if (lhs.isEmpty()) {
+      return true;
+    }
+
+    Map<T, T> lhsMap = new HashMap<T, T>(lhs.size());
+    for (T i1 : lhs) {
+      lhsMap.put(i1, i1);
+    }
+    for (T i2 : rhs) {
+      T i1 = lhsMap.get(i2);
+      if (!ObjectUtils.equals(i1, i2)) {
         return false;
       }
     }

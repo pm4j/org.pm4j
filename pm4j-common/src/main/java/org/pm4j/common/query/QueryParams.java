@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.pm4j.common.pageable.querybased.pagequery.PageQueryService;
 import org.pm4j.common.query.inmem.InMemQueryEvaluator;
 import org.pm4j.common.util.beanproperty.PropertyChangeSupportedBase;
@@ -260,6 +261,16 @@ public class QueryParams extends PropertyChangeSupportedBase implements Cloneabl
   public QueryParams clone() {
     QueryParams clone = (QueryParams) super.clone();
     return clone;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj == this) return true;
+    if (!(obj instanceof QueryParams)) return false;
+    QueryParams other = (QueryParams) obj;
+    return execQuery == other.execQuery &&
+    	   propertyMap.equals(other.propertyMap) &&
+           ObjectUtils.equals(queryExpression, other.queryExpression);
   }
 
 }

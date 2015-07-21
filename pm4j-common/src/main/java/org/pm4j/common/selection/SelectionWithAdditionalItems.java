@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.lang.Validate;
+import org.pm4j.common.util.CompareUtil;
 import org.pm4j.common.util.collection.CombinedIterator;
 import org.pm4j.common.util.collection.ListUtil;
 
@@ -21,7 +23,7 @@ public class SelectionWithAdditionalItems <T_ITEM> implements Selection<T_ITEM> 
 
   @SuppressWarnings("unchecked")
   public SelectionWithAdditionalItems(Selection<T_ITEM> baseSelection, Collection<T_ITEM> selectedTransientItems) {
-    assert baseSelection != null;
+    Validate.notNull(baseSelection);
 
     this.baseSelection = baseSelection;
     this.additionalSelectedItems = (selectedTransientItems != null && !selectedTransientItems.isEmpty())
@@ -65,4 +67,18 @@ public class SelectionWithAdditionalItems <T_ITEM> implements Selection<T_ITEM> 
   public Selection<T_ITEM> getBaseSelection() {
     return baseSelection;
   }
+
+  @Override
+  public boolean hasSameItemSet(Selection<T_ITEM> other) {
+    // Compare of other selections is currently not supported.
+    if (!(other instanceof SelectionWithAdditionalItems)) {
+      throw new UnsupportedOperationException("Unable to compare to: " + other);
+    }
+    SelectionWithAdditionalItems<T_ITEM> otherSelection = (SelectionWithAdditionalItems<T_ITEM>) other;
+
+    return CompareUtil.sameItemSet(additionalSelectedItems, otherSelection.additionalSelectedItems) &&
+           SelectionHandlerUtil.sameSelection(baseSelection, otherSelection.baseSelection);
+  }
+
+
 }

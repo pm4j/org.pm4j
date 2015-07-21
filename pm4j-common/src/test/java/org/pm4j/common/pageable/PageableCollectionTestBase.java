@@ -44,6 +44,7 @@ public abstract class PageableCollectionTestBase<T> {
   protected TestPropertyChangeListener pclRemove;
   protected TestPropertyChangeListener pclPageSize;
   protected TestPropertyChangeListener pclPageIdx;
+  protected TestPropertyChangeListener pclSelChange;
 
 
   /** Needs to be implemented by the concrete test classes. */
@@ -107,6 +108,7 @@ public abstract class PageableCollectionTestBase<T> {
     collection.addPropertyAndVetoableListener(PageableCollection.EVENT_REMOVE_SELECTION, pclRemove = new TestPropertyChangeListener());
     collection.addPropertyChangeListener(PageableCollection.PROP_PAGE_IDX, pclPageIdx = new TestPropertyChangeListener());
     collection.addPropertyChangeListener(PageableCollection.PROP_PAGE_SIZE, pclPageSize = new TestPropertyChangeListener());
+    collection.getSelectionHandler().addPropertyChangeListener(SelectionHandler.PROP_SELECTION, pclSelChange = new TestPropertyChangeListener());
   }
 
   @Test
@@ -263,10 +265,13 @@ public abstract class PageableCollectionTestBase<T> {
     collection.getSelectionHandler().setSelectMode(SelectMode.MULTI);
     assertEquals(SelectMode.MULTI, collection.getSelectionHandler().getSelectMode());
     assertEquals(0, collection.getSelectionHandler().getSelection().getSize());
+
     assertTrue(collection.getSelectionHandler().selectAll(true));
     assertEquals(6, collection.getSelectionHandler().getSelection().getSize());
+
     assertTrue(collection.getSelectionHandler().select(false, collection.getItemsOnPage().get(0)));
     assertEquals(5, collection.getSelectionHandler().getSelection().getSize());
+
     assertTrue(collection.getSelectionHandler().invertSelection());
     assertEquals(1, collection.getSelectionHandler().getSelection().getSize());
 
@@ -275,6 +280,19 @@ public abstract class PageableCollectionTestBase<T> {
     assertEquals("Remove event count", 0, pclRemove.getPropChangeEventCount());
     assertEquals("Set page index event count", 0, pclPageIdx.getPropChangeEventCount());
     assertEquals("Set page size event count", 0, pclPageSize.getPropChangeEventCount());
+    assertEquals(3, pclSelChange.getPropChangeEventCount());
+  }
+
+  @Test
+  public void testSelectItemTwice() {
+    assertEquals(0, pclSelChange.getPropChangeEventCount());
+    collection.getSelectionHandler().setSelectMode(SelectMode.SINGLE);
+
+    collection.getSelectionHandler().select(true, collection.getItemsOnPage().get(0));
+    assertEquals(1, pclSelChange.getPropChangeEventCount());
+
+    collection.getSelectionHandler().select(true, collection.getItemsOnPage().get(0));
+    assertEquals(1, pclSelChange.getPropChangeEventCount());
   }
 
   @Test
@@ -350,24 +368,28 @@ public abstract class PageableCollectionTestBase<T> {
     assertEquals("one item is selected", 1, collection.getSelection().getSize());
     assertEquals("the first item is selected", true, collection.getSelection().contains(firstItem));
     assertEquals("the second item is not selected", false, collection.getSelection().contains(secondItem));
+    assertEquals(1, pclSelChange.getPropChangeEventCount());
 
     // invert the selection
     assertEquals("invert the selection", true, collection.getSelectionHandler().invertSelection());
     assertEquals("the first item is not selected", false, collection.getSelection().contains(firstItem));
     assertEquals("the second item is selected", true, collection.getSelection().contains(secondItem));
     assertEquals("5 items are selected", 5, collection.getSelection().getSize());
+    assertEquals(2, pclSelChange.getPropChangeEventCount());
 
     // deselect the second item
     assertEquals("deselect the second item", true, collection.getSelectionHandler().select(false, secondItem));
     assertEquals("the first item is not selected", false, collection.getSelection().contains(firstItem));
     assertEquals("the second item is not selected", false, collection.getSelection().contains(secondItem));
     assertEquals("4 items are selected", 4, collection.getSelection().getSize());
+    assertEquals(3, pclSelChange.getPropChangeEventCount());
 
     // invert the selection again
     assertEquals("invert the selection", true, collection.getSelectionHandler().invertSelection());
     assertEquals("the first item is selected", true, collection.getSelection().contains(firstItem));
     assertEquals("the second item is selected", true, collection.getSelection().contains(secondItem));
     assertEquals("2 items are selected", 2, collection.getSelection().getSize());
+    assertEquals(4, pclSelChange.getPropChangeEventCount());
 
   }
 

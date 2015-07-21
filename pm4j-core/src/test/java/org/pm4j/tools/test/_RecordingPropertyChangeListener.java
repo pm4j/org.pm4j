@@ -51,4 +51,9 @@ public class _RecordingPropertyChangeListener implements PropertyAndVetoableChan
     return vetoableChangeCalls.size();
   }
 
+  public void clear() {
+    propertyChangeCalls.clear();
+    vetoableChangeCalls.clear();
+  }
+
 }

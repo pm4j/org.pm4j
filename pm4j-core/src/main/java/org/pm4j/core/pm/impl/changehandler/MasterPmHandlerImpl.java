@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.pm4j.common.modifications.ModificationHandler;
 import org.pm4j.common.modifications.Modifications;
 import org.pm4j.common.selection.Selection;
@@ -45,6 +46,7 @@ public abstract class MasterPmHandlerImpl<T_MASTER_BEAN> implements MasterPmHand
   private final SelectionHandler<T_MASTER_BEAN> selectionHandler;
   private List<DetailsPmHandler> detailsHandlers = new ArrayList<DetailsPmHandler>();
   private PropertyAndVetoableChangeListener masterSelectionChangeListener;
+  private T_MASTER_BEAN beanSelectedInBeforeCall;
 
   /**
    * Creates an instance uing a {@link DetailsPmHandler} that is responsible
@@ -146,7 +148,7 @@ public abstract class MasterPmHandlerImpl<T_MASTER_BEAN> implements MasterPmHand
     T_MASTER_BEAN selectedMasterBean = getSelectedMasterBean();
     if (selectedMasterBean != null) {
       for (DetailsPmHandler dh : detailsHandlers) {
-        dh.afterMasterRecordChange(selectedMasterBean);
+        dh.afterMasterRecordChange(null, selectedMasterBean);
       }
     }
   }
@@ -184,7 +186,7 @@ public abstract class MasterPmHandlerImpl<T_MASTER_BEAN> implements MasterPmHand
 
   /**
    * Re-adjusts the details area by calling
-   * {@link DetailsPmHandler#afterMasterRecordChange(Object)} with the new
+   * {@link DetailsPmHandler#afterMasterRecordChange(Object, Object)} with the new
    * selected table row.
    */
   // TODO oboede: delegates to a property change listener.
@@ -194,6 +196,7 @@ public abstract class MasterPmHandlerImpl<T_MASTER_BEAN> implements MasterPmHand
     PropertyAndVetoableChangeListener l = getMasterSelectionChangeListener();
     try {
       l.vetoableChange(new PropertyChangeEvent(getMasterPm(), SelectionHandler.PROP_SELECTION, null, null));
+      beanSelectedInBeforeCall = getSelectedMasterBean();
       return true;
     } catch (PropertyVetoException e) {
       if (LOG.isDebugEnabled()) {
@@ -206,19 +209,21 @@ public abstract class MasterPmHandlerImpl<T_MASTER_BEAN> implements MasterPmHand
 
   /**
    * Re-adjusts the details area by calling
-   * {@link DetailsPmHandler#afterMasterRecordChange(Object)} with the new
+   * {@link DetailsPmHandler#afterMasterRecordChange(Object, Object)} with the new
    * selected table row.
    */
   @Override
   public void afterMasterSelectionChange() {
     T_MASTER_BEAN selectedMasterBean = getSelectedMasterBean();
+    T_MASTER_BEAN beanSelectedInBeforeCall = this.beanSelectedInBeforeCall;
+    this.beanSelectedInBeforeCall = null;
 
-    if (LOG.isDebugEnabled() && getMasterBeanModifications().isModified()) {
-      LOG.debug("Master record selection changed to " + selectedMasterBean + ". MasterPm: " + PmUtil.getPmLogString(masterPm));
+    if (LOG.isDebugEnabled() && !ObjectUtils.equals(selectedMasterBean, beanSelectedInBeforeCall)) {
+      LOG.debug("Master record selection changed from " + beanSelectedInBeforeCall + "to " + selectedMasterBean + ". MasterPm: " + PmUtil.getPmLogString(masterPm));
     }
 
     for (DetailsPmHandler dh : detailsHandlers) {
-      dh.afterMasterRecordChange(selectedMasterBean);
+      dh.afterMasterRecordChange(beanSelectedInBeforeCall, selectedMasterBean);
     }
   }
 
@@ -265,7 +270,12 @@ public abstract class MasterPmHandlerImpl<T_MASTER_BEAN> implements MasterPmHand
    * @return <code>true</code> if the switch can be performed.
    */
   private boolean beforeSwitch(T_MASTER_BEAN oldMasterBean, T_MASTER_BEAN newMasterBean) {
-    if (oldMasterBean == null) {
+    // TODO: a workaround for the old ACE data table connector. Should disappear asap.
+    T_MASTER_BEAN old = oldMasterBean != null
+        ? oldMasterBean
+        : getSelectedMasterBean();
+
+    if (old == null) {
       return true;
     }
 
@@ -275,6 +285,11 @@ public abstract class MasterPmHandlerImpl<T_MASTER_BEAN> implements MasterPmHand
         allDetailsAgree = false;
       }
     }
+
+    if (allDetailsAgree) {
+      beanSelectedInBeforeCall = old;
+    }
+
     return allDetailsAgree;
   }
 

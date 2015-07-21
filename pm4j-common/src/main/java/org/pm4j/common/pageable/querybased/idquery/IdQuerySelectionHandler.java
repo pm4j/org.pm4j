@@ -15,6 +15,7 @@ import org.pm4j.common.selection.SelectMode;
 import org.pm4j.common.selection.Selection;
 import org.pm4j.common.selection.SelectionHandler;
 import org.pm4j.common.selection.SelectionHandlerBase;
+import org.pm4j.common.selection.SelectionHandlerUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -156,8 +157,7 @@ public abstract class IdQuerySelectionHandler<T_ITEM, T_ID> extends SelectionHan
     Selection<T_ITEM> newSelection = selection;
 
     // check for noop:
-    if (oldSelection.getSize() == 0 &&
-        newSelection.getSize() == 0) {
+    if (SelectionHandlerUtil.sameSelection(oldSelection, selection)) {
       return true;
     }
 

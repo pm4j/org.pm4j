@@ -1,7 +1,10 @@
 package org.pm4j.common.selection;
 
+import org.pm4j.common.util.CompareUtil;
 import org.pm4j.common.util.beanproperty.ForcedPropertyChange;
 import org.pm4j.common.util.beanproperty.PropertyChangeSupported;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Helper methods for selection handler functionality.
@@ -9,6 +12,8 @@ import org.pm4j.common.util.beanproperty.PropertyChangeSupported;
  * @author olaf boede
  */
 public class SelectionHandlerUtil {
+
+  private static final Logger LOG = LoggerFactory.getLogger(SelectionHandlerUtil.class);
 
   /**
    * Switches veto event notification off and sets the selection.<br>
@@ -170,5 +175,53 @@ public class SelectionHandlerUtil {
     }
   }
 
+  /**
+   * @param lhs
+   * @param rhs
+   *
+   * @return <code>true</code> if both selections contain the same set of items.
+   */
+  public static <T> boolean sameSelection(Selection<T> lhs, Selection<T> rhs) {
+    // TODO: add a configuration option or parameter.
+    return sameSelection(lhs, rhs, 50);
+  }
+
+
+  /**
+   * @param lhs
+   * @param rhs
+   * @param maxItemByItemCompareSize
+   *   If the selection combination donsn't support {@link Selection#hasSameItemSet(Selection)},
+   *   the items can be compared until the given item count.<br>
+   *   This happens only if both selections have in addition the same size.<br>
+   *   It these not comparable selections are larger, this method returns <code>false</code>.
+   *
+   * @return <code>true</code> if both selections contain the same set of items.
+   */
+  public static <T> boolean sameSelection(Selection<T> lhs, Selection<T> rhs, int maxItemByItemCompareSize) {
+    if (lhs == rhs) {
+      return true;
+    }
+    if (lhs.getSize() != rhs.getSize()) {
+      return false;
+    }
+    if (lhs.isEmpty()) {
+      return true;
+    }
+
+    try {
+      return lhs.hasSameItemSet(rhs);
+    } catch (UnsupportedOperationException e) {
+      if (lhs.getSize() > maxItemByItemCompareSize) {
+        LOG.debug("Comparing selections of different types and more than " + maxItemByItemCompareSize +""
+             + " items caused an additional selection change event.\n"
+             + "lhs: " + lhs.getClass() + " rhs: " + rhs.getClass());
+        return false;
+      } else {
+        // Item by item iteration as fall back.
+        return CompareUtil.sameItemSet(lhs, rhs, (int)lhs.getSize());
+      }
+    }
+  }
 
 }

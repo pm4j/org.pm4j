@@ -24,7 +24,7 @@ public interface PmEventListener {
    * See: {@link PmEvent#addPostProcessingListener(PostProcessor, Object)}.
    * <p>
    * TODO: Document limitation. Only fix PM structure objects receive this event.
-   * 
+   *
    */
   public interface WithPreprocessCallback extends PmEventListener {
 
@@ -56,6 +56,5 @@ public interface PmEventListener {
      *          call.
      */
     void postProcess(PmEvent event, T postProcessPayload);
-
   }
 }
