@@ -172,7 +172,9 @@ public abstract class FilterItemPm<T_ITEM extends FilterItem> extends PmBeanBase
         PmAttr<Object> a =(PmAttr<Object>)getFilterByValuePmAttrFactory().makeValueAttrPm(this, fd, co);
         if (a != null) {
           a =  PmInitApi.initDynamicPmAttr(a, "filterBy");
-          a.setValue(bean.getFilterByValue());
+          if (bean.getFilterByValue() != null) {
+            a.setValue(bean.getFilterByValue());
+          }
           // XXX olaf: should be done on proxy level...
           PmEventApi.addValueChangeDecorator(a, filterValueChangeDecorator);
           filterByValue.setDelegate(a);
