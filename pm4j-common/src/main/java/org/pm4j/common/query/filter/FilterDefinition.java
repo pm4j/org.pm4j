@@ -95,4 +95,28 @@ public class FilterDefinition {
     this.defaultFilterByValue = defaultFilterByValue;
   }
 
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder(this.getClass().getName());
+    sb.append("[QueryAttr: ").append(attr.getName()).append(" - CompOps:");
+    if (compOps != null) {
+      sb.append(compOps.toString());      
+    } else {
+      sb.append("null");
+    }
+    sb.append(" - DefaultCompOp: ");
+    if (defaultCompOp != null) {
+      sb.append(defaultCompOp.toString());      
+    } else {
+      sb.append("null");
+    }
+    sb.append(" - DefaultFilterByValue: ");
+    if (defaultFilterByValue != null) {
+      sb.append(defaultFilterByValue.toString());      
+    } else {
+      sb.append("null");
+    }
+    sb.append("]");
+    return sb.toString();
+  }
 }
