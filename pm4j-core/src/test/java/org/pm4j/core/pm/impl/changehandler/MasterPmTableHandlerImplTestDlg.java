@@ -1,13 +1,10 @@
 package org.pm4j.core.pm.impl.changehandler;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.pm4j.common.selection.SelectMode;
-import org.pm4j.common.selection.Selection;
 import org.pm4j.common.selection.SelectionHandler;
 import org.pm4j.core.pm.PmAttrString;
 import org.pm4j.core.pm.PmBean;
@@ -36,11 +33,7 @@ import org.pm4j.tools.test._RecordingPropertyChangeListener;
 public class MasterPmTableHandlerImplTestDlg extends PmConversationImpl {
 
   @PmTableCfg(valuePath="masterTableBeans", rowSelectMode = SelectMode.SINGLE)
-  public final BeanTablePm masterTable = new BeanTablePm(this) {
-    protected BeanRowPm getMasterRowPmImpl() {
-      return super.getMasterRowPmImpl();
-    };
-  };
+  public final BeanTablePm masterTable = new BeanTablePm(this);
 
   @PmBeanCfg(beanClass=Bean.class)
   public final DetailsAreaPm detailsArea = new DetailsAreaPm(this);
