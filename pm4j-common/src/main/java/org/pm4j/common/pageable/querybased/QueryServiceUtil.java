@@ -16,6 +16,7 @@ import org.pm4j.common.util.collection.ListUtil;
  *
  * @author oboede
  */
+// TODO: add findEqual service method.
 public class QueryServiceUtil {
 
   private QueryServiceUtil() {

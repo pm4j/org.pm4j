@@ -52,6 +52,7 @@ public class DeprMasterPmTableHandlerImpl<T_MASTER_BEAN> implements MasterPmHand
   private static final Logger    LOG                = LoggerFactory.getLogger(DeprMasterPmTableHandlerImpl.class);
 
   private final DeprPmTable<?>    masterTablePm;
+  private T_MASTER_BEAN currentMasterBean;
   private Set<T_MASTER_BEAN>  changedMasterBeans = new HashSet<T_MASTER_BEAN>();
   private List<DetailsPmHandler> detailsHandlers = new ArrayList<DetailsPmHandler>();
   private PmCommandDecorator masterSelectionChangeDecorator;
@@ -198,8 +199,10 @@ public class DeprMasterPmTableHandlerImpl<T_MASTER_BEAN> implements MasterPmHand
 
     T_MASTER_BEAN selectedMasterBean = getSelectedMasterBean();
     for (DetailsPmHandler dh : detailsHandlers) {
-      dh.afterMasterRecordChange(null, selectedMasterBean);
+      dh.afterMasterRecordChange(currentMasterBean, selectedMasterBean);
     }
+    
+    currentMasterBean = selectedMasterBean;
   }
 
   /**
