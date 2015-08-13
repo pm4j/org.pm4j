@@ -32,7 +32,7 @@ public @interface PmTableColCfg {
    * This type specification defines the kind of UI control offered to the user
    * to enter the filter-by compare value for this column. It also affects the set
    * type specific compare operators.<br>
-   * This is usually value type like {@link String} or {@link LocalDate}.
+   * This is usually a value type like {@link String} or {@link LocalDate}.
    *
    * @return The value type the user can filter by.
    */
