@@ -4,7 +4,10 @@ import java.util.List;
 
 import org.pm4j.common.pageable.querybased.idquery.IdQueryService;
 import org.pm4j.common.pageable.querybased.pagequery.PageQueryService;
+import org.pm4j.common.query.CompOpEquals;
+import org.pm4j.common.query.QueryAttr;
 import org.pm4j.common.query.QueryExpr;
+import org.pm4j.common.query.QueryExprCompare;
 import org.pm4j.common.query.QueryParams;
 import org.pm4j.common.util.collection.ListUtil;
 
@@ -14,9 +17,8 @@ import org.pm4j.common.util.collection.ListUtil;
  * This utility provides helper methods that make it easier to use these
  * services for other tasks too (e.g. to provide a plain list).
  *
- * @author oboede
+ * @author Olaf Boede
  */
-// TODO: add findEqual service method.
 public class QueryServiceUtil {
 
   private QueryServiceUtil() {
@@ -96,6 +98,26 @@ public class QueryServiceUtil {
     } else {
       throw new RuntimeException("Unsupported service type found: " + s);
     }
+  }
+  
+  /**
+   * Looks for an item having the given attribute value.
+   * <p>
+   * Throws an {@link IllegalArgumentException} if more than one item was found
+   * for the given search criteria.
+   * 
+   * @param s
+   *          The service to use.<br>
+   *          Should be a kind of {@link PageQueryService} or
+   *          {@link IdQueryService}.
+   * @param qAttr
+   *          The attribute that should have the value.
+   * @param value
+   *          The condition value, 
+   * @return The found item or <code>null</code>.
+   */
+  public static <T> T findEqItem(QueryService<T, ?> s, QueryAttr qAttr, T value) {
+    return findItem(s, new QueryExprCompare(qAttr, CompOpEquals.class, value));
   }
 
 }
