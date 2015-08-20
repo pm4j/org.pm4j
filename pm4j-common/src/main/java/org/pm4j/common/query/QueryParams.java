@@ -73,18 +73,16 @@ public class QueryParams extends PropertyChangeSupportedBase implements Cloneabl
   /**
    * Copies all parameter values from the given source to this instance.
    * <p>
-   * Fires the change events {@link #PROP_EFFECTIVE_FILTER} and {@link #PROP_EFFECTIVE_FILTER}.
+   * Fires no change events.
    *
    * @param src The instance to copy the query parameter values from.
    */
-  public void copyParamValues(QueryParams src) {
-    // TODO oboede: smart fire of filter change is not yet implemented.
+  void copyParamValues(QueryParams src) {
     this.queryExpression = src.getQueryExpression();
     this.propertyMap = new HashMap<String, Object>(src.propertyMap);
-    setSortOrder(src.getSortOrder());
-    setDefaultSortOrder(src.getDefaultSortOrder());
+    this.sortOrder = src.getSortOrder();
+    this.defaultSortOrder = src.getDefaultSortOrder();
     this.execQuery = src.isExecQuery();
-    firePropertyChange(PROP_EFFECTIVE_FILTER, null, null);
   }
 
   /**
