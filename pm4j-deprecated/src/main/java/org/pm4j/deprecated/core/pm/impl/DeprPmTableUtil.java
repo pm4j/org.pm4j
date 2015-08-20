@@ -5,18 +5,18 @@ import java.util.List;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmElement;
 import org.pm4j.core.pm.PmObject;
-import org.pm4j.core.pm.impl.PmTableUtil;
+import org.pm4j.core.pm.impl.PmTableUtil2;
 import org.pm4j.core.pm.impl.PmUtil;
 import org.pm4j.core.pm.impl.changehandler.MasterPmHandler;
+import org.pm4j.deprecated.core.pm.DeprPmPager.PagerVisibility;
 import org.pm4j.deprecated.core.pm.DeprPmTable;
 import org.pm4j.deprecated.core.pm.DeprPmTableCol;
-import org.pm4j.deprecated.core.pm.DeprPmPager.PagerVisibility;
 
 /**
  * Some table related helper functions.
  *
  * @author olaf boede
- * @deprecated please use {@link PmTableUtil}
+ * @deprecated please use {@link PmTableUtil2}
  */
 @Deprecated
 public final class DeprPmTableUtil {
