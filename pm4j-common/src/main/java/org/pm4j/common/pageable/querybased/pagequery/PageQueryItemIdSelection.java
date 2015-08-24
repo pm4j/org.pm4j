@@ -116,8 +116,7 @@ import org.pm4j.common.util.CompareUtil;
 
     @Override
     public T_ITEM next() {
-
-      if ( getSize() == 1 ) {
+      if ((getSize() == 1) && useGetItemForIdForSingleItem) {
         // for the frequent case of a single selected item, sort order makes no difference
         idIndex++;
         return getService().getItemForId(ids.iterator().next());
