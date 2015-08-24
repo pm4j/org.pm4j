@@ -22,7 +22,8 @@ import org.pm4j.core.pm.PmTableCol;
 import org.pm4j.core.pm.api.PmMessageApi;
 import org.pm4j.core.pm.api.PmVisitorApi.PmVisitHierarchyCallBack;
 import org.pm4j.core.pm.api.PmVisitorApi.PmVisitResult;
-import org.pm4j.core.pm.impl.PmTableUtil2;
+import org.pm4j.core.pm.impl.PmTableUtil;
+import org.pm4j.core.pm.impl.PmUtil;
 import org.pm4j.core.pm.impl.PmVisitorImpl;
 import org.pm4j.core.pm.impl.options.PmOptionSetUtil;
 import org.pm4j.core.xml.visibleState.VisibleStateAspect;
@@ -87,7 +88,7 @@ public class VisibleStateXmlCallBack implements PmVisitHierarchyCallBack {
       newestXml = visitObject(pm, new XmlPmTableCol(), hiddenProps);
     }
     // XML readability: Rows are easier it identify if marked as 'row' element
-    else if (PmTableUtil2.findIndexOfRowOnCurrentPage(pm) != -1) {
+    else if (PmTableUtil.findIndexOfRowOnCurrentPage(pm) != -1) {
       newestXml = visitObject(pm, new XmlPmTableRow(), hiddenProps);
     } else if (pm instanceof PmTabSet) {
       newestXml = visitObject(pm, new XmlPmTabSet(), hiddenProps);
