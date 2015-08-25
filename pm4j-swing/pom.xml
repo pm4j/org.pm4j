@@ -3,12 +3,20 @@
 
   <groupId>org.pm4j</groupId>
   <artifactId>pm4j-swing</artifactId>
+<<<<<<< HEAD
   <version>0.9.64-SNAPSHOT</version>
+=======
+  <version>0.9.60.5-SNAPSHOT</version>
+>>>>>>> v0.9-maintenance
 
   <parent>
     <groupId>org.pm4j</groupId>
     <artifactId>main</artifactId>
+<<<<<<< HEAD
     <version>0.9.64-SNAPSHOT</version>
+=======
+    <version>0.9.60.5-SNAPSHOT</version>
+>>>>>>> v0.9-maintenance
     <relativePath>../pom.xml</relativePath>
   </parent>
 

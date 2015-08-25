@@ -771,13 +771,15 @@ public class PmTableImpl
    * @param pageable
    *          the data set to present. If it is <code>null</code> an empty
    *          collection will be created internally by the next {@link #getPmPageableCollection()} call.
+   *          
+   * @deprecated Please override {@link #getPmPageableCollectionImpl()} or {@link #getPmBeansImpl()} instead.
    */
-  @SuppressWarnings("deprecation")
+  @Deprecated
   public void setPmPageableCollection(PmBeanCollection<T_ROW_PM, T_ROW_BEAN> pageable) {
-    Selection<T_ROW_PM> selection = null;
+    Selection<T_ROW_BEAN> selection = null;
 
-    if (pmPageableCollection != null) {
-      selection = pmPageableCollection.getSelectionHandler().getSelection();
+    if (this.pmPageableCollection != null) {
+      selection = getPmPageableBeanCollection().getSelection();
     }
 
     assignPmPageableCollection(pageable);
@@ -785,10 +787,13 @@ public class PmTableImpl
 
     // re-apply the settings to preserve
     if (selection != null) {
-      // ensure that the internal field is set, even it was just reset to null.
-      getPmPageableCollection();
-      // XXX oboede: Move that method to a utility that is not visible for the programmer.
-      pmPageableCollection.getSelectionHandler().setSelection(selection);
+      SelectionHandler<T_ROW_BEAN> handler = getPmPageableBeanCollection().getSelectionHandler();
+      if (handler.getSelection().getClass().isAssignableFrom(selection.getClass())) {
+        handler.setSelection(selection);
+      } else {
+        // Selection types are not compatible. The official select call will do an iteration in this case.
+        handler.select(true, selection);
+      }
     }
   }
 

@@ -32,8 +32,6 @@ public abstract class PageQueryItemIteratorBase<T_ITEM> implements Iterator<T_IT
 
   protected abstract List<T_ITEM> getItems(long startIdx, int blockSize);
 
-//  protected abstract int getItemCount();
-
   /**
    * Gets called for all results of {@link #getItems(long, int)}. If this method
    * returns <code>false</code>, this item will not be used by this iterator.
