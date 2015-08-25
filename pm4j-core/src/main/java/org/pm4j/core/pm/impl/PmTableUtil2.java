@@ -3,7 +3,6 @@ package org.pm4j.core.pm.impl;
 import java.util.List;
 
 import org.pm4j.core.pm.PmObject;
-import org.pm4j.core.pm.PmPager.PagerVisibility;
 import org.pm4j.core.pm.PmTable;
 
 /**
