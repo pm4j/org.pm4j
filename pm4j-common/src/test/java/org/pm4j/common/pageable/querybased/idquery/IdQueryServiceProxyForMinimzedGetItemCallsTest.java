@@ -163,6 +163,12 @@ public class IdQueryServiceProxyForMinimzedGetItemCallsTest extends PageableColl
     super.testIterateEmptySelection();
     assertEquals("Call count stability check.", "{}", service.callCounter.toString());
   }
+  
+  @Override @Test
+  public void testIterateSingleSelection() {
+    super.testIterateSingleSelection();
+    assertEquals("Call count stability check.", "{}", service.callCounter.toString());
+  }
 
   @Test
   public void testGetNumOfItems() {

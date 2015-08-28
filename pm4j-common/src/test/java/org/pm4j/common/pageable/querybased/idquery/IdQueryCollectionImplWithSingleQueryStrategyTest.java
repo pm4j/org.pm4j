@@ -155,6 +155,12 @@ public class IdQueryCollectionImplWithSingleQueryStrategyTest extends PageableCo
     service.callCounter.assertCalls("{}");
   }
 
+  @Override @Test
+  public void testIterateSingleSelection() {
+    super.testIterateSingleSelection();
+    service.callCounter.assertCalls("{getItems=1}");
+  }
+  
   @Test
   public void testGetNumOfItems() {
     super.testGetNumOfItems();

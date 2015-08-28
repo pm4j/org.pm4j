@@ -644,6 +644,13 @@ public abstract class PageableCollectionTestBase<T> {
   }
 
   @Test
+  public void testIterateSingleSelection() {
+    doSelect(collection, 0, 0, true, "a");
+    resetCallCounter();
+    assertEquals("[a]", IterableUtil.asCollection(collection.getSelection()).toString());
+  }
+
+  @Test
   public void testGetNumOfItems() {
     resetCallCounter();
     long numOfItems = collection.getNumOfItems();

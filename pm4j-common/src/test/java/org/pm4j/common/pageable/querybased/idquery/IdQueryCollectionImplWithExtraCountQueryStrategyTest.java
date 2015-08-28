@@ -154,6 +154,12 @@ public class IdQueryCollectionImplWithExtraCountQueryStrategyTest extends Pageab
     super.testIterateEmptySelection();
     assertEquals("Call count stability check.", "{}", service.callCounter.toString());
   }
+  
+  @Override
+  public void testIterateSingleSelection() {
+    super.testIterateSingleSelection();
+    assertEquals("Call count stability check.", "{getItems=1}", service.callCounter.toString());
+  }
 
   @Test
   public void testGetNumOfItems() {
