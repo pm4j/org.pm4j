@@ -155,7 +155,7 @@ public class PageQueryCollection<T_ITEM, T_ID> extends QueryCollectionBase<T_ITE
    *          XXX: this method may disappear when all service signatures got a
    *          QueryParams parameter.
    */
-  protected void setUseGetItemForIdForSingleItem(boolean useGetItemForIdForSingleItem) {
+  public void setUseGetItemForIdForSingleItem(boolean useGetItemForIdForSingleItem) {
     querySelectionHandler.useGetItemForIdForSingleItem = useGetItemForIdForSingleItem;
   }
 
