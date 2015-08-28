@@ -29,7 +29,8 @@ import org.pm4j.common.util.collection.ListUtil;
 public class PageQueryCollection<T_ITEM, T_ID> extends QueryCollectionBase<T_ITEM, T_ID> {
 
   final PageQueryService<T_ITEM, T_ID>                  service;
-  private final SelectionHandler<T_ITEM>                    selectionHandler;
+  private final SelectionHandler<T_ITEM>                selectionHandler;
+  private PageQuerySelectionHandler<T_ITEM, T_ID>       querySelectionHandler;
   private final CachingPageQueryService<T_ITEM, T_ID>   cachingService;
 
   /**
@@ -52,7 +53,7 @@ public class PageQueryCollection<T_ITEM, T_ID> extends QueryCollectionBase<T_ITE
     };
 
     // Handling of transient and persistent item selection is separated by a handler composition.
-    SelectionHandler<T_ITEM> querySelectionHandler = new PageQuerySelectionHandler<T_ITEM, T_ID>(cachingService) {
+    querySelectionHandler = new PageQuerySelectionHandler<T_ITEM, T_ID>(cachingService) {
       @Override
       protected QueryParams getQueryParams() {
         return getQueryParamsWithRemovedItems();
@@ -143,6 +144,21 @@ public class PageQueryCollection<T_ITEM, T_ID> extends QueryCollectionBase<T_ITE
   public PageQueryService<T_ITEM, T_ID> getService() {
     return service;
   }
+  
+  /**
+   * @param useGetItemForIdForSingleItem
+   *          Switch for an optimization that may disturb implementations that
+   *          rely on only getting {@link PageQueryService#getItems()} called.<br>
+   *          May be useful, if the read operation needs access to the
+   *          QueryParams.
+   *          <p>
+   *          XXX: this method may disappear when all service signatures got a
+   *          QueryParams parameter.
+   */
+  protected void setUseGetItemForIdForSingleItem(boolean useGetItemForIdForSingleItem) {
+    querySelectionHandler.useGetItemForIdForSingleItem = useGetItemForIdForSingleItem;
+  }
+
 }
 
 /**

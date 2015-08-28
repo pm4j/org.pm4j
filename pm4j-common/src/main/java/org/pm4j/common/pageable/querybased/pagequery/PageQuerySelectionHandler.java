@@ -46,6 +46,11 @@ public abstract class PageQuerySelectionHandler<T_ITEM, T_ID> extends SelectionH
   private final PageQueryService<T_ITEM, T_ID> service;
   private final PageQueryItemIdSelection<T_ITEM, T_ID> emptySelection;
   private QuerySelectionWithClickedIds<T_ITEM, T_ID> currentSelection;
+  
+  /** Switch for an optimization that may disturb implementations that rely on getting 
+   * {@link PageQueryService#getItems()} called only.
+   * May be useful, if the read operation needs access to the QueryParams. */
+  /* package */ boolean useGetItemForIdForSingleItem = true;
 
 
   @SuppressWarnings("unchecked")
@@ -208,6 +213,7 @@ public abstract class PageQuerySelectionHandler<T_ITEM, T_ID> extends SelectionH
     PageQueryItemIdSelection<T_ITEM, T_ID> idSelection = selectedIds.isEmpty()
                   ? emptySelection
                   : new PageQueryItemIdSelection<T_ITEM, T_ID>(service, getQueryOptions().getIdAttribute(), getQueryParams(), selectedIds, true);
+    idSelection.setUseGetItemForIdForSingleItem(useGetItemForIdForSingleItem);
 
     return setSelection(isInverse()
                   ? new InvertedSelection<T_ITEM, T_ID>(service, getQueryParams(), idSelection)
