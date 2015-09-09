@@ -121,7 +121,7 @@ public class MasterPmTableHandlerImplTest {
     assertEquals("onPmValueChange=1", dlg.detailsTable.eventCalls.toString());
     assertEquals("", dlg.detailsAreaHandler.detailsCalls.toString());
     assertEquals("", dlg.detailsTableHandler.detailsCalls.toString());
-    assertEquals("ItemSetSelection[M]", dlg.masterTable.getPmPageableBeanCollection().getSelection().toString());
+    assertEquals("[M]", dlg.masterTable.getPmPageableBeanCollection().getSelection().toString());
 
     dlg.cleanCallCounter();
     dlg.masterTable.getPmPageableBeanCollection().getModificationHandler().removeSelectedItems();

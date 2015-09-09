@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.pm4j.common.util.CompareUtil;
 
 /**
@@ -66,7 +67,7 @@ public class ItemSetSelection<T_ITEM> implements Selection<T_ITEM> {
 
   @Override
   public String toString() {
-    return getClass().getSimpleName() + selectedItems;
+    return ObjectUtils.toString(selectedItems);
   }
 
 }
