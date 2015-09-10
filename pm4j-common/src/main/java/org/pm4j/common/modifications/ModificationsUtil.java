@@ -15,7 +15,7 @@ import org.pm4j.common.util.collection.ListUtil;
  * 
  * @author Olaf Boede
  */
-public class ModificationsUtil {
+public final class ModificationsUtil {
 
   /**
    * Converter used for
@@ -157,5 +157,7 @@ public class ModificationsUtil {
     }
     return result;
   }
+  
+  private ModificationsUtil() {}
 
 }

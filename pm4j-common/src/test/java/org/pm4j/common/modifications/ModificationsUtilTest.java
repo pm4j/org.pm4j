@@ -1,9 +1,12 @@
 package org.pm4j.common.modifications;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.pm4j.common.selection.ItemSetSelection;
 
@@ -51,5 +54,62 @@ public class ModificationsUtilTest {
     assertEquals("[u1, u2]", m3.getUpdatedItems().toString());
     assertEquals("[r1, r2]", m3.getRemovedItems().toString());
   }
+  
+  @Test
+  public void testJoinSingleModification() {
+    modifications.registerAddedItem("a");
+    Modifications<String> m = ModificationsUtil.joinModifications(Arrays.asList(modifications));
+    assertEquals("{added: 1, updated: 0, removed: 0}", m.toString());
+    assertEquals("[a]", m.getAddedItems().toString());
+  }
+  
+  @Test
+  public void testConvertModifications() {
+    modifications.registerAddedItem("a");
+    modifications.registerUpdatedItem("b", true);
+    modifications.setRemovedItems(new ItemSetSelection<>("c"));
+    
+    Modifications<String> converted = ModificationsUtil.convertModifications(modifications, new ModificationsUtil.Converter<String, String>() {
+      @Override
+      public String convert(String src) {
+        return src + "'";
+      }
+    });
+    
+    assertEquals("{added: 1, updated: 1, removed: 1}", converted.toString());
+    assertEquals("[a']", converted.getAddedItems().toString());
+    assertEquals("[b']", converted.getUpdatedItems().toString());
+    assertEquals("[c']", converted.getRemovedItems().toString());
+  }
+  
+  @Test
+  public void testCreateAndCheckEmptyModifications() {
+    Modifications<String> m = ModificationsUtil.createModfications(null, null, null);
+    assertEquals("{}", m.toString());
+    assertFalse(ModificationsUtil.isModified(m, "x"));
+  }
+  
+  @Test
+  public void testCreateAndCheckAddModifications() {
+    Modifications<String> m = ModificationsUtil.createModfications(Arrays.asList("x"), null, null);
+    assertEquals("{added: 1, updated: 0, removed: 0}", m.toString());
+    assertTrue(ModificationsUtil.isModified(m, "x"));
+  }
+  
+  @Test
+  public void testCreateAndCheckUpdateModifications() {
+    Modifications<String> m = ModificationsUtil.createModfications(null, Arrays.asList("x"), null);
+    assertEquals("{added: 0, updated: 1, removed: 0}", m.toString());
+    assertTrue(ModificationsUtil.isModified(m, "x"));
+  }
+  
+  @Test
+  public void testCreateAndCheckRemoveModifications() {
+    Modifications<String> m = ModificationsUtil.createModfications(null, null, Arrays.asList("x"));
+    assertEquals("{added: 0, updated: 0, removed: 1}", m.toString());
+    assertTrue(ModificationsUtil.isModified(m, "x"));
+  }
+  
+  
   
 }
