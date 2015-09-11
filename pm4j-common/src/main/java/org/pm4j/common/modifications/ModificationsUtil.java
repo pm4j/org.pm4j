@@ -54,7 +54,7 @@ public class ModificationsUtil {
     for (T1 t1 : src.getUpdatedItems()) {
       result.registerUpdatedItem(converter.convert(t1), true);
     }
-    Set<T2> removedItems = new HashSet<>();
+    Set<T2> removedItems = new HashSet<T2>();
     for (T1 t1 : src.getRemovedItems()) {
       removedItems.add(converter.convert(t1));
     }
@@ -133,7 +133,7 @@ public class ModificationsUtil {
       // not very likely but may get a problem when deleting thousands of items.
       List<T> removedItems = new ArrayList<T>(IterableUtil.asCollection(modifications.getRemovedItems()));
       removedItems.addAll(ListUtil.toList(items));
-      modifications.setRemovedItems(new ItemSetSelection<>(new HashSet<T>(removedItems)));
+      modifications.setRemovedItems(new ItemSetSelection<T>(new HashSet<T>(removedItems)));
     }
   }
 
@@ -149,7 +149,7 @@ public class ModificationsUtil {
       return modificationSet.iterator().next();
     }
 
-    ModificationsImpl<T> result = new ModificationsImpl<>();
+    ModificationsImpl<T> result = new ModificationsImpl<T>();
     for (Modifications<T> m : modificationSet) {
       registerAddedItems(result, m.getAddedItems());
       registerUpdatedItems(result, m.getUpdatedItems());
