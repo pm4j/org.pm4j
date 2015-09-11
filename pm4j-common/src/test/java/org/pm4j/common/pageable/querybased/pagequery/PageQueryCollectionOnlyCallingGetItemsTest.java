@@ -1,6 +1,7 @@
 package org.pm4j.common.pageable.querybased.pagequery;
 
 import org.junit.Test;
+import org.pm4j.common.pageable.TestBean;
 
 /**
  * Tests a {@link PageQueryCollection} having the restriction only to call 
@@ -13,8 +14,8 @@ public class PageQueryCollectionOnlyCallingGetItemsTest extends PageQueryCollect
 
   /** Test setup variation. */
   @Override
-  protected PageQueryCollection<Bean, Integer> makePageableCollection(String... strings) {
-    PageQueryCollection<Bean, Integer> pc = super.makePageableCollection(strings);
+  protected PageQueryCollection<TestBean, Integer> makePageableCollection(String... strings) {
+    PageQueryCollection<TestBean, Integer> pc = super.makePageableCollection(strings);
     pc.setUseGetItemForIdForSingleItem(false);
     return pc;
   }

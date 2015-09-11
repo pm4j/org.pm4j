@@ -3,6 +3,7 @@ package org.pm4j.common.pageable.querybased.idquery;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
+import org.pm4j.common.pageable.TestBean;
 import org.pm4j.common.pageable.PageableCollection;
 import org.pm4j.common.pageable.PageableCollectionTestBase;
 import org.pm4j.common.pageable.querybased.MaxQueryResultsViolationException;
@@ -12,24 +13,24 @@ import org.pm4j.common.pageable.querybased.MaxQueryResultsViolationException;
  *
  * @author Olaf Boede
  */
-public class IdQueryServiceProxyForMinimzedGetItemCallsTest extends PageableCollectionTestBase<PageableCollectionTestBase.Bean> {
+public class IdQueryServiceProxyForMinimzedGetItemCallsTest extends PageableCollectionTestBase<TestBean> {
   TestService service = new TestService();
-  IdQueryServiceProxyForMinimzedGetItemCalls<Bean, Integer> serviceProxy = new IdQueryServiceProxyForMinimzedGetItemCalls<Bean, Integer>(service);
+  IdQueryServiceProxyForMinimzedGetItemCalls<TestBean, Integer> serviceProxy = new IdQueryServiceProxyForMinimzedGetItemCalls<TestBean, Integer>(service);
 
   @Override
-  protected PageableCollection<Bean> makePageableCollection(String... strings) {
+  protected PageableCollection<TestBean> makePageableCollection(String... strings) {
     service.deleteAll();
     if (strings != null) {
       for (String s : strings) {
-        service.save(new Bean(s));
+        service.save(new TestBean(s));
       }
     }
-    return new IdQueryCollectionImpl<Bean, Integer>(serviceProxy, getQueryOptions());
+    return new IdQueryCollectionImpl<TestBean, Integer>(serviceProxy, getQueryOptions());
   }
 
   @Override
-  protected Bean createItem(int id, String name) {
-    return new Bean(id, name);
+  protected TestBean createItem(int id, String name) {
+    return new TestBean(id, name);
   }
 
   @Override
@@ -190,5 +191,5 @@ public class IdQueryServiceProxyForMinimzedGetItemCallsTest extends PageableColl
 
   // --- A fake service implementation that does the job just in memory. ---
 
-  static class TestService extends IdQueryServiceFake.WithIntegerId<Bean>{}
+  static class TestService extends IdQueryServiceFake.WithIntegerId<TestBean>{}
 }

@@ -1,28 +1,29 @@
 package org.pm4j.common.pageable.querybased.idquery;
 
 import org.junit.Test;
+import org.pm4j.common.pageable.TestBean;
 import org.pm4j.common.pageable.PageableCollection;
 import org.pm4j.common.pageable.PageableCollectionTestBase;
 import org.pm4j.common.pageable.querybased.MaxQueryResultsViolationException;
 
-public class IdQueryCollectionImplWithSingleQueryStrategyTest extends PageableCollectionTestBase<PageableCollectionTestBase.Bean> {
+public class IdQueryCollectionImplWithSingleQueryStrategyTest extends PageableCollectionTestBase<TestBean> {
 
   TestService service = new TestService();
 
   @Override
-  protected PageableCollection<Bean> makePageableCollection(String... strings) {
+  protected PageableCollection<TestBean> makePageableCollection(String... strings) {
     service.deleteAll();
     if (strings != null) {
       for (String s : strings) {
-        service.save(new Bean(s));
+        service.save(new TestBean(s));
       }
     }
-    return new IdQueryCollectionImpl<Bean, Integer>(service, getQueryOptions());
+    return new IdQueryCollectionImpl<TestBean, Integer>(service, getQueryOptions());
   }
 
   @Override
-  protected Bean createItem(int id, String name) {
-    return new Bean(id, name);
+  protected TestBean createItem(int id, String name) {
+    return new TestBean(id, name);
   }
 
   @Override
@@ -181,5 +182,5 @@ public class IdQueryCollectionImplWithSingleQueryStrategyTest extends PageableCo
 
   // --- A fake service implementation that does the job just in memory. ---
 
-  static class TestService extends IdQueryServiceFake.WithIntegerId<Bean>{}
+  static class TestService extends IdQueryServiceFake.WithIntegerId<TestBean>{}
 }

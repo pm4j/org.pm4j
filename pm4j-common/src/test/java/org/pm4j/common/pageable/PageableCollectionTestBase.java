@@ -11,13 +11,11 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.lang.ObjectUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.pm4j.common.itemnavigator.ItemNavigator;
 import org.pm4j.common.pageable.inmem.InMemCollectionItemNavigator;
 import org.pm4j.common.query.CompOpStartsWith;
-import org.pm4j.common.query.QueryAttr;
 import org.pm4j.common.query.QueryExpr;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.QueryUtil;
@@ -66,8 +64,8 @@ public abstract class PageableCollectionTestBase<T> {
 
   protected QueryOptions getQueryOptions() {
     QueryOptions options = new QueryOptions();
-    options.addSortOrder(Bean.ATTR_NAME);
-    options.addFilterCompareDefinition(new FilterDefinition(Bean.ATTR_NAME, new CompOpStartsWith()));
+    options.addSortOrder(TestBean.ATTR_NAME);
+    options.addFilterCompareDefinition(new FilterDefinition(TestBean.ATTR_NAME, new CompOpStartsWith()));
     return options;
   }
 
@@ -78,7 +76,7 @@ public abstract class PageableCollectionTestBase<T> {
   }
 
   protected SortOrder getOrderByName() {
-    return new SortOrder(Bean.ATTR_NAME);
+    return new SortOrder(TestBean.ATTR_NAME);
   }
 
   protected abstract T createItem(int id, String name);
@@ -431,7 +429,6 @@ public abstract class PageableCollectionTestBase<T> {
     //clear selection and select only 2 first items
     collection.getSelectionHandler().selectAll(false);
     collection.getQueryParams().setSortOrder(nameSortOrder);
-    @SuppressWarnings("unchecked")
     List<T> itemsToSelect = Arrays.asList(collection.getItemsOnPage().get(1), collection.getItemsOnPage().get(2));
     collection.getSelectionHandler().select(true, itemsToSelect);
     collection.getSelectionHandler().select(true, collection.getItemsOnPage().get(0));
@@ -685,12 +682,12 @@ public abstract class PageableCollectionTestBase<T> {
   protected void resetCallCounter() {
   }
 
-  protected static List<Bean> makeBeans(String... strings) {
-    List<Bean> list = new ArrayList<Bean>();
+  protected static List<TestBean> makeBeans(String... strings) {
+    List<TestBean> list = new ArrayList<TestBean>();
     if (strings != null) {
       int id = 0;
       for (String s : strings) {
-        list.add(new Bean(++id, s));
+        list.add(new TestBean(++id, s));
       }
     }
     return list;
@@ -710,47 +707,7 @@ public static class LastChangeReportingChangeListener<T> implements PropertyChan
   }
 
 
-  public static class Bean {
-    public Integer id;
-    public final String name;
-    public static final QueryAttr ATTR_ID = new QueryAttr("id", String.class);
-    public static final QueryAttr ATTR_NAME = new QueryAttr("name", String.class);
-
-    public Bean(String name) {
-      this.name = name;
-    }
-
-    public Bean(int id, String name) {
-      this(name);
-      this.id = id;
-    }
-
-    @Override
-    public String toString() {
-      return name;
-    }
-
-    public Integer getId() {
-      return id;
-    }
-
-    public void setId(Integer id) {
-      this.id = id;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-      return (obj instanceof Bean)
-              ? ObjectUtils.equals(id, ((Bean)obj).id)
-              : super.equals(obj);
-      }
-
-    @Override
-    public int hashCode() {
-      return ObjectUtils.hashCode(id);
-    }
-
-  }
+  
 
   // test helper
 

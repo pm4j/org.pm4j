@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Test;
+import org.pm4j.common.pageable.TestBean;
 import org.pm4j.common.pageable.PageableCollection;
 import org.pm4j.common.pageable.PageableCollectionTestBase;
 import org.pm4j.common.pageable.PageableCollectionUtil;
@@ -15,26 +16,26 @@ import org.pm4j.common.query.QueryAttr;
 import org.pm4j.common.query.QueryOptions;
 import org.pm4j.common.query.filter.FilterDefinition;
 
-public class InMemCollectionTest extends PageableCollectionTestBase<PageableCollectionTestBase.Bean> {
+public class InMemCollectionTest extends PageableCollectionTestBase<TestBean> {
 
   @Override
-  public PageableCollection<Bean> makePageableCollection(String... strings) {
+  public PageableCollection<TestBean> makePageableCollection(String... strings) {
     QueryOptions qo = new QueryOptions();
     qo.addFilterCompareDefinition(new FilterDefinition(new QueryAttr("name", String.class), new CompOpStartsWith()));
-    return new InMemCollectionImpl<Bean>(makeBeans(strings), qo);
+    return new InMemCollectionImpl<TestBean>(makeBeans(strings), qo);
   }
 
   @Override
-  protected Bean createItem(int id, String name) {
-    return new Bean(id, name);
+  protected TestBean createItem(int id, String name) {
+    return new TestBean(id, name);
   }
 
   @Test
   public void testRegisterExternallyAddedAndRemovedItems() {
-    Collection<Bean> backingCollection = ((InMemCollectionImpl<Bean>)collection).getBackingCollection();
+    Collection<TestBean> backingCollection = ((InMemCollectionImpl<TestBean>)collection).getBackingCollection();
 
     assertCollectionItems("[a, b, c, d, e, f]");
-    Bean newBean = new Bean(13, "x");
+    TestBean newBean = new TestBean(13, "x");
     backingCollection.add(newBean);
 
     // change is not yet externally visible (sorted objects cache provides the result).
@@ -46,7 +47,7 @@ public class InMemCollectionTest extends PageableCollectionTestBase<PageableColl
     assertCollectionItems("[a, b, c, d, e, f, x]");
     assertEquals("[x]", collection.getModifications().getAddedItems().toString());
 
-    Bean firstBean = backingCollection.iterator().next();
+    TestBean firstBean = backingCollection.iterator().next();
 
     backingCollection.remove(firstBean);
     backingCollection.remove(newBean);
