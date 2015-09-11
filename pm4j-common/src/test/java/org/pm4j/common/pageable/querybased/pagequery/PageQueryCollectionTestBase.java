@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
+import org.pm4j.common.pageable.TestBean;
 import org.pm4j.common.pageable.PageableCollectionTestBase;
 import org.pm4j.common.query.CompOpNotEquals;
 import org.pm4j.common.query.CompOpStartsWith;
@@ -18,7 +19,7 @@ import org.pm4j.common.util.collection.IterableUtil;
  *
  * @author Olaf Boede
  */
-public abstract class PageQueryCollectionTestBase extends PageableCollectionTestBase<PageableCollectionTestBase.Bean> {
+public abstract class PageQueryCollectionTestBase extends PageableCollectionTestBase<TestBean> {
 
   @Override
   public void testSwitchQueryExecOffAndOn() {
@@ -139,7 +140,7 @@ public abstract class PageQueryCollectionTestBase extends PageableCollectionTest
   // XXX: either find a better name of move to a PageQueryAllItemsSelectionTest class.
   @Test
   public void testAllItemsSelection() {
-    PageQueryAllItemsSelection<Bean, Integer> selection = new PageQueryAllItemsSelection<Bean, Integer>(service);
+    PageQueryAllItemsSelection<TestBean, Integer> selection = new PageQueryAllItemsSelection<TestBean, Integer>(service);
 
     assertEquals(7L, selection.getSize());
     assertEquals("[ , a, b, c, d, e, f]", IterableUtil.asCollection(selection).toString());
@@ -147,8 +148,8 @@ public abstract class PageQueryCollectionTestBase extends PageableCollectionTest
     service.callCounter.assertCalls("{getItemCount=1, getItems=1}");
 
     QueryParams queryParams = new QueryParams();
-    queryParams.setQueryExpression(new QueryExprCompare(Bean.ATTR_NAME, CompOpNotEquals.class, " "));
-    selection = new PageQueryAllItemsSelection<Bean, Integer>(service, queryParams);
+    queryParams.setQueryExpression(new QueryExprCompare(TestBean.ATTR_NAME, CompOpNotEquals.class, " "));
+    selection = new PageQueryAllItemsSelection<TestBean, Integer>(service, queryParams);
     assertEquals(6L, selection.getSize());
     assertEquals("[a, b, c, d, e, f]", IterableUtil.asCollection(selection).toString());
 
@@ -168,23 +169,23 @@ public abstract class PageQueryCollectionTestBase extends PageableCollectionTest
   protected final BeanPageQueryServiceFake service = new BeanPageQueryServiceFake();
 
   @Override
-  protected PageQueryCollection<Bean, Integer> makePageableCollection(String... strings) {
+  protected PageQueryCollection<TestBean, Integer> makePageableCollection(String... strings) {
     service.deleteAll();
     if (strings != null) {
       for (String s : strings) {
-        service.save(new Bean(s));
+        service.save(new TestBean(s));
       }
     }
 
     QueryOptions options = new QueryOptions();
-    options.addSortOrder(Bean.ATTR_NAME);
-    options.addFilterCompareDefinition(new FilterDefinition(Bean.ATTR_NAME, new CompOpStartsWith()));
+    options.addSortOrder(TestBean.ATTR_NAME);
+    options.addFilterCompareDefinition(new FilterDefinition(TestBean.ATTR_NAME, new CompOpStartsWith()));
 
-    return new PageQueryCollection<Bean, Integer>(service, options);
+    return new PageQueryCollection<TestBean, Integer>(service, options);
   }
 
   @Override
-  protected Bean createItem(int id, String name) {
-    return new Bean(id, name);
+  protected TestBean createItem(int id, String name) {
+    return new TestBean(id, name);
   }
 }

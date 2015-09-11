@@ -1,6 +1,7 @@
 package org.pm4j.core.pm.impl.pageable;
 
 import org.junit.Test;
+import org.pm4j.common.pageable.TestBean;
 import org.pm4j.common.pageable.PageableCollection;
 import org.pm4j.common.pageable.PageableCollectionTestBase;
 import org.pm4j.common.query.CompOpStartsWith;
@@ -32,11 +33,11 @@ public class PmBeanCollectionTest extends PageableCollectionTestBase<PmBeanColle
   @Test
   public void testUpdateEventPropagation() {
     PageableCollection<BeanRowPm> pmPc = beanTablePm.getPmPageableCollection();
-    PageableCollection<Bean> beanPc = beanTablePm.getPmPageableBeanCollection();
+    PageableCollection<TestBean> beanPc = beanTablePm.getPmPageableBeanCollection();
     _RecordingPropertyChangeListener pclPmUpdates = pmPc.addPropertyAndVetoableListener(EVENT_ITEM_UPDATE, new _RecordingPropertyChangeListener());
     _RecordingPropertyChangeListener pclBeanUpdates = beanPc.addPropertyAndVetoableListener(EVENT_ITEM_UPDATE, new _RecordingPropertyChangeListener());
 
-    Bean firstBean = beanPc.getItemsOnPage().get(0);
+    TestBean firstBean = beanPc.getItemsOnPage().get(0);
 
     beanPc.getModificationHandler().registerUpdatedItem(firstBean, true);
 
@@ -68,7 +69,7 @@ public class PmBeanCollectionTest extends PageableCollectionTestBase<PmBeanColle
 
   @Override
   protected PageableCollection<BeanRowPm> makePageableCollection(String... strings) {
-    List<Bean> beans = makeBeans(strings);
+    List<TestBean> beans = makeBeans(strings);
 
     QueryOptions qo = new QueryOptions();
     QueryAttr attrNameValue = new QueryAttr("name", String.class);
@@ -78,7 +79,7 @@ public class PmBeanCollectionTest extends PageableCollectionTestBase<PmBeanColle
     qo.addSortOrder("name", new InMemSortOrder(attrNameValue));
 
     // here PmTableUtil.setPmBeans() is not used because we fake here some query options.
-    beanTablePm.setPmPageableCollection(new PmBeanCollection<BeanRowPm, Bean>(beanTablePm, BeanRowPm.class, beans, qo));
+    beanTablePm.setPmPageableCollection(new PmBeanCollection<BeanRowPm, TestBean>(beanTablePm, BeanRowPm.class, beans, qo));
     beanTablePm.setPmRowSelectMode(SelectMode.SINGLE);
 
     return beanTablePm.getPmPageableCollection();
@@ -86,12 +87,12 @@ public class PmBeanCollectionTest extends PageableCollectionTestBase<PmBeanColle
 
   @Override
   protected BeanRowPm createItem(int id, String name) {
-    return PmFactoryApi.getPmForBean(beanTablePm, new Bean(id, name));
+    return PmFactoryApi.getPmForBean(beanTablePm, new TestBean(id, name));
   }
 
 
-  @PmBeanCfg(beanClass=Bean.class)
-  public static class BeanRowPm extends PmBeanBase<PageableCollectionTestBase.Bean> {
+  @PmBeanCfg(beanClass=TestBean.class)
+  public static class BeanRowPm extends PmBeanBase<TestBean> {
     public final PmAttrString name = new PmAttrStringImpl(this);
 
     @Override
@@ -101,7 +102,7 @@ public class PmBeanCollectionTest extends PageableCollectionTestBase<PmBeanColle
   }
 
   @PmFactoryCfg(beanPmClasses=BeanRowPm.class)
-  public static class BeanTablePm extends PmTableImpl<BeanRowPm, PageableCollectionTestBase.Bean> {
+  public static class BeanTablePm extends PmTableImpl<BeanRowPm, TestBean> {
 
 //    @PmTableColCfg(sortable=PmBoolean.TRUE)
     public final PmTableCol name = new PmTableColImpl(this);

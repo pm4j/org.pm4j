@@ -19,7 +19,6 @@ import org.pm4j.common.util.collection.ListUtil;
  *
  * @author Olaf Boede
  */
-// TODO: add findEqual service method.
 public class QueryServiceUtil {
 
   private QueryServiceUtil() {
@@ -117,7 +116,7 @@ public class QueryServiceUtil {
    *          The condition value, 
    * @return The found item or <code>null</code>.
    */
-  public static <T> T findEqItem(QueryService<T, ?> s, QueryAttr qAttr, T value) {
+  public static <T> T findEqItem(QueryService<T, ?> s, QueryAttr qAttr, Object value) {
     return findItem(s, new QueryExprCompare(qAttr, CompOpEquals.class, value));
   }
 
