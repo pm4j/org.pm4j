@@ -13,8 +13,8 @@ import org.pm4j.common.query.QueryExprCompare;
 
 public class QueryServiceUtilTest {
   
-  final IdQueryServiceFake<TestBean, Integer> idQueryService = new IdQueryServiceFake<>();
-  final PageQueryServiceFake<TestBean, Integer> pageQueryService = new PageQueryServiceFake<>();
+  final IdQueryServiceFake<TestBean, Integer> idQueryService = new IdQueryServiceFake<TestBean, Integer>();
+  final PageQueryServiceFake<TestBean, Integer> pageQueryService = new PageQueryServiceFake<TestBean, Integer>();
   
   @Before
   public void setUp() {

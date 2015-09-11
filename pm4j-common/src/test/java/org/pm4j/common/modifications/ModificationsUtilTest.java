@@ -9,7 +9,7 @@ import org.pm4j.common.selection.ItemSetSelection;
 
 public class ModificationsUtilTest {
 
-  ModificationsImpl<String> modifications = new ModificationsImpl<>();
+  ModificationsImpl<String> modifications = new ModificationsImpl<String>();
   
   @Test
   public void testRegisterAddedItems() {
@@ -34,16 +34,16 @@ public class ModificationsUtilTest {
   
   @Test
   public void testJoinModifications() {
-    ModificationsImpl<String> m1 = new ModificationsImpl<>();
-    ModificationsImpl<String> m2 = new ModificationsImpl<>();
+    ModificationsImpl<String> m1 = new ModificationsImpl<String>();
+    ModificationsImpl<String> m2 = new ModificationsImpl<String>();
     
     m1.registerAddedItem("a1");
     m1.registerUpdatedItem("u1", true);
-    m1.setRemovedItems(new ItemSetSelection<>("r1"));
+    m1.setRemovedItems(new ItemSetSelection<String>("r1"));
 
     m2.registerAddedItem("a2");
     m2.registerUpdatedItem("u2", true);
-    m2.setRemovedItems(new ItemSetSelection<>("r2"));
+    m2.setRemovedItems(new ItemSetSelection<String>("r2"));
 
     Modifications<String> m3 = ModificationsUtil.joinModifications(Arrays.asList(m1, m2));
     assertEquals("{added: 2, updated: 2, removed: 2}", m3.toString());
