@@ -47,7 +47,7 @@ public class ModificationsUtil {
    * @return corresponding {@link Modifications} reported for T2
    */
   public static <T1, T2> Modifications<T2> convertModifications(Modifications<T1> src, Converter<T1, T2> converter) {
-    ModificationsImpl<T2> result = new ModificationsImpl<>();
+    ModificationsImpl<T2> result = new ModificationsImpl<T2>();
     for (T1 t1 : src.getAddedItems()) {
       result.registerAddedItem(converter.convert(t1));
     }
@@ -72,7 +72,7 @@ public class ModificationsUtil {
    */
   public static <T> Modifications<T> createModfications(Collection<T> added, Collection<T> updated,
       Collection<T> removed) {
-    ModificationsImpl<T> m = new ModificationsImpl<>();
+    ModificationsImpl<T> m = new ModificationsImpl<T>();
     registerAddedItems(m, added);
     registerUpdatedItems(m, updated);
     registerRemovedItems(m, removed);
