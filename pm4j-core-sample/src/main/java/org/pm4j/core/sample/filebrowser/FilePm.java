@@ -1,8 +1,5 @@
 package org.pm4j.core.sample.filebrowser;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.impl.PmCommandImpl;
 import org.pm4j.core.pm.impl.commands.PmCommandGroup;
@@ -16,10 +13,9 @@ import org.pm4j.core.pm.impl.commands.PmCommandGroup;
 //   @PmCommandSet(popup="cmdDelete, cmdSeparator, cmdGroup)
 public class FilePm extends FilePmBase {
 
-  @Override
-  public List<PmCommand> getVisiblePmCommands(PmCommand.CommandSet commandSet) {
-    return Arrays.asList(cmdDelete, cmdSeparator, cmdGroup);
-  }
+//  public List<PmCommand> getVisiblePmCommands(PmCommand.CommandSet commandSet) {
+//    return Arrays.asList(cmdDelete, cmdSeparator, cmdGroup);
+//  }
 
   @SuppressWarnings("unused")
   public final PmCommand cmdGroup = new PmCommandGroup(this) {

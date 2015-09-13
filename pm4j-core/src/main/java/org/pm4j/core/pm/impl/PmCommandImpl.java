@@ -156,17 +156,6 @@ public class PmCommandImpl extends PmObjectBase implements PmCommand, Cloneable 
     return ctxt;
   }
 
-  /**
-   * Commands usually don't have popups. This default implementation always
-   * provides an empty list for this command set kind.
-   */
-  @Override @SuppressWarnings("unchecked")
-  public List<PmCommand> getVisiblePmCommands(CommandSet commandSet) {
-    return (commandSet == CommandSet.POPUP)
-              ? Collections.EMPTY_LIST
-              : super.getVisiblePmCommands(commandSet);
-  }
-
   public final PmCommand doIt() {
     return doIt(true);
   }

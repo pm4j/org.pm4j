@@ -88,10 +88,9 @@ public class DirPm extends FilePmBase {
     }
   };
 
-  @Override
-  protected List<PmCommand> getVisiblePmCommands(PmCommand.CommandSet commandSet) {
-    return Arrays.asList(cmdMakeSubDir, cmdDelete);
-  };
+//  protected List<PmCommand> getVisiblePmCommands(PmCommand.CommandSet commandSet) {
+//    return Arrays.asList(cmdMakeSubDir, cmdDelete);
+//  };
 
   /** Provides the tree-view sub-nodes. A <code>null</code> if there are no children (indicator for a leaf node). */
   @Override
