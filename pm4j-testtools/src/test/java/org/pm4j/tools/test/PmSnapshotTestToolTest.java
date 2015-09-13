@@ -86,7 +86,6 @@ public class PmSnapshotTestToolTest {
     snap.setTestMode(PmSnapshotTestTool.TestMode.AUTO_CREATE);
     File file = null;
     try {
-      pm.stringAttr.setPmTitle("String Attr");
       snap.exclude(pm.stringAttr, VisibleStateAspect.TITLE);
       file = snap.snapshot(pm, "testWriteSnapshot");
       assertEquals(file.getAbsolutePath(),
