@@ -30,7 +30,6 @@ import org.pm4j.common.util.reflection.ClassUtil;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.exception.PmValidationException;
 import org.pm4j.core.pm.PmBean;
-import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.PmDefaults;
 import org.pm4j.core.pm.PmEvent;
@@ -790,7 +789,7 @@ public class PmObjectBase implements PmObject {
 
   @Override
   public String toString() {
-    return getPmConversation().getPmDefaults().getToStringNameBuilder().makeName(this);
+    return PmUtil.getPmLogString(this);
   }
 
 
@@ -1647,80 +1646,6 @@ public class PmObjectBase implements PmObject {
       pmProperties.remove(propName);
     } else {
       pmProperties.put(propName, value);
-    }
-  }
-
-  // ====== dynamic pm support ====== //
-
-  /**
-   * Adds the given PM as a named member of this PM composite.
-   * <p>
-   * Has the same effect as declaring a composite PM in a public final field
-   * of its parent.
-   */
-  protected void addToPmComposite(String name, PmObject pm) {
-    if (pm.getPmParent() != this) {
-      throw new PmRuntimeException(this, "The added child '" + name + "' has not the expected parent.");
-    }
-
-    if (pm instanceof PmObjectBase) {
-      PmObjectBase pmAsPmBase = (PmObjectBase) pm;
-      if (pmAsPmBase.isMetaDataInitialized()) {
-        throw new PmRuntimeException(this, "Added child '" + name + "' is already initialized.\n" +
-            "Please make sure that no PM-method was called on the object before adding it to its parent.");
-      }
-
-      pmAsPmBase.zz_initMetaData(this, name, false, true);
-    }
-  }
-
-
-  public static interface NameBuilder {
-    String makeName(PmObjectBase pm);
-  }
-
-  public static class NameBuilderAbsoluteName implements NameBuilder {
-    public static final NameBuilder INSTANCE = new NameBuilderAbsoluteName();
-    @Override
-    public String makeName(PmObjectBase pm) {
-      return PmUtil.getAbsoluteName(pm);
-    }
-  }
-
-  public static class NameBuilderShortName implements NameBuilder {
-    public static final NameBuilder INSTANCE = new NameBuilderShortName();
-    @Override
-    public String makeName(PmObjectBase pm) {
-      return pm.getPmName();
-    }
-  }
-
-  /** Logs the the relative PM name and a hash code. */
-  public static class NameBuilderRelNameWithHashCode implements NameBuilder {
-    public static final NameBuilder INSTANCE = new NameBuilderRelNameWithHashCode();
-     @Override
-      public String makeName(PmObjectBase pm) {
-          return pm.getPmRelativeName() + "(" + Integer.toHexString(pm.hashCode()) + ")";
-      }
-  }
-
-  public static class NameBuilderTitle implements NameBuilder {
-    public static final NameBuilder INSTANCE = new NameBuilderTitle();
-    @Override
-    public String makeName(PmObjectBase pm) {
-      String title = null;
-
-      try {
-        title = pm.getPmTitle();
-      }
-      catch (Exception e) {
-        // possibly a toString call before completed presentation model initialization.
-        LOG.warn("Unable to resolve title for :" + PmUtil.getPmLogString(pm), e);
-      }
-
-      return title != null
-                ? title
-                : PmUtil.getPmLogString(pm);
     }
   }
 

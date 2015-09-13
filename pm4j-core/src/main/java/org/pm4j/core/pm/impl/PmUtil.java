@@ -345,7 +345,7 @@ public final class PmUtil {
       return pm.getClass().getName();
     }
     else {
-      return pm.getPmConversation().getPmDefaults().getLogStringBuilder().makeName((PmObjectBase)pm);
+      return pm.getPmRelativeName() + "(" + Integer.toHexString(pm.hashCode()) + ")";
     }
   }
 

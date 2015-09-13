@@ -12,8 +12,6 @@ import org.pm4j.core.pm.annotation.PmCommandCfg;
 import org.pm4j.core.pm.annotation.PmCommandCfg.BEFORE_DO;
 import org.pm4j.core.pm.annotation.PmInject;
 import org.pm4j.core.pm.impl.PmCommandImpl;
-import org.pm4j.core.pm.impl.PmObjectBase.NameBuilder;
-import org.pm4j.core.pm.impl.PmObjectBase.NameBuilderRelNameWithHashCode;
 import org.pm4j.core.pm.impl.inject.DiResolverFactory;
 import org.pm4j.core.pm.impl.inject.DiResolverFactoryPmInjectFieldByExpression;
 import org.pm4j.core.pm.impl.inject.DiResolverFactoryPmInjectFieldByParentOfType;
@@ -65,18 +63,6 @@ public class PmDefaults implements Cloneable {
    * The default delimiter is the pipe symbol '|'.
    */
   private String multiFormatPatternDelimiter = "|";
-
-  /**
-   * Defines the algorithm used for the toString() implementation of PMs.<br>
-   * The default implementation provides a name that reflects the complete PM hierarchy.
-   */
-  private NameBuilder toStringNameBuilder = NameBuilderRelNameWithHashCode.INSTANCE;
-
-  /**
-   * Defines the algorithm used for building the name of PMs as it will appear in the logs.<br>
-   * The default implementation provides a name that reflects the complete PM hierarchy.
-   */
-  private NameBuilder logStringBuilder = NameBuilderRelNameWithHashCode.INSTANCE;
 
   /**
    * Defines the default {@link PmCommandCfg#beforeDo()} setting for commands
@@ -211,22 +197,6 @@ public class PmDefaults implements Cloneable {
 
   public void setPmAttrTitleProvider(PmTitleProvider pmAttrTitleProvider) {
     this.pmAttrTitleProvider = pmAttrTitleProvider;
-  }
-
-  public NameBuilder getToStringNameBuilder() {
-    return toStringNameBuilder;
-  }
-
-  public void setToStringNameBuilder(NameBuilder toStringNameBuilder) {
-    this.toStringNameBuilder = toStringNameBuilder;
-  }
-
-  public NameBuilder getLogStringBuilder() {
-    return logStringBuilder;
-  }
-
-  public void setLogStringBuilder(NameBuilder logStringBuilder) {
-    this.logStringBuilder = logStringBuilder;
   }
 
   public Set<PmCommandCfg.BEFORE_DO> getBeforeDoCommandDefault() {
