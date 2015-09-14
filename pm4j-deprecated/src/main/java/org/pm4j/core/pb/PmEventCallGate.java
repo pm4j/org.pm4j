@@ -1,7 +1,8 @@
-package org.pm4j.core.pm.api;
+package org.pm4j.core.pb;
 
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmCommand;
+import org.pm4j.core.pm.api.PmEventApi;
 
 /**
  * The {@link PmEventCallGate} is used for (rich client) views to call PM methods that may

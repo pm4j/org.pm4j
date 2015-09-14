@@ -4,24 +4,18 @@
 
   <groupId>org.pm4j</groupId>
   <artifactId>pm4j-swing-sample</artifactId>
-  <version>0.5.1-SNAPSHOT</version>
+  <version>0.9.65-SNAPSHOT</version>
 
   <parent>
     <groupId>org.pm4j</groupId>
     <artifactId>main</artifactId>
-    <version>0.5.1-SNAPSHOT</version>
+    <version>0.9.65-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
   <name>pm4j swing sample</name>
 
   <dependencies>
-    <dependency>
-      <artifactId>pm4j-core</artifactId>
-      <groupId>org.pm4j</groupId>
-      <version>${project.version}</version>
-    </dependency>
-
     <dependency>
       <artifactId>pm4j-core-sample</artifactId>
       <groupId>org.pm4j</groupId>
