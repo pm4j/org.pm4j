@@ -172,19 +172,6 @@ public class PmEventApi {
     new BroadcastPmEventProcessor(rootPm, eventMask).doIt();
   }
 
-  public static void firePmEventIfInitialized(PmObject pm, PmEvent event) {
-    apiHandler.firePmEventIfInitialized(pm, event);
-  }
-
-  public static Object setThreadEventSource(Object src) {
-    apiHandler.setThreadEventSource(src);
-    return src;
-  }
-
-  public static Object getThreadEventSource() {
-    return apiHandler.getThreadEventSource();
-  }
-
   public static Object ensureThreadEventSource(Object param) {
     Object currSrc = apiHandler.getThreadEventSource();
     return (currSrc == null) ? apiHandler.setThreadEventSource(param) : currSrc;

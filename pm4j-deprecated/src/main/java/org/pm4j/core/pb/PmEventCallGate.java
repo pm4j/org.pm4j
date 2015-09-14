@@ -1,7 +1,9 @@
-package org.pm4j.core.pm.api;
+package org.pm4j.core.pb;
 
 import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmCommand;
+import org.pm4j.core.pm.api.PmEventApi;
+import org.pm4j.core.pm.impl.PmEventApiHandler;
 
 /**
  * The {@link PmEventCallGate} is used for (rich client) views to call PM methods that may
@@ -20,6 +22,8 @@ import org.pm4j.core.pm.PmCommand;
 // TODO olaf: move to package pb?
 public abstract class PmEventCallGate {
 
+  private static PmEventApiHandler apiHandler = new PmEventApiHandler();
+  
   /**
    * Creates a PM event call gate for the given event source (usually a view component).
    * <p>
@@ -30,16 +34,16 @@ public abstract class PmEventCallGate {
    * @param eventSource The event source for the call to process.
    */
   public PmEventCallGate(Object eventSource) {
-    Object oldEvenSrc = PmEventApi.getThreadEventSource();
+    Object oldEvenSrc = getThreadEventSource();
     try {
       if (eventSource != null) {
-        PmEventApi.setThreadEventSource(eventSource);
+        setThreadEventSource(eventSource);
       }
       // Execute the specific task to do.
       exec();
     }
     finally {
-      PmEventApi.setThreadEventSource(oldEvenSrc);
+      setThreadEventSource(oldEvenSrc);
     }
   }
 
@@ -57,45 +61,54 @@ public abstract class PmEventCallGate {
       }
     };
 
-    Object oldEvenSrc = PmEventApi.getThreadEventSource();
+    Object oldEvenSrc = getThreadEventSource();
     try {
       if (eventSource != null) {
-        PmEventApi.setThreadEventSource(eventSource);
+        setThreadEventSource(eventSource);
       }
       pmAttr.setValueAsString(value);
     }
     finally {
-      PmEventApi.setThreadEventSource(oldEvenSrc);
+      setThreadEventSource(oldEvenSrc);
     }
   }
 
   public static <T> void setValue(Object eventSource, PmAttr<T> pmAttr, T value) {
-    Object oldEvenSrc = PmEventApi.getThreadEventSource();
+    Object oldEvenSrc = getThreadEventSource();
     try {
       if (eventSource != null) {
-        PmEventApi.setThreadEventSource(eventSource);
+        setThreadEventSource(eventSource);
       }
       pmAttr.setValue(value);
     }
     finally {
-      PmEventApi.setThreadEventSource(oldEvenSrc);
+      setThreadEventSource(oldEvenSrc);
     }
   }
 
   public static PmCommand doIt(Object eventSource, PmCommand pmCommand) {
     PmCommand executedCommand = null;
-    Object oldEvenSrc = PmEventApi.getThreadEventSource();
+    Object oldEvenSrc = getThreadEventSource();
     try {
       if (eventSource != null) {
-        PmEventApi.setThreadEventSource(eventSource);
+        setThreadEventSource(eventSource);
       }
       executedCommand = pmCommand.doIt();
     }
     finally {
-      PmEventApi.setThreadEventSource(oldEvenSrc);
+      setThreadEventSource(oldEvenSrc);
     }
 
     return executedCommand;
+  }
+
+  private static Object setThreadEventSource(Object src) {
+    apiHandler.setThreadEventSource(src);
+    return src;
+  }
+
+  private static Object getThreadEventSource() {
+    return apiHandler.getThreadEventSource();
   }
 
 }

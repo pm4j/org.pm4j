@@ -30,7 +30,6 @@ import org.pm4j.common.util.reflection.ClassUtil;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.exception.PmValidationException;
 import org.pm4j.core.pm.PmBean;
-import org.pm4j.core.pm.PmCommand;
 import org.pm4j.core.pm.PmConversation;
 import org.pm4j.core.pm.PmDefaults;
 import org.pm4j.core.pm.PmEvent;
@@ -706,12 +705,8 @@ public class PmObjectBase implements PmObject {
     return resClasses;
   }
 
-  protected List<PmCommand> getVisiblePmCommands(PmCommand.CommandSet commandSet) {
-    return PmUtil.getVisiblePmCommands(this);
-  }
-
   /* package */ List<PmObject> getPmChildren() {
-    return BeanAttrArrayList.makeList(this, getPmMetaDataWithoutPmInitCall().childFieldAccessorArray, pmDynamicSubPms.all);
+    return BeanAttrArrayList.makeList(this, getPmMetaDataWithoutPmInitCall().childFieldAccessorArray);
   }
 
   /**
@@ -720,7 +715,7 @@ public class PmObjectBase implements PmObject {
    * @return
    */
   /* package */ List<PmObject> getPmChildrenAndFactoryPms() {
-    List<PmObject> subPms = BeanAttrArrayList.makeList(this, getPmMetaDataWithoutPmInitCall().childFieldAccessorArray, pmDynamicSubPms.all);
+    List<PmObject> subPms = BeanAttrArrayList.makeList(this, getPmMetaDataWithoutPmInitCall().childFieldAccessorArray);
     if (pmBeanFactoryCache != null && !pmBeanFactoryCache.isEmpty()) {
       return ListUtil.collectionsToList(subPms, getFactoryGeneratedChildPms());
     } else {
@@ -737,12 +732,7 @@ public class PmObjectBase implements PmObject {
 
   /* package */ PmObject findChildPm(String localChildName) {
     BeanAttrAccessor accessor = getPmMetaData().nameToChildAccessorMap.get(localChildName);
-    if (accessor != null) {
-      return accessor.getBeanAttrValue(this);
-    }
-    else {
-      return pmDynamicSubPms.nameToPmMap.get(localChildName);
-    }
+    return (PmObject) (accessor != null ? accessor.getBeanAttrValue(this) : null);
   }
 
   @Override
@@ -799,7 +789,7 @@ public class PmObjectBase implements PmObject {
 
   @Override
   public String toString() {
-    return getPmConversation().getPmDefaults().getToStringNameBuilder().makeName(this);
+    return PmUtil.getPmLogString(this);
   }
 
 
@@ -1656,129 +1646,6 @@ public class PmObjectBase implements PmObject {
       pmProperties.remove(propName);
     } else {
       pmProperties.put(propName, value);
-    }
-  }
-
-  // ====== dynamic pm support ====== //
-
-  /**
-   * Adds the given PM as a named member of this PM composite.
-   * <p>
-   * Has the same effect as declaring a composite PM in a public final field
-   * of its parent.
-   */
-  protected void addToPmComposite(String name, PmObject pm) {
-    if (pm.getPmParent() != this) {
-      throw new PmRuntimeException(this, "The added child '" + name + "' has not the expected parent.");
-    }
-
-    if (pm instanceof PmObjectBase) {
-      PmObjectBase pmAsPmBase = (PmObjectBase) pm;
-      if (pmAsPmBase.isMetaDataInitialized()) {
-        throw new PmRuntimeException(this, "Added child '" + name + "' is already initialized.\n" +
-            "Please make sure that no PM-method was called on the object before adding it to its parent.");
-      }
-
-      pmAsPmBase.zz_initMetaData(this, name, false, true);
-    }
-
-    if (pmDynamicSubPms == PmDynamicSubPms.EMPTY_INSTANCE) {
-      pmDynamicSubPms = new PmDynamicSubPms();
-    }
-    pmDynamicSubPms.addPm(name, pm);
-  }
-
-  protected void removePmChild(PmObject pm) {
-    pmDynamicSubPms.removePm(pm);
-  }
-
-  private PmDynamicSubPms pmDynamicSubPms = PmDynamicSubPms.EMPTY_INSTANCE;
-
-  /**
-   * A data structure that exists only in case of a PM with dynamic sub-PMs.
-   */
-  static class PmDynamicSubPms {
-    public static final PmDynamicSubPms EMPTY_INSTANCE = new PmDynamicSubPms() {
-      @Override public void addPm(String arg0, PmObject arg1) {
-        throw new UnsupportedOperationException();
-      }
-    };
-
-    private List<PmObject> all = Collections.emptyList();
-    private Map<String, PmObject> nameToPmMap = Collections.emptyMap();
-
-    public void addPm(String name, PmObject pm) {
-      if (!ObjectUtils.equals(name, pm.getPmName())) {
-        throw new PmRuntimeException("Illegal attempt to register PM with the name '" +
-            pm.getPmName() + "' under the name '" + name + "'. PM class: " + pm.getClass());
-      }
-      if (nameToPmMap.isEmpty()) {
-        nameToPmMap = new HashMap<String, PmObject>();
-      }
-      else if (nameToPmMap.containsKey(name)) {
-        throw new PmRuntimeException("A PM child with the name '" +
-            name + "' already exists.");
-      }
-      nameToPmMap.put(name, pm);
-
-      if (all.isEmpty())
-        all = new ArrayList<PmObject>();
-      all.add(pm);
-    }
-
-    public void removePm(PmObject pm) {
-      nameToPmMap.remove(pm.getPmName());
-      all.remove(pm);
-    }
-
-  }
-
-  public static interface NameBuilder {
-    String makeName(PmObjectBase pm);
-  }
-
-  public static class NameBuilderAbsoluteName implements NameBuilder {
-    public static final NameBuilder INSTANCE = new NameBuilderAbsoluteName();
-    @Override
-    public String makeName(PmObjectBase pm) {
-      return PmUtil.getAbsoluteName(pm);
-    }
-  }
-
-  public static class NameBuilderShortName implements NameBuilder {
-    public static final NameBuilder INSTANCE = new NameBuilderShortName();
-    @Override
-    public String makeName(PmObjectBase pm) {
-      return pm.getPmName();
-    }
-  }
-
-  /** Logs the the relative PM name and a hash code. */
-  public static class NameBuilderRelNameWithHashCode implements NameBuilder {
-    public static final NameBuilder INSTANCE = new NameBuilderRelNameWithHashCode();
-     @Override
-      public String makeName(PmObjectBase pm) {
-          return pm.getPmRelativeName() + "(" + Integer.toHexString(pm.hashCode()) + ")";
-      }
-  }
-
-  public static class NameBuilderTitle implements NameBuilder {
-    public static final NameBuilder INSTANCE = new NameBuilderTitle();
-    @Override
-    public String makeName(PmObjectBase pm) {
-      String title = null;
-
-      try {
-        title = pm.getPmTitle();
-      }
-      catch (Exception e) {
-        // possibly a toString call before completed presentation model initialization.
-        LOG.warn("Unable to resolve title for :" + PmUtil.getPmLogString(pm), e);
-      }
-
-      return title != null
-                ? title
-                : PmUtil.getPmLogString(pm);
     }
   }
 

@@ -68,6 +68,7 @@ public interface PmObject extends Comparable<PmObject> {
    * @return <code>true</code> when it is allowed to call
    *         {@link #setTitle(Object, Object, String)}.
    */
+  @Deprecated
   boolean canSetPmTitle();
 
   /**
@@ -79,6 +80,7 @@ public interface PmObject extends Comparable<PmObject> {
    * @param eventSource
    * @param titleString
    */
+  @Deprecated
   void setPmTitle(String titleString);
 
   /**

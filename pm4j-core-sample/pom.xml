@@ -17,29 +17,9 @@
   <dependencies>
     <dependency>
       <groupId>org.pm4j</groupId>
-      <artifactId>pm4j-core</artifactId>
+      <artifactId>pm4j-deprecated</artifactId>
       <version>${project.version}</version>
     </dependency>
 
-    <dependency>
-      <groupId>org.pm4j</groupId>
-      <artifactId>pm4j-common</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.pm4j</groupId>
-      <artifactId>pm4j-common</artifactId>
-      <version>${project.version}</version>
-      <classifier>tests</classifier>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.pm4j</groupId>
-      <artifactId>pm4j-core</artifactId>
-      <version>${project.version}</version>
-      <classifier>tests</classifier>
-    </dependency>
-  </dependencies>
+   </dependencies>
 </project>

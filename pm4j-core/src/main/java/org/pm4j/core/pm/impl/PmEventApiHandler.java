@@ -165,14 +165,6 @@ public class PmEventApiHandler {
     }
   }
 
-  public void firePmEventIfInitialized(PmObject pm, PmEvent event) {
-    PmObjectBase pmImpl = (PmObjectBase)pm;
-    if (pmImpl.pmInitState == PmInitState.INITIALIZED) {
-      PmEventApi.firePmEvent(pmImpl, event);
-    }
-  }
-
-
   public void firePmEventIfInitialized(PmObject pm, int eventMask, ValueChangeKind valueChangeKind) {
     PmObjectBase pmImpl = (PmObjectBase)pm;
     if (pmImpl.pmInitState == PmInitState.INITIALIZED) {
@@ -213,7 +205,7 @@ public class PmEventApiHandler {
 
     ListenerRef[] refs = pmImpl.pmEventListenerRefs.listenerRefs;
     if (LOG.isTraceEnabled())
-      LOG.trace("fireChange[" + event + "] for event source   : " + PmEventApi.getThreadEventSource() +
+      LOG.trace("fireChange[" + event + "] to listeners: " +
                 "\n\teventListeners: " + Arrays.asList(refs));
 
     if (refs.length > 0) {

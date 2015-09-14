@@ -261,14 +261,6 @@ public final class PmUtil {
   }
 
   /**
-   * @param The command set kind to get.
-   * @return The command set that should be shown within the given command set kind.
-   */
-  public static List<PmCommand> getVisiblePmCommands(PmObject pm, PmCommand.CommandSet commandSet) {
-    return ((PmObjectBase)pm).getVisiblePmCommands(commandSet);
-  }
-
-  /**
    * @param pm The pm to get the child PM from.
    * @param childName
    *          Name of the requested child PM.
@@ -353,7 +345,7 @@ public final class PmUtil {
       return pm.getClass().getName();
     }
     else {
-      return pm.getPmConversation().getPmDefaults().getLogStringBuilder().makeName((PmObjectBase)pm);
+      return pm.getPmRelativeName() + "(" + Integer.toHexString(pm.hashCode()) + ")";
     }
   }
 

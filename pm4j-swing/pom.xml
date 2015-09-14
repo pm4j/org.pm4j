@@ -16,15 +16,10 @@
 
   <dependencies>
     <dependency>
-      <artifactId>pm4j-core</artifactId>
-      <groupId>org.pm4j</groupId>
-      <version>${project.version}</version>
-    </dependency>
-
-    <dependency>
-      <artifactId>pm4j-common</artifactId>
+      <artifactId>pm4j-deprecated</artifactId>
       <groupId>org.pm4j</groupId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>
+  
 </project>
