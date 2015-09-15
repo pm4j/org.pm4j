@@ -31,33 +31,20 @@ public class PmFactoryApiHandler {
     }
 
     PmConversation pmConversation = pmCtxt.getPmConversation();
-    boolean supportFactoryHierarchy = pmConversation.getPmDefaults().supportFactoryHierarchy;
     synchronized (pmConversation) {
       T_PM pm = this.<T_PM>findPmForBean(pmCtxt, bean);
       if (pm != null) {
         return pm;
       }
 
-      BeanPmFactory factory = null;
-      if (supportFactoryHierarchy) {
-        factory = ((PmObjectBase)pmCtxt).getOwnPmElementFactory();
+      BeanPmFactory factory = findPmFactory(pmCtxt);
+      if (factory == null) {
+        throw new PmRuntimeException(pmCtxt, "Please add a @PmFactoryCfg configuration to be able to create a PM for a bean of type " + bean.getClass());
       }
-      else {
-        factory = findPmFactory(pmCtxt);
-        if (factory == null) {
-          throw new PmRuntimeException(pmCtxt, "Please add a @PmFactoryCfg configuration to be able to create a PM for a bean of type " + bean.getClass());
-        }
-      }
-
+      
       if (factory != null &&
           factory.canMakePmFor(bean)) {
         pm = factory.<T_PM>makePm(pmCtxt, bean);
-      }
-      else if (supportFactoryHierarchy) {
-        PmObject pmParent = pmCtxt.getPmParent();
-        if (pmParent != null) {
-          pm = this.<T, T_PM>getPmForBean(pmParent, bean);
-        }
       }
 
       if (pm == null) {
@@ -91,62 +78,8 @@ public class PmFactoryApiHandler {
         pmBean = pmCtxtImpl.pmBeanFactoryCache.<T>findByBean(bean);
       }
     }
-
-    if (pmBean == null) {
-      BeanPmFactory factory = pmCtxtImpl.getOwnPmElementFactory();
-
-      // check in hierarchy only if the own factory (and cache) does not
-      // manage objects of the given type.
-      if (pmCtxt.getPmConversation().getPmDefaults().supportFactoryHierarchy &&
-          (factory == null ||
-           ! factory.canMakePmFor(bean))) {
-        PmObject pmParent = pmCtxtImpl.getPmParent();
-        if (pmParent != null) {
-          pmBean = this.<T>findPmForBean(pmParent, bean);
-        }
-      }
-    }
-
     return pmBean;
   }
-
-
-
-  /**
-   * Searches an existing presentation model for a bean that equals the
-   * given bean instance.
-   *
-   * @param bean The bean to find a similar presentation model for.
-   * @return The presentation model for an 'equal' bean or <code>null</code>.
-   */
-  // TODO olaf: Check with first project context how to get rid of this...
-//  public <T extends PmBean<?>> T findPmForEqualBean(PmObject pmCtxt, Object bean) {
-//    PmObjectBase pmCtxtImpl = (PmObjectBase)pmCtxt;
-//    T pmBean = null;
-//
-//    if (pmCtxtImpl.pmBeanFactoryCache != null) {
-//      synchronized(pmCtxtImpl) {
-//        pmBean = pmCtxtImpl.pmBeanFactoryCache.<T>findPmForEqualBean(bean);
-//      }
-//    }
-//
-//    if (pmBean == null) {
-//      BeanPmFactory factory = pmCtxtImpl.getOwnPmElementFactory();
-//
-//      // check in hierarchy only when the own factory (and cache) does not
-//      // manage objects of the given type.
-//      if (factory == null ||
-//          ! factory.canMakePmFor(bean)) {
-//        PmObject pmParent = pmCtxtImpl.getPmParent();
-//        if (pmParent != null) {
-//          pmBean = this.<T>findPmForEqualBean(pmParent, bean);
-//        }
-//      }
-//    }
-//
-//    return pmBean;
-//  }
-
 
   /**
    * Convenience method that calls {@link #getPmForBean(Object)} for each item

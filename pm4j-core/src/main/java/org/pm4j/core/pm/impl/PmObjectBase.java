@@ -217,43 +217,11 @@ public class PmObjectBase implements PmObject {
 
   @Override
   public final String getPmTooltip() {
-
     CacheStrategy strategy = getPmMetaData().tooltipCache.cacheStrategy;
     Object cachedValue = strategy.getCachedValue(this);
-
-    String toolTip = null;
-    if (cachedValue != CacheStrategy.NO_CACHE_VALUE) {
-      // just use the cache hit (if there was one)
-      toolTip = (String) cachedValue;
-    }
-    else {
-      toolTip = (String) strategy.setAndReturnCachedValue(this, getPmTooltipImpl());
-    }
-
-    // XXX olaf: a kind of decorator could add some flexibility for
-    //           different error display requirements...
-    if (getPmMetaData().addErrorMessagesToTooltip &&
-        !isPmValid())
-    {
-      List<String> lines = new ArrayList<String>();
-
-      if (toolTip != null)
-        lines.add(toolTip);
-
-      for (PmMessage m : PmMessageApi.getMessages(this, Severity.ERROR))
-        lines.add(m.getTitle());
-
-      toolTip = lines.size() > 0
-        ? StringUtils.join(lines, "\n")
-        : null;
-    }
-
-    if (getPmConversation().getPmDefaults().debugHints) {
-      toolTip = toolTip != null ? toolTip + "/n" : "";
-      toolTip += PmUtil.getPmLogString(this);
-    }
-
-    return toolTip;
+    return (String) (cachedValue != CacheStrategy.NO_CACHE_VALUE 
+        ? cachedValue
+        : strategy.setAndReturnCachedValue(this, getPmTooltipImpl()));
   }
 
   protected String getPmTooltipImpl() {
@@ -1330,7 +1298,6 @@ public class PmObjectBase implements PmObject {
 
     /** Initializes the some attributes based on PM-default settings. */
     protected void init(PmDefaults pmDefaults) {
-      this.addErrorMessagesToTooltip = pmDefaults.addErrorMessagesToTooltip;
     }
 
     /**
@@ -1389,7 +1356,6 @@ public class PmObjectBase implements PmObject {
     private String resKeyBase;
     private List<Class<?>> resLoaderCtxtClasses;
     private boolean tooltipUsesTitle = false;
-    private boolean addErrorMessagesToTooltip;
 
     boolean deprValidation;
     private Validator validator;

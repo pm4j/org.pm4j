@@ -77,23 +77,8 @@ public class PmDefaults implements Cloneable {
    */
   private boolean exceptionOnSwitchToDisabledTab = true;
 
-  /**
-   * Defines, if validation error messages should be added to the tool tip text of
-   * the affected attributes.
-   */
-  public boolean addErrorMessagesToTooltip = true;
-
+  @Deprecated // no replacement planned
   public boolean debugHints = false;
-
-  /**
-   * The default defines that a factory must be declared on the PM that uses the factory.
-   * E.g. a PmTable should declare the factory for its row PMs directly.
-   * <p>
-   * If this property is set to <code>true</code>, a factory in the parent hierarchy may be
-   * used also.<br>
-   * This hierarchy feature will be removed in one of the next releases.
-   */
-  public boolean supportFactoryHierarchy = false;
 
   /**
    * The set of dependency injection resolvers used for the application.

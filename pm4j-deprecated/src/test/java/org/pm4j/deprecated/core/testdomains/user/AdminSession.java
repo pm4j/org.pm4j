@@ -35,11 +35,6 @@ public class AdminSession extends PmConversationImpl {
     super(parentSession);
     // fix Locale to ensure that title tests may run successfully on different machines.
     setPmLocale(Locale.GERMAN);
-
-    // XXX olaf: this feature will be removed in one of the next releases.
-    PmDefaults d = new PmDefaults();
-    d.supportFactoryHierarchy = true;
-    setPmDefaults(d);
   }
 
   // -------- Generated stuff -------- //
