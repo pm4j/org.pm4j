@@ -197,8 +197,7 @@ public class PmAttrListImpl<T> extends PmAttrBase<List<T>, List<T>> implements P
   protected void initMetaData(PmObjectBase.MetaData metaData) {
     super.initMetaData(metaData);
     MetaData myMetaData = (MetaData) metaData;
-    myMetaData.setValidateLengths(false);
-
+    
     PmAttrListCfg annotation = AnnotationUtil.findAnnotation(this, PmAttrListCfg.class);
     if (annotation != null) {
       if (annotation.itemStringConverter() != StringConverterToString.class) {
