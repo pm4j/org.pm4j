@@ -9,7 +9,7 @@ import org.junit.Test;
 
 public class ModificationsImplTest {
 
-  ModificationsImpl<String> modifications = new ModificationsImpl<>();
+  ModificationsImpl<String> modifications = new ModificationsImpl<String>();
   ModificationsImpl<String> modifAbc = (ModificationsImpl<String>) ModificationsUtil.createModfications(Arrays.asList("a"), Arrays.asList("b"), Arrays.asList("c"));
   
   @Test

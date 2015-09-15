@@ -6,7 +6,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 
-import org.junit.Assert;
 import org.junit.Test;
 import org.pm4j.common.selection.ItemSetSelection;
 
@@ -67,7 +66,7 @@ public class ModificationsUtilTest {
   public void testConvertModifications() {
     modifications.registerAddedItem("a");
     modifications.registerUpdatedItem("b", true);
-    modifications.setRemovedItems(new ItemSetSelection<>("c"));
+    modifications.setRemovedItems(new ItemSetSelection<String>("c"));
     
     Modifications<String> converted = ModificationsUtil.convertModifications(modifications, new ModificationsUtil.Converter<String, String>() {
       @Override
