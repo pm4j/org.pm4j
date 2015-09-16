@@ -214,4 +214,17 @@ public abstract class FilterItemPm<T_ITEM extends FilterItem> extends PmBeanBase
     filterByValuePmAttrFactory = factory;
   }
 
+  @Override
+  public String toString() {
+    FilterItem pmBean = getPmBean();
+    StringBuilder sb = new StringBuilder(this.getClass().getCanonicalName());
+    sb.append("[").append(pmBean.toString()).append(" - ");
+    if (filterByValue != null && filterByValue.getValue() != null) {
+      sb.append(filterByValue.getValue().toString());
+    } else {
+      sb.append("null");
+    }
+    sb.append("]");
+    return sb.toString();
+  }
 }

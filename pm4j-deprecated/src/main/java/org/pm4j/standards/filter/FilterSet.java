@@ -23,4 +23,13 @@ public class FilterSet {
     filterItems.add(fi);
   }
 
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder("FilterSet for filters [");
+    for (FilterItem filter : getFilterItems()) {
+      sb.append("\n\t").append(filter.toString());      
+    }
+    sb.append("]");
+    return sb.toString();
+  }
 }
