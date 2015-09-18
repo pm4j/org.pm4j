@@ -350,7 +350,7 @@ public class PmBeanImpl2<T_BEAN>
     protected final T_BEAN getPmBeanImpl() {
       return embeddingBeanPm != null
           ? parentBeanToOwnBean(embeddingBeanPm.getPmBean())
-          : super.getPmBean();
+          : super.getPmBeanImpl();
     }
 
     /** Ensure that nobody sets a bean if this instance is used within an embedded context. */
