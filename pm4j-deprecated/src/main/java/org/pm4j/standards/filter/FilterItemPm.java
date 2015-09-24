@@ -19,6 +19,7 @@ import org.pm4j.core.pm.api.PmEventApi;
 import org.pm4j.core.pm.api.PmLocalizeApi;
 import org.pm4j.core.pm.impl.PmAttrImpl;
 import org.pm4j.core.pm.impl.PmAttrProxyImpl;
+import org.pm4j.core.pm.impl.PmAttrStringImpl;
 import org.pm4j.core.pm.impl.PmAttrValueChangeDecorator;
 import org.pm4j.core.pm.impl.PmBeanBase;
 import org.pm4j.core.pm.impl.PmInitApi;
@@ -115,9 +116,10 @@ public abstract class FilterItemPm<T_ITEM extends FilterItem> extends PmBeanBase
 
     @Override
     protected void afterValueChange(CompOp oldValue, CompOp newValue) {
-      boolean oldFilterByPmExists = filterByValue.getDelegate() != null;
+      boolean oldFilterByPmExists = filterByValue != null && filterByValue.isPmVisible();
       boolean newFilterByPmNeeded = (newValue != null) && (newValue.getValueNeeded() != CompOp.ValueNeeded.NO);
 
+      // XXX: are all if's needed? Just re-generate?
       if (newFilterByPmNeeded) {
         if (!oldFilterByPmExists) {
           reGenerateFilterByValueAttr();
@@ -125,22 +127,14 @@ public abstract class FilterItemPm<T_ITEM extends FilterItem> extends PmBeanBase
       }
       else {
         if (oldFilterByPmExists) {
-          filterByValue.setDelegate(null);
+          reGenerateFilterByValueAttr();
         }
       }
     }
   };
 
   /** A proxy attribute in front of the value type specific value attribute. */
-  public final PmAttrProxy<Object> filterByValue = new PmAttrProxyImpl<Object>(this) {
-      @Override
-      protected void onPmInit() {
-        super.onPmInit();
-        if (getPmBean() != null) {
-          reGenerateFilterByValueAttr();
-        }
-      }
-  };
+  private PmAttr<?> filterByValue;
 
   /** The entered filter values have to be transferred to the filter value. */
   protected PmAttrValueChangeDecorator<?> filterValueChangeDecorator = new PmAttrValueChangeDecorator<Object>() {
@@ -152,6 +146,21 @@ public abstract class FilterItemPm<T_ITEM extends FilterItem> extends PmBeanBase
   /** Needed for mapping a type to a pm attribute for dynamic switching. */
   private FilterByValuePmAttrFactory filterByValuePmAttrFactory = new FilterByValuePmAttrFactoryImpl();
 
+  public PmAttr<?> getFilterByValue() {
+    if (filterByValue == null) {
+      reGenerateFilterByValueAttr();
+    }
+    return filterByValue;
+  }
+  
+  @Override
+  protected void onPmInit() {
+    super.onPmInit();
+    if (getPmBean() != null) {
+      reGenerateFilterByValueAttr();
+    }
+  }
+  
   /**
    * Whenever the bean behind the PM changes, we need to transfer the actual filter value to the value field PM.
    */
@@ -161,7 +170,7 @@ public abstract class FilterItemPm<T_ITEM extends FilterItem> extends PmBeanBase
   }
 
   protected void reGenerateFilterByValueAttr() {
-  T_ITEM bean = getPmBean();
+    T_ITEM bean = getPmBean();
     FilterDefinition fd = bean.getFilterBy();
     if (fd != null) {
       // TODO olaf: the getValue method is called within pmInit. should not happen...
@@ -177,13 +186,18 @@ public abstract class FilterItemPm<T_ITEM extends FilterItem> extends PmBeanBase
           }
           // XXX olaf: should be done on proxy level...
           PmEventApi.addValueChangeDecorator(a, filterValueChangeDecorator);
-          filterByValue.setDelegate(a);
+          filterByValue = a;
           return;
         }
       }
     }
     // in all other cases:
-    filterByValue.setDelegate(null);
+    filterByValue = new PmAttrStringImpl(this) {
+      @Override
+      protected boolean isPmVisibleImpl() {
+        return false;
+      }
+    };
   }
 
   /**
