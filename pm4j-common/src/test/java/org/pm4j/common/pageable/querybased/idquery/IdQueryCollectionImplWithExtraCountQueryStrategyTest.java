@@ -3,9 +3,10 @@ package org.pm4j.common.pageable.querybased.idquery;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
-import org.pm4j.common.pageable.TestBean;
 import org.pm4j.common.pageable.PageableCollection;
 import org.pm4j.common.pageable.PageableCollectionTestBase;
+import org.pm4j.common.pageable.TestBean;
+import org.pm4j.common.pageable.querybased.MaxQueryResultsViolationException;
 
 public class IdQueryCollectionImplWithExtraCountQueryStrategyTest extends PageableCollectionTestBase<TestBean> {
   TestService service = new TestService();
@@ -168,14 +169,7 @@ public class IdQueryCollectionImplWithExtraCountQueryStrategyTest extends Pageab
     assertEquals("Call count stability check.", "{findIds=1, getItemCount=1}", service.callCounter.toString());
   }
 
-  // tests just API compatibility for catch, can be removed when the deprecated class is removed
-  @Test(expected=org.pm4j.common.pageable.querybased.idquery.MaxQueryResultsViolationException.class)
-  public void testGetNumOfItemsWithMaxQueryResultsViolationExceptionCompatibility() {
-    collection.getQueryParams().setMaxResults(1L);
-    super.testGetNumOfItems();
-  }
-
-  @Test(expected=org.pm4j.common.pageable.querybased.MaxQueryResultsViolationException.class)
+  @Test(expected=MaxQueryResultsViolationException.class)
   public void testGetNumOfItemsWithMaxQueryResultsViolationException() {
     collection.getQueryParams().setMaxResults(1L);
     super.testGetNumOfItems();

@@ -5,13 +5,15 @@ package org.pm4j.common.pageable.querybased;
  *
  * @author MHOENNIG
  */
-// XXX move implementation from deprecated superclass when it's not used anymore
-public class MaxQueryResultsViolationException extends org.pm4j.common.pageable.querybased.idquery.MaxQueryResultsViolationException {
+public class MaxQueryResultsViolationException extends RuntimeException {
 
   /** Serialization id. */
   private static final long serialVersionUID = 1L;
 
- /**
+  private final Long foundResults;
+  private final long maxResults;
+
+  /**
    * Provides a message <i>The query returns more than XYZ entries.</i>
    *
    * @param maxResults
@@ -22,7 +24,7 @@ public class MaxQueryResultsViolationException extends org.pm4j.common.pageable.
    *          higher than then <code>maxResults</code>.
    */
   public MaxQueryResultsViolationException(long maxResults, Long foundResults) {
-    super(maxResults, foundResults);
+    this("The query returns more than " + maxResults + " entries.", maxResults, foundResults);
   }
 
   /**
@@ -36,6 +38,27 @@ public class MaxQueryResultsViolationException extends org.pm4j.common.pageable.
    *          higher than then <code>maxResults</code>.
    */
   public MaxQueryResultsViolationException(String message, long maxResults, Long foundResults) {
-    super(message, maxResults, foundResults);
+    super(message);
+
+    this.maxResults = maxResults;
+    this.foundResults = foundResults;
   }
+
+  /**
+   * @return the number of items found query results.<br>
+   *         May be <code>null</code> if it's
+   *         just known that the number is higher than then
+   *         <code>maxResults</code>.
+   */
+  public Long getFoundResults() {
+    return foundResults;
+  }
+
+  /**
+   * @return maximum number allowed to find by a query.
+   */
+  public long getMaxResults() {
+    return maxResults;
+  }
+
 }
