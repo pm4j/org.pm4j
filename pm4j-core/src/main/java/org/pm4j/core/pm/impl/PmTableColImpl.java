@@ -139,15 +139,20 @@ public class PmTableColImpl extends PmObjectBase implements PmTableCol {
   }
 
   /**
-   * Gets (or creates) the {@link QueryAttr} that addresses the value to filter/sort within this column.
+   * Provides the {@link QueryAttr} that may be used to filter and sort this column by.
    *
-   * @return
+   * @return The related attribute. May be <code>null</code> if the column does not support
+   * filter or sort functionality. 
    */
   protected QueryAttr getColQueryAttr() {
     MetaData md = getOwnMetaData();
     String name = getColQueryAttrName();
     String path = md.queryAttrPath != null ? md.queryAttrPath : name;
     return new QueryAttr(name, path, md.filterType, getPmTitle());
+  }
+  
+  /* package */ Boolean isSortableConfigured() {
+    return PmTableColImpl.this.getOwnMetaDataWithoutPmInitCall().sortable;
   }
 
   /**
@@ -310,37 +315,6 @@ public class PmTableColImpl extends PmObjectBase implements PmTableCol {
     }
   }
 
-  // ======== Public details layer access definition ======== //
-
-  /** Interface for other PMs. E.g. the table. */
-  private class ColumnDetailsImpl implements ImplDetails {
-
-    @Override
-    public String getQueryAttrName() {
-      return PmTableColImpl.this.getColQueryAttrName();
-    }
-
-    @Override
-    public QueryAttr getQueryAttr() {
-      return PmTableColImpl.this.getColQueryAttr();
-    }
-
-    @Override
-    public Boolean isSortableConfigured() {
-      return PmTableColImpl.this.getOwnMetaData().sortable;
-    }
-
-    @Override
-    public FilterDefinition getFilterCompareDefinition(FilterDefinitionFactory fcdf) {
-      return PmTableColImpl.this.createFilterCompareDefinition(fcdf);
-    }
-  }
-
-  @Override
-  public final ImplDetails getPmImplDetails() {
-    return new ColumnDetailsImpl();
-  }
-
   // ======== Meta data ======== //
 
   @Override
@@ -373,6 +347,10 @@ public class PmTableColImpl extends PmObjectBase implements PmTableCol {
 
   private final MetaData getOwnMetaData() {
     return (MetaData) getPmMetaData();
+  }
+
+  private final MetaData getOwnMetaDataWithoutPmInitCall() {
+    return (MetaData) getPmMetaDataWithoutPmInitCall();
   }
 
 }
