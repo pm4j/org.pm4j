@@ -200,12 +200,6 @@ public class PmObjectBase implements PmObject {
     }
   }
 
-
-  @Override
-  public boolean canSetPmTitle() {
-    return getPmTitleDef().canSetTitle(this);
-  }
-
   protected String getPmTitleImpl() {
     return getPmTitleDef().getTitle(this);
   }
@@ -249,12 +243,6 @@ public class PmObjectBase implements PmObject {
   @Override
   public String getPmIconPath() {
     return getPmTitleDef().getIconPath(this);
-  }
-
-  @Override
-  public void setPmTitle(String titleString) {
-    PmEventApi.ensureThreadEventSource(this);
-    getPmTitleDef().setTitle(this, titleString);
   }
 
   @Override

@@ -46,25 +46,4 @@ public interface PmTitleProvider<T> {
    */
   String getIconPath(T item);
 
-  /**
-   * Indicates if it is allowed to call the
-   * {@link #setTitle(Object, Object, String)} method for the given item.
-   *
-   * @param item
-   * @return <code>true</code> when it is allowed to call
-   *         {@link #setTitle(Object, Object, String)}.
-   */
-  boolean canSetTitle(T item);
-
-  /**
-   * An interface for 'in place editing' of node titles.
-   * <p>
-   * That might be a useful feature for title string editors of tree views where
-   * a user can simply click on a title and change it.
-   *
-   * @param item
-   * @param titleString
-   */
-  void setTitle(T item, String titleString);
-
 }

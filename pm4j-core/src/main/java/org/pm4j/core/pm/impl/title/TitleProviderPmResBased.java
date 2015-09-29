@@ -16,22 +16,6 @@ public class TitleProviderPmResBased<T extends PmObjectBase> implements PmTitleP
    */
   public static final TitleProviderPmResBased<PmObjectBase> INSTANCE = new TitleProviderPmResBased<PmObjectBase>();
 
-  /**
-   * @return <code>false</code>.
-   */
-  @Override
-  public boolean canSetTitle(T item) {
-    return false;
-  }
-
-  /**
-   * @throws UnsupportedOperationException
-   */
-  public void setTitle(T item, String titleString) {
-    throw new UnsupportedOperationException("Title can't be changed. Instance: " + item + "\n\tUsed title provider: "
-        + getClass());
-  }
-
   @Override
   public String getTitle(T item) {
     return PmLocalizeApi.localize(item, item.getPmResKey());

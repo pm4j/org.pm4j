@@ -55,28 +55,6 @@ public interface PmObject extends Comparable<PmObject> {
   String getPmIconPath();
 
   /**
-   * Indicates if it is allowed to call the {@link #setPmTitle(Object, String)}
-   * method for the given item.
-   *
-   * @return <code>true</code> when it is allowed to call
-   *         {@link #setTitle(Object, Object, String)}.
-   */
-  @Deprecated
-  boolean canSetPmTitle();
-
-  /**
-   * An interface for 'in place editing' of node titles.
-   * <p>
-   * That might be a useful feature for title string editors of tree views where
-   * a user can simply click on a title and change it.
-   *
-   * @param eventSource
-   * @param titleString
-   */
-  @Deprecated
-  void setPmTitle(String titleString);
-
-  /**
    * @return The conversation context of this model element. Never <code>null</code>.
    */
   PmConversation getPmConversation();
