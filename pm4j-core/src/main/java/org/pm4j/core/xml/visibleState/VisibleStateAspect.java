@@ -10,6 +10,7 @@ public enum VisibleStateAspect {
   NAME,
   ENABLED,
   TITLE,
+  SHORT_TITLE,
   TOOLTIP,
   ICON,
   STYLECLASS,

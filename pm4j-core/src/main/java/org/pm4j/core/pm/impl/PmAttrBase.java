@@ -1634,11 +1634,6 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
       }
     }
 
-    // Use default attribute title provider if no specific provider was configured.
-    if (metaData.getPmTitleProvider() == getPmConversation().getPmDefaults().getPmTitleProvider()) {
-      metaData.setPmTitleProvider(getPmConversation().getPmDefaults().getPmAttrTitleProvider());
-    }
-
     // -- Cache configuration --
     List cacheAnnotations = InternalPmCacheCfgUtil.findCacheCfgsInPmHierarchy(this, new ArrayList());
     if (!cacheAnnotations.isEmpty()) {

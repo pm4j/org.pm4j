@@ -16,7 +16,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlRootElement(name="table")
 @XmlType(propOrder = {
     // attributes:
-    "name", "isTab", "rows", "enabled", "title", "icon", "styleClass",
+    "name", "isTab", "rows", "enabled", "title", "shortTitle", "icon", "styleClass",
     // elements:
     "tooltip", "messages", "children" })
 public class XmlPmTable extends XmlPmObjectBase {
@@ -31,6 +31,7 @@ public class XmlPmTable extends XmlPmObjectBase {
   @XmlAttribute public Boolean getIsTab() { return isTab; }
   @XmlAttribute public String getStyleClass() { return styleClass; }
   @XmlAttribute public String getTitle() { return title; }
+  @XmlAttribute public String getShortTitle() { return shortTitle; }
 
   @XmlElement public String getTooltip() { return tooltip; }
   @XmlElementRef public List<XmlPmMessage> getMessages() { return messages; }

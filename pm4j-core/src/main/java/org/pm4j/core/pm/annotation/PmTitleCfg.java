@@ -82,6 +82,17 @@ public @interface PmTitleCfg {
   String title() default "";
 
   /**
+   * Specifies a fix short title value to be used.<br>
+   * Useful for single language applications that define resources within the Java code.
+   * <p>
+   * Will only be used when {@link #attrValue()}, {@link #resKey()} and {@link #titleProvider()}
+   * are not specified.
+   *
+   * @return A fix title value specification.
+   */
+  String shortTitle() default "";
+
+  /**
    * Specifies a fix tooltip value to be used.<br>
    * Useful for single language applications that define resources within the Java code.
    * <p>

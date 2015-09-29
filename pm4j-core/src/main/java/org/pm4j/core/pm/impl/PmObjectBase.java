@@ -211,8 +211,16 @@ public class PmObjectBase implements PmObject {
   }
 
   @Override
-  @Deprecated public String getPmShortTitle() {
-    return getPmTitleDef().getShortTitle(this);
+  public final String getPmShortTitle() {
+    // Caching is not yet supported for short titles.
+    return getPmShortTitleImpl();
+  }
+  
+  protected String getPmShortTitleImpl() {
+    String shortTitle = getPmTitleDef().getShortTitle(this);
+    return shortTitle != null 
+        ? shortTitle 
+        : getPmTitle();
   }
 
   @Override
@@ -1217,10 +1225,11 @@ public class PmObjectBase implements PmObject {
 
       // fix string are only considered if there is no resKey defined.
       String title = InternalPmTitleCfgUtil.readTitle(annotations);
+      String shortTitle = InternalPmTitleCfgUtil.readShortTitle(annotations);
       String toolTip = InternalPmTitleCfgUtil.readTooltip(annotations);
       String icon = InternalPmTitleCfgUtil.readIcon(annotations);
-      if (title != null || toolTip != null || icon != null) {
-        metaData.pmTitleProvider = new PmTitleProviderValuebased(title, toolTip, icon);
+      if (title != null || shortTitle != null || toolTip != null || icon != null) {
+        metaData.pmTitleProvider = new PmTitleProviderValuebased(title, shortTitle, toolTip, icon);
       }
     }
 

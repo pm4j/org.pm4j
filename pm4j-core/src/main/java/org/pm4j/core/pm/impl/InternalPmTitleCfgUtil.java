@@ -75,6 +75,21 @@ class InternalPmTitleCfgUtil {
 
   /**
    * @param annotations
+   *          A set of annotations to read {@link PmTitleCfg#shortTitle()} from.<br>
+   *          The read operation starts with the first list element.
+   * @return The value of the fist found value or <code>null</code> if all values where blank.
+   */
+  static String readShortTitle(List<PmTitleCfg> annotations) {
+    for (PmTitleCfg annotation : annotations) {
+      if (StringUtils.isNotEmpty(annotation.shortTitle())) {
+        return annotation.shortTitle();
+      }
+    }
+    return null;
+  }
+
+  /**
+   * @param annotations
    *          A set of annotations to read {@link PmTitleCfg#tooltip()} from.<br>
    *          The read operation starts with the first list element.
    * @return The value of the fist found value or <code>null</code> if all values where blank.

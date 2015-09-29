@@ -7,7 +7,7 @@ import org.pm4j.core.pm.impl.PmObjectBase;
 /**
  * Provides titles based on presentation model resource keys.
  *
- * @author olaf boede
+ * @author Olaf Boede
  */
 public class TitleProviderPmResBased<T extends PmObjectBase> implements PmTitleProvider<T> {
 
@@ -32,29 +32,17 @@ public class TitleProviderPmResBased<T extends PmObjectBase> implements PmTitleP
         + getClass());
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  @Override
   public String getTitle(T item) {
     return PmLocalizeApi.localize(item, item.getPmResKey());
   }
 
-  /**
-   * {@inheritDoc}
-   * @deprecated Please use getPmTitle() instead.
-   */
   @Override
-  @Deprecated public String getShortTitle(T item) {
-    String s = PmLocalizeApi.findLocalization(item, item.getPmResKey() + PmConstants.RESKEY_POSTFIX_SHORT_TITLE);
-
-    return (s != null)
-      ? s
-      : PmLocalizeApi.localize(item, item.getPmResKey());
+  public String getShortTitle(T item) {
+    return PmLocalizeApi.findLocalization(item, item.getPmResKey() + PmConstants.RESKEY_POSTFIX_SHORT_TITLE);
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  @Override
   public String getToolTip(T item) {
     return PmLocalizeApi.findLocalization(item, item.getPmResKey() + PmConstants.RESKEY_POSTFIX_TOOLTIP);
   }

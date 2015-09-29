@@ -24,11 +24,11 @@ public interface PmTitleProvider<T> {
   /**
    * @see PmTitledObject#getPmShortTitle()
    * @param item
-   *          An item to get the undecorated title for.
-   * @return The undecorated title string for the given item.
-   * @deprecated Please use getPmTitle() instead.
+   *          An item to get the short title for.
+   * @return The short title string for the given item or <code>null</code> if
+   *         there is no special short title configured.
    */
-  @Deprecated String getShortTitle(T item);
+  String getShortTitle(T item);
 
   /**
    * @param item

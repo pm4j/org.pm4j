@@ -15,8 +15,8 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlRootElement(name="column")
 @XmlType(propOrder = {
-    // attributes (in reverese order for Java 1.6. In java 1.7 in opposite direction :-( ):
-    "name", "enabled", "title", "icon", "styleClass",
+    // attributes:
+    "name", "enabled", "title", "shortTitle", "icon", "styleClass",
     // elements:
     "tooltip", "messages", "children" })
 public class XmlPmTableCol extends XmlPmObjectBase {
@@ -26,6 +26,7 @@ public class XmlPmTableCol extends XmlPmObjectBase {
   @XmlAttribute public String getName() { return name; }
   @XmlAttribute public String getStyleClass() { return styleClass; }
   @XmlAttribute public String getTitle() { return title; }
+  @XmlAttribute public String getShortTitle() { return shortTitle; }
 
   @XmlElement public String getTooltip() { return tooltip; }
   @XmlElementRef public List<XmlPmMessage> getMessages() { return messages; }

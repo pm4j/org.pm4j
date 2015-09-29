@@ -58,8 +58,8 @@ public class PmAttrListTest {
 
   @Test
   public void setAndGetListOfStringValuesAsString() {
-      _PmAssert.setValueAsString(testPm.listOfStrings, "a,b");
-      assertEquals("[a, b]", testPm.listOfStrings.getValue().toString());
+      _PmAssert.setValueAsString(testPm.listOfStrings, "a,b,c");
+      assertEquals("[a, b, c]", testPm.listOfStrings.getValue().toString());
   }
 
   @Test

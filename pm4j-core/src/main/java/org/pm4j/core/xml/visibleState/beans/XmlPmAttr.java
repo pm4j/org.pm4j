@@ -17,7 +17,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlRootElement(name="attr")
 @XmlType(propOrder = {
     // attributes:
-    "name", "isTab", "enabled", "title", "icon", "styleClass",
+    "name", "isTab", "enabled", "title", "shortTitle", "icon", "styleClass",
     // elements:
     "tooltip", "value", "options", "messages", "children" })
 public class XmlPmAttr extends XmlPmObjectBase {
@@ -32,6 +32,7 @@ public class XmlPmAttr extends XmlPmObjectBase {
   @XmlAttribute public Boolean getIsTab() { return isTab; }
   @XmlAttribute public String getStyleClass() { return styleClass; }
   @XmlAttribute public String getTitle() { return title; }
+  @XmlAttribute public String getShortTitle() { return shortTitle; }
 
   @XmlElement public String getTooltip() { return tooltip; }
   @XmlElementRef public List<XmlPmMessage> getMessages() { return messages; }
