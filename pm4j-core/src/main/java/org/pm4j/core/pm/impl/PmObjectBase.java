@@ -216,6 +216,14 @@ public class PmObjectBase implements PmObject {
     return getPmShortTitleImpl();
   }
   
+  /**
+   * The default implementation provides the configured short title or - if none is configured -
+   * the result of {@link #getPmTitle()}.
+   * 
+   * May be overridden to provide domain specific short title logic here.
+   * 
+   * @return The short title.
+   */
   protected String getPmShortTitleImpl() {
     String shortTitle = getPmTitleDef().getShortTitle(this);
     return shortTitle != null 

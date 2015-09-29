@@ -19,12 +19,25 @@ public class PmObjectTitleTest {
     assertEquals("A Short", resKeyTestPm.a.getPmShortTitle());
     assertEquals("B", resKeyTestPm.b.getPmTitle());
     assertEquals("B", resKeyTestPm.b.getPmShortTitle());
+    assertEquals("C", resKeyTestPm.c.getPmTitle());
+    assertEquals("C Short", resKeyTestPm.c.getPmShortTitle());
+    assertEquals("E", resKeyTestPm.pmWithFixTitleAndShortTitle.getPmTitle());
+    assertEquals("E Short", resKeyTestPm.pmWithFixTitleAndShortTitle.getPmShortTitle());
   }
   
   @PmTitleCfg(resKeyBase="pmObjectTitleTest.testPm")
   static class ResKeyBaseTitleTestPm extends PmConversationImpl {
     public final PmObject a = new PmObjectBase(this);
     public final PmObject b = new PmObjectBase(this);
+    public final PmObject c = new PmObjectBase(this) {
+      protected String getPmShortTitleImpl() {
+        return "C Short";
+      };
+    };
+    @PmTitleCfg(title="D")
+    public final PmObject d = new PmObjectBase(this);
+    @PmTitleCfg(title="E", shortTitle="E Short")
+    public final PmObject pmWithFixTitleAndShortTitle = new PmObjectBase(this);
   }
 
 }

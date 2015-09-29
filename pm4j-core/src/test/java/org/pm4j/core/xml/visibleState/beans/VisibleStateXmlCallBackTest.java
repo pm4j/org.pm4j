@@ -183,13 +183,8 @@ public class VisibleStateXmlCallBackTest {
 
   @PmFactoryCfg(beanPmClasses=TestRowPm.class)
   static class TestTablePm extends PmTableImpl<TestRowPm, TestBean> {
-    @PmTitleCfg(title = "Name")
-    public final PmTableCol name = new PmTableColImpl(this) {
-      @Override
-      protected String getPmShortTitleImpl() {
-        return "Nm";
-      }
-    };
+    @PmTitleCfg(title = "Name", shortTitle="Nm")
+    public final PmTableCol name = new PmTableColImpl(this);
 
     private List<TestBean> testBeans = new ArrayList<TestBean>(Arrays.asList(
                                 new TestBean("Hello"), new TestBean("World")));
