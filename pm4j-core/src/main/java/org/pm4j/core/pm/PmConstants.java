@@ -16,9 +16,8 @@ public final class PmConstants {
   /**
    * Post fix for simple title resource keys.
    * @see PmObject#getPmShortTitle()
-   * @deprecated Please use getPmTitle() instead.
    */
-  @Deprecated public static final String RESKEY_POSTFIX_SHORT_TITLE = "_shortTitle";
+  public static final String RESKEY_POSTFIX_SHORT_TITLE = "_shortTitle";
 
   /**
    * Postfix for icon resource keys.

@@ -131,14 +131,4 @@ public interface PmTable<T_ROW_PM> extends PmObject {
    */
   void updatePmTable(UpdateAspect... updateAspect);
 
-  // --- Implementation details offered to other PM implementations ---
-
-  /** @return Implementation details offered to other PM implementations. */
-  ImplDetails getPmImplDetails();
-
-  interface ImplDetails {
-    /** @return <code>true</code> if this table is configured to have all columns sortable by default. */
-    boolean isSortable();
-  }
-
 }

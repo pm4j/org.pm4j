@@ -10,23 +10,20 @@ import org.pm4j.core.pm.PmObject;
  * <p>
  * But in parallel it also allows to find resource based strings using the findLocalization methods.
  *
- * @author olaf boede
+ * @author Olaf Boede
  */
 public class PmTitleProviderValuebased implements PmTitleProvider<PmObject> {
 
   private String title;
+  private String shortTitle;
   private String tooltip;
   private String icon;
 
-  public PmTitleProviderValuebased(String value, String tooltip, String icon) {
-    this.title = StringUtils.isBlank(value) ? null : value;
+  public PmTitleProviderValuebased(String title, String shortTitle, String tooltip, String icon) {
+    this.title = StringUtils.isBlank(title) ? null : title;
+    this.shortTitle = StringUtils.isBlank(shortTitle) ? null : shortTitle;
     this.tooltip = StringUtils.isBlank(tooltip) ? null : tooltip;
     this.icon = StringUtils.isBlank(icon) ? null : icon;
-  }
-
-  @Override
-  public boolean canSetTitle(PmObject item) {
-    return true;
   }
 
   @Override
@@ -36,7 +33,7 @@ public class PmTitleProviderValuebased implements PmTitleProvider<PmObject> {
 
   @Override
   public String getShortTitle(PmObject item) {
-    return getTitle(item);
+    return shortTitle;
   }
 
   @Override
@@ -48,10 +45,4 @@ public class PmTitleProviderValuebased implements PmTitleProvider<PmObject> {
   public String getToolTip(PmObject item) {
     return tooltip;
   }
-
-  @Override
-  public void setTitle(PmObject item, String titleString) {
-    this.title = titleString;
-  }
-
 }

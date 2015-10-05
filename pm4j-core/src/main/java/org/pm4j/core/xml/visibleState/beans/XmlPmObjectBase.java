@@ -3,6 +3,7 @@ package org.pm4j.core.xml.visibleState.beans;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlSeeAlso;
 
 /**
@@ -27,6 +28,7 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 public class XmlPmObjectBase {
   protected String name;
   protected String title;
+  protected String shortTitle;
   /** Represented as element. May contain complex content (newlines etc.). */
   protected String tooltip;
   protected Boolean enabled;
@@ -36,4 +38,5 @@ public class XmlPmObjectBase {
   protected String styleClass;
   protected List<XmlPmMessage> messages = new ArrayList<XmlPmMessage>();
   protected List<XmlPmObjectBase> children = new ArrayList<XmlPmObjectBase>();
+  
 }

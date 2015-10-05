@@ -143,6 +143,12 @@ public class VisibleStateXmlCallBack implements PmVisitHierarchyCallBack {
       }
     }
 
+    if (!hiddenProps.contains(VisibleStateAspect.SHORT_TITLE)) {
+      if (!StringUtils.equals(pm.getPmTitle(), pm.getPmShortTitle())) {
+        xmlObject.shortTitle = pm.getPmShortTitle();
+      }
+    }
+
     if (!hiddenProps.contains(VisibleStateAspect.TOOLTIP)) {
       if (!StringUtils.isBlank(pm.getPmTooltip())) {
         xmlObject.tooltip = pm.getPmTooltip();

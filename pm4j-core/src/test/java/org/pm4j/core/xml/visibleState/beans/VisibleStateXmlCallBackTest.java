@@ -14,6 +14,8 @@ import org.junit.Test;
 import org.pm4j.core.pm.PmAttrBoolean;
 import org.pm4j.core.pm.PmAttrString;
 import org.pm4j.core.pm.PmCommand;
+import org.pm4j.core.pm.PmConstants;
+import org.pm4j.core.pm.PmMessage.Severity;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmTab;
 import org.pm4j.core.pm.PmTabSet;
@@ -22,13 +24,14 @@ import org.pm4j.core.pm.annotation.PmAttrCfg;
 import org.pm4j.core.pm.annotation.PmBeanCfg;
 import org.pm4j.core.pm.annotation.PmFactoryCfg;
 import org.pm4j.core.pm.annotation.PmTitleCfg;
+import org.pm4j.core.pm.api.PmMessageApi;
 import org.pm4j.core.pm.api.PmVisitorApi;
 import org.pm4j.core.pm.impl.PmAttrBooleanImpl;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
 import org.pm4j.core.pm.impl.PmBeanBase;
 import org.pm4j.core.pm.impl.PmCommandImpl;
 import org.pm4j.core.pm.impl.PmConversationImpl;
-import org.pm4j.core.pm.impl.PmElementBase;
+import org.pm4j.core.pm.impl.PmObjectBase;
 import org.pm4j.core.pm.impl.PmTabSetImpl;
 import org.pm4j.core.pm.impl.PmTableColImpl;
 import org.pm4j.core.pm.impl.PmTableImpl;
@@ -65,10 +68,25 @@ public class VisibleStateXmlCallBackTest {
         "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
         "<row xmlns=\"http://org.pm4j/xml/visibleState\" name=\"testRowPm\" title=\"Row\">\n" +
         "    <attr name=\"name\" title=\"Name\">\n" +
-                "        <value>Hello</value>\n" +
+        "        <value>Hello</value>\n" +
         "    </attr>\n" +
         "</row>"
     , VisibleStateUtil.toXmlString(new TestPm().table.getRowPms().get(0)));
+  }
+
+  @Test
+  public void testWriteTableRowWithMessage() {
+    TestRowPm row = new TestPm().table.getRowPms().get(0);
+    PmMessageApi.addMessage(row, Severity.INFO, PmConstants.MSGKEY_FIRST_MSG_PARAM, "A message");
+    assertEquals(
+        "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
+        "<row xmlns=\"http://org.pm4j/xml/visibleState\" name=\"testRowPm\" title=\"Row\" styleClass=\"info\">\n" +
+        "    <message severity=\"INFO\">A message</message>\n" +    
+        "    <attr name=\"name\" title=\"Name\">\n" +
+                "        <value>Hello</value>\n" +
+        "    </attr>\n" +
+        "</row>"
+    , VisibleStateUtil.toXmlString(row));
   }
 
   @Test
@@ -85,7 +103,7 @@ public class VisibleStateXmlCallBackTest {
         "    <attr name=\"readOnlyAttr\" enabled=\"false\" title=\"Readonly Attr\"/>\n" +
         "    <cmd name=\"cmdDoSomething\" title=\"Do something\"/>\n" +
         "    <table name=\"table\" rows=\"2\" title=\"Table\">\n" +
-        "        <column name=\"name\" title=\"Name\"/>\n" +
+        "        <column name=\"name\" title=\"Name\" shortTitle=\"Nm\"/>\n" +
         "        <row name=\"testRowPm\" title=\"Row\">\n" +
         "            <attr name=\"name\" title=\"Name\">\n" +
         "                <value>Hello</value>\n" +
@@ -104,7 +122,7 @@ public class VisibleStateXmlCallBackTest {
   @SuppressWarnings({"unchecked", "unused"})
   @Test
   public void testWriteTabSet() {
-    class Tab extends PmElementBase implements PmTab {
+    class Tab extends PmObjectBase implements PmTab {
       public final PmAttrString stringAttr = new PmAttrStringImpl(this);
       public Tab(PmObject pmParent) {
         super(pmParent);
@@ -165,7 +183,7 @@ public class VisibleStateXmlCallBackTest {
 
   @PmFactoryCfg(beanPmClasses=TestRowPm.class)
   static class TestTablePm extends PmTableImpl<TestRowPm, TestBean> {
-    @PmTitleCfg(title = "Name")
+    @PmTitleCfg(title = "Name", shortTitle="Nm")
     public final PmTableCol name = new PmTableColImpl(this);
 
     private List<TestBean> testBeans = new ArrayList<TestBean>(Arrays.asList(

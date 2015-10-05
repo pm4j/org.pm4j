@@ -1,5 +1,7 @@
 package org.pm4j.core.pm;
 
+import static org.apache.commons.lang.Validate.notNull;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -17,7 +19,6 @@ import org.pm4j.core.pm.impl.inject.DiResolverFactoryPmInjectFieldByExpression;
 import org.pm4j.core.pm.impl.inject.DiResolverFactoryPmInjectFieldByParentOfType;
 import org.pm4j.core.pm.impl.inject.DiResolverFactoryPmInjectSetterByExpression;
 import org.pm4j.core.pm.impl.inject.DiResolverFactoryPmInjectSetterByParentOfType;
-import org.pm4j.core.pm.impl.title.AsteriskAttrTitleProvider;
 import org.pm4j.core.pm.impl.title.PmTitleProvider;
 import org.pm4j.core.pm.impl.title.TitleProviderPmResBased;
 
@@ -40,14 +41,6 @@ public class PmDefaults implements Cloneable {
    * Default value for this attribute: {@link TitleProviderPmResBased}.
    */
   private PmTitleProvider pmTitleProvider = TitleProviderPmResBased.INSTANCE;
-
-  /**
-   * Defines the used default title provider for {@link PmAttr}'s.<br>
-   * Some applications use specific title provider for attributes to reflect the
-   * changed state of attributes (see {@link AsteriskAttrTitleProvider}).<br>
-   * Default value for this attribute: {@link TitleProviderPmResBased}.
-   */
-  private PmTitleProvider pmAttrTitleProvider = TitleProviderPmResBased.INSTANCE;
 
   /**
    * The application specific filter compare definition factory. Used for table filters.
@@ -158,7 +151,7 @@ public class PmDefaults implements Cloneable {
    * @param diResolverFactory the new factory to add.
    */
   public void addDiResolverFactory(DiResolverFactory diResolverFactory) {
-    assert diResolverFactory != null;
+    notNull(diResolverFactory);
 
     int oldSize = diResolverFactories.length;
     diResolverFactories = Arrays.copyOf(diResolverFactories, oldSize + 1);
@@ -171,17 +164,8 @@ public class PmDefaults implements Cloneable {
   }
 
   public void setPmTitleProvider(PmTitleProvider pmTitleProvider) {
-    assert pmTitleProvider != null;
-
+    notNull(pmTitleProvider);
     this.pmTitleProvider = pmTitleProvider;
-  }
-
-  public PmTitleProvider getPmAttrTitleProvider() {
-    return pmAttrTitleProvider;
-  }
-
-  public void setPmAttrTitleProvider(PmTitleProvider pmAttrTitleProvider) {
-    this.pmAttrTitleProvider = pmAttrTitleProvider;
   }
 
   public Set<PmCommandCfg.BEFORE_DO> getBeforeDoCommandDefault() {

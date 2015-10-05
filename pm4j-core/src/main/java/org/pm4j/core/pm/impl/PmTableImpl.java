@@ -36,8 +36,8 @@ import org.pm4j.common.query.inmem.InMemSortOrder;
 import org.pm4j.common.selection.SelectMode;
 import org.pm4j.common.selection.Selection;
 import org.pm4j.common.selection.SelectionHandler;
-import org.pm4j.common.selection.SelectionHandlerUtil;
 import org.pm4j.common.selection.SelectionHandler.SelectionHandlerCallback;
+import org.pm4j.common.selection.SelectionHandlerUtil;
 import org.pm4j.common.util.collection.IterableUtil;
 import org.pm4j.common.util.reflection.ClassUtil;
 import org.pm4j.common.util.reflection.GenericTypeUtil;
@@ -52,6 +52,7 @@ import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.PmPager;
 import org.pm4j.core.pm.PmTable;
 import org.pm4j.core.pm.PmTableCol;
+import org.pm4j.core.pm.annotation.PmCacheCfg2;
 import org.pm4j.core.pm.annotation.PmCacheCfg2.Cache;
 import org.pm4j.core.pm.annotation.PmCacheCfg2.Clear;
 import org.pm4j.core.pm.annotation.PmObjectCfg.Visible;
@@ -845,11 +846,6 @@ public class PmTableImpl
     }
   }
 
-  @Override
-  public PmTable.ImplDetails getPmImplDetails() {
-    return new TableDetailsImpl();
-  }
-
   // -- support classes --
 
   /**
@@ -895,15 +891,15 @@ public class PmTableImpl
 
       // * Read the column definitions
       FilterDefinitionFactory ff = pmTable.getPmFilterCompareDefinitionFactory();
-      boolean tableSortable = pmTable.getPmImplDetails().isSortable();
+      boolean tableSortable = md.sortable;
       for (PmTableCol col : pmTable.getColumnPms()) {
-        PmTableCol.ImplDetails d = col.getPmImplDetails();
-        if ((d.isSortableConfigured() == Boolean.TRUE) ||
-            (d.isSortableConfigured() == null && tableSortable)) {
-          options.addSortOrder(d.getQueryAttr());
+        PmTableColImpl colImpl = (PmTableColImpl) col;
+        if ((colImpl.isSortableConfigured() == Boolean.TRUE) ||
+            (colImpl.isSortableConfigured() == null && tableSortable)) {
+          options.addSortOrder(colImpl.getColQueryAttr());
         }
 
-        FilterDefinition fcd = d.getFilterCompareDefinition(ff);
+        FilterDefinition fcd = colImpl.createFilterCompareDefinition(ff);
         if (fcd != null) {
           options.addFilterCompareDefinition(fcd);
         }
@@ -960,14 +956,6 @@ public class PmTableImpl
           PageableCollectionUtil.selectFirstOnPage(pc);
         }
       }
-    }
-  }
-
-  /** Implements controlled implementation layer access for other PM classes. */
-  protected class TableDetailsImpl implements ImplDetails {
-    @Override
-    public boolean isSortable() {
-      return getOwnMetaDataWithoutPmInitCall().sortable;
     }
   }
 

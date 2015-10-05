@@ -200,19 +200,29 @@ public class PmObjectBase implements PmObject {
     }
   }
 
-
-  @Override
-  public boolean canSetPmTitle() {
-    return getPmTitleDef().canSetTitle(this);
-  }
-
   protected String getPmTitleImpl() {
     return getPmTitleDef().getTitle(this);
   }
 
   @Override
-  @Deprecated public String getPmShortTitle() {
-    return getPmTitleDef().getShortTitle(this);
+  public final String getPmShortTitle() {
+    // Caching is not yet supported for short titles.
+    return getPmShortTitleImpl();
+  }
+  
+  /**
+   * The default implementation provides the configured short title or - if none is configured -
+   * the result of {@link #getPmTitle()}.
+   * 
+   * May be overridden to provide domain specific short title logic here.
+   * 
+   * @return The short title.
+   */
+  protected String getPmShortTitleImpl() {
+    String shortTitle = getPmTitleDef().getShortTitle(this);
+    return shortTitle != null 
+        ? shortTitle 
+        : getPmTitle();
   }
 
   @Override
@@ -233,12 +243,6 @@ public class PmObjectBase implements PmObject {
   @Override
   public String getPmIconPath() {
     return getPmTitleDef().getIconPath(this);
-  }
-
-  @Override
-  public void setPmTitle(String titleString) {
-    PmEventApi.ensureThreadEventSource(this);
-    getPmTitleDef().setTitle(this, titleString);
   }
 
   @Override
@@ -1217,10 +1221,11 @@ public class PmObjectBase implements PmObject {
 
       // fix string are only considered if there is no resKey defined.
       String title = InternalPmTitleCfgUtil.readTitle(annotations);
+      String shortTitle = InternalPmTitleCfgUtil.readShortTitle(annotations);
       String toolTip = InternalPmTitleCfgUtil.readTooltip(annotations);
       String icon = InternalPmTitleCfgUtil.readIcon(annotations);
-      if (title != null || toolTip != null || icon != null) {
-        metaData.pmTitleProvider = new PmTitleProviderValuebased(title, toolTip, icon);
+      if (title != null || shortTitle != null || toolTip != null || icon != null) {
+        metaData.pmTitleProvider = new PmTitleProviderValuebased(title, shortTitle, toolTip, icon);
       }
     }
 

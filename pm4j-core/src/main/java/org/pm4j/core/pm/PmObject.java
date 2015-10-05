@@ -24,29 +24,22 @@ public interface PmObject extends Comparable<PmObject> {
   String getPmTitle();
 
   /**
-   * Some applications decorate titles for specific items with some extra characters.
+   * Some applications short titles for specific usages. E.g. in table headers.
    * <p>
-   * Example: A required field or a modified item may be decorated with an asterisk.
-   * So that the attribute 'name' appears with the title 'Name *' in an data entry form.
-   * <p>
-   * That decorated title is provided by {@link #getPmTitle()}.
-   * This method provides the undecorated title that may be used for generation of
-   * messages such as: 'Please enter a value for field Name.'.
-   * <p>
-   * In addition the simple title may be specified separately in the resource file
-   * with the postfix '.shortTitle'.
+   * The short title may be specified in a resource file by using the postfix
+   * '_shortTitle'.
    * <p>
    * Example resource definition for explicit short title definition:
-   *  <pre>
+   * 
+   * <pre>
    *    myPm.oriSelection=Specify the Original
-   *    myPm.oriSelection.shortTitle=Original
-   *  </pre>
+   *    myPm.oriSelection_shortTitle=Original
+   * </pre>
    *
-   *  @deprecated Please use {@link #getPmTitle()}. For state specific styles please use {@link #getPmStyleClasses()}.
-   *
-   * @return The undecorated title string for this item.
+   * @return The short title string for this item. <br>
+   *         It no specific short title is defined, the result of
+   *         {@link #getPmTitle()}.
    */
-  @Deprecated
   String getPmShortTitle();
 
   /**
@@ -60,28 +53,6 @@ public interface PmObject extends Comparable<PmObject> {
    *         if no icon should be displayed.
    */
   String getPmIconPath();
-
-  /**
-   * Indicates if it is allowed to call the {@link #setPmTitle(Object, String)}
-   * method for the given item.
-   *
-   * @return <code>true</code> when it is allowed to call
-   *         {@link #setTitle(Object, Object, String)}.
-   */
-  @Deprecated
-  boolean canSetPmTitle();
-
-  /**
-   * An interface for 'in place editing' of node titles.
-   * <p>
-   * That might be a useful feature for title string editors of tree views where
-   * a user can simply click on a title and change it.
-   *
-   * @param eventSource
-   * @param titleString
-   */
-  @Deprecated
-  void setPmTitle(String titleString);
 
   /**
    * @return The conversation context of this model element. Never <code>null</code>.

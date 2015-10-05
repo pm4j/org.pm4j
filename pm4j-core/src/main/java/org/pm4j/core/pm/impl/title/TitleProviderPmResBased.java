@@ -7,7 +7,7 @@ import org.pm4j.core.pm.impl.PmObjectBase;
 /**
  * Provides titles based on presentation model resource keys.
  *
- * @author olaf boede
+ * @author Olaf Boede
  */
 public class TitleProviderPmResBased<T extends PmObjectBase> implements PmTitleProvider<T> {
 
@@ -16,45 +16,17 @@ public class TitleProviderPmResBased<T extends PmObjectBase> implements PmTitleP
    */
   public static final TitleProviderPmResBased<PmObjectBase> INSTANCE = new TitleProviderPmResBased<PmObjectBase>();
 
-  /**
-   * @return <code>false</code>.
-   */
   @Override
-  public boolean canSetTitle(T item) {
-    return false;
-  }
-
-  /**
-   * @throws UnsupportedOperationException
-   */
-  public void setTitle(T item, String titleString) {
-    throw new UnsupportedOperationException("Title can't be changed. Instance: " + item + "\n\tUsed title provider: "
-        + getClass());
-  }
-
-  /**
-   * {@inheritDoc}
-   */
   public String getTitle(T item) {
     return PmLocalizeApi.localize(item, item.getPmResKey());
   }
 
-  /**
-   * {@inheritDoc}
-   * @deprecated Please use getPmTitle() instead.
-   */
   @Override
-  @Deprecated public String getShortTitle(T item) {
-    String s = PmLocalizeApi.findLocalization(item, item.getPmResKey() + PmConstants.RESKEY_POSTFIX_SHORT_TITLE);
-
-    return (s != null)
-      ? s
-      : PmLocalizeApi.localize(item, item.getPmResKey());
+  public String getShortTitle(T item) {
+    return PmLocalizeApi.findLocalization(item, item.getPmResKey() + PmConstants.RESKEY_POSTFIX_SHORT_TITLE);
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  @Override
   public String getToolTip(T item) {
     return PmLocalizeApi.findLocalization(item, item.getPmResKey() + PmConstants.RESKEY_POSTFIX_TOOLTIP);
   }

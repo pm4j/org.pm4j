@@ -24,11 +24,11 @@ public interface PmTitleProvider<T> {
   /**
    * @see PmTitledObject#getPmShortTitle()
    * @param item
-   *          An item to get the undecorated title for.
-   * @return The undecorated title string for the given item.
-   * @deprecated Please use getPmTitle() instead.
+   *          An item to get the short title for.
+   * @return The short title string for the given item or <code>null</code> if
+   *         there is no special short title configured.
    */
-  @Deprecated String getShortTitle(T item);
+  String getShortTitle(T item);
 
   /**
    * @param item
@@ -45,26 +45,5 @@ public interface PmTitleProvider<T> {
    *         for the given item.
    */
   String getIconPath(T item);
-
-  /**
-   * Indicates if it is allowed to call the
-   * {@link #setTitle(Object, Object, String)} method for the given item.
-   *
-   * @param item
-   * @return <code>true</code> when it is allowed to call
-   *         {@link #setTitle(Object, Object, String)}.
-   */
-  boolean canSetTitle(T item);
-
-  /**
-   * An interface for 'in place editing' of node titles.
-   * <p>
-   * That might be a useful feature for title string editors of tree views where
-   * a user can simply click on a title and change it.
-   *
-   * @param item
-   * @param titleString
-   */
-  void setTitle(T item, String titleString);
 
 }
