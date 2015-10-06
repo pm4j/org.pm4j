@@ -138,7 +138,7 @@ public class PmSnapshotTestTool {
      */
     public void exclude(Class<?> pmClass, String... names) {
         for (String name : names) {
-            PmMatcher pmMatcher = new PmMatcherBuilder().pmClass(pmClass).name(name).build();
+            PmMatcher pmMatcher = new PmMatcherBuilder().parent(pmClass).name(name).build();
             excludePms(pmMatcher);
         }
     }
@@ -203,7 +203,7 @@ public class PmSnapshotTestTool {
      *            The PM(s) to exclude.
      */
     public void exclude(PmObject... pms) {
-      exclude(new PmMatcherBuilder().pm(pms).build());
+      excludePms(new PmMatcherBuilder().pm(pms).build());
     }
 
     /**

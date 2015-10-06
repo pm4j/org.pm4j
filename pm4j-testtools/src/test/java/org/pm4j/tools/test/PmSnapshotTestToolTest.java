@@ -11,6 +11,7 @@ import org.junit.Assert;
 import org.junit.ComparisonFailure;
 import org.junit.Test;
 import org.pm4j.common.util.io.FileUtil;
+import org.pm4j.core.pm.PmAttr;
 import org.pm4j.core.pm.PmAttrString;
 import org.pm4j.core.pm.annotation.PmTitleCfg;
 import org.pm4j.core.pm.impl.PmAttrStringImpl;
@@ -44,61 +45,58 @@ public class PmSnapshotTestToolTest {
 
   @Test
   public void testWriteSnapshot() {
-    snap.setTestMode(PmSnapshotTestTool.TestMode.AUTO_CREATE);
-    File file = null;
-    try {
-      file = snap.snapshot(pm, "testWriteSnapshot");
-      assertEquals(file.getAbsolutePath(),
-          "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
-          "<conversation xmlns=\"http://org.pm4j/xml/visibleState\" name=\"miniTestPm\" title=\"Test PM\">\n" +
-          "    <attr name=\"stringAttr\" title=\"String Attr\"/>\n" +
-          "</conversation>",
-          FileUtil.fileToString(file));
-    } finally {
-      if (file != null) {
-        FileUtil.deleteFileAndEmptyParentDirs(file);
-      }
-    }
+    xml("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
+        "<conversation xmlns=\"http://org.pm4j/xml/visibleState\" name=\"miniTestPm\" title=\"Test PM\">\n" +
+        "    <attr name=\"stringAttr\" title=\"String Attr\"/>\n" +
+        "</conversation>");
   }
 
   @Test
   public void testExcludedTitleByClassAndFieldName() {
-    snap.setTestMode(PmSnapshotTestTool.TestMode.AUTO_CREATE);
-    File file = null;
-    try {
-      snap.exclude(MiniTestPm.class, "stringAttr", VisibleStateAspect.TITLE);
-      file = snap.snapshot(pm, "testWriteSnapshot");
-      assertEquals(file.getAbsolutePath(),
-          "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
-          "<conversation xmlns=\"http://org.pm4j/xml/visibleState\" name=\"miniTestPm\" title=\"Test PM\">\n" +
-          "    <attr name=\"stringAttr\"/>\n" +
-          "</conversation>",
-          FileUtil.fileToString(file));
-    } finally {
-      if (file != null) {
-        FileUtil.deleteFileAndEmptyParentDirs(file);
-      }
-    }
+    snap.exclude(MiniTestPm.class, "stringAttr", VisibleStateAspect.TITLE);
+    xml("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
+        "<conversation xmlns=\"http://org.pm4j/xml/visibleState\" name=\"miniTestPm\" title=\"Test PM\">\n" +
+        "    <attr name=\"stringAttr\"/>\n" +
+        "</conversation>");
   }
 
   @Test
   public void testExcludedTitleByPmRef() {
-    snap.setTestMode(PmSnapshotTestTool.TestMode.AUTO_CREATE);
-    File file = null;
-    try {
-      snap.exclude(pm.stringAttr, VisibleStateAspect.TITLE);
-      file = snap.snapshot(pm, "testWriteSnapshot");
-      assertEquals(file.getAbsolutePath(),
-          "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
-          "<conversation xmlns=\"http://org.pm4j/xml/visibleState\" name=\"miniTestPm\" title=\"Test PM\">\n" +
-          "    <attr name=\"stringAttr\"/>\n" +
-          "</conversation>",
-          FileUtil.fileToString(file));
-    } finally {
-      if (file != null) {
-        FileUtil.deleteFileAndEmptyParentDirs(file);
-      }
-    }
+    snap.exclude(pm.stringAttr, VisibleStateAspect.TITLE);
+    xml("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
+        "<conversation xmlns=\"http://org.pm4j/xml/visibleState\" name=\"miniTestPm\" title=\"Test PM\">\n" +
+        "    <attr name=\"stringAttr\"/>\n" +
+        "</conversation>");
+  }
+
+  @Test
+  public void testExcludedPm() {
+    snap.exclude(pm.stringAttr);
+    xml("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
+        "<conversation xmlns=\"http://org.pm4j/xml/visibleState\" name=\"miniTestPm\" title=\"Test PM\"/>");
+  }
+
+  @Test
+  public void testExcludedPmClass() {
+    snap.exclude(PmAttr.class);
+    xml("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
+        "<conversation xmlns=\"http://org.pm4j/xml/visibleState\" name=\"miniTestPm\" title=\"Test PM\"/>");
+  }
+
+  @Test
+  public void testExcludedPmClassField() {
+    snap.exclude(MiniTestPm.class, "stringAttr");
+    xml("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
+        "<conversation xmlns=\"http://org.pm4j/xml/visibleState\" name=\"miniTestPm\" title=\"Test PM\"/>");
+  }
+
+  @Test
+  public void testExcludedPmClassAspect() {
+    snap.exclude(MiniTestPm.class, VisibleStateAspect.TITLE);
+    xml("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
+        "<conversation xmlns=\"http://org.pm4j/xml/visibleState\" name=\"miniTestPm\">\n" +
+        "    <attr name=\"stringAttr\" title=\"String Attr\"/>\n" +
+        "</conversation>");
   }
 
   @Test
@@ -238,6 +236,18 @@ public class PmSnapshotTestToolTest {
     return new File(new File(snap.getSrcFileAccessor().getBinPkgDir(), snap.xmlSubDirName()), fileBaseName + ".xml");
   }
 
+  private void xml(String text) {
+    snap.setTestMode(PmSnapshotTestTool.TestMode.AUTO_CREATE);
+    File file = null;
+    try {
+      file = snap.snapshot(pm, "testWriteSnapshot");
+      assertEquals(file.getAbsolutePath(), text, FileUtil.fileToString(file));
+    } finally {
+      if (file != null) {
+        FileUtil.deleteFileAndEmptyParentDirs(file);
+      }
+    }
+  }
 
   @PmTitleCfg(title = "Test PM")
   public static class MiniTestPm extends PmConversationImpl {
