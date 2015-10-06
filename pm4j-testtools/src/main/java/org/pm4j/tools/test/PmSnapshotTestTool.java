@@ -202,7 +202,7 @@ public class PmSnapshotTestTool {
      * @param pm
      *            The PM(s) to exclude.
      */
-    public void exclude(PmObject... pms) {
+    public void excludePms(PmObject... pms) {
       excludePms(new PmMatcherBuilder().pm(pms).build());
     }
 

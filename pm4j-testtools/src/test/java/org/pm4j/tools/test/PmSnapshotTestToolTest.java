@@ -71,7 +71,7 @@ public class PmSnapshotTestToolTest {
 
   @Test
   public void testExcludedPm() {
-    snap.exclude(pm.stringAttr);
+    snap.excludePms(pm.stringAttr);
     xml("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
         "<conversation xmlns=\"http://org.pm4j/xml/visibleState\" name=\"miniTestPm\" title=\"Test PM\"/>");
   }
