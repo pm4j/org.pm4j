@@ -136,7 +136,7 @@ public class PmSnapshotTestTool {
      *            The field names to be excluded.<br>
      *            RegExpressions like <code>cmd*</code> are supported.
      */
-    public void exclude(Class<?> pmClass, String... names) {
+    public void excludeField(Class<?> pmClass, String... names) {
         for (String name : names) {
             PmMatcher pmMatcher = new PmMatcherBuilder().parent(pmClass).name(name).build();
             excludePms(pmMatcher);
