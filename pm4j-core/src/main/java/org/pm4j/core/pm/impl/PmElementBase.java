@@ -66,17 +66,19 @@ public abstract class PmElementBase
 
   @Override
   protected MetaData makeMetaData() {
-    return new MetaData() {
-      @SuppressWarnings("unchecked")
-      @Override
-      protected List<PmObject> getPmChildNodes(PmObjectBase pm) {
-        PmElementBase pe = (PmElementBase) pm;
-        if (pe.pmChildNodes == null) {
-          pmChildNodes = (List<PmObject>)pe.getPmChildNodesImpl();
-        }
-        return pmChildNodes;
+    return new MetaData();
+  }
+  
+  protected static class MetaData extends PmObjectBase.MetaData {
+    @SuppressWarnings("unchecked")
+    @Override
+    protected List<PmObject> getPmChildNodes(PmObjectBase pm) {
+      PmElementBase pe = (PmElementBase) pm;
+      if (pe.pmChildNodes == null) {
+        pe.pmChildNodes = (List<PmObject>)pe.getPmChildNodesImpl();
       }
-    };
+      return pe.pmChildNodes;
+    }
   }
 
 }

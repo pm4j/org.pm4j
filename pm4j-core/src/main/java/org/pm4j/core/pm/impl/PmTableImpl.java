@@ -1044,7 +1044,7 @@ public class PmTableImpl
     }
   }
 
-  protected class MetaData extends PmObjectBase.MetaData {
+  protected static class MetaData extends PmObjectBase.MetaData {
     private SelectMode rowSelectMode = SelectMode.DEFAULT;
     private int numOfPageRowPms = DEFAULT_NUM_OF_PAGE_ROW_PMS;
     private PathResolver valuePathResolver;
