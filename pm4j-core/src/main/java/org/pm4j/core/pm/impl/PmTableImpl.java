@@ -917,6 +917,39 @@ public class PmTableImpl
         }
         options.setDefaultSortOrder(so);
       }
+      
+      // * The 'initialSortCols' can only be evaluated after processing the column sort options.
+      if (md.initialSortColNames != null) {
+        SortOrder nextSortOrder = null;
+        String[] initialSortCols = StringUtils.split(md.initialSortColNames, ",");
+        
+        for (int i=initialSortCols.length-1; i>=0; i--) {
+          String initialSortCol = initialSortCols[i].trim();
+          String name = StringUtils.substringBefore(initialSortCol, " ");
+          SortOrder sortOrder = options.getSortOrder(name);
+          
+          if (sortOrder == null) {
+            throw new PmRuntimeException(pmTable, "initial sort column '" + name + "' is not a sortable column.");
+          }
+          
+          if ("desc".equals(StringUtils.trim(StringUtils.substringAfter(initialSortCol, " ")))) {
+            sortOrder = sortOrder.getReverseSortOrder();
+          }
+          
+          if (nextSortOrder != null) {
+            sortOrder.setNextSortOrder(nextSortOrder);
+          }
+          
+          if (i > 0) {
+            // Following sort order element
+            nextSortOrder = sortOrder;
+          } else {
+            // Root sort order element
+            options.setDefaultSortOrder(sortOrder);
+          }
+        }
+        
+      }
 
       Comparator<?> initialSortComparator = getInitialSortOrderComparator();
       if (initialSortComparator != null) {
@@ -1004,6 +1037,7 @@ public class PmTableImpl
                                 ? cfg.initialSortComparator()
                                 : null;
       myMetaData.initialSortColName = StringUtils.defaultIfEmpty(cfg.initialSortCol(), null);
+      myMetaData.initialSortColNames = StringUtils.defaultIfEmpty(cfg.initialSortCols(), null);
       myMetaData.serviceClass = (cfg.queryServiceClass() != QueryService.class)
                                 ? cfg.queryServiceClass()
                                 : null;
@@ -1041,6 +1075,7 @@ public class PmTableImpl
     private boolean sortable;
     private Class<?> initialBeanSortComparatorClass = null;
     private String initialSortColName = null;
+    private String initialSortColNames = null;
     private CacheStrategy inMemCollectionCacheStrategy = CacheStrategyNoCache.INSTANCE;
 
     /** May be used to define a different default value. */

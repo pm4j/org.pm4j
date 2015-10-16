@@ -113,7 +113,7 @@ public class SortOrder implements Serializable, Cloneable {
   /**
    * @param nextSortOrder the nextSortOrder to set
    */
-  protected void setNextSortOrder(SortOrder nextSortOrder) {
+  public void setNextSortOrder(SortOrder nextSortOrder) {
     this.nextSortOrder = nextSortOrder;
   }
 

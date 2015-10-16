@@ -68,8 +68,22 @@ public @interface PmTableCfg {
    * </ul>
    *
    * @return
+   * @deprecated Use initialSortCols instead
    */
+  @Deprecated
   String initialSortCol() default "";
+  
+  /**
+   * Defines the (optional) default sort columns.
+   * <ul>
+   *  <li>Sort by a column using the default 'asc' sort order:  <code>initialSortCols="column1"</code> </li>
+   *  <li>Sort by a column with an explicitly defined sort order:  <code>initialSortCols="column1 desc"</code> </li>
+   *  <li>Sort by multiple columns with different sort order:  <code>initialSortCols="column1 desc, column2, column3 desc"</code> </li>
+   * </ul>
+   *
+   * @return
+   */
+  String initialSortCols() default "";
 
   /**
    * Defines a bean comparator that provides the initial table sort order.
