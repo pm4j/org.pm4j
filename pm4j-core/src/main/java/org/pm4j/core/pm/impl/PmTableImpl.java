@@ -1,6 +1,7 @@
 package org.pm4j.core.pm.impl;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -905,50 +906,27 @@ public class PmTableImpl
         }
       }
 
-      // * The 'initialSortCol' can only be evaluated after processing the column sort options.
-      if (md.initialSortColName != null) {
-        String name = StringUtils.substringBefore(md.initialSortColName, ",");
-        SortOrder so = options.getSortOrder(name);
-        if (so == null) {
-          throw new PmRuntimeException(pmTable, "initial sort column '" + md.initialSortColName + "' is not a sortable column.");
-        }
-        if ("desc".equals(StringUtils.trim(StringUtils.substringAfter(md.initialSortColName, ",")))) {
-          so = so.getReverseSortOrder();
-        }
-        options.setDefaultSortOrder(so);
-      }
-      
       // * The 'initialSortCols' can only be evaluated after processing the column sort options.
       if (md.initialSortColNames != null) {
-        SortOrder nextSortOrder = null;
         String[] initialSortCols = StringUtils.split(md.initialSortColNames, ",");
+        SortOrder[] sortOrders = new SortOrder[initialSortCols.length];
         
-        for (int i=initialSortCols.length-1; i>=0; i--) {
-          String initialSortCol = initialSortCols[i].trim();
-          String name = StringUtils.substringBefore(initialSortCol, " ");
+        for (int i=0; i < initialSortCols.length; ++i) {
+          String initialSortCol = initialSortCols[i];
+          String name = StringUtils.substringBefore(initialSortCol, " ").trim();
           SortOrder sortOrder = options.getSortOrder(name);
           
           if (sortOrder == null) {
             throw new PmRuntimeException(pmTable, "initial sort column '" + name + "' is not a sortable column.");
           }
           
+          // TODO: 1. constant in table cfg 2. check if the else case is empty or 'asc'.
           if ("desc".equals(StringUtils.trim(StringUtils.substringAfter(initialSortCol, " ")))) {
             sortOrder = sortOrder.getReverseSortOrder();
           }
-          
-          if (nextSortOrder != null) {
-            sortOrder.setNextSortOrder(nextSortOrder);
-          }
-          
-          if (i > 0) {
-            // Following sort order element
-            nextSortOrder = sortOrder;
-          } else {
-            // Root sort order element
-            options.setDefaultSortOrder(sortOrder);
-          }
+          sortOrders[i] = sortOrder;
         }
-        
+        options.setDefaultSortOrder(SortOrder.join(sortOrders));
       }
 
       Comparator<?> initialSortComparator = getInitialSortOrderComparator();
@@ -1036,8 +1014,18 @@ public class PmTableImpl
       myMetaData.initialBeanSortComparatorClass = (cfg.initialSortComparator() != Comparator.class)
                                 ? cfg.initialSortComparator()
                                 : null;
-      myMetaData.initialSortColName = StringUtils.defaultIfEmpty(cfg.initialSortCol(), null);
       myMetaData.initialSortColNames = StringUtils.defaultIfEmpty(cfg.initialSortCols(), null);
+      if (StringUtils.isNotBlank(cfg.initialSortCol())) {
+        if (myMetaData.initialSortColNames !=null) {
+          throw new PmRuntimeException(this, "Please don't specify the initial sort columns twice.");
+        }
+        // the old syntax had a comma between name and direction. The new has a space there.
+        myMetaData.initialSortColNames = StringUtils.replace(cfg.initialSortCol(), ",", " ");
+      }
+      if (myMetaData.initialSortColNames != null && myMetaData.initialBeanSortComparatorClass != null) {
+        throw new PmRuntimeException(this, "Parallel definition of sort comparator and sort columns is not supported.");
+      }
+      
       myMetaData.serviceClass = (cfg.queryServiceClass() != QueryService.class)
                                 ? cfg.queryServiceClass()
                                 : null;
@@ -1074,7 +1062,6 @@ public class PmTableImpl
     private Class<? extends QueryService> serviceClass;
     private boolean sortable;
     private Class<?> initialBeanSortComparatorClass = null;
-    private String initialSortColName = null;
     private String initialSortColNames = null;
     private CacheStrategy inMemCollectionCacheStrategy = CacheStrategyNoCache.INSTANCE;
 

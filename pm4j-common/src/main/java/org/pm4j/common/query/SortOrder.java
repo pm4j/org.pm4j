@@ -1,6 +1,8 @@
 package org.pm4j.common.query;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
@@ -76,7 +78,7 @@ public class SortOrder implements Serializable, Cloneable {
       so = so.nextSortOrder;
     }
   }
-
+  
   /**
    * @return the ascending
    */
@@ -112,15 +114,17 @@ public class SortOrder implements Serializable, Cloneable {
 
   /**
    * @param nextSortOrder the nextSortOrder to set
+   * @deprecated Please never use it in domain code. SortOrders should be immutable.
    */
-  public void setNextSortOrder(SortOrder nextSortOrder) {
+  // TODO: should be finally package local. Same applies for ascending.
+  protected final void setNextSortOrder(SortOrder nextSortOrder) {
     this.nextSortOrder = nextSortOrder;
   }
 
   /**
    * @param ascending the ascending to set
    */
-  protected void setAscending(boolean ascending) {
+  protected final void setAscending(boolean ascending) {
     this.ascending = ascending;
   }
 
@@ -174,4 +178,43 @@ public class SortOrder implements Serializable, Cloneable {
         && bothOrdersUseTheSameAttributeSet(so1.getNextSortOrder(), so2.getNextSortOrder());
   }
 
+  /**
+   * Joins a set of {@link SortOrder}s to a new single {@link SortOrder}.
+   * 
+   * The new {@link SortOrder} represents the array items using the {@link #nextSortOrder} chain.
+   * 
+   * @param sortOrders A set of sort orders to be joined. 
+   * @return A single {@link SortOrder} or <code>null</code> if the given array was empty.
+   */
+  public static SortOrder join(SortOrder... sortOrders) {
+    if (sortOrders.length == 0) {
+      return null;
+    }
+    if (sortOrders.length == 1) {
+      return sortOrders[0];
+    }
+    List<SortOrder> list = new ArrayList<>(sortOrders.length);
+    for (SortOrder so : sortOrders) {
+      addChainToList(list, so);
+    }
+    for (int i = 0; i<list.size()-1; ++i) {
+      list.get(i).setNextSortOrder(list.get(i+1));
+    }
+    return list.get(0);
+  }
+  
+  private static List<SortOrder> addChainToList(List<SortOrder> list, SortOrder so) {
+    // Clone is needed because we need to support sub classes and are not allowed to
+    // modify the original.
+    SortOrder clone = so.clone();
+    // Prevent double chains. Next SO will be considered as next list member.
+    clone.setNextSortOrder(null);
+    list.add(clone);
+    
+    if (so.getNextSortOrder() != null) {
+      addChainToList(list, so.getNextSortOrder());
+    }
+    return list;
+  }
+  
 }
