@@ -12,6 +12,7 @@ import org.pm4j.core.pm.PmEventListener;
 import org.pm4j.core.pm.PmEventListener.PostProcessor;
 import org.pm4j.core.pm.PmObject;
 import org.pm4j.core.pm.api.PmEventApi;
+import org.pm4j.core.pm.api.PmCacheApi.CacheKind;
 import org.pm4j.core.pm.impl.InternalPmEventListenerRefs.ListenerRef;
 import org.pm4j.core.pm.impl.PmObjectBase.PmInitState;
 import org.slf4j.Logger;
@@ -71,6 +72,8 @@ public class PmEventApiHandler {
 
     if (LOG.isTraceEnabled())
       LOG.trace("Added PM-event listener '" + listener + "' for '" + PmUtil.getPmLogString(pmImpl) + "'.");
+    
+    checkEventListenerSize(pmImpl);
   }
 
   public void addWeakPmEventListener(PmObject pm, int eventMask, PmEventListener listener) {
@@ -82,6 +85,15 @@ public class PmEventApiHandler {
 
     if (LOG.isTraceEnabled())
       LOG.trace("Added weak PM-event listener '" + listener + "' for '" + PmUtil.getPmLogString(pmImpl) + "'.");
+
+    checkEventListenerSize(pmImpl);
+  }
+
+  private void checkEventListenerSize(PmObjectBase pm) {
+    if (pm.pmEventListenerRefs != null &&
+        pm.pmEventListenerRefs.listenerRefs.length > 100) {
+      LOG.warn(PmUtil.getPmLogString(pm) + " has a high number of PM event listeners: " + pm.pmEventListenerRefs.listenerRefs.length);
+    }
   }
 
   /**
@@ -188,13 +200,29 @@ public class PmEventApiHandler {
    * @param eventMask Defines the set of on-methods to be called.
    */
   protected static void dispatchToOnEventMethodCalls(PmObjectBase pmImpl, PmEvent event, int eventMask) {
-    // XXX olaf: the onPmXXX methods are really convenient to use, but
-    //           this construction costs some performance...
-    //           Is this really an issue?
-    //           Idea for better performing and convenient call back structure wanted!
+    // TODO olaf: for merge to master: check & consider moving to PmMetaData
+
     if ((eventMask & PmEvent.VALUE_CHANGE) != 0) {
       pmImpl.onPmValueChange(event);
     }
+    
+    // Re-load event handling:
+    // load/reload new data leads to an unchanged state.
+    if (event.isAllChangedEvent() || event.isReloadEvent()) {
+      // This kind event gets recursively applied to a PM tree (part). Because of that we don't need to
+      // handle the child PMs.
+      pmImpl._setPmValueChangedForThisInstanceOnly(pmImpl, false);
+      // XXX needs to be optimized: iterates repeated over the PM tree
+      pmImpl.clearCachedPmValues(CacheKind.ALL_SET);
+
+      // Cleanup gaps in listener array whenever a completely new data scenario appears.
+      if (!event.isReloadEvent() && pmImpl.pmEventListenerRefs != null) {
+        pmImpl.pmEventListenerRefs.compact();
+      }
+
+      pmImpl.onPmDataExchangeEvent(event);
+    }
+
   }
 
   /**

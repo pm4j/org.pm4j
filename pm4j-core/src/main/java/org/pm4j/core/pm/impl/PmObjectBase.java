@@ -162,28 +162,6 @@ public class PmObjectBase implements PmObject {
    */
   public PmObjectBase(PmObject pmParent) {
     this.pmParent = (PmObjectBase) pmParent;
-
-    // load/reload new data leads to an unchanged state.
-    PmEventApi.addPmEventListener(this, PmEvent.VALUE_CHANGE, new PmEventListenerBase(PmObjectBase.class.getSimpleName() + "#dataExchange") {
-      @Override
-      public void handleEvent(PmEvent event) {
-        if (event.isAllChangedEvent() || event.isReloadEvent()) {
-          // This kind event gets recursively applied to a PM tree (part). Because of that we don't need to
-          // handle the child PMs.
-          _setPmValueChangedForThisInstanceOnly(PmObjectBase.this, false);
-          // XXX needs to be optimized: iterates repeated over the PM tree
-          clearCachedPmValues(CacheKind.ALL_SET);
-
-          // Cleanup gaps in listener array whenever a completely new data scenario appears.
-          if (!event.isReloadEvent() && pmEventListenerRefs != null) {
-            pmEventListenerRefs.compact();
-          }
-
-          onPmDataExchangeEvent(event);
-        }
-      }
-    });
-
   }
 
   /** Clone support for sub classes (PmCommandImpl). */
