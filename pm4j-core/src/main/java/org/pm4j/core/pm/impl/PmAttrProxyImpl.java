@@ -1,8 +1,11 @@
 package org.pm4j.core.pm.impl;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.Set;
 
 import org.apache.commons.lang.ObjectUtils;
+import org.pm4j.common.util.reflection.GenericTypeUtil;
 import org.pm4j.core.exception.PmConverterException;
 import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.exception.PmValidationException;
@@ -73,6 +76,26 @@ public class PmAttrProxyImpl<T_VALUE> extends PmAttrImpl<T_VALUE> implements PmA
     return delegate != null
         ? delegate.getValue()
         : null;
+  }
+  
+  // Copied from PmAttrBase and adapted, because of some filter problems.
+  @Override
+  public Class<?> getValueClass() {
+    Type t = GenericTypeUtil.resolveGenericArgument(PmAttrProxyImpl.class, getClass(), 0);
+    
+    if (t instanceof ParameterizedType) {
+      t = ((ParameterizedType)t).getRawType();
+    }
+    
+    if (t == null) {
+      t = Void.class;
+    }
+    
+    if (!(t instanceof Class)) {
+      throw new PmRuntimeException(this, "Unable to handle an attribute value type that is not a class or interface. Found type: " + t);
+    }
+    
+    return (Class<?>) t;
   }
 
   @Override

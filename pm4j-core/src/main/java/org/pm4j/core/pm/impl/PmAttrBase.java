@@ -1421,20 +1421,13 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
 
   @Override
   public Class<?> getValueClass() {
-    Type t = GenericTypeUtil.resolveGenericArgument(PmAttrBase.class, getClass(), 0);
-    
+    Type t = GenericTypeUtil.resolveGenericArgument(PmAttrBase.class, getClass(), 0);    
     if (t instanceof ParameterizedType) {
       t = ((ParameterizedType)t).getRawType();
-    }
-    
-    if (t == null) {
-      t = Void.class;
-    }
-    
+    }    
     if (!(t instanceof Class)) {
       throw new PmRuntimeException(this, "Unable to handle an attribute value type that is not a class or interface. Found type: " + t);
-    }
-    
+    }    
     return (Class<?>) t;
   }
 
