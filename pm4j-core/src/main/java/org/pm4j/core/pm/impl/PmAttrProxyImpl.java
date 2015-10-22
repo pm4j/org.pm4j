@@ -80,7 +80,7 @@ public class PmAttrProxyImpl<T_VALUE> extends PmAttrImpl<T_VALUE> implements PmA
   
   @Override
   public Class<?> getValueClass() {
-    return (delegate != null) ? delegate.getValueClass() : Void.class;
+    return (delegate != null) ? delegate.getValueClass() : null;
   }
 
   @Override
