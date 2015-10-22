@@ -78,24 +78,9 @@ public class PmAttrProxyImpl<T_VALUE> extends PmAttrImpl<T_VALUE> implements PmA
         : null;
   }
   
-  // Copied from PmAttrBase and adapted, because of some filter problems.
   @Override
   public Class<?> getValueClass() {
-    Type t = GenericTypeUtil.resolveGenericArgument(PmAttrProxyImpl.class, getClass(), 0);
-    
-    if (t instanceof ParameterizedType) {
-      t = ((ParameterizedType)t).getRawType();
-    }
-    
-    if (t == null) {
-      t = Void.class;
-    }
-    
-    if (!(t instanceof Class)) {
-      throw new PmRuntimeException(this, "Unable to handle an attribute value type that is not a class or interface. Found type: " + t);
-    }
-    
-    return (Class<?>) t;
+    return (delegate != null) ? delegate.getValueClass() : Void.class;
   }
 
   @Override
