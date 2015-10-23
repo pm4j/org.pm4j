@@ -3,12 +3,12 @@
 
   <groupId>org.pm4j</groupId>
   <artifactId>pm4j-common</artifactId>
-  <version>0.9.60.10-SNAPSHOT</version>
+  <version>0.9.60.10</version>
 
   <parent>
     <groupId>org.pm4j</groupId>
     <artifactId>main</artifactId>
-    <version>0.9.60.10-SNAPSHOT</version>
+    <version>0.9.60.10</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
