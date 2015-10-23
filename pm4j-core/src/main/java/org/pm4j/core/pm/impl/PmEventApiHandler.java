@@ -28,6 +28,11 @@ import org.slf4j.LoggerFactory;
 public class PmEventApiHandler {
 
   private static final Logger LOG = LoggerFactory.getLogger(PmEventApiHandler.class);
+  
+  /** If the number of listeners reaches this number, add calls attempt to remove unused listener refs. */
+  static final int EVENT_LISTENER_NUM_CHECK_LIMIT = 80;
+  /** To reduce performance impact of unused listener handling, removal attempts will be started only in some interval. */
+  static final int EVENT_LISTENER_NUM_CHECK_INTERVAL = 10;
 
   /**
    * A handler that can hold a reference to an event source within the current thread.<br>
@@ -88,11 +93,13 @@ public class PmEventApiHandler {
 
     checkEventListenerSize(pmImpl);
   }
-
+  
   private void checkEventListenerSize(PmObjectBase pm) {
     if (pm.pmEventListenerRefs != null &&
-        pm.pmEventListenerRefs.listenerRefs.length > 100) {
+        pm.pmEventListenerRefs.listenerRefs.length >= EVENT_LISTENER_NUM_CHECK_LIMIT &&
+        pm.pmEventListenerRefs.listenerRefs.length % EVENT_LISTENER_NUM_CHECK_INTERVAL == 0) {
       LOG.warn(PmUtil.getPmLogString(pm) + " has a high number of PM event listeners: " + pm.pmEventListenerRefs.listenerRefs.length);
+      pm.pmEventListenerRefs.compact();
     }
   }
 

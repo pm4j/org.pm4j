@@ -114,7 +114,7 @@ class InternalPmEventListenerRefs implements Cloneable {
 
   private int firstFreePos() {
     int pos = listenerRefs.length-1;
-    while (listenerRefs[pos].getListener() == null) {
+    while (pos >= 0 && listenerRefs[pos].getListener() == null) {
       --pos;
     }
     return pos + 1;

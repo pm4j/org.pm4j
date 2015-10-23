@@ -388,11 +388,8 @@ public abstract class PmAttrBase<T_PM_VALUE, T_BEAN_VALUE>
       setValueImpl(vc);
     }
     else {
-      // XXX olaf: is only a workaround for the standard jsf-form behavior...
-      //           Approach: add a configuration parameter
-      if (LOG.isInfoEnabled()) {
-        LOG.info("Ignored setValue() call for read-only attribute: " + PmUtil.getPmLogString(this));
-      }
+      // XXX olaf: Should be an exception. - Behavior should be switchable in future.
+      LOG.warn("Ignored setValue() call for read-only attribute: " + PmUtil.getPmLogString(this));
     }
   }
 
