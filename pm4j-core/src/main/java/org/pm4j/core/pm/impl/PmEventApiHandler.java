@@ -98,7 +98,7 @@ public class PmEventApiHandler {
     if (pm.pmEventListenerRefs != null &&
         pm.pmEventListenerRefs.listenerRefs.length >= EVENT_LISTENER_NUM_CHECK_LIMIT &&
         pm.pmEventListenerRefs.listenerRefs.length % EVENT_LISTENER_NUM_CHECK_INTERVAL == 0) {
-      LOG.warn(PmUtil.getPmLogString(pm) + " has a high number of PM event listeners: " + pm.pmEventListenerRefs.listenerRefs.length);
+      LOG.info(PmUtil.getPmLogString(pm) + " has a high number of PM event listeners: " + pm.pmEventListenerRefs.listenerRefs.length);
       pm.pmEventListenerRefs.compact();
     }
   }
