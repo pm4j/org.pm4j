@@ -1,7 +1,11 @@
 package org.pm4j.common.query.inmem;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+
+import java.util.Arrays;
+import java.util.List;
 
 import org.junit.Test;
 import org.pm4j.common.query.CompOpEquals;
@@ -11,13 +15,14 @@ import org.pm4j.common.query.CompOpLe;
 import org.pm4j.common.query.CompOpLike;
 import org.pm4j.common.query.CompOpLt;
 import org.pm4j.common.query.CompOpNotEquals;
+import org.pm4j.common.query.QueryAttr;
+import org.pm4j.common.query.QueryExpr;
 import org.pm4j.common.query.QueryExprAnd;
 import org.pm4j.common.query.QueryExprCompare;
-import org.pm4j.common.query.QueryExpr;
 import org.pm4j.common.query.QueryExprInMemCondition;
 import org.pm4j.common.query.QueryExprNot;
 import org.pm4j.common.query.QueryExprOr;
-import org.pm4j.common.query.QueryAttr;
+import org.pm4j.common.query.SortOrder;
 
 public class InMemEvaluationTest {
 
@@ -34,12 +39,33 @@ public class InMemEvaluationTest {
     public Bean(int i) {
       this("", i);
     }
+    @Override
+    public String toString() {
+      return s+i;
+    }
   }
 
   private Bean bean = new Bean("hi", 3);
   private InMemQueryEvaluator<Bean> ctxt = new InMemQueryEvaluator<Bean>();
   private QueryAttr attrS = new QueryAttr("s", String.class);
   private QueryAttr attrI = new QueryAttr("i", String.class);
+
+
+  @Test
+  public void testEvalSortOrder() {
+    List<Bean> list = Arrays.asList(new Bean("a", 2), new Bean("b"), new Bean("a", 1));
+    List<Bean> sorted = ctxt.sort(list, new SortOrder(attrS, attrI));
+    
+    assertEquals("[a1, a2, b0]", sorted.toString());
+  }
+
+  @Test
+  public void testEvalSortOrderInverted() {
+    List<Bean> list = Arrays.asList(new Bean("a", 1), new Bean("b"), new Bean("a", 2));
+    List<Bean> sorted = ctxt.sort(list, new SortOrder(attrS, attrI).getReverseSortOrder());
+    
+    assertEquals("[b0, a2, a1]", sorted.toString());
+  }
 
 
   @Test

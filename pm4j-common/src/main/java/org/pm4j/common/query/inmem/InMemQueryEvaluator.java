@@ -11,13 +11,11 @@ import java.util.Map;
 import org.pm4j.common.expr.Expression;
 import org.pm4j.common.expr.PathExpressionChain;
 import org.pm4j.common.query.QueryAttr;
-import org.pm4j.common.query.QueryAttrMulti;
 import org.pm4j.common.query.QueryEvaluatorSet;
 import org.pm4j.common.query.QueryExpr;
 import org.pm4j.common.query.QueryExprCompare;
 import org.pm4j.common.query.SortOrder;
 import org.pm4j.common.util.collection.ListUtil;
-import org.pm4j.common.util.collection.MultiObjectValue;
 
 /**
  * An algorithm that allows to filter in-memory items based on {@link QueryExpr}s.<br>
@@ -208,11 +206,19 @@ public class InMemQueryEvaluator<T_ITEM> {
 
     @Override
     public int compare(T o1, T o2) {
-      QueryAttr d = sortOrder.getAttr();
-      Object v1 = evaluatorCtxt.getAttrValue(o1, d);
-      Object v2 = evaluatorCtxt.getAttrValue(o2, d);
+      int result = 0;
+      InMemSortOrder so = sortOrder;
+      
+      while (so != null && result == 0) {
+        QueryAttr d = so.getAttr();
+        Object v1 = evaluatorCtxt.getAttrValue(o1, d);
+        Object v2 = evaluatorCtxt.getAttrValue(o2, d);
 
-      return sortOrder.getComparator().compare(v1, v2);
+        result = so.getComparator().compare(v1, v2);
+        so = (InMemSortOrder) so.getNextSortOrder();
+      }
+      
+      return result;
     }
 
   }
