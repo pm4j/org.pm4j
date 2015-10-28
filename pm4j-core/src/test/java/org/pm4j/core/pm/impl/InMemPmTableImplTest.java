@@ -15,6 +15,7 @@ import org.joda.time.LocalDateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.pm4j.common.pageable.PageableCollection;
+import org.pm4j.core.exception.PmRuntimeException;
 import org.pm4j.core.pm.PmAttrBoolean;
 import org.pm4j.core.pm.PmAttrDate;
 import org.pm4j.core.pm.PmAttrInteger;
@@ -86,7 +87,7 @@ public class InMemPmTableImplTest {
     } 
   }
   
-  @PmTableCfg(sortable = true, initialSortCols = "val1, val2, val3")
+  @PmTableCfg(sortable = true, initialSortCols = "val1 asc, val2, val3")
   static class InMemTable1Pm extends InMemTableBasePm {
     
     public InMemTable1Pm(PmObject pmParent) {
@@ -94,7 +95,7 @@ public class InMemPmTableImplTest {
     } 
   }
   
-  @PmTableCfg(sortable = true, initialSortCols = "val2, val3, val1")
+  @PmTableCfg(sortable = true, initialSortCols = "val2, val3 asc, val1")
   static class InMemTable2Pm extends InMemTableBasePm {
     
     public InMemTable2Pm(PmObject pmParent) {
@@ -102,7 +103,7 @@ public class InMemPmTableImplTest {
     } 
   }
   
-  @PmTableCfg(sortable = true, initialSortCols = "val3, val1, val2")
+  @PmTableCfg(sortable = true, initialSortCols = "val3, val1, val2 ASC")
   static class InMemTable3Pm extends InMemTableBasePm {
     
     public InMemTable3Pm(PmObject pmParent) {
@@ -110,7 +111,7 @@ public class InMemPmTableImplTest {
     } 
   }
   
-  @PmTableCfg(sortable = true, initialSortCols = "val1 desc, val2 desc, val3")
+  @PmTableCfg(sortable = true, initialSortCols = "  val1    desc  ,   val2  desc   ,     val3 ")
   static class InMemTable4Pm extends InMemTableBasePm {
     
     public InMemTable4Pm(PmObject pmParent) {
@@ -118,10 +119,58 @@ public class InMemPmTableImplTest {
     } 
   }
   
-  @PmTableCfg(sortable = true, initialSortCols = "val1, val2 desc, val3 desc")
+  @PmTableCfg(sortable = true, initialSortCols = "val1, val2 desc, val3 DESC")
   static class InMemTable5Pm extends InMemTableBasePm {
     
     public InMemTable5Pm(PmObject pmParent) {
+      super(pmParent);      
+    } 
+  }  
+  
+  @PmTableCfg(sortable = true)
+  static class InMemTable6Pm extends InMemTableBasePm {
+    
+    public InMemTable6Pm(PmObject pmParent) {
+      super(pmParent);      
+    } 
+  } 
+  
+  @PmTableCfg(sortable = true, initialSortCols = "val3")
+  static class InMemTable7Pm extends InMemTableBasePm {
+    
+    public InMemTable7Pm(PmObject pmParent) {
+      super(pmParent);      
+    } 
+  } 
+  
+  @PmTableCfg(sortable = true, initialSortCols = "val3 asc")
+  static class InMemTable8Pm extends InMemTableBasePm {
+    
+    public InMemTable8Pm(PmObject pmParent) {
+      super(pmParent);      
+    } 
+  } 
+  
+  @PmTableCfg(sortable = true, initialSortCols = "val3 desc")
+  static class InMemTable9Pm extends InMemTableBasePm {
+    
+    public InMemTable9Pm(PmObject pmParent) {
+      super(pmParent);      
+    } 
+  } 
+  
+  @PmTableCfg(sortable = true, initialSortCols = "val3", initialSortCol = "val3")
+  static class InMemTable10Pm extends InMemTableBasePm {
+    
+    public InMemTable10Pm(PmObject pmParent) {
+      super(pmParent);      
+    } 
+  }
+  
+  @PmTableCfg(sortable = true, initialSortCol = "val3,asc")
+  static class InMemTable11Pm extends InMemTableBasePm {
+    
+    public InMemTable11Pm(PmObject pmParent) {
       super(pmParent);      
     } 
   }
@@ -210,6 +259,90 @@ public class InMemPmTableImplTest {
     int[] expectedSortOrderIds = new int[] {2, 3, 5, 8, 1, 7, 4, 6};
     
     InMemTable5Pm table = new InMemTable5Pm(new PmConversationImpl()) {
+      @Override
+      protected Collection<Bean> getPmBeansImpl() {
+        return entities;
+      }
+    };
+    
+    shouldHaveExpectedSortOrder(table, expectedSortOrderIds);
+  }
+  
+  @Test
+  public void shouldHaveSortOrder6() { 
+    int[] expectedSortOrderIds = new int[] {1, 2, 3, 4, 5, 6, 7, 8};
+    
+    InMemTable6Pm table = new InMemTable6Pm(new PmConversationImpl()) {
+      @Override
+      protected Collection<Bean> getPmBeansImpl() {
+        return entities;
+      }
+    };
+    
+    shouldHaveExpectedSortOrder(table, expectedSortOrderIds);
+  }
+  
+  @Test
+  public void shouldHaveSortOrder7() { 
+    int[] expectedSortOrderIds = new int[] {1, 3, 6, 7, 2, 4, 5, 8};
+    
+    InMemTable7Pm table = new InMemTable7Pm(new PmConversationImpl()) {
+      @Override
+      protected Collection<Bean> getPmBeansImpl() {
+        return entities;
+      }
+    };
+    
+    shouldHaveExpectedSortOrder(table, expectedSortOrderIds);
+  }
+  
+  @Test
+  public void shouldHaveSortOrder8() { 
+    int[] expectedSortOrderIds = new int[] {1, 3, 6, 7, 2, 4, 5, 8};
+    
+    InMemTable8Pm table = new InMemTable8Pm(new PmConversationImpl()) {
+      @Override
+      protected Collection<Bean> getPmBeansImpl() {
+        return entities;
+      }
+    };
+    
+    shouldHaveExpectedSortOrder(table, expectedSortOrderIds);
+  }
+  
+  @Test
+  public void shouldHaveSortOrder9() { 
+    int[] expectedSortOrderIds = new int[] {2, 4, 5, 8, 1, 3, 6, 7};
+    
+    InMemTable9Pm table = new InMemTable9Pm(new PmConversationImpl()) {
+      @Override
+      protected Collection<Bean> getPmBeansImpl() {
+        return entities;
+      }
+    };
+    
+    shouldHaveExpectedSortOrder(table, expectedSortOrderIds);
+  }
+  
+  @Test(expected=PmRuntimeException.class)
+  public void shouldHaveSortOrder10() { 
+    int[] expectedSortOrderIds = new int[] {2, 4, 5, 8, 1, 3, 6, 7};
+    
+    InMemTable10Pm table = new InMemTable10Pm(new PmConversationImpl()) {
+      @Override
+      protected Collection<Bean> getPmBeansImpl() {
+        return entities;
+      }
+    };
+    
+    shouldHaveExpectedSortOrder(table, expectedSortOrderIds);
+  }
+  
+  @Test
+  public void shouldHaveSortOrder11() { 
+    int[] expectedSortOrderIds = new int[] {1, 3, 6, 7, 2, 4, 5, 8};
+    
+    InMemTable11Pm table = new InMemTable11Pm(new PmConversationImpl()) {
       @Override
       protected Collection<Bean> getPmBeansImpl() {
         return entities;

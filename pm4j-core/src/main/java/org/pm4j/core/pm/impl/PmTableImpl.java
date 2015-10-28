@@ -912,18 +912,18 @@ public class PmTableImpl
         SortOrder[] sortOrders = new SortOrder[initialSortCols.length];
         
         for (int i=0; i < initialSortCols.length; ++i) {
-          String initialSortCol = initialSortCols[i];
-          String name = StringUtils.substringBefore(initialSortCol, " ").trim();
+          String initialSortCol = initialSortCols[i].trim();          
+          String name = StringUtils.substringBefore(initialSortCol, " ");
           SortOrder sortOrder = options.getSortOrder(name);
           
           if (sortOrder == null) {
             throw new PmRuntimeException(pmTable, "initial sort column '" + name + "' is not a sortable column.");
           }
           
-          // TODO: 1. constant in table cfg 2. check if the else case is empty or 'asc'.
-          if ("desc".equals(StringUtils.trim(StringUtils.substringAfter(initialSortCol, " ")))) {
+          if (PmTableCfg.DESC.equalsIgnoreCase(StringUtils.trim(StringUtils.substringAfter(initialSortCol, " ")))) {
             sortOrder = sortOrder.getReverseSortOrder();
           }
+          
           sortOrders[i] = sortOrder;
         }
         options.setDefaultSortOrder(SortOrder.join(sortOrders));

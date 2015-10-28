@@ -190,16 +190,20 @@ public class SortOrder implements Serializable, Cloneable {
     if (sortOrders.length == 0) {
       return null;
     }
+    
     if (sortOrders.length == 1) {
       return sortOrders[0];
     }
-    List<SortOrder> list = new ArrayList<>(sortOrders.length);
+    
+    List<SortOrder> list = new ArrayList<SortOrder>(sortOrders.length);
     for (SortOrder so : sortOrders) {
       addChainToList(list, so);
     }
-    for (int i = 0; i<list.size()-1; ++i) {
+    
+    for (int i = 0; i<list.size()-1; i++) {
       list.get(i).setNextSortOrder(list.get(i+1));
     }
+    
     return list.get(0);
   }
   
@@ -207,6 +211,7 @@ public class SortOrder implements Serializable, Cloneable {
     // Clone is needed because we need to support sub classes and are not allowed to
     // modify the original.
     SortOrder clone = so.clone();
+    
     // Prevent double chains. Next SO will be considered as next list member.
     clone.setNextSortOrder(null);
     list.add(clone);
@@ -214,6 +219,7 @@ public class SortOrder implements Serializable, Cloneable {
     if (so.getNextSortOrder() != null) {
       addChainToList(list, so.getNextSortOrder());
     }
+    
     return list;
   }
   
