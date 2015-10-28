@@ -208,13 +208,22 @@ public class InMemQueryEvaluator<T_ITEM> {
 
     @Override
     public int compare(T o1, T o2) {
-      QueryAttr d = sortOrder.getAttr();
-      Object v1 = evaluatorCtxt.getAttrValue(o1, d);
-      Object v2 = evaluatorCtxt.getAttrValue(o2, d);
+      int result = 0;
+      InMemSortOrder compSortOrder = sortOrder;
+      
+      while (result == 0 && compSortOrder != null) {        
+        QueryAttr d = compSortOrder.getAttr();
+        Object v1 = evaluatorCtxt.getAttrValue(o1, d);
+        Object v2 = evaluatorCtxt.getAttrValue(o2, d);
 
-      return sortOrder.getComparator().compare(v1, v2);
+        result = compSortOrder.getComparator().compare(v1, v2);
+        // Get the next sort order element to compare again. 
+        // Stops the loop, if the last sort order is reached (next sort order == null).
+        compSortOrder = (InMemSortOrder) compSortOrder.getNextSortOrder();                
+      }
+      
+      return result;
     }
-
   }
 
 
